@@ -1,10 +1,17 @@
-import { useSession } from "@/lib/auth-client";
-import { useRouter } from "@tanstack/react-router";
-import { User } from "lucide-react";
+import {LogOut, ShoppingBag, User} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import {authClient} from "@/lib/auth-client.ts";
 
-export default function UserMenu({ session }: { session: any }) {
-    const router = useRouter();
+
+type Props = {
+    user: {
+        name: string;
+        email: string;
+
+    };
+}
+
+export default function UserMenu({ user }: Props) {
     const menuRef = useRef<HTMLDivElement>(null);
 
     const [isOpen, setOpen] = useState(false);
@@ -20,6 +27,15 @@ export default function UserMenu({ session }: { session: any }) {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    async function signOut() {
+        await authClient.signOut({
+            fetchOptions: {
+                onSuccess: () => {
+                    setOpen(false);
+                }
+            }
+        });
+    }
 
     return (
         <div className="relative" ref={menuRef}>
@@ -33,13 +49,22 @@ export default function UserMenu({ session }: { session: any }) {
             </button>
 
             {isOpen && (
-                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-gray-100">
-                        <div className="px-4 py-3 border-b border-gray-100">
-                            <p className="text-sm font-medium text-gray-900">{ }</p>
-                            <p className="text-xs text-gray-500 mt-1">{ }</p>
-                        </div>
+                        <p className="text-sm font-medium text-gray-900">{ user.name }</p>
+                        <p className="text-xs text-gray-500 mt-1">{ user.email }</p>
                     </div>
+
+                    <a href="/orders" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        onClick={() => setOpen(false)}>
+                        <ShoppingBag className="size-4" />
+                        Meine Bestellungen
+                    </a>
+
+                    <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                        <LogOut className="size-4" />
+                        Abmelden
+                    </button>
                 </div>
             )}
         </div>

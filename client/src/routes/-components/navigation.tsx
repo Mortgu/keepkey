@@ -1,16 +1,13 @@
-import { NavLink } from "./nav-link";
-import { useSession, type authClient } from "@/lib/auth-client";
+import {NavLink} from "./nav-link";
 
 import {Home, Info, Loader} from 'lucide-react';
 import UserMenu from "./user-menu";
-import { useEffect } from "react";
+import {authClient} from "@/lib/auth-client.ts";
 
 export default function Navigation() {
-    const { data: session, isPending, error } = useSession();
+    const { data: session, isPending, error } = authClient.useSession();
 
-
-
-    console.log(session);
+    console.log(session)
 
     return (
         <div className="h-18 w-full bg-gray-100">
@@ -25,7 +22,7 @@ export default function Navigation() {
                             {(!session || !session.user) ? (
                                 <NavLink to="/login">Login</NavLink>
                             ) : (
-                                <UserMenu session={session} />
+                                <UserMenu user={session.user} />
                             )}
                         </>
                     )}

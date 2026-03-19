@@ -6,36 +6,36 @@ import {Loader} from "lucide-react";
 import { z } from 'zod';
 import Input from "@/components/inputs/input.tsx";
 import Button from "@/components/button/button.tsx";
-import {Route} from "@/routes/login";
 
-export function LoginFormComponent() {
+export function SignupFormComponent() {
     const [error, setError] = useState<string | undefined>(undefined);
-    const { redirect } = Route.useSearch();
 
     const form = useForm({
         defaultValues: {
+            name: '',
             email: '',
             password: '',
+            image: '',
         },
 
         validators: {
           onChange: z.object({
+              name: z.string().min(1),
               email: z.email(),
               password: z.string().min(8),
+              image: z.string(),
           })
         },
 
         onSubmit: async ({value}) => {
-            const {data, error} = await authClient.signIn.email({
-                ...value, rememberMe: true, callbackURL: redirect ? `${redirect}` : '/',
+            const {data, error} = await authClient.signUp.email({
+                ...value
             });
 
             if (error) {
                 setError(error.message);
                 return null;
             }
-
-            window.location.assign("/");
 
             return data;
         }
@@ -52,6 +52,13 @@ export function LoginFormComponent() {
                     <div>{error}</div>
                 )}
                 <div className='grid gap-6'>
+                    <form.Field name="name" children={(field) => (
+                        <div className='grid gap-2'>
+                            <label>Name</label>
+                            <Input id={field.name} name={field.name} value={field.state.value}
+                                   onChange={(e) => field.handleChange(e.target.value)} type="text"/>
+                        </div>
+                    )}/>
                     <form.Field name="email" children={(field) => (
                         <div className='grid gap-2'>
                             <label>E-Mail Adresse</label>
@@ -70,7 +77,7 @@ export function LoginFormComponent() {
                                     children={([canSubmit, isSubmitting]) => (
                                         <>
                                             <Button type="submit" disabled={!canSubmit}>
-                                                {isSubmitting ? <Loader className='animate-spin'/> : 'Anmelden'}
+                                                {isSubmitting ? <Loader className='animate-spin'/> : 'Registrieren'}
                                             </Button>
                                         </>
                                     )}/>
