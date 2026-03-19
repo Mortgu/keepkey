@@ -3,7 +3,6 @@ import { createClient } from 'redis';
 let client = null;
 
 export async function initializeRedisClient() {
-    console.log("dawdwa")
     if (!client) {
         client = createClient();
 

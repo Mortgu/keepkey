@@ -2,7 +2,8 @@ import 'dotenv/config';
 
 import express from 'express';
 import { toNodeHandler } from "better-auth/node";
-import { auth } from './lib/auth.js'
+import { auth } from './lib/auth.js';
+import cors from 'cors';
 
 import { Worker } from 'worker_threads';
 
@@ -10,6 +11,12 @@ import router from './routes/router.js';
 import { initializeRedisClient } from './lib/redis.js';
 
 const app = express();
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    methods: ['*'],
+    credentials: true
+}));
 
 app.all('/api/auth/{*any}', toNodeHandler(auth));
 

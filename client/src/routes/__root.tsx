@@ -1,6 +1,9 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import React from 'react';
-import { NavLink } from './-components/nav-link';
+import Navigation from './-components/navigation';
+
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query'
+
+const queryClient = new QueryClient();
 
 export const Route = createRootRoute({
     component: RootComponent,
@@ -8,10 +11,12 @@ export const Route = createRootRoute({
 
 function RootComponent() {
     return (
-        <React.Fragment>
-            <NavLink to="/">Main Page</NavLink>
-            <NavLink to="/about">About Page</NavLink>
-            <Outlet />
-        </React.Fragment>
+        <QueryClientProvider client={queryClient}>
+            <Navigation />
+
+            <div className='max-w-(--viewport) m-auto p-4'>
+                <Outlet />
+            </div>
+        </QueryClientProvider>
     )
 }

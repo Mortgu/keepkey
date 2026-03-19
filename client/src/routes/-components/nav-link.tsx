@@ -2,7 +2,6 @@ import { cn } from "@/lib/utils";
 import { createLink, type LinkComponent } from "@tanstack/react-router";
 
 type BasicLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
-    // other
     ref: React.Ref<HTMLAnchorElement>
 };
 
