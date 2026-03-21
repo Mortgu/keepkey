@@ -2,12 +2,10 @@ import {LogOut, ShoppingBag, User} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {authClient} from "@/lib/auth-client.ts";
 
-
 type Props = {
     user: {
         name: string;
         email: string;
-
     };
 }
 

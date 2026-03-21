@@ -1,14 +1,12 @@
 import 'dotenv/config';
 
 import express from 'express';
-import { toNodeHandler } from "better-auth/node";
-import { auth } from './lib/auth.js';
+import {toNodeHandler} from "better-auth/node";
+import {auth} from './lib/auth.js';
 import cors from 'cors';
 
-import { Worker } from 'worker_threads';
-
 import router from './routes/router.js';
-import { initializeRedisClient } from './lib/redis.js';
+import {initializeRedisClient} from './lib/redis.js';
 
 const app = express();
 
@@ -28,6 +26,7 @@ app.use('/api', router);
 
 app.get('/non-blocking', async (req, res) => {
     const client = await initializeRedisClient();
+
     res.status(200).send(`non blocking`);
 })
 

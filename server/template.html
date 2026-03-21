@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+	<style>
+		html, body {
+			margin: 2rem ;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		h1, h2, h3, h4, h5, h6, p, a {
+			margin: 0;
+			font-family: 'Inherit', sans-serif;
+			line-height: 20px;
+			letter-spacing: .25px;
+		}
+
+		.header {
+			display: flex;
+			justify-content: space-between;
+			align-items: flex-start;
+		}
+
+		.header-logo {
+			width: 11em;
+		}
+
+		.hero {
+			margin-top: 5rem;
+			width: 100%;
+			display: flex;
+			grid-gap: 20px;
+		}
+
+		.dignum-address {
+			flex: 1;
+			width: 100%;
+			height: fit-content;
+			margin-top: 4rem;
+
+			display: flex;
+			align-items: center;
+			justify-content: flex-start;
+
+			grid-gap: 5px;
+
+			border-bottom: 1px solid black;
+
+			white-space: nowrap;
+			font-size: 13px;
+		}
+
+		.offer-box {
+			flex: 1;
+			width: 100%;
+
+			border: 1px solid black;
+		}
+
+		.offer-box-heading {
+			line-height: normal;
+			text-transform: uppercase;
+			letter-spacing: 4px;
+			padding: 5px;
+			font-size: 1.4rem;
+
+			border-bottom: 1px solid black;
+		}
+
+		.offer-box-item {
+			width: 100%;
+
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+
+			border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+		}
+
+		.offer-box-item:last-child {
+			border-bottom: none;
+		}
+
+		.offer-box-item p {
+			width: 100%;
+
+			padding: 5px 5px;
+		}
+
+		.offer-box-item p:nth-child(1) {
+			border-right: 1px solid rgba(0, 0, 0, 0.25);
+		}
+		.offer-box-item p:nth-child(2) {
+		}
+
+	</style>
+</head>
+<body>
+
+	<div class="header">
+		<p class="page-numbers">Seite 1 von 3</p>
+		<img class="header-logo" src="https://www.dignum.de/cust/img/dignum_logo.svg" />
+	</div>
+
+	<div class="hero">
+		<div class="dignum-address">
+			<p>Dignum GmbH</p>•<p>Peterhostr.5</p>•<p>86438 Kissing</p>•<p>Germany</p>
+		</div>
+		<div class="offer-box">
+			<h1 class="offer-box-heading">Angebot</h1>
+			<div class="offer-box-body">
+				<div class="offer-box-item">
+					<p><b>Beleg-Nr.</b></p>
+					<p><b>AG250XXX</b></p>
+				</div>
+				<div class="offer-box-item">
+					<p>Datum:</p>
+					<p>20.03.2026</p>
+				</div>
+				<div class="offer-box-item">
+					<p>Zahlungsbedingung:</p>
+					<p>30 Tage</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</body>
+</html>
