@@ -6,6 +6,7 @@ type Props = {
     user: {
         name: string;
         email: string;
+        role: string;
     };
 }
 
@@ -49,7 +50,7 @@ export default function UserMenu({ user }: Props) {
             {isOpen && (
                 <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden z-50">
                     <div className="px-4 py-3 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{ user.name }</p>
+                        <p className="flex gap-2 items-center text-sm font-medium text-gray-900">{ user.name } <span className="text-xs bg-gray-200 py-1 px-2 rounded-lg">{ user.role }</span></p>
                         <p className="text-xs text-gray-500 mt-1">{ user.email }</p>
                     </div>
 

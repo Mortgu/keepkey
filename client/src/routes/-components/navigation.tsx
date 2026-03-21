@@ -1,20 +1,19 @@
 import {NavLink} from "./nav-link";
 
-import {Home, Info, Loader} from 'lucide-react';
+import {Loader} from 'lucide-react';
 import UserMenu from "./user-menu";
 import {authClient} from "@/lib/auth-client.ts";
 
 export default function Navigation() {
     const { data: session, isPending, error } = authClient.useSession();
 
-    console.log(session)
 
     return (
-        <div className="h-18 w-full bg-gray-100">
+        <div className="h-18 w-full border-b border-gray-200">
             <div className="flex max-w-(--viewport) m-auto px-4 items-center h-full justify-between">
-                <div className="flex gap-2">
-                    <NavLink to="/"><Home className='size-4' /> Startseite</NavLink>
-                    <NavLink to="/about"><Info className='size-4' /> About</NavLink>
+                <div className="flex h-full">
+                    <NavLink to="/">Startseite</NavLink>
+                    <NavLink to="/about">About</NavLink>
                 </div>
                 <div className="flex">
                     {(isPending || error) ? (<Loader className="animate-spin" />) : (
