@@ -3,6 +3,7 @@ import Navigation from './-components/navigation';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import {CartProvider} from "@/context/shopping-cart.tsx";
+import {AuthProvider} from "@/context/auth.tsx";
 
 const queryClient = new QueryClient();
 
@@ -14,13 +15,15 @@ export const Route = createRootRoute({
 function RootComponent() {
     return (
         <QueryClientProvider client={queryClient}>
-            <CartProvider>
-                <Navigation />
+            <AuthProvider>
+                <CartProvider>
+                    <Navigation />
 
-                <div className='max-w-(--viewport) m-auto p-4'>
-                    <Outlet />
-                </div>
-            </CartProvider>
+                    <div className='max-w-(--viewport) m-auto p-4'>
+                        <Outlet />
+                    </div>
+                </CartProvider>
+            </AuthProvider>
         </QueryClientProvider>
     )
 }

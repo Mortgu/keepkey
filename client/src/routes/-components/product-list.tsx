@@ -1,8 +1,8 @@
 import {getProducts} from "@/data/products.ts";
-import {Loader} from "lucide-react";
+import {Loader, Plus} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
-import { Link } from '@tanstack/react-router'
-import {useCart} from "@/context/shopping-cart.tsx";
+import {Link} from '@tanstack/react-router'
+import Button from "@/components/button/button.tsx";
 
 type Product = {
     id: string;
@@ -11,15 +11,14 @@ type Product = {
 }
 
 export default function ProductList() {
-    const { addToCart, isPending: isAdding } = useCart();
-    const { data, isPending, error } = useQuery({
+    const {data, isPending, error} = useQuery({
         queryKey: ['products'],
         queryFn: getProducts,
     });
 
     if (isPending) {
         return (
-            <Loader className='animate-spin' />
+            <Loader className='animate-spin'/>
         )
     }
 
@@ -32,19 +31,22 @@ export default function ProductList() {
         )
     }
 
-    return data.map((product: Product) => (
-        <div key={product.id} className="flex gap-4">
-            <Link to="/products/$productId" params={{ productId: product.id }}>
-                {product.name}
-            </Link>
-            <button onClick={() => addToCart({
-                id: "365", name: "test", price: 12, quantity: 1,
-            })}>
-                {isAdding && (<Loader className='animate-spin' />)}
-                {!isAdding && (
-                    "add"
-                )}
-            </button>
+    return (
+        <div>
+            <div className='mb-4 flex items-center justify-between'>
+                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Products <span
+                    className='p-2 rounded-md bg-gray-200 text-sm flex items-center justify-center'>{data.length}</span>
+                </h1>
+                <Button size='sm'>Create <Plus className='size-4'/></Button>
+            </div>
+            {data.map((product: Product) => (
+                <div key={product.id}
+                     className="flex gap-4 border-t border-b py-2 border-gray-300 hover:bg-gray-100 cursor-pointer">
+                    <Link to="/products/$productId" params={{productId: product.id}}>
+                        {product.name}
+                    </Link>
+                </div>
+            ))}
         </div>
-    ));
+    )
 }

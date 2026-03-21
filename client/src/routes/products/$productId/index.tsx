@@ -1,7 +1,10 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {useQuery} from "@tanstack/react-query";
 import {getProduct } from "@/data/products.ts";
-import {Loader} from "lucide-react";
+import {Loader, Pen} from "lucide-react";
+import Button from "@/components/button/button.tsx";
+import {authClient} from "@/lib/auth-client.ts";
+import {useAuth} from "@/context/auth.tsx";
 
 export const Route = createFileRoute('/products/$productId/')({
   loader: async ({ params }) => {
@@ -12,15 +15,14 @@ export const Route = createFileRoute('/products/$productId/')({
 
 function RouteComponent() {
   const { productId } = Route.useParams();
-
-  console.log(productId);
+  const { user, isLoading } = useAuth();
 
   const { data, isPending, error } = useQuery({
     queryKey: ['product'],
     queryFn: () => getProduct(productId),
   });
 
-  if (isPending) {
+  if (isPending || isLoading) {
     return (
         <Loader className='animate-spin' />
     )
@@ -35,7 +37,14 @@ function RouteComponent() {
     )
   }
 
+  console.log(user)
+
   return (
-      <div>{JSON.stringify(data)}</div>
+      <div>
+        <p>{JSON.stringify(data)}</p>
+          {user.role === 'admin' && (
+              <Button size='sm'><Pen className='size-4' /> Edit</Button>
+          )}
+      </div>
   )
 }
