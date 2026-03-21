@@ -14,7 +14,7 @@ export async function canCreateProduct(request, response, next) {
 
     if (!success) {
         return response.status(400).send({
-            error: "Permission not found",
+            success: false, message: "Permission not found",
         })
     }
 

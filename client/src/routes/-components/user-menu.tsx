@@ -1,4 +1,4 @@
-import {LogOut, ShoppingBag, User} from "lucide-react";
+import {LogOut, Settings, ShoppingBag, User} from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import {authClient} from "@/lib/auth-client.ts";
 
@@ -37,11 +37,11 @@ export default function UserMenu({ user }: Props) {
     }
 
     return (
-        <div className="relative" ref={menuRef}>
+        <div className="relative m-auto" ref={menuRef}>
             {/* Avatar */}
             <button onClick={() => setOpen(true)}>
                 <div className="flex items-center gap-2 w-full h-full">
-                    <div className="w-10 h-10 rounded-lg bg-gray-200 hover:bg-(--keepit-primary) text-(--keepit-primary) hover:text-white transition-all flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-lg  hover:text-(--keepit-primary) cursor-pointer transition-all flex items-center justify-center">
                         <User className="size-6" />
                     </div>
                 </div>
@@ -58,6 +58,12 @@ export default function UserMenu({ user }: Props) {
                         onClick={() => setOpen(false)}>
                         <ShoppingBag className="size-4" />
                         Meine Bestellungen
+                    </a>
+
+                    <a href="/user/settings" className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                       onClick={() => setOpen(false)}>
+                        <Settings className="size-4" />
+                        Settings
                     </a>
 
                     <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors">
