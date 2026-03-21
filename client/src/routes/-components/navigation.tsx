@@ -1,6 +1,6 @@
 import {NavLink} from "./nav-link";
 
-import {Loader, ShoppingBag} from 'lucide-react';
+import {Loader, Plus, ShoppingBag, User} from 'lucide-react';
 import UserMenu from "./user-menu";
 import {authClient} from "@/lib/auth-client.ts";
 import ShoppingCart from "@/components/shopping-cart.tsx";
@@ -19,19 +19,39 @@ export default function Navigation() {
                 <div className="flex h-full">
                     {isPending ? <Loader className="animate-spin" /> :
                     error ? "Error" : session ? (
-                        <div className='flex gap-4'>
-                            <UserMenu user={session.user} />
-                            <div className='m-auto'>
-                                <Link to="/checkout">
-                                    <ShoppingBag className="size-6"/>
-                                </Link>
-                            </div>
-                        </div>
+                        <NavigationActions />
                     ) : (
                         <NavLink to="/login">Login</NavLink>
                     )}
                 </div>
             </div>
+        </div>
+    )
+}
+
+function NavigationActions() {
+    return (
+        <div className='flex gap-4'>
+            <div className='w-8 h-8 m-auto'>
+                <button className='bg-(--keepit-primary) cursor-pointer w-full h-full rounded-lg flex items-center justify-center'>
+                    <Plus className='size-5 text-white' />
+                </button>
+            </div>
+
+            <div className='w-8 h-full m-auto hover:text-(--keepit-primary) cursor-pointer'>
+                <NavLink to="/user">
+                    <User className='size-6' />
+                </NavLink>
+            </div>
+
+            <div className='w-8 h-full m-auto'>
+                <div className='h-full m-auto hover:text-(--keepit-primary) cursor-pointer'>
+                    <NavLink to="/checkout">
+                        <ShoppingBag className="size-6"/>
+                    </NavLink>
+                </div>
+            </div>
+
         </div>
     )
 }

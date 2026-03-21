@@ -7,17 +7,15 @@ import {useCart} from "@/context/shopping-cart.tsx";
 type Product = {
     id: string;
     name: string;
+    quantity: number;
 }
 
 export default function ProductList() {
-    const { addToCart } = useCart();
+    const { addToCart, isPending: isAdding } = useCart();
     const { data, isPending, error } = useQuery({
         queryKey: ['products'],
         queryFn: getProducts,
     });
-
-    console.log(data, error);
-
 
     if (isPending) {
         return (
@@ -35,13 +33,18 @@ export default function ProductList() {
     }
 
     return data.map((product: Product) => (
-        <div className="flex gap-4">
+        <div key={product.id} className="flex gap-4">
             <Link to="/products/$productId" params={{ productId: product.id }}>
                 {product.name}
             </Link>
             <button onClick={() => addToCart({
-                id: "1", name: "test", price: 12, quantity: 1,
-            })}>add</button>
+                id: "365", name: "test", price: 12, quantity: 1,
+            })}>
+                {isAdding && (<Loader className='animate-spin' />)}
+                {!isAdding && (
+                    "add"
+                )}
+            </button>
         </div>
     ));
 }

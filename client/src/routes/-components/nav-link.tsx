@@ -16,6 +16,6 @@ export const NavLink: LinkComponent<typeof BasicLinkComponent> = (props) => {
     return (
         <CreatedLinkComponent
             activeProps={{className: "border-b-2 border-(--keepit-primary) text-(--keepit-primary)"}}
-            className={cn(props.className, "flex items-center justify-cente h-full w-auto border-b-2  border-white")} {...props} />
+            className={cn(props.className, "flex items-center justify-center h-full w-auto border-b-2  border-white")} {...props} />
     )
 }
