@@ -3,7 +3,6 @@ import {useQuery} from "@tanstack/react-query";
 import {getProduct } from "@/data/products.ts";
 import {Loader, Pen} from "lucide-react";
 import Button from "@/components/button/button.tsx";
-import {authClient} from "@/lib/auth-client.ts";
 import {useAuth} from "@/context/auth.tsx";
 
 export const Route = createFileRoute('/products/$productId/')({

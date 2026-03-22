@@ -21,3 +21,4 @@ export async function requireSession(req, res, next) {
         })
     }
 }
+

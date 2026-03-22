@@ -1,10 +1,7 @@
 import {NavLink} from "./nav-link";
 
 import {Loader, Plus, ShoppingBag, User} from 'lucide-react';
-import UserMenu from "./user-menu";
 import {authClient} from "@/lib/auth-client.ts";
-import ShoppingCart from "@/components/shopping-cart.tsx";
-import {Link} from "@tanstack/react-router";
 
 export default function Navigation() {
     const {data: session, isPending, error} = authClient.useSession();

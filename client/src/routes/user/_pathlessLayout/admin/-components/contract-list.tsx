@@ -84,7 +84,7 @@ export default function ContractList() {
                     <div key={contract.id}
                          className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300 cursor-pointer">
                         {contract.name}
-                        <Button onClick={() => handleContractDelete({id: contract.id})} size='sm'>
+                        <Button onClick={() => handleContractDelete({id: contract.id})} size='sm' variant='ghost'>
                             <Trash className='size-4'/>
                         </Button>
                     </div>
@@ -102,7 +102,10 @@ export default function ContractList() {
                         )}/>
                         <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
                                         children={([canSubmit, isSubmitting]) => (
-                                            <Button type='submit' size='sm'>Save</Button>
+                                            <Button disabled={!canSubmit} type='submit' size='sm'>
+                                                {isSubmitting && <Loader className='animate-spin' /> }
+                                                {!isSubmitting && ("Save")}
+                                            </Button>
                                         )}/>
                         <Button onClick={() => setOpen(false)} type='button' size='sm'
                                 variant='secondary'>Cancel</Button>

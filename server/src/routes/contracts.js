@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {prisma} from "../lib/prisma.js";
 import {requireSession} from "../middlewares/auth.js";
+import {canDeleteContract} from "../permissions/contract.js";
 
 const router = Router();
 
@@ -11,7 +12,7 @@ router.get('/', async (request, response) => {
 });
 
 /* [POST] http://localhost:3000/api/contracts */
-router.post('/', requireSession, async (request, response) => {
+router.post('/', requireSession, canDeleteContract, async (request, response) => {
     const { body } = request;
     const user = request.user;
 
@@ -27,7 +28,7 @@ router.post('/', requireSession, async (request, response) => {
 });
 
 /* [DELETE] http://localhost:3000/api/contracts */
-router.delete('/', requireSession, async (request, response) => {
+router.delete('/', requireSession, canDeleteContract, async (request, response) => {
     const { body } = request;
     const user = request.user;
 
