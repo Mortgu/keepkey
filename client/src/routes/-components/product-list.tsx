@@ -41,7 +41,7 @@ export default function ProductList() {
             </div>
             {data.map((product: Product) => (
                 <div key={product.id}
-                     className="flex gap-4 border-t border-b py-2 border-gray-300 hover:bg-gray-100 cursor-pointer">
+                     className="flex gap-4 border p-2 border-gray-300 hover:bg-gray-100 cursor-pointer">
                     <Link to="/products/$productId" params={{productId: product.id}}>
                         {product.name}
                     </Link>

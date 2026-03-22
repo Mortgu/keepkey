@@ -1,0 +1,37 @@
+import {createFileRoute, Outlet} from '@tanstack/react-router'
+import {NavLink} from "@/routes/-components/nav-link.tsx";
+import {ScrollText, Settings} from "lucide-react";
+import {useAuth} from "@/context/auth.tsx";
+
+export const Route = createFileRoute('/user/_pathlessLayout')({
+    component: PathlessLayoutComponent,
+})
+
+function PathlessLayoutComponent() {
+    const {user} = useAuth();
+    return (
+        <div className='flex gap-4'>
+            <div className='flex-1 '>
+                <div className='flex flex-col gap-2 border-b border-gray-200 pb-4'>
+                    <NavLink className='flex items-center gap-2' variant="filled" to='/user/settings'>
+                        <Settings className="size-5"/>
+                        Settings
+                    </NavLink>
+                    <NavLink className='flex items-center gap-2' variant="filled" to='/user/orders'>
+                        <ScrollText className="size-5"/>
+                        Orders
+                    </NavLink>
+                </div>
+
+                {user.role === "admin" && (
+                    <div className='flex flex-col gap-2 py-4'>
+                        <NavLink variant="filled" to='/user/admin'>Admin</NavLink>
+                    </div>
+                )}
+            </div>
+            <div className='flex-5'>
+                <Outlet/>
+            </div>
+        </div>
+    );
+}

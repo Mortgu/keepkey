@@ -9,21 +9,20 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SignupIndexRouteImport } from './routes/signup/index'
 import { Route as ProductsIndexRouteImport } from './routes/products/index'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as UserPathlessLayoutRouteRouteImport } from './routes/user/_pathlessLayout/route'
+import { Route as UserPathlessLayoutIndexRouteImport } from './routes/user/_pathlessLayout/index'
 import { Route as ProductsProductIdIndexRouteImport } from './routes/products/$productId/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as UserPathlessLayoutSettingsIndexRouteImport } from './routes/user/_pathlessLayout/settings/index'
+import { Route as UserPathlessLayoutOrdersIndexRouteImport } from './routes/user/_pathlessLayout/orders/index'
+import { Route as UserPathlessLayoutAdminIndexRouteImport } from './routes/user/_pathlessLayout/admin/index'
 
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AuthenticatedRoute = AuthenticatedRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -53,6 +52,16 @@ const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
   path: '/checkout/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const UserPathlessLayoutRouteRoute = UserPathlessLayoutRouteRouteImport.update({
+  id: '/user/_pathlessLayout',
+  path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UserPathlessLayoutIndexRoute = UserPathlessLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UserPathlessLayoutRouteRoute,
+} as any)
 const ProductsProductIdIndexRoute = ProductsProductIdIndexRouteImport.update({
   id: '/products/$productId/',
   path: '/products/$productId/',
@@ -64,77 +73,117 @@ const AuthenticatedDashboardIndexRoute =
     path: '/dashboard/',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const UserPathlessLayoutSettingsIndexRoute =
+  UserPathlessLayoutSettingsIndexRouteImport.update({
+    id: '/settings/',
+    path: '/settings/',
+    getParentRoute: () => UserPathlessLayoutRouteRoute,
+  } as any)
+const UserPathlessLayoutOrdersIndexRoute =
+  UserPathlessLayoutOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => UserPathlessLayoutRouteRoute,
+  } as any)
+const UserPathlessLayoutAdminIndexRoute =
+  UserPathlessLayoutAdminIndexRouteImport.update({
+    id: '/admin/',
+    path: '/admin/',
+    getParentRoute: () => UserPathlessLayoutRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
+  '/user': typeof UserPathlessLayoutRouteRouteWithChildren
   '/checkout/': typeof CheckoutIndexRoute
   '/login/': typeof LoginIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/products/$productId/': typeof ProductsProductIdIndexRoute
+  '/user/': typeof UserPathlessLayoutIndexRoute
+  '/user/admin/': typeof UserPathlessLayoutAdminIndexRoute
+  '/user/orders/': typeof UserPathlessLayoutOrdersIndexRoute
+  '/user/settings/': typeof UserPathlessLayoutSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
   '/checkout': typeof CheckoutIndexRoute
   '/login': typeof LoginIndexRoute
   '/products': typeof ProductsIndexRoute
   '/signup': typeof SignupIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/products/$productId': typeof ProductsProductIdIndexRoute
+  '/user': typeof UserPathlessLayoutIndexRoute
+  '/user/admin': typeof UserPathlessLayoutAdminIndexRoute
+  '/user/orders': typeof UserPathlessLayoutOrdersIndexRoute
+  '/user/settings': typeof UserPathlessLayoutSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/about': typeof AboutRoute
+  '/user/_pathlessLayout': typeof UserPathlessLayoutRouteRouteWithChildren
   '/checkout/': typeof CheckoutIndexRoute
   '/login/': typeof LoginIndexRoute
   '/products/': typeof ProductsIndexRoute
   '/signup/': typeof SignupIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/products/$productId/': typeof ProductsProductIdIndexRoute
+  '/user/_pathlessLayout/': typeof UserPathlessLayoutIndexRoute
+  '/user/_pathlessLayout/admin/': typeof UserPathlessLayoutAdminIndexRoute
+  '/user/_pathlessLayout/orders/': typeof UserPathlessLayoutOrdersIndexRoute
+  '/user/_pathlessLayout/settings/': typeof UserPathlessLayoutSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/about'
+    | '/user'
     | '/checkout/'
     | '/login/'
     | '/products/'
     | '/signup/'
     | '/dashboard/'
     | '/products/$productId/'
+    | '/user/'
+    | '/user/admin/'
+    | '/user/orders/'
+    | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/about'
     | '/checkout'
     | '/login'
     | '/products'
     | '/signup'
     | '/dashboard'
     | '/products/$productId'
+    | '/user'
+    | '/user/admin'
+    | '/user/orders'
+    | '/user/settings'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
-    | '/about'
+    | '/user/_pathlessLayout'
     | '/checkout/'
     | '/login/'
     | '/products/'
     | '/signup/'
     | '/_authenticated/dashboard/'
     | '/products/$productId/'
+    | '/user/_pathlessLayout/'
+    | '/user/_pathlessLayout/admin/'
+    | '/user/_pathlessLayout/orders/'
+    | '/user/_pathlessLayout/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  AboutRoute: typeof AboutRoute
+  UserPathlessLayoutRouteRoute: typeof UserPathlessLayoutRouteRouteWithChildren
   CheckoutIndexRoute: typeof CheckoutIndexRoute
   LoginIndexRoute: typeof LoginIndexRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
@@ -144,13 +193,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -193,6 +235,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CheckoutIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/user/_pathlessLayout': {
+      id: '/user/_pathlessLayout'
+      path: '/user'
+      fullPath: '/user'
+      preLoaderRoute: typeof UserPathlessLayoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/user/_pathlessLayout/': {
+      id: '/user/_pathlessLayout/'
+      path: '/'
+      fullPath: '/user/'
+      preLoaderRoute: typeof UserPathlessLayoutIndexRouteImport
+      parentRoute: typeof UserPathlessLayoutRouteRoute
+    }
     '/products/$productId/': {
       id: '/products/$productId/'
       path: '/products/$productId'
@@ -206,6 +262,27 @@ declare module '@tanstack/react-router' {
       fullPath: '/dashboard/'
       preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/user/_pathlessLayout/settings/': {
+      id: '/user/_pathlessLayout/settings/'
+      path: '/settings'
+      fullPath: '/user/settings/'
+      preLoaderRoute: typeof UserPathlessLayoutSettingsIndexRouteImport
+      parentRoute: typeof UserPathlessLayoutRouteRoute
+    }
+    '/user/_pathlessLayout/orders/': {
+      id: '/user/_pathlessLayout/orders/'
+      path: '/orders'
+      fullPath: '/user/orders/'
+      preLoaderRoute: typeof UserPathlessLayoutOrdersIndexRouteImport
+      parentRoute: typeof UserPathlessLayoutRouteRoute
+    }
+    '/user/_pathlessLayout/admin/': {
+      id: '/user/_pathlessLayout/admin/'
+      path: '/admin'
+      fullPath: '/user/admin/'
+      preLoaderRoute: typeof UserPathlessLayoutAdminIndexRouteImport
+      parentRoute: typeof UserPathlessLayoutRouteRoute
     }
   }
 }
@@ -222,10 +299,30 @@ const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
   AuthenticatedRouteChildren,
 )
 
+interface UserPathlessLayoutRouteRouteChildren {
+  UserPathlessLayoutIndexRoute: typeof UserPathlessLayoutIndexRoute
+  UserPathlessLayoutAdminIndexRoute: typeof UserPathlessLayoutAdminIndexRoute
+  UserPathlessLayoutOrdersIndexRoute: typeof UserPathlessLayoutOrdersIndexRoute
+  UserPathlessLayoutSettingsIndexRoute: typeof UserPathlessLayoutSettingsIndexRoute
+}
+
+const UserPathlessLayoutRouteRouteChildren: UserPathlessLayoutRouteRouteChildren =
+  {
+    UserPathlessLayoutIndexRoute: UserPathlessLayoutIndexRoute,
+    UserPathlessLayoutAdminIndexRoute: UserPathlessLayoutAdminIndexRoute,
+    UserPathlessLayoutOrdersIndexRoute: UserPathlessLayoutOrdersIndexRoute,
+    UserPathlessLayoutSettingsIndexRoute: UserPathlessLayoutSettingsIndexRoute,
+  }
+
+const UserPathlessLayoutRouteRouteWithChildren =
+  UserPathlessLayoutRouteRoute._addFileChildren(
+    UserPathlessLayoutRouteRouteChildren,
+  )
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  AboutRoute: AboutRoute,
+  UserPathlessLayoutRouteRoute: UserPathlessLayoutRouteRouteWithChildren,
   CheckoutIndexRoute: CheckoutIndexRoute,
   LoginIndexRoute: LoginIndexRoute,
   ProductsIndexRoute: ProductsIndexRoute,
