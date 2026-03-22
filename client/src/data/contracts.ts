@@ -38,7 +38,7 @@ export async function deleteContract({ id }: { id: string }) {
 
     const result = await response.json();
 
-    if (!result.ok) {
+    if (!response.ok) {
         throw new Error(result.message);
     }
 

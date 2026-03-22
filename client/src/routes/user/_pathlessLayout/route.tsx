@@ -19,7 +19,7 @@ function PathlessLayoutComponent() {
                     </NavLink>
                     <NavLink className='flex items-center gap-2' variant="filled" to='/user/orders'>
                         <ScrollText className="size-5"/>
-                        Orders
+                        My Orders
                     </NavLink>
                 </div>
 
