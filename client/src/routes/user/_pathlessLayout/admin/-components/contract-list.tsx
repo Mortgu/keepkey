@@ -37,6 +37,8 @@ export default function ContractList() {
                 body: JSON.stringify({name: value.name})
             });
 
+            console.log(response)
+
             const result = await response.json();
 
             if (!response.ok) {

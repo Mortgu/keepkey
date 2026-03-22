@@ -3,18 +3,51 @@ import {ArrowLeft, ChevronDown, Loader, Pen, Plus, Trash} from "lucide-react";
 import {useQuery} from "@tanstack/react-query";
 import {Link} from '@tanstack/react-router'
 import Button from "@/components/button/button.tsx";
-
-type Product = {
-    id: string;
-    name: string;
-    quantity: number;
-}
+import {useState} from "react";
+import {useForm} from "@tanstack/react-form";
+import {z} from "zod";
+import {getAllContracts} from "@/data/contracts.ts";
+import ProductItem, {type ProductItemProps} from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
 
 export default function ProductList() {
+    const [isAddingProduct, addProduct] = useState<boolean>(false);
+
+
     const {data, isPending, error} = useQuery({
         queryKey: ['products'],
         queryFn: getProducts,
     });
+
+    const productForm = useForm({
+        defaultValues: {
+            productName: "",
+        },
+        validators: {
+            onChange: z.object({
+                productName: z.string().min(1),
+            }),
+        },
+        onSubmit: async ({ value }) => {
+            const response = await fetch('http://localhost:3000/api/products', {
+                method: "POST",
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: value.productName
+                })
+            })
+
+            const result = await response.json();
+
+            if (!response.ok) {
+                return null;
+            }
+
+            addProduct(false);
+            window.location.assign('/user/admin');
+            return result;
+        }
+    })
 
     if (isPending) {
         return (
@@ -37,21 +70,33 @@ export default function ProductList() {
                 <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Products <span
                     className='p-2 rounded-md bg-gray-200 text-sm flex items-center justify-center'>{data.length}</span>
                 </h1>
-                <Button size='sm'>Create <Plus className='size-4'/></Button>
+                <Button onClick={() => addProduct(true)} size='sm'>Create <Plus className='size-4'/></Button>
             </div>
-            {data.map((product: Product) => (
-                <div key={product.id} className="flex items-center justify-between  rounded-md border p-2 border-gray-300">
-                    <a className='flex-1' params={{productId: product.id}}>
-                        {product.name}
-                    </a>
-                    <Button size='sm' variant='ghost'>
-                        <Pen className='size-4'/>
-                    </Button>
-                    <Button size='sm' variant='ghost'>
-                        <Trash className='size-4'/>
-                    </Button>
-                </div>
-            ))}
+            <div className='grid gap-2'>
+                {data.map((product: ProductItemProps) => (
+                    <ProductItem key={product.id} {...product} />
+                ))}
+            </div>
+
+            {isAddingProduct && (
+                <form onSubmit={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    productForm.handleSubmit(productForm);
+                }} className="rounded-md mt-4 flex gap-4 p-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">
+                    <productForm.Field name='productName' children={(field) => (
+                        <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
+                               value={field.state.value} onChange={(e) => field.handleChange(e.target.value)}/>
+                    )}/>
+                    <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}  children={([canSubmit, isSubmitting]) => (
+                        <Button disabled={!canSubmit} type='submit' size='sm'>
+                            {isSubmitting && <Loader className='animate-spin' /> }
+                            {!isSubmitting && ("Save")}
+                        </Button>
+                    )}/>
+                    <Button onClick={() => addProduct(false)} type='button' size='sm' variant='secondary'>Cancel</Button>
+                </form>
+            )}
         </div>
     )
 }

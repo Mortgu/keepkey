@@ -1,16 +1,16 @@
 export async function getProducts() {
-    const result = await fetch('http://localhost:3000/api/products', {
+    const response = await fetch('http://localhost:3000/api/products', {
         method: 'GET',
         credentials: 'include',
     });
 
-    const response = await result.json();
+    const result = await response.json();
 
-    if (!result.ok) {
-        throw new Error(response.message);
+    if (!response.ok) {
+        throw new Error(result.message);
     }
 
-    return response;
+    return result;
 }
 
 export async function getProduct(id: string) {
@@ -20,4 +20,19 @@ export async function getProduct(id: string) {
     });
 
     return await result.json();
+}
+
+export async function getProductPricing(id: string) {
+    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 }

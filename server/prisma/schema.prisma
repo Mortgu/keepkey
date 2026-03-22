@@ -103,14 +103,16 @@ model Contract {
 model ProductPricing {
   id String @id @default(uuid())
 
-  contract   Contract @relation(fields: [contractId], references: [id])
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
   min_quantity Int
   max_quantity Int? @default(0)
+
+  duration Int? @default(1)
 
   price Float
 

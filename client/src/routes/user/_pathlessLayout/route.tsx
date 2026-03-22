@@ -9,6 +9,11 @@ export const Route = createFileRoute('/user/_pathlessLayout')({
 
 function PathlessLayoutComponent() {
     const {user} = useAuth();
+
+    if (!user) {
+        window.location.assign("/login");
+    }
+
     return (
         <div className='flex gap-4'>
             <div className='flex-1 '>
@@ -23,7 +28,7 @@ function PathlessLayoutComponent() {
                     </NavLink>
                 </div>
 
-                {user.role === "admin" && (
+                {(user && user.role === "admin") && (
                     <div className='flex flex-col gap-2 py-4'>
                         <NavLink variant="filled" to='/user/admin'>Admin</NavLink>
                     </div>

@@ -27,7 +27,7 @@ export async function canDeleteContract(request, response, next) {
     const { success } = await auth.api.userHasPermission({
         body: {
             userId: user.id,
-            permission: {
+            permissions: {
                 contract: ["delete"]
             },
         }
