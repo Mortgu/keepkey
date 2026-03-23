@@ -1,6 +1,10 @@
-import type {ReactNode} from "react";
+import type { ReactNode } from "react";
 
-export default function Modal({ children }: { children: ReactNode }) {
+type ModalProps = {
+    children: ReactNode,
+};
+
+export default function Modal({ children }: ModalProps) {
     return (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
             <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">

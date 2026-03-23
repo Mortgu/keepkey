@@ -4,12 +4,16 @@ import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-comp
 import Button from '@/components/button/button';
 import { ShoppingBag } from 'lucide-react';
 import { useShoppingCart } from '@/hooks/shopping-cart';
+import { useState } from 'react';
+import ProductModal from './-components/product-modal';
 
 export const Route = createFileRoute('/products/')({
     component: RouteComponent,
 })
 
 function RouteComponent() {
+    const [isOpen, setOpen] = useState<boolean>(false);
+
     const { products } = useProducts();
     const { addToShoppingCart } = useShoppingCart();
 
@@ -22,12 +26,16 @@ function RouteComponent() {
                         <p>{product.name}</p>
                         <div>
                             <Button size='sm' variant='secondary' className='aspect-square' onClick={() => {
-                                addToShoppingCart(product);
+                                setOpen(true);
                             }}>
                                 <ShoppingBag className='size-4' />
                             </Button>
                         </div>
                     </div>
+
+                    {isOpen && (
+                        <ProductModal product={product} setOpen={setOpen} />
+                    )}
                 </div>
             ))}
         </div>
