@@ -1,7 +1,5 @@
 import {Loader, Plus, Trash} from "lucide-react";
-import {useMutation, useQuery} from "@tanstack/react-query";
 import Button from "@/components/button/button.tsx";
-import {deleteContractAction, getContractsAction} from "@/data/contracts.ts";
 import {useState} from "react";
 import {useForm} from "@tanstack/react-form";
 import {z} from "zod";
@@ -49,9 +47,7 @@ export default function ContractList() {
     return (
         <div>
             <div className='mb-4 flex items-center justify-between'>
-                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Contracts <span
-                    className='p-2 rounded-md bg-gray-200 text-sm flex items-center justify-center'>{contracts.length}</span>
-                </h1>
+                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Contracts ({contracts.length})</h1>
                 <Button onClick={() => setOpen(true)} size='sm'>Create <Plus className='size-4'/></Button>
             </div>
             <div className='grid gap-2'>
@@ -71,7 +67,7 @@ export default function ContractList() {
                         e.preventDefault();
                         e.stopPropagation();
                         form.handleSubmit(form);
-                    }} className="rounded-md flex gap-4 p-2 border border-gray-300 hover:bg-gray-100 cursor-pointer">
+                    }} className="rounded-md flex gap-2 p-2 border border-gray-300">
                         <form.Field name='name' children={(field) => (
                             <input id={field.name} name={field.name}
                                    className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
