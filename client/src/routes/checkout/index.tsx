@@ -3,6 +3,7 @@ import { Loader } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
+import {formatCurrency} from "@/lib/format.ts";
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
@@ -45,18 +46,27 @@ function RouteComponent() {
             </div>
 
             <div className='grid gap-4'>
-                {shoppingCart.map((item: any) => (
-                    <div key={item.id} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
-                        <div>
-                            <p className='text-lg'>{item.product.name}</p>
-                            <p className='text-gray-500'>{item.contract.name}</p>
+                {shoppingCart.map((item: any) =>  {
+
+                    // TODO: Berechnung Falsch! Neuer Preis wird für alle Seats gesetzt
+                    const price = item.product.productPricing.filter(i => {
+                        return i.min_quantity <= item.quantity && (i.max_quantity >= item.quantity || i.max_quantity === 0);
+                    })
+
+
+                    return (
+                        <div key={item.id} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
+                            <div>
+                                <p className='text-lg'>{item.product.name}</p>
+                                <p className='text-gray-500'>{item.contract.name} | {item.duration} Jahr(e)</p>
+                            </div>
+                            <div>
+                                <p>{item.quantity}x</p>
+                                <p>{price.length > 0 ? formatCurrency(price[0].price * item.quantity) : 'Kein Preis vorhanden!'}</p>
+                            </div>
                         </div>
-                        <div>
-                            <p>{item.quantity}x</p>
-                            <p>{item.product.price}</p>
-                        </div>
-                    </div>
-                ))}
+                    )
+                })}
             </div>
 
         </div >

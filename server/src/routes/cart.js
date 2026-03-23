@@ -23,6 +23,7 @@ router.post('/', requireSession, async (request, response) => {
                 { productId: body.productId },
                 { userId: body.userId },
                 { contractId: body.contractId },
+                { duration: body.duration },
             ]
         },
     });
@@ -35,6 +36,7 @@ router.post('/', requireSession, async (request, response) => {
                     { productId: body.productId },
                     { userId: body.userId },
                     { contractId: body.contractId },
+                    { duration: body.duration },
                 ]
             },
             data: {
