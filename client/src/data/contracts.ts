@@ -1,4 +1,4 @@
-export async function getAllContracts() {
+export async function getContractsAction() {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "GET",
     });
@@ -12,23 +12,26 @@ export async function getAllContracts() {
     return result;
 }
 
-export async function createContract({ name }: { name: string }) {
+export async function createContractAction(name: string) {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
         credentials: "include",
         body: JSON.stringify({ name })
     });
 
     const result = await response.json();
 
-    if (!result.ok) {
+    if (!response.ok) {
         throw new Error(result.message);
     }
 
     return result;
 }
 
-export async function deleteContract({ id }: { id: string }) {
+export async function deleteContractAction(id: string) {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "DELETE",
         credentials: "include",

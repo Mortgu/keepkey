@@ -4,7 +4,7 @@ import {useQuery} from "@tanstack/react-query";
 import {useForm} from "@tanstack/react-form";
 import {z} from "zod";
 import {useState} from "react";
-import {getAllContracts} from "@/data/contracts.ts";
+import {getContractsAction} from "@/data/contracts.ts";
 import {useProducts} from "@/hooks/product.ts";
 
 export type ProductItemProps = {
@@ -33,7 +33,7 @@ export default function ProductItem(product: ProductItemProps) {
 
     const { data: contracts } = useQuery({
         queryKey: ['contracts'],
-        queryFn: getAllContracts,
+        queryFn: getContractsAction,
     });
 
     const pricingForm = useForm({
