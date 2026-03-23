@@ -33,3 +33,18 @@ export async function createOrderAction(products: ProductItemProps[]): Promise<P
 
     return result;
 }
+
+export async function deleteOrderAction(orderId: string) {
+    const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}

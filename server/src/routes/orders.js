@@ -72,4 +72,16 @@ router.post('/', requireSession, async (request, response) => {
     response.status(200).send({});
 });
 
+router.delete('/:id', requireSession, async (request, response) => {
+    const { id } = request.params;
+
+    await prisma.order.deleteMany({
+        where: { id }
+    });
+
+    return response.status(200).send({
+        message: 'Deletion successfully', success: true
+    });
+})
+
 export default router;

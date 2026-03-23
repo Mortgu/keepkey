@@ -1,5 +1,5 @@
-import {getOrdersAction} from "@/data/orders";
-import {useQuery, useQueryClient} from "@tanstack/react-query"
+import {deleteOrderAction, getOrdersAction} from "@/data/orders";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query"
 
 export const useOrders = () => {
     const queryClient = useQueryClient();
@@ -9,9 +9,19 @@ export const useOrders = () => {
         queryFn: getOrdersAction,
     });
 
+    const deleteMutation = useMutation({
+        mutationFn: (orderId: string) => deleteOrderAction(orderId),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: ['orders'],
+        }),
+    })
+
     return {
         orders,
         isPending,
         error,
+
+        deleteOrder: deleteMutation.mutate,
+        isDeleting: deleteMutation.isPending,
     }
 }
