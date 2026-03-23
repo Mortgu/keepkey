@@ -39,9 +39,6 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
                 productId: product.id,
                 userId: session?.user?.id,
             }
-            //console.log(product, value);
-            console.log(item);
-
             setOpen(false);
             return await addToShoppingCart(item);
         },

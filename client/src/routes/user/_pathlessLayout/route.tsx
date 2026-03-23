@@ -1,6 +1,6 @@
 import {createFileRoute, Outlet} from '@tanstack/react-router'
 import {NavLink} from "@/routes/-components/nav-link.tsx";
-import {ScrollText, Settings} from "lucide-react";
+import {Car, ScrollText, Settings} from "lucide-react";
 import {useAuth} from "@/context/auth.tsx";
 
 export const Route = createFileRoute('/user/_pathlessLayout')({
@@ -22,8 +22,12 @@ function PathlessLayoutComponent() {
                         <Settings className="size-5"/>
                         Settings
                     </NavLink>
-                    <NavLink className='flex items-center gap-2' variant="filled" to='/user/orders'>
+                    <NavLink className='flex items-center gap-2' variant="filled" to='/user/offers'>
                         <ScrollText className="size-5"/>
+                        My Offers
+                    </NavLink>
+                    <NavLink className='flex items-center gap-2' variant="filled" to='/user/orders'>
+                        <Car className="size-5"/>
                         My Orders
                     </NavLink>
                 </div>

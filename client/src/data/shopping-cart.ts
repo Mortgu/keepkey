@@ -22,7 +22,6 @@ export async function getShoppingCart() {
 }
 
 export async function addToShoppingCartAction(product: Partial<ProductItemProps>) {
-    console.log('dwadwa', product);
     const response = await fetch('http://localhost:3000/api/cart', {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },

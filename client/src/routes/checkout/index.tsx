@@ -10,34 +10,35 @@ export const Route = createFileRoute('/checkout/')({
 })
 
 function RouteComponent() {
-    const { shoppingCart, checkout, isProcessing } = useShoppingCart();
+    const { shoppingCart, checkout, isProcessing, error } = useShoppingCart();
 
-    const { data: session, isPending, error } = authClient.useSession();
+    const { data: session, isPending, error: sessionError } = authClient.useSession();
 
     if (isPending) {
         return <Loader className="animate-spin" />
     }
 
-    if (error) {
+    if (error || sessionError) {
         return (
-            <p>Error: {error.message}</p>
+            <p>Error: {sessionError.message}</p>
         )
     }
 
     if (!session || !session.user) {
         return (
-            <p>Not autherized</p>
+            <p>Not authorized</p>
         )
     }
 
-    console.log(shoppingCart)
-
     return (
         <div>
+            {error && (
+                <p>{error}</p>
+            )}
             {/* Header */}
             <div className='w-full flex items-center justify-between my-4'>
-                <h1 className='text-2xl'>Warenkorp</h1>
-                <Button size='sm' onClick={() => {
+                <h1 className='text-2xl'>Warenkorb</h1>
+                <Button disabled={shoppingCart.length === 0} size='sm' onClick={() => {
                     checkout(shoppingCart);
                 }}>
                     {isProcessing && <Loader className='size-4 animate-spin' />}

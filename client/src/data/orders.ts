@@ -16,6 +16,10 @@ export async function getOrdersAction() {
 }
 
 export async function createOrderAction(products: ProductItemProps[]): Promise<ProductItemProps> {
+    if (products.length === 0) {
+        throw new Error("No products found.");
+    }
+
     const response = await fetch('http://localhost:3000/api/orders', {
         method: 'POST',
         credentials: 'include',
