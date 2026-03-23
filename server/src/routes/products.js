@@ -20,7 +20,7 @@ router.get('/', async (request, response) => {
     response.status(200).send(result);
 });
 
-/* [GET] http://localhost:3000/api/products */
+/* [GET] http://localhost:3000/api/products/{id} */
 router.get('/:id', async (request, response) => {
     const { id } = request.params;
     const result = await prisma.product.findUnique({
@@ -45,9 +45,26 @@ router.post('/', requireSession, canCreateProduct, async (request, response) => 
     const result = await prisma.product.create({
         data: {
             ...body
+        },
+        include: {
+            productPricing: {
+                include: {
+                    product: true,
+                    contract: true
+                }
+            }
         }
     })
 
+    response.status(200).send(result);
+});
+
+/* [DELETE] http://localhost:3000/api/products/{id} */
+router.delete('/:id', async (request, response) => {
+    const { id } = request.params;
+    const result = await prisma.product.deleteMany({
+        where: { id },
+    });
     response.status(200).send(result);
 });
 

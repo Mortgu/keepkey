@@ -1,22 +1,15 @@
-import {getProducts} from "@/data/products.ts";
-import {ArrowLeft, ChevronDown, Loader, Pen, Plus, Trash} from "lucide-react";
-import {useQuery} from "@tanstack/react-query";
-import {Link} from '@tanstack/react-router'
+import {Loader, Plus} from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import {useState} from "react";
 import {useForm} from "@tanstack/react-form";
 import {z} from "zod";
-import {getAllContracts} from "@/data/contracts.ts";
 import ProductItem, {type ProductItemProps} from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
+import {useProducts} from "@/hooks/product.ts";
 
 export default function ProductList() {
+    const { products, isPending, error, createProduct } = useProducts();
+
     const [isAddingProduct, addProduct] = useState<boolean>(false);
-
-
-    const {data, isPending, error} = useQuery({
-        queryKey: ['products'],
-        queryFn: getProducts,
-    });
 
     const productForm = useForm({
         defaultValues: {
@@ -28,24 +21,7 @@ export default function ProductList() {
             }),
         },
         onSubmit: async ({ value }) => {
-            const response = await fetch('http://localhost:3000/api/products', {
-                method: "POST",
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: value.productName
-                })
-            })
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                return null;
-            }
-
-            addProduct(false);
-            window.location.assign('/user/admin');
-            return result;
+            await createProduct(value.productName);
         }
     })
 
@@ -68,12 +44,12 @@ export default function ProductList() {
         <div>
             <div className='mb-4 flex items-center justify-between'>
                 <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Products <span
-                    className='p-2 rounded-md bg-gray-200 text-sm flex items-center justify-center'>{data.length}</span>
+                    className='p-2 rounded-md bg-gray-200 text-sm flex items-center justify-center'>{products.length}</span>
                 </h1>
                 <Button onClick={() => addProduct(true)} size='sm'>Create <Plus className='size-4'/></Button>
             </div>
             <div className='grid gap-2'>
-                {data.map((product: ProductItemProps) => (
+                {products.map((product: ProductItemProps) => (
                     <ProductItem key={product.id} {...product} />
                 ))}
             </div>

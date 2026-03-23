@@ -5,6 +5,7 @@ import {useForm} from "@tanstack/react-form";
 import {z} from "zod";
 import {useState} from "react";
 import {getAllContracts} from "@/data/contracts.ts";
+import {useProducts} from "@/hooks/product.ts";
 
 export type ProductItemProps = {
     id: string;
@@ -27,14 +28,13 @@ export type ProductItemProps = {
 }
 
 export default function ProductItem(product: ProductItemProps) {
+    const { deleteProduct, isDeleting } = useProducts();
     const [isAddingPricing, addPricing] = useState<boolean>(false);
 
     const { data: contracts } = useQuery({
         queryKey: ['contracts'],
         queryFn: getAllContracts,
-    })
-
-    console.log(product)
+    });
 
     const pricingForm = useForm({
         defaultValues: {
@@ -86,8 +86,9 @@ export default function ProductItem(product: ProductItemProps) {
                     <Button size='sm' variant='ghost'>
                         <Pen className='size-4' />
                     </Button>
-                    <Button size='sm' variant='ghost'>
-                        <Trash className='size-4' />
+                    <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost'>
+                        {isDeleting && <Loader className='size-4 animate-spin' /> }
+                        {!isDeleting && <Trash className='size-4' /> }
                     </Button>
                 </div>
             </div>
@@ -110,7 +111,6 @@ export default function ProductItem(product: ProductItemProps) {
             ))}
 
             {/* Add Pricing Form */}
-
             {isAddingPricing && (
                 <form onSubmit={(e) => {
                     e.preventDefault();
@@ -120,7 +120,7 @@ export default function ProductItem(product: ProductItemProps) {
                     <pricingForm.Field name='contractId' children={(field) => (
                         <select id={field.name} name={field.name} defaultValue={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)} className="flex-[2] h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                            {contracts.map((contract) => (
+                            {contracts.map((contract: any) => (
                                 <option key={contract.id} value={contract.id}>{contract.name}</option>
                             ))}
                         </select>
