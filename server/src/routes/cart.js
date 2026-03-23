@@ -1,12 +1,12 @@
-import {Router} from "express";
-import {prisma} from "../lib/prisma.js";
-import {requireSession} from "../middlewares/auth.js";
+import { Router } from "express";
+import { prisma } from "../lib/prisma.js";
+import { requireSession } from "../middlewares/auth.js";
 
 const router = Router();
 
 /* [POST] http://localhost:3000/api/cart */
 router.post('/', requireSession, async (request, response) => {
-    const {body} = request;
+    const { body } = request;
     const user = request.user;
 
     if (!body) {
@@ -18,20 +18,19 @@ router.post('/', requireSession, async (request, response) => {
     const match = await prisma.shoppingCart.findFirst({
         where: {
             AND: [
-                {productId: body.id},
-                {userId: user.id}
+                { productId: body.id },
+                { userId: user.id }
             ]
         },
     });
 
-    console.log(match);
 
     if (match) {
         await prisma.shoppingCart.updateMany({
             where: {
                 AND: [
-                    {productId: body.id},
-                    {userId: user.id}
+                    { productId: body.id },
+                    { userId: user.id }
                 ]
             },
             data: {

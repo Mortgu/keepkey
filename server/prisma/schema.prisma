@@ -23,6 +23,7 @@ model User {
   banReason     String?
   banExpires    DateTime?
   shoppingCarts ShoppingCart[]
+  orders        Order[]
 
   @@map("user")
 }
@@ -83,8 +84,9 @@ model Product {
   shoppingCarts  ShoppingCart[]
   productPricing ProductPricing[]
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
+  createdAt      DateTime?       @default(now())
+  updatedAt      DateTime?
+  orderPositions OrderPosition[]
 
   @@index([name])
   @@map("product")
@@ -96,6 +98,7 @@ model Contract {
   name String
 
   productPricing ProductPricing[]
+  orderPositions OrderPosition[]
 
   @@map("contract")
 }
@@ -134,4 +137,39 @@ model ShoppingCart {
   updatedAt DateTime? @default(now())
 
   @@map("cart")
+}
+
+model Order {
+  id String @id @default(uuid())
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
+
+  orderPositions OrderPosition[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("order")
+}
+
+model OrderPosition {
+  id String @id @default(uuid())
+
+  order   Order  @relation(fields: [orderId], references: [id])
+  orderId String
+
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration Int
+  quantity Int
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
+
+  @@map("order_position")
 }

@@ -1,11 +1,10 @@
-import {useCheckout} from "@/hooks/checkout.ts";
-import {ShoppingBag} from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 
 export default function ShoppingCart() {
 
     return (
         <div className='m-auto'>
-            <ShoppingBag className="size-6"/>
+            <ShoppingBag className="size-6" />
         </div>
     )
 }

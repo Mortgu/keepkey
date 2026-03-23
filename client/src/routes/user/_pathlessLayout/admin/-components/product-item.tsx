@@ -1,11 +1,11 @@
 import Button from "@/components/button/button.tsx";
-import {Loader, Pen, Plus, Trash} from "lucide-react";
-import {useQuery} from "@tanstack/react-query";
-import {useForm} from "@tanstack/react-form";
-import {z} from "zod";
-import {useState} from "react";
-import {getContractsAction} from "@/data/contracts.ts";
-import {useProducts} from "@/hooks/product.ts";
+import { Loader, Pen, Plus, Trash } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+import { useState } from "react";
+import { getContractsAction } from "@/data/contracts.ts";
+import { useProducts } from "@/hooks/product.ts";
 
 export type ProductItemProps = {
     id: string;
@@ -83,12 +83,12 @@ export default function ProductItem(product: ProductItemProps) {
             <div className='flex items-center justify-between p-2'>
                 <p>{product.name}</p>
                 <div>
-                    <Button size='sm' variant='ghost'>
+                    <Button size='sm' variant='ghost' className='aspect-square'>
                         <Pen className='size-4' />
                     </Button>
-                    <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost'>
-                        {isDeleting && <Loader className='size-4 animate-spin' /> }
-                        {!isDeleting && <Trash className='size-4' /> }
+                    <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' className='aspect-square'>
+                        {isDeleting && <Loader className='size-4 animate-spin' />}
+                        {!isDeleting && <Trash className='size-4' />}
                     </Button>
                 </div>
             </div>
@@ -102,10 +102,10 @@ export default function ProductItem(product: ProductItemProps) {
                     <p className='flex-1'>{pricing?.duration}</p>
                     <p className='flex-1'>{pricing?.price} €</p>
                     <Button size='sm' variant='ghost'>
-                        <Pen className='size-4'/>
+                        <Pen className='size-4' />
                     </Button>
                     <Button size='sm' variant='ghost'>
-                        <Trash className='size-4'/>
+                        <Trash className='size-4' />
                     </Button>
                 </div>
             ))}
@@ -119,7 +119,7 @@ export default function ProductItem(product: ProductItemProps) {
                 }} className="border-t gap-2 border-gray-200 py-2 px-2 flex flex-wrap items-center justify-between">
                     <pricingForm.Field name='contractId' children={(field) => (
                         <select id={field.name} name={field.name} defaultValue={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)} className="flex-[2] h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
+                            onChange={(e) => field.handleChange(e.target.value)} className="flex-[2] h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
                             {contracts.map((contract: any) => (
                                 <option key={contract.id} value={contract.id}>{contract.name}</option>
                             ))}
@@ -128,25 +128,25 @@ export default function ProductItem(product: ProductItemProps) {
 
                     <pricingForm.Field name='min_quantity' children={(field) => (
                         <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="min-seats"
-                               onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='max_quantity' children={(field) => (
                         <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="max-seats"
-                               onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='duration' children={(field) => (
                         <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="duration"
-                               onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='price' children={(field) => (
                         <input id={field.name} value={field.state.value} type="number" step="0.01" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="price"
-                               onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
+                            onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
                     )} />
 
                     <div className="flex gap-1 shrink-0">
                         <pricingForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
                             <Button disabled={!canSubmit} type='submit' size='sm' variant='primary'>
-                                {isSubmitting && <Loader className='animate-spin' /> }
+                                {isSubmitting && <Loader className='animate-spin' />}
                                 {!isSubmitting && ("Save")}
                             </Button>
                         )} />
@@ -159,7 +159,7 @@ export default function ProductItem(product: ProductItemProps) {
                 <p></p>
                 <p></p>
                 <button onClick={() => addPricing(true)} className='flex items-center justify-between gap-2 cursor-pointer'>
-                    <Plus className='size-4'/>
+                    <Plus className='size-4' />
                     <p>Hinzufügen</p>
                 </button>
             </div>

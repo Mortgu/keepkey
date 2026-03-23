@@ -1,7 +1,7 @@
-import {Router} from "express";
-import {prisma} from "../lib/prisma.js";
-import {requireSession} from "../middlewares/auth.js";
-import {canDeleteContract} from "../permissions/contract.js";
+import { Router } from "express";
+import { prisma } from "../lib/prisma.js";
+import { requireSession } from "../middlewares/auth.js";
+import { canDeleteContract } from "../permissions/contract.js";
 
 const router = Router();
 
@@ -22,8 +22,7 @@ router.post('/', requireSession, canDeleteContract, async (request, response) =>
         });
     }
 
-    const result = await prisma.contract.create({data: body});
-    console.log(result)
+    const result = await prisma.contract.create({ data: body });
     response.status(200).send(result);
 });
 
@@ -39,7 +38,7 @@ router.delete('/', requireSession, canDeleteContract, async (request, response) 
     }
 
     const result = await prisma.contract.deleteMany({
-        where: {id: body.id}
+        where: { id: body.id }
     });
 
     response.status(200).send(result);

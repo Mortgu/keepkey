@@ -1,7 +1,41 @@
+import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
+
 type CheckoutProps = {
     userId: string;
     productId: string;
     quantity: number;
+}
+
+export async function getShoppingCart() {
+    const response = await fetch('http://localhost:3000/api/cart', {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
+export async function addToShoppingCartAction(product: ProductItemProps) {
+    const response = await fetch('http://localhost:3000/api/cart', {
+        method: 'POST',
+        headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+        credentials: "include",
+        body: JSON.stringify({ ...product }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 }
 
 export async function updateShoppingCart({ userId, productId, quantity }: CheckoutProps) {
@@ -14,11 +48,3 @@ export async function updateShoppingCart({ userId, productId, quantity }: Checko
     return await result.json();
 }
 
-export async function getShoppingCart() {
-    const result = await fetch('http://localhost:3000/api/cart', {
-        method: 'GET',
-        credentials: 'include',
-    });
-
-    return await result.json();
-}
