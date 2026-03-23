@@ -1,5 +1,5 @@
 import { createOrderAction } from "@/data/orders";
-import { addToShoppingCartAction, getShoppingCart } from "@/data/shopping-cart";
+import {addToShoppingCartAction, deleteShoppingCartAction, getShoppingCart} from "@/data/shopping-cart";
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -21,9 +21,16 @@ export const useShoppingCart = () => {
     const checkoutMutation = useMutation({
         mutationFn: (products: ProductItemProps[]) => createOrderAction(products),
         onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['orders', 'cart'],
+            queryKey: ['cart'],
         })
-    })
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: deleteShoppingCartAction,
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: ['cart'],
+        }),
+    });
 
     return {
         shoppingCart,
@@ -32,6 +39,9 @@ export const useShoppingCart = () => {
 
         addToShoppingCart: createMutation.mutateAsync,
         isAddingToShoppingCart: createMutation.isPending,
+
+        clearCart: deleteMutation.mutate,
+        isClearingCart: deleteMutation.isPending,
 
         checkout: checkoutMutation.mutate,
         isProcessing: checkoutMutation.isPending

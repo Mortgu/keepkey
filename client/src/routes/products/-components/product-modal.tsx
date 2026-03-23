@@ -6,6 +6,8 @@ import { useForm } from "@tanstack/react-form";
 import { Loader } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
+import {useShoppingCart} from "@/hooks/shopping-cart.ts";
+import {authClient} from "@/lib/auth-client.ts";
 
 type ProductModalProps = {
     product: ProductItemProps,
@@ -15,6 +17,8 @@ type ProductModalProps = {
 
 export default function ProductModal({ product, onSubmit, setOpen }: ProductModalProps) {
     const { contracts, isPending } = useContracts();
+    const { addToShoppingCart } = useShoppingCart();
+    const { data: session } = authClient.useSession();
 
     const form = useForm({
         defaultValues: {
@@ -30,7 +34,16 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
             }),
         },
         onSubmit: async ({ value }) => {
-            console.log(value);
+            const item = {
+                ...value,
+                productId: product.id,
+                userId: session?.user?.id,
+            }
+            //console.log(product, value);
+            console.log(item);
+
+            setOpen(false);
+            return await addToShoppingCart(item);
         },
     })
 

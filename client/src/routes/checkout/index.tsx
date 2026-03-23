@@ -29,6 +29,8 @@ function RouteComponent() {
         )
     }
 
+    console.log(shoppingCart)
+
     return (
         <div>
             {/* Header */}
@@ -42,15 +44,20 @@ function RouteComponent() {
                 </Button>
             </div>
 
-            {shoppingCart.map((item: any) => (
-                <div key={item.id}>
-                    <p>{item.product.name}</p>
-                    <div>
-                        <p>{item.quantity}x</p>
-                        <p>{item.product.price}</p>
+            <div className='grid gap-4'>
+                {shoppingCart.map((item: any) => (
+                    <div key={item.id} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
+                        <div>
+                            <p className='text-lg'>{item.product.name}</p>
+                            <p className='text-gray-500'>{item.contract.name}</p>
+                        </div>
+                        <div>
+                            <p>{item.quantity}x</p>
+                            <p>{item.product.price}</p>
+                        </div>
                     </div>
-                </div>
-            ))}
+                ))}
+            </div>
 
         </div >
     )

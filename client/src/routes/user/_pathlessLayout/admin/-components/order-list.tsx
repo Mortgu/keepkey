@@ -1,6 +1,7 @@
 import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
 import { Loader, Plus } from "lucide-react";
+import {formatDate} from "@/lib/format.ts";
 
 export default function OrderList() {
     const { orders, isPending, error } = useOrders();
@@ -28,7 +29,18 @@ export default function OrderList() {
             </div>
             <div className='grid gap-2'>
                 {orders.map(order => (
-                    <>{JSON.stringify(order)}</>
+                    <div className='border border-gray-200 p-3'>
+                        <p className='text-lg'>{order.user.name} <label className='text-sm text-gray-700'>({formatDate(order.createdAt)})</label></p>
+                        <p className='text-sm text-gray-500'>{order.id}</p>
+                        <div className='flex gap-2 mt-2'>
+                            {order.orderPositions.map((position) => (
+                                <div className='flex-1 grid gap-2 p-3 border border-gray-200'>
+                                    <div className='' key={position.id}>{position.product.name} ({position.quantity}x)</div>
+                                    <div className='' key={position.id}>{position.contract.name}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 ))}
             </div>
 

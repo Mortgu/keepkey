@@ -41,15 +41,28 @@ router.post('/', requireSession, async (request, response) => {
     console.log(body);
 
     const createdOrder = await prisma.$transaction(async (tx) => {
+        /* Create Order */
         const order = await tx.order.create({
             data: { userId: user.id }
         });
 
+        /* Create Order Positions */
         for (const item of body) {
             await tx.orderPosition.create({
-                data: { orderId: order.id, ...item }
-            })
+                data: {
+                    orderId: order.id,
+                    productId: item.productId,
+                    contractId: item.contractId,
+                    duration: item.duration,
+                    quantity: item.quantity,
+                }
+            });
         }
+
+        /* Clear Shopping Card */
+        await prisma.shoppingCart.deleteMany({
+            where: { userId: user.id }
+        });
 
         return order;
     });

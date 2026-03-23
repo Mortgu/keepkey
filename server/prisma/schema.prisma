@@ -99,6 +99,7 @@ model Contract {
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]
+  shoppingCard   ShoppingCart[]
 
   @@map("contract")
 }
@@ -131,7 +132,11 @@ model ShoppingCart {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  quantity Int @default(1)
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration Int
+  quantity Int
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())

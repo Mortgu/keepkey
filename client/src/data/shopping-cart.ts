@@ -21,7 +21,8 @@ export async function getShoppingCart() {
     return result;
 }
 
-export async function addToShoppingCartAction(product: ProductItemProps) {
+export async function addToShoppingCartAction(product: Partial<ProductItemProps>) {
+    console.log('dwadwa', product);
     const response = await fetch('http://localhost:3000/api/cart', {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
@@ -48,3 +49,17 @@ export async function updateShoppingCart({ userId, productId, quantity }: Checko
     return await result.json();
 }
 
+export async function deleteShoppingCartAction(userId: string) {
+    const response = await fetch(`http://localhost:3000/api/cart/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}

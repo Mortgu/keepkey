@@ -15,26 +15,30 @@ router.post('/', requireSession, async (request, response) => {
         })
     }
 
+    console.log("body", body)
+
     const match = await prisma.shoppingCart.findFirst({
         where: {
             AND: [
-                { productId: body.id },
-                { userId: user.id }
+                { productId: body.productId },
+                { userId: body.userId },
+                { contractId: body.contractId },
             ]
         },
     });
 
 
-    if (match) {
+   if (match) {
         await prisma.shoppingCart.updateMany({
             where: {
                 AND: [
-                    { productId: body.id },
-                    { userId: user.id }
+                    { productId: body.productId },
+                    { userId: body.userId },
+                    { contractId: body.contractId },
                 ]
             },
             data: {
-                quantity: match.quantity + 1,
+                quantity: match.quantity + body.quantity,
             }
         });
 
@@ -44,11 +48,7 @@ router.post('/', requireSession, async (request, response) => {
     }
 
     await prisma.shoppingCart.create({
-        data: {
-            userId: user.id,
-            productId: body.id,
-            quantity: 1,
-        }
+        data: body
     });
 
     return response.status(200).json({
@@ -64,8 +64,10 @@ router.get('/', requireSession, async (request, response) => {
             userId: user.id
         },
         include: {
+            contract: true,
             product: {
                 include: {
+                    orderPositions: true,
                     productPricing: true
                 }
             },
@@ -73,6 +75,20 @@ router.get('/', requireSession, async (request, response) => {
     });
 
     return response.status(200).send(items);
+})
+
+/* [DELETE] http://localhost:3000/api/cart/{userId} */
+router.get('/:userId', requireSession, async (request, response) => {
+    const { userId } = request.params;
+    const sessionUser = request.user;
+
+    await prisma.shoppingCart.deleteMany({
+        where: { userId: userId },
+    });
+
+    return response.status(200).send({
+        message: "Successfully deleted item", success: true
+    })
 })
 
 export default router;
