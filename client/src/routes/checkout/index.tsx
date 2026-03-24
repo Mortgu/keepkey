@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import {createFileRoute, redirect} from '@tanstack/react-router'
 import { Loader } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
@@ -7,6 +7,15 @@ import {formatCurrency} from "@/lib/format.ts";
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
+    beforeLoad: async ({ context }) => {
+        const { data: session } = await context.auth.getSession();
+
+        if (!session) {
+            throw redirect({ to: '/login' });
+        }
+
+        return { session };
+    }
 })
 
 function RouteComponent() {

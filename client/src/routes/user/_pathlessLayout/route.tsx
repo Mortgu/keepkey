@@ -1,6 +1,6 @@
 import {createFileRoute, Outlet} from '@tanstack/react-router'
 import {NavLink} from "@/routes/-components/nav-link.tsx";
-import {Car, ScrollText, Settings} from "lucide-react";
+import {Car, LogOut, ScrollText, Settings} from "lucide-react";
 import {useAuth} from "@/context/auth.tsx";
 
 export const Route = createFileRoute('/user/_pathlessLayout')({
@@ -8,7 +8,7 @@ export const Route = createFileRoute('/user/_pathlessLayout')({
 })
 
 function PathlessLayoutComponent() {
-    const {user} = useAuth();
+    const { user, logout } = useAuth();
 
     if (!user) {
         window.location.assign("/login");
@@ -30,6 +30,10 @@ function PathlessLayoutComponent() {
                         <Car className="size-5"/>
                         My Orders
                     </NavLink>
+                    <button onClick={logout} className='bg-red-100 hover:bg-red-200 px-4 py-2 rounded-md flex items-center gap-2' variant="filled" to='/user/orders'>
+                        <LogOut className="size-5"/>
+                        Sign Out
+                    </button>
                 </div>
 
                 {(user && user.role === "admin") && (

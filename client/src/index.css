@@ -7,6 +7,10 @@
     --keepit-primary-25: #00683e34;
 }
 
+* {
+    /*border: 1px dashed var(--keepit-primary-25);*/
+}
+
 @layer components {
 
 }
