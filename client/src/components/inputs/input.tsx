@@ -7,7 +7,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const styles = tv({
     base: [
-        'w-full px-4 py-3 rounded-lg border-2 transition-all duration-200',
+        'w-full px-4 py-3 rounded-lg border-1 transition-all duration-200',
         'text-base outline-none',
         'placeholder:text-gray-400',
         'disabled:opacity-50 disabled:cursor-not-allowed',

@@ -18,7 +18,9 @@ export default function Navigation() {
                     error ? "Error" : session ? (
                         <NavigationActions />
                     ) : (
-                        <NavLink to="/login">Login</NavLink>
+                        <div className='flex items-center gap-2'>
+                            <NavLink to="/login">Login</NavLink>
+                        </div>
                     )}
                 </div>
             </div>

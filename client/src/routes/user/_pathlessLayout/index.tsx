@@ -10,6 +10,13 @@ export const Route = createFileRoute('/user/_pathlessLayout/')({
         }
 
         return { session };
+    },
+    notFoundComponent: ({ data }) => {
+        return (
+            <div className='p-4 bg-gray-100 rounded-md border border-gray-200'>
+                <p>Diese Seite existiert nicht.</p>
+            </div>
+        )
     }
 })
 

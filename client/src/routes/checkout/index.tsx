@@ -1,41 +1,29 @@
-import {createFileRoute, redirect} from '@tanstack/react-router'
+import {createFileRoute} from '@tanstack/react-router'
 import { Loader } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
 import {formatCurrency} from "@/lib/format.ts";
+import {requireSession} from "@/lib/session.ts";
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
-    beforeLoad: async ({ context }) => {
-        const { data: session } = await context.auth.getSession();
 
-        if (!session) {
-            throw redirect({ to: '/login' });
-        }
-
-        return { session };
-    }
+    beforeLoad: ({ context }) => requireSession(context),
 })
 
 function RouteComponent() {
     const { shoppingCart, checkout, isProcessing, error } = useShoppingCart();
+    const { data: session } = authClient.useSession();
+    const emailVerified = session?.user.emailVerified;
 
-    const { data: session, isPending, error: sessionError } = authClient.useSession();
-
-    if (isPending) {
+    if (isProcessing) {
         return <Loader className="animate-spin" />
     }
 
-    if (error || sessionError) {
+    if (error) {
         return (
-            <p>Error: {sessionError.message}</p>
-        )
-    }
-
-    if (!session || !session.user) {
-        return (
-            <p>Not authorized</p>
+            <p>Error: {error.message}</p>
         )
     }
 
@@ -44,6 +32,11 @@ function RouteComponent() {
             {error && (
                 <p>{error}</p>
             )}
+
+            {!emailVerified && (
+                <div>Please verify your e-mail</div>
+            )}
+
             {/* Header */}
             <div className='w-full flex items-center justify-between my-4'>
                 <h1 className='text-2xl'>Warenkorb</h1>

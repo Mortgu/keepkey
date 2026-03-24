@@ -13,6 +13,22 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    user: {
+        additionalFields: {
+            salutation: {
+                type: "string",
+                required: true,
+            },
+            firstName: {
+                type: "string",
+                required: true,
+            },
+            lastName: {
+                type: "string",
+                required: true,
+            }
+        }
+    },
     plugins: [
         adminPlugin({
             ac,

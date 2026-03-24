@@ -8,6 +8,7 @@
 }
 
 * {
+    box-sizing: border-box;
     /*border: 1px dashed var(--keepit-primary-25);*/
 }
 
