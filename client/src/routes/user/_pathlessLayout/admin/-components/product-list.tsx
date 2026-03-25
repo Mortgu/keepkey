@@ -1,10 +1,10 @@
-import {Loader, Plus} from "lucide-react";
+import { Loader, Plus } from "lucide-react";
 import Button from "@/components/button/button.tsx";
-import {useState} from "react";
-import {useForm} from "@tanstack/react-form";
-import {z} from "zod";
-import ProductItem, {type ProductItemProps} from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
-import {useProducts} from "@/hooks/product.ts";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+import ProductItem, { type ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
+import { useProducts } from "@/hooks/product.ts";
 import Modal from "@/components/modal.tsx";
 
 export default function ProductList() {
@@ -30,7 +30,7 @@ export default function ProductList() {
 
     if (isPending) {
         return (
-            <Loader className='animate-spin'/>
+            <Loader className='animate-spin' />
         )
     }
 
@@ -47,7 +47,7 @@ export default function ProductList() {
         <div>
             <div className='mb-4 flex items-center justify-between'>
                 <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Products ({products.length})</h1>
-                <Button onClick={() => addProduct(true)} size='sm'>Create <Plus className='size-4'/></Button>
+                <Button onClick={() => addProduct(true)} size='sm'>Create <Plus className='size-4' /></Button>
             </div>
             <div className='grid gap-2'>
                 {products.map((product: ProductItemProps) => (
@@ -64,19 +64,19 @@ export default function ProductList() {
                     }} className="rounded-md flex flex-col gap-4 p-2 cursor-pointer">
                         <productForm.Field name='productName' children={(field) => (
                             <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
-                                   value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)}/>
-                        )}/>
+                                value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
+                        )} />
                         <productForm.Field name='link' children={(field) => (
                             <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
-                                   value={field.state.value} placeholder="https://www..." onChange={(e) => field.handleChange(e.target.value)}/>
-                        )}/>
+                                value={field.state.value} placeholder="https://www..." onChange={(e) => field.handleChange(e.target.value)} />
+                        )} />
                         <div className='flex items-center gap-2 w-full'>
-                            <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}  children={([canSubmit, isSubmitting]) => (
+                            <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
                                 <Button disabled={!canSubmit} type='submit' size='sm'>
-                                    {isSubmitting && <Loader className='animate-spin' /> }
+                                    {isSubmitting && <Loader className='animate-spin' />}
                                     {!isSubmitting && ("Save")}
                                 </Button>
-                            )}/>
+                            )} />
                             <Button onClick={() => addProduct(false)} type='button' size='sm' variant='secondary'>Cancel</Button>
                         </div>
                     </form>

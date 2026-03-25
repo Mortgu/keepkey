@@ -1,6 +1,6 @@
-import type {ProductItemProps} from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {getProducts, createProductAction, deleteProductAction, updateProductAction} from "@/data/products.ts";
+import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getProducts, createProductAction, deleteProductAction, updateProductAction } from "@/data/products.ts";
 
 export const useProducts = () => {
     const queryClient = useQueryClient();
@@ -26,7 +26,7 @@ export const useProducts = () => {
                 queryKey: ['products'],
             })
         }
-    })
+    });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, product }: { id: string; product: Partial<ProductItemProps> }) =>

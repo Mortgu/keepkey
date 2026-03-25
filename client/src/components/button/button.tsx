@@ -2,8 +2,9 @@ import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
 import { tv } from 'tailwind-variants';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'ghost';
+    variant?: 'primary' | 'secondary' | 'ghost' | 'link';
     size?: 'sm' | 'md' | 'lg';
+    active?: false | true,
     children: ReactNode;
 }
 
@@ -30,6 +31,15 @@ const styles = tv({
                 'hover:bg-gray-100 active:bg-gray-200',
                 'focus:ring-2 focus:ring-gray-300',
             ],
+            link: [
+                'bg-transparent text-gray-700 cursor-pointer',
+                'hover:text-(--keepit-primary) active:text-(--keepit-primary)',
+                'focus:ring-2 focus:ring-gray-300',
+            ]
+        },
+        active: {
+            true: "text-(--keepit-primary)",
+            false: ""
         },
         size: {
             sm: 'px-3 py-2 text-sm font-medium',
@@ -40,6 +50,7 @@ const styles = tv({
     defaultVariants: {
         variant: 'primary',
         size: 'md',
+        active: false,
     }
 });
 

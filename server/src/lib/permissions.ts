@@ -1,7 +1,7 @@
 import { createAccessControl } from "better-auth/plugins/access";
 
 const statement = {
-    product: ["create", "share", "update", "delete"],
+    product: ["create", "publish", "update", "delete"],
     contract: ["create", "update", "delete"],
     carts: ['view', 'create', 'update', 'delete'],
 };
@@ -9,13 +9,13 @@ const statement = {
 export const ac = createAccessControl(statement);
 
 export const user = ac.newRole({
-    product: ["share"],
+    product: [],
     contract: [],
     carts: [],
 });
 
 export const admin = ac.newRole({
-    product: ["create", "update", "delete", "share"],
+    product: ["create", "update", "delete", "publish"],
     contract: ["create", "update", "delete"],
     carts: ["view", "create", "update", "delete"],
 });

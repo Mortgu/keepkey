@@ -65,6 +65,9 @@ export async function deleteProductAction(id: string): Promise<void> {
 }
 
 export async function updateProductAction(id: string, product: Partial<ProductItemProps>) {
+    console.log(id, product);
+
+
     const response = await fetch(`http://localhost:3000/api/products/${id}`, {
         method: 'PUT',
         credentials: 'include',

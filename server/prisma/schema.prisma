@@ -84,12 +84,14 @@ model Product {
   id   String @id @default(uuid())
   name String @unique
 
+  published Boolean @default(false)
+
   shoppingCarts  ShoppingCart[]
   productPricing ProductPricing[]
-
-  createdAt      DateTime?       @default(now())
-  updatedAt      DateTime?
   orderPositions OrderPosition[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
 
   @@index([name])
   @@map("product")

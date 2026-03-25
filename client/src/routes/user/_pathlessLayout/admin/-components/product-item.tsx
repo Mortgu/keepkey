@@ -1,5 +1,5 @@
 import Button from "@/components/button/button.tsx";
-import { Loader, Pen, Plus, Trash } from "lucide-react";
+import { BadgeCheck, Check, Cross, Loader, Pen, Plus, Trash, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -12,6 +12,7 @@ export type ProductItemProps = {
     name: string;
     quantity: number;
     price: number;
+    published: boolean;
     productPricing: [{
         contract: {
             name: string;
@@ -28,7 +29,7 @@ export type ProductItemProps = {
 }
 
 export default function ProductItem(product: ProductItemProps) {
-    const { deleteProduct, isDeleting } = useProducts();
+    const { deleteProduct, updateProduct, isDeleting } = useProducts();
     const [isAddingPricing, addPricing] = useState<boolean>(false);
 
     const { data: contracts } = useQuery({
@@ -74,15 +75,43 @@ export default function ProductItem(product: ProductItemProps) {
 
             return result;
         }
-    })
+    });
+
+    const handlePublication = () => {
+        const answer = confirm("Change the visibility?");
+
+        if (answer) {
+            updateProduct({ id: product.id, product: { published: !product.published } });
+        }
+    }
 
     return (
         <div className='border border-gray-300 rounded-md overflow-hidden'>
 
             {/* Product Header */}
             <div className='flex items-center justify-between p-2'>
-                <p>{product.name}</p>
+                <div className="flex items-center gap-4">
+                    <p>{product.name}</p>
+
+                </div>
+
                 <div>
+                    {/* Publish Product Button */}
+                    <Button onClick={handlePublication} variant="primary" size='sm' className="mr-4">
+                        {product.published && (
+                            <>
+                                <BadgeCheck className="size-4" />
+                                <label className="text-md">Published</label>
+                            </>
+                        )}
+                        {!product.published && (
+                            <>
+                                <X className="size-4" />
+                                <label className="text-md">Not Published</label>
+                            </>
+                        )}
+                    </Button>
+
                     <Button size='sm' variant='ghost' className='aspect-square'>
                         <Pen className='size-4' />
                     </Button>
