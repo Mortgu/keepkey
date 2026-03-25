@@ -16,5 +16,7 @@ export interface ShoppingCardItem extends ProductItem {
     duration: number;
     contract: Contract;
 
+    product: ProductItem;
+
     price: number;
 }

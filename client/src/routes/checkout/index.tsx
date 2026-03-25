@@ -5,6 +5,7 @@ import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
 import { formatCurrency } from "@/lib/format.ts";
 import { requireSession } from "@/lib/session.ts";
+import type { ProductItem, ShoppingCardItem } from '@/data/types';
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
@@ -51,7 +52,7 @@ function RouteComponent() {
             </div>
 
             <div className='grid gap-4'>
-                {shoppingCart.map((item, index) => (
+                {shoppingCart.map((item: ShoppingCardItem, index) => (
                     <div key={index} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
                         <div>
                             <p className='text-lg'>{item.product.name}</p>
@@ -59,7 +60,7 @@ function RouteComponent() {
                         </div>
                         <div>
                             <p>{item.quantity}x</p>
-                            <p>{item.price?.total} €</p>
+                            <p>{item.price} €</p>
                         </div>
                     </div>
                 ))}

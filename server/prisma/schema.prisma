@@ -146,6 +146,7 @@ model ShoppingCart {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
+  @@unique([userId, productId, contractId])
   @@map("cart")
 }
 

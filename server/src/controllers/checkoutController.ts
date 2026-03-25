@@ -17,7 +17,11 @@ export const getShoppingCart = async (request: Request, response: Response, next
     }
 
     const cart = await prisma.shoppingCart.findMany({
-        where: { userId: userId as string }
+        where: { userId: userId as string },
+        include: {
+            contract: true,
+            product: true
+        }
     });
 
     return response.status(200).json(cart);
@@ -37,7 +41,11 @@ export const getSessionShoppingCart = async (request: Request, response: Respons
     }
 
     const cart = await prisma.shoppingCart.findMany({
-        where: { userId: user.id as string }
+        where: { userId: user.id as string },
+        include: {
+            contract: true,
+            product: true
+        }
     });
 
     return response.status(200).json(cart);
@@ -65,67 +73,39 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
 
     const test = ShoppingCartSchema.parse(body);
 
-    const [product, entry] = await Promise.all([
-        prisma.product.findUnique({
-            where: { id: test.productId },
-            include: {
-                productPricing: true,
+    // TODO: make transaction
+
+    const entry = await prisma.shoppingCart.upsert({
+        where: {
+            userId_productId_contractId: {
+                userId: user.id, productId: test.productId, contractId: test.contractId,
             }
-        }),
-
-        prisma.shoppingCart.findFirst({
-            where: {
-                AND: [
-                    { productId: test.productId },
-                    { userId: user.id },
-                    { contractId: test.contractId },
-                    { duration: test.duration },
-                ]
-            },
-            include: {
-                product: {
-                    include: {
-                        productPricing: true
-                    }
-                },
+        },
+        create: { ...body },
+        update: {
+            quantity: { increment: test.quantity },
+        },
+        include: {
+            product: {
+                include: {
+                    productPricing: true
+                }
             }
-        })
-    ]);
-
-    if (!product) {
-        return response.status(400).json({
-            message: "Bad request. ", success: false
-        });
-    }
-
-    if (entry) {
-        const pricing = calculateProductPrice(entry.product, test.quantity, test.duration, test.contractId);
-
-        /* Update existing entry */
-        await prisma.shoppingCart.updateMany({
-            where: {
-                AND: [
-                    { productId: test.productId },
-                    { userId: user.id },
-                    { contractId: test.contractId },
-                    { duration: test.duration },
-                ]
-            },
-            data: {
-                quantity: test.quantity,
-                price: pricing.total,
-            }
-        });
-
-        return response.status(200).json({
-            message: "Updated item", success: true
-        });
-    }
-
-
-    await prisma.shoppingCart.create({
-        data: { ...body, price: 0 },
+        }
     });
+
+    const price = calculateProductPrice(entry.product, entry.quantity, test.duration, test.contractId);
+
+    await prisma.shoppingCart.update({
+        where: {
+            userId_productId_contractId: {
+                userId: user.id, productId: test.productId, contractId: test.contractId,
+            }
+        },
+        data: {
+            price: price.total,
+        }
+    })
 
     return response.status(200).json({
         message: "Successfully created item", success: true
