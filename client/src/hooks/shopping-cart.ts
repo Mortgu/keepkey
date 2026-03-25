@@ -1,5 +1,6 @@
 import { createOrderAction } from "@/data/orders";
-import { addToShoppingCartAction, deleteShoppingCartAction, getShoppingCart, type ShoppingCartItem } from "@/data/shopping-cart";
+import { addToShoppingCartAction, removeFromShoppingCartAction, deleteShoppingCartAction, getShoppingCart } from "@/data/shopping-cart";
+import type { ShoppingCartItem } from "@/data/types";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
@@ -19,6 +20,14 @@ export const useShoppingCart = () => {
             queryKey: ['cart'],
         }),
     });
+
+    const removeMutation = useMutation({
+        mutationFn: removeFromShoppingCartAction,
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: ['cart'],
+        }),
+    })
+
 
     /*  */
     const checkoutMutation = useMutation({
@@ -65,6 +74,9 @@ export const useShoppingCart = () => {
 
         addToShoppingCart: createMutation.mutateAsync,
         isAddingToShoppingCart: createMutation.isPending,
+
+        removeFromShoppingCart: removeMutation.mutateAsync,
+        isRemovingFromShoppingCart: removeMutation.isPending,
 
         clearCart: deleteMutation.mutate,
         isClearingCart: deleteMutation.isPending,

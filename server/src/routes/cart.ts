@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireSession } from "../middlewares/auth.js";
 import { createSessionShoppingCart, deleteSessionShoppingCart, deleteShoppingCart, getSessionShoppingCart, getShoppingCart } from "../controllers/checkoutController.js";
-import { canDeleteShoppingCarts, canViewShoppingCarts } from "../permissions/cart.js";
+import { canViewShoppingCarts } from "../permissions/cart.js";
 
 const router = Router();
 
@@ -18,6 +18,6 @@ router.post('/', requireSession, createSessionShoppingCart);
 router.delete('/', requireSession, deleteSessionShoppingCart);
 
 /* [DELETE] http://localhost:3000/api/cart/{userId} */
-router.delete('/:userId', requireSession, canDeleteShoppingCarts, deleteShoppingCart);
+router.delete('/:userId', requireSession, deleteShoppingCart);
 
 export default router;

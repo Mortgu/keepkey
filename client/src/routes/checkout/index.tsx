@@ -1,11 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Loader } from "lucide-react";
+import { Loader, Pen, Trash } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
 import { formatCurrency } from "@/lib/format.ts";
 import { requireSession } from "@/lib/session.ts";
-import type { ProductItem, ShoppingCardItem } from '@/data/types';
+import type { ProductItem, ShoppingCartItem } from '@/data/types';
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
@@ -14,7 +14,7 @@ export const Route = createFileRoute('/checkout/')({
 })
 
 function RouteComponent() {
-    const { shoppingCart, handleCheckout, isProcessing, error } = useShoppingCart();
+    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error } = useShoppingCart();
     const { data: session } = authClient.useSession();
     const emailVerified = session?.user.emailVerified;
 
@@ -52,7 +52,7 @@ function RouteComponent() {
             </div>
 
             <div className='grid gap-4'>
-                {shoppingCart.map((item: ShoppingCardItem, index) => (
+                {shoppingCart.map((item: ShoppingCartItem, index) => (
                     <div key={index} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
                         <div>
                             <p className='text-lg'>{item.product.name}</p>
@@ -61,6 +61,15 @@ function RouteComponent() {
                         <div>
                             <p>{item.quantity}x</p>
                             <p>{item.price} €</p>
+                        </div>
+                        <div>
+                            <Button variant="ghost" size='sm' className='aspect-square'>
+                                <Pen className='size-4' />
+                            </Button>
+
+                            <Button onClick={() => removeFromShoppingCart(item)} variant="ghost" size='sm' className='aspect-square'>
+                                <Trash className='size-4' />
+                            </Button>
                         </div>
                     </div>
                 ))}

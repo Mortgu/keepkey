@@ -11,7 +11,7 @@ export interface ProductItem {
     updatedAt: Date;
 };
 
-export interface ShoppingCardItem extends ProductItem {
+export interface ShoppingCartItem extends ProductItem {
     quantity: number;
     duration: number;
     contract: Contract;
