@@ -1,11 +1,12 @@
-import {auth} from "../lib/auth.js";
+import type { Request, Response, NextFunction } from 'express';
+import { auth } from "../lib/auth.js";
 
-export async function canCreateProduct(request, response, next) {
+export async function canCreateProduct(request: Request, response: Response, next: NextFunction) {
     const user = request.user;
 
     const { success } = await auth.api.userHasPermission({
         body: {
-            userId: user.id,
+            userId: user!.id,
             permissions: {
                 product: ["create"]
             }

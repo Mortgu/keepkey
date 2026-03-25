@@ -1,12 +1,13 @@
-import {auth} from "../lib/auth.js";
+import type { Request, Response, NextFunction } from 'express';
+import { auth } from "../lib/auth.js";
 
-export async function canCreateContract(request, response, next) {
+export async function canCreateContract(request: Request, response: Response, next: NextFunction) {
     const user = request.user;
 
-    const {success} = await auth.api.userHasPermission({
+    const { success } = await auth.api.userHasPermission({
         body: {
-            userId: user.id,
-            permission: {
+            userId: user!.id,
+            permissions: {
                 contract: ["create"]
             },
         }
@@ -21,12 +22,12 @@ export async function canCreateContract(request, response, next) {
     next();
 }
 
-export async function canDeleteContract(request, response, next) {
+export async function canDeleteContract(request: Request, response: Response, next: NextFunction) {
     const user = request.user;
 
     const { success } = await auth.api.userHasPermission({
         body: {
-            userId: user.id,
+            userId: user!.id,
             permissions: {
                 contract: ["delete"]
             },

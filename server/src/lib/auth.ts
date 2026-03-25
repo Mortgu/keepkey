@@ -3,7 +3,7 @@ import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { prisma } from './prisma.js';
 import { admin as adminPlugin } from 'better-auth/plugins';
 
-import  { ac, admin, user } from './permissions.js';
+import { ac, admin, user } from './permissions.js';
 
 export const auth = betterAuth({
     trustedOrigins: ["http://localhost:5173"],
@@ -39,4 +39,3 @@ export const auth = betterAuth({
         }),
     ]
 });
-

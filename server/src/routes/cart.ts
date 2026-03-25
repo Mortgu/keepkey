@@ -1,12 +1,14 @@
+import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
 import { calculateProductPrice } from "../utils/products.js";
+import { ShoppingCart } from "@prisma/client";
 
 const router = Router();
 
 /* [POST] http://localhost:3000/api/cart */
-router.post('/', requireSession, async (request, response) => {
+router.post('/', requireSession, async (request: Request, response: Response) => {
     const { body } = request;
     const user = request.user;
 
@@ -58,12 +60,12 @@ router.post('/', requireSession, async (request, response) => {
 });
 
 /* [GET] http://localhost:3000/api/cart */
-router.get('/', requireSession, async (request, response) => {
+router.get('/', requireSession, async (request: Request, response: Response) => {
     const user = request.user;
 
     // 1. Fetching the cart items with related data
     const items = await prisma.shoppingCart.findMany({
-        where: { userId: user.id },
+        where: { userId: user!.id },
         include: {
             contract: true,
             product: {
@@ -86,12 +88,12 @@ router.get('/', requireSession, async (request, response) => {
 })
 
 /* [DELETE] http://localhost:3000/api/cart/{userId} */
-router.get('/:userId', requireSession, async (request, response) => {
+router.delete('/:userId', requireSession, async (request: Request, response: Response) => {
     const { userId } = request.params;
     const sessionUser = request.user;
 
     await prisma.shoppingCart.deleteMany({
-        where: { userId: userId },
+        where: { userId: userId as string },
     });
 
     return response.status(200).send({

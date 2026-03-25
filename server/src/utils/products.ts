@@ -1,4 +1,11 @@
-export function calculateProductPrice(product, quantity, duration, contractId) {
+import type { Prisma } from '@prisma/client';
+
+export function calculateProductPrice(
+    product: Prisma.ProductGetPayload<{ include: { productPricing: true } }>,
+    quantity: string | number,
+    duration: number,
+    contractId?: string
+) {
     let total = 0;
     let remainingQuantity = Number(quantity);
 
@@ -14,16 +21,16 @@ export function calculateProductPrice(product, quantity, duration, contractId) {
 
         // If max_quantity is 0 or null, it's unlimited - use all remaining quantity
         const isUnlimited = pricing.max_quantity === 0 || pricing.max_quantity === null;
-        const rangeSize = isUnlimited ? remainingQuantity : pricing.max_quantity - pricing.min_quantity + 1;
+        const rangeSize = isUnlimited ? remainingQuantity : (pricing.max_quantity || 0) - pricing.min_quantity + 1;
         const quantityInThisTier = Math.min(remainingQuantity, rangeSize);
-        const subtotal = quantityInThisTier * pricing.price;
+        const subtotal = quantityInThisTier * Number(pricing.price);
 
         breakdown.push({
             range: isUnlimited ? `${pricing.min_quantity}+` : `${pricing.min_quantity}-${pricing.max_quantity}`,
             minQuantity: pricing.min_quantity,
             maxQuantity: pricing.max_quantity || null,
             quantity: quantityInThisTier,
-            pricePerUnit: pricing.price,
+            pricePerUnit: Number(pricing.price),
             subtotal: parseFloat(subtotal.toFixed(2))
         });
 

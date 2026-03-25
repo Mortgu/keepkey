@@ -1,3 +1,4 @@
+import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
@@ -5,7 +6,7 @@ import { requireSession } from "../middlewares/auth.js";
 const router = Router();
 
 /* [GET] http://localhost:3000/api/orders */
-router.get('/', async (request, response) => {
+router.get('/', async (request: Request, response: Response) => {
     const result = await prisma.order.findMany({
         include: {
             user: true,
@@ -22,7 +23,7 @@ router.get('/', async (request, response) => {
 
 // TODO Permission Check
 /* [POST] http://localhost:3000/api/orders */
-router.post('/', requireSession, async (request, response) => {
+router.post('/', requireSession, async (request: Request, response: Response) => {
     const { body } = request;
     const user = request.user;
 
@@ -43,7 +44,7 @@ router.post('/', requireSession, async (request, response) => {
     const createdOrder = await prisma.$transaction(async (tx) => {
         /* Create Order */
         const order = await tx.order.create({
-            data: { userId: user.id }
+            data: { userId: user!.id }
         });
 
         /* Create Order Positions */
@@ -55,13 +56,14 @@ router.post('/', requireSession, async (request, response) => {
                     contractId: item.contractId,
                     duration: item.duration,
                     quantity: item.quantity,
+                    priceAtPurchase: item.priceAtPurchase || 0,
                 }
             });
         }
 
         /* Clear Shopping Card */
         await prisma.shoppingCart.deleteMany({
-            where: { userId: user.id }
+            where: { userId: user!.id }
         });
 
         return order;
@@ -72,11 +74,11 @@ router.post('/', requireSession, async (request, response) => {
     response.status(200).send({});
 });
 
-router.delete('/:id', requireSession, async (request, response) => {
+router.delete('/:id', requireSession, async (request: Request, response: Response) => {
     const { id } = request.params;
 
-    await prisma.order.deleteMany({
-        where: { id }
+    await prisma.order.delete({
+        where: { id: id as string }
     });
 
     return response.status(200).send({
