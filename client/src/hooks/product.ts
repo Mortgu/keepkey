@@ -1,6 +1,7 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getProducts, createProductAction, deleteProductAction, updateProductAction } from "@/data/products.ts";
+import { authClient } from "@/lib/auth-client";
 
 export const useProducts = () => {
     const queryClient = useQueryClient();

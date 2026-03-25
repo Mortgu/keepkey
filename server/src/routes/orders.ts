@@ -2,24 +2,13 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
+import { getAllOrders, getSessionOrders } from "../controllers/orderController.js";
+import { canViewOrders } from "../permissions/order.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/orders */
-router.get('/', async (request: Request, response: Response) => {
-    const result = await prisma.order.findMany({
-        include: {
-            user: true,
-            orderPositions: {
-                include: {
-                    product: true,
-                    contract: true,
-                }
-            }
-        }
-    });
-    response.status(200).send(result);
-});
+router.get('/', requireSession, getSessionOrders);
 
 // TODO Permission Check
 /* [POST] http://localhost:3000/api/orders */

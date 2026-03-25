@@ -1,7 +1,7 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
 
 export async function getProducts() {
-    const response = await fetch('http://localhost:3000/api/products', {
+    const response = await fetch(`http://localhost:3000/api/products`, {
         method: 'GET',
         credentials: 'include',
     });
@@ -65,9 +65,6 @@ export async function deleteProductAction(id: string): Promise<void> {
 }
 
 export async function updateProductAction(id: string, product: Partial<ProductItemProps>) {
-    console.log(id, product);
-
-
     const response = await fetch(`http://localhost:3000/api/products/${id}`, {
         method: 'PUT',
         credentials: 'include',

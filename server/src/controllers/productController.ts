@@ -5,7 +5,7 @@ import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
 
 /* 
- * Get Products 
+ * Get Session/Published Products 
  * [GET] http://localhost:3000/api/products 
  */
 export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
@@ -25,7 +25,7 @@ export const getProducts = async (request: Request, response: Response, next: Ne
         const { success } = await auth.api.userHasPermission({
             body: {
                 userId: session.user.id,
-                permissions: { product: ["create", "update"] },
+                permissions: { products: ["create", "update"] },
             },
         });
         canSeeUnpublished = success;

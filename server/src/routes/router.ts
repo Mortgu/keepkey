@@ -1,5 +1,6 @@
 import { Router } from 'express';
 
+import adminRouter from './admin.js';
 import productRouter from './products.js';
 import cartRouter from './cart.js';
 import userRouter from './user.js';
@@ -8,6 +9,8 @@ import pricingRouter from './pricing.js';
 import orderRouter from './orders.js';
 
 const router = Router();
+
+router.use('/admin', adminRouter);
 
 router.use('/products', productRouter);
 router.use('/cart', cartRouter);
