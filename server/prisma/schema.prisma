@@ -176,8 +176,10 @@ model OrderPosition {
   duration Int
   quantity Int
 
+  priceAtPurchase Float
+  currency        String @default("EUR")
+
   createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
 
   @@map("order_position")
 }

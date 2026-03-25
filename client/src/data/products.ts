@@ -1,4 +1,4 @@
-import type {ProductItemProps} from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
+import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
 
 export async function getProducts() {
     const response = await fetch('http://localhost:3000/api/products', {
@@ -16,12 +16,18 @@ export async function getProducts() {
 }
 
 export async function getProduct(id: string) {
-    const result = await fetch(`http://localhost:3000/api/products/${id}`, {
+    const response = await fetch(`http://localhost:3000/api/products/${id}`, {
         method: 'GET',
         credentials: 'include',
     });
 
-    return await result.json();
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
 }
 
 export async function createProductAction(name: string): Promise<ProductItemProps> {
@@ -65,7 +71,7 @@ export async function updateProductAction(id: string, product: Partial<ProductIt
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({...product})
+        body: JSON.stringify({ ...product })
     });
 
     const result = await response.json();

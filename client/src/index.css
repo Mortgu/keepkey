@@ -9,9 +9,10 @@
 
 * {
     box-sizing: border-box;
-    /*border: 1px dashed var(--keepit-primary-25);*/
 }
 
-@layer components {
-
+div {
+    outline: 1px solid red;
 }
+
+@layer components {}

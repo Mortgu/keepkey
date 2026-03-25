@@ -1,4 +1,5 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
+import { type ShoppingCardItem } from "./types";
 
 type CheckoutProps = {
     userId: string;
@@ -6,17 +7,18 @@ type CheckoutProps = {
     quantity: number;
 }
 
-export async function getShoppingCart() {
+
+export async function getShoppingCart(): Promise<ShoppingCardItem[]> {
     const response = await fetch('http://localhost:3000/api/cart', {
         method: 'GET',
         credentials: 'include',
     });
 
-    const result = await response.json();
-
     if (!response.ok) {
-        throw new Error(result.message);
+        throw new Error("Failed to fetch shopping cart from user!");
     }
+
+    const result: ShoppingCardItem[] = await response.json();
 
     return result;
 }

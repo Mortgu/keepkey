@@ -8,7 +8,8 @@ const router = Router();
 /* [GET] http://localhost:3000/api/contracts */
 router.get('/', async (request, response) => {
     const match = await prisma.contract.findMany();
-    response.status(200).send(match);
+
+    response.status(200).json(match);
 });
 
 /* [POST] http://localhost:3000/api/contracts */
@@ -23,7 +24,8 @@ router.post('/', requireSession, canDeleteContract, async (request, response) =>
     }
 
     const result = await prisma.contract.create({ data: body });
-    response.status(200).send(result);
+
+    response.status(200).json(result);
 });
 
 /* [DELETE] http://localhost:3000/api/contracts */

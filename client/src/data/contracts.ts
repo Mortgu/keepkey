@@ -1,4 +1,6 @@
-export async function getContractsAction() {
+import type { Contract } from "./types";
+
+export async function getContractsAction(): Promise<Contract[]> {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "GET",
     });
@@ -12,7 +14,7 @@ export async function getContractsAction() {
     return result;
 }
 
-export async function createContractAction(name: string) {
+export async function createContractAction(name: string): Promise<Contract> {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "POST",
         headers: {

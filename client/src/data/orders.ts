@@ -1,4 +1,5 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
+import type { ShoppingCartItem } from "./shopping-cart";
 
 export async function getOrdersAction() {
     const response = await fetch('http://localhost:3000/api/orders', {
@@ -15,7 +16,7 @@ export async function getOrdersAction() {
     return result;
 }
 
-export async function createOrderAction(products: ProductItemProps[]): Promise<ProductItemProps> {
+export async function createOrderAction(products: ShoppingCartItem[]): Promise<ProductItemProps> {
     if (products.length === 0) {
         throw new Error("No products found.");
     }

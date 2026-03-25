@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
+import { calculateProductPrice } from "../utils/products.js";
 
 const router = Router();
 
@@ -15,8 +16,6 @@ router.post('/', requireSession, async (request, response) => {
         })
     }
 
-    console.log("body", body)
-
     const match = await prisma.shoppingCart.findFirst({
         where: {
             AND: [
@@ -29,7 +28,7 @@ router.post('/', requireSession, async (request, response) => {
     });
 
 
-   if (match) {
+    if (match) {
         await prisma.shoppingCart.updateMany({
             where: {
                 AND: [
@@ -61,22 +60,29 @@ router.post('/', requireSession, async (request, response) => {
 /* [GET] http://localhost:3000/api/cart */
 router.get('/', requireSession, async (request, response) => {
     const user = request.user;
+
+    // 1. Fetching the cart items with related data
     const items = await prisma.shoppingCart.findMany({
-        where: {
-            userId: user.id
-        },
+        where: { userId: user.id },
         include: {
             contract: true,
             product: {
                 include: {
-                    orderPositions: true,
-                    productPricing: true
+                    productPricing: true,
                 }
             },
         }
     });
 
-    return response.status(200).send(items);
+    const merged = items.map(async (item) => {
+        const price = calculateProductPrice(item.product, item.quantity, item.duration, item.contractId);
+
+        return {
+            ...item, price: price,
+        }
+    });
+
+    return response.status(200).json(items);
 })
 
 /* [DELETE] http://localhost:3000/api/cart/{userId} */

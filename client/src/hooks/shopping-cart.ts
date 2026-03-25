@@ -1,9 +1,11 @@
 import { createOrderAction } from "@/data/orders";
-import {addToShoppingCartAction, deleteShoppingCartAction, getShoppingCart} from "@/data/shopping-cart";
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
+import { addToShoppingCartAction, deleteShoppingCartAction, getShoppingCart, type ShoppingCartItem } from "@/data/shopping-cart";
+import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 
 export const useShoppingCart = () => {
+    const { data: session } = authClient.useSession();
     const queryClient = useQueryClient();
 
     const { data: shoppingCart = [], isPending, error } = useQuery({
@@ -18,12 +20,36 @@ export const useShoppingCart = () => {
         }),
     });
 
+    /*  */
     const checkoutMutation = useMutation({
-        mutationFn: (products: ProductItemProps[]) => createOrderAction(products),
+        mutationFn: (products: ShoppingCartItem[]) => createOrderAction(products),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: ['cart'],
         })
     });
+
+    const handleCheckout = useCallback(
+        (products: ShoppingCartItem[]) => {
+            if (!session || !session.user) {
+                alert("Du bist nicht angemeldet!");
+                return;
+            }
+
+            if (!session.user.emailVerified) {
+                alert("Du musst zuerst deine E-Mail verifizieren!");
+                return;
+            }
+
+            if (products.length <= 0) {
+                alert("Es konnten keine Produkte in deinem Warenkorb gefunden werden!");
+                return;
+            }
+
+
+            checkoutMutation.mutate(products);
+        },
+        [checkoutMutation.mutate, session]
+    )
 
     const deleteMutation = useMutation({
         mutationFn: deleteShoppingCartAction,
@@ -43,7 +69,7 @@ export const useShoppingCart = () => {
         clearCart: deleteMutation.mutate,
         isClearingCart: deleteMutation.isPending,
 
-        checkout: checkoutMutation.mutate,
+        handleCheckout,
         isProcessing: checkoutMutation.isPending
     };
 }
