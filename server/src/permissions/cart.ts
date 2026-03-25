@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from "express";
 import { auth } from "../lib/auth.js";
 
-export async function canCreateProduct(request: Request, response: Response, next: NextFunction) {
+export const canViewShoppingCarts = async (request: Request, response: Response, next: NextFunction) => {
     const user = request.user;
 
     if (!user) {
@@ -14,21 +14,21 @@ export async function canCreateProduct(request: Request, response: Response, nex
         body: {
             userId: user.id,
             permissions: {
-                product: ["create"]
+                carts: ["view"]
             }
         },
     });
 
     if (!success) {
         return response.status(400).send({
-            success: false, message: "Permission not found",
+            success: false, message: "Missing permissions.",
         })
     }
 
     next();
 }
 
-export async function canDeleteProduct(request: Request, response: Response, next: NextFunction) {
+export const canDeleteShoppingCarts = async (request: Request, response: Response, next: NextFunction) => {
     const user = request.user;
 
     if (!user) {
@@ -41,15 +41,15 @@ export async function canDeleteProduct(request: Request, response: Response, nex
         body: {
             userId: user.id,
             permissions: {
-                product: ['delete'],
-            },
+                carts: ["delete"]
+            }
         },
     });
 
     if (!success) {
-        return response.status(400).json({
-            success: false, message: "You are not allowed to delete a product!",
-        });
+        return response.status(400).send({
+            success: false, message: "Missing permissions.",
+        })
     }
 
     next();

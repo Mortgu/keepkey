@@ -6,6 +6,8 @@ import { auth } from './lib/auth.js';
 import cors from 'cors';
 
 import router from './routes/router.js';
+import { errorHandler } from './middlewares/errorHandler.js';
+import config from './config/config.js';
 
 const app: Express = express();
 
@@ -21,6 +23,9 @@ app.use(express.json());
 
 app.use('/api', router);
 
-app.listen(3000, () => {
-    console.log('Server is listening on port 3000');
+// Global error handler 
+app.use(errorHandler);
+
+app.listen(config.port, () => {
+    console.log(`Server is listening on port ${config.port}`);
 });
