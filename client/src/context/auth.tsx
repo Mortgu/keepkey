@@ -1,9 +1,8 @@
-import {createContext, type ReactNode, useContext} from "react";
-import {useQuery} from "@tanstack/react-query";
-import {getCurrentUser} from "@/data/user.ts";
-import {Loader} from "lucide-react";
-import {authClient} from "@/lib/auth-client.ts";
-import {redirect} from "@tanstack/react-router";
+import { createContext, type ReactNode, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getCurrentUser } from "@/data/user.ts";
+import { Loader } from "lucide-react";
+import { authClient } from "@/lib/auth-client.ts";
 
 type User = {
     id: string,

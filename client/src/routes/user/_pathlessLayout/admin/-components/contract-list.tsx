@@ -51,8 +51,8 @@ export default function ContractList() {
                 <Button onClick={() => setOpen(true)} size='sm'>Create <Plus className='size-4' /></Button>
             </div>
             <div className='grid gap-2'>
-                {contracts.map((contract: Contract) => (
-                    <div key={contract.id} className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300">
+                {contracts.map((contract: Contract, index) => (
+                    <div key={index} className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300">
                         <div>
                             <p>{contract.name}</p>
                             <p className='text-sm text-gray-400'>{contract.id}</p>

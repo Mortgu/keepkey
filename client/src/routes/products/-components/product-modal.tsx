@@ -1,16 +1,16 @@
 import Button from "@/components/button/button";
 import Modal from "@/components/modal";
 import { useContracts } from "@/hooks/contract";
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
 import { useForm } from "@tanstack/react-form";
 import { Loader } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
-import {useShoppingCart} from "@/hooks/shopping-cart.ts";
-import {authClient} from "@/lib/auth-client.ts";
+import { useShoppingCart } from "@/hooks/shopping-cart.ts";
+import { authClient } from "@/lib/auth-client.ts";
+import type { ProductItem } from "@/data/types";
 
 type ProductModalProps = {
-    product: ProductItemProps,
+    product: ProductItem,
     onSubmit?: () => void,
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
@@ -62,8 +62,8 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
                 <form.Field name='contractId' children={(field) => (
                     <select defaultValue={field.state.value}
                         onChange={(e) => field.handleChange(e.target.value)} className="w-full px-3 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                        {contracts.map((contract: any) => (
-                            <option key={contract.id} value={contract.id}>{contract.name}</option>
+                        {contracts.map((contract: any, index) => (
+                            <option key={index} value={contract.id}>{contract.name}</option>
                         ))}
                     </select>
                 )} />
