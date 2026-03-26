@@ -84,6 +84,9 @@ model Product {
   id   String @id @default(uuid())
   name String @unique
 
+  description String?
+  link        String?
+
   published Boolean @default(false)
 
   shoppingCarts  ShoppingCart[]
@@ -148,7 +151,7 @@ model ShoppingCart {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
-  @@unique([userId, productId, contractId])
+  @@unique([userId, productId, contractId, duration])
   @@map("cart")
 }
 

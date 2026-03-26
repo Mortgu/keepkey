@@ -8,9 +8,27 @@ export const useAdmin = () => {
         queryFn: () => { },
     });
 
+    const { data: products = [], isPending: pendingProducts, error: errorProducts } = useQuery({
+        queryKey: ['admin:products'],
+        queryFn: () => { },
+    });
+
+    const { data: contracts = [], isPending: pendingContracts, error: errorContracts } = useQuery({
+        queryKey: ['admin:contracts'],
+        queryFn: () => { },
+    });
+
     return {
         orders,
         pendingOrders,
         errorOrders,
+
+        products,
+        pendingProducts,
+        errorProducts,
+
+        contracts,
+        pendingContracts,
+        errorContracts,
     }
 }

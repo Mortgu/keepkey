@@ -41,9 +41,22 @@ export async function addToShoppingCartAction(product: Partial<ProductItemProps>
 }
 
 export async function removeFromShoppingCartAction(product: Partial<ShoppingCartItem>) {
-    console.log(product)
+    const response = await fetch(`http://localhost:3000/api/cart/${product.userId}`, {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+            'Content-type': 'application/json',
+        },
+        body: JSON.stringify({ product }),
+    });
 
-    return product;
+    if (!response.ok) {
+        throw new Error("Failed to remove from shopping cart!", await response.json());
+    }
+
+    const result = await response.json();
+
+    return result;
 }
 
 export async function updateShoppingCart({ userId, productId, quantity }: CheckoutProps) {

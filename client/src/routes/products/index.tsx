@@ -11,7 +11,7 @@ function RouteComponent() {
     const { products } = useProducts();
 
     return (
-        <div>
+        <div className='grid gap-4'>
             {products.map((product: ProductItem, index: number) => (
                 <ProductCard key={index} product={product} />
             ))}

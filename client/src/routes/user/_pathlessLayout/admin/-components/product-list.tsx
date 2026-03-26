@@ -15,11 +15,13 @@ export default function ProductList() {
     const productForm = useForm({
         defaultValues: {
             productName: "",
+            description: "",
             link: "",
         },
         validators: {
             onChange: z.object({
                 productName: z.string().min(1),
+                description: z.string(),
                 link: z.string(),
             }),
         },
@@ -66,18 +68,22 @@ export default function ProductList() {
                             <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
                                 value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
                         )} />
+                        <productForm.Field name='description' children={(field) => (
+                            <textarea id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
+                                value={field.state.value} placeholder="Produkt Beschreibung" onChange={(e) => field.handleChange(e.target.value)} />
+                        )} />
                         <productForm.Field name='link' children={(field) => (
                             <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
                                 value={field.state.value} placeholder="https://www..." onChange={(e) => field.handleChange(e.target.value)} />
                         )} />
                         <div className='flex items-center gap-2 w-full'>
+                            <Button className="flex-1" onClick={() => addProduct(false)} type='button' size='sm' variant='secondary'>Cancel</Button>
                             <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                                <Button disabled={!canSubmit} type='submit' size='sm'>
+                                <Button className="flex-1" disabled={!canSubmit} type='submit' size='sm'>
                                     {isSubmitting && <Loader className='animate-spin' />}
                                     {!isSubmitting && ("Save")}
                                 </Button>
                             )} />
-                            <Button onClick={() => addProduct(false)} type='button' size='sm' variant='secondary'>Cancel</Button>
                         </div>
                     </form>
                 </Modal>

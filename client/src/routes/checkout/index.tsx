@@ -3,9 +3,8 @@ import { Loader, Pen, Trash } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
-import { formatCurrency } from "@/lib/format.ts";
 import { requireSession } from "@/lib/session.ts";
-import type { ProductItem, ShoppingCartItem } from '@/data/types';
+import type { ShoppingCartItem } from '@/data/types';
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,

@@ -77,14 +77,17 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
 
     const entry = await prisma.shoppingCart.upsert({
         where: {
-            userId_productId_contractId: {
-                userId: user.id, productId: test.productId, contractId: test.contractId,
+            userId_productId_contractId_duration: {
+                userId: user.id,
+                productId: test.productId,
+                contractId: test.contractId,
+                duration: test.duration,
             }
         },
-        create: { ...body },
         update: {
             quantity: { increment: test.quantity },
         },
+        create: { ...body },
         include: {
             product: {
                 include: {
@@ -136,21 +139,29 @@ export const deleteSessionShoppingCart = async (request: Request, response: Resp
 
 
 /* 
- * Remove item from shopping cart for session user
- * [UPDATE] http://localhost:3000/api/cart
+ * Remove item from shopping cart for user
+ * [PUT] http://localhost:3000/api/cart/{userId}
  */
-export const removeFromSessionShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const user = request.user;
+export const removeFromShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
+    const { userId } = request.params;
+    const body = request.body;
 
-    if (!user) {
+    if (!userId || !body) {
         return response.status(400).json({
             message: "Bad request.", success: false
         });
     }
 
     await prisma.shoppingCart.deleteMany({
-        where: { userId: user.id },
-    });
+        where: {
+            AND: [
+                { userId: userId as string },
+                { productId: body.productId },
+                { contractId: body.contractId },
+            ]
+        }
+    })
+
 
     return response.status(200).send({
         message: "Successfully deleted item", success: true
