@@ -1,4 +1,4 @@
-import { deleteOrderAction, getAllOrdersAction } from "@/data/orders";
+import { deleteOrderAction, getOrdersAction } from "@/data/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useOrders = () => {
@@ -6,7 +6,7 @@ export const useOrders = () => {
 
     const { data: orders = [], isPending, error } = useQuery({
         queryKey: ["orders"],
-        queryFn: getAllOrdersAction,
+        queryFn: getOrdersAction,
     });
 
     const deleteMutation = useMutation({

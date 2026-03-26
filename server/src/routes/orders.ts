@@ -10,7 +10,6 @@ const router = Router();
 /* [GET] http://localhost:3000/api/orders */
 router.get('/', requireSession, getSessionOrders);
 
-// TODO Permission Check
 /* [POST] http://localhost:3000/api/orders */
 router.post('/', requireSession, async (request: Request, response: Response) => {
     const { body } = request;

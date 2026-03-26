@@ -1,8 +1,8 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
 import type { ShoppingCartItem } from "./types";
 
-export async function getAllOrdersAction() {
-    const response = await fetch('http://localhost:3000/api/admin/orders', {
+export async function getOrdersAction() {
+    const response = await fetch('http://localhost:3000/api/orders', {
         method: 'GET',
         credentials: 'include',
     });
