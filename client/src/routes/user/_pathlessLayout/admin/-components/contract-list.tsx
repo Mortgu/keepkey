@@ -4,10 +4,12 @@ import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useContracts } from "@/hooks/contract.ts";
+import { formatDate } from "@/lib/format";
 
 type Contract = {
     id: string;
     name: string;
+    createdAt: Date;
 }
 
 export default function ContractList() {
@@ -55,7 +57,7 @@ export default function ContractList() {
                     <div key={index} className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300">
                         <div>
                             <p>{contract.name}</p>
-                            <p className='text-sm text-gray-400'>{contract.id}</p>
+                            <p className='text-sm text-gray-400'>{formatDate(contract.createdAt)}</p>
                         </div>
                         <Button onClick={() => deleteContract(contract.id)} size='sm' variant='ghost' className='aspect-square'>
                             <Trash className='size-4' />

@@ -1,6 +1,6 @@
 
 export async function getCurrentUser() {
-    const user = await fetch('http://localhost:3000/api/users/current', {
+    const user = await fetch('http://localhost:3000/api/users/session', {
         method: 'GET',
         credentials: 'include',
     });

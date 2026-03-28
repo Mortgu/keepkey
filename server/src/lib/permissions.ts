@@ -5,6 +5,7 @@ const statement = {
     contracts: ["create", "update", "delete"],
     carts: ['view', 'create', 'update', 'delete'],
     orders: ['view', 'create', 'update', 'delete'],
+    users: ['view', 'create', 'update', 'delete'],
 };
 
 export const ac = createAccessControl(statement);
@@ -13,7 +14,8 @@ export const user = ac.newRole({
     products: [],
     contracts: [],
     carts: [],
-    orders: [''],
+    orders: [],
+    users: [],
 });
 
 export const admin = ac.newRole({
@@ -21,4 +23,5 @@ export const admin = ac.newRole({
     contracts: ["create", "update", "delete"],
     carts: ["view", "create", "update", "delete"],
     orders: ["view", "create", "update", "delete"],
+    users: ['view', 'create', 'update', 'delete'],
 });

@@ -109,6 +109,8 @@ model Contract {
   orderPositions OrderPosition[]
   shoppingCard   ShoppingCart[]
 
+  createdAt DateTime? @default(now())
+
   @@map("contract")
 }
 

@@ -1,7 +1,7 @@
-import {createFileRoute, Outlet} from '@tanstack/react-router'
-import {NavLink} from "@/routes/-components/nav-link.tsx";
-import {Car, LogOut, ScrollText, Settings} from "lucide-react";
-import {useAuth} from "@/context/auth.tsx";
+import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { NavLink } from "@/routes/-components/nav-link.tsx";
+import { Car, LogOut, ScrollText, Settings } from "lucide-react";
+import { useAuth } from "@/context/auth.tsx";
 
 export const Route = createFileRoute('/user/_pathlessLayout')({
     component: PathlessLayoutComponent,
@@ -15,35 +15,35 @@ function PathlessLayoutComponent() {
     }
 
     return (
-        <div className='flex gap-4'>
-            <div className='flex-1 '>
-                <div className='flex flex-col gap-2 border-b border-gray-200 pb-4'>
+        <div className='grid gap-4'>
+            <div className='flex items-center justify-between border rounded-md p-3 border-gray-300'>
+                <div className='flex h-full gap-2'>
                     <NavLink className='flex items-center gap-2' variant="filled" to='/user/settings'>
-                        <Settings className="size-5"/>
+                        <Settings className="size-4" />
                         Settings
                     </NavLink>
                     <NavLink className='flex items-center gap-2' variant="filled" to='/user/offers'>
-                        <ScrollText className="size-5"/>
+                        <ScrollText className="size-5" />
                         My Offers
                     </NavLink>
                     <NavLink className='flex items-center gap-2' variant="filled" to='/user/orders'>
-                        <Car className="size-5"/>
+                        <Car className="size-5" />
                         My Orders
                     </NavLink>
                     <button onClick={logout} className='bg-red-100 hover:bg-red-200 px-4 py-2 rounded-md flex items-center gap-2' variant="filled" to='/user/orders'>
-                        <LogOut className="size-5"/>
+                        <LogOut className="size-5" />
                         Sign Out
                     </button>
                 </div>
 
                 {(user && user.role === "admin") && (
-                    <div className='flex flex-col gap-2 py-4'>
+                    <div className='flex flex-col gap-2'>
                         <NavLink variant="filled" to='/user/admin'>Admin</NavLink>
                     </div>
                 )}
             </div>
             <div className='flex-5'>
-                <Outlet/>
+                <Outlet />
             </div>
         </div>
     );

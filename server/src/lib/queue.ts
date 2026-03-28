@@ -6,28 +6,24 @@ const connection = { host: 'localhost', port: 6379 };
 export const documentQueue = new Queue('document-generation', { connection });
 
 export function startWorker() {
-  const worker = new Worker(
-    'document-generation',
-    async (job: Job) => {
-      const { documentJobId, type, orderId } = job.data;
+  const worker = new Worker('document-generation', async (job: Job) => {
+    const { documentJobId, type, orderId } = job.data;
 
-      // Status auf "processing" setzen
-      await prisma.documentJob.update({
-        where: { id: documentJobId },
-        data: { status: 'processing' },
-      });
+    // Status auf "processing" setzen
+    await prisma.documentJob.update({
+      where: { id: documentJobId },
+      data: { status: 'processing' },
+    });
 
-      // Hier die eigentliche Dokument-Generierung (Platzhalter)
-      await generateDocument(type, orderId);
+    // Hier die eigentliche Dokument-Generierung (Platzhalter)
+    await generateDocument(type, orderId);
 
-      // Status auf "completed" setzen
-      await prisma.documentJob.update({
-        where: { id: documentJobId },
-        data: { status: 'completed' },
-      });
-    },
-    { connection }
-  );
+    // Status auf "completed" setzen
+    await prisma.documentJob.update({
+      where: { id: documentJobId },
+      data: { status: 'completed' },
+    });
+  }, { connection });
 
   worker.on('failed', async (job, err) => {
     if (job) {

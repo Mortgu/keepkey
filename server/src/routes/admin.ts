@@ -4,6 +4,8 @@ import { requireSession } from "../middlewares/auth.js";
 import { getAllOrders } from "../controllers/orderController.js";
 import { canViewProducts } from "../permissions/product.js";
 import { getProducts } from "../controllers/productController.js";
+import { canViewAllUsers } from "../permissions/user.js";
+import { getAllUsers } from "../controllers/userController.js";
 
 const router = Router();
 
@@ -12,5 +14,8 @@ router.get('/orders', requireSession, canViewOrders, getAllOrders);
 
 /* [GET] http://localhost:3000/api/admin/products */
 //router.get('/products', requireSession, canViewProducts, getProducts);
+
+/* [GET] http://localhost:3000/api/admin/users */
+router.get('/users', requireSession, canViewAllUsers, getAllUsers);
 
 export default router;

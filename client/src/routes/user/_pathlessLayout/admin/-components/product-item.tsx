@@ -1,5 +1,5 @@
 import Button from "@/components/button/button.tsx";
-import { BadgeCheck, Check, Cross, Loader, Pen, Plus, Trash, X } from "lucide-react";
+import { BadgeCheck, Loader, Pen, Plus, Trash, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -154,8 +154,8 @@ export default function ProductItem(product: ProductItemProps) {
                 }} className="border-t gap-2 border-gray-200 py-2 px-2 flex flex-wrap items-center justify-between">
                     <pricingForm.Field name='contractId' children={(field) => (
                         <select id={field.name} name={field.name} defaultValue={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)} className="flex-[2] h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                            {contracts.map((contract: any) => (
+                            onChange={(e) => field.handleChange(e.target.value)} className="flex-2 h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
+                            {contracts?.map((contract: any) => (
                                 <option key={contract.id} value={contract.id}>{contract.name}</option>
                             ))}
                         </select>

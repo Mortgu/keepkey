@@ -7,10 +7,11 @@ const styles = tv({
     variants: {
         variant: {
             primary: "flex items-center justify-center h-full border-b-2 border-transparent", // Transparent border prevents layout shift
-            filled: "px-4 py-2 rounded-md",
+            filled: "py-2 px-4 rounded-md ",
         },
         isActive: {
             true: "",
+            false: ""
         },
     },
     compoundVariants: [
@@ -22,7 +23,7 @@ const styles = tv({
         {
             variant: "filled",
             isActive: true,
-            class: "bg-(--keepit-primary) text-white",
+            class: "bg-(--keepit-primary-25) text-black",
         },
     ],
     defaultVariants: {
@@ -39,11 +40,7 @@ type BasicLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 const BasicLinkComponent = React.forwardRef<HTMLAnchorElement, BasicLinkProps>(
     ({ className, variant, ...props }, ref) => {
         return (
-            <a
-                ref={ref}
-                {...props}
-                className={styles({ variant, className })}
-            />
+            <a ref={ref} {...props} className={styles({ variant, className })} />
         );
     }
 );
@@ -52,11 +49,8 @@ const CreatedLinkComponent = createLink(BasicLinkComponent);
 
 export const NavLink: LinkComponent<typeof BasicLinkComponent> = (props) => {
     return (
-        <CreatedLinkComponent
-            {...props}
-            activeProps={{
-                className: styles({ variant: props.variant, isActive: true }),
-            }}
-        />
+        <CreatedLinkComponent {...props} activeProps={{
+            className: styles({ variant: props.variant, isActive: true }),
+        }} />
     );
 };
