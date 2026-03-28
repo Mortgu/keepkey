@@ -14,19 +14,19 @@ export default function ProductList() {
 
     const productForm = useForm({
         defaultValues: {
-            productName: "",
+            name: "",
             description: "",
             link: "",
         },
         validators: {
             onChange: z.object({
-                productName: z.string().min(1),
+                name: z.string().min(1),
                 description: z.string(),
                 link: z.string(),
             }),
         },
         onSubmit: async ({ value }) => {
-            await createProduct(value.productName);
+            await createProduct({ ...value });
         }
     })
 
@@ -64,7 +64,7 @@ export default function ProductList() {
                         e.stopPropagation();
                         productForm.handleSubmit(productForm);
                     }} className="rounded-md flex flex-col gap-4 p-2 cursor-pointer">
-                        <productForm.Field name='productName' children={(field) => (
+                        <productForm.Field name='name' children={(field) => (
                             <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-1 rounded-md'
                                 value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
                         )} />

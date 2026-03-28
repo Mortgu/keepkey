@@ -2,6 +2,7 @@ import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
 import { Loader, Pen, Plus, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
+import DocumentStatus from "@/components/document-status";
 
 export default function OrderList() {
     const { orders, isPending, error, deleteOrder } = useOrders();
@@ -36,6 +37,9 @@ export default function OrderList() {
                                 <p className='text-lg'>{order.user.name} </p>
                                 <p className='text-sm text-gray-500'>{formatDate(order.createdAt)}</p>
                             </div>
+                            <div className="mr-4">
+                                <DocumentStatus orderId={order.id} />
+                            </div>
                             <div>
                                 <Button size='sm' variant='ghost' className='aspect-square'>
                                     <Pen className='size-4' />
@@ -46,7 +50,7 @@ export default function OrderList() {
                             </div>
                         </div>
                         <div className='flex gap-2 mt-2'>
-                            {order.orderPositions.map((position) => (
+                            {order.orderPositions.map((position: any) => (
                                 <div className='flex items-center justify-between flex-1 gap-2 p-3 border border-gray-200 rounded-md'>
                                     <div className="grid gap-2">
                                         <p className='text-md' key={position.id}>{position.product.name} ({position.quantity}x)

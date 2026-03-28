@@ -162,11 +162,28 @@ model Order {
   userId String
 
   orderPositions OrderPosition[]
+  documentJobs   DocumentJob[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
   @@map("order")
+}
+
+model DocumentJob {
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  type      String
+  status    String   @default("pending")
+  error     String?
+  jobId     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([status])
+  @@map("document_job")
 }
 
 model OrderPosition {

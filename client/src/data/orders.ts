@@ -1,5 +1,9 @@
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
-import type { ShoppingCartItem } from "./types";
+import type { ShoppingCartItem, DocumentJob } from "./types";
+
+interface CreateOrderResponse {
+    orderId: string;
+    success: boolean;
+}
 
 export async function getOrdersAction() {
     const response = await fetch('http://localhost:3000/api/orders', {
@@ -16,7 +20,7 @@ export async function getOrdersAction() {
     return result;
 }
 
-export async function createOrderAction(products: ShoppingCartItem[]): Promise<ProductItemProps> {
+export async function createOrderAction(products: ShoppingCartItem[]): Promise<CreateOrderResponse> {
     if (products.length === 0) {
         throw new Error("No products found.");
     }
@@ -42,6 +46,21 @@ export async function createOrderAction(products: ShoppingCartItem[]): Promise<P
 export async function deleteOrderAction(orderId: string) {
     const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
         method: 'DELETE',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
+export async function getDocumentJobsAction(orderId: string): Promise<DocumentJob[]> {
+    const response = await fetch(`http://localhost:3000/api/orders/${orderId}/documents`, {
+        method: 'GET',
         credentials: 'include',
     });
 

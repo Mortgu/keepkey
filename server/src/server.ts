@@ -8,6 +8,7 @@ import cors from 'cors';
 import router from './routes/router.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import config from './config/config.js';
+import { startWorker } from './lib/queue.js';
 
 const app: Express = express();
 
@@ -23,8 +24,11 @@ app.use(express.json());
 
 app.use('/api', router);
 
-// Global error handler 
+// Global error handler
 app.use(errorHandler);
+
+// Start document generation worker
+startWorker();
 
 app.listen(config.port, () => {
     console.log(`Server is listening on port ${config.port}`);

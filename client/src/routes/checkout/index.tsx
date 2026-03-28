@@ -5,6 +5,7 @@ import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
 import { requireSession } from "@/lib/session.ts";
 import type { ShoppingCartItem } from '@/data/types';
+import DocumentStatus from '@/components/document-status';
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
@@ -13,7 +14,7 @@ export const Route = createFileRoute('/checkout/')({
 })
 
 function RouteComponent() {
-    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error } = useShoppingCart();
+    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error, checkoutData } = useShoppingCart();
     const { data: session } = authClient.useSession();
     const emailVerified = session?.user.emailVerified;
 
@@ -27,7 +28,6 @@ function RouteComponent() {
         )
     }
 
-    console.log(shoppingCart)
 
     return (
         <div>
@@ -73,6 +73,12 @@ function RouteComponent() {
                     </div>
                 ))}
             </div>
+
+            {checkoutData?.orderId && (
+                <div className='mt-6'>
+                    <DocumentStatus orderId={checkoutData.orderId} />
+                </div>
+            )}
         </div>
     )
 }

@@ -82,6 +82,7 @@ export const useShoppingCart = () => {
         isClearingCart: deleteMutation.isPending,
 
         handleCheckout,
-        isProcessing: checkoutMutation.isPending
+        isProcessing: checkoutMutation.isPending,
+        checkoutData: checkoutMutation.data,
     };
 }

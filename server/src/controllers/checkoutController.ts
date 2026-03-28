@@ -101,8 +101,9 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
 
     await prisma.shoppingCart.update({
         where: {
-            userId_productId_contractId: {
+            userId_productId_contractId_duration: {
                 userId: user.id, productId: test.productId, contractId: test.contractId,
+                duration: test.duration,
             }
         },
         data: {
@@ -153,13 +154,7 @@ export const removeFromShoppingCart = async (request: Request, response: Respons
     }
 
     await prisma.shoppingCart.deleteMany({
-        where: {
-            AND: [
-                { userId: userId as string },
-                { productId: body.productId },
-                { contractId: body.contractId },
-            ]
-        }
+        where: { id: body.id },
     })
 
 

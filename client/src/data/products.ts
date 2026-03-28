@@ -30,13 +30,15 @@ export async function getProduct(id: string) {
     return result;
 }
 
-export async function createProductAction(name: string): Promise<ProductItemProps> {
+export async function createProductAction(product: {
+    name: string, description: string, link: string,
+}): Promise<ProductItemProps> {
     const response = await fetch('http://localhost:3000/api/products', {
         method: "POST",
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            name: name
+            ...product
         })
     })
 

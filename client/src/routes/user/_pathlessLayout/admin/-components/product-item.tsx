@@ -13,6 +13,8 @@ export type ProductItemProps = {
     quantity: number;
     price: number;
     published: boolean;
+    description: string;
+    link: string;
     productPricing: [{
         contract: {
             name: string;
@@ -90,9 +92,9 @@ export default function ProductItem(product: ProductItemProps) {
 
             {/* Product Header */}
             <div className='flex items-center justify-between p-2'>
-                <div className="flex items-center gap-4">
-                    <p>{product.name}</p>
-
+                <div className="grid items-center">
+                    <p className="text-md">{product.name}</p>
+                    <p className="text-sm text-gray-600">{product.description}</p>
                 </div>
 
                 <div>
@@ -120,6 +122,10 @@ export default function ProductItem(product: ProductItemProps) {
                         {!isDeleting && <Trash className='size-4' />}
                     </Button>
                 </div>
+            </div>
+
+            <div className='flex items-center p-2 border-t border-gray-200'>
+                <p className='flex-1 text-sm'>{product.link}</p>
             </div>
 
             {/* Product Body */}
