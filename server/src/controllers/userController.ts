@@ -13,5 +13,5 @@ export const getSessionUser = async (request: Request, response: Response) => {
         where: { id: user!.id },
     });
 
-    return response.status(200).json(user);
+    return response.status(200).json(databaseUser);
 }
