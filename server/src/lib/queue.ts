@@ -1,5 +1,9 @@
 import { Queue, Worker, Job } from 'bullmq';
 import { prisma } from './prisma.js';
+import puppeteer from 'puppeteer';
+
+import fs from 'fs';
+import { generateInvoicePDF } from '../utils/document-generator.js';
 
 const connection = { host: 'localhost', port: 6379 };
 
@@ -39,8 +43,5 @@ export function startWorker() {
 }
 
 async function generateDocument(type: string, orderId: string) {
-  // TODO: Echte Implementierung (PDF-Generierung etc.)
-  console.log(`Generating ${type} document for order ${orderId}`);
-  await new Promise((resolve) => setTimeout(resolve, 2000)); // Simulation
-  console.log(`Finished generating ${type} document for order ${orderId}`);
+  console.log(type, orderId);
 }

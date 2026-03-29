@@ -58,8 +58,6 @@ router.post('/', requireSession, async (request: Request, response: Response) =>
         return order;
     });
 
-    console.log(createdOrder);
-
     // Dispatch document generation jobs
     const jobTypes = ['invoice', 'license'];
     for (const type of jobTypes) {
