@@ -1,11 +1,11 @@
 import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
-import { Loader, Pen, Plus, Trash } from "lucide-react";
-import { formatDate } from "@/lib/format.ts";
-import DocumentStatus from "@/components/document-status";
+import { Loader, Plus } from "lucide-react";
+import type { Order } from "@/data/types";
+import OrderListItem from "./order-list-item";
 
 export default function OrderList() {
-    const { orders, isPending, error, deleteOrder } = useOrders();
+    const { orders, isPending, error } = useOrders();
 
     if (isPending) {
         return (
@@ -23,49 +23,26 @@ export default function OrderList() {
     }
 
     return (
-        <div className="">
-            <div className='mb-4 flex items-center justify-between'>
-                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Orders
-                    ({orders.length})</h1>
-                <Button size='sm'>Create <Plus className='size-4' /></Button>
+        <div>
+
+            {/* Order list header */}
+            <div className="flex items-center justify-between mb-6">
+                <div className="grid gap-1">
+                    <h1 className="text-2xl font-medium">Orders</h1>
+                    <p className="text-sm text-gray-500">{orders.length} Orders - 0 €</p>
+                </div>
+
+                {/* Header actions */}
+                <Button size="sm">Create <Plus className="size-4" /></Button>
             </div>
-            <div className='grid gap-2'>
-                {orders.map((order: any) => (
-                    <div className='grid gap-2 border border-gray-200 p-3 rounded-md'>
-                        <div className='flex items-center justify-between'>
-                            <div className=" flex-1">
-                                <p className='text-lg'>{order.user.name} </p>
-                                <p className='text-sm text-gray-500'>{formatDate(order.createdAt)}</p>
-                            </div>
-                            <div className="mr-4">
-                                <DocumentStatus orderId={order.id} />
-                            </div>
-                            <div>
-                                <Button size='sm' variant='ghost' className='aspect-square'>
-                                    <Pen className='size-4' />
-                                </Button>
-                                <Button onClick={() => deleteOrder(order.id)} size='sm' variant='ghost' className='aspect-square'>
-                                    <Trash className='size-4' />
-                                </Button>
-                            </div>
-                        </div>
-                        <div className='flex gap-2 mt-2'>
-                            {order.orderPositions.map((position: any) => (
-                                <div className='flex items-center justify-between flex-1 gap-2 p-3 border border-gray-200 rounded-md'>
-                                    <div className="grid gap-2">
-                                        <p className='text-md' key={position.id}>{position.product.name} ({position.quantity}x)
-                                        </p>
-                                        <p className='text-sm text-gray-500' key={position.id}>{position.contract.name}</p>
-                                    </div>
-                                    <p>200,00€</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+
+            {/* Order list item */}
+            <div className="grid gap-0">
+                {orders.map((order: Order, index: number) => (
+                    <OrderListItem key={index} order={order} />
                 ))}
             </div>
 
-
-        </div>
+        </div >
     )
 }

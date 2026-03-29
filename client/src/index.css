@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-    --viewport: 1600px;
+    --viewport: 1200px;
 
     --keepit-primary: #00683F;
     --keepit-primary-25: #00683e34;

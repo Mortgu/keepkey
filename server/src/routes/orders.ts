@@ -45,7 +45,7 @@ router.post('/', requireSession, async (request: Request, response: Response) =>
                     contractId: item.contractId,
                     duration: item.duration,
                     quantity: item.quantity,
-                    priceAtPurchase: item.priceAtPurchase || 0,
+                    priceAtPurchase: item.price || 0,
                 }
             });
         }

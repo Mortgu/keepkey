@@ -1,3 +1,17 @@
+export interface User {
+    id: string;
+    name: string;
+
+    salutation: string;
+    firstName: string;
+    lastName: string;
+
+    email: string;
+    emailVerified: boolean;
+
+    createdAt: Date;
+}
+
 export interface Contract {
     id: string;
     name: string;
@@ -25,6 +39,23 @@ export interface ShoppingCartItem extends ProductItem {
 
     price: number;
 }
+
+export interface OrderPositionItem extends ShoppingCartItem {
+    id: string;
+    priceAtPurchase: number;
+    currency: string;
+    createdAt: Date;
+}
+
+export interface Order {
+    id: string;
+    user: User;
+
+    orderPositions: OrderPositionItem[],
+
+    createdAt: Date;
+}
+
 
 export interface DocumentJob {
     id: string;
