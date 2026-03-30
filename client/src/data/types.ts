@@ -15,6 +15,8 @@ export interface User {
 export interface Contract {
     id: string;
     name: string;
+
+    createdAt: Date;
 }
 
 export interface ProductItem {

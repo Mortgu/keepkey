@@ -29,7 +29,7 @@ export const Route = createFileRoute('/user/_pathlessLayout/admin/')({
 function RouteComponent() {
     return (
         <div className='grid gap-8'>
-            <div className='grid gap-4 rounded-md border border-gray-200 p-3'>
+            {/*<div className='grid gap-4 rounded-md border border-gray-200 p-3'>
                 <div className='flex items-center justify-between'>
                     <p>Require E-Mail verification</p>
                     <ToggleSlider checked={true} />
@@ -38,7 +38,7 @@ function RouteComponent() {
                     <p>Require E-Mail verification</p>
                     <ToggleSlider checked={true} />
                 </div>
-            </div>
+            </div>*/}
 
             {/* Contracts */}
             <ContractList />

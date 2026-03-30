@@ -1,0 +1,38 @@
+@startuml
+skinparam componentStyle uml2
+skinparam packageStyle rectangle
+
+title Keepit Bestellprozess - Übersicht
+
+' === SYNCHRONER FLOW (Order-Erstellung) ===
+package "Synchron: Order erstellen" {
+    [Frontend] as GUI
+    [POST /api/orders] as API
+    [OrderController] as Ctrl
+    [PostgreSQL] as DB
+}
+
+GUI --> API : Artikel-Array
+API --> Ctrl : erstellt Order
+Ctrl --> DB : Transaction:\n- Order\n- OrderPositions\n- DocumentJobs\n- Cart löschen
+
+' === ASYNCHRONER FLOW (Document Generation) ===
+package "Asynchron: Dokumente generieren" {
+    [BullMQ Queue\n(Redis)] as Queue
+    [Worker Process] as Worker
+    [PDF Generator\n(Puppeteer)] as Generator
+}
+
+DB -.-> Queue : DocumentJobs\nqueue.add()
+Queue --> Worker : pollt
+Worker --> Generator : startet
+Generator --> DB : speichert Status
+
+note right of Queue
+  Job-Typen:
+  - invoice
+  - license
+  Status: pending→processing→completed
+end note
+
+@enduml

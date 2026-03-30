@@ -5,12 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useContracts } from "@/hooks/contract.ts";
 import { formatDate } from "@/lib/format";
-
-type Contract = {
-    id: string;
-    name: string;
-    createdAt: Date;
-}
+import type { Contract } from "@/data/types";
 
 export default function ContractList() {
     const { contracts, isPending, error, createContract, deleteContract } = useContracts();

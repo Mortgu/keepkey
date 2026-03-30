@@ -27,14 +27,20 @@ export default function ProductCard({ product }: ProductCardProps) {
 
             {/* Product Header */}
             <div className='flex items-center justify-between p-2'>
-                <p>{product.name}</p>
                 <div>
-                    <Button size='sm' variant='secondary' className='aspect-square'
+                    <h1 className="font-normal text-lg">{product.name}</h1>
+                    <p className="text-sm">{product.description}</p>
+                </div>
+
+                <div>
+                    <Button size='sm' variant='secondary' className=''
                         onClick={handleOpenModal}>
                         <ShoppingBag className='size-4' />
+                        Hinzufügen
                     </Button>
                 </div>
             </div>
+
 
             {/* Product Modal */}
             {isOpen && (

@@ -2,10 +2,12 @@ import Button from "@/components/button/button.tsx";
 import { BadgeCheck, Loader, Pen, Plus, Trash, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
+import { set, z } from "zod";
 import { useState } from "react";
 import { getContractsAction } from "@/data/contracts.ts";
 import { useProducts } from "@/hooks/product.ts";
+import Modal from "@/components/modal";
+import ProductModal from "./product-modal";
 
 export type ProductItemProps = {
     id: string;
@@ -33,6 +35,9 @@ export type ProductItemProps = {
 export default function ProductItem(product: ProductItemProps) {
     const { deleteProduct, updateProduct, isDeleting } = useProducts();
     const [isAddingPricing, addPricing] = useState<boolean>(false);
+    const [isEdeting, setEdit] = useState<boolean>(false);
+
+    const { name, description, link } = product;
 
     const { data: contracts } = useQuery({
         queryKey: ['contracts'],
@@ -114,9 +119,12 @@ export default function ProductItem(product: ProductItemProps) {
                         )}
                     </Button>
 
-                    <Button size='sm' variant='ghost' className='aspect-square'>
+                    {/* Edit Product Button */}
+                    <Button onClick={() => setEdit(true)} size='sm' variant='ghost' className='aspect-square'>
                         <Pen className='size-4' />
                     </Button>
+
+                    {/* Delete Product Button */}
                     <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' className='aspect-square'>
                         {isDeleting && <Loader className='size-4 animate-spin' />}
                         {!isDeleting && <Trash className='size-4' />}
@@ -199,6 +207,9 @@ export default function ProductItem(product: ProductItemProps) {
                 </button>
             </div>
 
+            {/* Edit Product Modal */}
+            <ProductModal isOpen={isEdeting} onClose={() => setEdit(false)}
+                onSubmit={(value) => updateProduct({ id: product.id, product: value })} currentItem={{ name, description, link }} />
         </div>
     );
 }

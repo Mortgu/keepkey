@@ -29,8 +29,8 @@ export default function OrderList() {
                 <Button size='sm'>Create <Plus className='size-4' /></Button>
             </div>
             <div className='grid gap-2'>
-                {orders.map((order: any) => (
-                    <div className='grid gap-2 border border-gray-200 p-3 rounded-md'>
+                {orders.map((order: any, index: number) => (
+                    <div key={index} className='grid gap-2 border border-gray-200 p-3 rounded-md'>
                         <div className='flex items-center justify-between'>
                             <div className=" flex-1">
                                 <p className='text-lg'>{order.user.name} </p>
@@ -46,16 +46,7 @@ export default function OrderList() {
                             </div>
                         </div>
                         <div className='flex gap-2 mt-2'>
-                            {order.orderPositions.map((position) => (
-                                <div className='flex items-center justify-between flex-1 gap-2 p-3 border border-gray-200 rounded-md'>
-                                    <div className="grid gap-2">
-                                        <p className='text-md' key={position.id}>{position.product.name} ({position.quantity}x)
-                                        </p>
-                                        <p className='text-sm text-gray-500' key={position.id}>{position.contract.name}</p>
-                                    </div>
-                                    <p>200,00€</p>
-                                </div>
-                            ))}
+
                         </div>
                     </div>
                 ))}
