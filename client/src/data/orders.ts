@@ -5,6 +5,21 @@ interface CreateOrderResponse {
     success: boolean;
 }
 
+export async function getAllOrdersAction() {
+    const response = await fetch('http://localhost:3000/api/admin/orders', {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        return [];
+    }
+
+    return result;
+}
+
 export async function getOrdersAction() {
     const response = await fetch('http://localhost:3000/api/orders', {
         method: 'GET',

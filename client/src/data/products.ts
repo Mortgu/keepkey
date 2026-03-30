@@ -1,4 +1,4 @@
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item.tsx";
+import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item.tsx";
 
 export async function getProducts() {
     const response = await fetch(`http://localhost:3000/api/products`, {

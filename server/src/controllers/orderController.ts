@@ -4,7 +4,7 @@ import { generateInvoicePDF } from "../utils/document-generator.js";
 
 /*
  * Get all orders
- * [GET] http://localhost:3000/api/orders 
+ * [GET] http://localhost:3000/api/admin/orders 
  */
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
     const orders = await prisma.order.findMany({

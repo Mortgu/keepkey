@@ -1,4 +1,4 @@
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product-item";
+import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item";
 import { type ShoppingCartItem } from "./types";
 
 type CheckoutProps = {
@@ -6,7 +6,6 @@ type CheckoutProps = {
     productId: string;
     quantity: number;
 }
-
 
 export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
     const response = await fetch('http://localhost:3000/api/cart', {
@@ -40,14 +39,14 @@ export async function addToShoppingCartAction(product: Partial<ProductItemProps>
     return result;
 }
 
-export async function removeFromShoppingCartAction(product: Partial<ShoppingCartItem>) {
-    const response = await fetch(`http://localhost:3000/api/cart/${product.userId}`, {
+export async function removeFromShoppingCartAction(shoppingCartItemId: string) {
+    const response = await fetch(`http://localhost:3000/api/cart`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
             'Content-type': 'application/json',
         },
-        body: JSON.stringify({ product }),
+        body: JSON.stringify({ id: shoppingCartItemId }),
     });
 
     if (!response.ok) {

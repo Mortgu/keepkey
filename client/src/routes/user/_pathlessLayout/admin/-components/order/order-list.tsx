@@ -2,9 +2,12 @@ import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
 import { Loader, Pen, Plus, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
+import { useAdmin } from "@/hooks/admin";
 
 export default function OrderList() {
-    const { orders, isPending, error, deleteOrder } = useOrders();
+    const { orders, isPending, error, deleteOrder } = useOrders({
+        adminMode: true
+    });
 
     if (isPending) {
         return (

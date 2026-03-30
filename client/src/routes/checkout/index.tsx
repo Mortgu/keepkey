@@ -66,7 +66,7 @@ function RouteComponent() {
                                 <Pen className='size-4' />
                             </Button>
 
-                            <Button onClick={() => removeFromShoppingCart(item)} variant="ghost" size='sm' className='aspect-square'>
+                            <Button onClick={() => removeFromShoppingCart(item.id)} variant="ghost" size='sm' className='aspect-square'>
                                 <Trash className='size-4' />
                             </Button>
                         </div>

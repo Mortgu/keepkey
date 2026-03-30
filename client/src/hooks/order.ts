@@ -1,18 +1,25 @@
-import { deleteOrderAction, getOrdersAction } from "@/data/orders";
+import { deleteOrderAction, getAllOrdersAction, getOrdersAction } from "@/data/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-export const useOrders = () => {
+interface UseOrdersOptions {
+    adminMode?: boolean;
+};
+
+export const useOrders = (options: UseOrdersOptions = {}) => {
+    const { adminMode = false } = options;
     const queryClient = useQueryClient();
 
+    const queryKey = adminMode ? ['admin:orders'] : ['orders'];
+
     const { data: orders = [], isPending, error } = useQuery({
-        queryKey: ["orders"],
-        queryFn: getOrdersAction,
+        queryKey: queryKey,
+        queryFn: adminMode ? getAllOrdersAction : getOrdersAction,
     });
 
     const deleteMutation = useMutation({
         mutationFn: (orderId: string) => deleteOrderAction(orderId),
         onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['orders'],
+            queryKey: queryKey,
         }),
     })
 

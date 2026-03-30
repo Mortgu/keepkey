@@ -141,13 +141,12 @@ export const deleteSessionShoppingCart = async (request: Request, response: Resp
 
 /* 
  * Remove item from shopping cart for user
- * [PUT] http://localhost:3000/api/cart/{userId}
+ * [PUT] http://localhost:3000/api/cart
  */
 export const removeFromShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId } = request.params;
-    const body = request.body;
+    const { user, body } = request;
 
-    if (!userId || !body) {
+    if (!user || !body || !body.id) {
         return response.status(400).json({
             message: "Bad request.", success: false
         });
@@ -155,8 +154,7 @@ export const removeFromShoppingCart = async (request: Request, response: Respons
 
     await prisma.shoppingCart.deleteMany({
         where: { id: body.id },
-    })
-
+    });
 
     return response.status(200).send({
         message: "Successfully deleted item", success: true

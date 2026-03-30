@@ -14,7 +14,7 @@ router.get('/', requireSession, getSessionShoppingCart);
 /* [POST] http://localhost:3000/api/cart */
 router.post('/', requireSession, createSessionShoppingCart);
 
-/* [PUT] http://localhost:3000/api/cart/{userId} */
+/* [PUT] http://localhost:3000/api/cart */
 router.put('/:userId', requireSession, removeFromShoppingCart);
 
 /* [DELETE] http://localhost:3000/api/cart */

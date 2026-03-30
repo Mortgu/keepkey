@@ -1,8 +1,9 @@
 import { createFileRoute, notFound } from '@tanstack/react-router'
-import ContractList from "@/routes/user/_pathlessLayout/admin/-components/contract-list.tsx";
-import ProductList from "@/routes/user/_pathlessLayout/admin/-components/product-list.tsx";
-import OrderList from './-components/order-list';
-import ToggleSlider from '@/components/inputs/toggle-slider';
+import ContractList from "@/routes/user/_pathlessLayout/admin/-components/contract/contract-list";
+import ProductList from "@/routes/user/_pathlessLayout/admin/-components/product/product-list.tsx";
+import OrderList from './-components/order/order-list';
+import UserList from './-components/user/user-list';
+import { useAdmin } from '@/hooks/admin';
 
 export const Route = createFileRoute('/user/_pathlessLayout/admin/')({
     component: RouteComponent,
@@ -27,6 +28,8 @@ export const Route = createFileRoute('/user/_pathlessLayout/admin/')({
 })
 
 function RouteComponent() {
+    const { orders } = useAdmin();
+
     return (
         <div className='grid gap-8'>
             {/*<div className='grid gap-4 rounded-md border border-gray-200 p-3'>
@@ -40,12 +43,18 @@ function RouteComponent() {
                 </div>
             </div>*/}
 
+            {/* Users */}
+            <UserList />
+
             {/* Contracts */}
             <ContractList />
 
             <ProductList />
 
             <OrderList />
+
+
+
         </div>
     );
 }
