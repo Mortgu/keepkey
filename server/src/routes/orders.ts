@@ -12,7 +12,7 @@ router.get('/', requireSession, getSessionOrders);
 
 router.get('/:orderId', getOrderById);
 
-/* [POST] http://localhost:3000/api/orders */
+/* DEPRECATED: [POST] http://localhost:3000/api/orders */
 router.post('/', requireSession, async (request: Request, response: Response) => {
     const { body } = request;
     const user = request.user;

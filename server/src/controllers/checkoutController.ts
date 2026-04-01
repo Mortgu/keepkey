@@ -10,7 +10,7 @@ export const handleCheckout = async (request: Request, response: Response) => {
         return response.sendStatus(400);
     }
 
-    /* Get shopping cart from session user */
+    /* 1. Get shopping cart from session user */
     const shoppingCart = await prisma.shoppingCart.findMany({
         where: { userId: user?.id },
         include: {
@@ -18,6 +18,7 @@ export const handleCheckout = async (request: Request, response: Response) => {
         }
     });
 
+    /* 2. Check shopping cart */
     if (shoppingCart.length <= 0) {
         return response.status(400).json({
             success: false, message: 'Shopping cart is empty!',
@@ -30,7 +31,7 @@ export const handleCheckout = async (request: Request, response: Response) => {
         line_items.push({
             price_data: {
                 currency: 'eur',
-                unit_amount: entry.price * 100,
+                unit_amount: (entry.price || 0) * 100,
                 product_data: {
                     name: entry.product.name,
                 }
