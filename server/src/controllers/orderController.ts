@@ -1,12 +1,39 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { generateInvoicePDF } from "../utils/document-generator.js";
+import { generateInvoicePDF, generateInvoicePDFFromHtml } from "../utils/generation/document-generator.js";
 
 /*
  * Get all orders
  * [GET] http://localhost:3000/api/admin/orders 
  */
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
+    generateInvoicePDFFromHtml({
+        invoiceNumber: "AG260001",
+        date: String(Date.now()),
+        customerContactPerson: "Herr Sammet",
+        contactPerson: "Oskar Sammet",
+        contactPhone: "+49 172 8387614",
+        contactEmail: "oskar.sammet@dignum.de",
+        companyName: "Dignum GmbH",
+        contactFull: "Herr Oskar Sammet",
+        street: "Waldspielplatz 5",
+        plzCity: "82319 Starnberg",
+        products: "Microsoft 365",
+        alternativeOffers: [{
+            rows: [{ pos: 1, tariff: "string", tariffDescription: "string", runtime: "1" }]
+        }],
+        productDescriptions: ["productDescriptions"],
+        enterprise: [{
+            rows: [
+                { tariff: "string", name: "string", quantity: 1, pricePerUnit: "string", price12: "dwa", price36: "wda" }
+            ], total: "dwa"
+        }],
+        essentials: [{
+            rows: [
+                { tariff: "string", name: "string", quantity: 1, pricePerUnit: "string", price12: "dwa", price36: "wda" }
+            ], total: "daw"
+        }]
+    }, "output.pdf", "template-offer.html");
     const orders = await prisma.order.findMany({
         include: {
             user: true,

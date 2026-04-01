@@ -3,13 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getCurrentUser } from "@/data/user.ts";
 import { Loader } from "lucide-react";
 import { authClient } from "@/lib/auth-client.ts";
-
-type User = {
-    id: string,
-    name: string,
-    email: string,
-    role: string
-}
+import type { User } from "@/data/types";
 
 type AuthContextType = {
     user: User | null | undefined,
@@ -18,12 +12,14 @@ type AuthContextType = {
     logout: () => void,
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+    user: null, isLoading: false, refetch: () => { }, logout: () => { },
+});
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const { data: user, isLoading, refetch } = useQuery({
-        queryKey: ['user'],
+    const { data: user = null, isLoading, refetch } = useQuery({
+        queryKey: ['session'],
         queryFn: getCurrentUser
     });
 
@@ -39,7 +35,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user: user[0], logout, isLoading, refetch }}>
+        <AuthContext.Provider value={{ user: user ? user[0] : null, logout, isLoading, refetch }}>
             {children}
         </AuthContext.Provider>
     )

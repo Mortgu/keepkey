@@ -5,7 +5,6 @@ import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
 import { requireSession } from "@/lib/session.ts";
 import type { ShoppingCartItem } from '@/data/types';
-import DocumentStatus from '@/components/document-status';
 
 export const Route = createFileRoute('/checkout/')({
     component: RouteComponent,
@@ -73,12 +72,6 @@ function RouteComponent() {
                     </div>
                 ))}
             </div>
-
-            {checkoutData?.orderId && (
-                <div className='mt-6'>
-                    <DocumentStatus orderId={checkoutData.orderId} />
-                </div>
-            )}
         </div>
     )
 }

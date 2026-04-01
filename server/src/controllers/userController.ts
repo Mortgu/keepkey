@@ -9,6 +9,12 @@ export const getAllUsers = async (request: Request, response: Response) => {
 export const getSessionUser = async (request: Request, response: Response) => {
     const user = request.user;
 
+    if (!user) {
+        return response.status(404).json({
+            success: false, message: 'No session found!'
+        });
+    }
+
     const databaseUser = await prisma.user.findMany({
         where: { id: user!.id },
     });

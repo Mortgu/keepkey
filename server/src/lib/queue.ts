@@ -3,7 +3,7 @@ import { prisma } from './prisma.js';
 import puppeteer from 'puppeteer';
 
 import fs from 'fs';
-import { generateInvoicePDF } from '../utils/document-generator.js';
+import { generateInvoicePDF } from '../utils/generation/document-generator.js';
 
 const connection = { host: 'localhost', port: 6379 };
 

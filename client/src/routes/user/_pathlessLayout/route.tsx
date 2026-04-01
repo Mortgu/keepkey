@@ -10,6 +10,8 @@ export const Route = createFileRoute('/user/_pathlessLayout')({
 function PathlessLayoutComponent() {
     const { user, logout } = useAuth();
 
+    console.log(user);
+
     if (!user) {
         window.location.assign("/login");
     }

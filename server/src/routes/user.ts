@@ -1,7 +1,6 @@
 import { Router } from "express";
 import { requireSession } from "../middlewares/auth.js";
-import { getAllUsers, getSessionUser } from "../controllers/userController.js";
-import { canViewAllUsers } from "../permissions/user.js";
+import { getSessionUser } from "../controllers/userController.js";
 
 const router = Router();
 
