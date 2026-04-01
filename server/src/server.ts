@@ -8,7 +8,9 @@ import cors from 'cors';
 import router from './routes/router.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import config from './config/config.js';
-import { startWorker } from './lib/queue.js';
+
+import stripeRouter from './routes/stripe.js';
+import startDocumentWorker from './workers/document-worker.js';
 
 const app: Express = express();
 
@@ -20,6 +22,9 @@ app.use(cors({
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
 
+/* Stripe Webhook before express.json() => raw body */
+app.use('/api/stripe-webhook', stripeRouter);
+
 app.use(express.json());
 
 app.use('/api', router);
@@ -28,7 +33,7 @@ app.use('/api', router);
 app.use(errorHandler);
 
 // Start document generation worker
-startWorker();
+startDocumentWorker();
 
 app.listen(config.port, () => {
     console.log(`Server is listening on port ${config.port}`);

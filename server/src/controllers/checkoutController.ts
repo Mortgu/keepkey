@@ -1,184 +1,56 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
+import stripe from "../lib/stripe.js";
 import { prisma } from "../lib/prisma.js";
-import { calculateProductPrice } from "../utils/products.js";
-import z from "zod";
+import { cursorTo } from "node:readline";
 
-/* 
- * Get shopping cart from provided user
- * [GET] http://localhost:3000/api/cart/{userId}
- */
-export const getShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId } = request.params;
-
-    if (!userId) {
-        return response.status(400).json({
-            success: false, message: 'Invalid user id format!'
-        });
-    }
-
-    const cart = await prisma.shoppingCart.findMany({
-        where: { userId: userId as string },
-        include: {
-            contract: true,
-            product: true
-        }
-    });
-
-    return response.status(200).json(cart);
-}
-
-/* 
- * Get shopping cart from session user
- * [GET] http://localhost:3000/api/cart
- */
-export const getSessionShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
+export const handleCheckout = async (request: Request, response: Response) => {
     const user = request.user;
 
     if (!user) {
-        return response.status(400).json({
-            success: false, message: 'Your are not authenticated!'
-        });
+        return response.sendStatus(400);
     }
 
-    const cart = await prisma.shoppingCart.findMany({
-        where: { userId: user.id as string },
+    /* Get shopping cart from session user */
+    const shoppingCart = await prisma.shoppingCart.findMany({
+        where: { userId: user?.id },
         include: {
-            contract: true,
             product: true
         }
     });
 
-    return response.status(200).json(cart);
-}
-
-const ShoppingCartSchema = z.object({
-    productId: z.string().min(1),
-    contractId: z.string().min(1),
-    duration: z.int().min(1).max(3),
-    quantity: z.int().min(1),
-});
-
-/* 
- * Create shopping cart for session user
- * [GET] http://localhost:3000/api/cart
- */
-export const createSessionShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { body, user } = request;
-
-    if (!body || !user) {
+    if (shoppingCart.length <= 0) {
         return response.status(400).json({
-            message: "Bad request.", success: false
+            success: false, message: 'Shopping cart is empty!',
         });
     }
 
-    const test = ShoppingCartSchema.parse(body);
+    const line_items = [];
 
-    // TODO: make transaction
-
-    const entry = await prisma.shoppingCart.upsert({
-        where: {
-            userId_productId_contractId_duration: {
-                userId: user.id,
-                productId: test.productId,
-                contractId: test.contractId,
-                duration: test.duration,
-            }
-        },
-        update: {
-            quantity: { increment: test.quantity },
-        },
-        create: { ...body },
-        include: {
-            product: {
-                include: {
-                    productPricing: true
+    for (let entry of shoppingCart) {
+        line_items.push({
+            price_data: {
+                currency: 'eur',
+                unit_amount: entry.price * 100,
+                product_data: {
+                    name: entry.product.name,
                 }
-            }
-        }
-    });
+            },
+            quantity: 1,
+        });
+    }
 
-    const price = calculateProductPrice(entry.product, entry.quantity, test.duration, test.contractId);
-
-    await prisma.shoppingCart.update({
-        where: {
-            userId_productId_contractId_duration: {
-                userId: user.id, productId: test.productId, contractId: test.contractId,
-                duration: test.duration,
-            }
+    const checkoutSession = await stripe.checkout.sessions.create({
+        line_items: line_items,
+        mode: 'payment',
+        metadata: {
+            userId: user.id,
         },
-        data: {
-            price: price.total,
-        }
-    })
+
+        success_url: 'http://localhost:5173/checkout?status=success',
+        cancel_url: 'http://localhost:5173/checkout?status=failed',
+    });
 
     return response.status(200).json({
-        message: "Successfully created item", success: true
-    });
-}
-
-/* 
- * Delete shopping cart for session user
- * [DELETE] http://localhost:3000/api/cart
- */
-export const deleteSessionShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const user = request.user;
-
-    if (!user) {
-        return response.status(400).json({
-            message: "Bad request.", success: false
-        });
-    }
-
-    await prisma.shoppingCart.deleteMany({
-        where: { userId: user.id },
-    });
-
-    return response.status(200).send({
-        message: "Successfully deleted item", success: true
-    });
-}
-
-
-/* 
- * Remove item from shopping cart for user
- * [PUT] http://localhost:3000/api/cart
- */
-export const removeFromShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { user, body } = request;
-
-    if (!user || !body || !body.id) {
-        return response.status(400).json({
-            message: "Bad request.", success: false
-        });
-    }
-
-    await prisma.shoppingCart.deleteMany({
-        where: { id: body.id },
-    });
-
-    return response.status(200).send({
-        message: "Successfully deleted item", success: true
-    });
-}
-
-/* 
- * Delete shopping cart for provided userId
- * [DELETE] http://localhost:3000/api/cart/{userId}
- */
-export const deleteShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId } = request.params;
-
-    if (!userId) {
-        return response.status(400).json({
-            message: "Bad request.", success: false
-        });
-    }
-
-    await prisma.shoppingCart.deleteMany({
-        where: { userId: userId as string },
-    });
-
-    return response.status(200).send({
-        message: "Successfully deleted item", success: true
+        url: checkoutSession.url,
     });
 }

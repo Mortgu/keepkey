@@ -7,28 +7,32 @@ import userRouter from './user.js';
 import contractRouter from './contracts.js';
 import pricingRouter from './pricing.js';
 import orderRouter from './orders.js';
+import checkoutRouter from './checkout.js';
 
 const router = Router();
 
-/* http://localhost:3000/api/admin */
+/* /api/admin */
 router.use('/admin', adminRouter);
 
-/* http://localhost:3000/api/products */
+/* /api/products */
 router.use('/products', productRouter);
 
-/* http://localhost:3000/api/cart */
-router.use('/cart', cartRouter);
+/* /api/checkout */
+router.use('/checkout', checkoutRouter);
 
-/* http://localhost:3000/api/users */
+/* /api/shopping-cart */
+router.use('/shopping-cart', cartRouter);
+
+/* /api/users */
 router.use('/users', userRouter);
 
-/* http://localhost:3000/api/contracts */
+/* /api/contracts */
 router.use('/contracts', contractRouter);
 
-/* http://localhost:3000/api/pricing */
+/* /api/pricing */
 router.use('/pricing', pricingRouter);
 
-/* http://localhost:3000/api/orders */
+/* /api/orders */
 router.use('/orders', orderRouter);
 
 export default router;

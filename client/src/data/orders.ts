@@ -35,27 +35,19 @@ export async function getOrdersAction() {
     return result;
 }
 
-export async function createOrderAction(products: ShoppingCartItem[]): Promise<CreateOrderResponse> {
-    if (products.length === 0) {
-        throw new Error("No products found.");
-    }
-
-    const response = await fetch('http://localhost:3000/api/orders', {
+export async function createCheckoutAction() {
+    const response = await fetch('http://localhost:3000/api/checkout', {
         method: 'POST',
         credentials: 'include',
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify([...products])
     });
+
+    if (!response.ok) {
+        throw new Error("Checkout request failed.")
+    }
 
     const result = await response.json();
 
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
+    return window.location.assign(result.url);
 }
 
 export async function deleteOrderAction(orderId: string) {

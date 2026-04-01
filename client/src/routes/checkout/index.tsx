@@ -13,7 +13,7 @@ export const Route = createFileRoute('/checkout/')({
 })
 
 function RouteComponent() {
-    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error, checkoutData } = useShoppingCart();
+    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error, checkoutErrors } = useShoppingCart();
     const { data: session } = authClient.useSession();
     const emailVerified = session?.user.emailVerified;
 
@@ -32,6 +32,10 @@ function RouteComponent() {
         <div>
             {error && (
                 <p>{error}</p>
+            )}
+
+            {checkoutErrors && (
+                <p>{checkoutErrors.message}</p>
             )}
 
             {!emailVerified && (

@@ -1,14 +1,8 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item";
 import { type ShoppingCartItem } from "./types";
 
-type CheckoutProps = {
-    userId: string;
-    productId: string;
-    quantity: number;
-}
-
 export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
-    const response = await fetch('http://localhost:3000/api/cart', {
+    const response = await fetch('http://localhost:3000/api/shopping-cart', {
         method: 'GET',
         credentials: 'include',
     });
@@ -23,7 +17,7 @@ export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
 }
 
 export async function addToShoppingCartAction(product: Partial<ProductItemProps>) {
-    const response = await fetch('http://localhost:3000/api/cart', {
+    const response = await fetch('http://localhost:3000/api/shopping-cart', {
         method: 'POST',
         headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
         credentials: "include",
@@ -40,7 +34,7 @@ export async function addToShoppingCartAction(product: Partial<ProductItemProps>
 }
 
 export async function removeFromShoppingCartAction(shoppingCartItemId: string) {
-    const response = await fetch(`http://localhost:3000/api/cart`, {
+    const response = await fetch(`http://localhost:3000/api/shopping-cart`, {
         method: 'PUT',
         credentials: 'include',
         headers: {
@@ -58,18 +52,8 @@ export async function removeFromShoppingCartAction(shoppingCartItemId: string) {
     return result;
 }
 
-export async function updateShoppingCart({ userId, productId, quantity }: CheckoutProps) {
-    const result = await fetch('http://localhost:3000/api/checkout', {
-        method: 'POST',
-        credentials: 'include',
-        body: JSON.stringify({ userId, productId, quantity }),
-    });
-
-    return await result.json();
-}
-
 export async function deleteShoppingCartAction(userId: string) {
-    const response = await fetch(`http://localhost:3000/api/cart/${userId}`, {
+    const response = await fetch(`http://localhost:3000/api/shopping-cart/${userId}`, {
         method: 'DELETE',
         credentials: 'include',
     });

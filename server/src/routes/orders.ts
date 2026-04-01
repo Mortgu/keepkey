@@ -2,13 +2,15 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
-import { getSessionOrders } from "../controllers/orderController.js";
-import { documentQueue } from "../lib/queue.js";
+import { getOrderById, getSessionOrders } from "../controllers/orderController.js";
+import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/orders */
 router.get('/', requireSession, getSessionOrders);
+
+router.get('/:orderId', getOrderById);
 
 /* [POST] http://localhost:3000/api/orders */
 router.post('/', requireSession, async (request: Request, response: Response) => {
@@ -68,10 +70,8 @@ router.post('/', requireSession, async (request: Request, response: Response) =>
             },
         });
 
-        const bullJob = await documentQueue.add('generate-document', {
-            documentJobId: docJob.id,
-            type,
-            orderId: createdOrder.id,
+        const bullJob = await documentQueue.add(documentQueueKey, {
+            documentJobId: docJob.id, type, orderId: createdOrder.id,
         });
 
         // BullMQ Job-ID zurückschreiben

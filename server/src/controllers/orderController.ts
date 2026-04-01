@@ -1,39 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { generateInvoicePDF, generateInvoicePDFFromHtml } from "../utils/generation/document-generator.js";
+import { generatedOfferPdf } from "../utils/generation/document-generator.js";
+import { OfferData } from "../utils/generation/types.js";
+import { oAuthProtectedResourceMetadata } from "better-auth/plugins";
+import stripe from "../lib/stripe.js";
 
 /*
  * Get all orders
  * [GET] http://localhost:3000/api/admin/orders 
  */
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
-    generateInvoicePDFFromHtml({
-        invoiceNumber: "AG260001",
-        date: String(Date.now()),
-        customerContactPerson: "Herr Sammet",
-        contactPerson: "Oskar Sammet",
-        contactPhone: "+49 172 8387614",
-        contactEmail: "oskar.sammet@dignum.de",
-        companyName: "Dignum GmbH",
-        contactFull: "Herr Oskar Sammet",
-        street: "Waldspielplatz 5",
-        plzCity: "82319 Starnberg",
-        products: "Microsoft 365",
-        alternativeOffers: [{
-            rows: [{ pos: 1, tariff: "string", tariffDescription: "string", runtime: "1" }]
-        }],
-        productDescriptions: ["productDescriptions"],
-        enterprise: [{
-            rows: [
-                { tariff: "string", name: "string", quantity: 1, pricePerUnit: "string", price12: "dwa", price36: "wda" }
-            ], total: "dwa"
-        }],
-        essentials: [{
-            rows: [
-                { tariff: "string", name: "string", quantity: 1, pricePerUnit: "string", price12: "dwa", price36: "wda" }
-            ], total: "daw"
-        }]
-    }, "output.pdf", "template-offer.html");
     const orders = await prisma.order.findMany({
         include: {
             user: true,
@@ -47,6 +23,57 @@ export const getAllOrders = async (request: Request, response: Response, next: N
     });
 
     return response.status(200).json(orders);
+}
+
+/*
+ * [GET] http://localhost:3000/api/orders/:oderId
+ */
+export const getOrderById = async (request: Request, response: Response, next: NextFunction) => {
+    const { orderId } = request.params;
+
+    const order = await prisma.order.findUnique({
+        where: { id: orderId as string },
+        include: {
+            user: true,
+            orderPositions: {
+                include: {
+                    product: true,
+                    contract: true,
+                }
+            }
+        }
+    });
+
+    generatedOfferPdf({
+        data: {
+            order: { invoiceNumber: orderId as string },
+        },
+        outputPath: "output.pdf",
+        templatePath: "template-offer.html"
+    });
+
+    // Stark vereinfachtes Beispiel, wie der Code für Stripe aussieht:
+    const session = await stripe.checkout.sessions.create({
+        line_items: [{
+            price_data: {
+                currency: 'eur',
+                unit_amount: 41250,
+                product_data: {
+                    name: 'Premium Lizenzpaket (37 Lizenzen, 24 Mon. Laufzeit)',
+                },
+            },
+            quantity: 1,
+        }],
+        mode: 'payment',
+        success_url: 'http://localhost:5173/erfolg',
+        cancel_url: 'http://localhost:5173/abbrechen',
+    });
+
+    console.log(session);
+
+
+
+    return response.status(200).json(order);
 }
 
 /*

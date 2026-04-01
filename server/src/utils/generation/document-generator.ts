@@ -1,60 +1,21 @@
 import puppeteer from "puppeteer";
 import fs from 'fs';
 import Handlebars from 'handlebars';
-import mammoth from 'mammoth';
+import { OfferData } from "./types.js";
 
-interface InvoiceData {
-    invoiceNumber: string;
-    date: string;
-    customerContactPerson: string;
-    contactPerson: string;
-    contactPhone: string;
-    contactEmail: string;
-    companyName: string;
-    contactFull: string;
-    street: string;
-    plzCity: string;
-    products: string;
-    alternativeOffers: Array<{
-        rows: Array<{
-            pos: number;
-            tariff: string;
-            tariffDescription: string;
-            runtime: string;
-        }>;
-    }>;
-    productDescriptions: string[];
-    enterprise: Array<{
-        rows: Array<{
-            tariff: string;
-            name: string;
-            quantity: number;
-            pricePerUnit: string;
-            price12: string;
-            price36: string;
-        }>;
-        total: string;
-    }>;
-    essentials: Array<{
-        rows: Array<{
-            tariff: string;
-            name: string;
-            quantity: number;
-            pricePerUnit: string;
-            price12: string;
-            price36: string;
-        }>;
-        total: string;
-    }>;
-}
+type Props = {
+    data: OfferData;
+    outputPath: string;
+    templatePath: string;
+};
 
 /*
  * Generate Invoice PDF from HTML template with data (alternative method)
  */
-export const generatedOfferPdf = async (data: InvoiceData, outputPath: string = "output.pdf", htmlTemplatePath: string = "template-invoice.html"): Promise<Uint8Array> => {
+export const generatedOfferPdf = async ({ data, outputPath, templatePath }: Props): Promise<Uint8Array> => {
     try {
         // Read HTML template
-        const htmlTemplate = fs.readFileSync(htmlTemplatePath, "utf8");
+        const htmlTemplate = fs.readFileSync(templatePath, "utf8");
 
         // Compile Handlebars template
         const template = Handlebars.compile(htmlTemplate);

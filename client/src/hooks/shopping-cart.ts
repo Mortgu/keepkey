@@ -1,4 +1,4 @@
-import { createOrderAction } from "@/data/orders";
+import { createCheckoutAction } from "@/data/orders";
 import { addToShoppingCartAction, removeFromShoppingCartAction, deleteShoppingCartAction, getShoppingCart } from "@/data/shopping-cart";
 import type { ShoppingCartItem } from "@/data/types";
 import { authClient } from "@/lib/auth-client";
@@ -29,9 +29,9 @@ export const useShoppingCart = () => {
     })
 
 
-    /*  */
+    /* Checkout */
     const checkoutMutation = useMutation({
-        mutationFn: (products: ShoppingCartItem[]) => createOrderAction(products),
+        mutationFn: createCheckoutAction,
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: ['cart'],
         })
@@ -55,7 +55,7 @@ export const useShoppingCart = () => {
             }
 
 
-            checkoutMutation.mutate(products);
+            checkoutMutation.mutate();
         },
         [checkoutMutation.mutate, session]
     )
@@ -84,5 +84,6 @@ export const useShoppingCart = () => {
         handleCheckout,
         isProcessing: checkoutMutation.isPending,
         checkoutData: checkoutMutation.data,
+        checkoutErrors: checkoutMutation.error,
     };
 }
