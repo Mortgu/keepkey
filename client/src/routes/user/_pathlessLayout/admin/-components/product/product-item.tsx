@@ -7,6 +7,7 @@ import { useState } from "react";
 import { getContractsAction } from "@/data/contracts.ts";
 import { useProducts } from "@/hooks/product.ts";
 import ProductModal from "./product-modal";
+import { useAdmin } from "@/hooks/admin";
 
 export type ProductItemProps = {
     id: string;
@@ -32,7 +33,7 @@ export type ProductItemProps = {
 }
 
 export default function ProductItem(product: ProductItemProps) {
-    const { deleteProduct, updateProduct, isDeleting } = useProducts();
+    const { deleteProduct, updateProduct, isDeletingProduct } = useAdmin();
     const [isAddingPricing, addPricing] = useState<boolean>(false);
     const [isEdeting, setEdit] = useState<boolean>(false);
 
@@ -125,8 +126,8 @@ export default function ProductItem(product: ProductItemProps) {
 
                     {/* Delete Product Button */}
                     <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' className='aspect-square'>
-                        {isDeleting && <Loader className='size-4 animate-spin' />}
-                        {!isDeleting && <Trash className='size-4' />}
+                        {isDeletingProduct && <Loader className='size-4 animate-spin' />}
+                        {!isDeletingProduct && <Trash className='size-4' />}
                     </Button>
                 </div>
             </div>

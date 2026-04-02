@@ -1,5 +1,20 @@
 import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item.tsx";
 
+export async function getAllProducts() {
+    const response = await fetch(`http://localhost:3000/api/admin/products`, {
+        method: 'GET',
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
 export async function getProducts() {
     const response = await fetch(`http://localhost:3000/api/products`, {
         method: 'GET',

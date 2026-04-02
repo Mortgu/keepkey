@@ -5,34 +5,11 @@ import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
 
 /* 
- * Get Session/Published Products 
- * [GET] http://localhost:3000/api/products 
+ * Get all products for admin
+ * [GET] http://localhost:3000/api/admin/products 
  */
-export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
-    let session: Awaited<ReturnType<typeof auth.api.getSession>> | null = null;
-    try {
-        session = await auth.api.getSession({
-            headers: fromNodeHeaders(request.headers),
-        });
-    } catch {
-        return response.status(403).json({
-            success: false, message: 'unauthorized',
-        });
-    }
-
-    let canSeeUnpublished = false;
-    if (session?.user) {
-        const { success } = await auth.api.userHasPermission({
-            body: {
-                userId: session.user.id,
-                permissions: { products: ["create", "update"] },
-            },
-        });
-        canSeeUnpublished = success;
-    }
-
-    const result = await prisma.product.findMany({
-        where: canSeeUnpublished ? undefined : { published: true },
+export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
+    const prodcuts = await prisma.product.findMany({
         include: {
             productPricing: {
                 include: {
@@ -43,7 +20,28 @@ export const getProducts = async (request: Request, response: Response, next: Ne
         }
     });
 
-    return response.status(200).json(result);
+    return response.status(200).json(prodcuts);
+}
+
+
+/* 
+ * Get Session/Published Products 
+ * [GET] http://localhost:3000/api/products 
+ */
+export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
+    const products = await prisma.product.findMany({
+        where: { published: true },
+        include: {
+            productPricing: {
+                include: {
+                    product: true,
+                    contract: true
+                }
+            }
+        }
+    });
+
+    return response.status(200).json(products);
 }
 
 /* 
