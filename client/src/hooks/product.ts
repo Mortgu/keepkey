@@ -36,6 +36,13 @@ export const useProducts = () => {
         },
     });
 
+    const publishMutation = useMutation({
+        mutationFn: () => { },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+        },
+    });
+
     return {
         products,
         isPending,

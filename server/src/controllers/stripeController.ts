@@ -1,6 +1,7 @@
 import { Response, Request } from "express";
 import stripe from "../lib/stripe.js";
 import { prisma } from "../lib/prisma.js";
+import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
 
@@ -38,18 +39,18 @@ export const stripeWebhook = async (request: Request, response: Response) => {
                     data: { userId: userId },
                 });
 
-                shoppingCart.forEach(async (item) => {
-                    await prisma.orderPosition.create({
+                for (const item of shoppingCart) {
+                    await tx.orderPosition.create({
                         data: {
                             orderId: order.id,
                             productId: item.productId,
                             contractId: item.contractId,
                             duration: item.duration,
                             quantity: item.quantity,
-                            priceAtPurchase: item.price,
+                            priceAtPurchase: item.price || 0,
                         }
                     });
-                });
+                }
 
                 await prisma.shoppingCart.deleteMany({
                     where: { userId },
@@ -59,6 +60,23 @@ export const stripeWebhook = async (request: Request, response: Response) => {
             });
 
             console.log(`Successfully inserted order ${createdOrder.id}`);
+
+            // TODO: generate Invoice
+            // 1. Create document job
+            const documentJob = await prisma.documentJob.create({
+                data: { orderId: createdOrder.id, type: 'invoice', status: 'pending' }
+            });
+
+            // 2. Queue task
+            const bullJob = await documentQueue.add(documentQueueKey, {
+                documentJobId: documentJob.id, type: 'invoice', orderId: createdOrder.id,
+            });
+
+            // BullMQ Job-ID zurückschreiben
+            await prisma.documentJob.update({
+                where: { id: documentJob.id },
+                data: { jobId: bullJob.id },
+            });
 
             break;
         default:

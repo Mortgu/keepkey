@@ -2,11 +2,10 @@ import Button from "@/components/button/button.tsx";
 import { BadgeCheck, Loader, Pen, Plus, Trash, X } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
-import { set, z } from "zod";
+import { z } from "zod";
 import { useState } from "react";
 import { getContractsAction } from "@/data/contracts.ts";
 import { useProducts } from "@/hooks/product.ts";
-import Modal from "@/components/modal";
 import ProductModal from "./product-modal";
 
 export type ProductItemProps = {

@@ -15,10 +15,19 @@ type ProductModalProps = {
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
 
+const schema = z.object({
+    contractId: z.string().min(1),
+    quantity: z.int().min(1, "At least one product must be added!")
+        .max(300, "Exceeding limit!"),
+    duration: z.int(),
+});
+
 export default function ProductModal({ product, onSubmit, setOpen }: ProductModalProps) {
     const { contracts, isPending } = useContracts();
     const { addToShoppingCart } = useShoppingCart();
     const { data: session } = authClient.useSession();
+
+    console.log(product);
 
     const form = useForm({
         defaultValues: {
@@ -27,11 +36,7 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
             duration: 1,
         },
         validators: {
-            onChange: z.object({
-                contractId: z.string().min(1),
-                quantity: z.int(),
-                duration: z.int(),
-            }),
+            onChange: schema,
         },
         onSubmit: async ({ value }) => {
             const item = {
@@ -46,12 +51,10 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
 
     return (
         <Modal>
-
             {/* Display selected product */}
-            <div className="flex items-center justify-between p-2 border border-gray-300 rounded-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 bg-gray-100 rounded-md overflow-hidden">
                 <p>{product.name}</p>
             </div>
-
 
             <form onSubmit={(e) => {
                 e.preventDefault();
@@ -60,12 +63,20 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
             }} className="grid gap-4">
                 {/* Display contract selection */}
                 <form.Field name='contractId' children={(field) => (
-                    <select defaultValue={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)} className="w-full px-3 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                        {contracts.map((contract: any, index) => (
-                            <option key={index} value={contract.id}>{contract.name}</option>
-                        ))}
-                    </select>
+                    <div className="flex-1 grid gap-1">
+                        {field.state.meta.errors.length <= 0 && (
+                            <label htmlFor={field.name}>Vertrag</label>
+                        )}
+                        {field.state.meta.errors.length <= 0 && (
+                            <label htmlFor={field.name}>{field.state.meta.errors.map(err => typeof err === 'object' ? err.message : err).join(', ')}</label>
+                        )}
+                        <select defaultValue={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)} className="w-full px-3 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
+                            {contracts.map((contract: any, index) => (
+                                <option key={index} value={contract.id}>{contract.name}</option>
+                            ))}
+                        </select>
+                    </div>
                 )} />
 
                 {/* Quantity and duration */}
@@ -73,16 +84,28 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
 
                 <div className="flex gap-2">
                     <form.Field name="quantity" children={(field) => (
-                        <input id={field.name} name={field.name} value={field.state.value} className="flex-1 px-3 py-3 rounded-md border border-gray-200 text-sm bg-gray-50"
-                            placeholder="quantity" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                        <div className="flex-1 grid gap-1">
+                            {field.state.meta.isValid && (
+                                <label htmlFor={field.name}>Anzahl</label>
+                            )}
+                            {!field.state.meta.isValid && (
+                                <label className="text-red-500" htmlFor={field.name}>{field.state.meta.errors.map(i => i.message).join(', ')}</label>
+                            )}
+                            <input id={field.name} name={field.name} value={field.state.value} className="flex-1 px-3 py-3 rounded-md border border-gray-200 text-sm bg-gray-50"
+                                placeholder="quantity" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                        </div>
                     )} />
+
                     <form.Field name="duration" children={(field) => (
-                        <select defaultValue={field.state.value}
-                            onChange={(e) => field.handleChange(parseInt(e.target.value))} className="w-full px-3 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                            <option value={1}>1 Jahr</option>
-                            <option value={2}>2 Jahre</option>
-                            <option value={3}>3 Jahre</option>
-                        </select>
+                        <div className="flex-1 grid gap-1">
+                            <label htmlFor={field.name}>Laufzeit</label>
+                            <select defaultValue={field.state.value}
+                                onChange={(e) => field.handleChange(parseInt(e.target.value))} className="w-full px-3 py-3 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
+                                <option value={1}>1 Jahr</option>
+                                <option value={2}>2 Jahre</option>
+                                <option value={3}>3 Jahre</option>
+                            </select>
+                        </div>
                     )} />
 
 
