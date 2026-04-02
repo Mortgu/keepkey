@@ -6,9 +6,5 @@ export const Route = createFileRoute('/user/_pathlessLayout/orders/')({
 })
 
 function RouteComponent() {
-  return (
-    <div>
-      <OrderList />
-    </div>
-  )
+  return <OrderList />
 }

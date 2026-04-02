@@ -7,7 +7,7 @@ export const Route = createFileRoute('/user/_pathlessLayout')({
     component: PathlessLayoutComponent,
 })
 
-async function PathlessLayoutComponent() {
+function PathlessLayoutComponent() {
     const { user } = useAuth();
 
     if (!user) {

@@ -3,7 +3,11 @@ import type { Order } from "@/data/types";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { useEffect, useRef, useState } from "react";
 
-export default function OrderListItem({ order, key }: { order: Order, key: number | string, }) {
+type Props = {
+    order: Order;
+}
+
+export default function OrderListItem({ order }: Props) {
     const [isOpen, setOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
 
@@ -21,7 +25,7 @@ export default function OrderListItem({ order, key }: { order: Order, key: numbe
     }, [isOpen]);
 
     return (
-        <div key={key} className="flex gap-2 border-b py-4 border-gray-200 first:border-t">
+        <div className="flex gap-2 border-b py-4 border-gray-200 first:border-t">
             <div className="w-full flex items-center justify-between ">
                 <div className="grid gap-1">
                     <h1 className="font-semibold">{formatDate(order.createdAt)}</h1>
