@@ -45,11 +45,10 @@ function RouteComponent() {
             {/* Header */}
             <div className='w-full flex items-center justify-between my-4'>
                 <h1 className='text-2xl'>Warenkorb</h1>
-                <Button disabled={shoppingCart.length === 0} size='sm' onClick={() => {
+                <Button loading={isProcessing} disabled={shoppingCart.length === 0} size='sm' onClick={() => {
                     handleCheckout(shoppingCart);
                 }}>
-                    {isProcessing && <Loader className='size-4 animate-spin' />}
-                    {!isProcessing && "Create Order"}
+                    Create Order
                 </Button>
             </div>
 

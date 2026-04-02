@@ -10,6 +10,7 @@ import { fromNodeHeaders } from "better-auth/node";
  */
 export const getAllProducts = async (request: Request, response: Response, next: NextFunction) => {
     const prodcuts = await prisma.product.findMany({
+        orderBy: { createdAt: 'asc' },
         include: {
             productPricing: {
                 include: {
@@ -31,6 +32,7 @@ export const getAllProducts = async (request: Request, response: Response, next:
 export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
     const products = await prisma.product.findMany({
         where: { published: true },
+        orderBy: { createdAt: 'asc' },
         include: {
             productPricing: {
                 include: {

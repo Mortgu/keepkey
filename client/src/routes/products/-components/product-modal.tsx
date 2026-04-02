@@ -115,9 +115,8 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
                 <div className="flex gap-2">
                     <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <Button disabled={!canSubmit} className="flex-1">
-                                {isSubmitting && <Loader className="size-4 animate-spin" />}
-                                {!isSubmitting && "Hinzufügen"}
+                            <Button disabled={!canSubmit} loading={isSubmitting} className="flex-1">
+                                Hinzufügen
                             </Button>
                         )} />
 

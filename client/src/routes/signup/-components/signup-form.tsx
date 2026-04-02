@@ -1,9 +1,9 @@
-import {useState} from "react";
-import {useForm} from "@tanstack/react-form";
-import {authClient} from "@/lib/auth-client.ts";
-import {Loader} from "lucide-react";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { authClient } from "@/lib/auth-client.ts";
+import { Loader } from "lucide-react";
 
-import {z} from 'zod';
+import { z } from 'zod';
 import Input from "@/components/inputs/input.tsx";
 import Button from "@/components/button/button.tsx";
 import Checkbox from "@/components/inputs/checkbox.tsx";
@@ -33,12 +33,12 @@ export function SignupFormComponent() {
         validators: {
             onChange: signupSchema,
         },
-        onSubmit: async ({value}) => {
+        onSubmit: async ({ value }) => {
             setError(undefined);
 
             const fullName = `${value.firstName} ${value.lastName}`.trim();
 
-            const {data, error: authError} = await authClient.signUp.email({
+            const { data, error: authError } = await authClient.signUp.email({
                 email: value.userEmail,
                 password: value.password,
                 name: fullName,
@@ -200,8 +200,8 @@ export function SignupFormComponent() {
                     <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <Button type="submit" disabled={!canSubmit} className="w-full">
-                                {isSubmitting ? <Loader className='animate-spin mx-auto'/> : 'Registrieren'}
+                            <Button loading={isSubmitting} type="submit" disabled={!canSubmit} className="w-full">
+                                Registrieren
                             </Button>
                         )}
                     />

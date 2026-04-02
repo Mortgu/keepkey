@@ -1,10 +1,10 @@
-import {NavLink} from "./nav-link";
+import { NavLink } from "./nav-link";
 
-import {Loader, Plus, ShoppingBag, User} from 'lucide-react';
-import {authClient} from "@/lib/auth-client.ts";
+import { Loader, Plus, ShoppingBag, User } from 'lucide-react';
+import { authClient } from "@/lib/auth-client.ts";
 
 export default function Navigation() {
-    const {data: session, isPending, error} = authClient.useSession();
+    const { data: session, isPending, error } = authClient.useSession();
 
     return (
         <div className="h-18 w-full border-b border-gray-200">
@@ -15,13 +15,13 @@ export default function Navigation() {
                 </div>
                 <div className="flex h-full">
                     {isPending ? <Loader className="animate-spin" /> :
-                    error ? "Error" : session ? (
-                        <NavigationActions />
-                    ) : (
-                        <div className='flex items-center gap-2'>
-                            <NavLink to="/login">Login</NavLink>
-                        </div>
-                    )}
+                        error ? "Error" : session ? (
+                            <NavigationActions />
+                        ) : (
+                            <div className='flex items-center gap-2'>
+                                <NavLink to="/login">Login</NavLink>
+                            </div>
+                        )}
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@ function NavigationActions() {
             </div>
 
             <div className='w-8 h-full m-auto hover:text-(--keepit-primary) cursor-pointer'>
-                <NavLink to="/user">
+                <NavLink to="/user/settings">
                     <User className='size-6' />
                 </NavLink>
             </div>
@@ -46,7 +46,7 @@ function NavigationActions() {
             <div className='w-8 h-full m-auto'>
                 <div className='h-full m-auto hover:text-(--keepit-primary) cursor-pointer'>
                     <NavLink to="/checkout">
-                        <ShoppingBag className="size-6"/>
+                        <ShoppingBag className="size-6" />
                     </NavLink>
                 </div>
             </div>
