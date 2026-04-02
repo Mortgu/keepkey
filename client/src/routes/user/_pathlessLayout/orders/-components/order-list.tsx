@@ -1,8 +1,17 @@
-import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
-import { Loader, Plus } from "lucide-react";
+import { Loader } from "lucide-react";
 import type { Order } from "@/data/types";
 import OrderListItem from "./order-list-item";
+
+function getTotalRevenue(orders: Order[]): number {
+    return orders.reduce((orderSum, order) => {
+        const orderTotal = order.orderPositions.reduce((posSum, item) => {
+            return posSum + item.priceAtPurchase;
+        }, 0);
+
+        return orderSum + orderTotal;
+    }, 0);
+}
 
 export default function OrderList() {
     const { orders, isPending, error } = useOrders();
@@ -22,6 +31,8 @@ export default function OrderList() {
         )
     }
 
+    const total = getTotalRevenue(orders);
+
     return (
         <div>
 
@@ -29,7 +40,7 @@ export default function OrderList() {
             <div className="flex items-center justify-between mb-6">
                 <div className="grid gap-1">
                     <h1 className="text-2xl font-medium">Orders</h1>
-                    <p className="text-sm text-gray-500">{orders.length} Orders - 0 €</p>
+                    <p className="text-sm text-gray-500">{orders.length} Orders - {total} €</p>
                 </div>
 
                 {/* Header actions */}

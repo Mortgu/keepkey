@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "@/lib/auth-client.ts";
-import { Loader } from "lucide-react";
 
 import { z } from 'zod';
 import Input from "@/components/inputs/input.tsx";

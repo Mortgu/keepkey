@@ -12,7 +12,7 @@ type Props = {
 /*
  * Generate Invoice PDF from HTML template with data (alternative method)
  */
-export const generatedOfferPdf = async ({ data, outputPath, templatePath }: Props): Promise<Uint8Array> => {
+export const generateOfferPdf = async ({ data, outputPath, templatePath }: Props): Promise<Uint8Array> => {
     try {
         // Read HTML template
         const htmlTemplate = fs.readFileSync(templatePath, "utf8");

@@ -1,8 +1,5 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { generatedOfferPdf } from "../utils/generation/document-generator.js";
-import { OfferData } from "../utils/generation/types.js";
-import { oAuthProtectedResourceMetadata } from "better-auth/plugins";
 import stripe from "../lib/stripe.js";
 
 /*
@@ -44,13 +41,6 @@ export const getOrderById = async (request: Request, response: Response, next: N
         }
     });
 
-    generatedOfferPdf({
-        data: {
-            order: { invoiceNumber: orderId as string },
-        },
-        outputPath: "output.pdf",
-        templatePath: "template-offer.html"
-    });
 
     // Stark vereinfachtes Beispiel, wie der Code für Stripe aussieht:
     const session = await stripe.checkout.sessions.create({

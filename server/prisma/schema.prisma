@@ -21,12 +21,14 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  role          String?
-  banned        Boolean?       @default(false)
-  banReason     String?
-  banExpires    DateTime?
-  shoppingCarts ShoppingCart[]
-  orders        Order[]
+  role           String?
+  banned         Boolean?        @default(false)
+  banReason      String?
+  banExpires     DateTime?
+  shoppingCarts  ShoppingCart[]
+  orders         Order[]
+  address        Address?
+  contactPersons ContactPerson[]
 
   @@map("user")
 }
@@ -209,4 +211,37 @@ model OrderPosition {
   createdAt DateTime? @default(now())
 
   @@map("order_position")
+}
+
+model Address {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  street String?
+  city   String?
+  plz    String?
+  phone  String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("address")
+}
+
+model ContactPerson {
+  id     String @id @default(uuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  salutation String
+  firstName  String
+  lastName   String
+  email      String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@index([userId])
+  @@map("contact_person")
 }
