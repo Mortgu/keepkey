@@ -1,17 +1,17 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { NavLink } from "@/routes/-components/nav-link.tsx";
-import { Car, MoveRight, ScrollText, Settings } from "lucide-react";
-import { authClient } from '@/lib/auth-client';
+import { Car, MoveRight, Settings } from "lucide-react";
+import { useAuth } from '@/context/auth';
 
 export const Route = createFileRoute('/user/_pathlessLayout')({
     component: PathlessLayoutComponent,
 })
 
-function PathlessLayoutComponent() {
-    const { data: session } = authClient.useSession();
+async function PathlessLayoutComponent() {
+    const { user } = useAuth();
 
-    if (!session || !session.user) {
-        return window.location.assign("/login");
+    if (!user) {
+        return window.location.assign('/login');
     }
 
     return (
@@ -29,7 +29,7 @@ function PathlessLayoutComponent() {
                         </NavLink>
                     </div>
                     <div className='flex items-center gap-8 h-full'>
-                        {session.user.role === 'admin' && (
+                        {user.role === 'admin' && (
                             <NavLink className='flex items-center gap-2' to='/admin'>
                                 Dashboard
                                 <MoveRight className="size-4" />

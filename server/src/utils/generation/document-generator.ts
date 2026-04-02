@@ -29,16 +29,28 @@ export const generateOfferPdf = async ({ data, outputPath, templatePath }: Props
             waitUntil: "networkidle0"
         });
 
+        await page.emulateMediaType('screen');
+
+        await page.setViewport({
+            width: 794,
+            height: 1122,
+            deviceScaleFactor: 1,
+        })
+
         const pdf = await page.pdf({
             path: outputPath,
             format: "A4",
             printBackground: true,
+            scale: 0.85,
+            width: "8.27in",
+            height: "11.69in",
             margin: {
-                top: '10mm',
-                right: '10mm',
-                bottom: '10mm',
-                left: '10mm',
+                top: '0.49in',
+                right: '0.5in',
+                bottom: '0.32in',
+                left: '0.5in',
             },
+            preferCSSPageSize: false,
         });
 
         await browser.close();

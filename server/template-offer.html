@@ -20,6 +20,9 @@
                     "Courier New", monospace;
                 --color-red-400: oklch(70.4% 0.191 22.216);
                 --spacing: 0.25rem;
+                --container-7xl: 80rem;
+                --text-xs: 0.75rem;
+                --text-xs--line-height: calc(1 / 0.75);
                 --text-sm: 0.875rem;
                 --text-sm--line-height: calc(1.25 / 0.875);
                 --text-lg: 1.125rem;
@@ -270,6 +273,10 @@
                 display: grid;
             }
 
+            .table {
+                display: table;
+            }
+
             .h-fit {
                 height: fit-content;
             }
@@ -282,8 +289,16 @@
                 width: fit-content;
             }
 
+            .max-w-7xl {
+                max-width: var(--container-7xl);
+            }
+
             .max-w-225 {
                 max-width: calc(var(--spacing) * 225);
+            }
+
+            .max-w-\[1280px\] {
+                max-width: 1280px;
             }
 
             .min-w-fit {
@@ -296,6 +311,10 @@
 
             .border-collapse {
                 border-collapse: collapse;
+            }
+
+            .resize {
+                resize: both;
             }
 
             .justify-between {
@@ -324,6 +343,14 @@
                 border-bottom-width: 1px;
             }
 
+            .p-1 {
+                padding: calc(var(--spacing) * 1);
+            }
+
+            .px-1 {
+                padding-inline: calc(var(--spacing) * 1);
+            }
+
             .px-3 {
                 padding-inline: calc(var(--spacing) * 3);
             }
@@ -350,9 +377,23 @@
                 line-height: var(--tw-leading, var(--text-sm--line-height));
             }
 
+            .text-xs {
+                font-size: var(--text-xs);
+                line-height: var(--tw-leading, var(--text-xs--line-height));
+            }
+
             .font-bold {
                 --tw-font-weight: var(--font-weight-bold);
                 font-weight: var(--font-weight-bold);
+            }
+
+            .underline {
+                text-decoration-line: underline;
+            }
+
+            .outline {
+                outline-style: var(--tw-outline-style);
+                outline-width: 1px;
             }
         }
 
@@ -367,6 +408,12 @@
             inherits: false;
         }
 
+        @property --tw-outline-style {
+            syntax: "*";
+            inherits: false;
+            initial-value: solid;
+        }
+
         @layer properties {
             @supports ((-webkit-hyphens: none) and (not (margin-trim: inline))) or ((-moz-orient: inline) and (not (color:rgb(from red r g b)))) {
 
@@ -376,6 +423,7 @@
                 ::backdrop {
                     --tw-border-style: solid;
                     --tw-font-weight: initial;
+                    --tw-outline-style: solid;
                 }
             }
         }
@@ -383,19 +431,19 @@
 </head>
 
 <body>
-    <div class="grid gap-4 max-w-225 m-auto">
+    <div class="grid gap-4 max-w-7xl m-auto p-1">
 
         <div class="flex justify-between gap-4">
             <div class="grid gap-4 h-fit">
 
-                <div class="text-sm flex gap-1 border-b w-fit min-w-fit h-fit">
+                <div class="text-xs flex gap-1 border-b w-fit min-w-fit h-fit">
                     <p>dignum GmbH •</p>
                     <p>Peterhofstr. 5 •</p>
                     <p>86438 Kissing •</p>
                     <p>Germany</p>
                 </div>
 
-                <div class="grid gap-0">
+                <div class="grid gap-0 text-sm">
                     <p>{{companyName}}</p>
                     <p>{{contactPerson}}</p>
                     <p>{{street}}</p>
@@ -406,45 +454,45 @@
             <table class="border border-collapse table-fixed w-auto">
                 <thead>
                     <tr>
-                        <th class="py-2 px-3 border text-left font-bold" colspan="2">ANGEBOT</th>
+                        <th class="py-2 px-3 border text-sm text-left font-bold" colspan="2">ANGEBOT</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td class="border py-1 px-3 text-sm font-bold">Beleg-Nr.:</td>
-                        <td class="border py-1 px-3 text-sm font-bold">{{order.invoiceNumber}}</td>
+                        <td class="border py-1 px-3 text-xs font-bold">Beleg-Nr.:</td>
+                        <td class="border py-1 px-3 text-xs font-bold">{{order.invoiceNumber}}</td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Datum:</td>
-                        <td class="border py-1 px-3 text-sm">{{date}}</td>
+                        <td class="border py-1 px-3 text-xs">Datum:</td>
+                        <td class="border py-1 px-3 text-xs">{{date}}</td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Zahlungsbedingung:</td>
-                        <td class="border py-1 px-3 text-sm">30 Tage</td>
+                        <td class="border py-1 px-3 text-xs">Zahlungsbedingung:</td>
+                        <td class="border py-1 px-3 text-xs">30 Tage</td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Angebot gültig bis:</td>
-                        <td class="border py-1 px-3 text-sm"></td>
+                        <td class="border py-1 px-3 text-xs">Angebot gültig bis:</td>
+                        <td class="border py-1 px-3 text-xs"></td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Kunden-Nr.:</td>
-                        <td class="border py-1 px-3 text-sm"></td>
+                        <td class="border py-1 px-3 text-xs">Kunden-Nr.:</td>
+                        <td class="border py-1 px-3 text-xs"></td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Lieferanten-Nr.:</td>
-                        <td class="border py-1 px-3 text-sm"></td>
+                        <td class="border py-1 px-3 text-xs">Lieferanten-Nr.:</td>
+                        <td class="border py-1 px-3 text-xs"></td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Ihre Anfrage vom:</td>
-                        <td class="border py-1 px-3 text-sm"></td>
+                        <td class="border py-1 px-3 text-xs">Ihre Anfrage vom:</td>
+                        <td class="border py-1 px-3 text-xs"></td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Ihr Ansprechpartner:</td>
-                        <td class="border py-1 px-3 text-sm"></td>
+                        <td class="border py-1 px-3 text-xs">Ihr Ansprechpartner:</td>
+                        <td class="border py-1 px-3 text-xs"></td>
                     </tr>
                     <tr>
-                        <td class="border py-1 px-3 text-sm">Unser Ansprechpartner:</td>
-                        <td class="border py-1 px-3 text-sm">
+                        <td class="border py-1 px-3 text-xs">Unser Ansprechpartner:</td>
+                        <td class="border py-1 px-3 text-xs">
                             <p>Oskar Sammet</p>
                             <p>+49 172 8387614</p>
                         </td>
@@ -454,9 +502,10 @@
         </div>
 
         <div class="grid gap-4">
-            <h1 class="text-lg font-bold">Keepit SaaS-Backup für {{products}}</h1>
-            <p>Sehr geehrte(r) {{Kunde}},</p>
-            <p>hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup Lösung für Ihre
+            <h1 class="text-md font-bold">Keepit SaaS-Backup für {{products}}</h1>
+            <p class="text-sm">Sehr geehrte(r) {{Kunde}},</p>
+            <p class="text-sm">hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup
+                Lösung für Ihre
                 {{products}} Umgebung:</p>
         </div>
 

@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import stripe from "../lib/stripe.js";
+import { generateOfferPdf } from "../utils/generation/document-generator.js";
 
 /*
  * Get all orders
@@ -28,6 +29,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 export const getOrderById = async (request: Request, response: Response, next: NextFunction) => {
     const { orderId } = request.params;
 
+
     const order = await prisma.order.findUnique({
         where: { id: orderId as string },
         include: {
@@ -41,27 +43,21 @@ export const getOrderById = async (request: Request, response: Response, next: N
         }
     });
 
-
-    // Stark vereinfachtes Beispiel, wie der Code für Stripe aussieht:
-    const session = await stripe.checkout.sessions.create({
-        line_items: [{
-            price_data: {
-                currency: 'eur',
-                unit_amount: 41250,
-                product_data: {
-                    name: 'Premium Lizenzpaket (37 Lizenzen, 24 Mon. Laufzeit)',
-                },
+    generateOfferPdf({
+        data: {
+            companyName: "",
+            contactPerson: `${order?.user.salutation} ${order?.user.firstName} ${order?.user.lastName}`,
+            street: "",
+            plzCity: "",
+            order: {
+                invoiceNumber: String(order?.id.slice(0, 8)),
             },
-            quantity: 1,
-        }],
-        mode: 'payment',
-        success_url: 'http://localhost:5173/erfolg',
-        cancel_url: 'http://localhost:5173/abbrechen',
+            date: String(Date.now()),
+            products: "Product 1 & Product 2",
+        },
+        outputPath: "output.pdf",
+        templatePath: "template-offer.html"
     });
-
-    console.log(session);
-
-
 
     return response.status(200).json(order);
 }
