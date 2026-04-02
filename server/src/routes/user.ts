@@ -1,11 +1,14 @@
 import { Router } from "express";
 import { requireSession } from "../middlewares/auth.js";
-import { getSessionUser, upsertAddress, createContactPersons } from "../controllers/userController.js";
+import { getSessionUser, upsertAddress, createContactPersons, deleteAccount } from "../controllers/userController.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/users/session */
 router.get('/session', requireSession, getSessionUser);
+
+/* [DELETE] http://localhost:3000/api/users */
+router.delete('/', requireSession, deleteAccount);
 
 /* [POST] http://localhost:3000/api/users/me/address */
 router.post('/me/address', requireSession, upsertAddress);

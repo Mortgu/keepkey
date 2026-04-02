@@ -15,7 +15,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const styles = tv({
     base: [
-        'cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-medium h-fit',
+        'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-medium h-fit',
         'transition-all duration-200 outline-none',
         'disabled:opacity-50 disabled:cursor-not-allowed ',
     ],

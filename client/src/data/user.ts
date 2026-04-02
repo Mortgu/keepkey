@@ -53,3 +53,16 @@ export async function createContactPersons(data: Array<{ salutation: string; fir
 
     return await response.json();
 }
+
+export async function deleteAccountAction() {
+    const response = await fetch('http://localhost:3000/api/users', {
+        method: 'DELETE',
+        credentials: 'include',
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to create contact persons');
+    }
+
+    return await response.json();
+}

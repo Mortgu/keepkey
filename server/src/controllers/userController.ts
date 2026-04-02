@@ -22,6 +22,24 @@ export const getSessionUser = async (request: Request, response: Response) => {
     return response.status(200).json(databaseUser);
 }
 
+export const deleteAccount = async (request: Request, response: Response) => {
+    const user = request.user;
+
+    if (!user) {
+        return response.status(404).json({
+            success: false, message: 'No session found!'
+        });
+    }
+
+    await prisma.user.delete({
+        where: { id: user.id },
+    });
+
+    return response.status(200).json({
+        success: true, message: 'Successfully deleted account!',
+    });
+}
+
 export const upsertAddress = async (request: Request, response: Response) => {
     const { street, plz, city, phone } = request.body;
     const userId = request.user?.id;
