@@ -16,10 +16,7 @@ function RootComponent() {
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
                 <Navigation />
-
-                <div className='max-w-(--viewport) m-auto p-4 h-full'>
-                    <Outlet />
-                </div>
+                <Outlet />
             </AuthProvider>
         </QueryClientProvider>
     )

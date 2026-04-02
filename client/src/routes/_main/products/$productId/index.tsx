@@ -5,7 +5,7 @@ import { Loader, Pen } from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import { useAuth } from "@/context/auth.tsx";
 
-export const Route = createFileRoute('/products/$productId/')({
+export const Route = createFileRoute('/_main/products/$productId/')({
   loader: async ({ params }) => {
     return getProduct(params.productId)
   },

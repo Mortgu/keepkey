@@ -1,4 +1,4 @@
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item";
+import type { ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
 import { type ShoppingCartItem } from "./types";
 
 export async function getShoppingCart(): Promise<ShoppingCartItem[]> {

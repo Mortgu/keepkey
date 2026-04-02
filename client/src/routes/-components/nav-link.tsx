@@ -6,7 +6,7 @@ const styles = tv({
     base: "transition-colors", // Add common transition logic here
     variants: {
         variant: {
-            primary: "flex items-center justify-center h-full border-b-2 border-transparent", // Transparent border prevents layout shift
+            primary: "flex items-center justify-center h-full border-b-2 border-transparent hover:text-(--keepit-primary)", // Transparent border prevents layout shift
             filled: "py-2 px-4 rounded-md ",
         },
         isActive: {
@@ -49,7 +49,7 @@ const CreatedLinkComponent = createLink(BasicLinkComponent);
 
 export const NavLink: LinkComponent<typeof BasicLinkComponent> = (props) => {
     return (
-        <CreatedLinkComponent {...props} activeProps={{
+        <CreatedLinkComponent {...props} activeOptions={{ exact: true }} activeProps={{
             className: styles({ variant: props.variant, isActive: true }),
         }} />
     );

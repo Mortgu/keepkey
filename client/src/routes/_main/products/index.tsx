@@ -3,7 +3,7 @@ import { useProducts } from "@/hooks/product.ts";
 import ProductCard from './-components/product-card';
 import type { ProductItem } from '@/data/types';
 
-export const Route = createFileRoute('/products/')({
+export const Route = createFileRoute('/_main/products/')({
     component: RouteComponent,
 })
 

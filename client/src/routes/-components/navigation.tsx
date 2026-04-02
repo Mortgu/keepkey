@@ -9,7 +9,7 @@ export default function Navigation() {
     return (
         <div className="h-18 w-full border-b border-gray-200">
             <div className="flex max-w-(--viewport) m-auto px-4 items-center h-full justify-between">
-                <div className="flex h-full gap-6">
+                <div className="flex h-full gap-8">
                     <NavLink to="/">Home</NavLink>
                     <NavLink to="/products">Products</NavLink>
                 </div>

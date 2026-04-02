@@ -6,7 +6,7 @@ import { useShoppingCart } from '@/hooks/shopping-cart';
 import { requireSession } from "@/lib/session.ts";
 import type { ShoppingCartItem } from '@/data/types';
 
-export const Route = createFileRoute('/checkout/')({
+export const Route = createFileRoute('/_main/checkout/')({
     component: RouteComponent,
 
     beforeLoad: ({ context }) => requireSession(context),

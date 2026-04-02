@@ -1,7 +1,7 @@
 import { getAllOrdersAction } from "@/data/orders";
 import { createProductAction, deleteProductAction, getAllProducts, updateProductAction } from "@/data/products";
 import { getAllUsersAction } from "@/data/user";
-import type { ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item";
+import type { ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useAdmin = () => {

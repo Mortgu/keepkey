@@ -9,58 +9,52 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TestRouteImport } from './routes/test'
-import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as SignupIndexRouteImport } from './routes/signup/index'
-import { Route as ProductsIndexRouteImport } from './routes/products/index'
-import { Route as LoginIndexRouteImport } from './routes/login/index'
-import { Route as CheckoutIndexRouteImport } from './routes/checkout/index'
+import { Route as MainRouteRouteImport } from './routes/_main/route'
+import { Route as MainIndexRouteImport } from './routes/_main/index'
+import { Route as MainTestRouteImport } from './routes/_main/test'
+import { Route as MainAuthenticatedRouteImport } from './routes/_main/_authenticated'
 import { Route as UserPathlessLayoutRouteRouteImport } from './routes/user/_pathlessLayout/route'
+import { Route as AdminAdminLayoutRouteRouteImport } from './routes/admin/_adminLayout/route'
 import { Route as UserPathlessLayoutIndexRouteImport } from './routes/user/_pathlessLayout/index'
-import { Route as ProductsProductIdIndexRouteImport } from './routes/products/$productId/index'
-import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
+import { Route as AdminAdminLayoutIndexRouteImport } from './routes/admin/_adminLayout/index'
+import { Route as MainSignupIndexRouteImport } from './routes/_main/signup/index'
+import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
+import { Route as MainLoginIndexRouteImport } from './routes/_main/login/index'
+import { Route as MainCheckoutIndexRouteImport } from './routes/_main/checkout/index'
 import { Route as UserPathlessLayoutSettingsIndexRouteImport } from './routes/user/_pathlessLayout/settings/index'
 import { Route as UserPathlessLayoutOrdersIndexRouteImport } from './routes/user/_pathlessLayout/orders/index'
-import { Route as UserPathlessLayoutAdminIndexRouteImport } from './routes/user/_pathlessLayout/admin/index'
+import { Route as AdminAdminLayoutUsersIndexRouteImport } from './routes/admin/_adminLayout/users/index'
+import { Route as AdminAdminLayoutProductsIndexRouteImport } from './routes/admin/_adminLayout/products/index'
+import { Route as AdminAdminLayoutOrdersIndexRouteImport } from './routes/admin/_adminLayout/orders/index'
+import { Route as MainProductsProductIdIndexRouteImport } from './routes/_main/products/$productId/index'
+import { Route as MainAuthenticatedDashboardIndexRouteImport } from './routes/_main/_authenticated/dashboard/index'
 
-const TestRoute = TestRouteImport.update({
-  id: '/test',
-  path: '/test',
+const MainRouteRoute = MainRouteRouteImport.update({
+  id: '/_main',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedRoute = AuthenticatedRouteImport.update({
-  id: '/_authenticated',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const IndexRoute = IndexRouteImport.update({
+const MainIndexRoute = MainIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => MainRouteRoute,
 } as any)
-const SignupIndexRoute = SignupIndexRouteImport.update({
-  id: '/signup/',
-  path: '/signup/',
-  getParentRoute: () => rootRouteImport,
+const MainTestRoute = MainTestRouteImport.update({
+  id: '/test',
+  path: '/test',
+  getParentRoute: () => MainRouteRoute,
 } as any)
-const ProductsIndexRoute = ProductsIndexRouteImport.update({
-  id: '/products/',
-  path: '/products/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginIndexRoute = LoginIndexRouteImport.update({
-  id: '/login/',
-  path: '/login/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CheckoutIndexRoute = CheckoutIndexRouteImport.update({
-  id: '/checkout/',
-  path: '/checkout/',
-  getParentRoute: () => rootRouteImport,
+const MainAuthenticatedRoute = MainAuthenticatedRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => MainRouteRoute,
 } as any)
 const UserPathlessLayoutRouteRoute = UserPathlessLayoutRouteRouteImport.update({
   id: '/user/_pathlessLayout',
   path: '/user',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAdminLayoutRouteRoute = AdminAdminLayoutRouteRouteImport.update({
+  id: '/admin/_adminLayout',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const UserPathlessLayoutIndexRoute = UserPathlessLayoutIndexRouteImport.update({
@@ -68,17 +62,31 @@ const UserPathlessLayoutIndexRoute = UserPathlessLayoutIndexRouteImport.update({
   path: '/',
   getParentRoute: () => UserPathlessLayoutRouteRoute,
 } as any)
-const ProductsProductIdIndexRoute = ProductsProductIdIndexRouteImport.update({
-  id: '/products/$productId/',
-  path: '/products/$productId/',
-  getParentRoute: () => rootRouteImport,
+const AdminAdminLayoutIndexRoute = AdminAdminLayoutIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AdminAdminLayoutRouteRoute,
 } as any)
-const AuthenticatedDashboardIndexRoute =
-  AuthenticatedDashboardIndexRouteImport.update({
-    id: '/dashboard/',
-    path: '/dashboard/',
-    getParentRoute: () => AuthenticatedRoute,
-  } as any)
+const MainSignupIndexRoute = MainSignupIndexRouteImport.update({
+  id: '/signup/',
+  path: '/signup/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
+  id: '/products/',
+  path: '/products/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainLoginIndexRoute = MainLoginIndexRouteImport.update({
+  id: '/login/',
+  path: '/login/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainCheckoutIndexRoute = MainCheckoutIndexRouteImport.update({
+  id: '/checkout/',
+  path: '/checkout/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const UserPathlessLayoutSettingsIndexRoute =
   UserPathlessLayoutSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -91,56 +99,92 @@ const UserPathlessLayoutOrdersIndexRoute =
     path: '/orders/',
     getParentRoute: () => UserPathlessLayoutRouteRoute,
   } as any)
-const UserPathlessLayoutAdminIndexRoute =
-  UserPathlessLayoutAdminIndexRouteImport.update({
-    id: '/admin/',
-    path: '/admin/',
-    getParentRoute: () => UserPathlessLayoutRouteRoute,
+const AdminAdminLayoutUsersIndexRoute =
+  AdminAdminLayoutUsersIndexRouteImport.update({
+    id: '/users/',
+    path: '/users/',
+    getParentRoute: () => AdminAdminLayoutRouteRoute,
+  } as any)
+const AdminAdminLayoutProductsIndexRoute =
+  AdminAdminLayoutProductsIndexRouteImport.update({
+    id: '/products/',
+    path: '/products/',
+    getParentRoute: () => AdminAdminLayoutRouteRoute,
+  } as any)
+const AdminAdminLayoutOrdersIndexRoute =
+  AdminAdminLayoutOrdersIndexRouteImport.update({
+    id: '/orders/',
+    path: '/orders/',
+    getParentRoute: () => AdminAdminLayoutRouteRoute,
+  } as any)
+const MainProductsProductIdIndexRoute =
+  MainProductsProductIdIndexRouteImport.update({
+    id: '/products/$productId/',
+    path: '/products/$productId/',
+    getParentRoute: () => MainRouteRoute,
+  } as any)
+const MainAuthenticatedDashboardIndexRoute =
+  MainAuthenticatedDashboardIndexRouteImport.update({
+    id: '/dashboard/',
+    path: '/dashboard/',
+    getParentRoute: () => MainAuthenticatedRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/test': typeof TestRoute
+  '/': typeof MainIndexRoute
+  '/admin': typeof AdminAdminLayoutRouteRouteWithChildren
   '/user': typeof UserPathlessLayoutRouteRouteWithChildren
-  '/checkout/': typeof CheckoutIndexRoute
-  '/login/': typeof LoginIndexRoute
-  '/products/': typeof ProductsIndexRoute
-  '/signup/': typeof SignupIndexRoute
-  '/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/products/$productId/': typeof ProductsProductIdIndexRoute
+  '/test': typeof MainTestRoute
+  '/checkout/': typeof MainCheckoutIndexRoute
+  '/login/': typeof MainLoginIndexRoute
+  '/products/': typeof MainProductsIndexRoute
+  '/signup/': typeof MainSignupIndexRoute
+  '/admin/': typeof AdminAdminLayoutIndexRoute
   '/user/': typeof UserPathlessLayoutIndexRoute
-  '/user/admin/': typeof UserPathlessLayoutAdminIndexRoute
+  '/dashboard/': typeof MainAuthenticatedDashboardIndexRoute
+  '/products/$productId/': typeof MainProductsProductIdIndexRoute
+  '/admin/orders/': typeof AdminAdminLayoutOrdersIndexRoute
+  '/admin/products/': typeof AdminAdminLayoutProductsIndexRoute
+  '/admin/users/': typeof AdminAdminLayoutUsersIndexRoute
   '/user/orders/': typeof UserPathlessLayoutOrdersIndexRoute
   '/user/settings/': typeof UserPathlessLayoutSettingsIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/test': typeof TestRoute
-  '/checkout': typeof CheckoutIndexRoute
-  '/login': typeof LoginIndexRoute
-  '/products': typeof ProductsIndexRoute
-  '/signup': typeof SignupIndexRoute
-  '/dashboard': typeof AuthenticatedDashboardIndexRoute
-  '/products/$productId': typeof ProductsProductIdIndexRoute
+  '/': typeof MainIndexRoute
+  '/test': typeof MainTestRoute
+  '/checkout': typeof MainCheckoutIndexRoute
+  '/login': typeof MainLoginIndexRoute
+  '/products': typeof MainProductsIndexRoute
+  '/signup': typeof MainSignupIndexRoute
+  '/admin': typeof AdminAdminLayoutIndexRoute
   '/user': typeof UserPathlessLayoutIndexRoute
-  '/user/admin': typeof UserPathlessLayoutAdminIndexRoute
+  '/dashboard': typeof MainAuthenticatedDashboardIndexRoute
+  '/products/$productId': typeof MainProductsProductIdIndexRoute
+  '/admin/orders': typeof AdminAdminLayoutOrdersIndexRoute
+  '/admin/products': typeof AdminAdminLayoutProductsIndexRoute
+  '/admin/users': typeof AdminAdminLayoutUsersIndexRoute
   '/user/orders': typeof UserPathlessLayoutOrdersIndexRoute
   '/user/settings': typeof UserPathlessLayoutSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/_authenticated': typeof AuthenticatedRouteWithChildren
-  '/test': typeof TestRoute
+  '/_main': typeof MainRouteRouteWithChildren
+  '/admin/_adminLayout': typeof AdminAdminLayoutRouteRouteWithChildren
   '/user/_pathlessLayout': typeof UserPathlessLayoutRouteRouteWithChildren
-  '/checkout/': typeof CheckoutIndexRoute
-  '/login/': typeof LoginIndexRoute
-  '/products/': typeof ProductsIndexRoute
-  '/signup/': typeof SignupIndexRoute
-  '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
-  '/products/$productId/': typeof ProductsProductIdIndexRoute
+  '/_main/_authenticated': typeof MainAuthenticatedRouteWithChildren
+  '/_main/test': typeof MainTestRoute
+  '/_main/': typeof MainIndexRoute
+  '/_main/checkout/': typeof MainCheckoutIndexRoute
+  '/_main/login/': typeof MainLoginIndexRoute
+  '/_main/products/': typeof MainProductsIndexRoute
+  '/_main/signup/': typeof MainSignupIndexRoute
+  '/admin/_adminLayout/': typeof AdminAdminLayoutIndexRoute
   '/user/_pathlessLayout/': typeof UserPathlessLayoutIndexRoute
-  '/user/_pathlessLayout/admin/': typeof UserPathlessLayoutAdminIndexRoute
+  '/_main/_authenticated/dashboard/': typeof MainAuthenticatedDashboardIndexRoute
+  '/_main/products/$productId/': typeof MainProductsProductIdIndexRoute
+  '/admin/_adminLayout/orders/': typeof AdminAdminLayoutOrdersIndexRoute
+  '/admin/_adminLayout/products/': typeof AdminAdminLayoutProductsIndexRoute
+  '/admin/_adminLayout/users/': typeof AdminAdminLayoutUsersIndexRoute
   '/user/_pathlessLayout/orders/': typeof UserPathlessLayoutOrdersIndexRoute
   '/user/_pathlessLayout/settings/': typeof UserPathlessLayoutSettingsIndexRoute
 }
@@ -148,16 +192,20 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/test'
+    | '/admin'
     | '/user'
+    | '/test'
     | '/checkout/'
     | '/login/'
     | '/products/'
     | '/signup/'
+    | '/admin/'
+    | '/user/'
     | '/dashboard/'
     | '/products/$productId/'
-    | '/user/'
-    | '/user/admin/'
+    | '/admin/orders/'
+    | '/admin/products/'
+    | '/admin/users/'
     | '/user/orders/'
     | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
@@ -168,98 +216,86 @@ export interface FileRouteTypes {
     | '/login'
     | '/products'
     | '/signup'
+    | '/admin'
+    | '/user'
     | '/dashboard'
     | '/products/$productId'
-    | '/user'
-    | '/user/admin'
+    | '/admin/orders'
+    | '/admin/products'
+    | '/admin/users'
     | '/user/orders'
     | '/user/settings'
   id:
     | '__root__'
-    | '/'
-    | '/_authenticated'
-    | '/test'
+    | '/_main'
+    | '/admin/_adminLayout'
     | '/user/_pathlessLayout'
-    | '/checkout/'
-    | '/login/'
-    | '/products/'
-    | '/signup/'
-    | '/_authenticated/dashboard/'
-    | '/products/$productId/'
+    | '/_main/_authenticated'
+    | '/_main/test'
+    | '/_main/'
+    | '/_main/checkout/'
+    | '/_main/login/'
+    | '/_main/products/'
+    | '/_main/signup/'
+    | '/admin/_adminLayout/'
     | '/user/_pathlessLayout/'
-    | '/user/_pathlessLayout/admin/'
+    | '/_main/_authenticated/dashboard/'
+    | '/_main/products/$productId/'
+    | '/admin/_adminLayout/orders/'
+    | '/admin/_adminLayout/products/'
+    | '/admin/_adminLayout/users/'
     | '/user/_pathlessLayout/orders/'
     | '/user/_pathlessLayout/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
-  TestRoute: typeof TestRoute
+  MainRouteRoute: typeof MainRouteRouteWithChildren
+  AdminAdminLayoutRouteRoute: typeof AdminAdminLayoutRouteRouteWithChildren
   UserPathlessLayoutRouteRoute: typeof UserPathlessLayoutRouteRouteWithChildren
-  CheckoutIndexRoute: typeof CheckoutIndexRoute
-  LoginIndexRoute: typeof LoginIndexRoute
-  ProductsIndexRoute: typeof ProductsIndexRoute
-  SignupIndexRoute: typeof SignupIndexRoute
-  ProductsProductIdIndexRoute: typeof ProductsProductIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/test': {
-      id: '/test'
-      path: '/test'
-      fullPath: '/test'
-      preLoaderRoute: typeof TestRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated': {
-      id: '/_authenticated'
+    '/_main': {
+      id: '/_main'
       path: ''
       fullPath: '/'
-      preLoaderRoute: typeof AuthenticatedRouteImport
+      preLoaderRoute: typeof MainRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
+    '/_main/': {
+      id: '/_main/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof MainIndexRouteImport
+      parentRoute: typeof MainRouteRoute
     }
-    '/signup/': {
-      id: '/signup/'
-      path: '/signup'
-      fullPath: '/signup/'
-      preLoaderRoute: typeof SignupIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/test': {
+      id: '/_main/test'
+      path: '/test'
+      fullPath: '/test'
+      preLoaderRoute: typeof MainTestRouteImport
+      parentRoute: typeof MainRouteRoute
     }
-    '/products/': {
-      id: '/products/'
-      path: '/products'
-      fullPath: '/products/'
-      preLoaderRoute: typeof ProductsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login/': {
-      id: '/login/'
-      path: '/login'
-      fullPath: '/login/'
-      preLoaderRoute: typeof LoginIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/checkout/': {
-      id: '/checkout/'
-      path: '/checkout'
-      fullPath: '/checkout/'
-      preLoaderRoute: typeof CheckoutIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/_main/_authenticated': {
+      id: '/_main/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof MainAuthenticatedRouteImport
+      parentRoute: typeof MainRouteRoute
     }
     '/user/_pathlessLayout': {
       id: '/user/_pathlessLayout'
       path: '/user'
       fullPath: '/user'
       preLoaderRoute: typeof UserPathlessLayoutRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/_adminLayout': {
+      id: '/admin/_adminLayout'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminAdminLayoutRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/user/_pathlessLayout/': {
@@ -269,19 +305,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserPathlessLayoutIndexRouteImport
       parentRoute: typeof UserPathlessLayoutRouteRoute
     }
-    '/products/$productId/': {
-      id: '/products/$productId/'
-      path: '/products/$productId'
-      fullPath: '/products/$productId/'
-      preLoaderRoute: typeof ProductsProductIdIndexRouteImport
-      parentRoute: typeof rootRouteImport
+    '/admin/_adminLayout/': {
+      id: '/admin/_adminLayout/'
+      path: '/'
+      fullPath: '/admin/'
+      preLoaderRoute: typeof AdminAdminLayoutIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
     }
-    '/_authenticated/dashboard/': {
-      id: '/_authenticated/dashboard/'
-      path: '/dashboard'
-      fullPath: '/dashboard/'
-      preLoaderRoute: typeof AuthenticatedDashboardIndexRouteImport
-      parentRoute: typeof AuthenticatedRoute
+    '/_main/signup/': {
+      id: '/_main/signup/'
+      path: '/signup'
+      fullPath: '/signup/'
+      preLoaderRoute: typeof MainSignupIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/products/': {
+      id: '/_main/products/'
+      path: '/products'
+      fullPath: '/products/'
+      preLoaderRoute: typeof MainProductsIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/login/': {
+      id: '/_main/login/'
+      path: '/login'
+      fullPath: '/login/'
+      preLoaderRoute: typeof MainLoginIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/checkout/': {
+      id: '/_main/checkout/'
+      path: '/checkout'
+      fullPath: '/checkout/'
+      preLoaderRoute: typeof MainCheckoutIndexRouteImport
+      parentRoute: typeof MainRouteRoute
     }
     '/user/_pathlessLayout/settings/': {
       id: '/user/_pathlessLayout/settings/'
@@ -297,31 +354,102 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UserPathlessLayoutOrdersIndexRouteImport
       parentRoute: typeof UserPathlessLayoutRouteRoute
     }
-    '/user/_pathlessLayout/admin/': {
-      id: '/user/_pathlessLayout/admin/'
-      path: '/admin'
-      fullPath: '/user/admin/'
-      preLoaderRoute: typeof UserPathlessLayoutAdminIndexRouteImport
-      parentRoute: typeof UserPathlessLayoutRouteRoute
+    '/admin/_adminLayout/users/': {
+      id: '/admin/_adminLayout/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminAdminLayoutUsersIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
+    }
+    '/admin/_adminLayout/products/': {
+      id: '/admin/_adminLayout/products/'
+      path: '/products'
+      fullPath: '/admin/products/'
+      preLoaderRoute: typeof AdminAdminLayoutProductsIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
+    }
+    '/admin/_adminLayout/orders/': {
+      id: '/admin/_adminLayout/orders/'
+      path: '/orders'
+      fullPath: '/admin/orders/'
+      preLoaderRoute: typeof AdminAdminLayoutOrdersIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
+    }
+    '/_main/products/$productId/': {
+      id: '/_main/products/$productId/'
+      path: '/products/$productId'
+      fullPath: '/products/$productId/'
+      preLoaderRoute: typeof MainProductsProductIdIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/_authenticated/dashboard/': {
+      id: '/_main/_authenticated/dashboard/'
+      path: '/dashboard'
+      fullPath: '/dashboard/'
+      preLoaderRoute: typeof MainAuthenticatedDashboardIndexRouteImport
+      parentRoute: typeof MainAuthenticatedRoute
     }
   }
 }
 
-interface AuthenticatedRouteChildren {
-  AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
+interface MainAuthenticatedRouteChildren {
+  MainAuthenticatedDashboardIndexRoute: typeof MainAuthenticatedDashboardIndexRoute
 }
 
-const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
+const MainAuthenticatedRouteChildren: MainAuthenticatedRouteChildren = {
+  MainAuthenticatedDashboardIndexRoute: MainAuthenticatedDashboardIndexRoute,
 }
 
-const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
-  AuthenticatedRouteChildren,
+const MainAuthenticatedRouteWithChildren =
+  MainAuthenticatedRoute._addFileChildren(MainAuthenticatedRouteChildren)
+
+interface MainRouteRouteChildren {
+  MainAuthenticatedRoute: typeof MainAuthenticatedRouteWithChildren
+  MainTestRoute: typeof MainTestRoute
+  MainIndexRoute: typeof MainIndexRoute
+  MainCheckoutIndexRoute: typeof MainCheckoutIndexRoute
+  MainLoginIndexRoute: typeof MainLoginIndexRoute
+  MainProductsIndexRoute: typeof MainProductsIndexRoute
+  MainSignupIndexRoute: typeof MainSignupIndexRoute
+  MainProductsProductIdIndexRoute: typeof MainProductsProductIdIndexRoute
+}
+
+const MainRouteRouteChildren: MainRouteRouteChildren = {
+  MainAuthenticatedRoute: MainAuthenticatedRouteWithChildren,
+  MainTestRoute: MainTestRoute,
+  MainIndexRoute: MainIndexRoute,
+  MainCheckoutIndexRoute: MainCheckoutIndexRoute,
+  MainLoginIndexRoute: MainLoginIndexRoute,
+  MainProductsIndexRoute: MainProductsIndexRoute,
+  MainSignupIndexRoute: MainSignupIndexRoute,
+  MainProductsProductIdIndexRoute: MainProductsProductIdIndexRoute,
+}
+
+const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
+  MainRouteRouteChildren,
 )
+
+interface AdminAdminLayoutRouteRouteChildren {
+  AdminAdminLayoutIndexRoute: typeof AdminAdminLayoutIndexRoute
+  AdminAdminLayoutOrdersIndexRoute: typeof AdminAdminLayoutOrdersIndexRoute
+  AdminAdminLayoutProductsIndexRoute: typeof AdminAdminLayoutProductsIndexRoute
+  AdminAdminLayoutUsersIndexRoute: typeof AdminAdminLayoutUsersIndexRoute
+}
+
+const AdminAdminLayoutRouteRouteChildren: AdminAdminLayoutRouteRouteChildren = {
+  AdminAdminLayoutIndexRoute: AdminAdminLayoutIndexRoute,
+  AdminAdminLayoutOrdersIndexRoute: AdminAdminLayoutOrdersIndexRoute,
+  AdminAdminLayoutProductsIndexRoute: AdminAdminLayoutProductsIndexRoute,
+  AdminAdminLayoutUsersIndexRoute: AdminAdminLayoutUsersIndexRoute,
+}
+
+const AdminAdminLayoutRouteRouteWithChildren =
+  AdminAdminLayoutRouteRoute._addFileChildren(
+    AdminAdminLayoutRouteRouteChildren,
+  )
 
 interface UserPathlessLayoutRouteRouteChildren {
   UserPathlessLayoutIndexRoute: typeof UserPathlessLayoutIndexRoute
-  UserPathlessLayoutAdminIndexRoute: typeof UserPathlessLayoutAdminIndexRoute
   UserPathlessLayoutOrdersIndexRoute: typeof UserPathlessLayoutOrdersIndexRoute
   UserPathlessLayoutSettingsIndexRoute: typeof UserPathlessLayoutSettingsIndexRoute
 }
@@ -329,7 +457,6 @@ interface UserPathlessLayoutRouteRouteChildren {
 const UserPathlessLayoutRouteRouteChildren: UserPathlessLayoutRouteRouteChildren =
   {
     UserPathlessLayoutIndexRoute: UserPathlessLayoutIndexRoute,
-    UserPathlessLayoutAdminIndexRoute: UserPathlessLayoutAdminIndexRoute,
     UserPathlessLayoutOrdersIndexRoute: UserPathlessLayoutOrdersIndexRoute,
     UserPathlessLayoutSettingsIndexRoute: UserPathlessLayoutSettingsIndexRoute,
   }
@@ -340,15 +467,9 @@ const UserPathlessLayoutRouteRouteWithChildren =
   )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  AuthenticatedRoute: AuthenticatedRouteWithChildren,
-  TestRoute: TestRoute,
+  MainRouteRoute: MainRouteRouteWithChildren,
+  AdminAdminLayoutRouteRoute: AdminAdminLayoutRouteRouteWithChildren,
   UserPathlessLayoutRouteRoute: UserPathlessLayoutRouteRouteWithChildren,
-  CheckoutIndexRoute: CheckoutIndexRoute,
-  LoginIndexRoute: LoginIndexRoute,
-  ProductsIndexRoute: ProductsIndexRoute,
-  SignupIndexRoute: SignupIndexRoute,
-  ProductsProductIdIndexRoute: ProductsProductIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

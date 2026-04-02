@@ -1,7 +1,7 @@
 import { Loader, Plus } from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import { useState } from "react";
-import ProductItem, { type ProductItemProps } from "@/routes/user/_pathlessLayout/admin/-components/product/product-item.tsx";
+import ProductItem, { type ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
 import ProductModal from "./product-modal";
 import { useAdmin } from "@/hooks/admin";
 
