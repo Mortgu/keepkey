@@ -1,11 +1,10 @@
 import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
-import { Loader, Pen, Plus, Trash } from "lucide-react";
+import { Loader, Pen, Plus, Trash, File, RotateCcw, Download } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
-import { useAdmin } from "@/hooks/admin";
 
 export default function OrderList() {
-    const { orders, isPending, error, deleteOrder } = useOrders({
+    const { orders, isPending, error, deleteOrder, isDeleting } = useOrders({
         adminMode: true
     });
 
@@ -35,21 +34,21 @@ export default function OrderList() {
                 {orders.map((order: any, index: number) => (
                     <div key={index} className='grid gap-2 border border-gray-200 p-3 rounded-md'>
                         <div className='flex items-center justify-between'>
-                            <div className=" flex-1">
+                            <div className="flex-1">
                                 <p className='text-lg'>{order.user.name} </p>
                                 <p className='text-sm text-gray-500'>{formatDate(order.createdAt)}</p>
                             </div>
-                            <div>
-                                <Button size='sm' variant='ghost' className='aspect-square'>
-                                    <Pen className='size-4' />
-                                </Button>
-                                <Button onClick={() => deleteOrder(order.id)} size='sm' variant='ghost' className='aspect-square'>
+                            <div className="flex items-center">
+                                <Button loading={isDeleting} onClick={() => deleteOrder(order.id)} size='sm' variant='ghost' iconOnly icon={
                                     <Trash className='size-4' />
-                                </Button>
+                                } />
                             </div>
                         </div>
                         <div className='flex gap-2 mt-2'>
-
+                            <div className="flex items-center justify-center gap-0 bg-gray-100 rounded-xl px-1 py-0.5">
+                                <Button icon={<Download className="size-4" />} variant="primary" size="sm">Rechnung</Button>
+                                <Button icon={<RotateCcw className="size-4" />} iconOnly variant="link" size='sm' />
+                            </div>
                         </div>
                     </div>
                 ))}

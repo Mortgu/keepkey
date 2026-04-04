@@ -103,7 +103,7 @@ export default function ProductItem(product: ProductItemProps) {
 
                 <div>
                     {/* Publish Product Button */}
-                    <Button onClick={handlePublication} variant="primary" size='sm' className="mr-4">
+                    <Button onClick={handlePublication} variant="ghost" size='sm' className="mr-4">
                         {product.published && (
                             <>
                                 <BadgeCheck className="size-4" />
@@ -119,15 +119,14 @@ export default function ProductItem(product: ProductItemProps) {
                     </Button>
 
                     {/* Edit Product Button */}
-                    <Button onClick={() => setEdit(true)} size='sm' variant='ghost' className='aspect-square'>
+                    <Button onClick={() => setEdit(true)} size='sm' variant='ghost' className='aspect-square' iconOnly icon={
                         <Pen className='size-4' />
-                    </Button>
+                    } />
 
                     {/* Delete Product Button */}
-                    <Button onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' className='aspect-square'>
-                        {isDeletingProduct && <Loader className='size-4 animate-spin' />}
-                        {!isDeletingProduct && <Trash className='size-4' />}
-                    </Button>
+                    <Button loading={isDeletingProduct} onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' iconOnly icon={
+                        <Trash className='size-4' />
+                    } />
                 </div>
             </div>
 
@@ -143,12 +142,12 @@ export default function ProductItem(product: ProductItemProps) {
                     <p className='flex-1'>{pricing?.min_quantity}-{pricing.max_quantity}</p>
                     <p className='flex-1'>{pricing?.duration}</p>
                     <p className='flex-1'>{pricing?.price} €</p>
-                    <Button size='sm' variant='ghost'>
+                    <Button size='xs' variant='link' iconOnly icon={
                         <Pen className='size-4' />
-                    </Button>
-                    <Button size='sm' variant='ghost'>
+                    } />
+                    <Button size='xs' variant='link' iconOnly icon={
                         <Trash className='size-4' />
-                    </Button>
+                    } />
                 </div>
             ))}
 

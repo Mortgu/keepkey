@@ -1,6 +1,8 @@
+import Button from "@/components/button/button";
 import DocumentStatus from "@/components/document-status";
 import type { Order } from "@/data/types";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { Download, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 type Props = {
@@ -45,7 +47,7 @@ export default function OrderListItem({ order }: Props) {
                 <div className="flex items-center relative">
 
                     {/* Tasks */}
-                    <div className="">
+                    <div className="flex gap-1 items-center">
                         <DocumentStatus orderId={order.id} />
                     </div>
 

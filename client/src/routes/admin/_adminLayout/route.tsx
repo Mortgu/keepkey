@@ -1,9 +1,24 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { createFileRoute, isRedirect, notFound, Outlet, redirect } from '@tanstack/react-router'
 import { NavLink } from "@/routes/-components/nav-link.tsx";
 import { useAuth } from "@/context/auth.tsx";
+import { authClient } from '@/lib/auth-client';
 
 export const Route = createFileRoute('/admin/_adminLayout')({
     component: AdminLayoutComponent,
+    beforeLoad: async ({ location }) => {
+        const { data: session } = await authClient.getSession();
+
+        if (!session || !session.user || session.user.role !== 'admin') {
+            throw notFound();
+        }
+    },
+    notFoundComponent: ({ data }) => {
+        return (
+            <div className='max-w-(--viewport) m-auto h-full p-4'>
+                <p>Not Found</p>
+            </div>
+        )
+    }
 })
 
 function AdminLayoutComponent() {

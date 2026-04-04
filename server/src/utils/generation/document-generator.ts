@@ -53,6 +53,8 @@ export const generateOfferPdf = async ({ data, outputPath, templatePath }: Props
             preferCSSPageSize: false,
         });
 
+        console.log(pdf.byteLength);
+
         await browser.close();
         console.log("Invoice PDF generated successfully");
 
