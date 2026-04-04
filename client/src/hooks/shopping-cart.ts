@@ -1,6 +1,5 @@
 import { createCheckoutAction } from "@/data/orders";
 import { addToShoppingCartAction, removeFromShoppingCartAction, deleteShoppingCartAction, getShoppingCart } from "@/data/shopping-cart";
-import type { ShoppingCartItem } from "@/data/types";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
@@ -9,7 +8,7 @@ export const useShoppingCart = () => {
     const { data: session } = authClient.useSession();
     const queryClient = useQueryClient();
 
-    const { data: shoppingCart = [], isPending, error } = useQuery({
+    const { data: shoppingCart, isPending, error } = useQuery({
         queryKey: ['cart'],
         queryFn: getShoppingCart,
     });
@@ -37,26 +36,7 @@ export const useShoppingCart = () => {
         })
     });
 
-    const handleCheckout = useCallback(
-        (products: ShoppingCartItem[]) => {
-            if (!session || !session.user) {
-                alert("Du bist nicht angemeldet!");
-                return;
-            }
-
-            if (!session.user.emailVerified) {
-                alert("Du musst zuerst deine E-Mail verifizieren!");
-                return;
-            }
-
-            if (products.length <= 0) {
-                alert("Es konnten keine Produkte in deinem Warenkorb gefunden werden!");
-                return;
-            }
-
-
-            checkoutMutation.mutate();
-        },
+    const handleCheckout = useCallback(checkoutMutation.mutate,
         [checkoutMutation.mutate, session]
     )
 

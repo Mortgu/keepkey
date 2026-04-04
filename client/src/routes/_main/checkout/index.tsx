@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { Loader, Pen, Trash } from "lucide-react";
+import { File, Loader, Pen, Trash } from "lucide-react";
 import Button from '@/components/button/button';
 import { authClient } from '@/lib/auth-client';
 import { useShoppingCart } from '@/hooks/shopping-cart';
@@ -13,11 +13,13 @@ export const Route = createFileRoute('/_main/checkout/')({
 })
 
 function RouteComponent() {
-    const { shoppingCart, handleCheckout, isProcessing, removeFromShoppingCart, error, checkoutErrors } = useShoppingCart();
+    const { shoppingCart, isPending, handleCheckout, isProcessing, removeFromShoppingCart, error, checkoutErrors } = useShoppingCart();
     const { data: session } = authClient.useSession();
     const emailVerified = session?.user.emailVerified;
 
-    if (isProcessing) {
+    console.log(shoppingCart)
+
+    if (isPending || isProcessing) {
         return <Loader className="animate-spin" />
     }
 
@@ -45,35 +47,68 @@ function RouteComponent() {
             {/* Header */}
             <div className='w-full flex items-center justify-between my-4'>
                 <h1 className='text-2xl'>Warenkorb</h1>
-                <Button loading={isProcessing} disabled={shoppingCart.length === 0} size='sm' onClick={() => {
-                    handleCheckout(shoppingCart);
-                }}>
-                    Create Order
-                </Button>
+                <div className='flex items-center gap-4'>
+                    {/*<Button variant="secondary" size='sm' icon={<File className='size-4' />}>Angebot</Button>*/}
+                    <Button loading={isProcessing} disabled={shoppingCart?.products.length === 0} size='sm' onClick={() => {
+                        handleCheckout();
+                    }}>
+                        Kostenpflichtig bestellen
+                    </Button>
+                </div>
+
             </div>
 
-            <div className='grid gap-4'>
-                {shoppingCart.map((item: ShoppingCartItem, index) => (
-                    <div key={index} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
-                        <div>
-                            <p className='text-lg'>{item.product.name}</p>
-                            <p className='text-gray-500'>{item.contract.name} | {item.duration} Jahr(e)</p>
-                        </div>
-                        <div>
-                            <p>{item.quantity}x</p>
-                            <p>{item.price} €</p>
-                        </div>
-                        <div>
-                            <Button variant="ghost" size='sm' className='aspect-square'>
-                                <Pen className='size-4' />
-                            </Button>
+            <div className='flex items-start gap-4'>
+                {/* Produkte als liste */}
+                <div className='flex-3 grid gap-4'>
+                    {shoppingCart?.products.map((item: ShoppingCartItem, index) => (
+                        <div key={index} className='flex items-center justify-between gap-4 border border-gray-200 p-3 rounded-md'>
+                            <div>
+                                <p className='text-lg'>{item.product.name}</p>
+                                <p className='text-gray-500'>{item.contract.name} | {item.duration} Jahr(e)</p>
+                            </div>
+                            <div>
+                                <p>{item.quantity}x</p>
+                                <p>{item.price} €</p>
+                            </div>
+                            <div>
+                                <Button variant="ghost" size='sm' className='aspect-square'>
+                                    <Pen className='size-4' />
+                                </Button>
 
-                            <Button onClick={() => removeFromShoppingCart(item.id)} variant="ghost" size='sm' className='aspect-square'>
-                                <Trash className='size-4' />
-                            </Button>
+                                <Button onClick={() => removeFromShoppingCart(item.id)} variant="ghost" size='sm' className='aspect-square'>
+                                    <Trash className='size-4' />
+                                </Button>
+                            </div>
                         </div>
+                    ))}
+                </div>
+
+                {/* Einstellungen */}
+                <div className='flex-1 border border-gray-300  rounded-md'>
+                    {/* Gesamtsumme */}
+                    <div className='flex items-center justify-between border-b border-gray-200 py-4 mx-4'>
+                        <p className='font-bold'>Gesamt:</p>
+                        <p>{shoppingCart?.total} €</p>
                     </div>
-                ))}
+                    <div className='p-4'>
+
+                        {/* Ansprechpartner */}
+                        <div className='grid gap-2'>
+                            <label className='text-sm text-gray-500'>Ihr Ansprechpartner:</label>
+                            <div className='flex items-center justify-between hover:border-(--keepit-primary) hover:transition-all border border-gray-200 py-2 px-3 rounded-md'>
+                                <div className='grid'>
+                                    <p className='font-semibold'>Herr Oskar Sammet</p>
+                                    <p className='text-sm text-gray-500'>oskar.sammet@dignum.de</p>
+                                </div>
+                                <Button size='sm' variant='ghost' iconOnly icon={
+                                    <Pen className='size-4' />
+                                } />
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
         </div>
     )

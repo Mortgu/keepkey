@@ -30,9 +30,20 @@ export interface ProductItem {
     description: string;
     link: string;
 
+    productPricing: ProductItemPricing[],
+
     createdAt: Date;
     updatedAt: Date;
 };
+
+export interface ProductItemPricing {
+    contract: Contract;
+    product: ProductItem,
+    duration: number;
+
+    max_quantity: number;
+    min_quantity: number;
+}
 
 export interface ShoppingCartItem extends ProductItem {
     quantity: number;
@@ -49,6 +60,12 @@ export interface OrderPositionItem extends ShoppingCartItem {
     priceAtPurchase: number;
     currency: string;
     createdAt: Date;
+}
+
+export interface ShoppingCart {
+    id: string;
+    products: ShoppingCartItem[];
+    total: number,
 }
 
 export interface Order {

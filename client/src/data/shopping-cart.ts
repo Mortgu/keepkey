@@ -1,7 +1,7 @@
 import type { ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
-import { type ShoppingCartItem } from "./types";
+import { type ShoppingCart } from "./types";
 
-export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
+export async function getShoppingCart(): Promise<ShoppingCart> {
     const response = await fetch('http://localhost:3000/api/shopping-cart', {
         method: 'GET',
         credentials: 'include',
@@ -11,8 +11,7 @@ export async function getShoppingCart(): Promise<ShoppingCartItem[]> {
         throw new Error("Failed to fetch shopping cart from user!");
     }
 
-    const result: ShoppingCartItem[] = await response.json();
-
+    const result: ShoppingCart = await response.json();
     return result;
 }
 

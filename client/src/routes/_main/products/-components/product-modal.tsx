@@ -2,12 +2,11 @@ import Button from "@/components/button/button";
 import Modal from "@/components/modal";
 import { useContracts } from "@/hooks/contract";
 import { useForm } from "@tanstack/react-form";
-import { Loader } from "lucide-react";
 import type { Dispatch, SetStateAction } from "react";
 import { z } from "zod";
 import { useShoppingCart } from "@/hooks/shopping-cart.ts";
 import { authClient } from "@/lib/auth-client.ts";
-import type { ProductItem } from "@/data/types";
+import type { ProductItem, ProductItemPricing } from "@/data/types";
 
 type ProductModalProps = {
     product: ProductItem,
@@ -15,19 +14,38 @@ type ProductModalProps = {
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
 
-const schema = z.object({
-    contractId: z.string().min(1),
-    quantity: z.int().min(1, "At least one product must be added!")
-        .max(300, "Exceeding limit!"),
-    duration: z.int(),
-});
+/* Finds the greates max_quantity value in an object array of pricings */
+const findMaxQuantity = (pricings: ProductItemPricing[]) => {
+    let match: ProductItemPricing = pricings[0];
+    pricings.map((pricing: ProductItemPricing) => {
+        pricing.max_quantity >= match?.max_quantity && (match = pricing);
+    });
+    return match?.max_quantity || 0;
+};
+
+/* Finds the smallest max_quantity value in an object array of pricings */
+const findMinQuantity = (pricings: ProductItemPricing[]) => {
+    let match: ProductItemPricing = pricings[0];
+    pricings.map((pricing: ProductItemPricing) => {
+        pricing.min_quantity <= match?.min_quantity && (match = pricing);
+    });
+    return match?.min_quantity || 0;
+};
 
 export default function ProductModal({ product, onSubmit, setOpen }: ProductModalProps) {
     const { contracts, isPending } = useContracts();
     const { addToShoppingCart } = useShoppingCart();
     const { data: session } = authClient.useSession();
 
-    console.log(product);
+    const min_quantity = findMinQuantity(product.productPricing);
+    const max_quantity = findMaxQuantity(product.productPricing)
+
+    const schema = z.object({
+        contractId: z.string().min(1),
+        quantity: z.int().min(min_quantity, `At least ${min_quantity} product must be added!`)
+            .max(max_quantity, `Exceeding limit of ${max_quantity}!`),
+        duration: z.int(),
+    });
 
     const form = useForm({
         defaultValues: {

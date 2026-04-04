@@ -10,6 +10,7 @@ export const Route = createFileRoute('/_main/products/')({
 function RouteComponent() {
     const { products } = useProducts();
 
+
     return (
         <div className='grid gap-4'>
             {products.map((product: ProductItem, index: number) => (

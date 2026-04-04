@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { calculateProductPrice } from "../utils/products.js";
 import z from "zod";
+import { totalmem } from "node:os";
 
 /* This file handles all the actions for the "/api/shopping-cart" route */
 
@@ -42,15 +43,26 @@ export const getSessionShoppingCart = async (request: Request, response: Respons
         });
     }
 
-    const cart = await prisma.shoppingCart.findMany({
+    const products = await prisma.shoppingCart.findMany({
         where: { userId: user.id as string },
         include: {
             contract: true,
             product: true
-        }
+        },
     });
 
-    return response.status(200).json(cart);
+    const total = await prisma.shoppingCart.aggregate({
+        where: { userId: user.id as string },
+        _sum: {
+            price: true,
+        }
+    })
+
+
+    return response.status(200).json({
+        products: products,
+        total: total._sum.price,
+    });
 }
 
 const ShoppingCartSchema = z.object({

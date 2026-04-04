@@ -1,4 +1,4 @@
-import { Order, User } from "@prisma/client";
+import { Order, Product, User } from "@prisma/client";
 
 export interface OfferData {
     companyName: string;
@@ -13,3 +13,9 @@ export interface OfferData {
 
     products: string;
 };
+
+export interface ShoppingCart {
+    id: string,
+    total: number,
+    products: Product[],
+}
