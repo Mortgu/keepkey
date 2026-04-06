@@ -21,8 +21,6 @@ export default function ProductCard({ product }: ProductCardProps) {
     const [isOpen, setOpen] = useState(false);
     const { data: session } = authClient.useSession();
 
-    console.log(findMaxQuantity(product.productPricing))
-
     const handleOpenModal = () => {
         if (!session || !session.user) {
             window.location.assign('/login');

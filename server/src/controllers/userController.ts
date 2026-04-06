@@ -1,8 +1,13 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { dmmfToRuntimeDataModel } from "@prisma/client/runtime/client";
 
 export const getAllUsers = async (request: Request, response: Response) => {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+        include: {
+            orders: true,
+        }
+    });
     return response.status(200).json(users);
 }
 

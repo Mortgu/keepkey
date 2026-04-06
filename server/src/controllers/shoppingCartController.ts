@@ -61,7 +61,7 @@ export const getSessionShoppingCart = async (request: Request, response: Respons
 
     return response.status(200).json({
         products: products,
-        total: total._sum.price,
+        total: total._sum.price || 0,
     });
 }
 

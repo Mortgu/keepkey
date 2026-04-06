@@ -11,6 +11,8 @@ export interface User {
 
     role: string;
 
+    orders: Order[];
+
     createdAt: Date;
 }
 

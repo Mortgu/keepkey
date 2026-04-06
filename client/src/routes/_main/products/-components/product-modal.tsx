@@ -2,11 +2,12 @@ import Button from "@/components/button/button";
 import Modal from "@/components/modal";
 import { useContracts } from "@/hooks/contract";
 import { useForm } from "@tanstack/react-form";
-import type { Dispatch, SetStateAction } from "react";
+import { useEffect, type Dispatch, type SetStateAction } from "react";
 import { z } from "zod";
 import { useShoppingCart } from "@/hooks/shopping-cart.ts";
 import { authClient } from "@/lib/auth-client.ts";
-import type { ProductItem, ProductItemPricing } from "@/data/types";
+import type { Contract, ProductItem, ProductItemPricing, ShoppingCartItem } from "@/data/types";
+import { Loader } from "lucide-react";
 
 type ProductModalProps = {
     product: ProductItem,
@@ -14,36 +15,15 @@ type ProductModalProps = {
     setOpen: Dispatch<SetStateAction<boolean>>,
 }
 
-/* Finds the greates max_quantity value in an object array of pricings */
-const findMaxQuantity = (pricings: ProductItemPricing[]) => {
-    let match: ProductItemPricing = pricings[0];
-    pricings.map((pricing: ProductItemPricing) => {
-        pricing.max_quantity >= match?.max_quantity && (match = pricing);
-    });
-    return match?.max_quantity || 0;
-};
-
-/* Finds the smallest max_quantity value in an object array of pricings */
-const findMinQuantity = (pricings: ProductItemPricing[]) => {
-    let match: ProductItemPricing = pricings[0];
-    pricings.map((pricing: ProductItemPricing) => {
-        pricing.min_quantity <= match?.min_quantity && (match = pricing);
-    });
-    return match?.min_quantity || 0;
-};
-
 export default function ProductModal({ product, onSubmit, setOpen }: ProductModalProps) {
     const { contracts, isPending } = useContracts();
     const { addToShoppingCart } = useShoppingCart();
     const { data: session } = authClient.useSession();
 
-    const min_quantity = findMinQuantity(product.productPricing);
-    const max_quantity = findMaxQuantity(product.productPricing)
-
     const schema = z.object({
         contractId: z.string().min(1),
-        quantity: z.int().min(min_quantity, `At least ${min_quantity} product must be added!`)
-            .max(max_quantity, `Exceeding limit of ${max_quantity}!`),
+        quantity: z.int().min(1, `At least ${1} product must be added!`)
+            .max(300, `Exceeding limit of ${300}!`),
         duration: z.int(),
     });
 
@@ -65,7 +45,13 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
             setOpen(false);
             return await addToShoppingCart(item);
         },
-    })
+    });
+
+    if (isPending) {
+        return (
+            <Loader className="size-4" />
+        );
+    }
 
     return (
         <Modal>
@@ -107,7 +93,7 @@ export default function ProductModal({ product, onSubmit, setOpen }: ProductModa
                                 <label htmlFor={field.name}>Anzahl</label>
                             )}
                             {!field.state.meta.isValid && (
-                                <label className="text-red-500" htmlFor={field.name}>{field.state.meta.errors.map(i => i.message).join(', ')}</label>
+                                <label className="text-red-500" htmlFor={field.name}>{field.state.meta.errors.map((i: any) => i.message).join(', ')}</label>
                             )}
                             <input id={field.name} name={field.name} value={field.state.value} className="flex-1 px-3 py-3 rounded-md border border-gray-200 text-sm bg-gray-50"
                                 placeholder="quantity" onChange={(e) => field.handleChange(parseInt(e.target.value))} />

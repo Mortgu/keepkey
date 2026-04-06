@@ -77,6 +77,7 @@ export const getSessionOrders = async (request: Request, response: Response, nex
 
     const orders = await prisma.order.findMany({
         where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
         include: {
             user: true,
             orderPositions: {

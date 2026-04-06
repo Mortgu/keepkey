@@ -31,7 +31,7 @@ export default function OrderList() {
         )
     }
 
-    const total = getTotalRevenue(orders);
+    const total = getTotalRevenue(orders).toFixed(2);
 
     return (
         <div>

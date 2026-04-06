@@ -21,7 +21,9 @@ export async function getAllUsersAction() {
         return [];
     }
 
-    return await response.json();
+    const result = await response.json();
+    console.log(result);
+    return result;
 }
 
 export async function upsertAddress(data: { street: string; plz: string; city: string; phone?: string }) {

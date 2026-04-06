@@ -17,8 +17,6 @@ function RouteComponent() {
     const { data: session } = authClient.useSession();
     const emailVerified = session?.user.emailVerified;
 
-    console.log(shoppingCart)
-
     if (isPending || isProcessing) {
         return <Loader className="animate-spin" />
     }
@@ -82,6 +80,14 @@ function RouteComponent() {
                             </div>
                         </div>
                     ))}
+
+                    {shoppingCart?.products.length === 0 && (
+                        <div className='flex items-center justify-between gap-4 border border-dashed border-gray-400 p-3 rounded-md'>
+                            <div>
+                                <p className='text-md text-gray-600'>Füge Produkte deinem Wahrenkorb hinzu</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Einstellungen */}
@@ -91,12 +97,17 @@ function RouteComponent() {
                         <p className='font-bold'>Gesamt:</p>
                         <p>{shoppingCart?.total} €</p>
                     </div>
-                    <div className='p-4'>
+                    <div className='grid gap-4 p-4'>
 
+                        {/* Kunden-Nr. */}
+                        <div className='grid'>
+                            <p className='text-sm font-semibold text-gray-600'>Ihre Kunden-Nr:</p>
+                            <p className='text-md font-bold'>#34AD2CDV</p>
+                        </div>
                         {/* Ansprechpartner */}
                         <div className='grid gap-2'>
-                            <label className='text-sm text-gray-500'>Ihr Ansprechpartner:</label>
-                            <div className='flex items-center justify-between hover:border-(--keepit-primary) hover:transition-all border border-gray-200 py-2 px-3 rounded-md'>
+                            <label className='text-sm font-semibold text-gray-600'>Ihr Ansprechpartner:</label>
+                            <div className='flex items-center justify-between hover:border-(--keepit-primary) hover:transition-all border border-gray-200 p-2 rounded-md'>
                                 <div className='grid'>
                                     <p className='font-semibold'>Herr Oskar Sammet</p>
                                     <p className='text-sm text-gray-500'>oskar.sammet@dignum.de</p>
