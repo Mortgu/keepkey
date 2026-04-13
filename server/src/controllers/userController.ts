@@ -7,6 +7,7 @@ export const getAllUsers = async (request: Request, response: Response) => {
     const users = await prisma.user.findMany({
         include: {
             orders: true,
+            contactPersons: true,
         }
     });
     return response.status(200).json(users);
@@ -37,10 +38,29 @@ export const updateUserById = async (request: Request, response: Response) => {
     }
 
     try {
-        const response = await prisma.user.update({
+        const { contactPersons, ...userFields } = body;
+
+        console.log(contactPersons, userFields)
+
+        await prisma.user.update({
             where: { id: id as string },
-            data: { ...body },
+            data: { ...userFields },
         });
+
+        if (contactPersons !== undefined) {
+            await prisma.contactPerson.deleteMany({ where: { userId: id as string } });
+            if (contactPersons.length > 0) {
+                await prisma.contactPerson.createMany({
+                    data: contactPersons.map((p: any) => ({
+                        salutation: p.salutation,
+                        firstName: p.firstName,
+                        lastName: p.lastName,
+                        email: p.email,
+                        userId: id,
+                    })),
+                });
+            }
+        }
     } catch (exception: any) {
         return response.status(500).json({
             success: false, message: 'Something went wrong trying to update user!'
@@ -53,7 +73,7 @@ export const updateUserById = async (request: Request, response: Response) => {
 }
 
 export const createUser = async (request: Request, response: Response) => {
-    const { body, params } = request;
+    const { body } = request;
 
     if (!body) {
         return response.status(404).json({
@@ -62,17 +82,31 @@ export const createUser = async (request: Request, response: Response) => {
     }
 
     try {
-        const newUser = await auth.api.createUser({
+        const { contactPersons, ...rest } = body;
+
+        const created = await auth.api.createUser({
             body: {
-                email: body.email,
+                email: rest.email,
                 password: '',
-                name: `${body.firstName} ${body.lastName}`,
+                name: `${rest.firstName} ${rest.lastName}`,
                 role: 'user',
-                data: {
-                    ...body,
-                }
+                data: { ...rest },
             },
         });
+
+        console.log(contactPersons, rest);
+
+        if (contactPersons?.length > 0) {
+            await prisma.contactPerson.createMany({
+                data: contactPersons.map((p: any) => ({
+                    salutation: p.salutation,
+                    firstName: p.firstName,
+                    lastName: p.lastName,
+                    email: p.email,
+                    userId: created.user.id,
+                })),
+            });
+        }
     } catch (exception: any) {
         return response.status(500).json({
             success: false, message: 'Something went wrong trying to create user!', exception: exception.message
