@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { dmmfToRuntimeDataModel } from "@prisma/client/runtime/client";
+import { auth } from "../lib/auth.js";
 
 export const getAllUsers = async (request: Request, response: Response) => {
     const users = await prisma.user.findMany({
@@ -9,6 +10,102 @@ export const getAllUsers = async (request: Request, response: Response) => {
         }
     });
     return response.status(200).json(users);
+}
+
+export const getUserById = async (request: Request, response: Response) => {
+    const { id } = request.params;
+
+    const user = await prisma.user.findUnique({
+        where: { id: id as string },
+        include: {
+            orders: true,
+            contactPersons: true
+        }
+    });
+
+    return response.status(200).json(user);
+}
+
+export const updateUserById = async (request: Request, response: Response) => {
+    const { body, params } = request;
+    const { id } = params;
+
+    if (!body || !id) {
+        return response.status(404).json({
+            success: false, message: 'Missing data!'
+        });
+    }
+
+    try {
+        const response = await prisma.user.update({
+            where: { id: id as string },
+            data: { ...body },
+        });
+    } catch (exception: any) {
+        return response.status(500).json({
+            success: false, message: 'Something went wrong trying to update user!'
+        });
+    }
+
+    return response.status(200).json({
+        success: true, message: 'Successfully updated user!'
+    });
+}
+
+export const createUser = async (request: Request, response: Response) => {
+    const { body, params } = request;
+
+    if (!body) {
+        return response.status(404).json({
+            success: false, message: 'Missing data!'
+        });
+    }
+
+    try {
+        const newUser = await auth.api.createUser({
+            body: {
+                email: body.email,
+                password: '',
+                name: `${body.firstName} ${body.lastName}`,
+                role: 'user',
+                data: {
+                    ...body,
+                }
+            },
+        });
+    } catch (exception: any) {
+        return response.status(500).json({
+            success: false, message: 'Something went wrong trying to create user!', exception: exception.message
+        });
+    }
+
+    return response.status(200).json({
+        success: true, message: 'Successfully created user!'
+    });
+}
+
+export const deleteUser = async (request: Request, response: Response) => {
+    const { id } = request.params;
+
+    if (!id) {
+        return response.status(404).json({
+            success: false, message: 'Missing user Id!'
+        });
+    }
+
+    try {
+        await prisma.user.delete({
+            where: { id: id as string }
+        })
+    } catch (exception: any) {
+        return response.status(500).json({
+            success: false, message: 'Something went wrong trying to delete user!', exception: exception.message
+        });
+    }
+
+    return response.status(200).json({
+        success: true, message: 'Successfully deleted user!'
+    });
 }
 
 export const getSessionUser = async (request: Request, response: Response) => {

@@ -138,7 +138,7 @@ model ProductPricing {
 model ShoppingCart {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   product   Product @relation(fields: [productId], references: [id])
@@ -162,7 +162,7 @@ model ShoppingCart {
 model Order {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
   userId String
 
   orderPositions OrderPosition[]
@@ -193,7 +193,7 @@ model DocumentJob {
 model OrderPosition {
   id String @id @default(uuid())
 
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   orderId String
 
   product   Product @relation(fields: [productId], references: [id])

@@ -12,8 +12,21 @@ export interface User {
     role: string;
 
     orders: Order[];
+    contactPersons: ContactPerson[];
 
     createdAt: Date;
+}
+
+export interface ContactPerson {
+    id: string;
+
+    salutation: String;
+    firstName: String;
+    lastName: String;
+    email?: String;
+
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface Contract {

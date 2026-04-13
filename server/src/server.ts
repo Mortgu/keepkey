@@ -16,7 +16,7 @@ const app: Express = express();
 
 app.use(cors({
     origin: "http://localhost:5173",
-    methods: ['*', 'DELETE', 'PUT'],
+    methods: ['*', 'DELETE', 'PUT', 'PATCH'],
     credentials: true
 }));
 

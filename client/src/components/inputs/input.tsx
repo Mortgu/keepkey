@@ -2,33 +2,40 @@ import { type InputHTMLAttributes, forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-    error?: boolean;
+    variant?: 'primary' | 'secondary';
+    input_size?: 'xs' | 'sm' | 'md';
 }
 
 const styles = tv({
     base: [
-        'w-full px-4 py-3 rounded-lg border-1 transition-all duration-200',
-        'text-base outline-none',
+        'w-full rounded-lg border-1 border-gray-200 transition-all duration-200',
+        'text-base outline-none focus:bg-gray-100',
         'placeholder:text-gray-400',
         'disabled:opacity-50 disabled:cursor-not-allowed',
     ],
     variants: {
-        error: {
-            true: 'border-red-500 focus:border-red-600 focus:ring-2 focus:ring-red-200',
-            false: 'border-gray-300 focus:border-[var(--keepit-primary)] focus:ring-2 focus:ring-[var(--keepit-primary-25)]',
+        variant: {
+            primary: '',
+            secondary: ''
+        },
+        input_size: {
+            xs: '',
+            sm: 'px-3 py-2 text-base',
+            md: 'px-4 py-3 text-base',
         }
     },
     defaultVariants: {
-        error: false,
+        variant: 'primary',
+        input_size: 'sm',
     }
 });
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
-    ({ className, error, ...rest }, ref) => {
+    ({ className, variant, input_size, ...rest }, ref) => {
         return (
             <input
                 ref={ref}
-                className={styles({ error, className })}
+                className={styles({ variant, input_size, className })}
                 {...rest}
             />
         );

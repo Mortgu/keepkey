@@ -68,11 +68,9 @@ export function LoginFormComponent() {
                     )} />
                     <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <>
-                                <Button type="submit" disabled={!canSubmit}>
-                                    {isSubmitting ? <Loader className='animate-spin' /> : 'Anmelden'}
-                                </Button>
-                            </>
+                            <Button type="submit" disabled={!canSubmit}>
+                                {isSubmitting ? <Loader className='animate-spin' /> : 'Anmelden'}
+                            </Button>
                         )} />
                 </div>
             </form>
