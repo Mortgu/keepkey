@@ -2,10 +2,9 @@ import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
 import Select from "@/components/select/select-modal";
 import type { ContactPerson, Order, User } from "@/data/types";
-import { getAllContactPersons } from "@/data/user";
 import { useAdmin } from "@/hooks/admin";
 import { useForm } from "@tanstack/react-form";
-import { useQuery } from "@tanstack/react-query";
+import { Loader } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 
@@ -38,13 +37,6 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
     const { users } = useAdmin();
     const [selectedCustomer, setSelectedCustomer] = useState<User>(currentOrder.user);
 
-    const { data: contactPersons, isPending: pendingContactPerson, error: errorContactPerson, refetch } = useQuery({
-        queryKey: ['contactPerson'],
-        queryFn: () => getAllContactPersons(currentOrder.user.id),
-        enabled: false,
-    });
-
-
     const orderForm = useForm({
         defaultValues: currentOrder || emptyOrder,
         validators: {
@@ -67,7 +59,11 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                             <div className="flex-1 grid gap-2 items-center">
                                 {/* Unser Ansprechpartner select */}
                                 <label className="text-sm  text-gray-500" htmlFor={field.name}>Kunde:</label>
-                                <Select onChange={(element) => field.handleChange(element.id)} elements={users?.map((user: User) => {
+                                <Select onChange={(element) => {
+                                    field.handleChange(element.id);
+                                    const user = users.find((u: User) => u.id === element.id);
+                                    if (user) setSelectedCustomer(user);
+                                }} elements={users?.map((user: User) => {
                                     return {
                                         id: user.id, child: (
                                             <div className="grid gap-0">
@@ -147,13 +143,13 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                         </div>
                     </div>
 
-
-
                     <div className="flex gap-4">
                         <Button onClick={onClose} className="flex-1" type='button' size='md' variant='secondary'>Cancel</Button>
-                        <Button className="flex-1" disabled={false} type='submit' size='md'>
-                            Save
-                        </Button>
+                        <orderForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                            <Button disabled={!canSubmit} className="flex-1" type='submit' size='md'>
+                                {isSubmitting ? <Loader className="size-4" /> : 'Save'}
+                            </Button>
+                        )} />
                     </div>
 
                 </form>

@@ -468,27 +468,28 @@
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Zahlungsbedingung:</td>
-                        <td class="border py-1 px-3 text-xs">30 Tage</td>
+                        <td class="border py-1 px-3 text-xs">{{paymentTerm}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Angebot gültig bis:</td>
-                        <td class="border py-1 px-3 text-xs"></td>
+                        <td class="border py-1 px-3 text-xs">{{validUntil}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Kunden-Nr.:</td>
-                        <td class="border py-1 px-3 text-xs"></td>
+                        <td class="border py-1 px-3 text-xs">{{customerId}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Lieferanten-Nr.:</td>
-                        <td class="border py-1 px-3 text-xs"></td>
+                        <td class="border py-1 px-3 text-xs">{{suplireId}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Ihre Anfrage vom:</td>
-                        <td class="border py-1 px-3 text-xs"></td>
+                        <td class="border py-1 px-3 text-xs">{{requestDate}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Ihr Ansprechpartner:</td>
-                        <td class="border py-1 px-3 text-xs"></td>
+                        <td class="border py-1 px-3 text-xs">{{customer.salutation}} {{customer.firstName}}
+                            {{customer.lastName}}</td>
                     </tr>
                     <tr>
                         <td class="border py-1 px-3 text-xs">Unser Ansprechpartner:</td>
@@ -503,7 +504,7 @@
 
         <div class="grid gap-4">
             <h1 class="text-md font-bold">Keepit SaaS-Backup für {{products}}</h1>
-            <p class="text-sm">Sehr geehrte(r) {{Kunde}},</p>
+            <p class="text-sm">Sehr geehrte(r) {{customer.salutation}} {{customer.lastName}},</p>
             <p class="text-sm">hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup
                 Lösung für Ihre
                 {{products}} Umgebung:</p>

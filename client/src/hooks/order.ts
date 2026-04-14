@@ -1,4 +1,4 @@
-import { deleteOrderAction, getAllOrdersAction, getOrdersAction } from "@/data/orders";
+import { deleteOrderAction, getAllOrdersAction, getOrdersAction, startGeneration } from "@/data/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 interface UseOrdersOptions {
@@ -21,6 +21,13 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: queryKey,
         }),
+    });
+
+    const generateMutation = useMutation({
+        mutationFn: ({ orderId }: { orderId: string }) => startGeneration(orderId),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: queryKey,
+        }),
     })
 
     return {
@@ -30,5 +37,8 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
 
         deleteOrder: deleteMutation.mutate,
         isDeleting: deleteMutation.isPending,
+
+        generate: generateMutation.mutate,
+        isGenerating: generateMutation.isPending,
     }
 }

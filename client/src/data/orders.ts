@@ -79,3 +79,20 @@ export async function getDocumentJobsAction(orderId: string): Promise<DocumentJo
 
     return result;
 }
+
+export async function startGeneration(orderId: string) {
+    const response = await fetch(`http://localhost:3000/api/checkout/generate`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            orderId: orderId,
+        }),
+    });
+
+    if (!response.ok) {
+        return { job: null };
+    }
+
+    return await response.json();;
+}

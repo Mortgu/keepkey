@@ -26,7 +26,8 @@ model User {
   banReason      String?
   banExpires     DateTime?
   shoppingCarts  ShoppingCart[]
-  orders         Order[]
+  customerOrders Order[]         @relation("CustomerRelation")
+  employeeOrders Order[]         @relation("EmployeeRelation")
   address        Address?
   contactPersons ContactPerson[]
 
@@ -162,11 +163,14 @@ model ShoppingCart {
 model Order {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user   User   @relation("CustomerRelation", fields: [userId], references: [id], onDelete: Restrict)
   userId String
 
   orderPositions OrderPosition[]
   documentJobs   DocumentJob[]
+
+  employee   User?   @relation("EmployeeRelation", fields: [employeeId], references: [id])
+  employeeId String?
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())

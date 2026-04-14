@@ -7,6 +7,7 @@ import { Job, Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
 import { generateOfferPdf } from "../utils/generation/document-generator.js";
+import { formatDate } from "../utils/utils.js";
 
 export default function startDocumentWorker() {
     const documentWorker = new Worker(documentQueueKey, async (job: Job) => {
@@ -30,20 +31,44 @@ export default function startDocumentWorker() {
                     }
                 }
             }
-        })
+        });
+
+        /* Variables */
+        const companyName = "{companyName}";
+        const street = "{street}";
+        const plzCity = "{plzCity}";
+        const customer = {
+            salutation: order?.user.salutation || '',
+            firstName: order?.user.firstName || '',
+            lastName: order?.user.lastName || '',
+        }
+
+        const paymentTerm = '{paymentTerm}';
+        const validUntil = '{validUntil}';
+        const customerId = '{customerId}';
+        const suplirId = '{supplirId}';
+        const requestDate = formatDate(String(order?.createdAt));
+        const employee = {
+            salutation: '{employeeSalutation}',
+            firstName: '{employeeFirstName}',
+            lastName: '{employeeLastName}',
+        }
+
+        const date = formatDate(String(order?.createdAt));
+        const products = order?.orderPositions.map(position => position.product.name).join(', ') || '{products}';
+
 
         /* TODO: Hier die Datei erzeugen */
         generateOfferPdf({
             data: {
-                companyName: "",
-                contactPerson: `${order?.user.salutation} ${order?.user.firstName} ${order?.user.lastName}`,
-                street: "",
-                plzCity: "",
+                companyName, customer, street, plzCity,
+
+                paymentTerm, validUntil, customerId, suplirId, requestDate,
+
                 order: {
                     invoiceNumber: String(order?.id.slice(0, 8)),
                 },
-                date: String(Date.now()),
-                products: "Product 1 & Product 2",
+                date, products,
             },
             outputPath: "output.pdf",
             templatePath: "template-offer.html"

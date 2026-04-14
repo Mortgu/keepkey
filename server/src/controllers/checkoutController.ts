@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import stripe from "../lib/stripe.js";
 import { prisma } from "../lib/prisma.js";
 import { cursorTo } from "node:readline";
+import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 export const handleCheckout = async (request: Request, response: Response) => {
     const user = request.user;
@@ -53,5 +54,30 @@ export const handleCheckout = async (request: Request, response: Response) => {
 
     return response.status(200).json({
         url: checkoutSession.url,
+    });
+}
+
+export const handleGenerate = async (request: Request, response: Response) => {
+    const { orderId } = request.body;
+
+    const documentJob = await prisma.documentJob.create({
+        data: {
+            orderId: orderId,
+            type: 'offer',
+            status: 'pending'
+        }
+    });
+
+    const job = await documentQueue.add(documentQueueKey, {
+        documentJobId: documentJob.id, type: 'offer', orderId: orderId
+    });
+
+    await prisma.documentJob.update({
+        where: { id: documentJob.id },
+        data: { jobId: job.id }
+    });
+
+    return response.status(200).send({
+        documentJob, job
     });
 }
