@@ -12,24 +12,24 @@ export const useCustomers = () => {
     const queryClient = useQueryClient();
 
     const { data: customers = [], isPending, error } = useQuery({
-        queryKey: ['admin:customers'],
+        queryKey: ['customers'],
         queryFn: getAllCustomersAction,
     });
 
     const createMutation = useMutation({
         mutationFn: (body: Partial<Customer>) => createCustomerAction(body),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin:customers'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
     });
 
     const updateMutation = useMutation({
         mutationFn: ({ id, body }: { id: string; body: Partial<Customer> }) =>
             updateCustomerByIdAction(id, body),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin:customers'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
     });
 
     const deleteMutation = useMutation({
         mutationFn: ({ id }: { id: string }) => deleteCustomerAction(id),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin:customers'] }),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
     });
 
     return {
@@ -50,7 +50,7 @@ export const useCustomers = () => {
 
 export const useCustomer = (id: string) => {
     const { data: customer = null, isPending, error } = useQuery({
-        queryKey: ['admin:customers', id],
+        queryKey: ['customers', id],
         queryFn: () => getCustomerByIdAction(id),
         enabled: !!id,
     });

@@ -56,7 +56,7 @@ const styles = tv({
             md: 'h-[42px] px-3 text-md font-semibold',
         },
         iconOnly: {
-            true: 'aspect-square',
+            true: 'aspect-square px-0',
             false: ''
         }
     },

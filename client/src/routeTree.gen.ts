@@ -19,12 +19,13 @@ import { Route as AdminAdminLayoutIndexRouteImport } from './routes/admin/_admin
 import { Route as MainSignupIndexRouteImport } from './routes/_main/signup/index'
 import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
 import { Route as MainLoginIndexRouteImport } from './routes/_main/login/index'
-import { Route as MainCheckoutIndexRouteImport } from './routes/_main/checkout/index'
 import { Route as UserPathlessLayoutSettingsIndexRouteImport } from './routes/user/_pathlessLayout/settings/index'
 import { Route as UserPathlessLayoutOrdersIndexRouteImport } from './routes/user/_pathlessLayout/orders/index'
 import { Route as AdminAdminLayoutUsersIndexRouteImport } from './routes/admin/_adminLayout/users/index'
 import { Route as AdminAdminLayoutProductsIndexRouteImport } from './routes/admin/_adminLayout/products/index'
 import { Route as AdminAdminLayoutOrdersIndexRouteImport } from './routes/admin/_adminLayout/orders/index'
+import { Route as AdminAdminLayoutOffersIndexRouteImport } from './routes/admin/_adminLayout/offers/index'
+import { Route as AdminAdminLayoutCustomersIndexRouteImport } from './routes/admin/_adminLayout/customers/index'
 import { Route as MainProductsProductIdIndexRouteImport } from './routes/_main/products/$productId/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
@@ -76,11 +77,6 @@ const MainLoginIndexRoute = MainLoginIndexRouteImport.update({
   path: '/login/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainCheckoutIndexRoute = MainCheckoutIndexRouteImport.update({
-  id: '/checkout/',
-  path: '/checkout/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const UserPathlessLayoutSettingsIndexRoute =
   UserPathlessLayoutSettingsIndexRouteImport.update({
     id: '/settings/',
@@ -111,6 +107,18 @@ const AdminAdminLayoutOrdersIndexRoute =
     path: '/orders/',
     getParentRoute: () => AdminAdminLayoutRouteRoute,
   } as any)
+const AdminAdminLayoutOffersIndexRoute =
+  AdminAdminLayoutOffersIndexRouteImport.update({
+    id: '/offers/',
+    path: '/offers/',
+    getParentRoute: () => AdminAdminLayoutRouteRoute,
+  } as any)
+const AdminAdminLayoutCustomersIndexRoute =
+  AdminAdminLayoutCustomersIndexRouteImport.update({
+    id: '/customers/',
+    path: '/customers/',
+    getParentRoute: () => AdminAdminLayoutRouteRoute,
+  } as any)
 const MainProductsProductIdIndexRoute =
   MainProductsProductIdIndexRouteImport.update({
     id: '/products/$productId/',
@@ -123,13 +131,14 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminAdminLayoutRouteRouteWithChildren
   '/user': typeof UserPathlessLayoutRouteRouteWithChildren
   '/test': typeof MainTestRoute
-  '/checkout/': typeof MainCheckoutIndexRoute
   '/login/': typeof MainLoginIndexRoute
   '/products/': typeof MainProductsIndexRoute
   '/signup/': typeof MainSignupIndexRoute
   '/admin/': typeof AdminAdminLayoutIndexRoute
   '/user/': typeof UserPathlessLayoutIndexRoute
   '/products/$productId/': typeof MainProductsProductIdIndexRoute
+  '/admin/customers/': typeof AdminAdminLayoutCustomersIndexRoute
+  '/admin/offers/': typeof AdminAdminLayoutOffersIndexRoute
   '/admin/orders/': typeof AdminAdminLayoutOrdersIndexRoute
   '/admin/products/': typeof AdminAdminLayoutProductsIndexRoute
   '/admin/users/': typeof AdminAdminLayoutUsersIndexRoute
@@ -139,13 +148,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/test': typeof MainTestRoute
   '/': typeof MainIndexRoute
-  '/checkout': typeof MainCheckoutIndexRoute
   '/login': typeof MainLoginIndexRoute
   '/products': typeof MainProductsIndexRoute
   '/signup': typeof MainSignupIndexRoute
   '/admin': typeof AdminAdminLayoutIndexRoute
   '/user': typeof UserPathlessLayoutIndexRoute
   '/products/$productId': typeof MainProductsProductIdIndexRoute
+  '/admin/customers': typeof AdminAdminLayoutCustomersIndexRoute
+  '/admin/offers': typeof AdminAdminLayoutOffersIndexRoute
   '/admin/orders': typeof AdminAdminLayoutOrdersIndexRoute
   '/admin/products': typeof AdminAdminLayoutProductsIndexRoute
   '/admin/users': typeof AdminAdminLayoutUsersIndexRoute
@@ -159,13 +169,14 @@ export interface FileRoutesById {
   '/user/_pathlessLayout': typeof UserPathlessLayoutRouteRouteWithChildren
   '/_main/test': typeof MainTestRoute
   '/_main/': typeof MainIndexRoute
-  '/_main/checkout/': typeof MainCheckoutIndexRoute
   '/_main/login/': typeof MainLoginIndexRoute
   '/_main/products/': typeof MainProductsIndexRoute
   '/_main/signup/': typeof MainSignupIndexRoute
   '/admin/_adminLayout/': typeof AdminAdminLayoutIndexRoute
   '/user/_pathlessLayout/': typeof UserPathlessLayoutIndexRoute
   '/_main/products/$productId/': typeof MainProductsProductIdIndexRoute
+  '/admin/_adminLayout/customers/': typeof AdminAdminLayoutCustomersIndexRoute
+  '/admin/_adminLayout/offers/': typeof AdminAdminLayoutOffersIndexRoute
   '/admin/_adminLayout/orders/': typeof AdminAdminLayoutOrdersIndexRoute
   '/admin/_adminLayout/products/': typeof AdminAdminLayoutProductsIndexRoute
   '/admin/_adminLayout/users/': typeof AdminAdminLayoutUsersIndexRoute
@@ -179,13 +190,14 @@ export interface FileRouteTypes {
     | '/admin'
     | '/user'
     | '/test'
-    | '/checkout/'
     | '/login/'
     | '/products/'
     | '/signup/'
     | '/admin/'
     | '/user/'
     | '/products/$productId/'
+    | '/admin/customers/'
+    | '/admin/offers/'
     | '/admin/orders/'
     | '/admin/products/'
     | '/admin/users/'
@@ -195,13 +207,14 @@ export interface FileRouteTypes {
   to:
     | '/test'
     | '/'
-    | '/checkout'
     | '/login'
     | '/products'
     | '/signup'
     | '/admin'
     | '/user'
     | '/products/$productId'
+    | '/admin/customers'
+    | '/admin/offers'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
@@ -214,13 +227,14 @@ export interface FileRouteTypes {
     | '/user/_pathlessLayout'
     | '/_main/test'
     | '/_main/'
-    | '/_main/checkout/'
     | '/_main/login/'
     | '/_main/products/'
     | '/_main/signup/'
     | '/admin/_adminLayout/'
     | '/user/_pathlessLayout/'
     | '/_main/products/$productId/'
+    | '/admin/_adminLayout/customers/'
+    | '/admin/_adminLayout/offers/'
     | '/admin/_adminLayout/orders/'
     | '/admin/_adminLayout/products/'
     | '/admin/_adminLayout/users/'
@@ -306,13 +320,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainLoginIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/checkout/': {
-      id: '/_main/checkout/'
-      path: '/checkout'
-      fullPath: '/checkout/'
-      preLoaderRoute: typeof MainCheckoutIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/user/_pathlessLayout/settings/': {
       id: '/user/_pathlessLayout/settings/'
       path: '/settings'
@@ -348,6 +355,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAdminLayoutOrdersIndexRouteImport
       parentRoute: typeof AdminAdminLayoutRouteRoute
     }
+    '/admin/_adminLayout/offers/': {
+      id: '/admin/_adminLayout/offers/'
+      path: '/offers'
+      fullPath: '/admin/offers/'
+      preLoaderRoute: typeof AdminAdminLayoutOffersIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
+    }
+    '/admin/_adminLayout/customers/': {
+      id: '/admin/_adminLayout/customers/'
+      path: '/customers'
+      fullPath: '/admin/customers/'
+      preLoaderRoute: typeof AdminAdminLayoutCustomersIndexRouteImport
+      parentRoute: typeof AdminAdminLayoutRouteRoute
+    }
     '/_main/products/$productId/': {
       id: '/_main/products/$productId/'
       path: '/products/$productId'
@@ -361,7 +382,6 @@ declare module '@tanstack/react-router' {
 interface MainRouteRouteChildren {
   MainTestRoute: typeof MainTestRoute
   MainIndexRoute: typeof MainIndexRoute
-  MainCheckoutIndexRoute: typeof MainCheckoutIndexRoute
   MainLoginIndexRoute: typeof MainLoginIndexRoute
   MainProductsIndexRoute: typeof MainProductsIndexRoute
   MainSignupIndexRoute: typeof MainSignupIndexRoute
@@ -371,7 +391,6 @@ interface MainRouteRouteChildren {
 const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainTestRoute: MainTestRoute,
   MainIndexRoute: MainIndexRoute,
-  MainCheckoutIndexRoute: MainCheckoutIndexRoute,
   MainLoginIndexRoute: MainLoginIndexRoute,
   MainProductsIndexRoute: MainProductsIndexRoute,
   MainSignupIndexRoute: MainSignupIndexRoute,
@@ -384,6 +403,8 @@ const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
 
 interface AdminAdminLayoutRouteRouteChildren {
   AdminAdminLayoutIndexRoute: typeof AdminAdminLayoutIndexRoute
+  AdminAdminLayoutCustomersIndexRoute: typeof AdminAdminLayoutCustomersIndexRoute
+  AdminAdminLayoutOffersIndexRoute: typeof AdminAdminLayoutOffersIndexRoute
   AdminAdminLayoutOrdersIndexRoute: typeof AdminAdminLayoutOrdersIndexRoute
   AdminAdminLayoutProductsIndexRoute: typeof AdminAdminLayoutProductsIndexRoute
   AdminAdminLayoutUsersIndexRoute: typeof AdminAdminLayoutUsersIndexRoute
@@ -391,6 +412,8 @@ interface AdminAdminLayoutRouteRouteChildren {
 
 const AdminAdminLayoutRouteRouteChildren: AdminAdminLayoutRouteRouteChildren = {
   AdminAdminLayoutIndexRoute: AdminAdminLayoutIndexRoute,
+  AdminAdminLayoutCustomersIndexRoute: AdminAdminLayoutCustomersIndexRoute,
+  AdminAdminLayoutOffersIndexRoute: AdminAdminLayoutOffersIndexRoute,
   AdminAdminLayoutOrdersIndexRoute: AdminAdminLayoutOrdersIndexRoute,
   AdminAdminLayoutProductsIndexRoute: AdminAdminLayoutProductsIndexRoute,
   AdminAdminLayoutUsersIndexRoute: AdminAdminLayoutUsersIndexRoute,
