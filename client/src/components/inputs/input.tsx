@@ -19,9 +19,9 @@ const styles = tv({
             secondary: ''
         },
         input_size: {
-            xs: '',
-            sm: 'px-3 py-2 text-base',
-            md: 'px-4 py-3 text-base',
+            xs: 'h-[34px] px-3 text-xs font-light',
+            sm: 'h-[38px] px-3 text-sm font-normal',
+            md: 'h-[42px] px-3 text-md font-semibold',
         }
     },
     defaultVariants: {

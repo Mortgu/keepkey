@@ -142,7 +142,11 @@ export interface Offer {
     requestFrom: string;
 }
 
-export interface Supplier {
-    id: string;
+export interface BaseSupplier {
+    supplierId: string;
     name: string;
+}
+
+export interface Supplier extends BaseSupplier {
+    id: string;
 }

@@ -51,9 +51,9 @@ const styles = tv({
             false: ''
         },
         size: {
-            xs: 'px-[0.5rem] py-[0.25rem] text-xs font-medium',
-            sm: 'px-3 py-2 text-sm font-medium',
-            md: 'px-4 py-3 text-base',
+            xs: 'h-[34px] px-3 text-xs font-light',
+            sm: 'h-[38px] px-3 text-sm font-normal',
+            md: 'h-[42px] px-3 text-md font-semibold',
         },
         iconOnly: {
             true: 'aspect-square',

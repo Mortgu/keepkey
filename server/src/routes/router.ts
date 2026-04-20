@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 import adminRouter from './admin.js';
 import productRouter from './products.js';
-import cartRouter from './cart.js';
+import supplierRouter from './supplier.js';
 import userRouter from './user.js';
 import contractRouter from './contracts.js';
 import pricingRouter from './pricing.js';
@@ -17,8 +17,8 @@ router.use('/admin', adminRouter);
 /* /api/products */
 router.use('/products', productRouter);
 
-/* /api/shopping-cart */
-router.use('/shopping-cart', cartRouter);
+/* /api/suppliers */
+router.use('/suppliers', supplierRouter);
 
 /* /api/users */
 router.use('/users', userRouter);

@@ -44,7 +44,7 @@ export default function ContractList() {
     return (
         <div>
             <div className='mb-4 flex items-center justify-between'>
-                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Contracts ({contracts.length})</h1>
+                <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Verträge ({contracts.length})</h1>
                 <Button onClick={() => setOpen(true)} size='sm'>Create <Plus className='size-4' /></Button>
             </div>
             <div className='grid gap-2'>
