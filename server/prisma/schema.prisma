@@ -44,13 +44,13 @@ model Customer {
   userId String? @unique
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
 
-  shoppingCarts  ShoppingCart[]
   orders         Order[]         @relation("CustomerRelation")
   address        Address?
   contactPersons ContactPerson[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+  offers    Offer[]
 
   @@map("customer")
 }
@@ -110,6 +110,12 @@ model Offer {
   supplier   Supplier @relation(fields: [supplierId], references: [id])
   supplierId String
 
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
+
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  contactPersonId       String
+
   voucherId   String
   paymentTerm String
 
@@ -117,10 +123,33 @@ model Offer {
   validUntil  DateTime
   requestFrom DateTime
 
+  offerPositions OfferPosition[]
+  order          Order?
+
   createdAt DateTime? @default(now())
   updatedAt DateTime?
 
   @@map("offer")
+}
+
+model OfferPosition {
+  id String @id @default(uuid())
+
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String
+
+  product   Product  @relation(fields: [productId], references: [id])
+  productId String
+
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration Int
+  quantity Int
+
+  createdAt DateTime? @default(now())
+
+  @@map("offer_position")
 }
 
 model Supplier {
@@ -145,9 +174,9 @@ model Product {
 
   published Boolean @default(false)
 
-  shoppingCarts  ShoppingCart[]
-  productPricing ProductPricing[]
-  orderPositions OrderPosition[]
+  productPricing  ProductPricing[]
+  orderPositions  OrderPosition[]
+  offerPositions  OfferPosition[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime?
@@ -163,7 +192,7 @@ model Contract {
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]
-  shoppingCard   ShoppingCart[]
+  offerPositions OfferPosition[]
 
   createdAt DateTime? @default(now())
 
@@ -189,30 +218,6 @@ model ProductPricing {
   @@map("pricing")
 }
 
-model ShoppingCart {
-  id String @id @default(uuid())
-
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration Int
-  quantity Int
-
-  price Float? @default(0)
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
-
-  @@unique([customerId, productId, contractId, duration])
-  @@map("cart")
-}
-
 model Order {
   id String @id @default(uuid())
 
@@ -221,6 +226,9 @@ model Order {
 
   orderPositions OrderPosition[]
   documentJobs   DocumentJob[]
+
+  offer   Offer?  @relation(fields: [offerId], references: [id])
+  offerId String? @unique
 
   employee   User?   @relation("EmployeeRelation", fields: [employeeId], references: [id])
   employeeId String?
@@ -298,6 +306,7 @@ model ContactPerson {
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
+  offers    Offer[]
 
   @@index([customerId])
   @@map("contact_person")

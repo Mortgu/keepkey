@@ -1,14 +1,13 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { ContactPerson, Customer, ProductItem, User } from "@/data/types";
-import { useAdmin } from "@/hooks/admin";
+import type { ContactPerson, Customer, ProductItem } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, X } from "lucide-react";
-import type React from "react";
+import { Loader, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
+import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import { z } from "zod";
 
 interface OfferModalProps {
@@ -32,33 +31,38 @@ const emptyOfferFormVlues = {
     supplierId: "",
     customerId: "",
 
+    date: new Date(),
     paymentTerm: "30 Tage",
     validUntil: new Date(),
     requestFrom: new Date(),
 }
 
 export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProps) {
-    if (!isOpen) return null;
-
-    const { users } = useAdmin();
     const { customers } = useCustomers();
     const { products } = useProducts();
     const { contracts } = useContracts();
 
-    const [selectedProducts, setSelectedProducts] = useState<{}>([])
+    const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
+    const [showProductForm, setShowProductForm] = useState(false);
 
     const offerForm = useForm({
         defaultValues: emptyOfferFormVlues,
         validators: {
             onChange: offerSchema
+        },
+        onSubmit: ({ value }) => {
+            console.log(value)
+            onClose();
         }
     });
 
-    const handleFormSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleFormSubmit = (e: { preventDefault(): void; stopPropagation(): void }) => {
         e.preventDefault();
         e.stopPropagation();
         offerForm.handleSubmit();
     }
+
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4">
@@ -118,7 +122,7 @@ export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProp
                             <offerForm.Field name="voucherId" children={(field) => (
                                 <div className="flex-1 grid gap-2 items-center">
                                     <label className="text-sm  text-gray-500" htmlFor={field.name}>Beleg-Nr:</label>
-                                    <Input type="text" value={field.state.value} />
+                                    <Input type="text" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                                 </div>
                             )} />
 
@@ -126,7 +130,7 @@ export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProp
                             <offerForm.Field name="paymentTerm" children={(field) => (
                                 <div className="flex-1 grid gap-2">
                                     <label className="text-sm text-gray-500" htmlFor="">Zahlungsbedingung:</label>
-                                    <Input input_size="sm" placeholder="Zahlungsbedingung..." value={field.state.value} />
+                                    <Input input_size="sm" placeholder="Zahlungsbedingung..." value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                                 </div>
                             )} />
 
@@ -153,28 +157,52 @@ export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProp
                         <hr className="text-gray-200" />
 
                         <div className="grid gap-2">
-                            <div className="grid gap-2">
-                                {selectedProducts.map(i => (
-                                    <div className="flex items-center gap-2 bg-gray-50 p-1 rounded-md">
-                                        <select className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100">
-                                            {products?.map((product: ProductItem) => (
-                                                <option>{product.name}</option>
-                                            ))}
-                                        </select>
-                                        <select className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100">
-                                            <option>None</option>
-                                        </select>
-                                        <select className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100">
-                                            <option>None</option>
-                                        </select>
-                                    </div>
-                                ))}
+                            <div className="w-full">
+                                <Button
+                                    onClick={() => setShowProductForm(true)}
+                                    type="button"
+                                    className="float-right"
+                                    variant="link"
+                                    icon={<Plus className="size-4" />}
+                                    size="sm"
+                                    disabled={showProductForm}
+                                >
+                                    Produkt hinzufügen
+                                </Button>
                             </div>
 
-                            <Button onClick={() => setSelectedProducts([...selectedProducts, { quantity: 1, duration: 1, product: products[0], contract: contracts[0] }])} variant="secondary" size="md" className="w-full">
-                                <Plus className="size-4" /> Produkt hinzufügen
-                            </Button>
+                            {offerProducts.length === 0 && !showProductForm && (
+                                <p className="text-sm text-gray-500 text-center py-2">Noch kein Produkt hinzugefügt</p>
+                            )}
 
+                            <div className="flex flex-col gap-2">
+                                {offerProducts.map((op, index) => {
+                                    const product = products?.find((p: ProductItem) => p.id === op.productId);
+                                    return (
+                                        <div key={index} className="flex items-center justify-between bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                                            <span className="text-sm text-gray-700">
+                                                {product?.name} · {op.duration} · Menge: {op.quantity}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))}
+                                                className="text-gray-400 hover:text-red-500 transition-colors"
+                                            >
+                                                <Trash2 className="size-4" />
+                                            </button>
+                                        </div>
+                                    );
+                                })}
+
+                                {showProductForm && (
+                                    <OfferProductForm
+                                        products={products ?? []}
+                                        contracts={contracts ?? []}
+                                        onSave={(data) => { setOfferProducts((prev) => [...prev, data]); setShowProductForm(false); }}
+                                        onCancel={() => setShowProductForm(false)}
+                                    />
+                                )}
+                            </div>
                         </div>
 
                         <hr className="text-gray-200" />
