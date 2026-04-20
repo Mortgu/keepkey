@@ -33,9 +33,11 @@ function AdminLayoutComponent() {
             <div className='w-full h-14 border-b bg-gray-100 border-gray-200'>
                 <div className='flex items-center gap-8 w-full max-w-(--viewport) m-auto h-full px-4'>
                     <NavLink variant="primary" to='/admin'>Dashboard</NavLink>
-                    <NavLink variant="primary" to='/admin/users'>Users</NavLink>
+                    <NavLink variant="primary" to='/admin/users'>Accounts</NavLink>
+                    <NavLink variant="primary" to='/admin/customers'>Kunden</NavLink>
                     <NavLink variant="primary" to='/admin/products'>Contracts & Products</NavLink>
-                    <NavLink variant="primary" to='/admin/orders'>Orders</NavLink>
+                    <NavLink variant="primary" to='/admin/orders'>Bestellungen</NavLink>
+                    <NavLink variant="primary" to='/admin/offers'>Angebote</NavLink>
                 </div>
             </div>
 

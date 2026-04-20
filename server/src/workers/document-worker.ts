@@ -23,7 +23,7 @@ export default function startDocumentWorker() {
         const order = await prisma.order.findUnique({
             where: { id: orderId },
             include: {
-                user: true,
+                customer: true,
                 orderPositions: {
                     include: {
                         product: true,
@@ -38,9 +38,9 @@ export default function startDocumentWorker() {
         const street = "{street}";
         const plzCity = "{plzCity}";
         const customer = {
-            salutation: order?.user.salutation || '',
-            firstName: order?.user.firstName || '',
-            lastName: order?.user.lastName || '',
+            salutation: order?.customer.salutation || '',
+            firstName: order?.customer.firstName || '',
+            lastName: order?.customer.lastName || '',
         }
 
         const paymentTerm = '{paymentTerm}';
@@ -62,9 +62,8 @@ export default function startDocumentWorker() {
         generateOfferPdf({
             data: {
                 companyName, customer, street, plzCity,
-
                 paymentTerm, validUntil, customerId, suplirId, requestDate,
-
+                employee,
                 order: {
                     invoiceNumber: String(order?.id.slice(0, 8)),
                 },

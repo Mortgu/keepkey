@@ -14,7 +14,9 @@ export async function getCurrentUser() {
 }
 
 export async function getAllContactPersons(userId: string): Promise<ContactPerson[]> {
-    const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`)
+    const response = await fetch(`http://localhost:3000/api/admin/users/${userId}`, {
+        credentials: 'include',
+    });
 
     if (!response.ok) {
         return [];
@@ -22,7 +24,7 @@ export async function getAllContactPersons(userId: string): Promise<ContactPerso
 
     const user: User = await response.json();
 
-    return user.contactPersons;
+    return user.customer?.contactPersons ?? [];
 }
 
 export async function getAllUsersAction() {

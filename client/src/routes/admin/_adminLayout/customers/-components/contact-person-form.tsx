@@ -1,0 +1,76 @@
+import Button from '@/components/button/button';
+import Input from '@/components/inputs/input';
+import { useState } from 'react';
+import { z } from 'zod';
+
+const contactPersonSchema = z.object({
+    salutation: z.string().min(1, ''),
+    firstName: z.string().min(1, ''),
+    lastName: z.string().min(1, ''),
+    email: z.string().optional(),
+});
+
+type ContactPersonData = {
+    salutation: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+};
+
+interface Props {
+    onSave: (data: ContactPersonData) => void;
+    onCancel: () => void;
+}
+
+export default function ContactPersonForm({ onSave, onCancel }: Props) {
+    const [salutation, setSalutation] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [email, setEmail] = useState('');
+    const [errors, setErrors] = useState<string[]>([]);
+
+    const handleSave = () => {
+        const result = contactPersonSchema.safeParse({ salutation, firstName, lastName, email: email || undefined });
+        if (!result.success) {
+            setErrors(result.error.issues.map((e: { message: string }) => e.message).filter(Boolean));
+            return;
+        }
+        onSave({ salutation, firstName, lastName, email: email || undefined });
+    };
+
+    return (
+        <div className='bg-gray-100 w-full grid gap-3 border border-gray-200 p-2 rounded-md'>
+            <div className='flex items-center gap-3'>
+                <div className='flex-1'>
+                    <label className='text-sm text-gray-600'>Anrede</label>
+                    <Input value={salutation} onChange={(e) => setSalutation(e.target.value)} className='bg-white' />
+                </div>
+
+                <div className='flex-1'>
+                    <label className='text-sm text-gray-600'>Vorname</label>
+                    <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} className='bg-white' />
+                </div>
+
+                <div className='flex-1'>
+                    <label className='text-sm text-gray-600'>Nachname</label>
+                    <Input value={lastName} onChange={(e) => setLastName(e.target.value)} className='bg-white' />
+                </div>
+            </div>
+            <div className='flex'>
+                <div className='flex-1'>
+                    <label className='text-sm text-gray-600'>E-Mail Adresse</label>
+                    <Input value={email} onChange={(e) => setEmail(e.target.value)} className='bg-white' />
+                </div>
+            </div>
+
+            {errors.length > 0 && (
+                <p className='text-sm text-red-400'>{errors.join(', ')}</p>
+            )}
+
+            <div className='flex gap-2 ml-auto mt-3'>
+                <Button type='button' variant="secondary" size='sm' onClick={onCancel}>Abbrechen</Button>
+                <Button type='button' size='sm' onClick={handleSave}>Speichern</Button>
+            </div>
+        </div>
+    );
+}

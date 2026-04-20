@@ -1,3 +1,43 @@
+export interface Address {
+    id: string;
+    street?: string;
+    city?: string;
+    plz?: string;
+    phone?: string;
+}
+
+export interface ContactPerson {
+    id: string;
+
+    salutation: string;
+    firstName: string;
+    lastName: string;
+    email?: string;
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
+export interface Customer {
+    id: string;
+    customerId: string;
+
+    salutation?: string;
+    name: string;
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+
+    userId?: string;
+
+    address?: Address;
+    contactPersons: ContactPerson[];
+    orders: Order[];
+
+    createdAt: Date;
+    updatedAt: Date;
+}
+
 export interface User {
     id: string;
     name: string;
@@ -11,22 +51,9 @@ export interface User {
 
     role: string;
 
-    orders: Order[];
-    contactPersons: ContactPerson[];
+    customer?: Customer;
 
     createdAt: Date;
-}
-
-export interface ContactPerson {
-    id: string;
-
-    salutation: String;
-    firstName: String;
-    lastName: String;
-    email?: String;
-
-    createdAt: Date;
-    updatedAt: Date;
 }
 
 export interface Contract {
@@ -85,13 +112,12 @@ export interface ShoppingCart {
 
 export interface Order {
     id: string;
-    user: User;
+    customer: Customer;
 
     orderPositions: OrderPositionItem[],
 
     createdAt: Date;
 }
-
 
 export interface DocumentJob {
     id: string;
@@ -101,4 +127,22 @@ export interface DocumentJob {
     error?: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface Offer {
+    voucherId: string;
+    date: Date,
+    paymentTerm: string;
+    validUntil: Date;
+    customerId: string;
+
+    supplier: Supplier;
+    supplierId: string;
+
+    requestFrom: string;
+}
+
+export interface Supplier {
+    id: string;
+    name: string;
 }

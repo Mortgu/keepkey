@@ -31,10 +31,15 @@ router.post('/', requireSession, async (request: Request, response: Response) =>
 
     console.log(body);
 
+    const customer = await prisma.customer.findUnique({ where: { userId: user!.id } });
+    if (!customer) {
+        return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+    }
+
     const createdOrder = await prisma.$transaction(async (tx) => {
         /* Create Order */
         const order = await tx.order.create({
-            data: { userId: user!.id }
+            data: { customerId: customer.id }
         });
 
         /* Create Order Positions */
@@ -53,7 +58,7 @@ router.post('/', requireSession, async (request: Request, response: Response) =>
 
         /* Clear Shopping Card */
         await prisma.shoppingCart.deleteMany({
-            where: { userId: user!.id }
+            where: { customerId: customer.id }
         });
 
         return order;

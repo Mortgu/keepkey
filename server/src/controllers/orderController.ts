@@ -1,16 +1,15 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import stripe from "../lib/stripe.js";
 import { generateOfferPdf } from "../utils/generation/document-generator.js";
 
 /*
  * Get all orders
- * [GET] http://localhost:3000/api/admin/orders 
+ * [GET] http://localhost:3000/api/admin/orders
  */
 export const getAllOrders = async (request: Request, response: Response, next: NextFunction) => {
     const orders = await prisma.order.findMany({
         include: {
-            user: true,
+            customer: true,
             orderPositions: {
                 include: {
                     product: true,
@@ -29,11 +28,10 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 export const getOrderById = async (request: Request, response: Response, next: NextFunction) => {
     const { orderId } = request.params;
 
-
     const order = await prisma.order.findUnique({
         where: { id: orderId as string },
         include: {
-            user: true,
+            customer: true,
             orderPositions: {
                 include: {
                     product: true,
@@ -46,9 +44,19 @@ export const getOrderById = async (request: Request, response: Response, next: N
     generateOfferPdf({
         data: {
             companyName: "",
-            contactPerson: `${order?.user.salutation} ${order?.user.firstName} ${order?.user.lastName}`,
+            customer: {
+                salutation: order?.customer.salutation || '',
+                firstName: order?.customer.firstName || '',
+                lastName: order?.customer.lastName || '',
+            },
             street: "",
             plzCity: "",
+            paymentTerm: "",
+            validUntil: "",
+            customerId: order?.customerId || '',
+            suplirId: "",
+            requestDate: "",
+            employee: { salutation: "", firstName: "", lastName: "" },
             order: {
                 invoiceNumber: String(order?.id.slice(0, 8)),
             },
@@ -64,7 +72,7 @@ export const getOrderById = async (request: Request, response: Response, next: N
 
 /*
  * Get all session orders
- * [GET] http://localhost:3000/api/orders 
+ * [GET] http://localhost:3000/api/orders
  */
 export const getSessionOrders = async (request: Request, response: Response, next: NextFunction) => {
     const user = request.user;
@@ -75,11 +83,16 @@ export const getSessionOrders = async (request: Request, response: Response, nex
         });
     }
 
+    const customer = await prisma.customer.findUnique({ where: { userId: user.id } });
+    if (!customer) {
+        return response.status(200).json([]);
+    }
+
     const orders = await prisma.order.findMany({
-        where: { userId: user.id },
+        where: { customerId: customer.id },
         orderBy: { createdAt: 'desc' },
         include: {
-            user: true,
+            customer: true,
             orderPositions: {
                 include: {
                     product: true,
@@ -94,7 +107,7 @@ export const getSessionOrders = async (request: Request, response: Response, nex
 
 /*
  * Create new order
- * [POST] http://localhost:3000/api/orders 
+ * [POST] http://localhost:3000/api/orders
  */
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
     const { body, user } = request;
@@ -111,10 +124,15 @@ export const createOrder = async (request: Request, response: Response, next: Ne
         });
     }
 
+    const customer = await prisma.customer.findUnique({ where: { userId: user!.id } });
+    if (!customer) {
+        return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+    }
+
     const createdOrder = await prisma.$transaction(async (tx) => {
         /* Create Order */
         const order = await tx.order.create({
-            data: { userId: user!.id },
+            data: { customerId: customer.id },
         });
 
         /* Create Order Positions */
@@ -133,7 +151,7 @@ export const createOrder = async (request: Request, response: Response, next: Ne
 
         /* Clear Shopping Card */
         await prisma.shoppingCart.deleteMany({
-            where: { userId: user!.id }
+            where: { customerId: customer.id }
         });
 
         return order;

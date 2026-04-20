@@ -8,7 +8,7 @@ export async function canCreateContract(request: Request, response: Response, ne
         body: {
             userId: user!.id,
             permissions: {
-                contract: ["create"]
+                contracts: ["create"]
             },
         }
     });
@@ -29,7 +29,7 @@ export async function canDeleteContract(request: Request, response: Response, ne
         body: {
             userId: user!.id,
             permissions: {
-                contract: ["delete"]
+                contracts: ["delete"]
             },
         }
     });

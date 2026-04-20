@@ -1,4 +1,3 @@
-import { createCheckoutAction } from "@/data/orders";
 import { addToShoppingCartAction, removeFromShoppingCartAction, deleteShoppingCartAction, getShoppingCart } from "@/data/shopping-cart";
 import { authClient } from "@/lib/auth-client";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -27,19 +26,6 @@ export const useShoppingCart = () => {
         }),
     })
 
-
-    /* Checkout */
-    const checkoutMutation = useMutation({
-        mutationFn: createCheckoutAction,
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['cart'],
-        })
-    });
-
-    const handleCheckout = useCallback(checkoutMutation.mutate,
-        [checkoutMutation.mutate, session]
-    )
-
     const deleteMutation = useMutation({
         mutationFn: deleteShoppingCartAction,
         onSuccess: () => queryClient.invalidateQueries({
@@ -60,10 +46,5 @@ export const useShoppingCart = () => {
 
         clearCart: deleteMutation.mutate,
         isClearingCart: deleteMutation.isPending,
-
-        handleCheckout,
-        isProcessing: checkoutMutation.isPending,
-        checkoutData: checkoutMutation.data,
-        checkoutErrors: checkoutMutation.error,
     };
 }

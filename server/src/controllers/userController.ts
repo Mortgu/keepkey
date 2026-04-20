@@ -6,8 +6,8 @@ import { auth } from "../lib/auth.js";
 export const getAllUsers = async (request: Request, response: Response) => {
     const users = await prisma.user.findMany({
         include: {
-            orders: true,
-            contactPersons: true,
+            employeeOrders: true,
+            customer: true,
         }
     });
     return response.status(200).json(users);
@@ -19,8 +19,13 @@ export const getUserById = async (request: Request, response: Response) => {
     const user = await prisma.user.findUnique({
         where: { id: id as string },
         include: {
-            orders: true,
-            contactPersons: true
+            employeeOrders: true,
+            customer: {
+                include: {
+                    contactPersons: true,
+                    address: true,
+                }
+            }
         }
     });
 
@@ -48,17 +53,20 @@ export const updateUserById = async (request: Request, response: Response) => {
         });
 
         if (contactPersons !== undefined) {
-            await prisma.contactPerson.deleteMany({ where: { userId: id as string } });
-            if (contactPersons.length > 0) {
-                await prisma.contactPerson.createMany({
-                    data: contactPersons.map((p: any) => ({
-                        salutation: p.salutation,
-                        firstName: p.firstName,
-                        lastName: p.lastName,
-                        email: p.email,
-                        userId: id,
-                    })),
-                });
+            const linkedCustomer = await prisma.customer.findUnique({ where: { userId: id as string } });
+            if (linkedCustomer) {
+                await prisma.contactPerson.deleteMany({ where: { customerId: linkedCustomer.id } });
+                if (contactPersons.length > 0) {
+                    await prisma.contactPerson.createMany({
+                        data: contactPersons.map((p: any) => ({
+                            salutation: p.salutation,
+                            firstName: p.firstName,
+                            lastName: p.lastName,
+                            email: p.email,
+                            customerId: linkedCustomer.id,
+                        })),
+                    });
+                }
             }
         }
     } catch (exception: any) {
@@ -94,16 +102,15 @@ export const createUser = async (request: Request, response: Response) => {
             },
         });
 
-        console.log(contactPersons, rest);
-
-        if (contactPersons?.length > 0) {
+        const linkedCustomer = await prisma.customer.findUnique({ where: { userId: created.user.id } });
+        if (contactPersons?.length > 0 && linkedCustomer) {
             await prisma.contactPerson.createMany({
                 data: contactPersons.map((p: any) => ({
                     salutation: p.salutation,
                     firstName: p.firstName,
                     lastName: p.lastName,
                     email: p.email,
-                    userId: created.user.id,
+                    customerId: linkedCustomer.id,
                 })),
             });
         }
@@ -185,9 +192,14 @@ export const upsertAddress = async (request: Request, response: Response) => {
     }
 
     try {
+        const customer = await prisma.customer.findUnique({ where: { userId } });
+        if (!customer) {
+            return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+        }
+
         const address = await prisma.address.upsert({
-            where: { userId },
-            create: { userId, street, plz, city, phone },
+            where: { customerId: customer.id },
+            create: { customerId: customer.id, street, plz, city, phone },
             update: { street, plz, city, phone },
         });
         return response.status(200).json(address);
@@ -205,8 +217,13 @@ export const createContactPersons = async (request: Request, response: Response)
     }
 
     try {
+        const customer = await prisma.customer.findUnique({ where: { userId } });
+        if (!customer) {
+            return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+        }
+
         await prisma.contactPerson.createMany({
-            data: persons.map(p => ({ ...p, userId })),
+            data: persons.map(p => ({ ...p, customerId: customer.id })),
         });
         return response.status(201).json({ ok: true });
     } catch (error) {

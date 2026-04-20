@@ -25,17 +25,20 @@ const orderSchema = z.object({
     requestFrom: z.string(),
 });
 
-const emptyOrder: Partial<Order> = {
+const emptyOrder = {
     id: "",
     createdAt: new Date(),
     orderPositions: [],
+    paymentTerm: "30 Days"
 };
 
 export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: OrderModalProps) {
     if (!isOpen) return null;
 
     const { users } = useAdmin();
-    const [selectedCustomer, setSelectedCustomer] = useState<User>(currentOrder.user);
+    const [selectedCustomer, setSelectedCustomer] = useState<User | undefined>(
+        currentOrder?.user ? currentOrder.user : undefined
+    );
 
     const orderForm = useForm({
         defaultValues: currentOrder || emptyOrder,
@@ -43,6 +46,13 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
             onChange: orderSchema,
         }
     });
+
+    const handleChange = (e: any) => {
+        const userId = e.target.value;
+        const selectedUser = users.find(u => u.id === userId);
+
+        setSelectedCustomer(selectedUser)
+    };
 
     return (
         <div className="fixed inset-0 bg-black/10 z-50 flex items-center justify-center p-4">
@@ -57,38 +67,33 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <orderForm.Field name="customerId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
-                                {/* Unser Ansprechpartner select */}
                                 <label className="text-sm  text-gray-500" htmlFor={field.name}>Kunde:</label>
-                                <Select onChange={(element) => {
-                                    field.handleChange(element.id);
-                                    const user = users.find((u: User) => u.id === element.id);
-                                    if (user) setSelectedCustomer(user);
-                                }} elements={users?.map((user: User) => {
-                                    return {
-                                        id: user.id, child: (
-                                            <div className="grid gap-0">
-                                                <p>{user.salutation} {user.firstName} {user.lastName}</p>
-                                                <p className="text-sm text-gray-500">{user.email}</p>
-                                            </div>
-                                        ), isSelected: currentOrder.user.id === user.id
-                                    }
-                                })} />
+                                <select onChange={handleChange} className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100">
+                                    <option>None</option>
+                                    {users?.map((user: User) => (
+                                        <option key={user.id} value={user.id}>
+                                            {user.firstName} {user.lastName}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
                         )} />
 
                         <div className="flex-1 grid gap-2 items-center">
                             {/* Unser Ansprechpartner select */}
-                            <label className="text-sm  text-gray-500" htmlFor="">Ihr Ansprechpatner:</label>
-                            <Select onChange={() => { }} elements={selectedCustomer.contactPersons?.map((person: ContactPerson) => {
-                                return {
-                                    id: person.id, child: (
-                                        <div className="grid gap-0">
-                                            <p>{person.salutation} {person.firstName} {person.lastName}</p>
-                                            <p className="text-sm text-gray-500">{person.email}</p>
-                                        </div>
-                                    ), isSelected: currentOrder.user.id === person.id
-                                }
-                            })} />
+                            <orderForm.Field name="customerId" children={(field) => (
+                                <div className="flex-1 grid gap-2 items-center">
+                                    <label className="text-sm  text-gray-500" htmlFor="">Ihr Ansprechpatner:</label>
+                                    <select className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100">
+                                        <option>None</option>
+                                        {selectedCustomer?.contactPersons.map((cp) => (
+                                            <option key={cp.id} value={cp.id}>
+                                                {cp.firstName} {cp.lastName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            )} />
                         </div>
                     </div>
 
@@ -101,7 +106,7 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                         <orderForm.Field name="createdAt" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <label className="text-sm  text-gray-500" htmlFor={field.name}>Datum:</label>
-                                <Input id={field.name} input_size="sm" variant="secondary" value={field.state.value}
+                                <Input type="date" id={field.name} input_size="sm" variant="secondary" value={field.state.value}
                                     onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
                         )} />
@@ -115,7 +120,7 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
 
                         <div className="flex-1 grid gap-2">
                             <label className="text-sm  text-gray-500" htmlFor="">Angebot gültig bis:</label>
-                            <Input input_size="sm" variant="secondary" placeholder="Valid unitl..." />
+                            <Input type="date" input_size="sm" variant="secondary" placeholder="Valid unitl..." />
                         </div>
                     </div>
 
@@ -134,12 +139,7 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <div className="flex-1 grid gap-2">
                             <label className="text-sm  text-gray-500" htmlFor="">Ihre Anfrage vom:</label>
-                            <Input input_size="sm" />
-                        </div>
-
-                        <div className="flex-1 grid gap-2">
-                            <label className="text-sm  text-gray-500" htmlFor="">Ihr Ansprechpartner:</label>
-                            <Input input_size="sm" variant="secondary" />
+                            <Input type="date" input_size="sm" />
                         </div>
                     </div>
 
@@ -151,9 +151,7 @@ export default function OrderModal({ isOpen, onClose, onSubmit, currentOrder }: 
                             </Button>
                         )} />
                     </div>
-
                 </form>
-
             </div>
         </div>
     )

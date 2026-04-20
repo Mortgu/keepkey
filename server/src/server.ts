@@ -9,7 +9,6 @@ import router from './routes/router.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import config from './config/config.js';
 
-import stripeRouter from './routes/stripe.js';
 import startDocumentWorker from './workers/document-worker.js';
 
 const app: Express = express();
@@ -21,9 +20,6 @@ app.use(cors({
 }));
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
-
-/* Stripe Webhook before express.json() => raw body */
-app.use('/api/stripe-webhook', stripeRouter);
 
 app.use(express.json());
 

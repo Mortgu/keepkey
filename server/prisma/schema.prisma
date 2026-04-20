@@ -22,16 +22,37 @@ model User {
   accounts      Account[]
 
   role           String?
-  banned         Boolean?        @default(false)
+  banned         Boolean?  @default(false)
   banReason      String?
   banExpires     DateTime?
+  employeeOrders Order[]   @relation("EmployeeRelation")
+  customer       Customer?
+
+  @@map("user")
+}
+
+model Customer {
+  id         String  @id @default(uuid())
+  customerId String  @unique
+
+  salutation String?
+  name       String
+  firstName  String?
+  lastName   String?
+  email      String? @unique
+
+  userId String? @unique
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
   shoppingCarts  ShoppingCart[]
-  customerOrders Order[]         @relation("CustomerRelation")
-  employeeOrders Order[]         @relation("EmployeeRelation")
+  orders         Order[]         @relation("CustomerRelation")
   address        Address?
   contactPersons ContactPerson[]
 
-  @@map("user")
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("customer")
 }
 
 model Session {
@@ -81,6 +102,37 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Offer {
+  id String @id @default(uuid())
+
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+  supplierId String
+
+  voucherId   String
+  paymentTerm String
+
+  date        DateTime
+  validUntil  DateTime
+  requestFrom DateTime
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+
+  @@map("offer")
+}
+
+model Supplier {
+  id String @id @default(uuid())
+
+  name String
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+  offers    Offer[]
+
+  @@map("supplier")
 }
 
 model Product {
@@ -139,8 +191,8 @@ model ProductPricing {
 model ShoppingCart {
   id String @id @default(uuid())
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
 
   product   Product @relation(fields: [productId], references: [id])
   productId String
@@ -156,15 +208,15 @@ model ShoppingCart {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
 
-  @@unique([userId, productId, contractId, duration])
+  @@unique([customerId, productId, contractId, duration])
   @@map("cart")
 }
 
 model Order {
   id String @id @default(uuid())
 
-  user   User   @relation("CustomerRelation", fields: [userId], references: [id], onDelete: Restrict)
-  userId String
+  customer   Customer @relation("CustomerRelation", fields: [customerId], references: [id], onDelete: Restrict)
+  customerId String
 
   orderPositions OrderPosition[]
   documentJobs   DocumentJob[]
@@ -218,9 +270,9 @@ model OrderPosition {
 }
 
 model Address {
-  id     String @id @default(uuid())
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  customerId String   @unique
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   street String?
   city   String?
@@ -234,9 +286,9 @@ model Address {
 }
 
 model ContactPerson {
-  id     String @id @default(uuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id         String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
   salutation String
   firstName  String
@@ -246,6 +298,6 @@ model ContactPerson {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  @@index([userId])
+  @@index([customerId])
   @@map("contact_person")
 }

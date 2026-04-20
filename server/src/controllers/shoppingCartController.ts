@@ -2,25 +2,24 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { calculateProductPrice } from "../utils/products.js";
 import z from "zod";
-import { totalmem } from "node:os";
 
 /* This file handles all the actions for the "/api/shopping-cart" route */
 
-/* 
- * Get shopping cart from provided user
- * [GET] http://localhost:3000/api/shopping-cart/{userId}
+/*
+ * Get shopping cart from provided customerId
+ * [GET] http://localhost:3000/api/shopping-cart/{customerId}
  */
 export const getShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId } = request.params;
+    const { customerId } = request.params;
 
-    if (!userId) {
+    if (!customerId) {
         return response.status(400).json({
-            success: false, message: 'Invalid user id format!'
+            success: false, message: 'Invalid customer id format!'
         });
     }
 
     const cart = await prisma.shoppingCart.findMany({
-        where: { userId: userId as string },
+        where: { customerId: customerId as string },
         include: {
             contract: true,
             product: true
@@ -30,7 +29,7 @@ export const getShoppingCart = async (request: Request, response: Response, next
     return response.status(200).json(cart);
 }
 
-/* 
+/*
  * Get shopping cart from session user
  * [GET] http://localhost:3000/api/shopping-cart
  */
@@ -43,8 +42,13 @@ export const getSessionShoppingCart = async (request: Request, response: Respons
         });
     }
 
+    const customer = await prisma.customer.findUnique({ where: { userId: user.id } });
+    if (!customer) {
+        return response.status(200).json({ products: [], total: 0 });
+    }
+
     const products = await prisma.shoppingCart.findMany({
-        where: { userId: user.id as string },
+        where: { customerId: customer.id },
         include: {
             contract: true,
             product: true
@@ -52,16 +56,15 @@ export const getSessionShoppingCart = async (request: Request, response: Respons
     });
 
     const total = await prisma.shoppingCart.aggregate({
-        where: { userId: user.id as string },
+        where: { customerId: customer.id },
         _sum: {
             price: true,
         }
-    })
-
+    });
 
     return response.status(200).json({
         products: products,
-        total: total._sum.price || 0,
+        total: total._sum?.price || 0,
     });
 }
 
@@ -72,9 +75,9 @@ const ShoppingCartSchema = z.object({
     quantity: z.int().min(1),
 });
 
-/* 
+/*
  * Create shopping cart for session user
- * [GET] http://localhost:3000/api/shopping-cart
+ * [POST] http://localhost:3000/api/shopping-cart
  */
 export const createSessionShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
     const { body, user } = request;
@@ -85,14 +88,17 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
         });
     }
 
-    const test = ShoppingCartSchema.parse(body);
+    const customer = await prisma.customer.findUnique({ where: { userId: user.id } });
+    if (!customer) {
+        return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+    }
 
-    // TODO: make transaction
+    const test = ShoppingCartSchema.parse(body);
 
     const entry = await prisma.shoppingCart.upsert({
         where: {
-            userId_productId_contractId_duration: {
-                userId: user.id,
+            customerId_productId_contractId_duration: {
+                customerId: customer.id,
                 productId: test.productId,
                 contractId: test.contractId,
                 duration: test.duration,
@@ -101,7 +107,13 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
         update: {
             quantity: { increment: test.quantity },
         },
-        create: { ...body },
+        create: {
+            customerId: customer.id,
+            productId: test.productId,
+            contractId: test.contractId,
+            duration: test.duration,
+            quantity: test.quantity,
+        },
         include: {
             product: {
                 include: {
@@ -115,22 +127,24 @@ export const createSessionShoppingCart = async (request: Request, response: Resp
 
     await prisma.shoppingCart.update({
         where: {
-            userId_productId_contractId_duration: {
-                userId: user.id, productId: test.productId, contractId: test.contractId,
+            customerId_productId_contractId_duration: {
+                customerId: customer.id,
+                productId: test.productId,
+                contractId: test.contractId,
                 duration: test.duration,
             }
         },
         data: {
             price: price.total,
         }
-    })
+    });
 
     return response.status(200).json({
         message: "Successfully created item", success: true
     });
 }
 
-/* 
+/*
  * Delete shopping cart for session user
  * [DELETE] http://localhost:3000/api/shopping-cart
  */
@@ -143,8 +157,13 @@ export const deleteSessionShoppingCart = async (request: Request, response: Resp
         });
     }
 
+    const customer = await prisma.customer.findUnique({ where: { userId: user.id } });
+    if (!customer) {
+        return response.status(200).send({ message: "Cart is empty", success: true });
+    }
+
     await prisma.shoppingCart.deleteMany({
-        where: { userId: user.id },
+        where: { customerId: customer.id },
     });
 
     return response.status(200).send({
@@ -152,8 +171,7 @@ export const deleteSessionShoppingCart = async (request: Request, response: Resp
     });
 }
 
-
-/* 
+/*
  * Remove item from shopping cart for user
  * [PUT] http://localhost:3000/api/shopping-cart
  */
@@ -175,21 +193,21 @@ export const removeFromShoppingCart = async (request: Request, response: Respons
     });
 }
 
-/* 
- * Delete shopping cart for provided userId
- * [DELETE] http://localhost:3000/api/shopping-cart/{userId}
+/*
+ * Delete shopping cart for provided customerId
+ * [DELETE] http://localhost:3000/api/shopping-cart/{customerId}
  */
 export const deleteShoppingCart = async (request: Request, response: Response, next: NextFunction) => {
-    const { userId } = request.params;
+    const { customerId } = request.params;
 
-    if (!userId) {
+    if (!customerId) {
         return response.status(400).json({
             message: "Bad request.", success: false
         });
     }
 
     await prisma.shoppingCart.deleteMany({
-        where: { userId: userId as string },
+        where: { customerId: customerId as string },
     });
 
     return response.status(200).send({

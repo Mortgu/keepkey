@@ -74,9 +74,6 @@ export function LoginFormComponent() {
                         )} />
                 </div>
             </form>
-            <p>
-                <a href="/signup">SignUp</a>
-            </p>
         </div>
     )
 }

@@ -7,7 +7,7 @@ import userRouter from './user.js';
 import contractRouter from './contracts.js';
 import pricingRouter from './pricing.js';
 import orderRouter from './orders.js';
-import checkoutRouter from './checkout.js';
+import customerRouter from './customers.js';
 
 const router = Router();
 
@@ -16,9 +16,6 @@ router.use('/admin', adminRouter);
 
 /* /api/products */
 router.use('/products', productRouter);
-
-/* /api/checkout */
-router.use('/checkout', checkoutRouter);
 
 /* /api/shopping-cart */
 router.use('/shopping-cart', cartRouter);
@@ -34,5 +31,8 @@ router.use('/pricing', pricingRouter);
 
 /* /api/orders */
 router.use('/orders', orderRouter);
+
+/* /api/customers */
+router.use('/customers', customerRouter);
 
 export default router;
