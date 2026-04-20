@@ -1,6 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { ContactPerson, Customer, ProductItem } from "@/data/types";
+import type { BaseOffer, ContactPerson, Customer, ProductItem, Supplier } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
@@ -9,11 +9,12 @@ import { Loader, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import { z } from "zod";
+import { useOffer } from "@/hooks/offer";
+import { useSupplier } from "@/hooks/supplier";
 
 interface OfferModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSubmit?: () => void;
 }
 
 export const offerSchema = z.object({
@@ -23,6 +24,7 @@ export const offerSchema = z.object({
     validUntil: z.date(),
     customerId: z.string(),
     supplierId: z.string(),
+    contactPersonId: z.string(),
     requestFrom: z.date(),
 });
 
@@ -30,6 +32,7 @@ const emptyOfferFormVlues = {
     voucherId: "",
     supplierId: "",
     customerId: "",
+    contactPersonId: "",
 
     date: new Date(),
     paymentTerm: "30 Tage",
@@ -37,22 +40,32 @@ const emptyOfferFormVlues = {
     requestFrom: new Date(),
 }
 
-export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProps) {
+export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
     const { customers } = useCustomers();
     const { products } = useProducts();
     const { contracts } = useContracts();
+    const { suppliers } = useSupplier();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
+
+    const { createOffer } = useOffer();
 
     const offerForm = useForm({
         defaultValues: emptyOfferFormVlues,
         validators: {
             onChange: offerSchema
         },
-        onSubmit: ({ value }) => {
-            console.log(value)
+        onSubmit: async ({ value }) => {
+            const offer: BaseOffer = {
+                ...value,
+            }
+
             onClose();
+
+            return await createOffer({
+                offer: offer, positions: offerProducts
+            });
         }
     });
 
@@ -93,7 +106,7 @@ export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProp
                             )} />
 
                             {/* Ihr Ansprechpartner */}
-                            <offerForm.Field name="supplierId" children={(field) => (
+                            <offerForm.Field name="contactPersonId" children={(field) => (
                                 <div className="flex-1 grid gap-2 items-center">
                                     <label className="text-sm  text-gray-500" htmlFor={field.name}>Ansprechpartner Kunde:</label>
                                     <offerForm.Subscribe selector={(state) => state.values.customerId} children={(customerId) => {
@@ -122,7 +135,24 @@ export default function OfferModal({ isOpen, onClose, onSubmit }: OfferModalProp
                             <offerForm.Field name="voucherId" children={(field) => (
                                 <div className="flex-1 grid gap-2 items-center">
                                     <label className="text-sm  text-gray-500" htmlFor={field.name}>Beleg-Nr:</label>
-                                    <Input type="text" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                                    <Input type="text" value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)} />
+                                </div>
+                            )} />
+
+                            {/* Lieferant / Supplier */}
+                            <offerForm.Field name="supplierId" children={(field) => (
+                                <div className="flex-1 grid gap-2 items-center">
+                                    <label className="text-sm  text-gray-500" htmlFor={field.name}>Lieferant:</label>
+                                    <select value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                        className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100"
+                                    >
+                                        <option value="">None</option>
+                                        {suppliers?.map((supplier: Supplier) => (
+                                            <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             )} />
 

@@ -63,15 +63,16 @@ export interface Contract {
     createdAt: Date;
 }
 
-export interface ProductItem {
-    id: string;
+export interface BaseProduct {
     name: string;
-
-    published: boolean,
-
     description: string;
     link: string;
+}
 
+export interface ProductItem extends BaseProduct {
+    id: string;
+
+    published: boolean,
     productPricing: ProductItemPricing[],
 
     createdAt: Date;
@@ -129,19 +130,24 @@ export interface DocumentJob {
     updatedAt: string;
 }
 
-export interface Offer {
+/* OFFER */
+export interface BaseOffer {
     voucherId: string;
     date: Date,
     paymentTerm: string;
     validUntil: Date;
     customerId: string;
 
-    supplier: Supplier;
     supplierId: string;
 
-    requestFrom: string;
+    requestFrom: Date;
 }
 
+export interface Offer extends BaseOffer {
+    id: string;
+}
+
+/* SUPPLIER */
 export interface BaseSupplier {
     supplierId: string;
     name: string;

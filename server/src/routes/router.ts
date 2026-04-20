@@ -8,6 +8,7 @@ import contractRouter from './contracts.js';
 import pricingRouter from './pricing.js';
 import orderRouter from './orders.js';
 import customerRouter from './customers.js';
+import offerRouter from './offer.js';
 
 const router = Router();
 
@@ -19,6 +20,9 @@ router.use('/products', productRouter);
 
 /* /api/suppliers */
 router.use('/suppliers', supplierRouter);
+
+/* /api/offers */
+router.use('/offers', offerRouter);
 
 /* /api/users */
 router.use('/users', userRouter);
