@@ -86,6 +86,8 @@ export interface ProductItemPricing {
 
     max_quantity: number;
     min_quantity: number;
+
+    price: number;
 }
 
 export interface ShoppingCartItem extends ProductItem {
@@ -162,6 +164,9 @@ export interface OfferPosition {
 
     duration: number;
     quantity: number;
+
+    totalPrice: number;
+    priceBreakdown: any;
 
     createdAt: Date;
 }

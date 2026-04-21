@@ -27,7 +27,8 @@ export const createOfferAction = async (offer: BaseOffer, positions: OfferProduc
     });
 
     if (!response.ok) {
-        throw new Error("Failed to create offer!");
+        const error = await response.json();
+        throw new Error(error.message);
     }
 
     return await response.json();

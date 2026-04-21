@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { calculatePrice } from "../utils/products.js";
 
 export const getOffers = async (request: Request, response: Response) => {
     const offers = await prisma.offer.findMany({
@@ -42,10 +43,33 @@ export const createOffer = async (request: Request, response: Response) => {
             });
 
             for (const position of body.positions) {
+                const pricing = await prisma.productPricing.findMany({
+                    where: {
+                        AND: [
+                            { productId: position.productId },
+                            { contractId: position.contractId },
+                            { duration: position.duration },
+                        ]
+                    },
+                    select: {
+                        min_quantity: true,
+                        max_quantity: true,
+                        price: true
+                    }
+                });
+
+                if (pricing.length === 0) {
+                    throw new Error(`No pricing found for product!`);
+                }
+
+                const { totalPrice, priceBreakdown } = calculatePrice(pricing, position.quantity);
+
                 await tx.offerPosition.create({
                     data: {
+                        ...position,
                         offerId: offer.id,
-                        ...position
+                        totalPrice,
+                        priceBreakdown,
                     }
                 });
             }
@@ -55,7 +79,7 @@ export const createOffer = async (request: Request, response: Response) => {
 
         return response.status(200).json(createdOffer);
     } catch (exception: any) {
-        return response.status(500).json({
+        return response.status(408).json({
             message: "Somthing went wrong trying to create offer: " + exception.message, success: false
         });
     }

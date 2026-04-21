@@ -1,47 +1,50 @@
-import type { Prisma } from '@prisma/client';
+type PricingTier = {
+    min_quantity: number;
+    max_quantity: number | null;
+    price: number;
+};
 
-export function calculateProductPrice(
-    product: Prisma.ProductGetPayload<{ include: { productPricing: true } }>,
-    quantity: string | number,
-    duration: number,
-    contractId?: string
-) {
-    let total = 0;
-    let remainingQuantity = Number(quantity);
+export type PriceBreakdownItem = {
+    from: number;
+    to: number | null;
+    pricePerUnit: number;
+    quantity: number;
+    subtotal: number;
+};
 
-    // Filter pricing by contract and sort by min_quantity
-    const applicablePricing = product.productPricing
-        .filter(pricing => !contractId || pricing.contractId === contractId || pricing.duration === duration)
-        .sort((a, b) => a.min_quantity - b.min_quantity);
+export type PriceCalculationResult = {
+    totalPrice: number;
+    priceBreakdown: PriceBreakdownItem[];
+};
 
-    // Calculate tiered pricing with breakdown
-    const breakdown = [];
-    for (const pricing of applicablePricing) {
-        if (remainingQuantity <= 0) break;
+export function calculatePrice(tiers: PricingTier[], quantity: number): PriceCalculationResult {
+    const sorted = [...tiers].sort((a, b) => a.min_quantity - b.min_quantity);
 
-        // If max_quantity is 0 or null, it's unlimited - use all remaining quantity
-        const isUnlimited = pricing.max_quantity === 0 || pricing.max_quantity === null;
-        const rangeSize = isUnlimited ? remainingQuantity : (pricing.max_quantity || 0) - pricing.min_quantity + 1;
-        const quantityInThisTier = Math.min(remainingQuantity, rangeSize);
-        const subtotal = quantityInThisTier * Number(pricing.price);
+    let remaining = quantity;
+    let totalPrice = 0;
+    const priceBreakdown: PriceBreakdownItem[] = [];
 
-        breakdown.push({
-            range: isUnlimited ? `${pricing.min_quantity}+` : `${pricing.min_quantity}-${pricing.max_quantity}`,
-            minQuantity: pricing.min_quantity,
-            maxQuantity: pricing.max_quantity || null,
-            quantity: quantityInThisTier,
-            pricePerUnit: Number(pricing.price),
-            subtotal: parseFloat(subtotal.toFixed(2))
+    for (let i = 0; i < sorted.length; i++) {
+        if (remaining <= 0) break;
+
+        const tier = sorted[i];
+        const isLastTier = i === sorted.length - 1;
+        const tierMax = isLastTier || !tier.max_quantity ? Infinity : tier.max_quantity;
+        const tierCapacity = tierMax - tier.min_quantity + 1;
+        const applied = Math.min(remaining, tierCapacity);
+        const subtotal = applied * tier.price;
+
+        totalPrice += subtotal;
+        priceBreakdown.push({
+            from: tier.min_quantity,
+            to: tier.max_quantity === 0 ? null : tier.max_quantity,
+            pricePerUnit: tier.price,
+            quantity: applied,
+            subtotal,
         });
 
-        total += subtotal;
-        remainingQuantity -= quantityInThisTier;
+        remaining -= applied;
     }
 
-    return {
-        quantity: Number(quantity),
-        contractId,
-        breakdown,
-        total: parseFloat(total.toFixed(2))
-    }
+    return { totalPrice, priceBreakdown };
 }

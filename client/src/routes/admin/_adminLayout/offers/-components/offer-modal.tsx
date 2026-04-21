@@ -49,7 +49,7 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
 
-    const { createOffer } = useOffer();
+    const { createOffer, errorCreatingOffer } = useOffer();
 
     const offerForm = useForm({
         defaultValues: emptyOfferFormVlues,
@@ -61,11 +61,18 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                 ...value,
             }
 
-            onClose();
+            try {
+                const response = await createOffer({
+                    offer: offer, positions: offerProducts
+                });
 
-            return await createOffer({
-                offer: offer, positions: offerProducts
-            });
+                onClose();
+
+                return response;
+            } catch (exception: any) {
+
+            }
+
         }
     });
 
@@ -83,6 +90,10 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                 <div className="flex justify-between items-center bg-gray-50 border-b border-gray-200 px-2 py-2">
                     <h1 className="text-xl ml-2">Neues Angebot erstellen.</h1>
                     <Button onClick={onClose} variant="secondary" size="sm" icon={<X className="size-4" />} iconOnly />
+                </div>
+
+                <div className="flex p-4 bg-red-50 border-b border-red-300">
+                    <p className="text-red-500">{errorCreatingOffer?.message}</p>
                 </div>
 
                 <div className="p-4">

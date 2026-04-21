@@ -11,7 +11,13 @@ export default function OfferList() {
 
     const { offers, deleteOffer } = useOffer();
 
-    console.log(offers)
+    const handleDeleteOffer = (id: string) => {
+        if (confirm("Angebot löschen?")) {
+            deleteOffer({ id });
+        } else {
+
+        }
+    }
 
     return (
         <div className="">
@@ -39,7 +45,7 @@ export default function OfferList() {
                             </div>
                             <div className="flex items-center">
                                 <Button size="sm" variant="ghost" icon={<Pen className="size-4" />} iconOnly />
-                                <Button onClick={() => deleteOffer({ id: offer.id })} size="sm" variant="ghost" icon={<Trash className="size-4" />} iconOnly />
+                                <Button onClick={() => handleDeleteOffer(offer.id)} size="sm" variant="ghost" icon={<Trash className="size-4" />} iconOnly />
                             </div>
                         </div>
 
@@ -49,18 +55,18 @@ export default function OfferList() {
                                 <div key={i} className='flex items-center justify-between even:bg-gray-50 px-3 py-2'>
                                     <div className='flex items-center gap-2'>
                                         <p className='text-sm'>{pos.product.name}</p>
-                                        <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)})</p>
+                                        <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
                                     </div>
                                     <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                        <span>{pos.quantity} ×  €</span>
-                                        <span className='w-20 text-right font-medium text-gray-700'> €</span>
+                                        <span>{ } €</span>
+                                        <span className='w-20 text-right font-medium text-gray-700'>{pos.totalPrice.toFixed(2)} €</span>
                                     </div>
                                 </div>
                             ))}
 
                             <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
                                 <span className=''>Gesamt</span>
-                                <span>{offer.offerPositions.reduce((sum, pos) => sum + (pos.quantity * 5), 0).toFixed(2)} €</span>
+                                <span>{offer.offerPositions.reduce((sum, pos) => sum + pos.totalPrice, 0).toFixed(2)} €</span>
                             </div>
                         </div>
 
