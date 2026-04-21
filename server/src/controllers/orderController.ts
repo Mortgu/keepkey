@@ -41,32 +41,6 @@ export const getOrderById = async (request: Request, response: Response, next: N
         }
     });
 
-    generateOfferPdf({
-        data: {
-            companyName: "",
-            customer: {
-                salutation: order?.customer.salutation || '',
-                firstName: order?.customer.firstName || '',
-                lastName: order?.customer.lastName || '',
-            },
-            street: "",
-            plzCity: "",
-            paymentTerm: "",
-            validUntil: "",
-            customerId: order?.customerId || '',
-            suplirId: "",
-            requestDate: "",
-            employee: { salutation: "", firstName: "", lastName: "" },
-            order: {
-                invoiceNumber: String(order?.id.slice(0, 8)),
-            },
-            date: String(Date.now()),
-            products: "Product 1 & Product 2",
-        },
-        outputPath: "output.pdf",
-        templatePath: "template-offer.html"
-    });
-
     return response.status(200).json(order);
 }
 
@@ -124,7 +98,10 @@ export const createOrder = async (request: Request, response: Response, next: Ne
         });
     }
 
-    const customer = await prisma.customer.findUnique({ where: { userId: user!.id } });
+    const customer = await prisma.customer.findUnique({
+        where: { userId: user!.id }
+    });
+
     if (!customer) {
         return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
     }

@@ -29,7 +29,7 @@ export default function CustomerList() {
                 ))}
             </div>
 
-            <CustomerModal currentCustomer={null} isOpen={isOpen} onClose={() => setOpen(false)} />
+            <CustomerModal isOpen={isOpen} onClose={() => setOpen(false)} />
         </div>
     );
 }

@@ -1,4 +1,4 @@
-import type { ContactPerson, User } from "./types";
+import type { BaseUser, ContactPerson, User } from "./types";
 
 export async function getCurrentUser() {
     const response = await fetch('http://localhost:3000/api/users/session', {
@@ -42,7 +42,7 @@ export async function getAllUsersAction() {
 }
 
 /* Update user */
-export async function updateUserByIdAction(id: string, body: Partial<User>) {
+export async function updateUserByIdAction(id: string, body: BaseUser) {
     const response = await fetch(`http://localhost:3000/api/users/${id}`, {
         method: 'POST',
         credentials: 'include',

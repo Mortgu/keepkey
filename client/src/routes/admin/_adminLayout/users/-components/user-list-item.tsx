@@ -25,7 +25,6 @@ export default function UserListItem({ user }: UserListItemProps) {
                 </div>
 
                 <div className="flex items-center gap-12">
-                    <p className="text-sm text-gray-500">{user.orders?.length} Orders</p>
 
                     <div className="flex items-center ">
                         <Button onClick={() => setOpen(true)} size='sm' variant="ghost" icon={<Pen className="size-4" />} iconOnly></Button>

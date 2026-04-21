@@ -1,9 +1,10 @@
 import Button from '@/components/button/button';
 import Input from '@/components/inputs/input';
-import { type User } from '@/data/types';
+import { type BaseUser, type User } from '@/data/types';
 import { useAdmin } from '@/hooks/admin';
 import { useForm } from '@tanstack/react-form';
 import { Loader } from 'lucide-react';
+import type React from 'react';
 import { z } from 'zod';
 
 interface UserModalProps {
@@ -12,13 +13,25 @@ interface UserModalProps {
     currentUser: User | null;
 }
 
-const userSchema = z.object({
+const createUserSchema = z.object({
     salutation: z.string().min(1, "Pflichtfeld"),
     firstName: z.string().min(1, "Pflichtfeld"),
     lastName: z.string().min(1, "Pflichtfeld"),
     email: z.email("Ungültige E-Mail"),
-    password: z.string(),
+    password: z.string().min(8, "Pflichtfeld (8)"),
 });
+
+const editUserSchema = createUserSchema.extend({
+    password: z.string().refine(val => val === '' || val.length >= 8, "Mind. 8 Zeichen"),
+});
+
+const emptyUser = {
+    salutation: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    password: '',
+};
 
 export default function UserModal({ isOpen, onClose, currentUser }: UserModalProps) {
     if (!isOpen) return null;
@@ -27,45 +40,37 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
     const { updateUser, createUser } = useAdmin();
 
     const userForm = useForm({
-        defaultValues: {
-            salutation: currentUser?.salutation ?? '',
-            firstName: currentUser?.firstName ?? '',
-            lastName: currentUser?.lastName ?? '',
-            email: currentUser?.email ?? '',
-            password: '',
-        },
+        defaultValues: currentUser ? { ...currentUser, password: '' } : emptyUser,
         validators: {
-            onChange: userSchema,
+            onChange: isEdit ? editUserSchema : createUserSchema,
         },
-        onSubmit: ({ value }) => {
-            const { password, ...rest } = value;
-            const body: Partial<User> & { password?: string } = isEdit
-                ? { ...rest }
-                : { ...rest, password };
-
+        onSubmit: async ({ value }) => {
+            const name = `${value.firstName} ${value.lastName}`;
             if (isEdit) {
-                updateUser({ id: currentUser.id, body });
+                updateUser({ id: currentUser.id, body: { ...value, name } });
             } else {
-                createUser({ body });
+                await createUser({ body: { ...value, name } });
             }
             onClose();
-        }
+        },
     });
+
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        userForm.handleSubmit();
+    }
 
     return (
         <div className="fixed inset-0 bg-black/10 z-50 flex items-center justify-center p-4">
             <div className="p-4 relative bg-white rounded-lg shadow-2xl w-full max-w-2xl">
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    userForm.handleSubmit();
-                }} className="grid gap-4">
+                <form onSubmit={handleSubmit} className="grid gap-4">
 
                     <div className='flex items-center gap-4'>
                         <userForm.Field name="salutation" children={(field) => (
                             <div className='flex-1 grid gap-2'>
                                 <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
-                                    {field.state.meta.errors.length > 0 ? String(field.state.meta.errors[0]) : 'Anrede'}
+                                    Anrede
                                 </label>
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
@@ -74,7 +79,7 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
                         <userForm.Field name="firstName" children={(field) => (
                             <div className='flex-1 grid gap-2'>
                                 <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
-                                    {field.state.meta.errors.length > 0 ? String(field.state.meta.errors[0]) : 'Vorname'}
+                                    Vorname
                                 </label>
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
@@ -83,7 +88,7 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
                         <userForm.Field name="lastName" children={(field) => (
                             <div className='flex-1 grid gap-2'>
                                 <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
-                                    {field.state.meta.errors.length > 0 ? String(field.state.meta.errors[0]) : 'Nachname'}
+                                    Nachname
                                 </label>
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
@@ -94,29 +99,20 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
                         <userForm.Field name="email" children={(field) => (
                             <div className='flex-1 grid gap-2'>
                                 <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
-                                    {field.state.meta.errors.length > 0 ? String(field.state.meta.errors[0]) : 'E-Mail'}
+                                    E-Mail
                                 </label>
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
                         )} />
 
-                        {!isEdit && (
-                            <userForm.Field
-                                name="password"
-                                validators={{
-                                    onChange: ({ value }) =>
-                                        !value || value.length < 8 ? "Mindestens 8 Zeichen" : undefined,
-                                }}
-                                children={(field) => (
-                                    <div className='flex-1 grid gap-2'>
-                                        <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
-                                            {field.state.meta.errors.length > 0 ? String(field.state.meta.errors[0]) : 'Passwort'}
-                                        </label>
-                                        <Input id={field.name} type="password" input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
-                                    </div>
-                                )}
-                            />
-                        )}
+                        <userForm.Field name="password" children={(field) => (
+                            <div className='flex-1 grid gap-2'>
+                                <label htmlFor={field.name} className={`text-sm ${field.state.meta.errors.length > 0 ? 'text-red-400' : 'text-gray-500'}`}>
+                                    Passwort
+                                </label>
+                                <Input id={field.name} type="password" input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                            </div>
+                        )} />
                     </div>
 
                     <div className='flex items-center gap-4'>

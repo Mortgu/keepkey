@@ -5,8 +5,8 @@ export const getAllCustomers = async (request: Request, response: Response) => {
     const customers = await prisma.customer.findMany({
         include: {
             contactPersons: true,
-            address: true,
             orders: true,
+            offers: true,
         }
     });
     return response.status(200).json(customers);
@@ -19,7 +19,6 @@ export const getCustomerById = async (request: Request, response: Response) => {
         where: { id },
         include: {
             contactPersons: true,
-            address: true,
             orders: true,
         }
     });
@@ -35,27 +34,36 @@ export const createCustomer = async (request: Request, response: Response) => {
     const { body } = request;
 
     if (!body) {
-        return response.status(400).json({ success: false, message: 'Missing data!' });
+        return response.status(400).json({
+            success: false, message: 'Bad request! Missing body data.'
+        });
     }
 
-    try {
-        const { contactPersons, ...customerFields } = body;
+    const { contactPersons, ...customerFields } = body;
 
-        const customer = await prisma.customer.create({
-            data: { ...customerFields },
+    try {
+        const createdCustomer = await prisma.$transaction(async (tx) => {
+            const customer = await tx.customer.create({
+                data: {
+                    companyName: body.companyName,
+                    customerId: body.customerId,
+                    email: body.email,
+                },
+            });
+
+            if (contactPersons?.length > 0) {
+                await tx.contactPerson.createMany({
+                    data: contactPersons.map((p: any) => ({
+                        customerId: customer.id,
+                        ...p,
+                    })),
+                });
+            }
+
+            return customer;
         });
 
-        if (contactPersons?.length > 0) {
-            await prisma.contactPerson.createMany({
-                data: contactPersons.map((p: any) => ({
-                    salutation: p.salutation,
-                    firstName: p.firstName,
-                    lastName: p.lastName,
-                    email: p.email,
-                    customerId: customer.id,
-                })),
-            });
-        }
+        return response.status(200).json(createdCustomer);
     } catch (exception: any) {
         return response.status(500).json({
             success: false, message: 'Failed to create customer!', exception: exception.message

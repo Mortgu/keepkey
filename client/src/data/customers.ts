@@ -1,4 +1,4 @@
-import type { Customer } from "./types";
+import type { CreateCustomer, Customer } from "./types";
 
 export async function getAllCustomersAction(): Promise<Customer[]> {
     const response = await fetch('http://localhost:3000/api/customers', {
@@ -26,7 +26,7 @@ export async function getCustomerByIdAction(id: string): Promise<Customer | null
     return await response.json();
 }
 
-export async function createCustomerAction(body: Partial<Customer>) {
+export async function createCustomerAction(body: CreateCustomer) {
     const response = await fetch('http://localhost:3000/api/customers', {
         method: 'POST',
         credentials: 'include',

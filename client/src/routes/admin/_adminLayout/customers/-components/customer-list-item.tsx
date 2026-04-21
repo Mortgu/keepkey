@@ -19,7 +19,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
         <React.Fragment>
             <div className='flex items-center justify-between gap-3 border border-gray-300 p-2 rounded-md'>
                 <div className="grid gap-0">
-                    <h1 className='text-md'>{customer.name}</h1>
+                    <h1 className='text-md'>{customer.companyName}</h1>
                     <p className='text-sm text-gray-500'>{customer.customerId} · {formatDate(customer.createdAt)}</p>
                 </div>
 

@@ -1,57 +1,54 @@
-export interface Address {
-    id: string;
-    street?: string;
-    city?: string;
-    plz?: string;
-    phone?: string;
-}
-
-export interface ContactPerson {
-    id: string;
-
+export interface BaseContactPerson {
     salutation: string;
     firstName: string;
     lastName: string;
     email?: string;
+}
+
+export interface ContactPerson extends BaseContactPerson {
+    id: string;
 
     createdAt: Date;
     updatedAt: Date;
 }
 
-export interface Customer {
-    id: string;
+export interface BaseCustomer {
     customerId: string;
+    companyName: string;
+    email: string;
+}
 
-    salutation?: string;
-    name: string;
-    firstName?: string;
-    lastName?: string;
-    email?: string;
+export interface CreateCustomer extends BaseCustomer {
+    contactPersons: BaseContactPerson[];
+}
 
-    userId?: string;
+export interface Customer extends BaseCustomer {
+    id: string;
 
-    address?: Address;
-    contactPersons: ContactPerson[];
+    contactPersons?: ContactPerson[];
     orders: Order[];
 
     createdAt: Date;
     updatedAt: Date;
 }
 
-export interface User {
-    id: string;
+export interface BaseUser {
     name: string;
-
     salutation: string;
     firstName: string;
     lastName: string;
-
     email: string;
-    emailVerified: boolean;
+}
 
+export interface User extends BaseUser {
+    id: string;
+
+    emailVerified: boolean;
     role: string;
 
     customer?: Customer;
+    orders?: Order[];
+    offers?: Offer[];
 
     createdAt: Date;
 }
@@ -150,6 +147,7 @@ export interface Offer extends BaseOffer {
 
     customer: Customer;
     offerPositions: OfferPosition[];
+    customerContactPerson: ContactPerson;
 }
 
 export interface OfferPosition {

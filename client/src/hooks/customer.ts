@@ -5,31 +5,38 @@ import {
     updateCustomerByIdAction,
     deleteCustomerAction,
 } from "@/data/customers";
-import type { Customer } from "@/data/types";
+import type { BaseCustomer, CreateCustomer, Customer } from "@/data/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCustomers = () => {
     const queryClient = useQueryClient();
+    const queryKey = ['customers'];
 
     const { data: customers = [], isPending, error } = useQuery({
-        queryKey: ['customers'],
+        queryKey: queryKey,
         queryFn: getAllCustomersAction,
     });
 
     const createMutation = useMutation({
-        mutationFn: (body: Partial<Customer>) => createCustomerAction(body),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
+        mutationFn: (body: CreateCustomer) => createCustomerAction(body),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: queryKey
+        }),
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: Partial<Customer> }) =>
+        mutationFn: ({ id, body }: { id: string; body: BaseCustomer }) =>
             updateCustomerByIdAction(id, body),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: queryKey
+        }),
     });
 
     const deleteMutation = useMutation({
         mutationFn: ({ id }: { id: string }) => deleteCustomerAction(id),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['customers'] }),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: queryKey
+        }),
     });
 
     return {
@@ -39,6 +46,7 @@ export const useCustomers = () => {
 
         createCustomer: createMutation.mutateAsync,
         isCreating: createMutation.isPending,
+        errorCreatingCustomer: createMutation.error,
 
         updateCustomer: updateMutation.mutate,
         isUpdating: updateMutation.isPending,

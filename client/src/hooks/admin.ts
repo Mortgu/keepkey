@@ -1,6 +1,6 @@
 import { getAllOrdersAction } from "@/data/orders";
 import { createProductAction, deleteProductAction, getAllProducts, updateProductAction } from "@/data/products";
-import type { User } from "@/data/types";
+import type { BaseUser, User } from "@/data/types";
 import { createUserAction, getAllUsersAction, updateUserByIdAction, deleteUserAction } from "@/data/user";
 import type { ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -59,7 +59,7 @@ export const useAdmin = () => {
     });
 
     const updateUserMutation = useMutation({
-        mutationFn: ({ id, body }: { id: string, body: Partial<User> }) => updateUserByIdAction(id, body),
+        mutationFn: ({ id, body }: { id: string, body: BaseUser }) => updateUserByIdAction(id, body),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: ['admin:users'],
         }),

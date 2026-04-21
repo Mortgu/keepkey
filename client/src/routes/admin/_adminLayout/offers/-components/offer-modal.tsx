@@ -1,6 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { BaseOffer, ContactPerson, Customer, ProductItem, Supplier } from "@/data/types";
+import type { BaseOffer, ContactPerson, Customer, ProductItem, Supplier, User } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
@@ -11,6 +11,8 @@ import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import { z } from "zod";
 import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
+import { useUser } from "@/hooks/user";
+import { useAdmin } from "@/hooks/admin";
 
 interface OfferModalProps {
     isOpen: boolean;
@@ -26,6 +28,7 @@ export const offerSchema = z.object({
     supplierId: z.string(),
     contactPersonId: z.string(),
     requestFrom: z.date(),
+    userId: z.string(),
 });
 
 const emptyOfferFormVlues = {
@@ -33,6 +36,7 @@ const emptyOfferFormVlues = {
     supplierId: "",
     customerId: "",
     contactPersonId: "",
+    userId: "",
 
     date: new Date(),
     paymentTerm: "30 Tage",
@@ -45,6 +49,7 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
     const { products } = useProducts();
     const { contracts } = useContracts();
     const { suppliers } = useSupplier();
+    const { users } = useAdmin();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
@@ -92,9 +97,11 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                     <Button onClick={onClose} variant="secondary" size="sm" icon={<X className="size-4" />} iconOnly />
                 </div>
 
-                <div className="flex p-4 bg-red-50 border-b border-red-300">
-                    <p className="text-red-500">{errorCreatingOffer?.message}</p>
-                </div>
+                {errorCreatingOffer && (
+                    <div className="flex p-4 bg-red-50 border-b border-red-300">
+                        <p className="text-red-500">{errorCreatingOffer.message}</p>
+                    </div>
+                )}
 
                 <div className="p-4">
                     <form onSubmit={handleFormSubmit} className="grid gap-4">
@@ -110,7 +117,7 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                                     >
                                         <option value="">None</option>
                                         {customers?.map((customer: Customer) => (
-                                            <option key={customer.id} value={customer.id}>{customer.firstName} {customer.lastName}</option>
+                                            <option key={customer.id} value={customer.id}>{customer.companyName}</option>
                                         ))}
                                     </select>
                                 </div>
@@ -138,6 +145,19 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                                             </select>
                                         );
                                     }} />
+                                </div>
+                            )} />
+
+                            <offerForm.Field name="userId" children={(field) => (
+                                <div className="flex-1 grid gap-2 items-center">
+                                    <label className="text-sm  text-gray-500" htmlFor={field.name}>Unser Ansprechpartner:</label>
+                                    <select value={field.state.value} onChange={(e) => field.handleChange(e.target.value)}
+                                        className="w-full rounded-lg border border-gray-200 transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100 disabled:opacity-50">
+                                        <option value="">None</option>
+                                        {users.map((user: User) => (
+                                            <option key={user.id} value={user.id}>{user.firstName} {user.lastName}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             )} />
                         </div>

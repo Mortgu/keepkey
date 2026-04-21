@@ -8,6 +8,7 @@ export const getAllUsers = async (request: Request, response: Response) => {
         include: {
             employeeOrders: true,
             customer: true,
+            offers: true,
         }
     });
     return response.status(200).json(users);
@@ -45,30 +46,11 @@ export const updateUserById = async (request: Request, response: Response) => {
     try {
         const { contactPersons, ...userFields } = body;
 
-        console.log(contactPersons, userFields)
-
         await prisma.user.update({
             where: { id: id as string },
             data: { ...userFields },
         });
 
-        if (contactPersons !== undefined) {
-            const linkedCustomer = await prisma.customer.findUnique({ where: { userId: id as string } });
-            if (linkedCustomer) {
-                await prisma.contactPerson.deleteMany({ where: { customerId: linkedCustomer.id } });
-                if (contactPersons.length > 0) {
-                    await prisma.contactPerson.createMany({
-                        data: contactPersons.map((p: any) => ({
-                            salutation: p.salutation,
-                            firstName: p.firstName,
-                            lastName: p.lastName,
-                            email: p.email,
-                            customerId: linkedCustomer.id,
-                        })),
-                    });
-                }
-            }
-        }
     } catch (exception: any) {
         return response.status(500).json({
             success: false, message: 'Something went wrong trying to update user!'
@@ -90,30 +72,18 @@ export const createUser = async (request: Request, response: Response) => {
     }
 
     try {
-        const { contactPersons, ...rest } = body;
 
-        const created = await auth.api.createUser({
+        const createdUser = await auth.api.createUser({
             body: {
-                email: rest.email,
+                email: body.email,
                 password: '',
-                name: `${rest.firstName} ${rest.lastName}`,
+                name: `${body.firstName} ${body.lastName}`,
                 role: 'user',
-                data: { ...rest },
+                data: { ...body },
             },
         });
 
-        const linkedCustomer = await prisma.customer.findUnique({ where: { userId: created.user.id } });
-        if (contactPersons?.length > 0 && linkedCustomer) {
-            await prisma.contactPerson.createMany({
-                data: contactPersons.map((p: any) => ({
-                    salutation: p.salutation,
-                    firstName: p.firstName,
-                    lastName: p.lastName,
-                    email: p.email,
-                    customerId: linkedCustomer.id,
-                })),
-            });
-        }
+        return response.status(200).json(createdUser);
     } catch (exception: any) {
         return response.status(500).json({
             success: false, message: 'Something went wrong trying to create user!', exception: exception.message

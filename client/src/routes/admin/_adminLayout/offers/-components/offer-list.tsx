@@ -19,6 +19,8 @@ export default function OfferList() {
         }
     }
 
+    console.log(offers)
+
     return (
         <div className="">
             <div className='mb-4 flex items-center justify-between'>
@@ -35,9 +37,8 @@ export default function OfferList() {
                             <div className='flex items-center gap-4'>
                                 <div>
                                     <p className='text-base font-medium'>{offer.voucherId}</p>
-                                    <p className='text-sm text-gray-500'>{offer.customer.name} · {offer.customer.firstName} {offer.customer.lastName}</p>
+                                    <p className='text-sm text-gray-500'>{offer.customer.companyName} · {offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}</p>
                                 </div>
-                                <div className='hidden sm:block h-8 w-px bg-gray-200' />
                                 <div className='hidden sm:block text-sm text-gray-500'>
                                     {/*<p>Gültig bis: {formatDate(offer.validUntil)}</p>
                                     <p>Anfrage vom: {formatDate(offer.requestFrom)}</p>*/}
