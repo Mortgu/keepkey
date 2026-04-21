@@ -145,6 +145,25 @@ export interface BaseOffer {
 
 export interface Offer extends BaseOffer {
     id: string;
+
+    customer: Customer;
+    offerPositions: OfferPosition[];
+}
+
+export interface OfferPosition {
+    offerId: String;
+    offer: Offer;
+
+    productId: String;
+    product: ProductItem;
+
+    contract: Contract;
+    contractId: String;
+
+    duration: number;
+    quantity: number;
+
+    createdAt: Date;
 }
 
 /* SUPPLIER */

@@ -1,4 +1,4 @@
-import { createOfferAction, getOffersAction } from "@/data/offer";
+import { createOfferAction, deleteOfferAction, getOffersAction } from "@/data/offer";
 import type { BaseOffer, Offer } from "@/data/types";
 import type { OfferProductInput } from "@/routes/admin/_adminLayout/offers/-components/offer-product-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -17,6 +17,13 @@ export const useOffer = () => {
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: queryKey
         })
+    });
+
+    const deleteMutation = useMutation({
+        mutationFn: ({ id }: { id: string }) => deleteOfferAction(id),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: queryKey
+        })
     })
 
     return {
@@ -26,6 +33,10 @@ export const useOffer = () => {
 
         createOffer: createMutation.mutateAsync,
         isCreatingOffer: createMutation.isPaused,
-        errorCreatingOffer: createMutation.error
+        errorCreatingOffer: createMutation.error,
+
+        deleteOffer: deleteMutation.mutate,
+        isDeletingOffer: deleteMutation.isPending,
+        errorDeletingOffer: deleteMutation.error,
     }
 }

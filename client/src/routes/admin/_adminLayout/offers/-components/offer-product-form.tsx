@@ -6,11 +6,15 @@ import { useState } from 'react';
 export type OfferProductInput = {
     productId: string;
     contractId: string;
-    duration: '1 Jahr' | '2 Jahre' | '3 Jahre';
+    duration: 1 | 2 | 3;
     quantity: number;
 };
 
-const DURATIONS = ['1 Jahr', '2 Jahre', '3 Jahre'] as const;
+const DURATIONS: { value: 1 | 2 | 3; label: string }[] = [
+    { value: 1, label: '1 Jahr' },
+    { value: 2, label: '2 Jahre' },
+    { value: 3, label: '3 Jahre' },
+];
 
 interface Props {
     products: ProductItem[];
@@ -22,7 +26,7 @@ interface Props {
 export default function OfferProductForm({ products, contracts, onSave, onCancel }: Props) {
     const [productId, setProductId] = useState(products[0]?.id ?? '');
     const [contractId, setContractId] = useState(contracts[0]?.id ?? '');
-    const [duration, setDuration] = useState<OfferProductInput['duration']>('1 Jahr');
+    const [duration, setDuration] = useState<OfferProductInput['duration']>(1);
     const [quantity, setQuantity] = useState(1);
     const [error, setError] = useState('');
 
@@ -58,9 +62,9 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
 
                 <div className='flex-1 grid gap-1'>
                     <label className='text-sm text-gray-600'>Laufzeit</label>
-                    <select value={duration} onChange={(e) => setDuration(e.target.value as OfferProductInput['duration'])} className={selectClass}>
+                    <select value={duration} onChange={(e) => setDuration(Number(e.target.value) as OfferProductInput['duration'])} className={selectClass}>
                         {DURATIONS.map((d) => (
-                            <option key={d} value={d}>{d}</option>
+                            <option key={d.value} value={d.value}>{d.label}</option>
                         ))}
                     </select>
                 </div>

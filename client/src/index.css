@@ -3,8 +3,35 @@
 :root {
     --viewport: 1280px;
 
+    /* Base */
     --keepit-primary: #00683F;
-    --keepit-primary-25: #00683e34;
+
+    /* Tints (heller) */
+    --keepit-primary-50:  #80b49f;
+    --keepit-primary-100: #99c3b2;
+    --keepit-primary-200: #b3d2c6;
+    --keepit-primary-300: #cce1d9;
+    --keepit-primary-400: #e6f0ec;
+
+    /* Shades (dunkler) */
+    --keepit-primary-600: #005435;
+    --keepit-primary-700: #003f27;
+    --keepit-primary-800: #002a1a;
+    --keepit-primary-900: #00150d;
+
+    /* Alpha */
+    --keepit-primary-a5:  color-mix(in srgb, #00683F 5%,  transparent);
+    --keepit-primary-a10: color-mix(in srgb, #00683F 10%, transparent);
+    --keepit-primary-a15: color-mix(in srgb, #00683F 15%, transparent);
+    --keepit-primary-a20: color-mix(in srgb, #00683F 20%, transparent);
+    --keepit-primary-a25: color-mix(in srgb, #00683F 25%, transparent);
+    --keepit-primary-a30: color-mix(in srgb, #00683F 30%, transparent);
+    --keepit-primary-a40: color-mix(in srgb, #00683F 40%, transparent);
+    --keepit-primary-a50: color-mix(in srgb, #00683F 50%, transparent);
+    --keepit-primary-a60: color-mix(in srgb, #00683F 60%, transparent);
+    --keepit-primary-a70: color-mix(in srgb, #00683F 70%, transparent);
+    --keepit-primary-a80: color-mix(in srgb, #00683F 80%, transparent);
+    --keepit-primary-a90: color-mix(in srgb, #00683F 90%, transparent);
 }
 
 * {

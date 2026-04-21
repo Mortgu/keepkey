@@ -149,11 +149,6 @@ export const createOrder = async (request: Request, response: Response, next: Ne
             });
         }
 
-        /* Clear Shopping Card */
-        await prisma.shoppingCart.deleteMany({
-            where: { customerId: customer.id }
-        });
-
         return order;
     });
 
