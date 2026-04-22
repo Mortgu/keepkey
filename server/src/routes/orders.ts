@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
-import { getOrderById, getSessionOrders } from "../controllers/orderController.js";
+import { getOrderById, getSessionOrders, getOrderDocumentJobs } from "../controllers/orderController.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 const router = Router();
@@ -11,6 +11,8 @@ const router = Router();
 router.get('/', requireSession, getSessionOrders);
 
 router.get('/:orderId', getOrderById);
+
+router.get('/:orderId/documents', requireSession, getOrderDocumentJobs);
 
 router.delete('/:id', requireSession, async (request: Request, response: Response) => {
     const { id } = request.params;

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { generateOfferPdf } from "../utils/generation/document-generator.js";
+import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 /*
  * Get all orders
@@ -23,7 +23,7 @@ export const getAllOrders = async (request: Request, response: Response, next: N
 }
 
 /*
- * [GET] http://localhost:3000/api/orders/:oderId
+ * [GET] http://localhost:3000/api/orders/:orderId
  */
 export const getOrderById = async (request: Request, response: Response, next: NextFunction) => {
     const { orderId } = request.params;
@@ -57,13 +57,13 @@ export const getSessionOrders = async (request: Request, response: Response, nex
         });
     }
 
-    const customer = await prisma.customer.findUnique({ where: { userId: user.id } });
-    if (!customer) {
+    const userRecord = await prisma.user.findUnique({ where: { id: user.id } });
+    if (!userRecord?.customerId) {
         return response.status(200).json([]);
     }
 
     const orders = await prisma.order.findMany({
-        where: { customerId: customer.id },
+        where: { customerId: userRecord.customerId },
         orderBy: { createdAt: 'desc' },
         include: {
             customer: true,
@@ -77,6 +77,21 @@ export const getSessionOrders = async (request: Request, response: Response, nex
     });
 
     return response.status(200).json(orders);
+}
+
+/*
+ * Get document jobs for an order
+ * [GET] http://localhost:3000/api/orders/:orderId/documents
+ */
+export const getOrderDocumentJobs = async (request: Request, response: Response) => {
+    const { orderId } = request.params;
+
+    const jobs = await prisma.documentJob.findMany({
+        where: { orderId: orderId as string },
+        orderBy: { createdAt: 'desc' },
+    });
+
+    return response.status(200).json(jobs);
 }
 
 /*
@@ -98,21 +113,16 @@ export const createOrder = async (request: Request, response: Response, next: Ne
         });
     }
 
-    const customer = await prisma.customer.findUnique({
-        where: { userId: user!.id }
-    });
-
-    if (!customer) {
+    const userRecord = await prisma.user.findUnique({ where: { id: user!.id } });
+    if (!userRecord?.customerId) {
         return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
     }
 
     const createdOrder = await prisma.$transaction(async (tx) => {
-        /* Create Order */
         const order = await tx.order.create({
-            data: { customerId: customer.id },
+            data: { customerId: userRecord.customerId! },
         });
 
-        /* Create Order Positions */
         for (const item of body) {
             await tx.orderPosition.create({
                 data: {
@@ -129,13 +139,28 @@ export const createOrder = async (request: Request, response: Response, next: Ne
         return order;
     });
 
-    /* Return if failed */
     if (!createdOrder) {
         return response.status(500).json({
             success: false, message: "Failed to create Order!",
         });
     }
 
-    /* Order successfull => Generate Documents */
+    const documentJob = await prisma.documentJob.create({
+        data: {
+            orderId: createdOrder.id,
+            type: 'invoice',
+            status: 'pending',
+        }
+    });
 
+    const job = await documentQueue.add(documentQueueKey, {
+        documentJobId: documentJob.id, type: 'invoice'
+    });
+
+    await prisma.documentJob.update({
+        where: { id: documentJob.id },
+        data: { jobId: job.id }
+    });
+
+    return response.status(200).json(createdOrder);
 }

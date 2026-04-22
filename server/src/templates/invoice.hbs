@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: Arial, sans-serif; font-size: 11pt; color: #1a1a1a; }
+
+  .header { display: flex; justify-content: space-between; margin-bottom: 32px; }
+  .company-logo { font-size: 18pt; font-weight: bold; color: #1a3a6b; }
+  .doc-meta { text-align: right; }
+  .doc-meta h1 { font-size: 16pt; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: #1a3a6b; }
+  .doc-meta table { margin-top: 8px; margin-left: auto; }
+  .doc-meta td { padding: 2px 6px; }
+  .doc-meta td:first-child { color: #555; }
+  .doc-meta td:last-child { font-weight: 500; }
+
+  .recipient { margin: 24px 0 32px; }
+  .recipient p { line-height: 1.6; }
+
+  table.positions {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+  }
+  table.positions th {
+    background: #1a3a6b;
+    color: white;
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 10pt;
+  }
+  table.positions th.right,
+  table.positions td.right { text-align: right; }
+  table.positions td {
+    padding: 7px 10px;
+    border-bottom: 1px solid #e0e0e0;
+    font-size: 10pt;
+  }
+  table.positions tr:nth-child(even) td { background: #f7f9fc; }
+
+  .total-row td {
+    border-top: 2px solid #1a3a6b;
+    font-weight: bold;
+    padding: 10px;
+    font-size: 11pt;
+  }
+
+  .footer { margin-top: 40px; font-size: 9pt; color: #888; border-top: 1px solid #ddd; padding-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="company-logo">dignum GmbH</div>
+  <div class="doc-meta">
+    <h1>Rechnung</h1>
+    <table>
+      <tr><td>Auftrags-Nr.:</td><td>{{orderId}}</td></tr>
+      <tr><td>Datum:</td><td>{{date}}</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="recipient">
+  <p><strong>{{companyName}}</strong></p>
+  <p>{{contactFull}}</p>
+  <p>{{street}}</p>
+  <p>{{plzCity}}</p>
+</div>
+
+<table class="positions">
+  <thead>
+    <tr>
+      <th>Pos.</th>
+      <th>Produkt</th>
+      <th>Vertrag</th>
+      <th>Laufzeit</th>
+      <th class="right">Menge</th>
+      <th class="right">Einzelpreis</th>
+      <th class="right">Gesamt</th>
+    </tr>
+  </thead>
+  <tbody>
+    {{#each positions}}
+    <tr>
+      <td>{{pos}}</td>
+      <td>{{productName}}</td>
+      <td>{{contractName}}</td>
+      <td>{{duration}} Mon.</td>
+      <td class="right">{{quantity}}</td>
+      <td class="right">{{priceAtPurchase}}</td>
+      <td class="right">{{lineTotal}}</td>
+    </tr>
+    {{/each}}
+    <tr class="total-row">
+      <td colspan="6" class="right">Summe Netto</td>
+      <td class="right">{{totalSum}}</td>
+    </tr>
+  </tbody>
+</table>
+
+<p style="font-size:9pt;color:#555;margin-top:8px;">Alle Preise in EUR, zzgl. gesetzlicher MwSt.</p>
+
+<div class="footer">
+  dignum GmbH &bull; Peterhofstr. 5 &bull; 86438 Kissing &bull; Germany
+</div>
+
+</body>
+</html>

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import { calculatePrice } from "../utils/products.js";
-import { generateOfferPdf } from "../utils/generation/document-generator.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 export const getOffers = async (request: Request, response: Response) => {

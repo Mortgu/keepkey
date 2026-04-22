@@ -1,37 +1,61 @@
-import { Order, Product, User } from "@prisma/client";
+import { Product } from "@prisma/client";
 
-export interface OfferData {
+export interface OfferPositionTemplateData {
+    pos: number;
+    productName: string;
+    contractName: string;
+    duration: number;
+    quantity: number;
+    pricePerUnit: string;
+    price12: string;
+    price36: string;
+    totalPrice: string;
+}
+
+export interface OfferTemplateData {
     companyName: string;
-    customer: {
-        salutation: string;
-        firstName: string;
-        lastName: string;
-    };
+    contactFull: string;
     street: string;
     plzCity: string;
 
-    paymentTerm: string;
+    voucherId: string;
+    date: string;
     validUntil: string;
-    customerId: string;
-    suplirId: string;
-    requestDate: string;
-    employee: {
-        salutation: string;
-        firstName: string;
-        lastName: string;
-    };
+    requestFrom: string;
+    paymentTerm: string;
 
-    order: {
-        invoiceNumber: string;
-    };
+    customerContactPerson: string;
+    contactPerson: string;
 
+    positions: OfferPositionTemplateData[];
+    totalSum: string;
+}
+
+export interface InvoicePositionTemplateData {
+    pos: number;
+    productName: string;
+    contractName: string;
+    duration: number;
+    quantity: number;
+    priceAtPurchase: string;
+    lineTotal: string;
+}
+
+export interface InvoiceTemplateData {
+    companyName: string;
+    contactFull: string;
+    street: string;
+    plzCity: string;
+
+    orderId: string;
     date: string;
 
-    products: string;
-};
+    positions: InvoicePositionTemplateData[];
+    totalSum: string;
+}
 
 export interface ShoppingCart {
-    id: string,
-    total: number,
-    products: Product[],
+    id: string;
+    total: number;
+    products: Product[];
 }
