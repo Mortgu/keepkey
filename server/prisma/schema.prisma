@@ -29,6 +29,7 @@ model User {
   customer       Customer? @relation(fields: [customerId], references: [id])
   customerId     String?
   offers         Offer[]
+  orders         Order[]
 
   @@map("user")
 }
@@ -233,6 +234,9 @@ model Order {
 
   customer   Customer @relation("CustomerRelation", fields: [customerId], references: [id], onDelete: Restrict)
   customerId String
+
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
   orderPositions OrderPosition[]
   documentJobs   DocumentJob[]

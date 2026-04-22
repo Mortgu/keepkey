@@ -1,37 +1,61 @@
 import { Product } from "@prisma/client";
 
-export interface OfferPositionTemplateData {
-    pos: number;
-    label: string;
-    productName: string;
-    contractName: string;
-    features: string[];
-    duration: number;
-    quantity: number;
-    pricePerUnit: string;
-    totalPrice: string;
+/*  */
+export interface OfferTemplateData {
+    voucherId: string;      // "Beleg-Nr."
+    date: string;             // "Datum"
+    paymentTerm: string;    // "Zahlungsbedingung:"
+    validUntil: string;       // "Angebot gültig bis:"
+    requestFrom: string;      // "Ihre Anfrage vom:"
+    supplierId: string;     // "Lieferantennummer"
+
+    customer: TemplateData_Customer;
+    employee: TemplateData_Employee;
+
+    products: TemplateData_Products;
 }
 
-export interface OfferTemplateData {
+export interface TemplateData_Customer {
+    id: string;             // "Kunden-Nr."
     companyName: string;
-    contactFull: string;
     street: string;
-    plzCity: string;
+    plz: string;
+    city: string;
 
-    products: string;
+    salutation: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+}
 
-    voucherId: string;
-    date: string;
-    validUntil: string;
-    requestFrom: string;
-    paymentTerm: string;
+export interface TemplateData_Employee {
+    salutation: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    email: string;
+}
 
-    customerContactPerson: string;
-    contactPerson: string;
+export interface TemplateData_Products {
+    names: string;
+    positions: TemplateData_ProductPosition[];
+}
 
-    hasOptionalPositions: boolean;
-    positions: OfferPositionTemplateData[];
-    totalSum: string;
+export interface TemplateData_ProductPosition {
+    name: string;
+    description: string;
+    duration: string;
+    quantity: string;
+    contract: TemplateData_Contract;
+    pricePerUnit: string;
+    totalPrice: string;
+    optional: boolean;
+}
+
+export interface TemplateData_Contract {
+    name: string;
+    features: string;
 }
 
 export interface InvoicePositionTemplateData {

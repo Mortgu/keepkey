@@ -19,7 +19,7 @@ export async function generateOffer(offerId: string, jobId: string): Promise<{ p
     const data = await getOfferTemplateData(offerId);
     const outDir = await ensureOutputDir(jobId);
 
-    const docx = await renderDocx(path.join(TEMPLATES_DIR, "offer.docx"), data as unknown as Record<string, unknown>);
+    const docx = await renderDocx(path.join(TEMPLATES_DIR, "offer.docx"), data);
     const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "angebot.pdf");
@@ -37,7 +37,7 @@ export async function generateInvoice(orderId: string, jobId: string): Promise<{
     const data = await getInvoiceTemplateData(orderId);
     const outDir = await ensureOutputDir(jobId);
 
-    const docx = await renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data as unknown as Record<string, unknown>);
+    const docx = await renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data);
     const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "rechnung.pdf");

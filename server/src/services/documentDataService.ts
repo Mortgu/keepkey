@@ -1,6 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { formatDate } from "../utils/utils.js";
-import { InvoiceTemplateData, OfferTemplateData } from "../utils/generation/types.js";
+import { InvoiceTemplateData, OfferTemplateData, TemplateData_ProductPosition } from "../utils/generation/types.js";
 
 function formatEur(value: number): string {
     return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
@@ -44,19 +44,21 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
 
     const hasOptionalPositions = offer.offerPositions.some(p => p.optional);
 
-    const positions = offer.offerPositions.map((pos, index) => {
+    const products = offer.offerPositions.map((pos, index): TemplateData_ProductPosition => {
         const pricePerUnit = pos.totalPrice / pos.quantity;
 
         return {
-            pos: index + 1,
-            label: hasOptionalPositions ? positionLabel(index) : "",
-            productName: pos.product.name,
-            contractName: pos.contract.name,
-            features: CONTRACT_FEATURES[pos.contract.name] ?? [],
-            duration: pos.duration,
-            quantity: pos.quantity,
+            name: pos.product.name || '{product.name}',
+            description: pos.product.description || '{product.description}',
+            duration: String(pos.duration) || '{product.duration}',
+            quantity: String(pos.quantity) || '{product.quantity}',
+            contract: {
+                name: pos.contract.name || '{product.contract.name}',
+                features: "{product.contract.features}",
+            },
             pricePerUnit: formatEur(pricePerUnit),
             totalPrice: formatEur(pos.totalPrice),
+            optional: pos.optional || false
         };
     });
 
@@ -64,33 +66,48 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
     const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
 
     return {
-        companyName: customer.companyName,
-        contactFull: `${customerContactPerson.salutation} ${customerContactPerson.firstName} ${customerContactPerson.lastName}`,
-        street: customer.street ?? "",
-        plzCity: `${customer.plz ?? ""} ${customer.city ?? ""}`.trim(),
+        voucherId: offer.voucherId || '{voucherId}',
+        date: formatDate(offer.date) || '{date}',
+        paymentTerm: offer.paymentTerm || '{paymentTerm}',
+        validUntil: formatDate(offer.validUntil) || '{validUntil}',
+        requestFrom: formatDate(offer.requestFrom) || '{requestFrom}',
+        supplierId: offer.supplierId.slice(0, 8) || '{supplierId}',
 
-        products: allProducts,
+        customer: {
+            id: customer.customerId || '{customer.id}',
+            companyName: customer.companyName || '{customer.companyName}',
+            street: customer.street || '{customer.street}',
+            plz: customer.plz || '{customer.plz}',
+            city: customer.city || '{customer.city}',
 
-        voucherId: offer.voucherId,
-        date: formatDate(offer.date),
-        validUntil: formatDate(offer.validUntil),
-        requestFrom: formatDate(offer.requestFrom),
-        paymentTerm: offer.paymentTerm,
+            salutation: customerContactPerson.salutation || '{customer.salutation}',
+            firstName: customerContactPerson.firstName || '{customer.firstName}',
+            lastName: customerContactPerson.lastName || '{customer.lastName}',
+            phone: customer.phone || '{customer.phone}',
+            email: customer.email || '{customer.email}',
+        },
 
-        customerContactPerson: `${customerContactPerson.salutation} ${customerContactPerson.lastName}`,
-        contactPerson: `${user.salutation} ${user.firstName} ${user.lastName}`,
+        employee: {
+            salutation: user.salutation || '{employee.salutation}',
+            firstName: user.firstName || '{employee.firstName}',
+            lastName: user.lastName || '{employee.lastName}',
+            phone: '',
+            email: user.email || '{employee.email}',
+        },
 
-        hasOptionalPositions,
-        positions,
-        totalSum: formatEur(totalSum),
+        products: {
+            names: products.map(p => p.name).join(" & "),
+            positions: products,
+        }
     };
 }
 
-export async function getInvoiceTemplateData(orderId: string): Promise<InvoiceTemplateData> {
+export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemplateData> {
     const order = await prisma.order.findUniqueOrThrow({
         where: { id: orderId },
         include: {
             customer: true,
+            user: true,
             orderPositions: {
                 include: {
                     product: true,
@@ -100,22 +117,26 @@ export async function getInvoiceTemplateData(orderId: string): Promise<InvoiceTe
         }
     });
 
-    const { customer } = order;
+    const { customer, user } = order;
 
     const contactPerson = await prisma.contactPerson.findFirst({
         where: { customerId: customer.id }
     });
 
-    const positions = order.orderPositions.map((pos, index) => {
+    const products = order.orderPositions.map((pos, index) => {
         const lineTotal = pos.priceAtPurchase * pos.quantity;
         return {
-            pos: index + 1,
-            productName: pos.product.name,
-            contractName: pos.contract.name,
-            duration: pos.duration,
-            quantity: pos.quantity,
-            priceAtPurchase: formatEur(pos.priceAtPurchase),
-            lineTotal: formatEur(lineTotal),
+            name: pos.product.name || '{product.name}',
+            description: pos.product.description || '{product.description}',
+            duration: String(pos.duration) || '{product.duration}',
+            quantity: String(pos.quantity) || '{product.quantity}',
+            contract: {
+                name: pos.contract.name || '{product.contract.name}',
+                features: "{product.contract.features}",
+            },
+            pricePerUnit: formatEur(lineTotal),
+            totalPrice: formatEur(lineTotal),
+            optional: false,
         };
     });
 
@@ -126,15 +147,38 @@ export async function getInvoiceTemplateData(orderId: string): Promise<InvoiceTe
         : "";
 
     return {
-        companyName: customer.companyName,
-        contactFull,
-        street: customer.street ?? "",
-        plzCity: `${customer.plz ?? ""} ${customer.city ?? ""}`.trim(),
+        voucherId: '{voucherId}',
+        date: '{date}',
+        paymentTerm: '{paymentTerm}',
+        validUntil: '{validUntil}',
+        requestFrom: '{requestFrom}',
+        supplierId: '{supplierId}',
 
-        orderId: order.id,
-        date: formatDate(order.createdAt ?? new Date()),
+        customer: {
+            id: customer.customerId || '{customer.id}',
+            companyName: customer.companyName || '{customer.companyName}',
+            street: customer.street || '{customer.street}',
+            plz: customer.plz || '{customer.plz}',
+            city: customer.city || '{customer.city}',
 
-        positions,
-        totalSum: formatEur(totalSum),
+            salutation: '{customer.salutation}',
+            firstName: '{customer.firstName}',
+            lastName: '{customer.lastName}',
+            phone: customer.phone || '{customer.phone}',
+            email: customer.email || '{customer.email}',
+        },
+
+        employee: {
+            salutation: user.salutation || '{employee.salutation}',
+            firstName: user.firstName || '{employee.firstName}',
+            lastName: user.lastName || '{employee.lastName}',
+            phone: '',
+            email: user.email || '{employee.email}',
+        },
+
+        products: {
+            names: "",
+            positions: products,
+        }
     };
 }
