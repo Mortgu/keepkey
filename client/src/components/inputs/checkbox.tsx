@@ -2,12 +2,13 @@ import { type InputHTMLAttributes, forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 
 interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
+    eerror?: string;
     label?: string;
 }
 
 const styles = tv({
     base: [
-        'w-5 h-5 rounded border-2 cursor-pointer accent-[var(--keepit-primary)]',
+        'w-4 h-4 aspect-squere rounded-md border border-gray-100 cursor-pointer accent-[var(--keepit-primary)]',
         'transition-all duration-200 outline-none',
         'disabled:opacity-50 disabled:cursor-not-allowed',
         'focus:ring-2 focus:ring-[var(--keepit-primary-25)] focus:ring-offset-1',

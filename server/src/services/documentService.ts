@@ -1,8 +1,8 @@
 import path from "path";
 import fs from "fs/promises";
 import { fileURLToPath } from "url";
-import { renderPdf } from "../utils/generation/renderers/pdfRenderer.js";
 import { renderDocx } from "../utils/generation/renderers/docxRenderer.js";
+import { convertDocxToPdf } from "../utils/generation/renderers/docxToPdfConverter.js";
 import { getOfferTemplateData, getInvoiceTemplateData } from "./documentDataService.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -19,10 +19,8 @@ export async function generateOffer(offerId: string, jobId: string): Promise<{ p
     const data = await getOfferTemplateData(offerId);
     const outDir = await ensureOutputDir(jobId);
 
-    const [pdf, docx] = await Promise.all([
-        renderPdf(path.join(TEMPLATES_DIR, "offer.hbs"), data as unknown as Record<string, unknown>),
-        renderDocx(path.join(TEMPLATES_DIR, "offer.docx"), data as unknown as Record<string, unknown>),
-    ]);
+    const docx = await renderDocx(path.join(TEMPLATES_DIR, "offer.docx"), data as unknown as Record<string, unknown>);
+    const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "angebot.pdf");
     const docxPath = path.join(outDir, "angebot.docx");
@@ -39,10 +37,8 @@ export async function generateInvoice(orderId: string, jobId: string): Promise<{
     const data = await getInvoiceTemplateData(orderId);
     const outDir = await ensureOutputDir(jobId);
 
-    const [pdf, docx] = await Promise.all([
-        renderPdf(path.join(TEMPLATES_DIR, "invoice.hbs"), data as unknown as Record<string, unknown>),
-        renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data as unknown as Record<string, unknown>),
-    ]);
+    const docx = await renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data as unknown as Record<string, unknown>);
+    const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "rechnung.pdf");
     const docxPath = path.join(outDir, "rechnung.docx");

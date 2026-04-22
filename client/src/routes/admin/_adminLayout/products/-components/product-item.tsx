@@ -95,15 +95,15 @@ export default function ProductItem(product: ProductItemProps) {
         <div className='border border-gray-300 rounded-md overflow-hidden'>
 
             {/* Product Header */}
-            <div className='flex items-center justify-between p-2'>
+            <div className='flex items-center justify-between p-2 gap-4'>
                 <div className="grid items-center">
                     <p className="text-md">{product.name}</p>
                     <p className="text-sm text-gray-600">{product.description}</p>
                 </div>
 
-                <div>
+                <div className="min-w-fit">
                     {/* Publish Product Button */}
-                    <Button onClick={handlePublication} variant="ghost" size='sm' className="mr-4">
+                    <Button onClick={handlePublication} variant="secondary" size='sm' className="mr-4">
                         {product.published && (
                             <>
                                 <BadgeCheck className="size-4" />

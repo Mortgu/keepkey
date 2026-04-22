@@ -1,4 +1,5 @@
 import Button from '@/components/button/button';
+import Checkbox from '@/components/inputs/checkbox';
 import Input from '@/components/inputs/input';
 import type { Contract, ProductItem } from '@/data/types';
 import { useState } from 'react';
@@ -8,6 +9,7 @@ export type OfferProductInput = {
     contractId: string;
     duration: 1 | 2 | 3;
     quantity: number;
+    optional: boolean;
 };
 
 const DURATIONS: { value: 1 | 2 | 3; label: string }[] = [
@@ -28,13 +30,14 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
     const [contractId, setContractId] = useState(contracts[0]?.id ?? '');
     const [duration, setDuration] = useState<OfferProductInput['duration']>(1);
     const [quantity, setQuantity] = useState(1);
+    const [optional, setOptional] = useState<boolean>(false);
     const [error, setError] = useState('');
 
     const handleSave = () => {
         if (!productId) { setError('Bitte ein Produkt auswählen.'); return; }
         if (!contractId) { setError('Bitte einen Vertrag auswählen.'); return; }
         if (quantity < 1) { setError('Menge muss mindestens 1 sein.'); return; }
-        onSave({ productId, contractId, duration, quantity });
+        onSave({ productId, contractId, duration, quantity, optional });
     };
 
     const selectClass = 'w-full rounded-lg border border-gray-200 bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100';
@@ -82,9 +85,12 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
 
             {error && <p className='text-sm text-red-400'>{error}</p>}
 
-            <div className='flex gap-2 ml-auto'>
-                <Button type='button' variant='secondary' size='sm' onClick={onCancel}>Abbrechen</Button>
-                <Button type='button' size='sm' onClick={handleSave}>Hinzufügen</Button>
+            <div className='flex items-center justify-between gap-2'>
+                <Checkbox label="Optional?" onChange={(e) => setOptional(!optional)} />
+                <div className='flex gap-2'>
+                    <Button type='button' variant='secondary' size='sm' onClick={onCancel}>Abbrechen</Button>
+                    <Button type='button' size='sm' onClick={handleSave}>Hinzufügen</Button>
+                </div>
             </div>
         </div>
     );

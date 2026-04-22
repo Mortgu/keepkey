@@ -6,6 +6,24 @@ function formatEur(value: number): string {
     return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
 }
 
+const CONTRACT_FEATURES: Record<string, string[]> = {
+    "Business Essentials": [
+        "Datenaufbewahrung / max. Retention: 1 Jahr",
+        "9*5 Support (Business Hours) über Chat & eMail",
+    ],
+    "Enterprise Unlimited": [
+        "Datenaufbewahrung / max. Retention: unlimitiert (>99 Jahre)",
+        "API-Unterstützung für Integration von Drittanbietern",
+        "Individuelles RBAC (individuelle Anpassung von Rollen & Rechten)",
+        "24*7 Support über Telefon, Chat & eMail",
+        "Persönlicher Customer Success Manager",
+    ],
+};
+
+function positionLabel(index: number): string {
+    return `${String.fromCharCode(65 + index)})`;
+}
+
 export async function getOfferTemplateData(offerId: string): Promise<OfferTemplateData> {
     const offer = await prisma.offer.findUniqueOrThrow({
         where: { id: offerId },
@@ -24,24 +42,25 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
 
     const { customer, customerContactPerson, user } = offer;
 
+    const hasOptionalPositions = offer.offerPositions.some(p => p.optional);
+
     const positions = offer.offerPositions.map((pos, index) => {
         const pricePerUnit = pos.totalPrice / pos.quantity;
-        const price12 = pricePerUnit * pos.quantity * 12;
-        const price36 = pricePerUnit * pos.quantity * 36;
 
         return {
             pos: index + 1,
+            label: hasOptionalPositions ? positionLabel(index) : "",
             productName: pos.product.name,
             contractName: pos.contract.name,
+            features: CONTRACT_FEATURES[pos.contract.name] ?? [],
             duration: pos.duration,
             quantity: pos.quantity,
             pricePerUnit: formatEur(pricePerUnit),
-            price12: formatEur(price12),
-            price36: formatEur(price36),
             totalPrice: formatEur(pos.totalPrice),
         };
     });
 
+    const allProducts = offer.offerPositions.map(i => i.product.name).join(" & ");
     const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
 
     return {
@@ -49,6 +68,8 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         contactFull: `${customerContactPerson.salutation} ${customerContactPerson.firstName} ${customerContactPerson.lastName}`,
         street: customer.street ?? "",
         plzCity: `${customer.plz ?? ""} ${customer.city ?? ""}`.trim(),
+
+        products: allProducts,
 
         voucherId: offer.voucherId,
         date: formatDate(offer.date),
@@ -59,6 +80,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         customerContactPerson: `${customerContactPerson.salutation} ${customerContactPerson.lastName}`,
         contactPerson: `${user.salutation} ${user.firstName} ${user.lastName}`,
 
+        hasOptionalPositions,
         positions,
         totalSum: formatEur(totalSum),
     };

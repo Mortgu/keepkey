@@ -2,13 +2,13 @@ import { Product } from "@prisma/client";
 
 export interface OfferPositionTemplateData {
     pos: number;
+    label: string;
     productName: string;
     contractName: string;
+    features: string[];
     duration: number;
     quantity: number;
     pricePerUnit: string;
-    price12: string;
-    price36: string;
     totalPrice: string;
 }
 
@@ -17,6 +17,8 @@ export interface OfferTemplateData {
     contactFull: string;
     street: string;
     plzCity: string;
+
+    products: string;
 
     voucherId: string;
     date: string;
@@ -27,6 +29,7 @@ export interface OfferTemplateData {
     customerContactPerson: string;
     contactPerson: string;
 
+    hasOptionalPositions: boolean;
     positions: OfferPositionTemplateData[];
     totalSum: string;
 }
