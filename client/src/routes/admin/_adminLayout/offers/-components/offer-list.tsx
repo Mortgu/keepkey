@@ -71,6 +71,7 @@ export default function OfferList() {
 
                         {/* Dokumente */}
                         <div className='flex items-center gap-2 px-3 py-2 bg-gray-50 border-t border-gray-200'>
+
                             <Button variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
                                 DOCX
                             </Button>

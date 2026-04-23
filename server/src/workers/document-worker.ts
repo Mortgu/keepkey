@@ -29,6 +29,10 @@ export default function startDocumentWorker() {
             throw new Error(`Unknown document type "${type}" or missing reference ID`);
         }
 
+        await prisma.documentJob.update({
+            where: { id: documentJobId },
+            data: { status: 'completed' },
+        });
 
     }, { connection, concurrency: 2 });
 
@@ -36,10 +40,7 @@ export default function startDocumentWorker() {
         console.log(`[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`);
 
         if (job) {
-            await prisma.documentJob.update({
-                where: { id: job.id },
-                data: { status: 'completed' },
-            });
+
         }
     });
 
