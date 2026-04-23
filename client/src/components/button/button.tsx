@@ -43,7 +43,10 @@ const styles = tv({
             ]
         },
         active: {
-            true: "text-(--primary)",
+            true: [
+                "bg-(--primary-600) text-white border-(--primary-600)",
+                "hover:bg-(--primary-800)"
+            ],
             false: ""
         },
         danger: {

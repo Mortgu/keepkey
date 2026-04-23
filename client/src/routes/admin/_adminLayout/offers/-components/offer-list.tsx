@@ -4,18 +4,26 @@ import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useOffer } from "@/hooks/offer";
 import type { Offer, OfferPosition } from "@/data/types";
-import { SortDropdown } from "@/components/filters";
+import { FilterChip, FilterTabBar, SingleDropdown, SortDropdown } from "@/components/filters";
 
-const options = [
+const sort_options = [
     { value: 'date-desc', label: 'Date – newest first' },
     { value: 'date-asc', label: 'Date – oldest first' },
     { value: 'name-asc', label: 'Name – A to Z' },
     { value: 'name-desc', label: 'Name – Z to A' },
 ];
 
+const STATUS_TABS = [
+    { value: 'all', label: 'All' },
+    { value: 'generated', label: 'Generated' },
+    { value: 'pending', label: 'Pending' },
+    { value: 'failed', label: 'Failed' },
+];
+
 export default function OfferList() {
     const [isOpen, setOpen] = useState<boolean>(false);
-    const [sort, setSort] = useState<string>(options[0].value);
+    const [sort, setSort] = useState<string>(sort_options[0].value);
+    const [selectedStatus, setSelectedStatus] = useState<string>(STATUS_TABS[0].value);
 
     const { offers, deleteOffer } = useOffer();
 
@@ -40,11 +48,21 @@ export default function OfferList() {
     }
 
     return (
-        <div className="">
-            <div className='mb-4 flex items-center justify-between'>
+        <div className="grid gap-4">
+            <div className='flex items-center justify-between'>
                 <h1 className='text-2xl font-medium'>Angebote</h1>
+
+            </div>
+
+            <div className="flex justify-between items-center">
+                <div className="w-full flex items-center gap-4">
+                    <FilterTabBar tabs={STATUS_TABS} value={selectedStatus} onChange={setSelectedStatus}>
+                    </FilterTabBar>
+                    <SortDropdown value={sort} onChange={setSort} options={sort_options} />
+
+                </div>
+
                 <div className="flex items-center gap-2">
-                    <SortDropdown value={sort} onChange={setSort} options={options} />
                     <Button onClick={() => setOpen(true)} size='sm'>Erstellen <Plus className='size-4' /></Button>
                 </div>
             </div>
