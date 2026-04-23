@@ -24,7 +24,7 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
                     <div className="border p-1 w-full rounded-md border-gray-300">
                         <ul>
                             {contract.features.map(i => (
-                                <li className="text-gray-700 list-disc ml-5">{i}</li>
+                                <li key={i} className="text-gray-700 list-disc ml-5">{i}</li>
                             ))}
                         </ul>
                     </div>

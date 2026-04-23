@@ -155,6 +155,11 @@ export const createOrder = async (request: Request, response: Response, next: Ne
 
     const job = await documentQueue.add(documentQueueKey, {
         documentJobId: documentJob.id, type: 'invoice'
+    }, {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
+        removeOnComplete: 100,
+        removeOnFail: 200,
     });
 
     await prisma.documentJob.update({

@@ -1,7 +1,9 @@
 import { Queue } from "bullmq";
+import { Redis as IORedis } from "ioredis";
 
-/* BullMQ redis connection */
-export const connection = { host: 'localhost', port: 6379 };
+export const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+  maxRetriesPerRequest: null,
+});
 
 /* Definiert die Queue für die Dokumenten generierung */
 export const documentQueueKey = 'document-generation'

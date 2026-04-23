@@ -29,7 +29,14 @@ app.use('/api', router);
 app.use(errorHandler);
 
 // Start document generation worker
-startDocumentWorker();
+const documentWorker = startDocumentWorker();
+
+const shutdown = async () => {
+    await documentWorker.close();
+    process.exit(0);
+};
+process.on('SIGTERM', shutdown);
+process.on('SIGINT', shutdown);
 
 app.listen(config.port, () => {
     console.log(`Server is listening on port ${config.port}`);

@@ -1,15 +1,15 @@
-/*
- * Diese Datei stellt den BullMQ Worker für die generierung der Dokumente
- * bereit.
- */
-
-import { Job, Worker } from "bullmq";
+import { Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
 import { generateOffer, generateInvoice } from "../services/documentService.js";
 
+interface DocumentJobData {
+    documentJobId: string;
+    type: 'offer' | 'invoice';
+}
+
 export default function startDocumentWorker() {
-    const documentWorker = new Worker(documentQueueKey, async (job: Job) => {
+    const worker = new Worker<DocumentJobData>(documentQueueKey, async (job) => {
         const { documentJobId, type } = job.data;
 
         await prisma.documentJob.update({
@@ -18,7 +18,7 @@ export default function startDocumentWorker() {
         });
 
         const documentJob = await prisma.documentJob.findUniqueOrThrow({
-            where: { id: documentJobId }
+            where: { id: documentJobId },
         });
 
         if (type === 'offer' && documentJob.offerId) {
@@ -29,13 +29,23 @@ export default function startDocumentWorker() {
             throw new Error(`Unknown document type "${type}" or missing reference ID`);
         }
 
-        await prisma.documentJob.update({
-            where: { id: documentJobId },
-            data: { status: 'completed' },
-        });
-    }, { connection });
 
-    documentWorker.on('failed', async (job, err) => {
+    }, { connection, concurrency: 2 });
+
+    worker.on('completed', async (job) => {
+        console.log(`[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`);
+
+        if (job) {
+            await prisma.documentJob.update({
+                where: { id: job.id },
+                data: { status: 'completed' },
+            });
+        }
+    });
+
+    worker.on('failed', async (job, err) => {
+        console.error(`[worker] job ${job?.id} failed:`, err);
+
         if (job) {
             await prisma.documentJob.update({
                 where: { id: job.data.documentJobId },
@@ -44,5 +54,9 @@ export default function startDocumentWorker() {
         }
     });
 
-    return documentWorker;
+    worker.on('stalled', (jobId) => {
+        console.warn(`[worker] job ${jobId} stalled`);
+    });
+
+    return worker;
 }

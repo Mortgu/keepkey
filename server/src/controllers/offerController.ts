@@ -33,6 +33,11 @@ export const createOfferDocumentJob = async (request: Request, response: Respons
 
     const job = await documentQueue.add(documentQueueKey, {
         documentJobId: documentJob.id, type: 'offer'
+    }, {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 },
+        removeOnComplete: 100,
+        removeOnFail: 200,
     });
 
     await prisma.documentJob.update({
