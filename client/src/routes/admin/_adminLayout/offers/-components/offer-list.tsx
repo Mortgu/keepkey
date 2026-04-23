@@ -81,7 +81,7 @@ export default function OfferList() {
                                         <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
                                     </div>
                                     <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                        <span>{ } €</span>
+                                        <span>{ }</span>
                                         <span className='w-20 text-right font-medium text-gray-700'>{pos.totalPrice.toFixed(2)} €</span>
                                     </div>
                                 </div>

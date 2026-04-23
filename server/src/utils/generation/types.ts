@@ -13,6 +13,7 @@ export interface OfferTemplateData {
     employee: TemplateData_Employee;
 
     products: TemplateData_Products;
+    positions: TemplateData_Position[];
 }
 
 export interface TemplateData_Customer {
@@ -43,6 +44,12 @@ export interface TemplateData_Products {
     names: string;
     positions: TemplateData_ProductPosition[];
     hasOptionals: boolean;
+}
+
+export interface TemplateData_Position {
+    contract: TemplateData_Contract;
+    duration: string;
+    products: string;
 }
 
 export interface TemplateData_ProductPosition {

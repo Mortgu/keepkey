@@ -1,27 +1,9 @@
 import { prisma } from "../lib/prisma.js";
 import { formatDate } from "../utils/utils.js";
-import { InvoiceTemplateData, OfferTemplateData, TemplateData_ProductPosition } from "../utils/generation/types.js";
+import { OfferTemplateData, TemplateData_ProductPosition } from "../utils/generation/types.js";
 
 function formatEur(value: number): string {
     return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
-}
-
-const CONTRACT_FEATURES: Record<string, string[]> = {
-    "Business Essentials": [
-        "Datenaufbewahrung / max. Retention: 1 Jahr",
-        "9*5 Support (Business Hours) über Chat & eMail",
-    ],
-    "Enterprise Unlimited": [
-        "Datenaufbewahrung / max. Retention: unlimitiert (>99 Jahre)",
-        "API-Unterstützung für Integration von Drittanbietern",
-        "Individuelles RBAC (individuelle Anpassung von Rollen & Rechten)",
-        "24*7 Support über Telefon, Chat & eMail",
-        "Persönlicher Customer Success Manager",
-    ],
-};
-
-function positionLabel(index: number): string {
-    return `${String.fromCharCode(65 + index)})`;
 }
 
 export async function getOfferTemplateData(offerId: string): Promise<OfferTemplateData> {
@@ -65,6 +47,19 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         };
     });
 
+    const grouped = Object.groupBy(offer.offerPositions, p => `${p.contract.name}_${p.duration}`);
+
+    const positions = Object.values(grouped).map(group => {
+        const first = group![0];
+        return {
+            contract: {
+                name: first.contract.name,
+                features: first.contract.features,
+            },
+            duration: String(first.duration),
+            products: group!.map(p => p.product.name).join(' & '),
+        };
+    });
 
     const allProducts = offer.offerPositions.map(i => i.product.name).join(" & ");
     const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
@@ -105,7 +100,8 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
             names: products.map(p => p.name).join(" & "),
             positions: products,
             hasOptionals: hasOptionalPositions,
-        }
+        },
+        positions,
     };
 }
 
@@ -189,6 +185,7 @@ export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemp
             names: "",
             positions: products,
             hasOptionals: false,
-        }
+        },
+        positions: []
     };
 }
