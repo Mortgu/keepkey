@@ -48,6 +48,8 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
     const products = offer.offerPositions.map((pos, index): TemplateData_ProductPosition => {
         const pricePerUnit = pos.totalPrice / pos.quantity;
 
+        console.log(pos)
+
         return {
             name: pos.product.name || '{product.name}',
             description: pos.product.description || '{product.description}',
@@ -55,7 +57,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
             quantity: String(pos.quantity) || '{product.quantity}',
             contract: {
                 name: pos.contract.name || '{product.contract.name}',
-                features: "{product.contract.features}",
+                features: pos.contract.features || ["NaN"],
             },
             pricePerUnit: formatEur(pricePerUnit),
             totalPrice: formatEur(pos.totalPrice),
@@ -63,7 +65,6 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         };
     });
 
-    console.log(hasOptionalPositions, products)
 
     const allProducts = offer.offerPositions.map(i => i.product.name).join(" & ");
     const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
@@ -138,7 +139,7 @@ export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemp
             quantity: String(pos.quantity) || '{product.quantity}',
             contract: {
                 name: pos.contract.name || '{product.contract.name}',
-                features: "{product.contract.features}",
+                features: ["{product.contract.features}"],
             },
             pricePerUnit: formatEur(lineTotal),
             totalPrice: formatEur(lineTotal),

@@ -58,7 +58,7 @@ export interface TemplateData_ProductPosition {
 
 export interface TemplateData_Contract {
     name: string;
-    features: string;
+    features: string[];
 }
 
 export interface InvoicePositionTemplateData {

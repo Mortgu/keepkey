@@ -202,7 +202,7 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                             <offerForm.Field name="validUntil" children={(field) => (
                                 <div className="flex-1 grid gap-2">
                                     <label className="text-sm text-gray-500" htmlFor="">Angebot gültig bis:</label>
-                                    <Input type="date" input_size="sm" placeholder="Gültig bis..." value={new Date(field.state.value).toISOString().split('T')[0]} />
+                                    <Input type="date" input_size="sm" placeholder="Gültig bis..." value={new Date(field.state.value).toISOString().split('T')[0]} onChange={(e) => field.handleChange(new Date(e.target.value))} />
                                 </div>
                             )} />
 
@@ -210,7 +210,7 @@ export default function OfferModal({ isOpen, onClose }: OfferModalProps) {
                             <offerForm.Field name="requestFrom" children={(field) => (
                                 <div className="flex-1 grid gap-2">
                                     <label className="text-sm text-gray-500" htmlFor="">Ihre Anfrage vom:</label>
-                                    <Input type="date" input_size="sm" placeholder="Ihre Anfrage vom..." value={new Date(field.state.value).toISOString().split('T')[0]} />
+                                    <Input type="date" input_size="sm" placeholder="Ihre Anfrage vom..." value={new Date(field.state.value).toISOString().split('T')[0]} onChange={(e) => field.handleChange(new Date(e.target.value))} />
                                 </div>
                             )} />
                         </div>
