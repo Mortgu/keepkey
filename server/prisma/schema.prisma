@@ -125,9 +125,9 @@ model Offer {
   voucherId   String
   paymentTerm String
 
-  date        DateTime
-  validUntil  DateTime
-  requestFrom DateTime
+  date        DateTime  @default(now())
+  validUntil  DateTime?
+  requestFrom DateTime?
 
   offerPositions OfferPosition[]
   order          Order?

@@ -1,15 +1,35 @@
 import Button from "@/components/button/button";
 import { FileText, Pen, Plus, Trash } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useOffer } from "@/hooks/offer";
 import type { Offer, OfferPosition } from "@/data/types";
+import { SortDropdown } from "@/components/filters";
 
+const options = [
+    { value: 'date-desc', label: 'Date – newest first' },
+    { value: 'date-asc', label: 'Date – oldest first' },
+    { value: 'name-asc', label: 'Name – A to Z' },
+    { value: 'name-desc', label: 'Name – Z to A' },
+];
 
 export default function OfferList() {
     const [isOpen, setOpen] = useState<boolean>(false);
+    const [sort, setSort] = useState<string>(options[0].value);
 
     const { offers, deleteOffer } = useOffer();
+
+    const sortedOffers = useMemo(() => {
+        return [...(offers ?? [])].sort((a, b) => {
+            switch (sort) {
+                case 'date-desc': return new Date(b.date).getTime() - new Date(a.date).getTime();
+                case 'date-asc': return new Date(a.date).getTime() - new Date(b.date).getTime();
+                case 'name-asc': return a.voucherId.localeCompare(b.voucherId);
+                case 'name-desc': return b.voucherId.localeCompare(a.voucherId);
+                default: return 0;
+            }
+        });
+    }, [offers, sort]);
 
     const handleDeleteOffer = (id: string) => {
         if (confirm("Angebot löschen?")) {
@@ -23,15 +43,19 @@ export default function OfferList() {
         <div className="">
             <div className='mb-4 flex items-center justify-between'>
                 <h1 className='text-2xl font-medium'>Angebote</h1>
-                <Button onClick={() => setOpen(true)} size='sm'>Erstellen <Plus className='size-4' /></Button>
+                <div className="flex items-center gap-2">
+                    <SortDropdown value={sort} onChange={setSort} options={options} />
+                    <Button onClick={() => setOpen(true)} size='sm'>Erstellen <Plus className='size-4' /></Button>
+                </div>
             </div>
 
+
             <div className='grid gap-2'>
-                {offers.map((offer: Offer) => (
+                {sortedOffers.map((offer: Offer) => (
                     <div key={offer.id} className='grid border border-(--border) rounded-md overflow-hidden'>
 
                         {/* Header */}
-                        <div className='flex items-center justify-between bg-gray-50 border-(--primary) px-3 py-2'>
+                        <div className='flex items-center justify-between border-b border-(--border) px-3 py-2'>
                             <div className='flex items-center gap-4'>
                                 <div>
                                     <p className='text-base font-medium'>{offer.voucherId}</p>
@@ -70,7 +94,7 @@ export default function OfferList() {
                         </div>
 
                         {/* Dokumente */}
-                        <div className='flex items-center gap-2 px-3 py-2 bg-gray-50 border-t border-(--border)'>
+                        <div className='flex items-center gap-2 px-3 py-2 bg-(--page-bg) border-t border-(--border)'>
 
                             <Button variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
                                 DOCX

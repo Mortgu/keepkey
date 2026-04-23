@@ -1,5 +1,8 @@
 import Button from "@/components/button/button";
 import ModalDialog from "@/components/modal";
+import type { Offer } from "@/data/types";
+import { useOffer } from "@/hooks/offer";
+import { formatDate } from "@/lib/format";
 import { useForm } from "@tanstack/react-form";
 import { Loader } from "lucide-react";
 import { z } from "zod";
@@ -29,21 +32,8 @@ const emptyOrder = {
 };
 
 export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: OrderModalProps) {
-    const orderForm = useForm({
-        defaultValues: currentOrder || emptyOrder,
-        validators: {
-            onChange: orderSchema,
-        },
-        onSubmit: ({ value }) => {
-            submitFn();
-        }
-    });
+    const { offers } = useOffer();
 
-    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        orderForm.handleSubmit();
-    }
 
     return (
         <ModalDialog open={open} cancelFn={cancelFn}>
@@ -51,18 +41,20 @@ export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: O
                 <h1 className="text-lg">Neue Bestellung erstellen</h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
-                <form id="order-form" onSubmit={handleSubmit} className="grid gap-4">
-
-
-                </form>
+                {offers.map((offer: Offer) => (
+                    <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer">
+                        <div className="grid">
+                            <p className="text-(--text)">{offer.voucherId}</p>
+                            <p className="text-(--neutral-400)">{formatDate(offer.date)}</p>
+                        </div>
+                    </div>
+                ))}
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Cancel</Button>
-                <orderForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                    <Button form='order-form' disabled={!canSubmit} type='submit' size='sm'>
-                        {isSubmitting ? <Loader className="size-4" /> : 'Save'}
-                    </Button>
-                )} />
+                <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Abbrechen</Button>
+                <Button form='order-form' type='submit' size='sm'>
+                    Speichern
+                </Button>
             </ModalDialog.Footer>
         </ModalDialog>
     )

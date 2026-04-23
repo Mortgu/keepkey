@@ -137,12 +137,12 @@ export interface BaseOffer {
     voucherId: string;
     date: Date,
     paymentTerm: string;
-    validUntil: Date;
+    validUntil: Date | null;
     customerId: string;
 
     supplierId: string;
 
-    requestFrom: Date;
+    requestFrom: Date | null;
 }
 
 export interface Offer extends BaseOffer {

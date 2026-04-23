@@ -57,7 +57,7 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
                 </h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
-                <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4 p-4">
+                <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4">
 
                     <contractForm.Field name="name" children={(field) => (
                         <div className="grid gap-2">

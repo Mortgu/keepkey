@@ -23,11 +23,11 @@ export const offerSchema = z.object({
     voucherId: z.string().min(1),
     date: z.date(),
     paymentTerm: z.string().min(1),
-    validUntil: z.date(),
+    validUntil: z.date().nullable(),
     customerId: z.string().min(1),
     supplierId: z.string().min(1),
     contactPersonId: z.string().min(1),
-    requestFrom: z.date(),
+    requestFrom: z.date().nullable(),
     userId: z.string().min(1),
 });
 
@@ -40,8 +40,8 @@ const emptyOfferFormVlues = {
 
     date: new Date(),
     paymentTerm: "30 Tage",
-    validUntil: new Date(),
-    requestFrom: new Date(),
+    validUntil: null as Date | null,
+    requestFrom: null as Date | null,
 }
 
 export default function OfferModal({ open, cancelFn }: OfferModalProps) {
@@ -198,7 +198,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                         <offerForm.Field name="validUntil" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <label className="text-sm text-gray-500" htmlFor="">Angebot gültig bis:</label>
-                                <Input type="date" input_size="sm" placeholder="Gültig bis..." value={new Date(field.state.value).toISOString().split('T')[0]} onChange={(e) => field.handleChange(new Date(e.target.value))} />
+                                <Input type="date" input_size="sm" placeholder="Gültig bis..." value={field.state.value ? new Date(field.state.value).toISOString().split('T')[0] : ''} onChange={(e) => field.handleChange(e.target.value ? new Date(e.target.value) : null)} />
                             </div>
                         )} />
 
@@ -206,7 +206,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                         <offerForm.Field name="requestFrom" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <label className="text-sm text-gray-500" htmlFor="">Ihre Anfrage vom:</label>
-                                <Input type="date" input_size="sm" placeholder="Ihre Anfrage vom..." value={new Date(field.state.value).toISOString().split('T')[0]} onChange={(e) => field.handleChange(new Date(e.target.value))} />
+                                <Input type="date" input_size="sm" placeholder="Ihre Anfrage vom..." value={field.state.value ? new Date(field.state.value).toISOString().split('T')[0] : ''} onChange={(e) => field.handleChange(e.target.value ? new Date(e.target.value) : null)} />
                             </div>
                         )} />
                     </div>
