@@ -16,7 +16,9 @@ function RootComponent() {
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
                 <Navigation />
-                <Outlet />
+                <div id="app" className=''>
+                    <Outlet />
+                </div>
             </AuthProvider>
         </QueryClientProvider>
     )

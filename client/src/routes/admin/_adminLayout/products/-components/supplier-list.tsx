@@ -53,7 +53,7 @@ export default function SupplierList() {
             </div>
 
             {suppliers.map((supplier: Supplier, idx: number) => (
-                <div key={idx} className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300">
+                <div key={idx} className="rounded-md flex items-center justify-between gap-4 p-2 border border-(--border)">
                     <div className="grid">
                         <p>{supplier.name}</p>
                         <p className='text-sm text-gray-400'>{supplier.supplierId}</p>
@@ -70,7 +70,7 @@ export default function SupplierList() {
             ))}
 
             {isOpen && (
-                <form onSubmit={handleFormSubmit} className="rounded-md flex gap-2 p-2 border border-gray-300">
+                <form onSubmit={handleFormSubmit} className="rounded-md flex gap-2 p-2 border border-(--border)">
                     <supplierForm.Field name='name' children={(field) => (
                         <Input input_size="sm" id={field.name} name={field.name}
                             value={field.state.value} placeholder="Lieferanten Name" onChange={(e) => field.handleChange(e.target.value)} />

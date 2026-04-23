@@ -15,20 +15,20 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const styles = tv({
     base: [
-        'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg font-medium h-fit',
+        'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-lg h-fit',
         'transition-all duration-200 outline-none',
         'disabled:opacity-50 disabled:cursor-not-allowed ',
     ],
     variants: {
         variant: {
             primary: [
-                'bg-[var(--keepit-primary)] text-white',
+                'bg-(--primary-600) text-white',
                 'hover:opacity-90 active:opacity-80',
-                'focus:ring-2 focus:ring-[var(--keepit-primary-25)]',
+                'focus:ring-2 focus:ring-(--primary-400)',
             ],
             secondary: [
-                'bg-gray-100 text-gray-900',
-                'hover:bg-gray-200 active:bg-gray-300',
+                'bg-white text-gray-900 border border-(--border)',
+                'hover:bg-(--page-bg) active:bg-gray-300',
                 'focus:ring-2 focus:ring-gray-300',
             ],
             ghost: [
@@ -38,12 +38,12 @@ const styles = tv({
             ],
             link: [
                 'bg-transparent text-gray-700 cursor-pointer',
-                'hover:text-(--keepit-primary) active:text-(--keepit-primary)',
+                'hover:text-(--primary) active:text-(--primary)',
                 '',
             ]
         },
         active: {
-            true: "text-(--keepit-primary)",
+            true: "text-(--primary)",
             false: ""
         },
         danger: {
@@ -51,9 +51,9 @@ const styles = tv({
             false: ''
         },
         size: {
-            xs: 'h-[34px] px-3 text-xs font-light',
-            sm: 'h-[38px] px-3 text-sm font-normal',
-            md: 'h-[42px] px-3 text-md font-semibold',
+            xs: 'h-[34px] px-[12px] py-[5px] text-xs',
+            sm: 'h-[38px] px-[16px] py-[7px] text-sm',
+            md: 'h-[42px] px-[22px] py-[10px] text-md',
         },
         iconOnly: {
             true: 'aspect-square px-0',

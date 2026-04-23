@@ -1,4 +1,5 @@
 import Button from "@/components/button/button";
+import ModalDialog from "@/components/modal";
 import { useForm } from "@tanstack/react-form";
 import { Loader } from "lucide-react";
 import { z } from "zod";
@@ -10,9 +11,9 @@ type Fields = {
 }
 
 interface ProductModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    onSubmit: (value: Fields) => void;
+    open: boolean;
+    cancelFn: () => void;
+    submitFn: (value: Fields) => void;
     currentItem?: Fields | null;
 };
 
@@ -28,8 +29,8 @@ const emptyData: Fields = {
     link: "",
 };
 
-export default function ProductModal({ isOpen, onClose, onSubmit, currentItem }: ProductModalProps) {
-    if (!isOpen) return null;
+export default function ProductModal({ open, cancelFn, submitFn, currentItem = null }: ProductModalProps) {
+    const isEdit = currentItem !== null;
 
     const productForm = useForm({
         defaultValues: currentItem || emptyData,
@@ -37,21 +38,28 @@ export default function ProductModal({ isOpen, onClose, onSubmit, currentItem }:
             onChange: productScheme,
         },
         onSubmit: ({ value }) => {
-            onSubmit(value);
-            onClose();
+            submitFn(value);
+            cancelFn();
         },
     });
 
-    return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="p-4 relative bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        productForm.handleSubmit();
+    }
 
-                {/* Body/Form */}
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    productForm.handleSubmit(productForm);
-                }} className="grid gap-4">
+    return (
+        <ModalDialog open={open} cancelFn={cancelFn}>
+            <ModalDialog.Header>
+                <h1 className="text-lg">
+                    {isEdit && 'Produkt bearbeiten'}
+                    {!isEdit && 'Neues Produkt anlegen'}
+                </h1>
+            </ModalDialog.Header>
+
+            <ModalDialog.Content>
+                <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
                     <productForm.Field name="name" children={(field) => (
                         <div className="grid gap-1">
                             <div className="flex items-center justify-between">
@@ -62,7 +70,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, currentItem }:
                                     </p>
                                 ))}
                             </div>
-                            <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-2 rounded-md'
+                            <input id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
                                 value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
                         </div>
                     )} />
@@ -77,7 +85,7 @@ export default function ProductModal({ isOpen, onClose, onSubmit, currentItem }:
                                     </p>
                                 ))}
                             </div>
-                            <input id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-2 rounded-md'
+                            <input id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
                                 value={field.state.value} placeholder="https://www.keepit.com/" onChange={(e) => field.handleChange(e.target.value)} />
                         </div>
                     )} />
@@ -85,23 +93,22 @@ export default function ProductModal({ isOpen, onClose, onSubmit, currentItem }:
                     <productForm.Field name="description" children={(field) => (
                         <div className="grid gap-1">
                             <label htmlFor={field.name} className="text-sm text-gray-500">Produkt Beschreibung</label>
-                            <textarea id={field.name} name={field.name} className='flex-1 outline-none border border-gray-300 p-2 rounded-md'
+                            <textarea rows={10} id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
                                 value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
                         </div>
                     )} />
-
-                    <div className='flex items-center gap-2 w-full'>
-                        <Button onClick={onClose} className="flex-1" type='button' size='sm' variant='secondary'>Cancel</Button>
-                        <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                            <Button className="flex-1" disabled={!canSubmit} type='submit' size='sm'>
-                                {isSubmitting && <Loader className='animate-spin' />}
-                                {!isSubmitting && ("Save")}
-                            </Button>
-                        )} />
-                    </div>
                 </form>
+            </ModalDialog.Content>
 
-            </div>
-        </div>
+            <ModalDialog.Footer>
+                <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Cancel</Button>
+                <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                    <Button form="product-form" disabled={!canSubmit} type='submit' size='sm'>
+                        {isSubmitting && <Loader className='animate-spin' />}
+                        {!isSubmitting && ("Save")}
+                    </Button>
+                )} />
+            </ModalDialog.Footer>
+        </ModalDialog>
     );
 }

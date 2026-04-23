@@ -39,7 +39,7 @@ export default function ContactPersonForm({ onSave, onCancel }: Props) {
     };
 
     return (
-        <div className='bg-gray-100 w-full grid gap-3 border border-gray-200 p-2 rounded-md'>
+        <div className='bg-gray-100 w-full grid gap-3 border border-(--border) p-2 rounded-md'>
             <div className='flex items-center gap-3'>
                 <div className='flex-1'>
                     <label className='text-sm text-gray-600'>Anrede</label>

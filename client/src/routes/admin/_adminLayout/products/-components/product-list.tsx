@@ -37,8 +37,8 @@ export default function ProductList() {
             </div>
 
             {/* Product Modal */}
-            <ProductModal isOpen={isOpen} onClose={() => setOpen(false)}
-                onSubmit={(value) => createProduct({ ...value })} />
+            <ProductModal open={isOpen} cancelFn={() => setOpen(false)}
+                submitFn={(value) => createProduct({ ...value })} />
         </div>
     )
 }

@@ -1,5 +1,6 @@
 import Button from '@/components/button/button';
 import Input from '@/components/inputs/input';
+import ModalDialog from '@/components/modal';
 import { type BaseUser, type User } from '@/data/types';
 import { useAdmin } from '@/hooks/admin';
 import { useForm } from '@tanstack/react-form';
@@ -8,8 +9,8 @@ import type React from 'react';
 import { z } from 'zod';
 
 interface UserModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+    open: boolean;
+    cancelFn: () => void;
     currentUser: User | null;
 }
 
@@ -33,14 +34,19 @@ const emptyUser = {
     password: '',
 };
 
-export default function UserModal({ isOpen, onClose, currentUser }: UserModalProps) {
-    if (!isOpen) return null;
+export default function UserModal({ open, cancelFn, currentUser }: UserModalProps) {
     const isEdit = currentUser !== null;
 
     const { updateUser, createUser } = useAdmin();
 
     const userForm = useForm({
-        defaultValues: currentUser ? { ...currentUser, password: '' } : emptyUser,
+        defaultValues: currentUser ? {
+            salutation: currentUser.salutation ?? '',
+            firstName: currentUser.firstName ?? '',
+            lastName: currentUser.lastName ?? '',
+            email: currentUser.email ?? '',
+            password: '',
+        } : emptyUser,
         validators: {
             onChange: isEdit ? editUserSchema : createUserSchema,
         },
@@ -51,20 +57,27 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
             } else {
                 await createUser({ body: { ...value, name } });
             }
-            onClose();
+            cancelFn();
         },
     });
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         e.stopPropagation();
         userForm.handleSubmit();
     }
 
     return (
-        <div className="fixed inset-0 bg-black/10 z-50 flex items-center justify-center p-4">
-            <div className="p-4 relative bg-white rounded-lg shadow-2xl w-full max-w-2xl">
-                <form onSubmit={handleSubmit} className="grid gap-4">
+        <ModalDialog open={open} cancelFn={cancelFn}>
+            <ModalDialog.Header>
+                <h1 className='text-lg'>
+                    {isEdit && 'Nutzer bearbeiten'}
+                    {!isEdit && 'Neuen Nutzer anlegen'}
+                </h1>
+            </ModalDialog.Header>
+
+            <ModalDialog.Content>
+                <form id="user-form" onSubmit={handleSubmit} className="grid gap-4">
 
                     <div className='flex items-center gap-4'>
                         <userForm.Field name="salutation" children={(field) => (
@@ -115,17 +128,17 @@ export default function UserModal({ isOpen, onClose, currentUser }: UserModalPro
                         )} />
                     </div>
 
-                    <div className='flex items-center gap-4'>
-                        <Button onClick={onClose} className='flex-1' variant="secondary" size='md'>Abbrechen</Button>
-                        <userForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                            <Button disabled={!canSubmit} className="flex-1" size='md'>
-                                {isSubmitting ? <Loader className="size-4 animate-spin" /> : 'Speichern'}
-                            </Button>
-                        )} />
-                    </div>
-
                 </form>
-            </div>
-        </div>
+            </ModalDialog.Content>
+
+            <ModalDialog.Footer>
+                <Button onClick={cancelFn} variant="secondary" size='xs'>Abbrechen</Button>
+                <userForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                    <Button form="user-form" disabled={!canSubmit} size='xs'>
+                        {isSubmitting ? <Loader className="size-4 animate-spin" /> : 'Speichern'}
+                    </Button>
+                )} />
+            </ModalDialog.Footer>
+        </ModalDialog>
     );
 }

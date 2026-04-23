@@ -111,7 +111,7 @@ export function SignupFormComponent() {
                     <div className='flex flex-wrap gap-4'>
                         <form.Field name='salutation'>
                             {(field) => (
-                                <div className='flex-1 min-w-[120px] grid gap-2'>
+                                <div className='flex-1 min-w-30 grid gap-2'>
                                     <div className="grid text-sm font-medium ">
                                         {field.state.meta.errors.length <= 0 && (
                                             <label>Anrede</label>
@@ -126,7 +126,7 @@ export function SignupFormComponent() {
                                     <select
                                         value={field.state.value}
                                         onChange={(e) => field.handleChange(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                                        className="w-full px-4 py-3 border border-(--border) rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                                     >
                                         <option value=''>Bitte wählen</option>
                                         <option value='Herr'>Herr</option>
@@ -333,7 +333,7 @@ export function SignupFormComponent() {
                                                 </div>
 
                                                 <div className='flex flex-wrap gap-4'>
-                                                    <div className='flex-1 min-w-[120px] grid gap-2'>
+                                                    <div className='flex-1 min-w-30 grid gap-2'>
                                                         <label className="text-sm font-medium">Anrede</label>
                                                         <select
                                                             value={person.salutation}
@@ -342,7 +342,7 @@ export function SignupFormComponent() {
                                                                 updated[idx].salutation = e.target.value;
                                                                 setContactPersons(updated);
                                                             }}
-                                                            className="w-full px-4 py-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                                                            className="w-full px-4 py-3 border border-(--border) rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
                                                         >
                                                             <option value=''>Bitte wählen</option>
                                                             <option value='Herr'>Herr</option>
@@ -351,7 +351,7 @@ export function SignupFormComponent() {
                                                         </select>
                                                     </div>
 
-                                                    <div className='flex-[2] min-w-[150px] grid gap-2'>
+                                                    <div className='flex-2 min-w-[150px] grid gap-2'>
                                                         <label className="text-sm font-medium">Vorname</label>
                                                         <Input
                                                             value={person.firstName}

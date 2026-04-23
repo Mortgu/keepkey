@@ -10,12 +10,12 @@ const styles = tv({
         container: 'flex items-center gap-3',
         wrapper: [
             'relative inline-flex w-12 h-6 rounded-full transition-colors duration-200',
-            'cursor-pointer focus-within:ring-2 focus-within:ring-[var(--keepit-primary-25)] focus-within:ring-offset-1',
+            'cursor-pointer focus-within:ring-2 focus-within:ring-[var(--primary-25)] focus-within:ring-offset-1',
             'disabled:cursor-not-allowed disabled:opacity-50',
         ],
         track: [
             'absolute inset-0 rounded-full transition-colors duration-200',
-            'bg-gray-300 peer-checked:bg-[var(--keepit-primary)]',
+            'bg-gray-300 peer-checked:bg-[var(--primary)]',
             'peer-disabled:bg-gray-200',
         ],
         thumb: [

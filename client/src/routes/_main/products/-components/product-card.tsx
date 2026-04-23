@@ -6,7 +6,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
     return (
-        <div className='border border-gray-300 rounded-md overflow-hidden'>
+        <div className='border border-(--border) rounded-md overflow-hidden'>
 
             {/* Product Header */}
             <div className='flex items-center justify-between p-2'>

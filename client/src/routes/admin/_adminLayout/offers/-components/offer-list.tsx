@@ -28,10 +28,10 @@ export default function OfferList() {
 
             <div className='grid gap-2'>
                 {offers.map((offer: Offer) => (
-                    <div key={offer.id} className='grid border border-gray-300 rounded-md overflow-hidden'>
+                    <div key={offer.id} className='grid border border-(--border) rounded-md overflow-hidden'>
 
                         {/* Header */}
-                        <div className='flex items-center justify-between bg-gray-50 border-(--keepit-primary) px-3 py-2'>
+                        <div className='flex items-center justify-between bg-gray-50 border-(--primary) px-3 py-2'>
                             <div className='flex items-center gap-4'>
                                 <div>
                                     <p className='text-base font-medium'>{offer.voucherId}</p>
@@ -70,7 +70,7 @@ export default function OfferList() {
                         </div>
 
                         {/* Dokumente */}
-                        <div className='flex items-center gap-2 px-3 py-2 bg-gray-50 border-t border-gray-200'>
+                        <div className='flex items-center gap-2 px-3 py-2 bg-gray-50 border-t border-(--border)'>
 
                             <Button variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
                                 DOCX
@@ -85,7 +85,7 @@ export default function OfferList() {
                 ))}
             </div>
 
-            <OfferModal isOpen={isOpen} onClose={() => setOpen(false)} />
+            <OfferModal open={isOpen} cancelFn={() => setOpen(false)} />
         </div>
     )
 }

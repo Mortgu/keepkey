@@ -20,7 +20,7 @@ export default function DocumentStatus({ orderId }: DocumentStatusProps) {
 
     if (isPending) {
         return (
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div className="p-4 bg-gray-50 rounded-lg border border-(--border)">
                 <p className="text-sm text-gray-600">Laden...</p>
             </div>
         );

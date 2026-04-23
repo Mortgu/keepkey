@@ -40,10 +40,10 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
         onSave({ productId, contractId, duration, quantity, optional });
     };
 
-    const selectClass = 'w-full rounded-lg border border-gray-200 bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100';
+    const selectClass = 'w-full rounded-lg border border-(--border) bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100';
 
     return (
-        <div className='bg-gray-100 w-full grid gap-3 border border-gray-200 p-2 rounded-md'>
+        <div className='bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-2 rounded-md'>
             <div className='flex items-end gap-3'>
                 <div className='flex-2 grid gap-1'>
                     <label className='text-sm text-gray-600'>Produkt</label>

@@ -17,7 +17,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
 
     return (
         <React.Fragment>
-            <div className='flex items-center justify-between gap-3 border border-gray-300 p-2 rounded-md'>
+            <div className='flex items-center justify-between gap-3 border border-(--border) p-2 rounded-md'>
                 <div className="grid gap-0">
                     <h1 className='text-md'>{customer.companyName}</h1>
                     <p className='text-sm text-gray-500'>{customer.customerId} · {formatDate(customer.createdAt)}</p>
@@ -39,7 +39,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
                 </div>
             </div>
 
-            <CustomerModal currentCustomer={customer} isOpen={isOpen} onClose={() => setOpen(false)} />
+            <CustomerModal currentCustomer={customer} open={isOpen} cancelFn={() => setOpen(false)} />
         </React.Fragment>
     );
 }

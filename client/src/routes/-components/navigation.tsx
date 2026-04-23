@@ -1,13 +1,13 @@
 import { NavLink } from "./nav-link";
 
-import { Loader, Plus, ShoppingBag, User } from 'lucide-react';
+import { Loader, User } from 'lucide-react';
 import { authClient } from "@/lib/auth-client.ts";
 
 export default function Navigation() {
     const { data: session, isPending, error } = authClient.useSession();
 
     return (
-        <div className="h-18 w-full border-b border-gray-200">
+        <div className="h-18 w-full border-b border-(--border) bg-white">
             <div className="flex max-w-(--viewport) m-auto px-4 items-center h-full justify-between">
                 <div className="flex h-full gap-8">
                     <NavLink to="/">Home</NavLink>
@@ -32,12 +32,12 @@ function NavigationActions() {
     return (
         <div className='flex gap-4'>
             {/*<div className='w-8 h-8 m-auto'>
-                <button className='bg-(--keepit-primary) cursor-pointer w-full h-full rounded-lg flex items-center justify-center'>
+                <button className='bg-(--primary) cursor-pointer w-full h-full rounded-lg flex items-center justify-center'>
                     <Plus className='size-5 text-white' />
                 </button>
             </div>*/}
 
-            <div className='w-8 h-full m-auto hover:text-(--keepit-primary) cursor-pointer'>
+            <div className='w-8 h-full m-auto hover:text-(--primary) cursor-pointer'>
                 <NavLink to="/user/settings">
                     <User className='size-6' />
                 </NavLink>

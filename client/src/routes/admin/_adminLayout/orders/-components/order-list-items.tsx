@@ -29,8 +29,8 @@ export default function OrderListItems() {
 
     return orders.map((order: Order, index: number) => (
         <React.Fragment key={index}>
-            <div className='grid border border-gray-200 rounded-md'>
-                <div className='flex items-center justify-between border-b border-gray-200 px-3 py-2'>
+            <div className='grid border border-(--border) rounded-md'>
+                <div className='flex items-center justify-between border-b border-(--border) px-3 py-2'>
                     <div className="flex-1">
                         <p className='text-lg'>{order.user.name} </p>
                         <p className='text-sm text-gray-500'>{formatDate(order.createdAt)}</p>
@@ -48,7 +48,7 @@ export default function OrderListItems() {
                 {/* Products */}
                 <div className="">
                     {order.orderPositions.map((position: OrderPositionItem) => (
-                        <div className="flex items-center justify-between border-b border-gray-200 px-3 py-2 ">
+                        <div className="flex items-center justify-between border-b border-(--border) px-3 py-2 ">
                             <div className="flex items-center gap-2">
                                 <p>{position.product.name}</p>
                                 <p className="text-gray-500">({position.contract.name} / {position.duration} Jahr(e))</p>
@@ -71,8 +71,8 @@ export default function OrderListItems() {
 
             </div>
 
-            <OrderModal isOpen={isOpen} onClose={() => setOpen(false)}
-                onSubmit={() => { }} currentOrder={order} />
+            <OrderModal open={isOpen} cancelFn={() => setOpen(false)}
+                submitFn={() => { }} currentOrder={order} />
         </React.Fragment>
     ))
 }

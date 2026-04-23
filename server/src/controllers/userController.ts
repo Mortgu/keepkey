@@ -44,16 +44,16 @@ export const updateUserById = async (request: Request, response: Response) => {
     }
 
     try {
-        const { contactPersons, ...userFields } = body;
+        const { name, salutation, firstName, lastName, phone, email, role, banned, banReason, banExpires, image } = body;
 
         await prisma.user.update({
             where: { id: id as string },
-            data: { ...userFields },
+            data: { name, salutation, firstName, lastName, phone, email, role, banned, banReason, banExpires, image },
         });
 
     } catch (exception: any) {
         return response.status(500).json({
-            success: false, message: 'Something went wrong trying to update user!'
+            success: false, message: `Something went wrong trying to update user! ${exception.message}`
         });
     }
 

@@ -15,13 +15,13 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
 
     return (
         <Fragment>
-            <div className="rounded-md flex items-center justify-between gap-4 p-2 border border-gray-300">
+            <div className="rounded-md flex items-center justify-between gap-4 p-2 border border-(--border)">
                 <div className="grid gap-4">
                     <div className="grid">
                         <p>{contract.name}</p>
                         <p className='text-sm text-gray-400'>{formatDate(contract.createdAt)}</p>
                     </div>
-                    <div className="border p-1 w-full rounded-md border-gray-300">
+                    <div className="border p-1 w-full rounded-md border-(--border)">
                         <ul>
                             {contract.features.map(i => (
                                 <li key={i} className="text-gray-700 list-disc ml-5">{i}</li>
@@ -32,17 +32,13 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
 
                 <div className="h-full flex items-center gap-0">
                     <div className="mb-auto">
-                        <Button onClick={() => setOpen(true)} size='sm' variant='ghost' className='aspect-square'>
-                            <Pen className='size-4' />
-                        </Button>
-                        <Button onClick={() => deleteContract(contract.id)} size='sm' variant='ghost' className='aspect-square'>
-                            <Trash className='size-4' />
-                        </Button>
+                        <Button variant="ghost" icon={<Pen className='size-4' />} iconOnly onClick={() => setOpen(true)} size='sm' />
+                        <Button variant="ghost" icon={<Trash className='size-4' />} iconOnly onClick={() => deleteContract(contract.id)} size='sm' />
                     </div>
                 </div>
             </div>
 
-            <ContractModal isOpen={isOpen} onClose={() => setOpen(false)}
+            <ContractModal open={isOpen} cancelFn={() => setOpen(false)}
                 currentContract={contract} />
         </Fragment>
     )

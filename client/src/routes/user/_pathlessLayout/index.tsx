@@ -1,4 +1,4 @@
-import {createFileRoute, redirect} from '@tanstack/react-router'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/user/_pathlessLayout/')({
     component: RouteComponent,
@@ -13,7 +13,7 @@ export const Route = createFileRoute('/user/_pathlessLayout/')({
     },
     notFoundComponent: ({ data }) => {
         return (
-            <div className='p-4 bg-gray-100 rounded-md border border-gray-200'>
+            <div className='p-4 bg-gray-100 rounded-md border border-(--border)'>
                 <p>Diese Seite existiert nicht.</p>
             </div>
         )

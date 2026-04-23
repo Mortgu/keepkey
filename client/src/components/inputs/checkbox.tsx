@@ -8,15 +8,15 @@ interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const styles = tv({
     base: [
-        'w-4 h-4 aspect-squere rounded-md border border-gray-100 cursor-pointer accent-[var(--keepit-primary)]',
+        'w-4 h-4 aspect-squere rounded-md border border-(--border) cursor-pointer accent-[var(--primary)]',
         'transition-all duration-200 outline-none',
         'disabled:opacity-50 disabled:cursor-not-allowed',
-        'focus:ring-2 focus:ring-[var(--keepit-primary-25)] focus:ring-offset-1',
+        'focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-1',
     ],
     variants: {
         error: {
             true: 'border-red-500 focus:border-red-600',
-            false: 'border-gray-300 focus:border-[var(--keepit-primary)]',
+            false: 'border-(--border) focus:border-[var(--primary)]',
         }
     },
     defaultVariants: {

@@ -18,8 +18,8 @@ export default function OrderList() {
                 <OrderListItems />
             </div>
 
-            <OrderModal isOpen={isOpen} onClose={() => setOpen(false)}
-                onSubmit={() => { }} />
+            <OrderModal open={isOpen} cancelFn={() => setOpen(false)}
+                submitFn={() => { }} />
 
         </div>
     )

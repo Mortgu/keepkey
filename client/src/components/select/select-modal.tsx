@@ -35,7 +35,7 @@ export default function Select({ elements, onChange }: SelectProps) {
 
     return (
         <div className="w-full relative" ref={menuRef}>
-            <div onClick={() => setOpen(!isOpen)} className="w-full cursor-pointer border py-2 px-3 rounded-lg border-gray-200 flex items-center justify-between gap-4">
+            <div onClick={() => setOpen(!isOpen)} className="w-full cursor-pointer border py-2 px-3 rounded-lg border-(--border) flex items-center justify-between gap-4">
                 <div className="grid gap-0">
                     {selected && (<>{selected?.child}</>)}
                     {!selected && (
@@ -48,9 +48,9 @@ export default function Select({ elements, onChange }: SelectProps) {
 
             {
                 isOpen && (
-                    <div className="shadow w-full absolute top-full left-0 bg-white border border-gray-200 rounded-md mt-2">
+                    <div className="shadow w-full absolute top-full left-0 bg-white border border-(--border) rounded-md mt-2">
                         {/* Searbar */}
-                        <div className="border-b border-gray-200 p-2">
+                        <div className="border-b border-(--border) p-2">
                             <Input input_size="sm" placeholder="Search..." />
                         </div>
 
@@ -61,7 +61,7 @@ export default function Select({ elements, onChange }: SelectProps) {
                                     let classNames = tv({
                                         base: [
                                             "px-2 py-2 rounded-md cursor-pointer",
-                                            "hover:bg-(--keepit-primary-25)"
+                                            "hover:bg-(--primary)"
                                         ],
                                         variants: {
                                             active: {

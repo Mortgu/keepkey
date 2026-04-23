@@ -92,7 +92,7 @@ export default function ProductItem(product: ProductItemProps) {
     }
 
     return (
-        <div className='border border-gray-300 rounded-md overflow-hidden'>
+        <div className='border border-(--border) rounded-md overflow-hidden'>
 
             {/* Product Header */}
             <div className='flex items-center justify-between p-2 gap-4'>
@@ -130,14 +130,14 @@ export default function ProductItem(product: ProductItemProps) {
                 </div>
             </div>
 
-            <div className='flex items-center p-2 border-t border-gray-200'>
+            <div className='flex items-center p-2 border-t border-(--border)'>
                 <p className='flex-1 text-sm'>{product.link}</p>
             </div>
 
             {/* Product Body */}
 
             {product.productPricing.map((pricing, index) => (
-                <div key={index} className='flex items-center p-2 border-t border-gray-200'>
+                <div key={index} className='flex items-center p-2 border-t border-(--border)'>
                     <p className='flex-1'>{pricing?.contract?.name}</p>
                     <p className='flex-1'>{pricing?.min_quantity}-{pricing.max_quantity}</p>
                     <p className='flex-1'>{pricing?.duration}</p>
@@ -157,10 +157,10 @@ export default function ProductItem(product: ProductItemProps) {
                     e.preventDefault();
                     e.stopPropagation();
                     pricingForm.handleSubmit(pricingForm);
-                }} className="border-t gap-2 border-gray-200 py-2 px-2 flex flex-wrap items-center justify-between">
+                }} className="border-t gap-2 border-(--border) py-2 px-2 flex flex-wrap items-center justify-between">
                     <pricingForm.Field name='contractId' children={(field) => (
                         <select id={field.name} name={field.name} defaultValue={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)} className="flex-2 h-9 px-3 py-2 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
+                            onChange={(e) => field.handleChange(e.target.value)} className="flex-2 h-9 px-3 py-2 border border-(--border) rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
                             {contracts?.map((contract: any) => (
                                 <option key={contract.id} value={contract.id}>{contract.name}</option>
                             ))}
@@ -168,19 +168,19 @@ export default function ProductItem(product: ProductItemProps) {
                     )} />
 
                     <pricingForm.Field name='min_quantity' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="min-seats"
+                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="min-seats"
                             onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='max_quantity' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="max-seats"
+                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="max-seats"
                             onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='duration' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="duration"
+                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="duration"
                             onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                     )} />
                     <pricingForm.Field name='price' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" step="0.01" className='flex-1 min-w-0 h-9 outline-none border border-gray-300 p-1 rounded-md text-sm' placeholder="price"
+                        <input id={field.name} value={field.state.value} type="number" step="0.01" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="price"
                             onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
                     )} />
 
@@ -196,7 +196,7 @@ export default function ProductItem(product: ProductItemProps) {
                 </form>
             )}
 
-            <div className="border-t border-gray-200 py-2 px-2 flex items-center justify-between">
+            <div className="border-t border-(--border) py-2 px-2 flex items-center justify-between">
                 <p></p>
                 <p></p>
                 <button onClick={() => addPricing(true)} className='flex items-center justify-between gap-2 cursor-pointer'>
@@ -206,8 +206,8 @@ export default function ProductItem(product: ProductItemProps) {
             </div>
 
             {/* Edit Product Modal */}
-            <ProductModal isOpen={isEdeting} onClose={() => setEdit(false)}
-                onSubmit={(value) => updateProduct({ id: product.id, product: value })} currentItem={{ name, description, link }} />
+            <ProductModal open={isEdeting} cancelFn={() => setEdit(false)}
+                submitFn={(value) => updateProduct({ id: product.id, product: value })} currentItem={{ name, description, link }} />
         </div>
     );
 }

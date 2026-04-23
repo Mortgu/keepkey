@@ -6,7 +6,7 @@ const styles = tv({
     base: "transition-colors", // Add common transition logic here
     variants: {
         variant: {
-            primary: "flex items-center justify-center h-full border-b-2 border-transparent hover:text-(--keepit-primary)", // Transparent border prevents layout shift
+            primary: "flex items-center justify-center h-full border-b-2 border-transparent hover:text-(--primary)", // Transparent border prevents layout shift
             filled: "py-2 px-4 rounded-md ",
         },
         isActive: {
@@ -18,12 +18,12 @@ const styles = tv({
         {
             variant: "primary",
             isActive: true,
-            class: "border-(--keepit-primary) text-(--keepit-primary)",
+            class: "border-(--primary) text-(--primary)",
         },
         {
             variant: "filled",
             isActive: true,
-            class: "bg-(--keepit-primary-25) text-black",
+            class: "bg-(--primary) text-black",
         },
     ],
     defaultVariants: {

@@ -39,7 +39,7 @@ export default function ContractList() {
                 ))}
             </div>
 
-            <ContractModal isOpen={isOpen} onClose={() => setOpen(false)} />
+            <ContractModal open={isOpen} cancelFn={() => setOpen(false)} />
         </div>
     )
 }

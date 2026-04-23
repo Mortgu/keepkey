@@ -31,7 +31,7 @@ export default function UserList() {
 
             </div>
 
-            <UserModal currentUser={null} isOpen={isOpen} onClose={() => setOpen(false)} />
+            <UserModal currentUser={null} open={isOpen} cancelFn={() => setOpen(false)} />
         </div>
     )
 }

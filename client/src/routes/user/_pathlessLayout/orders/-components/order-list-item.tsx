@@ -27,7 +27,7 @@ export default function OrderListItem({ order }: Props) {
     }, [isOpen]);
 
     return (
-        <div className="flex gap-2 border-b py-4 border-gray-200 first:border-t">
+        <div className="flex gap-2 border-b py-4 border-(--border) first:border-t">
             <div className="w-full flex items-center justify-between ">
                 <div className="grid gap-1">
                     <h1 className="font-semibold">{formatDate(order.createdAt)}</h1>

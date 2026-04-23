@@ -16,7 +16,7 @@ function PathlessLayoutComponent() {
 
     return (
         <div className='grid gap-4'>
-            <div className='w-full h-14 border-b bg-gray-100 border-gray-200'>
+            <div className='w-full h-14 border-b bg-gray-100 border-(--border)'>
                 <div className='flex items-center justify-between w-full max-w-(--viewport) m-auto h-full px-4'>
                     <div className='flex items-center gap-8 h-full'>
                         <NavLink className='flex items-center gap-2' to='/user/settings'>

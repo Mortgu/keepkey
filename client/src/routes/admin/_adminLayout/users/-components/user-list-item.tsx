@@ -18,7 +18,7 @@ export default function UserListItem({ user }: UserListItemProps) {
 
     return (
         <React.Fragment>
-            <div className='flex items-center justify-between gap-3 border border-gray-300 p-2 rounded-md'>
+            <div className='flex items-center justify-between gap-3 border border-(--border) p-2 rounded-md'>
                 <div className="grid gap-0">
                     <h1 className='text-md'>{user.firstName} {user.lastName}</h1>
                     <p className='text-sm text-gray-500'>{formatDate(user.createdAt)}</p>
@@ -35,7 +35,7 @@ export default function UserListItem({ user }: UserListItemProps) {
                 </div>
             </div>
 
-            <UserModal currentUser={user} isOpen={isOpen} onClose={() => setOpen(false)} />
+            <UserModal currentUser={user} open={isOpen} cancelFn={() => setOpen(false)} />
         </React.Fragment>
     )
 }

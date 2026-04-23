@@ -1,5 +1,6 @@
 import Button from '@/components/button/button';
 import Input from '@/components/inputs/input';
+import ModalDialog from '@/components/modal';
 import type { BaseContract, Contract } from '@/data/types';
 import { useContracts } from '@/hooks/contract';
 import { useForm } from '@tanstack/react-form';
@@ -7,8 +8,8 @@ import { Loader, Plus, Trash2, X } from 'lucide-react';
 import { z } from 'zod';
 
 interface ContractModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+    open: boolean;
+    cancelFn: () => void;
     currentContract?: Contract | null;
 };
 
@@ -22,9 +23,8 @@ const emptyContract: BaseContract = {
     features: [],
 }
 
-export default function ContractModal({ isOpen, onClose, currentContract }: ContractModalProps) {
-    if (!isOpen) return null;
-
+export default function ContractModal({ open, cancelFn, currentContract = null }: ContractModalProps) {
+    const isEdit = currentContract !== null;
     const { updateContract, createContract } = useContracts();
 
     const contractForm = useForm({
@@ -33,12 +33,12 @@ export default function ContractModal({ isOpen, onClose, currentContract }: Cont
             onChange: contractSchema
         },
         onSubmit: ({ value }) => {
-            if (currentContract) {
+            if (isEdit) {
                 updateContract({ id: currentContract.id, data: value as BaseContract })
             } else {
                 createContract(value as BaseContract);
             }
-            onClose();
+            cancelFn();
         }
     });
 
@@ -49,14 +49,15 @@ export default function ContractModal({ isOpen, onClose, currentContract }: Cont
     }
 
     return (
-        <div className="fixed inset-0 bg-black/20 z-50 flex items-center justify-center p-4">
-            <div className="overflow-hidden relative bg-white rounded-lg shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-                <div className="flex justify-between items-center bg-gray-50 border-b border-gray-200 px-2 py-2">
-                    <h1 className="text-xl ml-2">Contract bearbeiten</h1>
-                    <Button onClick={onClose} variant="secondary" size="sm" icon={<X className="size-4" />} iconOnly />
-                </div>
-
-                <form onSubmit={handleSubmit} className="grid gap-4 p-4">
+        <ModalDialog open={open} cancelFn={cancelFn}>
+            <ModalDialog.Header>
+                <h1 className='text-lg'>
+                    {isEdit && 'Vertrag bearbeiten'}
+                    {!isEdit && 'Neuen Vertrag anlegen'}
+                </h1>
+            </ModalDialog.Header>
+            <ModalDialog.Content>
+                <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4 p-4">
 
                     <contractForm.Field name="name" children={(field) => (
                         <div className="grid gap-2">
@@ -108,16 +109,19 @@ export default function ContractModal({ isOpen, onClose, currentContract }: Cont
                     )} />
 
                     <div className='flex gap-2'>
-                        <Button onClick={onClose} className="flex-1" type='button' size='md' variant='secondary'>Abbrechen</Button>
-                        <contractForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                            <Button disabled={!canSubmit} className="flex-1" type='submit' size='md'>
-                                {isSubmitting ? <Loader className="size-4" /> : 'Speichern'}
-                            </Button>
-                        )} />
+
                     </div>
 
                 </form>
-            </div>
-        </div>
+            </ModalDialog.Content>
+            <ModalDialog.Footer>
+                <Button onClick={cancelFn} type='button' size='xs' variant='secondary'>Abbrechen</Button>
+                <contractForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                    <Button form="contract-form" disabled={!canSubmit} type='submit' size='xs'>
+                        {isSubmitting ? <Loader className="size-4" /> : 'Speichern'}
+                    </Button>
+                )} />
+            </ModalDialog.Footer>
+        </ModalDialog>
     )
 }
