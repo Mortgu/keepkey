@@ -1,4 +1,4 @@
-import type { Contract } from "./types";
+import type { BaseContract, Contract } from "./types";
 
 export async function getContractsAction(): Promise<Contract[]> {
     const response = await fetch("http://localhost:3000/api/contracts", {
@@ -14,14 +14,29 @@ export async function getContractsAction(): Promise<Contract[]> {
     return result;
 }
 
-export async function createContractAction(name: string): Promise<Contract> {
+export async function createContractAction(data: BaseContract): Promise<Contract> {
     const response = await fetch("http://localhost:3000/api/contracts", {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name })
+        body: JSON.stringify(data),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
+export async function updateContractAction(id: string, data: BaseContract): Promise<Contract> {
+    const response = await fetch(`http://localhost:3000/api/contracts/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
     });
 
     const result = await response.json();

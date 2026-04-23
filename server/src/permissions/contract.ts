@@ -22,6 +22,27 @@ export async function canCreateContract(request: Request, response: Response, ne
     next();
 }
 
+export async function canUpdateContract(request: Request, response: Response, next: NextFunction) {
+    const user = request.user;
+
+    const { success } = await auth.api.userHasPermission({
+        body: {
+            userId: user!.id,
+            permissions: {
+                contracts: ["update"]
+            },
+        }
+    });
+
+    if (!success) {
+        return response.status(403).json({
+            success: false, message: "Can't update contract."
+        });
+    }
+
+    next();
+}
+
 export async function canDeleteContract(request: Request, response: Response, next: NextFunction) {
     const user = request.user;
 

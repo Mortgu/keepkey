@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import {adminClient, inferAdditionalFields} from 'better-auth/client/plugins';
+import { adminClient, inferAdditionalFields } from 'better-auth/client/plugins';
 
 import { ac, admin, user } from './permissions.ts';
 
@@ -20,6 +20,10 @@ export const authClient = createAuthClient({
                 lastName: {
                     type: "string",
                     required: true,
+                },
+                phone: {
+                    type: "string",
+                    required: false
                 }
             }
         }),

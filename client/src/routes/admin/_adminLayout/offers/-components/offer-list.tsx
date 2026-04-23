@@ -19,8 +19,6 @@ export default function OfferList() {
         }
     }
 
-    console.log(offers)
-
     return (
         <div className="">
             <div className='mb-4 flex items-center justify-between'>

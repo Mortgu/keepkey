@@ -26,6 +26,10 @@ export const auth = betterAuth({
             lastName: {
                 type: "string",
                 required: true,
+            },
+            phone: {
+                type: "string",
+                required: false,
             }
         }
     },

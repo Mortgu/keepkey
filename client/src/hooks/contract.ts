@@ -1,8 +1,11 @@
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import {createContractAction, deleteContractAction, getContractsAction} from "@/data/contracts.ts";
+import type { BaseContract } from "@/data/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createContractAction, deleteContractAction, getContractsAction, updateContractAction } from "@/data/contracts.ts";
 
 export const useContracts = () => {
     const queryClient = useQueryClient();
+
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: ['contracts'] });
 
     const { data: contracts = [], isPending, error } = useQuery({
         queryKey: ['contracts'],
@@ -10,18 +13,19 @@ export const useContracts = () => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (name: string) => createContractAction(name),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['contracts'],
-        }),
+        mutationFn: (data: BaseContract) => createContractAction(data),
+        onSuccess: invalidate,
+    });
+
+    const updateMutation = useMutation({
+        mutationFn: ({ id, data }: { id: string; data: BaseContract }) => updateContractAction(id, data),
+        onSuccess: invalidate,
     });
 
     const deleteMutation = useMutation({
         mutationFn: (id: string) => deleteContractAction(id),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['contracts'],
-        })
-    })
+        onSuccess: invalidate,
+    });
 
     return {
         contracts,
@@ -29,9 +33,11 @@ export const useContracts = () => {
         error,
 
         createContract: createMutation.mutateAsync,
+        updateContract: updateMutation.mutateAsync,
         deleteContract: deleteMutation.mutate,
 
         isCreating: createMutation.isPending,
+        isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
     }
 }

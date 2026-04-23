@@ -41,6 +41,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
     });
 
     const { customer, customerContactPerson, user } = offer;
+    const { salutation, firstName, lastName } = customerContactPerson;
 
     const hasOptionalPositions = offer.offerPositions.some(p => p.optional);
 
@@ -62,6 +63,8 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         };
     });
 
+    console.log(hasOptionalPositions, products)
+
     const allProducts = offer.offerPositions.map(i => i.product.name).join(" & ");
     const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
 
@@ -80,6 +83,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
             plz: customer.plz || '{customer.plz}',
             city: customer.city || '{customer.city}',
 
+            fullName: `${salutation} ${firstName} ${lastName}`,
             salutation: customerContactPerson.salutation || '{customer.salutation}',
             firstName: customerContactPerson.firstName || '{customer.firstName}',
             lastName: customerContactPerson.lastName || '{customer.lastName}',
@@ -88,6 +92,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         },
 
         employee: {
+            fullName: `${user.salutation} ${user.firstName} ${user.lastName}`,
             salutation: user.salutation || '{employee.salutation}',
             firstName: user.firstName || '{employee.firstName}',
             lastName: user.lastName || '{employee.lastName}',
@@ -98,6 +103,7 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         products: {
             names: products.map(p => p.name).join(" & "),
             positions: products,
+            hasOptionals: hasOptionalPositions,
         }
     };
 }
@@ -161,6 +167,7 @@ export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemp
             plz: customer.plz || '{customer.plz}',
             city: customer.city || '{customer.city}',
 
+            fullName: `{customer.fullName}`,
             salutation: '{customer.salutation}',
             firstName: '{customer.firstName}',
             lastName: '{customer.lastName}',
@@ -169,6 +176,7 @@ export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemp
         },
 
         employee: {
+            fullName: `${user.salutation} ${user.firstName} ${user.lastName}`,
             salutation: user.salutation || '{employee.salutation}',
             firstName: user.firstName || '{employee.firstName}',
             lastName: user.lastName || '{employee.lastName}',
@@ -179,6 +187,7 @@ export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemp
         products: {
             names: "",
             positions: products,
+            hasOptionals: false,
         }
     };
 }

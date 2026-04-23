@@ -22,6 +22,7 @@ export interface TemplateData_Customer {
     plz: string;
     city: string;
 
+    fullName: string;
     salutation: string;
     firstName: string;
     lastName: string;
@@ -30,6 +31,7 @@ export interface TemplateData_Customer {
 }
 
 export interface TemplateData_Employee {
+    fullName: string;
     salutation: string;
     firstName: string;
     lastName: string;
@@ -40,6 +42,7 @@ export interface TemplateData_Employee {
 export interface TemplateData_Products {
     names: string;
     positions: TemplateData_ProductPosition[];
+    hasOptionals: boolean;
 }
 
 export interface TemplateData_ProductPosition {
@@ -79,10 +82,4 @@ export interface InvoiceTemplateData {
 
     positions: InvoicePositionTemplateData[];
     totalSum: string;
-}
-
-export interface ShoppingCart {
-    id: string;
-    total: number;
-    products: Product[];
 }

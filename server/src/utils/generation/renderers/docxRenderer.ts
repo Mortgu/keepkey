@@ -18,20 +18,16 @@ import type { DXT } from "docxtemplater";
 type ParserResult = { get: (scope: any, context: DXT.ParserContext) => any };
 
 const customParser = function (tag: string): ParserResult {
-    console.log(tag)
-    // 1. Punkt-Operator für Arrays abfangen (siehe vorherige Antwort)
     if (tag === ".") {
         return {
             get: (s) => s,
         };
     }
 
-    // 2. Den Standard-Expression-Parser nutzen
     const expr = parser(tag);
 
     return {
         get: (scope: any, context: DXT.ParserContext) => {
-            // Falls der Ausdruck direkt im Scope existiert (z.B. "customer.name")
             return expr.get(scope, context);
         },
     };

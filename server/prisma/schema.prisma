@@ -13,6 +13,7 @@ model User {
   salutation    String
   firstName     String
   lastName      String
+  phone         String?   @default("")
   email         String    @unique
   emailVerified Boolean
   image         String?
@@ -199,7 +200,8 @@ model Product {
 model Contract {
   id String @id @default(uuid())
 
-  name String
+  name     String
+  features String[]
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]

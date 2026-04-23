@@ -7,7 +7,7 @@
     --keepit-primary: #00683F;
 
     /* Tints (heller) */
-    --keepit-primary-50:  #80b49f;
+    --keepit-primary-50: #80b49f;
     --keepit-primary-100: #99c3b2;
     --keepit-primary-200: #b3d2c6;
     --keepit-primary-300: #cce1d9;
@@ -20,7 +20,7 @@
     --keepit-primary-900: #00150d;
 
     /* Alpha */
-    --keepit-primary-a5:  color-mix(in srgb, #00683F 5%,  transparent);
+    --keepit-primary-a5: color-mix(in srgb, #00683F 5%, transparent);
     --keepit-primary-a10: color-mix(in srgb, #00683F 10%, transparent);
     --keepit-primary-a15: color-mix(in srgb, #00683F 15%, transparent);
     --keepit-primary-a20: color-mix(in srgb, #00683F 20%, transparent);
@@ -40,6 +40,10 @@
 
 div {
     /*outline: 1px solid red; */
+}
+
+li {
+    list-style: disc;
 }
 
 @layer components {}

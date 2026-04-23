@@ -53,10 +53,13 @@ export interface User extends BaseUser {
     createdAt: Date;
 }
 
-export interface Contract {
-    id: string;
+export interface BaseContract {
     name: string;
+    features: string[];
+}
 
+export interface Contract extends BaseContract {
+    id: string;
     createdAt: Date;
 }
 
