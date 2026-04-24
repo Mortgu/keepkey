@@ -149,6 +149,12 @@ export interface Offer extends BaseOffer {
     id: string;
 
     customer: Customer;
+
+    net_amount: number;
+    tax_rate: number;
+    tax_amount: number;
+    total_amount: number;
+
     offerPositions: OfferPosition[];
     customerContactPerson: ContactPerson;
 }
@@ -166,8 +172,10 @@ export interface OfferPosition {
     duration: number;
     quantity: number;
 
-    totalPrice: number;
-    priceBreakdown: any;
+    optional: boolean;
+
+    price_at_purchase: number;
+    tax_rate_at_purchase: number;
 
     createdAt: Date;
 }

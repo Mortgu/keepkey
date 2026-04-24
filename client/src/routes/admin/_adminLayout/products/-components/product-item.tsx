@@ -7,6 +7,7 @@ import { useState } from "react";
 import { getContractsAction } from "@/data/contracts.ts";
 import ProductModal from "./product-modal";
 import { useAdmin } from "@/hooks/admin";
+import { useContracts } from "@/hooks/contract";
 
 export type ProductItemProps = {
     id: string;
@@ -33,15 +34,12 @@ export type ProductItemProps = {
 
 export default function ProductItem(product: ProductItemProps) {
     const { deleteProduct, updateProduct, isDeletingProduct } = useAdmin();
+    const { contracts } = useContracts();
+
     const [isAddingPricing, addPricing] = useState<boolean>(false);
     const [isEdeting, setEdit] = useState<boolean>(false);
 
     const { name, description, link } = product;
-
-    const { data: contracts } = useQuery({
-        queryKey: ['contracts'],
-        queryFn: getContractsAction,
-    });
 
     const pricingForm = useForm({
         defaultValues: {
@@ -75,9 +73,6 @@ export default function ProductItem(product: ProductItemProps) {
             if (!response.ok) {
                 throw new Error("Failed to create new pricing!");
             }
-
-            addPricing(false);
-            window.location.reload();
 
             return result;
         }
@@ -141,7 +136,7 @@ export default function ProductItem(product: ProductItemProps) {
                     <p className='flex-1'>{pricing?.contract?.name}</p>
                     <p className='flex-1'>{pricing?.min_quantity}-{pricing.max_quantity}</p>
                     <p className='flex-1'>{pricing?.duration}</p>
-                    <p className='flex-1'>{pricing?.price} €</p>
+                    <p className='flex-1'>{(pricing.price / 100).toFixed(2)} €</p>
                     <Button size='xs' variant='link' iconOnly icon={
                         <Pen className='size-4' />
                     } />

@@ -43,7 +43,7 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
 
     return (
         <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
-            <div className="overflow-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
+            <div className="overflow-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-scroll flex flex-col">
 
                 <div className="flex items-center justify-between pt-5 px-5">
                     {header}

@@ -12,19 +12,23 @@ export default function startDocumentWorker() {
     const worker = new Worker<DocumentJobData>(documentQueueKey, async (job) => {
         const { documentJobId, type } = job.data;
 
+        const documentJob = await prisma.documentJob.findUnique({
+            where: { id: documentJobId },
+        });
+
+        if (!documentJob) {
+            throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
+        }
+
         await prisma.documentJob.update({
             where: { id: documentJobId },
             data: { status: 'processing' },
         });
 
-        const documentJob = await prisma.documentJob.findUniqueOrThrow({
-            where: { id: documentJobId },
-        });
-
         if (type === 'offer' && documentJob.offerId) {
             await generateOffer(documentJob.offerId, documentJobId);
         } else if (type === 'invoice' && documentJob.orderId) {
-            await generateInvoice(documentJob.orderId, documentJobId);
+            //await generateInvoice(documentJob.orderId, documentJobId);
         } else {
             throw new Error(`Unknown document type "${type}" or missing reference ID`);
         }
@@ -48,7 +52,7 @@ export default function startDocumentWorker() {
         console.error(`[worker] job ${job?.id} failed:`, err);
 
         if (job) {
-            await prisma.documentJob.update({
+            await prisma.documentJob.updateMany({
                 where: { id: job.data.documentJobId },
                 data: { status: 'failed', error: err.message },
             });

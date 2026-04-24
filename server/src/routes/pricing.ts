@@ -1,30 +1,19 @@
-import type { Request, Response } from "express";
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
-import { canCreateProduct } from "../permissions/product.js";
-import { requireSession } from "../middlewares/auth.js";
+
+import { createPricing, getPrice } from "../controllers/pricingController.js";
 
 const router = Router();
 
-/* [POST] http://localhost:3000/api/pricing */
-router.post('/:id', requireSession, canCreateProduct, async (request: Request, response: Response) => {
-    const { id: productId } = request.params;
-    const { body } = request;
+/* 
+ * Route for retreiving the price of a configuration
+ * [GET] /api/pricing?productId=&contractId=&duration=&quantity=
+ */
+router.get('/', getPrice);
 
-    if (!body) {
-        response.status(400).send({
-            message: "Bad request", success: false
-        })
-    }
-
-    const result = await prisma.productPricing.create({
-        data: {
-            productId: productId,
-            ...body
-        }
-    })
-
-    response.status(200).send(result);
-});
+/* 
+ *  Route for creating new pricing entries
+ *  [POST] /api/pricing/:product_id
+ */
+router.post('/:product_id', createPricing);
 
 export default router;

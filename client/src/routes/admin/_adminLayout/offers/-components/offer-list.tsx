@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useOffer } from "@/hooks/offer";
 import type { Offer, OfferPosition } from "@/data/types";
-import { FilterChip, FilterTabBar, SingleDropdown, SortDropdown } from "@/components/filters";
+import { FilterTabBar, SortDropdown } from "@/components/filters";
+import { formatEur } from "@/utils/utils";
 
 const sort_options = [
     { value: 'date-desc', label: 'Date – newest first' },
@@ -99,15 +100,22 @@ export default function OfferList() {
                                         <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
                                     </div>
                                     <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                        <span>{ }</span>
-                                        <span className='w-20 text-right font-medium text-gray-700'>{pos.totalPrice.toFixed(2)} €</span>
+                                        <span className='w-20 text-right font-medium text-gray-700'>{formatEur((pos.price_at_purchase * 12 * pos.duration))}</span>
                                     </div>
                                 </div>
                             ))}
 
                             <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
-                                <span className=''>Gesamt</span>
-                                <span>{offer.offerPositions.reduce((sum, pos) => sum + pos.totalPrice, 0).toFixed(2)} €</span>
+                                <span className=''>Zwischensumme (Netto)</span>
+                                <span>{formatEur(offer.net_amount)}</span>
+                            </div>
+                            <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
+                                <span className=''>+ Steuern</span>
+                                <span>+ {formatEur(offer.tax_amount)}</span>
+                            </div>
+                            <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
+                                <span className=''>Gesamt (Brutto)</span>
+                                <span>{formatEur(offer.total_amount)}</span>
                             </div>
                         </div>
 

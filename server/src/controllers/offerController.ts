@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { calculatePrice } from "../utils/products.js";
+import calculatePrice from "../utils/products.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
+import { Offer, OfferPosition } from "@prisma/client";
 
 export const getOffers = async (request: Request, response: Response) => {
     const offers = await prisma.offer.findMany({
@@ -33,11 +34,6 @@ export const createOfferDocumentJob = async (request: Request, response: Respons
 
     const job = await documentQueue.add(documentQueueKey, {
         documentJobId: documentJob.id, type: 'offer'
-    }, {
-        attempts: 3,
-        backoff: { type: 'exponential', delay: 2000 },
-        removeOnComplete: 100,
-        removeOnFail: 200,
     });
 
     await prisma.documentJob.update({
@@ -57,52 +53,57 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 
-    if (!body.offer || !body.positions) {
+    const { offer, positions } = body;
+
+    if (!offer || !positions) {
         return response.status(400).json({
             message: "Bad request.", success: false
         });
     }
 
+    console.log(offer, positions);
+
     try {
         const createdOffer = await prisma.$transaction(async (tx) => {
-            const offer = await tx.offer.create({
-                data: body.offer
-            });
+            let total_cent = 0;
 
-            for (const position of body.positions) {
-                const pricing = await prisma.productPricing.findMany({
-                    where: {
-                        AND: [
-                            { productId: position.productId },
-                            { contractId: position.contractId },
-                            { duration: position.duration },
-                        ]
-                    },
-                    select: {
-                        min_quantity: true,
-                        max_quantity: true,
-                        price: true
-                    }
-                });
+            for (const position of positions) {
+                const { productId, contractId, duration, quantity } = position;
+                const subtotal = await calculatePrice({ productId, contractId, duration, quantity });
 
-                if (pricing.length === 0) {
-                    throw new Error(`No pricing found for product!`);
+                if (!subtotal) {
+                    throw new Error("An items subtotal is null");
                 }
 
-                const { totalPrice, priceBreakdown } = calculatePrice(pricing, position.quantity);
+                total_cent = total_cent + subtotal.total.value * position.duration * 12;
+            }
+
+            const offer = await tx.offer.create({
+                data: {
+                    ...body.offer,
+                    net_amount: total_cent,
+                    tax_rate: 19,
+                    tax_amount: total_cent * 0.19,
+                    total_amount: total_cent * 1.19,
+                }
+            });
+
+            for (const position of positions) {
+                const { productId, contractId, duration, quantity } = position;
+                const subtotal = await calculatePrice({ productId, contractId, duration, quantity });
 
                 await tx.offerPosition.create({
                     data: {
-                        ...position,
                         offerId: offer.id,
-                        totalPrice,
-                        priceBreakdown,
+                        ...position,
+                        price_at_purchase: subtotal!.total.value,
+                        tax_rate_at_purchase: 19.00,
                     }
                 });
             }
 
             return offer;
-        })
+        });
 
         request.body.offer = createdOffer;
         next()

@@ -133,6 +133,12 @@ model Offer {
   order          Order?
   documentJobs   DocumentJob[]
 
+  // (in cent)
+  net_amount   Int // Der reine Warenwert (netto) 
+  tax_rate     Int // Der angewendete Prozentsatz (e.g 19.00)
+  tax_amount   Int // absolute Steuerbetrag
+  total_amount Int // Finale Brutto Betrag
+
   createdAt DateTime? @default(now())
   updatedAt DateTime?
 
@@ -154,12 +160,13 @@ model OfferPosition {
   duration Int
   quantity Int
 
-  totalPrice     Float
-  priceBreakdown Json?
-
   optional Boolean? @default(false)
 
+  price_at_purchase    Int
+  tax_rate_at_purchase Decimal
+
   createdAt DateTime? @default(now())
+  updatedAt DateTime? @default(now())
 
   @@map("offer_position")
 }
@@ -226,7 +233,7 @@ model ProductPricing {
 
   duration Int? @default(1)
 
-  price Float
+  price Int
 
   @@map("pricing")
 }

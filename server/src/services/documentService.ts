@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { fileURLToPath } from "url";
 import { renderDocx } from "../utils/generation/renderers/docxRenderer.js";
 import { convertDocxToPdf } from "../utils/generation/renderers/docxToPdfConverter.js";
-import { getOfferTemplateData, getInvoiceTemplateData } from "./documentDataService.js";
+import { getOfferTemplateData } from "./documentDataService.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.resolve(__dirname, "../templates");
@@ -33,8 +33,9 @@ export async function generateOffer(offerId: string, jobId: string): Promise<{ p
     return { pdfPath, docxPath };
 }
 
-export async function generateInvoice(orderId: string, jobId: string): Promise<{ pdfPath: string; docxPath: string }> {
-    const data = await getInvoiceTemplateData(orderId);
+export async function generateInvoice(orderId: string, jobId: string)/*: Promise<{ pdfPath: string; docxPath: string }>*/ {
+    /*
+    const data = {};
     const outDir = await ensureOutputDir(jobId);
 
     const docx = await renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data);
@@ -49,4 +50,5 @@ export async function generateInvoice(orderId: string, jobId: string): Promise<{
     ]);
 
     return { pdfPath, docxPath };
+    */
 }

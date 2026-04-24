@@ -1,36 +1,37 @@
 import { prisma } from "../lib/prisma.js";
-import { formatDate } from "../utils/utils.js";
-import { OfferTemplateData, TemplateData_ProductPosition } from "../utils/generation/types.js";
+import { formatDate, formatEur } from "../utils/utils.js";
+import { TemplateBaseData, TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
+import { Contract, Offer } from "@prisma/client";
 
-function formatEur(value: number): string {
-    return value.toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + " €";
-}
-
-export async function getOfferTemplateData(offerId: string): Promise<OfferTemplateData> {
-    const offer = await prisma.offer.findUniqueOrThrow({
-        where: { id: offerId },
-        include: {
-            customer: true,
-            customerContactPerson: true,
-            user: true,
-            offerPositions: {
-                include: {
-                    product: true,
-                    contract: true,
+export async function getOfferTemplateData(offerId: string): Promise<TemplateOfferData> {
+    const [offer, contracts] = await Promise.all([
+        await prisma.offer.findUniqueOrThrow({
+            where: { id: offerId },
+            include: {
+                customer: true,
+                customerContactPerson: true,
+                user: true,
+                offerPositions: {
+                    include: {
+                        product: true,
+                        contract: true,
+                    }
                 }
             }
-        }
-    });
+        }),
 
-    const { customer, customerContactPerson, user } = offer;
-    const { salutation, firstName, lastName } = customerContactPerson;
+        await prisma.contract.findMany(),
+    ]);
 
-    const hasOptionalPositions = offer.offerPositions.some(p => p.optional);
+    const { customer, customerContactPerson: ccp, user: employee, offerPositions } = offer;
 
-    const products = offer.offerPositions.map((pos, index): TemplateData_ProductPosition => {
-        const pricePerUnit = pos.totalPrice / pos.quantity;
-
-        console.log(pos)
+    const includesOptionals = offerPositions.some(op => op.optional);
+    const products = offerPositions.map((pos, index): TemplateProductData => {
+        const pricePerUnit = pos.price_at_purchase / pos.quantity;
+        const price_1 = pos.quantity * pricePerUnit;
+        const price_12 = `${price_1 * 12} €`; // 1. Jahr
+        const price_24 = `${price_1 * 24} €`; // 2. Jahre
+        const price_36 = `${price_1 * 36} €`; // 3. Jahre
 
         return {
             name: pos.product.name || '{product.name}',
@@ -42,14 +43,19 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
                 features: pos.contract.features || ["NaN"],
             },
             pricePerUnit: formatEur(pricePerUnit),
-            totalPrice: formatEur(pos.totalPrice),
-            optional: pos.optional || false
+            totalPrice: formatEur(pos.price_at_purchase),
+            optional: pos.optional || false,
+
+            prices: {
+                price_1: `${price_1} €`,
+                price_12: price_12,
+                price_24: price_24,
+                price_36: price_36,
+            }
         };
     });
-
-    const grouped = Object.groupBy(offer.offerPositions, p => `${p.contract.name}_${p.duration}`);
-
-    const positions = Object.values(grouped).map(group => {
+    const groupedProducts = Object.groupBy(offerPositions, p => `${p.contract.name}_${p.duration}`);
+    const positions = Object.values(groupedProducts).map(group => {
         const first = group![0];
         return {
             contract: {
@@ -61,16 +67,26 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
         };
     });
 
-    const allProducts = offer.offerPositions.map(i => i.product.name).join(" & ");
-    const totalSum = offer.offerPositions.reduce((sum, p) => sum + p.totalPrice, 0);
+    if (includesOptionals) {
+        const extraPositions = positions.flatMap(pos =>
+            contracts
+                .filter(contract => contract.name !== pos.contract.name)
+                .map(contract => ({
+                    contract: { name: contract.name, features: contract.features },
+                    duration: pos.duration,
+                    products: pos.products,
+                }))
+        );
+        positions.push(...extraPositions);
+    }
 
     return {
-        voucherId: offer.voucherId || '{voucherId}',
-        date: formatDate(offer.date) || '{date}',
-        paymentTerm: offer.paymentTerm || '{paymentTerm}',
-        validUntil: formatDate(offer.validUntil) || '{validUntil}',
-        requestFrom: formatDate(offer.requestFrom) || '{requestFrom}',
-        supplierId: offer.supplierId.slice(0, 8) || '{supplierId}',
+        voucherId: offer.voucherId,
+        date: formatDate(offer.date),
+        paymentTerm: offer.paymentTerm,
+        validUntil: offer.validUntil ? formatDate(offer.validUntil) : "",
+        requestFrom: offer.requestFrom ? formatDate(offer.requestFrom) : "",
+        supplierId: offer.supplierId.slice(0, 8),
 
         customer: {
             id: customer.customerId || '{customer.id}',
@@ -79,113 +95,30 @@ export async function getOfferTemplateData(offerId: string): Promise<OfferTempla
             plz: customer.plz || '{customer.plz}',
             city: customer.city || '{customer.city}',
 
-            fullName: `${salutation} ${firstName} ${lastName}`,
-            salutation: customerContactPerson.salutation || '{customer.salutation}',
-            firstName: customerContactPerson.firstName || '{customer.firstName}',
-            lastName: customerContactPerson.lastName || '{customer.lastName}',
+            fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,
+            salutation: ccp.salutation || '{customer.salutation}',
+            firstName: ccp.firstName || '{customer.firstName}',
+            lastName: ccp.lastName || '{customer.lastName}',
             phone: customer.phone || '{customer.phone}',
             email: customer.email || '{customer.email}',
         },
 
         employee: {
-            fullName: `${user.salutation} ${user.firstName} ${user.lastName}`,
-            salutation: user.salutation || '{employee.salutation}',
-            firstName: user.firstName || '{employee.firstName}',
-            lastName: user.lastName || '{employee.lastName}',
-            phone: '',
-            email: user.email || '{employee.email}',
+            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            salutation: employee.salutation || '{employee.salutation}',
+            firstName: employee.firstName || '{employee.firstName}',
+            lastName: employee.lastName || '{employee.lastName}',
+            phone: employee.phone || '{employee.phone}',
+            email: employee.email || '{employee.email}',
         },
 
-        products: {
-            names: products.map(p => p.name).join(" & "),
-            positions: products,
-            hasOptionals: hasOptionalPositions,
-        },
-        positions,
-    };
-}
+        /* Used for the tables */
+        products: products,
 
-export async function getInvoiceTemplateData(orderId: string): Promise<OfferTemplateData> {
-    const order = await prisma.order.findUniqueOrThrow({
-        where: { id: orderId },
-        include: {
-            customer: true,
-            user: true,
-            orderPositions: {
-                include: {
-                    product: true,
-                    contract: true,
-                }
-            }
+        /* Used for the first page */
+        positions: {
+            includesOptionals: includesOptionals,
+            products: positions
         }
-    });
-
-    const { customer, user } = order;
-
-    const contactPerson = await prisma.contactPerson.findFirst({
-        where: { customerId: customer.id }
-    });
-
-    const products = order.orderPositions.map((pos, index) => {
-        const lineTotal = pos.priceAtPurchase * pos.quantity;
-        return {
-            name: pos.product.name || '{product.name}',
-            description: pos.product.description || '{product.description}',
-            duration: String(pos.duration) || '{product.duration}',
-            quantity: String(pos.quantity) || '{product.quantity}',
-            contract: {
-                name: pos.contract.name || '{product.contract.name}',
-                features: ["{product.contract.features}"],
-            },
-            pricePerUnit: formatEur(lineTotal),
-            totalPrice: formatEur(lineTotal),
-            optional: false,
-        };
-    });
-
-    const totalSum = order.orderPositions.reduce((sum, p) => sum + p.priceAtPurchase * p.quantity, 0);
-
-    const contactFull = contactPerson
-        ? `${contactPerson.salutation} ${contactPerson.firstName} ${contactPerson.lastName}`
-        : "";
-
-    return {
-        voucherId: '{voucherId}',
-        date: '{date}',
-        paymentTerm: '{paymentTerm}',
-        validUntil: '{validUntil}',
-        requestFrom: '{requestFrom}',
-        supplierId: '{supplierId}',
-
-        customer: {
-            id: customer.customerId || '{customer.id}',
-            companyName: customer.companyName || '{customer.companyName}',
-            street: customer.street || '{customer.street}',
-            plz: customer.plz || '{customer.plz}',
-            city: customer.city || '{customer.city}',
-
-            fullName: `{customer.fullName}`,
-            salutation: '{customer.salutation}',
-            firstName: '{customer.firstName}',
-            lastName: '{customer.lastName}',
-            phone: customer.phone || '{customer.phone}',
-            email: customer.email || '{customer.email}',
-        },
-
-        employee: {
-            fullName: `${user.salutation} ${user.firstName} ${user.lastName}`,
-            salutation: user.salutation || '{employee.salutation}',
-            firstName: user.firstName || '{employee.firstName}',
-            lastName: user.lastName || '{employee.lastName}',
-            phone: '',
-            email: user.email || '{employee.email}',
-        },
-
-        products: {
-            names: "",
-            positions: products,
-            hasOptionals: false,
-        },
-        positions: []
     };
 }

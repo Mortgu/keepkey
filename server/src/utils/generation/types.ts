@@ -1,7 +1,7 @@
-import { Product } from "@prisma/client";
-
-/*  */
-export interface OfferTemplateData {
+/*
+ * This interface is the base of what docxtemplater revieves as data
+ */
+export interface TemplateBaseData {
     voucherId: string;      // "Beleg-Nr."
     date: string;             // "Datum"
     paymentTerm: string;    // "Zahlungsbedingung:"
@@ -9,14 +9,24 @@ export interface OfferTemplateData {
     requestFrom: string;      // "Ihre Anfrage vom:"
     supplierId: string;     // "Lieferantennummer"
 
-    customer: TemplateData_Customer;
-    employee: TemplateData_Employee;
+    customer: TemplateCustomerData;
+    employee: TemplateEmployeeData;
 
-    products: TemplateData_Products;
-    positions: TemplateData_Position[];
+    products: TemplateProductData[];
+    positions: {
+        includesOptionals: boolean;
+        products: TemplatePositionData[]
+    }
 }
 
-export interface TemplateData_Customer {
+/* Extended interface for additional field only used in offers */
+export interface TemplateOfferData extends TemplateBaseData { }
+
+/* Extended interface for additional field only used in invoices */
+export interface TemplateInvoiceData extends TemplateBaseData { }
+
+/* Every field from a customer that is required in a generated file */
+interface TemplateCustomerData {
     id: string;             // "Kunden-Nr."
     companyName: string;
     street: string;
@@ -31,7 +41,8 @@ export interface TemplateData_Customer {
     email: string;
 }
 
-export interface TemplateData_Employee {
+/* Every field from a employee/userq that is required in a generated file */
+interface TemplateEmployeeData {
     fullName: string;
     salutation: string;
     firstName: string;
@@ -40,53 +51,31 @@ export interface TemplateData_Employee {
     email: string;
 }
 
-export interface TemplateData_Products {
-    names: string;
-    positions: TemplateData_ProductPosition[];
-    hasOptionals: boolean;
-}
-
-export interface TemplateData_Position {
-    contract: TemplateData_Contract;
-    duration: string;
-    products: string;
-}
-
-export interface TemplateData_ProductPosition {
+export interface TemplateProductData {
     name: string;
     description: string;
     duration: string;
     quantity: string;
-    contract: TemplateData_Contract;
+    contract: TemplateContractData;
     pricePerUnit: string;
     totalPrice: string;
-    optional: boolean;
+    optional: boolean | null;
+
+    prices: {
+        price_1: string;
+        price_12: string;
+        price_24: string;
+        price_36: string;
+    }
 }
 
-export interface TemplateData_Contract {
+export interface TemplateContractData {
     name: string;
     features: string[];
 }
 
-export interface InvoicePositionTemplateData {
-    pos: number;
-    productName: string;
-    contractName: string;
-    duration: number;
-    quantity: number;
-    priceAtPurchase: string;
-    lineTotal: string;
-}
-
-export interface InvoiceTemplateData {
-    companyName: string;
-    contactFull: string;
-    street: string;
-    plzCity: string;
-
-    orderId: string;
-    date: string;
-
-    positions: InvoicePositionTemplateData[];
-    totalSum: string;
+export interface TemplatePositionData {
+    contract: TemplateContractData;
+    duration: string;
+    products: string;
 }

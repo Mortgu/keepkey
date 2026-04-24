@@ -2,7 +2,7 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import fs from "fs";
 import { createRequire } from "module";
-import { OfferTemplateData } from "../types.js";
+import { TemplateBaseData } from "../types.js";
 import { compileExpression, useDotAccessOperator } from "filtrex";
 import path from "path";
 
@@ -47,7 +47,7 @@ const simpleNestedParser = (tag: string): ParserResult => {
     };
 };
 
-export async function renderDocx(templatePath: string, data: OfferTemplateData): Promise<Buffer> {
+export async function renderDocx(templatePath: string, data: TemplateBaseData): Promise<Buffer> {
     const content = fs.readFileSync(templatePath, "binary");
 
     const zip = new PizZip(content);
