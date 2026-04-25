@@ -12,17 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as UserPathlessLayoutRouteRouteImport } from './routes/user/_pathlessLayout/route'
-import { Route as AdminAdminLayoutRouteRouteImport } from './routes/admin/_adminLayout/route'
-import { Route as UserPathlessLayoutIndexRouteImport } from './routes/user/_pathlessLayout/index'
-import { Route as AdminAdminLayoutIndexRouteImport } from './routes/admin/_adminLayout/index'
+import { Route as MainUserIndexRouteImport } from './routes/_main/user/index'
 import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
-import { Route as UserPathlessLayoutSettingsIndexRouteImport } from './routes/user/_pathlessLayout/settings/index'
-import { Route as UserPathlessLayoutOrdersIndexRouteImport } from './routes/user/_pathlessLayout/orders/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -38,25 +33,10 @@ const MainIndexRoute = MainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const UserPathlessLayoutRouteRoute = UserPathlessLayoutRouteRouteImport.update({
-  id: '/user/_pathlessLayout',
-  path: '/user',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminAdminLayoutRouteRoute = AdminAdminLayoutRouteRouteImport.update({
-  id: '/admin/_adminLayout',
-  path: '/admin',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UserPathlessLayoutIndexRoute = UserPathlessLayoutIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => UserPathlessLayoutRouteRoute,
-} as any)
-const AdminAdminLayoutIndexRoute = AdminAdminLayoutIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AdminAdminLayoutRouteRoute,
+const MainUserIndexRoute = MainUserIndexRouteImport.update({
+  id: '/user/',
+  path: '/user/',
+  getParentRoute: () => MainRouteRoute,
 } as any)
 const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
   id: '/products/',
@@ -83,33 +63,16 @@ const MainCustomersIndexRoute = MainCustomersIndexRouteImport.update({
   path: '/customers/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const UserPathlessLayoutSettingsIndexRoute =
-  UserPathlessLayoutSettingsIndexRouteImport.update({
-    id: '/settings/',
-    path: '/settings/',
-    getParentRoute: () => UserPathlessLayoutRouteRoute,
-  } as any)
-const UserPathlessLayoutOrdersIndexRoute =
-  UserPathlessLayoutOrdersIndexRouteImport.update({
-    id: '/orders/',
-    path: '/orders/',
-    getParentRoute: () => UserPathlessLayoutRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
-  '/admin': typeof AdminAdminLayoutRouteRouteWithChildren
-  '/user': typeof UserPathlessLayoutRouteRouteWithChildren
   '/login/': typeof LoginIndexRoute
   '/customers/': typeof MainCustomersIndexRoute
   '/employees/': typeof MainEmployeesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
   '/orders/': typeof MainOrdersIndexRoute
   '/products/': typeof MainProductsIndexRoute
-  '/admin/': typeof AdminAdminLayoutIndexRoute
-  '/user/': typeof UserPathlessLayoutIndexRoute
-  '/user/orders/': typeof UserPathlessLayoutOrdersIndexRoute
-  '/user/settings/': typeof UserPathlessLayoutSettingsIndexRoute
+  '/user/': typeof MainUserIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
@@ -119,16 +82,11 @@ export interface FileRoutesByTo {
   '/offers': typeof MainOffersIndexRoute
   '/orders': typeof MainOrdersIndexRoute
   '/products': typeof MainProductsIndexRoute
-  '/admin': typeof AdminAdminLayoutIndexRoute
-  '/user': typeof UserPathlessLayoutIndexRoute
-  '/user/orders': typeof UserPathlessLayoutOrdersIndexRoute
-  '/user/settings': typeof UserPathlessLayoutSettingsIndexRoute
+  '/user': typeof MainUserIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
-  '/admin/_adminLayout': typeof AdminAdminLayoutRouteRouteWithChildren
-  '/user/_pathlessLayout': typeof UserPathlessLayoutRouteRouteWithChildren
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
   '/_main/customers/': typeof MainCustomersIndexRoute
@@ -136,27 +94,19 @@ export interface FileRoutesById {
   '/_main/offers/': typeof MainOffersIndexRoute
   '/_main/orders/': typeof MainOrdersIndexRoute
   '/_main/products/': typeof MainProductsIndexRoute
-  '/admin/_adminLayout/': typeof AdminAdminLayoutIndexRoute
-  '/user/_pathlessLayout/': typeof UserPathlessLayoutIndexRoute
-  '/user/_pathlessLayout/orders/': typeof UserPathlessLayoutOrdersIndexRoute
-  '/user/_pathlessLayout/settings/': typeof UserPathlessLayoutSettingsIndexRoute
+  '/_main/user/': typeof MainUserIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/admin'
-    | '/user'
     | '/login/'
     | '/customers/'
     | '/employees/'
     | '/offers/'
     | '/orders/'
     | '/products/'
-    | '/admin/'
     | '/user/'
-    | '/user/orders/'
-    | '/user/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -166,15 +116,10 @@ export interface FileRouteTypes {
     | '/offers'
     | '/orders'
     | '/products'
-    | '/admin'
     | '/user'
-    | '/user/orders'
-    | '/user/settings'
   id:
     | '__root__'
     | '/_main'
-    | '/admin/_adminLayout'
-    | '/user/_pathlessLayout'
     | '/_main/'
     | '/login/'
     | '/_main/customers/'
@@ -182,16 +127,11 @@ export interface FileRouteTypes {
     | '/_main/offers/'
     | '/_main/orders/'
     | '/_main/products/'
-    | '/admin/_adminLayout/'
-    | '/user/_pathlessLayout/'
-    | '/user/_pathlessLayout/orders/'
-    | '/user/_pathlessLayout/settings/'
+    | '/_main/user/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   MainRouteRoute: typeof MainRouteRouteWithChildren
-  AdminAdminLayoutRouteRoute: typeof AdminAdminLayoutRouteRouteWithChildren
-  UserPathlessLayoutRouteRoute: typeof UserPathlessLayoutRouteRouteWithChildren
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
@@ -218,33 +158,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/user/_pathlessLayout': {
-      id: '/user/_pathlessLayout'
+    '/_main/user/': {
+      id: '/_main/user/'
       path: '/user'
-      fullPath: '/user'
-      preLoaderRoute: typeof UserPathlessLayoutRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/_adminLayout': {
-      id: '/admin/_adminLayout'
-      path: '/admin'
-      fullPath: '/admin'
-      preLoaderRoute: typeof AdminAdminLayoutRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/user/_pathlessLayout/': {
-      id: '/user/_pathlessLayout/'
-      path: '/'
       fullPath: '/user/'
-      preLoaderRoute: typeof UserPathlessLayoutIndexRouteImport
-      parentRoute: typeof UserPathlessLayoutRouteRoute
-    }
-    '/admin/_adminLayout/': {
-      id: '/admin/_adminLayout/'
-      path: '/'
-      fullPath: '/admin/'
-      preLoaderRoute: typeof AdminAdminLayoutIndexRouteImport
-      parentRoute: typeof AdminAdminLayoutRouteRoute
+      preLoaderRoute: typeof MainUserIndexRouteImport
+      parentRoute: typeof MainRouteRoute
     }
     '/_main/products/': {
       id: '/_main/products/'
@@ -281,20 +200,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCustomersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/user/_pathlessLayout/settings/': {
-      id: '/user/_pathlessLayout/settings/'
-      path: '/settings'
-      fullPath: '/user/settings/'
-      preLoaderRoute: typeof UserPathlessLayoutSettingsIndexRouteImport
-      parentRoute: typeof UserPathlessLayoutRouteRoute
-    }
-    '/user/_pathlessLayout/orders/': {
-      id: '/user/_pathlessLayout/orders/'
-      path: '/orders'
-      fullPath: '/user/orders/'
-      preLoaderRoute: typeof UserPathlessLayoutOrdersIndexRouteImport
-      parentRoute: typeof UserPathlessLayoutRouteRoute
-    }
   }
 }
 
@@ -305,6 +210,7 @@ interface MainRouteRouteChildren {
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
   MainProductsIndexRoute: typeof MainProductsIndexRoute
+  MainUserIndexRoute: typeof MainUserIndexRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
@@ -314,47 +220,15 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
   MainProductsIndexRoute: MainProductsIndexRoute,
+  MainUserIndexRoute: MainUserIndexRoute,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
   MainRouteRouteChildren,
 )
 
-interface AdminAdminLayoutRouteRouteChildren {
-  AdminAdminLayoutIndexRoute: typeof AdminAdminLayoutIndexRoute
-}
-
-const AdminAdminLayoutRouteRouteChildren: AdminAdminLayoutRouteRouteChildren = {
-  AdminAdminLayoutIndexRoute: AdminAdminLayoutIndexRoute,
-}
-
-const AdminAdminLayoutRouteRouteWithChildren =
-  AdminAdminLayoutRouteRoute._addFileChildren(
-    AdminAdminLayoutRouteRouteChildren,
-  )
-
-interface UserPathlessLayoutRouteRouteChildren {
-  UserPathlessLayoutIndexRoute: typeof UserPathlessLayoutIndexRoute
-  UserPathlessLayoutOrdersIndexRoute: typeof UserPathlessLayoutOrdersIndexRoute
-  UserPathlessLayoutSettingsIndexRoute: typeof UserPathlessLayoutSettingsIndexRoute
-}
-
-const UserPathlessLayoutRouteRouteChildren: UserPathlessLayoutRouteRouteChildren =
-  {
-    UserPathlessLayoutIndexRoute: UserPathlessLayoutIndexRoute,
-    UserPathlessLayoutOrdersIndexRoute: UserPathlessLayoutOrdersIndexRoute,
-    UserPathlessLayoutSettingsIndexRoute: UserPathlessLayoutSettingsIndexRoute,
-  }
-
-const UserPathlessLayoutRouteRouteWithChildren =
-  UserPathlessLayoutRouteRoute._addFileChildren(
-    UserPathlessLayoutRouteRouteChildren,
-  )
-
 const rootRouteChildren: RootRouteChildren = {
   MainRouteRoute: MainRouteRouteWithChildren,
-  AdminAdminLayoutRouteRoute: AdminAdminLayoutRouteRouteWithChildren,
-  UserPathlessLayoutRouteRoute: UserPathlessLayoutRouteRouteWithChildren,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport

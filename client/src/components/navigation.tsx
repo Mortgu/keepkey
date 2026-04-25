@@ -36,14 +36,8 @@ export default function Navigation() {
 function NavigationActions() {
     return (
         <div className='flex gap-4'>
-            {/*<div className='w-8 h-8 m-auto'>
-                <button className='bg-(--primary) cursor-pointer w-full h-full rounded-lg flex items-center justify-center'>
-                    <Plus className='size-5 text-white' />
-                </button>
-            </div>*/}
-
             <div className='w-8 h-full m-auto hover:text-(--primary) cursor-pointer'>
-                <NavLink to="/user/settings">
+                <NavLink to="/user">
                     <User className='size-6' />
                 </NavLink>
             </div>

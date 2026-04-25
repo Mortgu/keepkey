@@ -1,13 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_main/')({
-    component: Index,
+  component: RouteComponent,
 })
 
-function Index() {
-    return (
-        <div className="flex gap-4 items-center">
-
-        </div>
-    );
+function RouteComponent() {
+  return <div>Hello "/_main/"!</div>
 }

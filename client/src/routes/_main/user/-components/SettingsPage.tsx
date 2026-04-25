@@ -1,13 +1,8 @@
 import Button from '@/components/button/button'
 import { useAuth } from '@/context/auth';
-import { createFileRoute } from '@tanstack/react-router'
 import { LogOut, Trash } from 'lucide-react';
 
-export const Route = createFileRoute('/user/_pathlessLayout/settings/')({
-  component: RouteComponent,
-})
-
-function RouteComponent() {
+export default function SettingsPage() {
   const { logout, deleteAccount } = useAuth();
 
   return (
