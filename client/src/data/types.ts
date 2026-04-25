@@ -72,7 +72,6 @@ export interface BaseProduct {
 export interface ProductItem extends BaseProduct {
     id: string;
 
-    published: boolean,
     productPricing: ProductItemPricing[],
 
     createdAt: Date;

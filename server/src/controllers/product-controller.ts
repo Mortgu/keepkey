@@ -23,12 +23,11 @@ export const getAllProducts = async (request: Request, response: Response, next:
 
 
 /* 
- * Get Session/Published Products 
+ * Get Session Products 
  * [GET] http://localhost:3000/api/products 
  */
 export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
     const products = await prisma.product.findMany({
-        where: { published: true },
         orderBy: { createdAt: 'asc' },
         include: {
             productPricing: {

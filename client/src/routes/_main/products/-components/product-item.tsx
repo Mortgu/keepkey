@@ -1,5 +1,5 @@
 import Button from "@/components/button/button.tsx";
-import { BadgeCheck, Loader, Pen, Plus, Trash, X } from "lucide-react";
+import { Pen, Plus, Trash } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useState } from "react";
@@ -12,7 +12,6 @@ export type ProductItemProps = {
     name: string;
     quantity: number;
     price: number;
-    published: boolean;
     description: string;
     link: string;
     productPricing: [{
@@ -35,7 +34,7 @@ export default function ProductItem(product: ProductItemProps) {
     const { contracts } = useContracts();
 
     const [isAddingPricing, addPricing] = useState<boolean>(false);
-    const [isEdeting, setEdit] = useState<boolean>(false);
+    const [isEditing, setEdit] = useState<boolean>(false);
 
     const { name, description, link } = product;
 
@@ -59,148 +58,135 @@ export default function ProductItem(product: ProductItemProps) {
         onSubmit: async ({ value }) => {
             const response = await fetch(`http://localhost:3000/api/pricing/${product.id}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
                 body: JSON.stringify({ ...value })
             });
 
-            const result = await response.json();
-
-            if (!response.ok) {
-                throw new Error("Failed to create new pricing!");
-            }
-
-            return result;
+            if (!response.ok) throw new Error("Failed to create new pricing!");
+            return response.json();
         }
     });
 
-    const handlePublication = () => {
-        const answer = confirm("Change the visibility?");
-
-        if (answer) {
-            updateProduct({ id: product.id, product: { published: !product.published } });
-        }
-    }
-
     return (
-        <div className='border border-(--border) rounded-md overflow-hidden'>
+        <>
+            <div className="bg-white border border-(--border) rounded-md overflow-hidden">
 
-            {/* Product Header */}
-            <div className='flex items-center justify-between p-2 gap-4'>
-                <div className="grid items-center">
-                    <p className="text-md">{product.name}</p>
-                    <p className="text-sm text-gray-600">{product.description}</p>
-                </div>
-
-                <div className="min-w-fit">
-                    {/* Publish Product Button */}
-                    <Button onClick={handlePublication} variant="secondary" size='sm' className="mr-4">
-                        {product.published && (
-                            <>
-                                <BadgeCheck className="size-4" />
-                                <label className="text-md">Published</label>
-                            </>
-                        )}
-                        {!product.published && (
-                            <>
-                                <X className="size-4" />
-                                <label className="text-md">Not Published</label>
-                            </>
-                        )}
-                    </Button>
-
-                    {/* Edit Product Button */}
-                    <Button onClick={() => setEdit(true)} size='sm' variant='ghost' className='aspect-square' iconOnly icon={
-                        <Pen className='size-4' />
-                    } />
-
-                    {/* Delete Product Button */}
-                    <Button loading={isDeletingProduct} onClick={() => deleteProduct(product.id)} size='sm' variant='ghost' iconOnly icon={
-                        <Trash className='size-4' />
-                    } />
-                </div>
-            </div>
-
-            <div className='flex items-center p-2 border-t border-(--border)'>
-                <p className='flex-1 text-sm'>{product.link}</p>
-            </div>
-
-            {/* Product Body */}
-
-            {product.productPricing.map((pricing, index) => (
-                <div key={index} className='flex items-center p-2 border-t border-(--border)'>
-                    <p className='flex-1'>{pricing?.contract?.name}</p>
-                    <p className='flex-1'>{pricing?.min_quantity}-{pricing.max_quantity}</p>
-                    <p className='flex-1'>{pricing?.duration}</p>
-                    <p className='flex-1'>{(pricing.price / 100).toFixed(2)} €</p>
-                    <Button size='xs' variant='link' iconOnly icon={
-                        <Pen className='size-4' />
-                    } />
-                    <Button size='xs' variant='link' iconOnly icon={
-                        <Trash className='size-4' />
-                    } />
-                </div>
-            ))}
-
-            {/* Add Pricing Form */}
-            {isAddingPricing && (
-                <form onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    pricingForm.handleSubmit(pricingForm);
-                }} className="border-t gap-2 border-(--border) py-2 px-2 flex flex-wrap items-center justify-between">
-                    <pricingForm.Field name='contractId' children={(field) => (
-                        <select id={field.name} name={field.name} defaultValue={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)} className="flex-2 h-9 px-3 py-2 border border-(--border) rounded-md focus:ring-2 focus:ring-blue-500 outline-none disabled:opacity-50 text-sm bg-gray-50">
-                            {contracts?.map((contract: any) => (
-                                <option key={contract.id} value={contract.id}>{contract.name}</option>
-                            ))}
-                        </select>
-                    )} />
-
-                    <pricingForm.Field name='min_quantity' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="min-seats"
-                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
-                    )} />
-                    <pricingForm.Field name='max_quantity' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="max-seats"
-                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
-                    )} />
-                    <pricingForm.Field name='duration' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="duration"
-                            onChange={(e) => field.handleChange(parseInt(e.target.value))} />
-                    )} />
-                    <pricingForm.Field name='price' children={(field) => (
-                        <input id={field.name} value={field.state.value} type="number" step="0.01" className='flex-1 min-w-0 h-9 outline-none border border-(--border) p-1 rounded-md text-sm' placeholder="price"
-                            onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
-                    )} />
-
-                    <div className="flex gap-1 shrink-0">
-                        <pricingForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                            <Button disabled={!canSubmit} type='submit' size='sm' variant='primary'>
-                                {isSubmitting && <Loader className='animate-spin' />}
-                                {!isSubmitting && ("Save")}
-                            </Button>
-                        )} />
-                        <Button onClick={() => addPricing(false)} type='button' size='sm' variant='secondary'>Cancel</Button>
+                {/* Header */}
+                <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
+                    <div>
+                        <p className="text-md text-gray-900">{product.name}</p>
+                        <p className="text-sm font-light text-gray-400 mt-0.5">{product.description}</p>
                     </div>
-                </form>
-            )}
+                    <div className="flex items-center gap-1">
+                        <Button variant="ghost" icon={<Pen className="size-3.5" />} iconOnly onClick={() => setEdit(true)} size="sm" />
+                        <Button variant="ghost" loading={isDeletingProduct} icon={<Trash className="size-3.5" />} iconOnly onClick={() => deleteProduct(product.id)} size="sm" />
+                    </div>
+                </div>
 
-            <div className="border-t border-(--border) py-2 px-2 flex items-center justify-between">
-                <p></p>
-                <p></p>
-                <button onClick={() => addPricing(true)} className='flex items-center justify-between gap-2 cursor-pointer'>
-                    <Plus className='size-4' />
-                    <p>Hinzufügen</p>
-                </button>
+                {/* Pricing rows */}
+                {product.productPricing.length > 0 && (
+                    <>
+                        <div className="grid grid-cols-[1fr_96px_80px_80px_100px] items-center px-4 py-1.5 border-b border-(--border) bg-(--page-bg)">
+                            <span className="text-caption text-gray-400">Vertrag</span>
+                            <span className="text-caption text-gray-400 text-center">Menge</span>
+                            <span className="text-caption text-gray-400 text-center">Laufzeit</span>
+                            <span className="text-caption text-gray-400 text-right">Preis</span>
+                            <span />
+                        </div>
+                        {product.productPricing.map((pricing, index) => (
+                            <div key={index} className="grid grid-cols-[1fr_96px_80px_80px_100px] items-center px-4 py-1 border-b border-(--border)">
+                                <p className="text-sm text-gray-700 truncate">{pricing?.contract?.name}</p>
+                                <p className="text-sm text-gray-600 text-center">{pricing.min_quantity}–{pricing.max_quantity}</p>
+                                <p className="text-sm text-gray-600 text-center">{pricing.duration} Jahre</p>
+                                <p className="text-sm font-medium text-gray-900 text-right">{(pricing.price / 100).toFixed(2)} €</p>
+                                <div className="flex items-center gap-0.5 justify-end">
+                                    <Button variant="link" icon={<Pen className="size-3.5" />} iconOnly size="sm" />
+                                    <Button variant="link" icon={<Trash className="size-3.5" />} iconOnly size="sm" />
+                                </div>
+                            </div>
+                        ))}
+                    </>
+                )}
+
+                {/* Add Pricing Form */}
+                {isAddingPricing && (
+                    <form
+                        onSubmit={(e) => { e.preventDefault(); e.stopPropagation(); pricingForm.handleSubmit(pricingForm); }}
+                        className="px-4 py-3 border-b border-(--border) flex flex-wrap gap-2 items-center"
+                    >
+                        <pricingForm.Field name="contractId">
+                            {(field) => (
+                                <select
+                                    id={field.name} name={field.name} defaultValue={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    className="flex-2 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm bg-white"
+                                >
+                                    {contracts?.map((contract: any) => (
+                                        <option key={contract.id} value={contract.id}>{contract.name}</option>
+                                    ))}
+                                </select>
+                            )}
+                        </pricingForm.Field>
+                        <pricingForm.Field name="min_quantity">
+                            {(field) => (
+                                <input id={field.name} value={field.state.value} type="number"
+                                    className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"
+                                    placeholder="Min" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            )}
+                        </pricingForm.Field>
+                        <pricingForm.Field name="max_quantity">
+                            {(field) => (
+                                <input id={field.name} value={field.state.value} type="number"
+                                    className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"
+                                    placeholder="Max" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            )}
+                        </pricingForm.Field>
+                        <pricingForm.Field name="duration">
+                            {(field) => (
+                                <input id={field.name} value={field.state.value} type="number"
+                                    className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"
+                                    placeholder="Laufzeit" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
+                            )}
+                        </pricingForm.Field>
+                        <pricingForm.Field name="price">
+                            {(field) => (
+                                <input id={field.name} value={field.state.value} type="number" step="0.01"
+                                    className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"
+                                    placeholder="Preis" onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
+                            )}
+                        </pricingForm.Field>
+                        <div className="flex gap-1 shrink-0">
+                            <pricingForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
+                                {([canSubmit, isSubmitting]) => (
+                                    <Button disabled={!canSubmit} loading={isSubmitting as boolean} type="submit" size="sm">
+                                        {!(isSubmitting as boolean) && 'Speichern'}
+                                    </Button>
+                                )}
+                            </pricingForm.Subscribe>
+                            <Button onClick={() => addPricing(false)} type="button" size="sm" variant="secondary">Abbrechen</Button>
+                        </div>
+                    </form>
+                )}
+
+                {/* Footer */}
+                <div className="px-4 py-2.5 flex items-center justify-end">
+                    <button
+                        onClick={() => addPricing(true)}
+                        className="flex items-center gap-1.5 text-sm text-(--primary-600) hover:text-(--primary-700) cursor-pointer transition-colors"
+                    >
+                        <Plus className="size-3.5" />
+                        Preis hinzufügen
+                    </button>
+                </div>
             </div>
 
-            {/* Edit Product Modal */}
-            <ProductModal open={isEdeting} cancelFn={() => setEdit(false)}
-                submitFn={(value) => updateProduct({ id: product.id, product: value })} currentItem={{ name, description, link }} />
-        </div>
+            <ProductModal
+                open={isEditing}
+                cancelFn={() => setEdit(false)}
+                submitFn={(value) => updateProduct({ id: product.id, product: value })}
+                currentItem={{ name, description, link }}
+            />
+        </>
     );
 }

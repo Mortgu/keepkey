@@ -191,8 +191,6 @@ model Product {
   description String?
   link        String?
 
-  published Boolean @default(false)
-
   productPricing ProductPricing[]
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
