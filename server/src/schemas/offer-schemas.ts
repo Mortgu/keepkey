@@ -16,8 +16,8 @@ export const createOfferSchema = z.object({
         userId: z.string().min(1),
         voucherId: z.string().optional(),
         paymentTerm: z.string().optional(),
-        validUntil: z.string().datetime().optional(),
-        requestFrom: z.string().datetime().optional(),
+        validUntil: z.string().nullable(),
+        requestFrom: z.string().nullable(),
     }),
     positions: z.array(offerPositionSchema).min(1),
 });

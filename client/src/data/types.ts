@@ -115,6 +115,8 @@ export interface ShoppingCart {
 
 export interface Order {
     id: string;
+
+    employee: User;
     customer: Customer;
 
     orderPositions: OrderPositionItem[],

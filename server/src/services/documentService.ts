@@ -17,7 +17,7 @@ export async function generateOffer(offerId: string, jobId: string): Promise<{ p
     const data = await getOfferTemplateData(offerId);
     const outDir = await ensureOutputDir(jobId);
 
-    const docx = await renderDocx(path.join(env.TEMPLATE_DIR, "offer.docx"), data);
+    const docx = await renderDocx(path.join(env.TEMPLATES_DIR, "offer.docx"), data);
     const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "angebot.pdf");

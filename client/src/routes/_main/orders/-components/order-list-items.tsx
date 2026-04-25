@@ -32,7 +32,7 @@ export default function OrderListItems() {
             <div className='grid border border-(--border) rounded-md'>
                 <div className='flex items-center justify-between border-b border-(--border) px-3 py-2'>
                     <div className="flex-1">
-                        <p className='text-lg'>{order.user.name} </p>
+                        <p className='text-lg'>{order.employee.name} </p>
                         <p className='text-sm text-gray-500'>{formatDate(order.createdAt)}</p>
                     </div>
                     <div className="flex items-center">
