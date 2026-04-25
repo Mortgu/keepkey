@@ -1,7 +1,9 @@
 import { Router } from "express";
 import { requireSession } from "../middlewares/auth.js";
 import { canCreateContract, canDeleteContract, canUpdateContract } from "../permissions/contract.js";
-import { createContract, deleteContract, getAllContracts, updateContract } from "../controllers/contractController.js";
+import { createContract, deleteContract, getAllContracts, updateContract } from "../controllers/contract-controller.js";
+import { validate } from "../middlewares/validate.js";
+import { createContractSchema, updateContractSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -9,10 +11,10 @@ const router = Router();
 router.get('/', getAllContracts);
 
 /* [POST] http://localhost:3000/api/contracts */
-router.post('/', requireSession, canCreateContract, createContract);
+router.post('/', requireSession, canCreateContract, validate(createContractSchema), createContract);
 
 /* [PUT] http://localhost:3000/api/contracts/:id */
-router.put('/:id', requireSession, canUpdateContract, updateContract);
+router.put('/:id', requireSession, canUpdateContract, validate(updateContractSchema), updateContract);
 
 /* [DELETE] http://localhost:3000/api/contracts */
 router.delete('/', requireSession, canDeleteContract, deleteContract);

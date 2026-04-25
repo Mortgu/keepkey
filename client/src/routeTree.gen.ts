@@ -16,7 +16,6 @@ import { Route as UserPathlessLayoutRouteRouteImport } from './routes/user/_path
 import { Route as AdminAdminLayoutRouteRouteImport } from './routes/admin/_adminLayout/route'
 import { Route as UserPathlessLayoutIndexRouteImport } from './routes/user/_pathlessLayout/index'
 import { Route as AdminAdminLayoutIndexRouteImport } from './routes/admin/_adminLayout/index'
-import { Route as MainSignupIndexRouteImport } from './routes/_main/signup/index'
 import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
 import { Route as MainLoginIndexRouteImport } from './routes/_main/login/index'
 import { Route as UserPathlessLayoutSettingsIndexRouteImport } from './routes/user/_pathlessLayout/settings/index'
@@ -61,11 +60,6 @@ const AdminAdminLayoutIndexRoute = AdminAdminLayoutIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminAdminLayoutRouteRoute,
-} as any)
-const MainSignupIndexRoute = MainSignupIndexRouteImport.update({
-  id: '/signup/',
-  path: '/signup/',
-  getParentRoute: () => MainRouteRoute,
 } as any)
 const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
   id: '/products/',
@@ -133,7 +127,6 @@ export interface FileRoutesByFullPath {
   '/test': typeof MainTestRoute
   '/login/': typeof MainLoginIndexRoute
   '/products/': typeof MainProductsIndexRoute
-  '/signup/': typeof MainSignupIndexRoute
   '/admin/': typeof AdminAdminLayoutIndexRoute
   '/user/': typeof UserPathlessLayoutIndexRoute
   '/products/$productId/': typeof MainProductsProductIdIndexRoute
@@ -150,7 +143,6 @@ export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
   '/login': typeof MainLoginIndexRoute
   '/products': typeof MainProductsIndexRoute
-  '/signup': typeof MainSignupIndexRoute
   '/admin': typeof AdminAdminLayoutIndexRoute
   '/user': typeof UserPathlessLayoutIndexRoute
   '/products/$productId': typeof MainProductsProductIdIndexRoute
@@ -171,7 +163,6 @@ export interface FileRoutesById {
   '/_main/': typeof MainIndexRoute
   '/_main/login/': typeof MainLoginIndexRoute
   '/_main/products/': typeof MainProductsIndexRoute
-  '/_main/signup/': typeof MainSignupIndexRoute
   '/admin/_adminLayout/': typeof AdminAdminLayoutIndexRoute
   '/user/_pathlessLayout/': typeof UserPathlessLayoutIndexRoute
   '/_main/products/$productId/': typeof MainProductsProductIdIndexRoute
@@ -192,7 +183,6 @@ export interface FileRouteTypes {
     | '/test'
     | '/login/'
     | '/products/'
-    | '/signup/'
     | '/admin/'
     | '/user/'
     | '/products/$productId/'
@@ -209,7 +199,6 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/products'
-    | '/signup'
     | '/admin'
     | '/user'
     | '/products/$productId'
@@ -229,7 +218,6 @@ export interface FileRouteTypes {
     | '/_main/'
     | '/_main/login/'
     | '/_main/products/'
-    | '/_main/signup/'
     | '/admin/_adminLayout/'
     | '/user/_pathlessLayout/'
     | '/_main/products/$productId/'
@@ -298,13 +286,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminAdminLayoutIndexRouteImport
       parentRoute: typeof AdminAdminLayoutRouteRoute
-    }
-    '/_main/signup/': {
-      id: '/_main/signup/'
-      path: '/signup'
-      fullPath: '/signup/'
-      preLoaderRoute: typeof MainSignupIndexRouteImport
-      parentRoute: typeof MainRouteRoute
     }
     '/_main/products/': {
       id: '/_main/products/'
@@ -384,7 +365,6 @@ interface MainRouteRouteChildren {
   MainIndexRoute: typeof MainIndexRoute
   MainLoginIndexRoute: typeof MainLoginIndexRoute
   MainProductsIndexRoute: typeof MainProductsIndexRoute
-  MainSignupIndexRoute: typeof MainSignupIndexRoute
   MainProductsProductIdIndexRoute: typeof MainProductsProductIdIndexRoute
 }
 
@@ -393,7 +373,6 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainIndexRoute: MainIndexRoute,
   MainLoginIndexRoute: MainLoginIndexRoute,
   MainProductsIndexRoute: MainProductsIndexRoute,
-  MainSignupIndexRoute: MainSignupIndexRoute,
   MainProductsProductIdIndexRoute: MainProductsProductIdIndexRoute,
 }
 

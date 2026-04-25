@@ -1,8 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { Product } from "../models/product.js";
 import { prisma } from "../lib/prisma.js";
-import { auth } from "../lib/auth.js";
-import { fromNodeHeaders } from "better-auth/node";
 
 /* 
  * Get all products for admin
@@ -77,7 +74,7 @@ export const createProduct = async (request: Request, response: Response, next: 
             });
         }
 
-        const newProduct: Product = await prisma.product.create({
+        const newProduct = await prisma.product.create({
             data: { ...body }
         });
 

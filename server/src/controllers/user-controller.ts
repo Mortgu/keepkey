@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
-import { dmmfToRuntimeDataModel } from "@prisma/client/runtime/client";
 import { auth } from "../lib/auth.js";
 
 export const getAllUsers = async (request: Request, response: Response) => {
@@ -153,31 +152,6 @@ export const deleteAccount = async (request: Request, response: Response) => {
     });
 }
 
-export const upsertAddress = async (request: Request, response: Response) => {
-    const { street, plz, city, phone } = request.body;
-    const userId = request.user?.id;
-
-    if (!userId) {
-        return response.status(401).json({ success: false, message: 'Unauthorized' });
-    }
-
-    try {
-        const customer = await prisma.customer.findUnique({ where: { userId } });
-        if (!customer) {
-            return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
-        }
-
-        const address = await prisma.address.upsert({
-            where: { customerId: customer.id },
-            create: { customerId: customer.id, street, plz, city, phone },
-            update: { street, plz, city, phone },
-        });
-        return response.status(200).json(address);
-    } catch (error) {
-        return response.status(500).json({ success: false, message: 'Failed to save address' });
-    }
-}
-
 export const createContactPersons = async (request: Request, response: Response) => {
     const persons: Array<{ salutation: string; firstName: string; lastName: string; email?: string }> = request.body;
     const userId = request.user?.id;
@@ -187,16 +161,28 @@ export const createContactPersons = async (request: Request, response: Response)
     }
 
     try {
-        const customer = await prisma.customer.findUnique({ where: { userId } });
-        if (!customer) {
-            return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
-        }
+        const createdContactPerson = await prisma.$transaction(async (tx) => {
+            const customer = await prisma.customer.findUnique({
+                where: {
+                    id: userId
+                }
+            });
 
-        await prisma.contactPerson.createMany({
-            data: persons.map(p => ({ ...p, customerId: customer.id })),
+            if (!customer) {
+                return response.status(400).json({ success: false, message: 'No customer linked to this account!' });
+            }
+
+            const created = await prisma.contactPerson.createMany({
+                data: persons.map(p => ({ ...p, customerId: customer.id })),
+            });
+
+            return created;
         });
-        return response.status(201).json({ ok: true });
+
+        return response.status(201).json(createdContactPerson);
     } catch (error) {
-        return response.status(500).json({ success: false, message: 'Failed to create contact persons' });
+        return response.status(500).json({
+            success: false, message: 'Failed to create contact persons'
+        });
     }
 }

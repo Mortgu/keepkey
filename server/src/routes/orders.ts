@@ -2,7 +2,7 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
-import { getOrderById, getSessionOrders, getOrderDocumentJobs } from "../controllers/orderController.js";
+import { getOrderById, getSessionOrders, getOrderDocumentJobs } from "../controllers/order-controller.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 const router = Router();

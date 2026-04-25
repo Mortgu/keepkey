@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { requireSession } from "../middlewares/auth.js";
-import { getSessionUser, upsertAddress, createContactPersons, deleteAccount, updateUserById, createUser, deleteUser } from "../controllers/userController.js";
+import { getSessionUser, createContactPersons, deleteAccount, updateUserById, createUser, deleteUser } from "../controllers/user-controller.js";
+import { validate } from "../middlewares/validate.js";
+import { createUserSchema, updateUserSchema, upsertAddressSchema, createContactPersonsSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -8,11 +10,11 @@ const router = Router();
 router.get('/session', requireSession, getSessionUser);
 
 /* [POST] http://localhost:3000/api/users/{id} */
-router.post('/:id', requireSession, updateUserById);
+router.post('/:id', requireSession, validate(updateUserSchema), updateUserById);
 
 /* [POST] http://localhost:3000/api/users/ */
 /* canCreateUsers */
-router.post('/', requireSession, createUser)
+router.post('/', requireSession, validate(createUserSchema), createUser)
 
 /* [DELETE] http://localhost:3000/api/users */
 /* canDeleteUser */
@@ -21,10 +23,7 @@ router.delete('/:id', requireSession, deleteUser);
 /* [DELETE] http://localhost:3000/api/users */
 router.delete('/', requireSession, deleteAccount);
 
-/* [POST] http://localhost:3000/api/users/me/address */
-router.post('/me/address', requireSession, upsertAddress);
-
 /* [POST] http://localhost:3000/api/users/me/contact-persons */
-router.post('/me/contact-persons', requireSession, createContactPersons);
+router.post('/me/contact-persons', requireSession, validate(createContactPersonsSchema), createContactPersons);
 
 export default router;
