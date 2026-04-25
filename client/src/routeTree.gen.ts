@@ -18,6 +18,7 @@ import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
+import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -63,10 +64,16 @@ const MainCustomersIndexRoute = MainCustomersIndexRouteImport.update({
   path: '/customers/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainContractsIndexRoute = MainContractsIndexRouteImport.update({
+  id: '/contracts/',
+  path: '/contracts/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/contracts/': typeof MainContractsIndexRoute
   '/customers/': typeof MainCustomersIndexRoute
   '/employees/': typeof MainEmployeesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
@@ -77,6 +84,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
   '/login': typeof LoginIndexRoute
+  '/contracts': typeof MainContractsIndexRoute
   '/customers': typeof MainCustomersIndexRoute
   '/employees': typeof MainEmployeesIndexRoute
   '/offers': typeof MainOffersIndexRoute
@@ -89,6 +97,7 @@ export interface FileRoutesById {
   '/_main': typeof MainRouteRouteWithChildren
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
+  '/_main/contracts/': typeof MainContractsIndexRoute
   '/_main/customers/': typeof MainCustomersIndexRoute
   '/_main/employees/': typeof MainEmployeesIndexRoute
   '/_main/offers/': typeof MainOffersIndexRoute
@@ -101,6 +110,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/login/'
+    | '/contracts/'
     | '/customers/'
     | '/employees/'
     | '/offers/'
@@ -111,6 +121,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/login'
+    | '/contracts'
     | '/customers'
     | '/employees'
     | '/offers'
@@ -122,6 +133,7 @@ export interface FileRouteTypes {
     | '/_main'
     | '/_main/'
     | '/login/'
+    | '/_main/contracts/'
     | '/_main/customers/'
     | '/_main/employees/'
     | '/_main/offers/'
@@ -200,11 +212,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCustomersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/contracts/': {
+      id: '/_main/contracts/'
+      path: '/contracts'
+      fullPath: '/contracts/'
+      preLoaderRoute: typeof MainContractsIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
   }
 }
 
 interface MainRouteRouteChildren {
   MainIndexRoute: typeof MainIndexRoute
+  MainContractsIndexRoute: typeof MainContractsIndexRoute
   MainCustomersIndexRoute: typeof MainCustomersIndexRoute
   MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
   MainOffersIndexRoute: typeof MainOffersIndexRoute
@@ -215,6 +235,7 @@ interface MainRouteRouteChildren {
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainIndexRoute: MainIndexRoute,
+  MainContractsIndexRoute: MainContractsIndexRoute,
   MainCustomersIndexRoute: MainCustomersIndexRoute,
   MainEmployeesIndexRoute: MainEmployeesIndexRoute,
   MainOffersIndexRoute: MainOffersIndexRoute,
