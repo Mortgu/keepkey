@@ -1,7 +1,7 @@
 import Button from '@/components/button/button';
 import Input from '@/components/inputs/input';
 import ModalDialog from '@/components/modal';
-import { type BaseUser, type User } from '@/data/types';
+import { type User } from '@/data/types';
 import { useAdmin } from '@/hooks/admin';
 import { useForm } from '@tanstack/react-form';
 import { Loader } from 'lucide-react';

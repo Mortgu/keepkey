@@ -1,7 +1,7 @@
-import UserList from '@/routes/admin/_adminLayout/users/-components/user-list';
 import { createFileRoute } from '@tanstack/react-router'
+import UserList from './-components/user-list';
 
-export const Route = createFileRoute('/admin/_adminLayout/users/')({
+export const Route = createFileRoute('/_main/employees/')({
     component: RouteComponent,
 })
 

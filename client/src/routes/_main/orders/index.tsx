@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import OrderList from './-components/order-list'
 
-export const Route = createFileRoute('/admin/_adminLayout/orders/')({
+export const Route = createFileRoute('/_main/orders/')({
     component: RouteComponent,
 })
 

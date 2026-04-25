@@ -1,18 +1,8 @@
-import { NavLink } from "./nav-link";
-
 import { Loader, User } from 'lucide-react';
 import { authClient } from "@/lib/auth-client.ts";
-import { SearchBar, SingleDropdown } from "@/components/filters";
-import { useState } from "react";
-
-const SingleDropdownOptions = [
-    { value: "generated", label: "Generated", dot: "var(--primary)" }
-]
+import { NavLink } from './nav-link';
 
 export default function Navigation() {
-    const [search, setSearch] = useState<string>("");
-    const [selected, setSelected] = useState<string>("");
-
     const { data: session, isPending, error } = authClient.useSession();
 
     return (
@@ -21,10 +11,13 @@ export default function Navigation() {
                 <div className="flex h-full gap-8">
                     <NavLink to="/">Home</NavLink>
                     <NavLink to="/products">Products</NavLink>
+                    <NavLink to="/contracts">Tarife</NavLink>
+                    <NavLink to="/employees">Nutzer</NavLink>
+                    <NavLink to="/customers">Kunden</NavLink>
+                    <NavLink to="/orders">Bestellungen</NavLink>
+                    <NavLink to="/offers">Angebote</NavLink>
                 </div>
-                <div className="flex gap-2">
-                    <SearchBar value={search} onChange={setSearch} placeholder="Suchen..." />
-                </div>
+
                 <div className="flex h-full">
                     {isPending ? <Loader className="animate-spin" /> :
                         error ? "Error" : session ? (

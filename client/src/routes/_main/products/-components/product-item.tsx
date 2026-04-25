@@ -1,10 +1,8 @@
 import Button from "@/components/button/button.tsx";
 import { BadgeCheck, Loader, Pen, Plus, Trash, X } from "lucide-react";
-import { useQuery } from "@tanstack/react-query";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useState } from "react";
-import { getContractsAction } from "@/data/contracts.ts";
 import ProductModal from "./product-modal";
 import { useAdmin } from "@/hooks/admin";
 import { useContracts } from "@/hooks/contract";

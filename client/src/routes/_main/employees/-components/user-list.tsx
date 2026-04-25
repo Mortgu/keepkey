@@ -1,9 +1,8 @@
 import Button from "@/components/button/button";
 import type { User } from "@/data/types";
 import { useAdmin } from "@/hooks/admin";
-import { formatDate } from "@/lib/format";
-import { Pen, Plus, Trash } from "lucide-react";
-import React, { useState } from "react";
+import { Plus } from "lucide-react";
+import { useState } from "react";
 import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 

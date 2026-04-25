@@ -6,7 +6,7 @@ const loginSearchSchema = z.object({
     redirect: z.string().default('/'),
 });
 
-export const Route = createFileRoute('/_main/login/')({
+export const Route = createFileRoute('/login/')({
     validateSearch: loginSearchSchema,
     component: LoginFormComponent,
 });

@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from '@tanstack/react-router'
-import { NavLink } from "@/routes/-components/nav-link.tsx";
+import { NavLink } from "@/components/nav-link";
 import { Car, MoveRight, Settings } from "lucide-react";
 import { useAuth } from '@/context/auth';
 

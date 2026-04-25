@@ -1,9 +1,10 @@
 import { Loader, Plus } from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import { useState } from "react";
-import ProductItem, { type ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
 import ProductModal from "./product-modal";
 import { useAdmin } from "@/hooks/admin";
+import type { ProductItemProps } from "./product-item";
+import ProductItem from "./product-item";
 
 export default function ProductList() {
     const [isOpen, setOpen] = useState<boolean>(false);
