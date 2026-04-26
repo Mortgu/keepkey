@@ -25,12 +25,23 @@ export default function startDocumentWorker() {
             data: { status: 'processing' },
         });
 
-        if (type === 'offer' && documentJob.offerId) {
-            await generateOffer(documentJob.offerId, documentJobId);
-        } else if (type === 'invoice' && documentJob.orderId) {
-            //await generateInvoice(documentJob.orderId, documentJobId);
-        } else {
-            throw new Error(`Unknown document type "${type}" or missing reference ID`);
+        switch (type) {
+            case 'offer':
+                if (!documentJob.offerId) {
+                    throw new Error("Document job for offer with undefined offerId");
+                }
+
+                await generateOffer(documentJob.offerId, documentJobId);
+                break;
+            case 'invoice':
+                if (!documentJob.orderId) {
+                    throw new Error("Document job for order with undefined orderId");
+                }
+
+                //await generateInvoice(documentJob.orderId, documentJobId);
+                break;
+            default:
+                throw new Error(`Unknown document type "${type}" or missing reference ID`);
         }
 
         await prisma.documentJob.update({

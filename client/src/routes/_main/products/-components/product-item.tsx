@@ -87,7 +87,7 @@ export default function ProductItem(product: ProductItemProps) {
                 {/* Pricing rows */}
                 {product.productPricing.length > 0 && (
                     <>
-                        <div className="grid grid-cols-[1fr_96px_80px_80px_100px] items-center px-4 py-1.5 border-b border-(--border) bg-(--page-bg)">
+                        <div className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1.5 border-b border-(--border) bg-(--page-bg)">
                             <span className="text-caption text-gray-400">Vertrag</span>
                             <span className="text-caption text-gray-400 text-center">Menge</span>
                             <span className="text-caption text-gray-400 text-center">Laufzeit</span>
@@ -95,7 +95,7 @@ export default function ProductItem(product: ProductItemProps) {
                             <span />
                         </div>
                         {product.productPricing.map((pricing, index) => (
-                            <div key={index} className="grid grid-cols-[1fr_96px_80px_80px_100px] items-center px-4 py-1 border-b border-(--border)">
+                            <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
                                 <p className="text-sm text-gray-700 truncate">{pricing?.contract?.name}</p>
                                 <p className="text-sm text-gray-600 text-center">{pricing.min_quantity}–{pricing.max_quantity}</p>
                                 <p className="text-sm text-gray-600 text-center">{pricing.duration} Jahre</p>

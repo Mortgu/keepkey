@@ -1,4 +1,4 @@
-import type { ProductItemProps } from "@/routes/admin/_adminLayout/products/-components/product-item";
+import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
 
 export async function getAllProducts() {
     const response = await fetch(`http://localhost:3000/api/admin/products`, {

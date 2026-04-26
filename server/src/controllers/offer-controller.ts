@@ -21,6 +21,57 @@ export const getOffers = async (request: Request, response: Response) => {
     return response.status(200).json(offers);
 }
 
+export const getOfferById = async (request: Request, response: Response) => {
+    const { id } = request.params;
+
+    try {
+        const offer = await prisma.offer.findFirstOrThrow({
+            where: { id: id as string },
+            include: {
+                documentJobs: true
+            }
+        });
+
+        return response.status(200).json(offer);
+    } catch (exception: any) {
+        return response.status(404).json({
+            message: 'Offer not found!',
+        });
+    }
+}
+
+export const getOfferJobs = async (request: Request, response: Response) => {
+    const { id } = request.params;
+    const jobs = await prisma.documentJob.findMany({
+        where: { offerId: id as string }
+    });
+
+    return response.status(200).json(jobs);
+}
+
+export const getOfferJobById = async (request: Request, response: Response) => {
+    const { id, jobId } = request.params;
+
+    console.log(id, jobId)
+
+    try {
+        const documentJob = await prisma.documentJob.findFirstOrThrow({
+            where: {
+                AND: [
+                    { id: jobId as string },
+                    { offerId: id as string },
+                ]
+            }
+        });
+
+        return response.status(200).json(documentJob);
+    } catch (exception: any) {
+        return response.status(404).json({
+            message: 'Job not found!',
+        });
+    }
+}
+
 export const createOfferDocumentJob = async (request: Request, response: Response) => {
     const { offer } = request.body;
 
@@ -60,8 +111,6 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             message: "Bad request.", success: false
         });
     }
-
-    console.log(offer, positions);
 
     try {
         const createdOffer = await prisma.$transaction(async (tx) => {

@@ -59,12 +59,8 @@ export default function SupplierList() {
                         <p className='text-sm text-gray-400'>{supplier.supplierId}</p>
                     </div>
                     <div>
-                        <Button size='sm' variant='ghost' className='aspect-square'>
-                            <Pen className='size-4' />
-                        </Button>
-                        <Button onClick={() => deleteSupplier(supplier.id)} size='sm' variant='ghost' className='aspect-square'>
-                            <Trash className='size-4' />
-                        </Button>
+                        <Button icon={<Pen className='size-3.5' />} iconOnly onClick={() => deleteSupplier(supplier.id)} size='sm' variant='ghost' />
+                        <Button icon={<Trash className='size-3.5' />} iconOnly onClick={() => deleteSupplier(supplier.id)} size='sm' variant='ghost' />
                     </div>
                 </div>
             ))}
