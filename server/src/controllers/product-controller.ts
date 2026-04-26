@@ -97,7 +97,7 @@ export const deleteProduct = async (request: Request, response: Response, next: 
         });
     }
 
-    const result = await prisma.product.delete({
+    const result = await prisma.product.deleteMany({
         where: { id: id as string },
     });
 

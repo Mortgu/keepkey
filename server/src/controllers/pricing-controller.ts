@@ -49,3 +49,20 @@ export const createPricing = async (request: Request, response: Response) => {
         });
     }
 }
+
+export const deletePricing = async (request: Request, response: Response) => {
+    const { id } = request.params;
+
+    try {
+        const deletedPricing = await prisma.productPricing.deleteMany({
+            where: { id: id as string }
+        });
+
+        return response.status(200).json(deletedPricing);
+    } catch (exception: any) {
+        return response.status(500).json({
+            message: 'Something went wrong trying to delete product pricing!',
+            error: exception.message,
+        })
+    }
+}

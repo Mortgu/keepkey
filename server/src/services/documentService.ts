@@ -13,11 +13,16 @@ async function ensureOutputDir(jobId: string): Promise<string> {
     return dir;
 }
 
-export async function generateOffer(offerId: string, jobId: string): Promise<{ pdfPath: string; docxPath: string }> {
+export async function generateOfferDocx(offerId: string, jobId: string): Promise<{ docx: Buffer; outDir: string }> {
     const data = await getOfferTemplateData(offerId);
-    const outDir = await ensureOutputDir(jobId);
+    console.log(data.positions);
 
+    const outDir = await ensureOutputDir(jobId);
     const docx = await renderDocx(path.join(env.TEMPLATES_DIR, "offer.docx"), data);
+    return { docx, outDir };
+}
+
+export async function convertAndSaveOfferDocuments(docx: Buffer, outDir: string): Promise<{ pdfPath: string; docxPath: string }> {
     const pdf = await convertDocxToPdf(docx);
 
     const pdfPath = path.join(outDir, "angebot.pdf");
@@ -31,22 +36,6 @@ export async function generateOffer(offerId: string, jobId: string): Promise<{ p
     return { pdfPath, docxPath };
 }
 
-export async function generateInvoice(orderId: string, jobId: string)/*: Promise<{ pdfPath: string; docxPath: string }>*/ {
-    /*
-    const data = {};
-    const outDir = await ensureOutputDir(jobId);
-
-    const docx = await renderDocx(path.join(TEMPLATES_DIR, "invoice.docx"), data);
-    const pdf = await convertDocxToPdf(docx);
-
-    const pdfPath = path.join(outDir, "rechnung.pdf");
-    const docxPath = path.join(outDir, "rechnung.docx");
-
-    await Promise.all([
-        fs.writeFile(pdfPath, pdf),
-        fs.writeFile(docxPath, docx),
-    ]);
-
-    return { pdfPath, docxPath };
-    */
+export async function generateInvoice(orderId: string, jobId: string) {
+    // TODO
 }

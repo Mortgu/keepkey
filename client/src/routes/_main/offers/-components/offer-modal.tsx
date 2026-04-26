@@ -267,7 +267,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                 <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Abbrechen</Button>
                 <offerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
                     <Button form="offer-form" disabled={!canSubmit} type='submit' size='sm'>
-                        {isSubmitting ? <Loader className="size-4" /> : 'Speichern'}
+                        {isSubmitting ? <Loader className="size-4 animate-spin" /> : 'Speichern'}
                     </Button>
                 )} />
             </ModalDialog.Footer>

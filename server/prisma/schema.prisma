@@ -162,8 +162,8 @@ model OfferPosition {
 
   optional Boolean? @default(false)
 
-  price_at_purchase    Int
-  tax_rate_at_purchase Decimal
+  total_cents Int
+  tax_rate    Int
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
@@ -268,6 +268,9 @@ model DocumentJob {
   offer     Offer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
   type      String
   status    String   @default("pending")
+  isCurrent Boolean  @default(true)
+  docxPath  String?
+  pdfPath   String?
   error     String?
   jobId     String?
   createdAt DateTime @default(now())

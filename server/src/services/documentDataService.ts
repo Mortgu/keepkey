@@ -1,6 +1,7 @@
 import { prisma } from "../lib/prisma.js";
 import { formatDate, formatEur } from "../utils/utils.js";
 import { TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
+import calculatePrice from "../utils/products.js";
 
 export async function getOfferTemplateData(offerId: string): Promise<TemplateOfferData> {
     const [offer, contracts] = await Promise.all([
@@ -25,31 +26,37 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
     const { customer, customerContactPerson: ccp, user: employee, offerPositions } = offer;
 
     const includesOptionals = offerPositions.some(op => op.optional);
-    const products = offerPositions.map((pos, index): TemplateProductData => {
-        const pricePerUnit = pos.price_at_purchase / pos.quantity;
-        const price_1 = pos.quantity * pricePerUnit;
-        const price_12 = `${price_1 * 12} €`; // 1. Jahr
-        const price_24 = `${price_1 * 24} €`; // 2. Jahre
-        const price_36 = `${price_1 * 36} €`; // 3. Jahre
+    const products = offerPositions.map((position, index): TemplateProductData => {
+        const total_cents = position.total_cents;
+        const cents_per_unit = position.total_cents / position.quantity;
+
+        const total_eur = total_cents / 100;
+        const eur_per_unit = cents_per_unit / 100;
+
+        const month_eur = eur_per_unit * position.quantity;
+        const year_1_eur = month_eur * 12;
+        const year_2_eur = year_1_eur * 2;
+        const year_3_eur = year_1_eur * 3;
 
         return {
-            name: pos.product.name || '{product.name}',
-            description: pos.product.description || '{product.description}',
-            duration: String(pos.duration) || '{product.duration}',
-            quantity: String(pos.quantity) || '{product.quantity}',
+            name: position.product.name || '{product.name}',
+            description: position.product.description || '{product.description}',
+            duration: String(position.duration) || '{product.duration}',
+            quantity: String(position.quantity) || '{product.quantity}',
             contract: {
-                name: pos.contract.name || '{product.contract.name}',
-                features: pos.contract.features || ["NaN"],
+                name: position.contract.name || '{product.contract.name}',
+                features: position.contract.features || ["NaN"],
             },
-            pricePerUnit: formatEur(pricePerUnit),
-            totalPrice: formatEur(pos.price_at_purchase),
-            optional: pos.optional || false,
+
+            pricePerUnit: formatEur(eur_per_unit),
+            totalPrice: formatEur(total_eur),
+            optional: position.optional || false,
 
             prices: {
-                price_1: `${price_1} €`,
-                price_12: price_12,
-                price_24: price_24,
-                price_36: price_36,
+                price_1: formatEur(month_eur),
+                price_12: formatEur(year_1_eur),
+                price_24: formatEur(year_2_eur),
+                price_36: formatEur(year_3_eur),
             }
         };
     });
@@ -62,7 +69,8 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
                 features: first.contract.features,
             },
             duration: String(first.duration),
-            products: group!.map(p => p.product.name).join(' & '),
+            names: group!.map(p => p.product.name).join(' & '),
+            products: products
         };
     });
 
@@ -73,6 +81,7 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
                 .map(contract => ({
                     contract: { name: contract.name, features: contract.features },
                     duration: pos.duration,
+                    names: pos.names,
                     products: pos.products,
                 }))
         );
@@ -116,6 +125,7 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
 
         /* Used for the first page */
         positions: {
+            names: products.map(p => p.name).join(' & '),
             includesOptionals: includesOptionals,
             products: positions
         }

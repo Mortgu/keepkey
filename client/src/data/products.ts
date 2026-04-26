@@ -1,4 +1,5 @@
 import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
+import type { CreatePricingProps, ProductItemPricing } from "./types";
 
 export async function getAllProducts() {
     const response = await fetch(`http://localhost:3000/api/admin/products`, {
@@ -66,8 +67,38 @@ export async function createProductAction(product: {
     return result;
 }
 
+export async function createPricingAction({ productId, pricing }: CreatePricingProps) {
+    const response = await fetch(`http://localhost:3000/api/pricing/${productId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ...pricing })
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to create new pricing!");
+    }
+
+    return await response.json();
+}
+
 export async function deleteProductAction(id: string): Promise<void> {
     const response = await fetch(`http://localhost:3000/api/products/${id}`, {
+        method: "DELETE",
+        credentials: 'include',
+    });
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message);
+    }
+
+    return result;
+}
+
+export async function deletePricingAction(id: string) {
+    const response = await fetch(`http://localhost:3000/api/pricing/${id}`, {
         method: "DELETE",
         credentials: 'include',
     });

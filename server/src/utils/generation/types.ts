@@ -14,6 +14,7 @@ export interface TemplateBaseData {
 
     products: TemplateProductData[];
     positions: {
+        names: string;
         includesOptionals: boolean;
         products: TemplatePositionData[]
     }
@@ -77,5 +78,6 @@ export interface TemplateContractData {
 export interface TemplatePositionData {
     contract: TemplateContractData;
     duration: string;
-    products: string;
+    names: string;
+    products: TemplateProductData[];
 }

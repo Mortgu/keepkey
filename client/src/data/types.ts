@@ -78,6 +78,16 @@ export interface ProductItem extends BaseProduct {
     updatedAt: Date;
 };
 
+export interface CreatePricingProps {
+    productId: string;
+    pricing: {
+        contractId: string;
+        max_quantity: number;
+        min_quantity: number;
+        duration: number;
+    }
+}
+
 export interface ProductItemPricing {
     contract: Contract;
     product: ProductItem,
@@ -175,8 +185,8 @@ export interface OfferPosition {
 
     optional: boolean;
 
-    price_at_purchase: number;
-    tax_rate_at_purchase: number;
+    total_cents: number;
+    tax_rate: number;
 
     createdAt: Date;
 }

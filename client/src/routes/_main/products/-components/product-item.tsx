@@ -4,8 +4,8 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useState } from "react";
 import ProductModal from "./product-modal";
-import { useAdmin } from "@/hooks/admin";
 import { useContracts } from "@/hooks/contract";
+import { useProducts } from "@/hooks/product";
 
 export type ProductItemProps = {
     id: string;
@@ -15,6 +15,7 @@ export type ProductItemProps = {
     description: string;
     link: string;
     productPricing: [{
+        id: string;
         contract: {
             name: string;
         },
@@ -29,8 +30,16 @@ export type ProductItemProps = {
     }];
 }
 
+const productPricingSchema = z.object({
+    contractId: z.string().min(1),
+    min_quantity: z.int(),
+    max_quantity: z.int(),
+    duration: z.int(),
+    price: z.float32(),
+});
+
 export default function ProductItem(product: ProductItemProps) {
-    const { deleteProduct, updateProduct, isDeletingProduct } = useAdmin();
+    const { deleteProduct, updateProduct, isDeletingProduct, deletePricing, isDeletingPricing, createPricing } = useProducts();
     const { contracts } = useContracts();
 
     const [isAddingPricing, addPricing] = useState<boolean>(false);
@@ -40,31 +49,19 @@ export default function ProductItem(product: ProductItemProps) {
 
     const pricingForm = useForm({
         defaultValues: {
-            contractId: "",
+            contractId: contracts[0]?.id || "",
             min_quantity: 1,
             max_quantity: 1,
             duration: 1,
             price: 1.0,
         },
         validators: {
-            onChange: z.object({
-                contractId: z.string().min(1),
-                min_quantity: z.int(),
-                max_quantity: z.int(),
-                duration: z.int(),
-                price: z.float32(),
-            })
+            onChange: productPricingSchema,
+            onMount: productPricingSchema
         },
         onSubmit: async ({ value }) => {
-            const response = await fetch(`http://localhost:3000/api/pricing/${product.id}`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify({ ...value })
-            });
-
-            if (!response.ok) throw new Error("Failed to create new pricing!");
-            return response.json();
+            createPricing({ productId: product.id, pricing: value });
+            addPricing(false);
         }
     });
 
@@ -102,7 +99,7 @@ export default function ProductItem(product: ProductItemProps) {
                                 <p className="text-sm font-medium text-gray-900 text-right">{(pricing.price / 100).toFixed(2)} €</p>
                                 <div className="flex items-center gap-0.5 justify-end">
                                     <Button variant="link" icon={<Pen className="size-3.5" />} iconOnly size="sm" />
-                                    <Button variant="link" icon={<Trash className="size-3.5" />} iconOnly size="sm" />
+                                    <Button loading={isDeletingPricing} onClick={() => deletePricing({ id: pricing.id })} variant="link" icon={<Trash className="size-3.5" />} iconOnly size="sm" />
                                 </div>
                             </div>
                         ))}
@@ -117,8 +114,7 @@ export default function ProductItem(product: ProductItemProps) {
                     >
                         <pricingForm.Field name="contractId">
                             {(field) => (
-                                <select
-                                    id={field.name} name={field.name} defaultValue={field.state.value}
+                                <select id={field.name} name={field.name} defaultValue={field.state.value}
                                     onChange={(e) => field.handleChange(e.target.value)}
                                     className="flex-2 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm bg-white"
                                 >
@@ -151,7 +147,7 @@ export default function ProductItem(product: ProductItemProps) {
                         </pricingForm.Field>
                         <pricingForm.Field name="price">
                             {(field) => (
-                                <input id={field.name} value={field.state.value} type="number" step="0.01"
+                                <input id={field.name} value={field.state.value} type="number" step="1"
                                     className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"
                                     placeholder="Preis" onChange={(e) => field.handleChange(parseFloat(e.target.value))} />
                             )}

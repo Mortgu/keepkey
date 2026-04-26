@@ -42,11 +42,11 @@ export const getOfferById = async (request: Request, response: Response) => {
 
 export const getOfferJobs = async (request: Request, response: Response) => {
     const { id } = request.params;
-    const jobs = await prisma.documentJob.findMany({
-        where: { offerId: id as string }
+    const job = await prisma.documentJob.findFirst({
+        where: { offerId: id as string, isCurrent: true }
     });
 
-    return response.status(200).json(jobs);
+    return response.status(200).json(job ?? null);
 }
 
 export const getOfferJobById = async (request: Request, response: Response) => {
@@ -75,12 +75,20 @@ export const getOfferJobById = async (request: Request, response: Response) => {
 export const createOfferDocumentJob = async (request: Request, response: Response) => {
     const { offer } = request.body;
 
-    const documentJob = await prisma.documentJob.create({
-        data: {
-            offerId: offer.id,
-            type: 'offer',
-            status: 'pending'
-        }
+    const documentJob = await prisma.$transaction(async (tx) => {
+        await tx.documentJob.updateMany({
+            where: { offerId: offer.id, isCurrent: true },
+            data: { isCurrent: false }
+        });
+
+        return tx.documentJob.create({
+            data: {
+                offerId: offer.id,
+                type: 'offer',
+                status: 'pending',
+                isCurrent: true
+            }
+        });
     });
 
     const job = await documentQueue.add(documentQueueKey, {
@@ -112,41 +120,59 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 
+    const contracts = await prisma.contract.findMany();
+
+    const includesOptionals = positions.some((p: OfferPosition) => p.optional);
+
+    if (includesOptionals) {
+        positions.push(...positions.flatMap((position: OfferPosition) =>
+            contracts.filter(c => c.id !== position.contractId).map(contract => ({
+                ...position,
+                contractId: contract.id,
+                isAlternative: true,
+            }))
+        ))
+    }
+
+    for (const position of positions) {
+        const subtotal = await calculatePrice({
+            ...position
+        });
+
+        if (subtotal) {
+            position['total_cents'] = subtotal.total.value * position.duration * 12;
+        } else {
+            position['total_cents'] = 0;
+        }
+    }
+
     try {
         const createdOffer = await prisma.$transaction(async (tx) => {
-            let total_cent = 0;
-
-            for (const position of positions) {
-                const { productId, contractId, duration, quantity } = position;
-                const subtotal = await calculatePrice({ productId, contractId, duration, quantity });
-
-                if (!subtotal) {
-                    throw new Error("An items subtotal is null");
-                }
-
-                total_cent = total_cent + subtotal.total.value * position.duration * 12;
-            }
+            let net_amount = positions.reduce((sum: number, p: OfferPosition) => sum + p.total_cents, 0);
 
             const offer = await tx.offer.create({
                 data: {
                     ...body.offer,
-                    net_amount: total_cent,
+                    net_amount: net_amount,
                     tax_rate: 19,
-                    tax_amount: total_cent * 0.19,
-                    total_amount: total_cent * 1.19,
+                    tax_amount: net_amount * 0.19,
+                    total_amount: net_amount * 1.19,
                 }
             });
 
             for (const position of positions) {
-                const { productId, contractId, duration, quantity } = position;
-                const subtotal = await calculatePrice({ productId, contractId, duration, quantity });
+                const { productId, contractId, duration, quantity, optional, total_cents } = position;
 
                 await tx.offerPosition.create({
                     data: {
                         offerId: offer.id,
-                        ...position,
-                        price_at_purchase: subtotal!.total.value,
-                        tax_rate_at_purchase: 19.00,
+                        productId,
+                        contractId,
+                        duration,
+                        quantity,
+                        total_cents,
+                        optional,
+                        tax_rate: 19,
                     }
                 });
             }

@@ -2,13 +2,14 @@ import { Loader, Plus } from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import { useState } from "react";
 import ProductModal from "./product-modal";
-import { useAdmin } from "@/hooks/admin";
 import type { ProductItemProps } from "./product-item";
 import ProductItem from "./product-item";
+import { useProducts } from "@/hooks/product";
 
 export default function ProductList() {
     const [isOpen, setOpen] = useState<boolean>(false);
-    const { products, pendingProducts: isPending, errorProducts: error, createProduct } = useAdmin();
+
+    const { products, isPending, error, createProduct } = useProducts();
 
     if (isPending) {
         return (
