@@ -1,11 +1,11 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { Supplier } from "@/data/types";
-import { useSupplier } from "@/hooks/supplier";
-import { useForm } from "@tanstack/react-form";
-import { Loader, Pen, Plus, Trash } from "lucide-react";
-import { useState } from "react";
-import { z } from 'zod';
+import type {Supplier} from "@/data/types";
+import {useSupplier} from "@/hooks/supplier";
+import {useForm} from "@tanstack/react-form";
+import {Pen, Plus, Trash} from "lucide-react";
+import {useState} from "react";
+import {z} from 'zod';
 
 const supplierSchema = z.object({
     name: z.string().min(1, "Lieferant braucht mindestens ein Zeichen!"),
@@ -45,10 +45,8 @@ export default function SupplierList() {
         <div className="grid gap-2">
             <div className='mb-4 flex items-center justify-between'>
                 <h1 className='text-2xl font-medium flex items-center justify-center gap-4'>Lieferanten</h1>
-                <Button disabled={isCreatingSupplier || isDeletingSupplier} onClick={() => setOpen(true)} size='sm'>
-                    {isCreatingSupplier && (<Loader className='size-4' />)}
-                    {!isCreatingSupplier && (<Plus className='size-4' />)}
-                    Create
+                <Button disabled={isCreatingSupplier || isDeletingSupplier} loading={isCreatingSupplier || isDeletingSupplier} onClick={() => setOpen(true)} size='sm'>
+                    Erstellen <Plus className='size-4' />
                 </Button>
             </div>
 
@@ -77,13 +75,12 @@ export default function SupplierList() {
                     )} />
                     <supplierForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <Button disabled={!canSubmit} type='submit' size='sm'>
-                                {isSubmitting && <Loader className='animate-spin' />}
-                                {!isSubmitting && ("Save")}
+                            <Button disabled={!canSubmit} type='submit' size='sm' loading={isSubmitting}>
+                                Speichern
                             </Button>
                         )} />
                     <Button onClick={() => setOpen(false)} type='button' size='sm'
-                        variant='secondary'>Cancel</Button>
+                        variant='secondary'>Abbrechen</Button>
                 </form>
             )}
         </div>

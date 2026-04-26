@@ -1,24 +1,9 @@
-import { getAllOrdersAction } from "@/data/orders";
-import { createProductAction, deleteProductAction, getAllProducts, updateProductAction } from "@/data/products";
 import type { BaseUser, User } from "@/data/types";
 import { createUserAction, getAllUsersAction, updateUserByIdAction, deleteUserAction } from "@/data/user";
-import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useAdmin = () => {
     const queryClient = useQueryClient();
-
-    /* Admin Orders */
-    const { data: orders = [], isPending: pendingOrders, error: errorOrders } = useQuery({
-        queryKey: ['admin:orders'],
-        queryFn: getAllOrdersAction,
-    });
-
-    /* Admin Contracts */
-    /*const { data: contracts = [], isPending: pendingContracts, error: errorContracts } = useQuery({
-        queryKey: ['admin:contracts'],
-        queryFn: () => { },
-    });*/
 
     /* Admin Users */
     const { data: users = [], isPending: pendingUsers, error: errorUsers } = useQuery({
@@ -48,16 +33,6 @@ export const useAdmin = () => {
     })
 
     return {
-        orders,
-        pendingOrders,
-        errorOrders,
-
-
-
-        /*contracts,
-        pendingContracts,
-        errorContracts,*/
-
         users,
         pendingUsers,
         errorUsers,

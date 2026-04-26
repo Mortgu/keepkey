@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import {NextFunction, Request, Response} from "express";
+import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
-import { documentQueue, documentQueueKey } from "../lib/queues.js";
-import { Offer, OfferPosition } from "@prisma/client";
+import {documentQueue, documentQueueKey} from "../lib/queues.js";
+import {OfferPosition} from "@prisma/client";
 
 export const getOffers = async (request: Request, response: Response) => {
     const offers = await prisma.offer.findMany({
@@ -147,7 +147,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
     }
 
     try {
-        const createdOffer = await prisma.$transaction(async (tx) => {
+        request.body.offer = await prisma.$transaction(async (tx) => {
             let net_amount = positions.reduce((sum: number, p: OfferPosition) => sum + p.total_cents, 0);
 
             const offer = await tx.offer.create({
@@ -161,7 +161,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             });
 
             for (const position of positions) {
-                const { productId, contractId, duration, quantity, optional, total_cents } = position;
+                const {productId, contractId, duration, quantity, optional, total_cents} = position;
 
                 await tx.offerPosition.create({
                     data: {
@@ -179,12 +179,10 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
             return offer;
         });
-
-        request.body.offer = createdOffer;
         next()
     } catch (exception: any) {
         return response.status(408).json({
-            message: "Somthing went wrong trying to create offer: " + exception.message, success: false
+            message: "Something went wrong trying to create offer: " + exception.message, success: false
         });
     }
 }

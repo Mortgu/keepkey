@@ -1,42 +1,37 @@
 import {
+    createCustomerAction,
+    deleteCustomerAction,
     getAllCustomersAction,
     getCustomerByIdAction,
-    createCustomerAction,
     updateCustomerByIdAction,
-    deleteCustomerAction,
 } from "@/data/customers";
-import type { BaseCustomer, CreateCustomer, Customer } from "@/data/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {BaseCustomer, CreateCustomer} from "@/data/types";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 export const useCustomers = () => {
     const queryClient = useQueryClient();
-    const queryKey = ['customers'];
 
-    const { data: customers = [], isPending, error } = useQuery({
-        queryKey: queryKey,
+    const invalidate = () => queryClient.invalidateQueries({queryKey: ['customers']});
+
+    const {data: customers = [], isPending, error} = useQuery({
+        queryKey: ['customers'],
         queryFn: getAllCustomersAction,
     });
 
     const createMutation = useMutation({
         mutationFn: (body: CreateCustomer) => createCustomerAction(body),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: queryKey
-        }),
+        onSuccess: invalidate
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, body }: { id: string; body: BaseCustomer }) =>
+        mutationFn: ({id, body}: { id: string; body: BaseCustomer }) =>
             updateCustomerByIdAction(id, body),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: queryKey
-        }),
+        onSuccess: invalidate
     });
 
     const deleteMutation = useMutation({
-        mutationFn: ({ id }: { id: string }) => deleteCustomerAction(id),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: queryKey
-        }),
+        mutationFn: ({id}: { id: string }) => deleteCustomerAction(id),
+        onSuccess: invalidate
     });
 
     return {
@@ -57,11 +52,11 @@ export const useCustomers = () => {
 };
 
 export const useCustomer = (id: string) => {
-    const { data: customer = null, isPending, error } = useQuery({
+    const {data: customer = null, isPending, error} = useQuery({
         queryKey: ['customers', id],
         queryFn: () => getCustomerByIdAction(id),
         enabled: !!id,
     });
 
-    return { customer, isPending, error };
+    return {customer, isPending, error};
 };

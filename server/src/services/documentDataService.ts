@@ -74,20 +74,6 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
         };
     });
 
-    if (includesOptionals) {
-        const extraPositions = positions.flatMap(pos =>
-            contracts
-                .filter(contract => contract.name !== pos.contract.name)
-                .map(contract => ({
-                    contract: { name: contract.name, features: contract.features },
-                    duration: pos.duration,
-                    names: pos.names,
-                    products: pos.products,
-                }))
-        );
-        positions.push(...extraPositions);
-    }
-
     return {
         voucherId: offer.voucherId,
         date: formatDate(offer.date),

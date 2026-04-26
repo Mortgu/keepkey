@@ -8,9 +8,7 @@ import type { Order, OrderPositionItem } from "@/data/types";
 
 export default function OrderListItems() {
     const [isOpen, setOpen] = useState<boolean>(false);
-    const { orders, isPending, error, deleteOrder, isDeleting, generate, isGenerating } = useOrders({
-        adminMode: true
-    });
+    const { orders, isPending, error, deleteOrder, isDeleting, isGenerating } = useOrders();
 
     if (isPending) {
         return (
@@ -60,9 +58,7 @@ export default function OrderListItems() {
 
                 <div className="p-3">
                     <div className="flex items-center gap-2">
-                        <Button onClick={() => generate({ orderId: order.id })} variant="secondary" size="sm" icon={
-                            isGenerating ? <Loader className="size-4 animate-spin" /> : <Plus className="size-4" />
-                        }>
+                        <Button variant="secondary" size="sm" icon={<Plus className="size-4" />} loading={isGenerating}>
                             Angebot erstellen
                         </Button>
                         <Button variant="secondary" size="sm" icon={<Plus className="size-4" />}>Rechnung erstellen</Button>

@@ -2,13 +2,13 @@ import type { Request, Response } from "express";
 import { Router } from "express";
 import { prisma } from "../lib/prisma.js";
 import { requireSession } from "../middlewares/auth.js";
-import { getOrderById, getSessionOrders, getOrderDocumentJobs } from "../controllers/order-controller.js";
+import {getOrderById, getSessionOrders, getOrderDocumentJobs, getAllOrders} from "../controllers/order-controller.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/orders */
-router.get('/', requireSession, getSessionOrders);
+router.get('/', requireSession, getAllOrders);
 
 router.get('/:orderId', getOrderById);
 

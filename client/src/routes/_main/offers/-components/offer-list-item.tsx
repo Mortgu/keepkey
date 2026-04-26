@@ -4,7 +4,6 @@ import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
 import { FileText, Pen, Trash } from "lucide-react";
-import { tv } from "tailwind-variants";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -56,29 +55,19 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
                 </div>
             </div>
 
-            {/* Positionen */}
+            {/* Position */}
             <div>
-                {offer.offerPositions.map((pos: OfferPosition, i) => {
-                    const styles = tv({
-                        base: [
-                            "flex items-center justify-between",
-                            "even:bg-gray-50",
-                            "px-3 py-2"
-                        ],
-                    })
-
-                    return (
-                        <div key={i} className="flex items-center justify-between even:bg-gray-50 px-3 py-2">
-                            <div className='flex items-center gap-2'>
-                                <p className='text-sm'>{pos.product.name} {pos.optional && "(optional)"}</p>
-                                <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
-                            </div>
-                            <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                <span className='w-20 text-right font-medium text-gray-700'>{formatEur((pos.total_cents))}</span>
-                            </div>
+                {offer.offerPositions.map((pos: OfferPosition, i) => (
+                    <div key={i} className="flex items-center justify-between even:bg-gray-50 px-3 py-2">
+                        <div className='flex items-center gap-2'>
+                            <p className='text-sm'>{pos.product.name} {pos.optional && "(optional)"}</p>
+                            <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
                         </div>
-                    )
-                })}
+                        <div className='flex items-center gap-4 text-sm text-gray-500'>
+                            <span className='w-20 text-right font-medium text-gray-700'>{formatEur((pos.total_cents))}</span>
+                        </div>
+                    </div>
+                ))}
 
                 <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
                     <span className=''>Zwischensumme (Netto)</span>

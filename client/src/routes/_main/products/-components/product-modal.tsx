@@ -1,7 +1,6 @@
 import Button from "@/components/button/button";
 import ModalDialog from "@/components/modal";
 import { useForm } from "@tanstack/react-form";
-import { Loader } from "lucide-react";
 import { z } from "zod";
 
 type Fields = {
@@ -101,11 +100,10 @@ export default function ProductModal({ open, cancelFn, submitFn, currentItem = n
             </ModalDialog.Content>
 
             <ModalDialog.Footer>
-                <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Cancel</Button>
+                <Button onClick={cancelFn} type='button' size='sm' variant='secondary'>Abbrechen</Button>
                 <productForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                    <Button form="product-form" disabled={!canSubmit} type='submit' size='sm'>
-                        {isSubmitting && <Loader className='animate-spin' />}
-                        {!isSubmitting && ("Save")}
+                    <Button form="product-form" disabled={!canSubmit} type='submit' size='sm' loading={isSubmitting}>
+                        Speichern
                     </Button>
                 )} />
             </ModalDialog.Footer>

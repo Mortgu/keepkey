@@ -1,11 +1,11 @@
 import Button from '@/components/button/button';
 import Input from '@/components/inputs/input';
-import { type BaseContactPerson, type BaseCustomer, type ContactPerson, type Customer } from '@/data/types';
-import { useCustomers } from '@/hooks/customer';
-import { useForm } from '@tanstack/react-form';
-import { Loader, Plus, Trash2, X } from 'lucide-react';
-import { useState } from 'react';
-import { z } from 'zod';
+import {type BaseContactPerson, type Customer} from '@/data/types';
+import {useCustomers} from '@/hooks/customer';
+import {useForm} from '@tanstack/react-form';
+import {Plus, Trash2} from 'lucide-react';
+import {useState} from 'react';
+import {z} from 'zod';
 import ContactPersonForm from './contact-person-form';
 import ModalDialog from '@/components/modal';
 
@@ -19,6 +19,11 @@ const customerSchema = z.object({
     customerId: z.string().min(1, "min. 1 Zeichen!"),
     companyName: z.string().min(1, "min. 1 Zeichen!"),
     email: z.email(),
+
+    street: z.string(),
+    city: z.string(),
+    plz: z.string(),
+    phone: z.string(),
 });
 
 export default function CustomerModal({ open, cancelFn, currentCustomer = null }: CustomerModalProps) {
@@ -41,6 +46,11 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
             customerId: currentCustomer?.customerId ?? '',
             companyName: currentCustomer?.companyName ?? '',
             email: currentCustomer?.email ?? '',
+
+            street: currentCustomer?.street || '',
+            city: currentCustomer?.city || '',
+            plz: currentCustomer?.plz || '',
+            phone: currentCustomer?.phone || '',
         },
         validators: {
             onChange: customerSchema
@@ -110,7 +120,7 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
                         )} />
 
                         <customerForm.Field name="companyName" children={(field) => (
-                            <div className='flex-2 grid gap-2'>
+                            <div className='flex-3 grid gap-2'>
                                 {field.state.meta.errors.length > 0 ? (
                                     <label htmlFor={field.name} className='text-sm text-red-400'>
                                         {field.state.meta.errors.map(err => typeof err === 'object' ? err.message : err).join(', ')}
@@ -121,11 +131,13 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
                         )} />
+
+
                     </div>
 
                     <div className='flex items-center gap-4'>
                         <customerForm.Field name="email" children={(field) => (
-                            <div className='flex-1 grid gap-2'>
+                            <div className='flex-2 grid gap-2'>
                                 {field.state.meta.errors.length > 0 ? (
                                     <label htmlFor={field.name} className='text-sm text-red-400'>
                                         {field.state.meta.errors.map(err => typeof err === 'object' ? err.message : err).join(', ')}
@@ -133,6 +145,35 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
                                 ) : (
                                     <label htmlFor={field.name} className='text-sm text-gray-500'>E-Mail</label>
                                 )}
+                                <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                            </div>
+                        )} />
+
+                        <customerForm.Field name="phone" children={(field) => (
+                            <div className='flex-2 grid gap-2'>
+                                <label htmlFor={field.name} className='text-sm text-gray-500'>Telefonnummer:</label>
+                                <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                            </div>
+                        )} />
+                    </div>
+
+                    <div className='flex items-center gap-4'>
+                        <customerForm.Field name="street" children={(field) => (
+                            <div className='flex-2 grid gap-2'>
+                                <label htmlFor={field.name} className='text-sm text-gray-500'>Straße</label>
+                                <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                            </div>
+                        )} />
+                        <customerForm.Field name="city" children={(field) => (
+                            <div className='flex-2 grid gap-2'>
+                                <label htmlFor={field.name} className='text-sm text-gray-500'>Stadt</label>
+                                <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                            </div>
+                        )} />
+
+                        <customerForm.Field name="plz" children={(field) => (
+                            <div className='flex-1 grid gap-2'>
+                                <label htmlFor={field.name} className='text-sm text-gray-500'>Postleitzahl</label>
                                 <Input id={field.name} input_size='sm' value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
                             </div>
                         )} />
@@ -188,8 +229,8 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
             <ModalDialog.Footer>
                 <Button onClick={cancelFn} variant="secondary" size='xs'>Abbrechen</Button>
                 <customerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                    <Button form="customer-form" disabled={!canSubmit} size='xs'>
-                        {isSubmitting ? <Loader className="size-4 animate-spin" /> : 'Speichern'}
+                    <Button form="customer-form" disabled={!canSubmit} size='xs' loading={isSubmitting}>
+                        Speichern
                     </Button>
                 )} />
             </ModalDialog.Footer>

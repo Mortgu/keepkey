@@ -2,7 +2,7 @@ import Button from "@/components/button/button";
 import type { Customer } from "@/data/types";
 import { formatDate } from "@/lib/format";
 import { useCustomers } from "@/hooks/customer";
-import { Loader, Pen, Trash } from "lucide-react";
+import {Pen, Trash} from "lucide-react";
 import React, { useState } from "react";
 import CustomerModal from "./customer-modal";
 
@@ -17,7 +17,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
 
     return (
         <React.Fragment>
-            <div className='flex items-center justify-between gap-3 border border-(--border) p-2 rounded-md'>
+            <div className='flex items-center justify-between px-4 py-3 border border-(--border) rounded-md'>
                 <div className="grid gap-0">
                     <h1 className='text-md'>{customer.companyName}</h1>
                     <p className='text-sm text-gray-500'>{customer.customerId} · {formatDate(customer.createdAt)}</p>
@@ -32,9 +32,12 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
                             onClick={() => deleteCustomer({ id: customer.id })}
                             size='sm'
                             variant="ghost"
-                            icon={isDeleting ? <Loader className="size-4 animate-spin" /> : <Trash className="size-4" />}
+                            loading={isDeleting}
+                            icon={<Trash className="size-4" />}
                             iconOnly
                         />
+
+
                     </div>
                 </div>
             </div>

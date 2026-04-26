@@ -16,6 +16,11 @@ export interface BaseCustomer {
     customerId: string;
     companyName: string;
     email: string;
+
+    street: string;
+    city: string;
+    plz: string;
+    phone: string;
 }
 
 export interface CreateCustomer extends BaseCustomer {

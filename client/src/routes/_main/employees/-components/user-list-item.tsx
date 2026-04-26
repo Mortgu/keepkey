@@ -1,7 +1,7 @@
 import Button from "@/components/button/button";
 import type { User } from "@/data/types"
 import { formatDate } from "@/lib/format";
-import { Loader, Pen, Trash } from "lucide-react";
+import {KeyRound, Pen, Trash} from "lucide-react";
 import React, { useState } from "react"
 import UserModal from "./user-modal";
 import { useAdmin } from "@/hooks/admin";
@@ -18,7 +18,7 @@ export default function UserListItem({ user }: UserListItemProps) {
 
     return (
         <React.Fragment>
-            <div className='flex items-center justify-between gap-3 border border-(--border) p-2 rounded-md'>
+            <div className='flex items-center justify-between px-4 py-3 border border-(--border) rounded-md'>
                 <div className="grid gap-0">
                     <h1 className='text-md'>{user.firstName} {user.lastName}</h1>
                     <p className='text-sm text-gray-500'>{formatDate(user.createdAt)}</p>
@@ -28,9 +28,13 @@ export default function UserListItem({ user }: UserListItemProps) {
 
                     <div className="flex items-center ">
                         <Button onClick={() => setOpen(true)} size='sm' variant="ghost" icon={<Pen className="size-4" />} iconOnly></Button>
-                        <Button onClick={() => deleteUser({ id: user.id })} size='sm' variant="ghost" icon={
-                            isDeletingUser ? (<Loader className="size-4" />) : (<Trash className="size-4" />)
-                        } iconOnly />
+
+                        <Button onClick={() => {}} size='sm' variant="ghost"
+                            icon={<KeyRound className="size-4" />} iconOnly />
+
+                        <Button onClick={() => deleteUser({ id: user.id })} size='sm' variant="ghost"
+                                icon={<Trash className="size-4" />} iconOnly loading={isDeletingUser} />
+
                     </div>
                 </div>
             </div>

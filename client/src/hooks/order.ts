@@ -1,34 +1,20 @@
-import { deleteOrderAction, getAllOrdersAction, getOrdersAction, startGeneration } from "@/data/orders";
+import { deleteOrderAction, getOrdersAction } from "@/data/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
-interface UseOrdersOptions {
-    adminMode?: boolean;
-};
-
-export const useOrders = (options: UseOrdersOptions = {}) => {
-    const { adminMode = false } = options;
+export const useOrders = () => {
     const queryClient = useQueryClient();
 
-    const queryKey = adminMode ? ['admin:orders'] : ['orders'];
+    const invalidate = () => queryClient.invalidateQueries({queryKey: ['orders']});
 
     const { data: orders = [], isPending, error } = useQuery({
-        queryKey: queryKey,
-        queryFn: adminMode ? getAllOrdersAction : getOrdersAction,
+        queryKey: ['orders'],
+        queryFn: getOrdersAction,
     });
 
     const deleteMutation = useMutation({
         mutationFn: (orderId: string) => deleteOrderAction(orderId),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: queryKey,
-        }),
+        onSuccess: invalidate
     });
-
-    const generateMutation = useMutation({
-        mutationFn: ({ orderId }: { orderId: string }) => startGeneration(orderId),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: queryKey,
-        }),
-    })
 
     return {
         orders,
@@ -37,8 +23,5 @@ export const useOrders = (options: UseOrdersOptions = {}) => {
 
         deleteOrder: deleteMutation.mutate,
         isDeleting: deleteMutation.isPending,
-
-        generate: generateMutation.mutate,
-        isGenerating: generateMutation.isPending,
     }
 }

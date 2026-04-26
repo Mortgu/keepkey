@@ -1,5 +1,5 @@
-import { prisma } from '../src/lib/prisma.js';
-import { auth } from '../src/lib/auth.js';
+import {prisma} from "../src/lib/prisma";
+import {auth} from "../src/lib/auth";
 
 const OWNER = {
     email: 'admin@keepit.de',
