@@ -157,8 +157,8 @@ model OfferPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration Int
-  quantity Int
+  duration_months Int
+  quantity        Int
 
   optional Boolean? @default(false)
 
@@ -229,7 +229,7 @@ model ProductPricing {
   min_quantity Int
   max_quantity Int? @default(0)
 
-  duration Int? @default(1)
+  duration_months Int @default(12)
 
   price Int
 
@@ -294,8 +294,8 @@ model OrderPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration Int
-  quantity Int
+  duration_months Int
+  quantity        Int
 
   priceAtPurchase Float
   currency        String @default("EUR")

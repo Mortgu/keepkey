@@ -238,7 +238,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                                 return (
                                     <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
                                         <span className="text-sm text-gray-700">
-                                            {product?.name} · {op.duration} · Menge: {op.quantity}
+                                            {product?.name} · {op.duration_months} · Menge: {op.quantity}
                                         </span>
                                         <button
                                             type="button"

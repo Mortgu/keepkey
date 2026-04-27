@@ -1,5 +1,5 @@
 import { prisma } from "../lib/prisma.js";
-import { formatDate, formatEur } from "../utils/utils.js";
+import { formatDate, formatDuration, formatEur } from "../utils/utils.js";
 import { TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
 import calculatePrice from "../utils/products.js";
 
@@ -28,7 +28,7 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
     const includesOptionals = offerPositions.some(op => op.optional);
     const products = offerPositions.map((position, index): TemplateProductData => {
         const total_cents = position.total_cents;
-        const cents_per_unit = position.total_cents / position.quantity;
+        const cents_per_unit = total_cents / position.quantity;
 
         const total_eur = total_cents / 100;
         const eur_per_unit = cents_per_unit / 100;
@@ -41,7 +41,10 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
         return {
             name: position.product.name || '{product.name}',
             description: position.product.description || '{product.description}',
-            duration: String(position.duration) || '{product.duration}',
+
+            duration: formatDuration(position.duration_months),
+            duration_months: position.duration_months,
+
             quantity: String(position.quantity) || '{product.quantity}',
             contract: {
                 name: position.contract.name || '{product.contract.name}',
@@ -60,7 +63,7 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
             }
         };
     });
-    const groupedProducts = Object.groupBy(offerPositions, p => `${p.contract.name}_${p.duration}`);
+    const groupedProducts = Object.groupBy(products, p => `${p.contract.name}_${p.duration_months}`);
     const positions = Object.values(groupedProducts).map(group => {
         const first = group![0];
         return {
@@ -68,11 +71,13 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
                 name: first.contract.name,
                 features: first.contract.features,
             },
-            duration: String(first.duration),
-            names: group!.map(p => p.product.name).join(' & '),
-            products: products
+            duration_months: String(first.duration_months),
+            duration: first.duration,
+            names: group!.map(p => p.name).join(' & '),
+            products: group
         };
     });
+
 
     return {
         voucherId: offer.voucherId,
@@ -90,20 +95,20 @@ export async function getOfferTemplateData(offerId: string): Promise<TemplateOff
             city: customer.city || '{customer.city}',
 
             fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,
-            salutation: ccp.salutation || '{customer.salutation}',
-            firstName: ccp.firstName || '{customer.firstName}',
-            lastName: ccp.lastName || '{customer.lastName}',
-            phone: customer.phone || '{customer.phone}',
-            email: customer.email || '{customer.email}',
+            salutation: ccp.salutation || '',
+            firstName: ccp.firstName || '',
+            lastName: ccp.lastName || '',
+            phone: customer.phone || '',
+            email: customer.email || '',
         },
 
         employee: {
             fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
-            salutation: employee.salutation || '{employee.salutation}',
-            firstName: employee.firstName || '{employee.firstName}',
-            lastName: employee.lastName || '{employee.lastName}',
-            phone: employee.phone || '{employee.phone}',
-            email: employee.email || '{employee.email}',
+            salutation: employee.salutation || '',
+            firstName: employee.firstName || '',
+            lastName: employee.lastName || '',
+            phone: employee.phone || '',
+            email: employee.email || '',
         },
 
         /* Used for the tables */

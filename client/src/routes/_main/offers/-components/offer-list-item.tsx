@@ -61,7 +61,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
                     <div key={i} className="flex items-center justify-between even:bg-gray-50 px-3 py-2">
                         <div className='flex items-center gap-2'>
                             <p className='text-sm'>{pos.product.name} {pos.optional && "(optional)"}</p>
-                            <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration)} Jahr(e))</p>
+                            <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration_months)} Monate)</p>
                         </div>
                         <div className='flex items-center gap-4 text-sm text-gray-500'>
                             <span className='w-20 text-right font-medium text-gray-700'>{formatEur((pos.total_cents))}</span>

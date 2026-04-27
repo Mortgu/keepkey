@@ -9,7 +9,7 @@ const router = Router();
 
 /* 
  * Route for retreiving the price of a configuration
- * [GET] /api/pricing?productId=&contractId=&duration=&quantity=
+ * [GET] /api/pricing?productId=&contractId=&duration_months=&quantity=
  */
 router.get('/', requireSession, getPrice);
 

@@ -25,7 +25,7 @@ export type ProductItemProps = {
         }
         max_quantity: number;
         min_quantity: number;
-        duration: number;
+        duration_months: number;
         price: number;
     }];
 }
@@ -34,7 +34,7 @@ const productPricingSchema = z.object({
     contractId: z.string().min(1),
     min_quantity: z.int(),
     max_quantity: z.int(),
-    duration: z.int(),
+    duration_months: z.int(),
     price: z.float32(),
 });
 
@@ -51,9 +51,9 @@ export default function ProductItem(product: ProductItemProps) {
         defaultValues: {
             contractId: contracts[0]?.id || "",
             min_quantity: 1,
-            max_quantity: 1,
-            duration: 1,
-            price: 1.0,
+            max_quantity: 2,
+            duration_months: 12,
+            price: 100,
         },
         validators: {
             onChange: productPricingSchema,
@@ -95,7 +95,7 @@ export default function ProductItem(product: ProductItemProps) {
                             <div key={index} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
                                 <p className="text-sm text-gray-700 truncate">{pricing?.contract?.name}</p>
                                 <p className="text-sm text-gray-600 text-center">{pricing.min_quantity}–{pricing.max_quantity}</p>
-                                <p className="text-sm text-gray-600 text-center">{pricing.duration} Jahre</p>
+                                <p className="text-sm text-gray-600 text-center">{pricing.duration_months} Monate</p>
                                 <p className="text-sm font-medium text-gray-900 text-right">{(pricing.price / 100).toFixed(2)} €</p>
                                 <div className="flex items-center gap-0.5 justify-end">
                                     <Button variant="link" icon={<Pen className="size-3.5" />} iconOnly size="sm" />
@@ -138,7 +138,7 @@ export default function ProductItem(product: ProductItemProps) {
                                     placeholder="Max" onChange={(e) => field.handleChange(parseInt(e.target.value))} />
                             )}
                         </pricingForm.Field>
-                        <pricingForm.Field name="duration">
+                        <pricingForm.Field name="duration_months">
                             {(field) => (
                                 <input id={field.name} value={field.state.value} type="number"
                                     className="flex-1 min-w-0 h-8.5 px-2 border border-(--border) rounded-md outline-none text-sm"

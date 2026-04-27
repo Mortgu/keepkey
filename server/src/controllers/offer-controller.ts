@@ -1,8 +1,8 @@
-import {NextFunction, Request, Response} from "express";
-import {prisma} from "../lib/prisma.js";
+import { NextFunction, Request, Response } from "express";
+import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
-import {documentQueue, documentQueueKey} from "../lib/queues.js";
-import {OfferPosition} from "@prisma/client";
+import { documentQueue, documentQueueKey } from "../lib/queues.js";
+import { OfferPosition } from "@prisma/client";
 
 export const getOffers = async (request: Request, response: Response) => {
     const offers = await prisma.offer.findMany({
@@ -140,7 +140,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
 
         if (subtotal) {
-            position['total_cents'] = subtotal.total.value * position.duration * 12;
+            position['total_cents'] = subtotal.total.value * position.duration_months;
         } else {
             position['total_cents'] = 0;
         }
@@ -161,14 +161,14 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             });
 
             for (const position of positions) {
-                const {productId, contractId, duration, quantity, optional, total_cents} = position;
+                const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
 
                 await tx.offerPosition.create({
                     data: {
                         offerId: offer.id,
                         productId,
                         contractId,
-                        duration,
+                        duration_months,
                         quantity,
                         total_cents,
                         optional,

@@ -8,7 +8,7 @@ import type { Order, OrderPositionItem } from "@/data/types";
 
 export default function OrderListItems() {
     const [isOpen, setOpen] = useState<boolean>(false);
-    const { orders, isPending, error, deleteOrder, isDeleting, isGenerating } = useOrders();
+    const { orders, isPending, error, deleteOrder, isDeleting } = useOrders();
 
     if (isPending) {
         return (
@@ -49,7 +49,7 @@ export default function OrderListItems() {
                         <div className="flex items-center justify-between border-b border-(--border) px-3 py-2 ">
                             <div className="flex items-center gap-2">
                                 <p>{position.product.name}</p>
-                                <p className="text-gray-500">({position.contract.name} / {position.duration} Jahr(e))</p>
+                                <p className="text-gray-500">({position.contract.name} / {position.duration_months} Monate)</p>
                             </div>
                             <p>{position.priceAtPurchase.toFixed(2)} €</p>
                         </div>
@@ -58,7 +58,7 @@ export default function OrderListItems() {
 
                 <div className="p-3">
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" icon={<Plus className="size-4" />} loading={isGenerating}>
+                        <Button variant="secondary" size="sm" icon={<Plus className="size-4" />}>
                             Angebot erstellen
                         </Button>
                         <Button variant="secondary" size="sm" icon={<Plus className="size-4" />}>Rechnung erstellen</Button>

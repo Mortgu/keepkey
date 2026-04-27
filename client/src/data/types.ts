@@ -89,14 +89,14 @@ export interface CreatePricingProps {
         contractId: string;
         max_quantity: number;
         min_quantity: number;
-        duration: number;
+        duration_months: number;
     }
 }
 
 export interface ProductItemPricing {
     contract: Contract;
     product: ProductItem,
-    duration: number;
+    duration_months: number;
 
     max_quantity: number;
     min_quantity: number;
@@ -104,27 +104,19 @@ export interface ProductItemPricing {
     price: number;
 }
 
-export interface ShoppingCartItem extends ProductItem {
+export interface OrderPositionItem {
     quantity: number;
-    duration: number;
+    duration_months: number;
     contract: Contract;
 
     product: ProductItem;
 
     price: number;
-}
 
-export interface OrderPositionItem extends ShoppingCartItem {
     id: string;
     priceAtPurchase: number;
     currency: string;
     createdAt: Date;
-}
-
-export interface ShoppingCart {
-    id: string;
-    products: ShoppingCartItem[];
-    total: number,
 }
 
 export interface Order {
@@ -185,7 +177,7 @@ export interface OfferPosition {
     contract: Contract;
     contractId: String;
 
-    duration: number;
+    duration_months: number;
     quantity: number;
 
     optional: boolean;

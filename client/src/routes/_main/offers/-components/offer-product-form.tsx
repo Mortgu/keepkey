@@ -7,15 +7,15 @@ import { useState } from 'react';
 export type OfferProductInput = {
     productId: string;
     contractId: string;
-    duration: 1 | 2 | 3;
+    duration_months: number;
     quantity: number;
     optional: boolean;
 };
 
-const DURATIONS: { value: 1 | 2 | 3; label: string }[] = [
-    { value: 1, label: '1 Jahr' },
-    { value: 2, label: '2 Jahre' },
-    { value: 3, label: '3 Jahre' },
+const DURATIONS: { value: 12 | 24 | 36; label: string }[] = [
+    { value: 12, label: '12 Monate' },
+    { value: 24, label: '24 Monate' },
+    { value: 36, label: '36 Monate' },
 ];
 
 interface Props {
@@ -28,7 +28,7 @@ interface Props {
 export default function OfferProductForm({ products, contracts, onSave, onCancel }: Props) {
     const [productId, setProductId] = useState(products[0]?.id ?? '');
     const [contractId, setContractId] = useState(contracts[0]?.id ?? '');
-    const [duration, setDuration] = useState<OfferProductInput['duration']>(1);
+    const [duration_months, setDurationMonths] = useState<OfferProductInput['duration_months']>(12);
     const [quantity, setQuantity] = useState(1);
     const [optional, setOptional] = useState<boolean>(false);
     const [error, setError] = useState('');
@@ -37,7 +37,7 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
         if (!productId) { setError('Bitte ein Produkt auswählen.'); return; }
         if (!contractId) { setError('Bitte einen Vertrag auswählen.'); return; }
         if (quantity < 1) { setError('Menge muss mindestens 1 sein.'); return; }
-        onSave({ productId, contractId, duration, quantity, optional });
+        onSave({ productId, contractId, duration_months, quantity, optional });
     };
 
     const selectClass = 'w-full rounded-lg border border-(--border) bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100';
@@ -65,7 +65,7 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
 
                 <div className='flex-1 grid gap-1'>
                     <label className='text-sm text-gray-600'>Laufzeit</label>
-                    <select value={duration} onChange={(e) => setDuration(Number(e.target.value) as OfferProductInput['duration'])} className={selectClass}>
+                    <select value={duration_months} onChange={(e) => setDurationMonths(Number(e.target.value) as OfferProductInput['duration_months'])} className={selectClass}>
                         {DURATIONS.map((d) => (
                             <option key={d.value} value={d.value}>{d.label}</option>
                         ))}

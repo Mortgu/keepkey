@@ -2,20 +2,20 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 
 export const getPrice = async (request: Request, response: Response) => {
-    const { productId, contractId, duration, quantity } = request.query;
+    const { productId, contractId, duration_months, quantity } = request.query;
 
-    if (!productId || !contractId || !duration || !quantity) {
-        return response.status(400).send({ message: "productId, contractId, duration und quantity sind erforderlich.", success: false });
+    if (!productId || !contractId || !duration_months || !quantity) {
+        return response.status(400).send({ message: "productId, contractId, duration_months und quantity sind erforderlich.", success: false });
     }
 
-    const durationNum = parseInt(duration as string);
+    const durationNum = parseInt(duration_months as string);
     const quantityNum = parseInt(quantity as string);
 
     if (isNaN(durationNum) || isNaN(quantityNum) || quantityNum <= 0) {
-        return response.status(400).send({ message: "duration und quantity müssen positive Ganzzahlen sein.", success: false });
+        return response.status(400).send({ message: "duration_months und quantity müssen positive Ganzzahlen sein.", success: false });
     }
 
-    //const result = await calculatePrice(productId as string, contractId as string, durationNum, quantityNum);
+    //const result = await calculatePrice(productId as string, contractId as string, duration_months, quantityNum);
     const result = null;
 
     if (!result) {
