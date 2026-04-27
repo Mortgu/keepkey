@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+    --font-sans: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+}
+
 :root {
     --viewport: 1280px;
 
@@ -48,10 +53,16 @@
 html,
 body {
     /*background-color: var(--page-bg);*/
+    font-family: var(--font-sans);
+    color: var(--text);
 }
 
 * {
     box-sizing: border-box;
+}
+
+*::-webkit-scrollbar {
+    display: none;
 }
 
 #root {
@@ -66,4 +77,44 @@ li {
     list-style: disc;
 }
 
-@layer components {}
+@layer components {
+    /* Type scale */
+    .text-display {
+        font-size: 36px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.2;
+    }
+    .text-h1 {
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+    }
+    .text-h2 {
+        font-size: 20px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+    }
+    .text-h3 {
+        font-size: 17px;
+        font-weight: 500;
+    }
+    .text-h4 {
+        font-size: 14px;
+        font-weight: 600;
+    }
+    .text-body {
+        font-size: 14px;
+        font-weight: 400;
+    }
+    .text-small {
+        font-size: 13px;
+        font-weight: 400;
+    }
+    .text-caption {
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+    }
+}

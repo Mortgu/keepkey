@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
-import { generateOffer, generateInvoice } from "../services/documentService.js";
+import { generateOfferDocx, convertAndSaveOfferDocuments } from "../services/documentService.js";
 
 interface DocumentJobData {
     documentJobId: string;
@@ -20,23 +20,41 @@ export default function startDocumentWorker() {
             throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
         }
 
-        await prisma.documentJob.update({
-            where: { id: documentJobId },
-            data: { status: 'processing' },
-        });
+        switch (type) {
+            case 'offer': {
+                if (!documentJob.offerId) {
+                    throw new Error("Document job for offer with undefined offerId");
+                }
 
-        if (type === 'offer' && documentJob.offerId) {
-            await generateOffer(documentJob.offerId, documentJobId);
-        } else if (type === 'invoice' && documentJob.orderId) {
-            //await generateInvoice(documentJob.orderId, documentJobId);
-        } else {
-            throw new Error(`Unknown document type "${type}" or missing reference ID`);
+                await prisma.documentJob.update({
+                    where: { id: documentJobId },
+                    data: { status: 'generating' },
+                });
+
+                const { docx, outDir } = await generateOfferDocx(documentJob.offerId, documentJobId);
+
+                await prisma.documentJob.update({
+                    where: { id: documentJobId },
+                    data: { status: 'converting' },
+                });
+
+                const { pdfPath, docxPath } = await convertAndSaveOfferDocuments(docx, outDir);
+
+                await prisma.documentJob.update({
+                    where: { id: documentJobId },
+                    data: { status: 'completed', docxPath, pdfPath },
+                });
+                break;
+            }
+            case 'invoice':
+                if (!documentJob.orderId) {
+                    throw new Error("Document job for order with undefined orderId");
+                }
+                // TODO
+                break;
+            default:
+                throw new Error(`Unknown document type "${type}" or missing reference ID`);
         }
-
-        await prisma.documentJob.update({
-            where: { id: documentJobId },
-            data: { status: 'completed' },
-        });
 
     }, { connection, concurrency: 2 });
 

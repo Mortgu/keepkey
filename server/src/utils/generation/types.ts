@@ -13,9 +13,11 @@ export interface TemplateBaseData {
     employee: TemplateEmployeeData;
 
     products: TemplateProductData[];
+
     positions: {
+        names: string;
         includesOptionals: boolean;
-        products: TemplatePositionData[]
+        products: TemplatePositionData[];
     }
 }
 
@@ -54,12 +56,13 @@ interface TemplateEmployeeData {
 export interface TemplateProductData {
     name: string;
     description: string;
-    duration: string;
+    duration: string; // in Jahren
+    duration_months: number; // in Jahren
     quantity: string;
     contract: TemplateContractData;
     pricePerUnit: string;
     totalPrice: string;
-    optional: boolean | null;
+    optional: boolean;
 
     prices: {
         price_1: string;
@@ -76,6 +79,7 @@ export interface TemplateContractData {
 
 export interface TemplatePositionData {
     contract: TemplateContractData;
-    duration: string;
-    products: string;
+    duration_months: string;
+    names: string;
+    products: any;
 }

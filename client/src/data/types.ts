@@ -16,6 +16,11 @@ export interface BaseCustomer {
     customerId: string;
     companyName: string;
     email: string;
+
+    street: string;
+    city: string;
+    plz: string;
+    phone: string;
 }
 
 export interface CreateCustomer extends BaseCustomer {
@@ -66,23 +71,32 @@ export interface Contract extends BaseContract {
 export interface BaseProduct {
     name: string;
     description: string;
-    link: string;
+    alwaysIncluded: boolean;
 }
 
 export interface ProductItem extends BaseProduct {
     id: string;
 
-    published: boolean,
     productPricing: ProductItemPricing[],
 
     createdAt: Date;
     updatedAt: Date;
 };
 
-export interface ProductItemPricing {
+export interface CreatePricingProps {
+    productId: string;
+    pricing: {
+        contractId: string;
+        max_quantity: number;
+        min_quantity: number;
+        duration_months: number;
+    }
+}
+
+export interface ProductItemPricingBase {
     contract: Contract;
     product: ProductItem,
-    duration: number;
+    duration_months: number;
 
     max_quantity: number;
     min_quantity: number;
@@ -90,31 +104,29 @@ export interface ProductItemPricing {
     price: number;
 }
 
-export interface ShoppingCartItem extends ProductItem {
+export interface ProductItemPricing extends ProductItemPricingBase {
+    id: string;
+}
+
+export interface OrderPositionItem {
     quantity: number;
-    duration: number;
+    duration_months: number;
     contract: Contract;
 
     product: ProductItem;
 
     price: number;
-}
 
-export interface OrderPositionItem extends ShoppingCartItem {
     id: string;
     priceAtPurchase: number;
     currency: string;
     createdAt: Date;
 }
 
-export interface ShoppingCart {
-    id: string;
-    products: ShoppingCartItem[];
-    total: number,
-}
-
 export interface Order {
     id: string;
+
+    employee: User;
     customer: Customer;
 
     orderPositions: OrderPositionItem[],
@@ -169,13 +181,13 @@ export interface OfferPosition {
     contract: Contract;
     contractId: String;
 
-    duration: number;
+    duration_months: number;
     quantity: number;
 
     optional: boolean;
 
-    price_at_purchase: number;
-    tax_rate_at_purchase: number;
+    total_cents: number;
+    tax_rate: number;
 
     createdAt: Date;
 }

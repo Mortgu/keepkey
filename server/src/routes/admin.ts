@@ -1,11 +1,11 @@
 import { Router } from "express";
 import { canViewOrders } from "../permissions/order.js";
 import { requireSession } from "../middlewares/auth.js";
-import { getAllOrders } from "../controllers/orderController.js";
+import { getAllOrders } from "../controllers/order-controller.js";
 import { canViewProducts } from "../permissions/product.js";
-import { getAllProducts } from "../controllers/productController.js";
+import { getAllProducts } from "../controllers/product-controller.js";
 import { canViewAllUsers } from "../permissions/user.js";
-import { getAllUsers, getUserById } from "../controllers/userController.js";
+import { getAllUsers, getUserById } from "../controllers/user-controller.js";
 
 const router = Router();
 

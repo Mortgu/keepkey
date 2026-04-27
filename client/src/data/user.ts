@@ -93,21 +93,6 @@ export async function deleteUserAction(id: string) {
     return result;
 }
 
-export async function upsertAddress(data: { street: string; plz: string; city: string; phone?: string }) {
-    const response = await fetch('http://localhost:3000/api/users/me/address', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-        throw new Error('Failed to save address');
-    }
-
-    return await response.json();
-}
-
 export async function createContactPersons(data: Array<{ salutation: string; firstName: string; lastName: string; email?: string }>) {
     const response = await fetch('http://localhost:3000/api/users/me/contact-persons', {
         method: 'POST',

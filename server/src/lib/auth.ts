@@ -4,8 +4,10 @@ import { prisma } from './prisma.js';
 import { admin as adminPlugin } from 'better-auth/plugins';
 
 import { ac, admin, user } from './permissions.js';
+import env from "./env.js";
 
 export const auth = betterAuth({
+    baseURL: env.BETTER_AUTH_URL,
     trustedOrigins: ["http://localhost:5173"],
     database: prismaAdapter(prisma, {
         provider: 'postgresql',

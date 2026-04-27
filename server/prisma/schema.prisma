@@ -157,13 +157,13 @@ model OfferPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration Int
-  quantity Int
+  duration_months Int
+  quantity        Int
 
   optional Boolean? @default(false)
 
-  price_at_purchase    Int
-  tax_rate_at_purchase Decimal
+  total_cents Int
+  tax_rate    Int
 
   createdAt DateTime? @default(now())
   updatedAt DateTime? @default(now())
@@ -189,9 +189,8 @@ model Product {
   name String @unique
 
   description String?
-  link        String?
 
-  published Boolean @default(false)
+  alwaysIncluded Boolean? @default(false)
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]
@@ -231,7 +230,7 @@ model ProductPricing {
   min_quantity Int
   max_quantity Int? @default(0)
 
-  duration Int? @default(1)
+  duration_months Int @default(12)
 
   price Int
 
@@ -270,6 +269,9 @@ model DocumentJob {
   offer     Offer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
   type      String
   status    String   @default("pending")
+  isCurrent Boolean  @default(true)
+  docxPath  String?
+  pdfPath   String?
   error     String?
   jobId     String?
   createdAt DateTime @default(now())
@@ -293,8 +295,8 @@ model OrderPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration Int
-  quantity Int
+  duration_months Int
+  quantity        Int
 
   priceAtPurchase Float
   currency        String @default("EUR")

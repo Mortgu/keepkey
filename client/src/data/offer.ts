@@ -1,4 +1,4 @@
-import type { OfferProductInput } from "@/routes/admin/_adminLayout/offers/-components/offer-product-form";
+import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
 import type { BaseOffer, Offer } from "./types";
 
 export const getOffersAction = async () => {

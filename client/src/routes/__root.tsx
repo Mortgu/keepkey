@@ -1,5 +1,4 @@
 import { createRootRoute, Outlet } from '@tanstack/react-router'
-import Navigation from './-components/navigation';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from "@/context/auth.tsx";
@@ -15,10 +14,7 @@ function RootComponent() {
     return (
         <QueryClientProvider client={queryClient}>
             <AuthProvider>
-                <Navigation />
-                <div id="app" className=''>
-                    <Outlet />
-                </div>
+                <Outlet />
             </AuthProvider>
         </QueryClientProvider>
     )

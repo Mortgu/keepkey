@@ -10,18 +10,20 @@
   "scripts": {
     "dev": "nodemon --exec tsx src/server.ts",
     "start": "node dist/server.js",
-    "build": "tsc"
+    "build": "tsc",
+    "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
+    "@t3-oss/env-nextjs": "^0.13.11",
     "@types/node": "^25.5.0",
     "better-auth": "^1.5.5",
     "bullmq": "^5.71.1",
     "cors": "^2.8.6",
     "docxtemplater": "^3.68.5",
     "dotenv": "^17.3.1",
-    "easy-template-x": "^7.2.3",
+    "easy-template-x": "^3.0.2",
     "express": "^5.2.1",
     "filtrex": "^3.1.0",
     "i": "^0.3.7",
