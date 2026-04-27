@@ -122,7 +122,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
     const includesOptionals = positions.some((p: OfferPosition) => p.optional);
 
-    if (includesOptionals) {
+    /*if (includesOptionals) {
         positions.push(...positions.flatMap((position: OfferPosition) =>
             contracts.filter(c => c.id !== position.contractId).map(contract => ({
                 ...position,
@@ -130,18 +130,14 @@ export const createOffer = async (request: Request, response: Response, next: Ne
                 isAlternative: true,
             }))
         ))
-    }
+    }*/
 
     for (const position of positions) {
-        const subtotal = await calculatePrice({
+        position['total_cents'] = await calculatePrice({
             ...position
         });
 
-        if (subtotal) {
-            position['total_cents'] = subtotal.total.value;
-        } else {
-            position['total_cents'] = 0;
-        }
+
     }
 
     try {

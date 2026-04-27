@@ -15,6 +15,7 @@ async function ensureOutputDir(jobId: string): Promise<string> {
 
 export async function generateOfferDocx(offerId: string, jobId: string): Promise<{ docx: Buffer; outDir: string }> {
     const data = await getOfferTemplateData(offerId);
+    console.dir(data, { depth: null });
     const outDir = await ensureOutputDir(jobId);
     const docx = await renderDocx(path.join(env.TEMPLATES_DIR, "offer.docx"), data);
     return { docx, outDir };

@@ -13,6 +13,7 @@ import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
 import { useAdmin } from "@/hooks/admin";
 import ModalDialog from "@/components/modal";
+import Checkbox from "@/components/inputs/checkbox.tsx";
 
 interface OfferModalProps {
     open: boolean;
@@ -214,16 +215,10 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                     <hr className="text-gray-200" />
 
                     <div className="grid gap-2">
-                        <div className="w-full">
-                            <Button
-                                onClick={() => setShowProductForm(true)}
-                                type="button"
-                                className="float-right"
-                                variant="link"
-                                icon={<Plus className="size-4" />}
-                                size="sm"
-                                disabled={showProductForm}
-                            >
+                        <div className="flex items-center justify-between w-full">
+                            <Checkbox label="Vergleichen?" />
+                            <Button onClick={() => setShowProductForm(true)} variant="link"
+                                icon={<Plus className="size-4" />} size="sm" disabled={showProductForm}>
                                 Produkt hinzufügen
                             </Button>
                         </div>
