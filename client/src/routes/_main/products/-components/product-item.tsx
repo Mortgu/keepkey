@@ -6,6 +6,7 @@ import { useState } from "react";
 import ProductModal from "./product-modal";
 import { useContracts } from "@/hooks/contract";
 import { useProducts } from "@/hooks/product";
+import type { ProductItem } from "@/data/types";
 
 export type ProductItemProps = {
     id: string;
@@ -13,7 +14,7 @@ export type ProductItemProps = {
     quantity: number;
     price: number;
     description: string;
-    link: string;
+    alwaysIncluded: boolean;
     productPricing: [{
         id: string;
         contract: {
@@ -38,14 +39,14 @@ const productPricingSchema = z.object({
     price: z.float32(),
 });
 
-export default function ProductItem(product: ProductItemProps) {
+export default function ProductItem(product: ProductItem) {
     const { deleteProduct, updateProduct, isDeletingProduct, deletePricing, isDeletingPricing, createPricing } = useProducts();
     const { contracts } = useContracts();
 
     const [isAddingPricing, addPricing] = useState<boolean>(false);
     const [isEditing, setEdit] = useState<boolean>(false);
 
-    const { name, description, link } = product;
+    const { name, description, alwaysIncluded } = product;
 
     const pricingForm = useForm({
         defaultValues: {
@@ -181,7 +182,7 @@ export default function ProductItem(product: ProductItemProps) {
                 open={isEditing}
                 cancelFn={() => setEdit(false)}
                 submitFn={(value) => updateProduct({ id: product.id, product: value })}
-                currentItem={{ name, description, link }}
+                currentItem={{ name, description, alwaysIncluded }}
             />
         </>
     );

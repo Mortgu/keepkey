@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPricingAction, createProductAction, deletePricingAction, deleteProductAction, getProducts, updateProductAction } from "@/data/products.ts";
 import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
-import type { CreatePricingProps, ProductItemPricing } from "@/data/types";
+import type { CreatePricingProps } from "@/data/types";
 
 export const useProducts = () => {
     const queryClient = useQueryClient();

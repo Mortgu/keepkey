@@ -189,7 +189,8 @@ model Product {
   name String @unique
 
   description String?
-  link        String?
+
+  alwaysIncluded Boolean? @default(false)
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]

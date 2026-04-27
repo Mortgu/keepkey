@@ -1,5 +1,5 @@
 import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
-import type { CreatePricingProps, ProductItemPricing } from "./types";
+import type { CreatePricingProps } from "./types";
 
 export async function getAllProducts() {
     const response = await fetch(`http://localhost:3000/api/admin/products`, {
@@ -47,7 +47,7 @@ export async function getProduct(id: string) {
 }
 
 export async function createProductAction(product: {
-    name: string, description: string, link: string,
+    name: string, description: string, alwaysIncluded: boolean,
 }): Promise<ProductItemProps> {
     const response = await fetch('http://localhost:3000/api/products', {
         method: "POST",

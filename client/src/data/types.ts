@@ -71,7 +71,7 @@ export interface Contract extends BaseContract {
 export interface BaseProduct {
     name: string;
     description: string;
-    link: string;
+    alwaysIncluded: boolean;
 }
 
 export interface ProductItem extends BaseProduct {
@@ -93,7 +93,7 @@ export interface CreatePricingProps {
     }
 }
 
-export interface ProductItemPricing {
+export interface ProductItemPricingBase {
     contract: Contract;
     product: ProductItem,
     duration_months: number;
@@ -102,6 +102,10 @@ export interface ProductItemPricing {
     min_quantity: number;
 
     price: number;
+}
+
+export interface ProductItemPricing extends ProductItemPricingBase {
+    id: string;
 }
 
 export interface OrderPositionItem {
