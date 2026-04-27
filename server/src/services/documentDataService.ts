@@ -1,7 +1,6 @@
 import { prisma } from "../lib/prisma.js";
 import { formatDate, formatDuration, formatEur } from "../utils/utils.js";
 import { TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
-import calculatePrice from "../utils/products.js";
 
 export async function getOfferTemplateData(offerId: string): Promise<TemplateOfferData> {
     const [offer, contracts] = await Promise.all([

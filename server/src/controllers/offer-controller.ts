@@ -52,8 +52,6 @@ export const getOfferJobs = async (request: Request, response: Response) => {
 export const getOfferJobById = async (request: Request, response: Response) => {
     const { id, jobId } = request.params;
 
-    console.log(id, jobId)
-
     try {
         const documentJob = await prisma.documentJob.findFirstOrThrow({
             where: {
@@ -140,7 +138,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
 
         if (subtotal) {
-            position['total_cents'] = subtotal.total.value * position.duration_months;
+            position['total_cents'] = subtotal.total.value;
         } else {
             position['total_cents'] = 0;
         }

@@ -35,8 +35,6 @@ export const createPricing = async (request: Request, response: Response) => {
         });
     }
 
-    console.log(body)
-
     try {
         const result = await prisma.productPricing.create({
             data: { productId: product_id, ...body }

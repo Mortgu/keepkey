@@ -41,12 +41,16 @@ export default async function calculatePrice(props: PriceCalculatorProps): Promi
         return null;
     }
 
+    console.log(matchingTier, props)
+
     const subtotal_month = quantity * matchingTier.price;
 
     const year_1 = Math.round(subtotal_month * 12);
     const year_2 = Math.round(subtotal_month * 24);
     const year_3 = Math.round(subtotal_month * 36);
-    const total = subtotal_month * duration_months / 12;
+    const total = subtotal_month * duration_months;
+
+    console.log(total, subtotal_month, duration_months);
 
     return {
         unit: { value: matchingTier.price, label: formatEur(matchingTier.price) },
