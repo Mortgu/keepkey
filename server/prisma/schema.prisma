@@ -184,13 +184,19 @@ model Supplier {
   @@map("supplier")
 }
 
+enum ProductType {
+  product
+  flat_rate
+}
+
 model Product {
   id   String @id @default(uuid())
   name String @unique
 
   description String?
+  table       String?
 
-  alwaysIncluded Boolean? @default(false)
+  type ProductType? @default(product)
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]

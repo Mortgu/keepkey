@@ -8,28 +8,6 @@ import { useContracts } from "@/hooks/contract";
 import { useProducts } from "@/hooks/product";
 import type { ProductItem } from "@/data/types";
 
-export type ProductItemProps = {
-    id: string;
-    name: string;
-    quantity: number;
-    price: number;
-    description: string;
-    alwaysIncluded: boolean;
-    productPricing: [{
-        id: string;
-        contract: {
-            name: string;
-        },
-        product: {
-            name: string;
-            updatedAt: Date;
-        }
-        max_quantity: number;
-        min_quantity: number;
-        duration_months: number;
-        price: number;
-    }];
-}
 
 const productPricingSchema = z.object({
     contractId: z.string().min(1),
@@ -46,7 +24,7 @@ export default function ProductItem(product: ProductItem) {
     const [isAddingPricing, addPricing] = useState<boolean>(false);
     const [isEditing, setEdit] = useState<boolean>(false);
 
-    const { name, description, alwaysIncluded } = product;
+    const { name, description, table, type } = product;
 
     const pricingForm = useForm({
         defaultValues: {
@@ -182,7 +160,7 @@ export default function ProductItem(product: ProductItem) {
                 open={isEditing}
                 cancelFn={() => setEdit(false)}
                 submitFn={(value) => updateProduct({ id: product.id, product: value })}
-                currentItem={{ name, description, alwaysIncluded }}
+                currentItem={{ name, description, table, type }}
             />
         </>
     );

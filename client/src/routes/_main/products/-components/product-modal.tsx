@@ -1,10 +1,13 @@
 import Button from "@/components/button/button";
-import Checkbox from "@/components/inputs/checkbox";
 import ModalDialog from "@/components/modal";
-import type { BaseProduct } from "@/data/types";
+import type { BaseProduct, ProductType } from "@/data/types";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
+const productTypeOptions: { value: ProductType; label: string }[] = [
+    { value: "product", label: "Produkt" },
+    { value: "flat_rate", label: "Pauschale" },
+];
 
 interface ProductModalProps {
     open: boolean;
@@ -16,13 +19,15 @@ interface ProductModalProps {
 const productScheme = z.object({
     name: z.string().min(1, "Mindestens 1 Zeichen"),
     description: z.string(),
-    alwaysIncluded: z.boolean(),
+    table: z.string(),
+    type: z.enum(["product", "flat_rate"]),
 });
 
 const emptyData: BaseProduct = {
     name: "",
     description: "",
-    alwaysIncluded: false,
+    table: "",
+    type: "product",
 };
 
 export default function ProductModal({ open, cancelFn, submitFn, currentItem = null }: ProductModalProps) {
@@ -57,13 +62,30 @@ export default function ProductModal({ open, cancelFn, submitFn, currentItem = n
 
             <ModalDialog.Content>
                 <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
+                    <productForm.Field name="type" children={(field) => (
+                        <div className="grid gap-1">
+                            <label htmlFor={field.name} className="text-sm text-gray-500">Typ</label>
+                            <select
+                                id={field.name}
+                                name={field.name}
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value as ProductType)}
+                                className="outline-none border border-(--border) p-2 rounded-md"
+                            >
+                                {productTypeOptions.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                ))}
+                            </select>
+                        </div>
+                    )} />
+
                     <productForm.Field name="name" children={(field) => (
                         <div className="grid gap-1">
                             <div className="flex items-center justify-between">
                                 <label htmlFor={field.name} className="text-sm  text-gray-500">Produkt Name</label>
                                 {field.state.meta.errors.map((error, i) => (
                                     <p key={i} className="text-sm text-red-500">
-                                        {error?.message}
+                                        {(error as unknown as { message?: string })?.message}
                                     </p>
                                 ))}
                             </div>
@@ -75,14 +97,16 @@ export default function ProductModal({ open, cancelFn, submitFn, currentItem = n
                     <productForm.Field name="description" children={(field) => (
                         <div className="grid gap-1">
                             <label htmlFor={field.name} className="text-sm text-gray-500">Produkt Beschreibung</label>
-                            <textarea rows={10} id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
-                                value={field.state.value} placeholder="Produkt Name" onChange={(e) => field.handleChange(e.target.value)} />
+                            <textarea rows={5} id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
+                                value={field.state.value} placeholder="Produkt Beschreibung" onChange={(e) => field.handleChange(e.target.value)} />
                         </div>
                     )} />
 
-                    <productForm.Field name="alwaysIncluded" children={(field) => (
+                    <productForm.Field name="table" children={(field) => (
                         <div className="grid gap-1">
-                            <Checkbox checked={field.state.value} onChange={(e) => field.handleChange(e.target.checked)} label="Immer enthalten?" />
+                            <label htmlFor={field.name} className="text-sm text-gray-500">Tabelle Beschreibung</label>
+                            <textarea rows={5} id={field.name} name={field.name} className='flex-1 outline-none border border-(--border) p-2 rounded-md'
+                                value={field.state.value} placeholder="Tabellen Beschreibung" onChange={(e) => field.handleChange(e.target.value)} />
                         </div>
                     )} />
                 </form>

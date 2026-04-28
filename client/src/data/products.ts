@@ -47,7 +47,7 @@ export async function getProduct(id: string) {
 }
 
 export async function createProductAction(product: {
-    name: string, description: string, alwaysIncluded: boolean,
+    name: string, description: string, table: string, type: string,
 }): Promise<ProductItemProps> {
     const response = await fetch('http://localhost:3000/api/products', {
         method: "POST",

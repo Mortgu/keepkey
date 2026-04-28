@@ -46,6 +46,7 @@ export async function getOfferTemplateData(offerId: string) {
             items: group?.map((item) => ({
                 name: item.product.name,
                 description: item.product.description,
+                table: item.product.table,
 
                 quantity: item.quantity,
                 optional: item.optional,
