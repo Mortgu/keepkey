@@ -129,6 +129,7 @@ model Offer {
   validUntil  DateTime?
   requestFrom DateTime?
 
+  flatRates      FlatRates[]
   offerPositions OfferPosition[]
   order          Order?
   documentJobs   DocumentJob[]
@@ -184,9 +185,15 @@ model Supplier {
   @@map("supplier")
 }
 
-enum ProductType {
-  product
-  flat_rate
+model FlatRates {
+  id          String  @id @default(uuid())
+  name        String
+  table       String
+  total_cents Int
+  offer       Offer?  @relation(fields: [offerId], references: [id])
+  offerId     String?
+
+  @@map("flat_rates")
 }
 
 model Product {
@@ -195,8 +202,6 @@ model Product {
 
   description String?
   table       String?
-
-  type ProductType? @default(product)
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]

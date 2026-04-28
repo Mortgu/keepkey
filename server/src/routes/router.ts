@@ -9,6 +9,7 @@ import pricingRouter from './pricing.js';
 import orderRouter from './orders.js';
 import customerRouter from './customers.js';
 import offerRouter from './offer.js';
+import flatratesRoter from './flatrates.js';
 
 const router = Router();
 
@@ -38,5 +39,8 @@ router.use('/orders', orderRouter);
 
 /* /api/customers */
 router.use('/customers', customerRouter);
+
+/* /api/flatrates */
+router.use('/flatrates', flatratesRoter)
 
 export default router;

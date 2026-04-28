@@ -68,18 +68,10 @@ export interface Contract extends BaseContract {
     createdAt: Date;
 }
 
-export const ProductTypeC = {
-    product: "product",
-    flat_rate: "flat_rate",
-} as const;
-
-export type ProductType = typeof ProductTypeC[keyof typeof ProductTypeC];
-
 export interface BaseProduct {
     name: string;
     description: string;
     table: string;
-    type: ProductType;
 }
 
 export interface ProductItem extends BaseProduct {
@@ -198,6 +190,19 @@ export interface OfferPosition {
     tax_rate: number;
 
     createdAt: Date;
+}
+
+/* FLAT RATE */
+export interface FlatRateBase {
+    name: string;
+    table: string;
+    quantity?: number;
+    total_cents: number;
+    offerId?: string | null;
+}
+
+export interface FlatRate extends FlatRateBase {
+    id: string;
 }
 
 /* SUPPLIER */

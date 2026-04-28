@@ -1,6 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { BaseOffer, ContactPerson, Customer, ProductItem, Supplier, User } from "@/data/types";
+import type { FlatRateBase, BaseOffer, ContactPerson, Customer, ProductItem, Supplier, User } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
@@ -8,6 +8,7 @@ import { useForm } from "@tanstack/react-form";
 import { Loader, Plus, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
+import OfferFlatRateForm from "./offer-flat-rate-form";
 import { z } from "zod";
 import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
@@ -55,6 +56,9 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
 
+    const [offerFlatRates, setOfferFlatRates] = useState<FlatRateBase[]>([]);
+    const [showFlatRateForm, setShowFlatRateForm] = useState(false);
+
     const { createOffer, errorCreatingOffer } = useOffer();
 
     const offerForm = useForm({
@@ -70,7 +74,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
 
             try {
                 const response = await createOffer({
-                    offer: offer, positions: offerProducts
+                    offer: offer, positions: offerProducts, flatrates: offerFlatRates
                 });
 
                 cancelFn();
@@ -256,6 +260,38 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                             )}
                         </div>
                     </div>
+
+                    <hr className="text-gray-200" />
+
+                    <div className="grid gap-2">
+                        <div className="flex items-center justify-between w-full">
+                            <span className="text-sm font-medium text-gray-700">Pauschalen</span>
+                            <Button onClick={() => setShowFlatRateForm(true)} variant="link"
+                                icon={<Plus className="size-4" />} size="sm" disabled={showFlatRateForm}>
+                                Pauschale hinzufügen
+                            </Button>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            {offerFlatRates.map((fr, index) => {
+                                return (
+                                    <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
+                                        {JSON.stringify(fr)}
+                                    </div>
+                                );
+                            })}
+
+                            {showFlatRateForm && (
+                                <OfferFlatRateForm
+                                    onSave={(data) => { setOfferFlatRates((prev) => [...prev, data]); setShowFlatRateForm(false); }}
+                                    onCancel={() => setShowFlatRateForm(false)}
+                                />
+                            )}
+                        </div>
+                    </div>
+
+                    <hr className="text-gray-200" />
+
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>

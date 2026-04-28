@@ -2,6 +2,14 @@ import { prisma } from "../lib/prisma.js";
 import { formatDate, formatDuration, formatEur } from "../utils/utils.js";
 import { TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
 
+function interpolate(template: string, ctx: Record<string, unknown>): string {
+    return template.replace(/\{([\w.]+)\}/g, (_, key: string) => {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const value = key.split('.').reduce((obj: any, k: string) => obj?.[k], ctx);
+        return value != null ? String(value) : `{${key}}`;
+    });
+}
+
 export async function getOfferTemplateData(offerId: string) {
     const [offer, contracts] = await Promise.all([
         await prisma.offer.findUniqueOrThrow({
@@ -43,19 +51,29 @@ export async function getOfferTemplateData(offerId: string) {
             duration_months: first.duration_months,
             duration: formatDuration(first.duration_months),
             total: formatEur(group_total! / 100),
-            items: group?.map((item) => ({
-                name: item.product.name,
-                description: item.product.description,
-                table: item.product.table,
-
-                quantity: item.quantity,
-                optional: item.optional,
-
-                price: {
+            items: group?.map((item) => {
+                const price = {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(item.total_cents / item.quantity / item.duration_months / 100),
-                }
-            }))
+                };
+                const itemCtx: Record<string, unknown> = {
+                    name: item.product.name,
+                    description: item.product.description,
+                    quantity: item.quantity,
+                    optional: item.optional,
+                    duration_months: first.duration_months,
+                    duration: formatDuration(first.duration_months),
+                    price,
+                };
+                return {
+                    name: item.product.name,
+                    description: item.product.description,
+                    table: item.product.table ? interpolate(item.product.table, itemCtx) : "",
+                    quantity: item.quantity,
+                    optional: item.optional,
+                    price,
+                };
+            })
         }
     })
 

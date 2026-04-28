@@ -1,28 +1,29 @@
-import {createOfferAction, deleteOfferAction, getOffersAction} from "@/data/offer";
-import type {BaseOffer} from "@/data/types";
-import type {OfferProductInput} from "@/routes/_main/offers/-components/offer-product-form";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { createOfferAction, deleteOfferAction, getOffersAction } from "@/data/offer";
+import type { FlatRateBase, BaseOffer } from "@/data/types";
+import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useOffer = () => {
     const queryClient = useQueryClient();
 
-    const invalidate = () => queryClient.invalidateQueries({queryKey: ['offers']});
+    const invalidate = () => queryClient.invalidateQueries({ queryKey: ['offers'] });
 
-    const {data: offers = [], isPending, error} = useQuery({
+    const { data: offers = [], isPending, error } = useQuery({
         queryKey: ['offers'],
         queryFn: getOffersAction,
     });
 
     const createMutation = useMutation({
-        mutationFn: ({offer, positions}: {
+        mutationFn: ({ offer, positions, flatrates }: {
             offer: BaseOffer,
-            positions: OfferProductInput[]
-        }) => createOfferAction(offer, positions),
+            positions: OfferProductInput[],
+            flatrates: FlatRateBase[],
+        }) => createOfferAction(offer, positions, flatrates),
         onSuccess: invalidate
     });
 
     const deleteMutation = useMutation({
-        mutationFn: ({id}: { id: string }) => deleteOfferAction(id),
+        mutationFn: ({ id }: { id: string }) => deleteOfferAction(id),
         onSuccess: invalidate
     })
 

@@ -24,7 +24,7 @@ export default function ProductItem(product: ProductItem) {
     const [isAddingPricing, addPricing] = useState<boolean>(false);
     const [isEditing, setEdit] = useState<boolean>(false);
 
-    const { name, description, table, type } = product;
+    const { name, description, table } = product;
 
     const pricingForm = useForm({
         defaultValues: {
@@ -160,7 +160,7 @@ export default function ProductItem(product: ProductItem) {
                 open={isEditing}
                 cancelFn={() => setEdit(false)}
                 submitFn={(value) => updateProduct({ id: product.id, product: value })}
-                currentItem={{ name, description, table, type }}
+                currentItem={{ name, description, table }}
             />
         </>
     );

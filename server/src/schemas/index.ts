@@ -7,3 +7,4 @@ export * from "./supplier-schemas.js";
 export * from "./user-schemas.js";
 export * from "./pricing-schemas.js";
 export * from "./checkout-schemas.js";
+export * from "./flatrate-schemas.js";
