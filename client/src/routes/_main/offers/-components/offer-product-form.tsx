@@ -86,7 +86,7 @@ export default function OfferProductForm({ products, contracts, onSave, onCancel
             {error && <p className='text-sm text-red-400'>{error}</p>}
 
             <div className='flex items-center justify-between gap-2'>
-                <Checkbox label="Optional?" onChange={(e) => setOptional(!optional)} />
+                <Checkbox label="Optional?" onChange={() => setOptional(!optional)} />
                 <div className='flex gap-2'>
                     <Button type='button' variant='secondary' size='sm' onClick={onCancel}>Abbrechen</Button>
                     <Button type='button' size='sm' onClick={handleSave}>Hinzufügen</Button>

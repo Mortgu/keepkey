@@ -192,7 +192,6 @@ export interface OfferPosition {
     createdAt: Date;
 }
 
-/* FLAT RATE */
 export interface FlatRateBase {
     name: string;
     table: string;

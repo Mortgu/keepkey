@@ -8,7 +8,7 @@ import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateList() {
     const [isOpen, setOpen] = useState(false);
-    const { flatrates, isPending, error, createFlatRate } = useFlatRates();
+    const { flatRates, isPending, error, createFlatRate } = useFlatRates();
 
     if (isPending) {
         return <Loader className="animate-spin" />;
@@ -27,7 +27,7 @@ export default function FlatRateList() {
         <div>
             <div className="mb-4 flex items-center justify-between">
                 <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-                    Flatrates ({flatrates.length})
+                    Flatrates ({flatRates?.length})
                 </h1>
                 <Button onClick={() => setOpen(true)} size="sm">
                     Erstellen <Plus className="size-4" />
@@ -35,7 +35,7 @@ export default function FlatRateList() {
             </div>
 
             <div className="grid gap-2">
-                {flatrates.map((item: FlatRate) => (
+                {flatRates?.map((item: FlatRate) => (
                     <FlatRateItem key={item.id} {...item} />
                 ))}
             </div>

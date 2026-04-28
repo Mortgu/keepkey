@@ -1,11 +1,20 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { FlatRateBase, BaseOffer, ContactPerson, Customer, ProductItem, Supplier, User } from "@/data/types";
+import type {
+    FlatRateBase,
+    BaseOffer,
+    ContactPerson,
+    Customer,
+    ProductItem,
+    Supplier,
+    User,
+    FlatRate
+} from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash2, X } from "lucide-react";
+import { Loader, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import OfferFlatRateForm from "./offer-flat-rate-form";
@@ -15,6 +24,7 @@ import { useSupplier } from "@/hooks/supplier";
 import { useAdmin } from "@/hooks/admin";
 import ModalDialog from "@/components/modal";
 import Checkbox from "@/components/inputs/checkbox.tsx";
+import {useFlatRates} from "@/hooks/flatrate.ts";
 
 interface OfferModalProps {
     open: boolean;
@@ -52,11 +62,12 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
     const { contracts } = useContracts();
     const { suppliers } = useSupplier();
     const { users } = useAdmin();
+    const { flatRates } = useFlatRates();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
 
-    const [offerFlatRates, setOfferFlatRates] = useState<FlatRateBase[]>([]);
+    const [offerFlatRates, setOfferFlatRates] = useState([]);
     const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
     const { createOffer, errorCreatingOffer } = useOffer();
@@ -68,7 +79,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
             onMount: offerSchema,
         },
         onSubmit: async ({ value }) => {
-            const offer: BaseOffer = {
+            /*const offer: BaseOffer = {
                 ...value,
             }
 
@@ -82,8 +93,9 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                 return response;
             } catch (exception: any) {
 
-            }
+            }*/
 
+            console.log(value);
         }
     });
 
@@ -274,16 +286,22 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
 
                         <div className="flex flex-col gap-2">
                             {offerFlatRates.map((fr, index) => {
+                                const flatRate = flatRates?.find((f: FlatRate) => f.id === fr.flatRateId);
                                 return (
                                     <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
-                                        {JSON.stringify(fr)}
+                                        <p>{flatRate?.name}</p>
+                                        <p>{fr.quantity}x</p>
                                     </div>
                                 );
                             })}
 
                             {showFlatRateForm && (
                                 <OfferFlatRateForm
-                                    onSave={(data) => { setOfferFlatRates((prev) => [...prev, data]); setShowFlatRateForm(false); }}
+                                    flatRates={flatRates}
+                                    onSave={(data) => {
+                                        setOfferFlatRates((prev) => [...prev, data]);
+                                        setShowFlatRateForm(false);
+                                    }}
                                     onCancel={() => setShowFlatRateForm(false)}
                                 />
                             )}

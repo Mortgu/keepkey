@@ -1,13 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFlatRateAction, deleteFlatRateAction, getFlatRatesAction, updateFlatRateAction } from "@/data/flatrates";
-import type { FlatRateBase, FlatRate } from "@/data/types";
+import type { FlatRateBase } from "@/data/types";
 
 export const useFlatRates = () => {
     const queryClient = useQueryClient();
 
     const invalidate = () => queryClient.invalidateQueries({ queryKey: ['flatrates'] });
 
-    const { data: flatrates = [], isPending, error } = useQuery({
+    const { data: flatRates = [], isPending, error } = useQuery({
         queryKey: ['flatrates'],
         queryFn: getFlatRatesAction,
     });
@@ -29,7 +29,7 @@ export const useFlatRates = () => {
     });
 
     return {
-        flatrates,
+        flatRates,
         isPending,
         error,
 
