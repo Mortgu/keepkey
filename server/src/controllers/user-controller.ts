@@ -23,7 +23,6 @@ export const getUserById = async (request: Request, response: Response) => {
             customer: {
                 include: {
                     contactPersons: true,
-                    address: true,
                 }
             }
         }
