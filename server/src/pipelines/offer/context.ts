@@ -1,4 +1,3 @@
-import { getOfferTemplateData } from "../../services/documentDataService.js";
 import { fetchOfferData, formatFetchedData } from "./actions.js";
 import { PipelineContext } from "./pipeline.js";
 

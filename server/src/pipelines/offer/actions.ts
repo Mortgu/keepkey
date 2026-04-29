@@ -151,7 +151,7 @@ export async function generating(formatedData?: OfferFormatedData): Promise<Buff
     return doc.toBuffer();
 }
 
-export async function convert(docxBuffer: Buffer): Promise<Buffer> {
+export async function converting(docxBuffer: Buffer): Promise<Buffer> {
     const convertAsync = promisify(libconvert);
     return convertAsync(docxBuffer, ".pdf", undefined) as Promise<Buffer>;
 }

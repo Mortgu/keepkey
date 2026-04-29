@@ -2,11 +2,9 @@ import path from "path";
 import fs from 'fs/promises';
 
 import env from "../../lib/env.js";
-import { fetchOfferData, formatFetchedData, postprocessing, generating } from "./actions.js";
+import { fetchOfferData, formatFetchedData, postprocessing, generating, converting } from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
 import { Stage } from "./pipeline.js";
-import { convertDocxToPdf } from "../../utils/generation/renderers/docxToPdfConverter.js";
-
 
 const fetch: Stage<OfferPipelineContext> = {
     name: "fetch",
@@ -52,7 +50,7 @@ const convert: Stage<OfferPipelineContext> = {
     name: 'convert',
     status: 'converting',
     run: async (context) => {
-        context.pdfBuffer = await convertDocxToPdf(context.docxBuffer!);
+        context.pdfBuffer = await converting(context.docxBuffer!);
     }
 }
 
