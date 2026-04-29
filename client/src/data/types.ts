@@ -195,13 +195,24 @@ export interface OfferPosition {
 export interface FlatRateBase {
     name: string;
     table: string;
-    quantity?: number;
     total_cents: number;
-    offerId?: string | null;
 }
 
 export interface FlatRate extends FlatRateBase {
     id: string;
+}
+
+export interface OfferFlatRate {
+    id: string;
+
+    flatRate: FlatRate;
+    flatRateId: string;
+
+    offer: Offer;
+    offerId: string;
+
+    quantity: number;
+    total_cents: number;
 }
 
 /* SUPPLIER */

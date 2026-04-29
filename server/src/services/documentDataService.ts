@@ -23,11 +23,17 @@ export async function getOfferTemplateData(offerId: string) {
                         product: true,
                         contract: true,
                     }
+                },
+                offerFlatRates: {
+                    include: {
+                        flatRate: true
+                    }
                 }
             }
         }),
 
         await prisma.contract.findMany(),
+
     ]);
 
     const { customer, customerContactPerson: ccp, user: employee, offerPositions } = offer;
@@ -113,6 +119,8 @@ export async function getOfferTemplateData(offerId: string) {
             names: offerPositions.map(p => p.product.name).join(' & '),
             grouped: grouped,
             items: [...products]
-        }
+        },
+
+        flatRates: offer.offerFlatRates,
     };
 }

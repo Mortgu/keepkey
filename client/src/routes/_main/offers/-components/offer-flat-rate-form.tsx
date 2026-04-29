@@ -1,26 +1,23 @@
-import { useState } from 'react';
-import { useFlatRates } from '@/hooks/flatrate';
-import Button from '@/components/button/button';
-import Input from '@/components/inputs/input';
-import type {FlatRate} from "@/data/types.ts";
+import Button from "@/components/button/button";
+import Input from "@/components/inputs/input";
+import type { FlatRate } from "@/data/types"
+import { useState } from "react";
 
 interface Props {
     flatRates: FlatRate[];
-    onSave: (data: { flatRateId: string, quantity: number }) => void;
-    onCancel: () => void;
-}
+    saveFn: (flatRate: FlatRate) => void;
+    cancelFn: () => void
+};
 
-export default function OfferFlatRateForm({ flatRates, onSave, onCancel }: Props) {
-    const [flatRateId, setFlatRateId] = useState<string>(flatRates[0]?.id ?? '');
-    const [flatRate, setFlatRate] = useState<FlatRate | null>(flatRates[0] ?? null);
+export default function OfferFlatRateForm(props: Props) {
+    const { flatRates, saveFn, cancelFn } = props;
+
+    const [flatRateIndex, setFlatRateIndex] = useState<number>(0);
     const [quantity, setQuantity] = useState<number>(1);
 
-    const [error, setError] = useState<string | null>(null);
-
-    const selectClass = 'w-full rounded-lg border border-(--border) bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100';
-
-    const handleSubmit = () => {
-        onSave({ flatRateId, quantity });
+    const handleSave = () => {
+        flatRates[flatRateIndex]['quantity'] = quantity;
+        saveFn(flatRates[flatRateIndex]);
     }
 
     return (
@@ -28,9 +25,9 @@ export default function OfferFlatRateForm({ flatRates, onSave, onCancel }: Props
             <div className='flex items-end gap-3'>
                 <div className='flex-3 grid gap-1'>
                     <label className='text-sm text-gray-600'>Pauschale</label>
-                    <select value={flatRates[0].id} onChange={(e) => setFlatRateId(e.target.value)} className={selectClass}>
-                        {flatRates.map((p) => (
-                            <option onSelect={() => setFlatRate(p)} key={p.id} value={p.id}>{p.name}</option>
+                    <select value={flatRates[0].id} onChange={(e) => setFlatRateIndex(parseInt(e.target.value))} className="w-full rounded-lg border border-(--border) bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100">
+                        {flatRates.map((fr, index) => (
+                            <option key={index} value={index}>{fr.name}</option>
                         ))}
                     </select>
                 </div>
@@ -43,15 +40,12 @@ export default function OfferFlatRateForm({ flatRates, onSave, onCancel }: Props
 
             </div>
 
-            {error && <p className='text-sm text-red-400'>{error}</p>}
-
             <div className='flex items-center justify-end gap-2'>
                 <div className='flex gap-2'>
-                    <Button type='button' variant='secondary' size='sm' onClick={onCancel}>Abbrechen</Button>
-                    <Button type='button' size='sm' onClick={handleSubmit}>Hinzufügen</Button>
+                    <Button type='button' variant='secondary' size='sm' onClick={cancelFn}>Abbrechen</Button>
+                    <Button type='button' size='sm' onClick={handleSave}>Hinzufügen</Button>
                 </div>
             </div>
         </div>
-
-    );
+    )
 }

@@ -47,7 +47,7 @@ const simpleNestedParser = (tag: string): ParserResult => {
     };
 };
 
-export async function renderDocx(templatePath: string, data: TemplateBaseData): Promise<Buffer> {
+export async function renderDocx(templatePath: string, data: any): Promise<Buffer> {
     const content = fs.readFileSync(templatePath, "binary");
 
     const zip = new PizZip(content);

@@ -24,7 +24,7 @@ import { useSupplier } from "@/hooks/supplier";
 import { useAdmin } from "@/hooks/admin";
 import ModalDialog from "@/components/modal";
 import Checkbox from "@/components/inputs/checkbox.tsx";
-import {useFlatRates} from "@/hooks/flatrate.ts";
+import { useFlatRates } from "@/hooks/flatrate.ts";
 
 interface OfferModalProps {
     open: boolean;
@@ -67,7 +67,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
 
-    const [offerFlatRates, setOfferFlatRates] = useState([]);
+    const [offerFlatRates, setOfferFlatRates] = useState<FlatRateBase[]>([]);
     const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
     const { createOffer, errorCreatingOffer } = useOffer();
@@ -79,7 +79,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
             onMount: offerSchema,
         },
         onSubmit: async ({ value }) => {
-            /*const offer: BaseOffer = {
+            const offer: BaseOffer = {
                 ...value,
             }
 
@@ -93,9 +93,9 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                 return response;
             } catch (exception: any) {
 
-            }*/
+            }
 
-            console.log(value);
+            //console.log({ offer, positions: offerProducts, flatrates: offerFlatRates });
         }
     });
 
@@ -285,24 +285,22 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                         </div>
 
                         <div className="flex flex-col gap-2">
-                            {offerFlatRates.map((fr, index) => {
-                                const flatRate = flatRates?.find((f: FlatRate) => f.id === fr.flatRateId);
-                                return (
-                                    <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
-                                        <p>{flatRate?.name}</p>
-                                        <p>{fr.quantity}x</p>
-                                    </div>
-                                );
-                            })}
+                            {offerFlatRates.map((fr, index) => (
+                                <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
+                                    <p className="text-sm">{fr.name}</p>
+                                    <p className="text-sm">{fr.quantity}x</p>
+                                </div>
+                            ))}
 
                             {showFlatRateForm && (
                                 <OfferFlatRateForm
                                     flatRates={flatRates}
-                                    onSave={(data) => {
+                                    saveFn={(data) => {
+
                                         setOfferFlatRates((prev) => [...prev, data]);
                                         setShowFlatRateForm(false);
                                     }}
-                                    onCancel={() => setShowFlatRateForm(false)}
+                                    cancelFn={() => setShowFlatRateForm(false)}
                                 />
                             )}
                         </div>

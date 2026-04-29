@@ -22,7 +22,7 @@ export const createOfferAction = async (offer: BaseOffer, positions: OfferProduc
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            offer, positions, flatrates
+            offer, positions, flatRates: flatrates
         })
     });
 
