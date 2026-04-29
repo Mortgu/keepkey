@@ -1,5 +1,5 @@
 import Button from "@/components/button/button";
-import type { FlatRateBase, FlatRate } from "@/data/types";
+import type { BaseFlatRate, FlatRate } from "@/data/types";
 import { useFlatRates } from "@/hooks/flatrate";
 import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
@@ -32,7 +32,7 @@ export default function FlatRateItem(item: FlatRate) {
             <FlatRateModal
                 open={isEditing}
                 cancelFn={() => setEditing(false)}
-                submitFn={(value: FlatRateBase) => updateFlatRate({ id: item.id, flatrate: value })}
+                submitFn={(value: BaseFlatRate) => updateFlatRate({ id: item.id, flatrate: value })}
                 currentItem={{ name: item.name, table: item.table, quantity: item.quantity, total_cents: item.total_cents }}
             />
         </>

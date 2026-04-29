@@ -1,14 +1,14 @@
 import Button from "@/components/button/button";
 import ModalDialog from "@/components/modal";
-import type { FlatRateBase } from "@/data/types";
+import type { BaseFlatRate } from "@/data/types";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 interface FlatRateModalProps {
     open: boolean;
     cancelFn: () => void;
-    submitFn: (value: FlatRateBase) => void;
-    currentItem?: FlatRateBase | null;
+    submitFn: (value: BaseFlatRate) => void;
+    currentItem?: BaseFlatRate | null;
 }
 
 const flatRateSchema = z.object({
@@ -17,7 +17,7 @@ const flatRateSchema = z.object({
     total_cents: z.number().int().nonnegative(),
 });
 
-const emptyData: FlatRateBase = {
+const emptyData: BaseFlatRate = {
     name: "",
     table: "",
     total_cents: 0,

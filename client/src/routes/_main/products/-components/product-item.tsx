@@ -6,7 +6,7 @@ import { useState } from "react";
 import ProductModal from "./product-modal";
 import { useContracts } from "@/hooks/contract";
 import { useProducts } from "@/hooks/product";
-import type { ProductItem } from "@/data/types";
+import type { Product } from "@/data/types";
 
 
 const productPricingSchema = z.object({
@@ -17,7 +17,7 @@ const productPricingSchema = z.object({
     price: z.float32(),
 });
 
-export default function ProductItem(product: ProductItem) {
+export default function ProductItem(product: Product) {
     const { deleteProduct, updateProduct, isDeletingProduct, deletePricing, isDeletingPricing, createPricing } = useProducts();
     const { contracts } = useContracts();
 

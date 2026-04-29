@@ -4,7 +4,7 @@ import { useState } from "react";
 import ProductModal from "./product-modal";
 import ProductItem from "./product-item";
 import { useProducts } from "@/hooks/product";
-import type { ProductItem as ProductItemType } from "@/data/types";
+import type { Product } from "@/data/types";
 
 export default function ProductList() {
     const [isOpen, setOpen] = useState<boolean>(false);
@@ -33,7 +33,7 @@ export default function ProductList() {
                 <Button onClick={() => setOpen(true)} size='sm'>Create <Plus className='size-4' /></Button>
             </div>
             <div className='grid gap-2'>
-                {products.map((product: ProductItemType, index: number) => (
+                {products.map((product: Product, index: number) => (
                     <ProductItem key={index} {...product} />
                 ))}
             </div>

@@ -1,5 +1,5 @@
 import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
-import type { FlatRateBase, BaseOffer, Offer } from "./types";
+import type { BaseFlatRate, BaseOffer, Offer } from "./types";
 
 export const getOffersAction = async () => {
     const response = await fetch('http://localhost:3000/api/offers', {

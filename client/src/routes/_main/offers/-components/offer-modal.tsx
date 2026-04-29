@@ -1,14 +1,13 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
 import type {
-    FlatRateBase,
+    OfferFlatRateInput,
     BaseOffer,
     ContactPerson,
     Customer,
-    ProductItem,
+    Product,
     Supplier,
     User,
-    FlatRate
 } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
@@ -67,7 +66,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
 
-    const [offerFlatRates, setOfferFlatRates] = useState<FlatRateBase[]>([]);
+    const [offerFlatRates, setOfferFlatRates] = useState<OfferFlatRateInput[]>([]);
     const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
     const { createOffer, errorCreatingOffer } = useOffer();
@@ -243,7 +242,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
 
                         <div className="flex flex-col gap-2">
                             {offerProducts.map((op, index) => {
-                                const product = products?.find((p: ProductItem) => p.id === op.productId);
+                                const product = products?.find((p: Product) => p.id === op.productId);
                                 return (
                                     <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
                                         <span className="text-sm text-gray-700">

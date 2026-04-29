@@ -24,7 +24,7 @@ app.all('/api/auth/*splat', toNodeHandler(auth));
 
 app.use(express.json());
 
-manageNextcloud();
+//manageNextcloud();
 
 app.use('/api', router);
 

@@ -1,4 +1,4 @@
-import type { FlatRateBase, FlatRate } from "./types";
+import type { BaseFlatRate, FlatRate } from "./types";
 
 export async function getFlatRatesAction(): Promise<FlatRate[]> {
     const response = await fetch('http://localhost:3000/api/flatrates', {
@@ -15,7 +15,7 @@ export async function getFlatRatesAction(): Promise<FlatRate[]> {
     return result;
 }
 
-export async function createFlatRateAction(flatrate: FlatRateBase): Promise<FlatRate> {
+export async function createFlatRateAction(flatrate: BaseFlatRate): Promise<FlatRate> {
     const response = await fetch('http://localhost:3000/api/flatrates', {
         method: 'POST',
         credentials: 'include',
@@ -32,7 +32,7 @@ export async function createFlatRateAction(flatrate: FlatRateBase): Promise<Flat
     return result;
 }
 
-export async function updateFlatRateAction(id: string, flatrate: Partial<FlatRateBase>): Promise<FlatRate> {
+export async function updateFlatRateAction(id: string, flatrate: Partial<BaseFlatRate>): Promise<FlatRate> {
     const response = await fetch(`http://localhost:3000/api/flatrates/${id}`, {
         method: 'PUT',
         credentials: 'include',

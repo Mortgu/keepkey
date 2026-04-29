@@ -15,6 +15,11 @@ export const getOffers = async (request: Request, response: Response) => {
                     product: true,
                     contract: true,
                 }
+            },
+            offerFlatRates: {
+                include: {
+                    flatRate: true
+                }
             }
         }
     });

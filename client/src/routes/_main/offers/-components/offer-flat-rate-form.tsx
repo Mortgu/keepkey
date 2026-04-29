@@ -1,11 +1,11 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { FlatRate } from "@/data/types"
+import type { FlatRate, OfferFlatRateInput } from "@/data/types"
 import { useState } from "react";
 
 interface Props {
     flatRates: FlatRate[];
-    saveFn: (flatRate: FlatRate) => void;
+    saveFn: (flatRate: OfferFlatRateInput) => void;
     cancelFn: () => void
 };
 
@@ -16,8 +16,7 @@ export default function OfferFlatRateForm(props: Props) {
     const [quantity, setQuantity] = useState<number>(1);
 
     const handleSave = () => {
-        flatRates[flatRateIndex]['quantity'] = quantity;
-        saveFn(flatRates[flatRateIndex]);
+        saveFn({ ...flatRates[flatRateIndex], quantity });
     }
 
     return (

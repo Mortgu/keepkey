@@ -1,9 +1,12 @@
 import Button from "@/components/button/button";
-import type { Offer, OfferPosition } from "@/data/types";
+import type { Offer, OfferFlatRate, OfferPosition } from "@/data/types";
 import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
-import { FileText, Pen, Trash } from "lucide-react";
+import { CheckCircle2, CloudUpload, FileText, Link2, Pen, Trash, XCircle } from "lucide-react";
+import { useState } from "react";
+
+type NextcloudUploadStatus = null | 'uploading' | 'uploaded' | 'error';
 
 type OfferListItemProps = {
     offer: Offer;
@@ -11,6 +14,8 @@ type OfferListItemProps = {
 
 export default function OfferListItem({ offer }: OfferListItemProps) {
     const { deleteOffer } = useOffer();
+    const [uploadStatus, setUploadStatus] = useState<NextcloudUploadStatus>(null);
+    const [nextcloudUrl, setNextcloudUrl] = useState<string | null>(null);
 
     const { data: job } = useQuery({
         queryKey: ["documentJob", offer.id],
@@ -70,6 +75,20 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
                         </div>
                     ))}
 
+                    {offer.offerFlatRates.map((ofr: OfferFlatRate, i) => (
+                        <div key={i} className="flex items-center justify-between even:bg-gray-50 px-3 py-2">
+                            <div className='flex items-center gap-2'>
+                                <p className='text-sm'>{ofr.flatRate.name}</p>
+                                <p className='text-sm text-gray-400'></p>
+                            </div>
+                            <div className='flex items-center gap-4 text-sm text-gray-500'>
+                                <span className='w-20 text-right font-medium text-gray-700'>{formatEur((ofr.total_cents))}</span>
+                            </div>
+                        </div>
+                    ))}
+
+                    <hr className="border-(--border)" />
+
                     <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
                         <span className=''>Zwischensumme (Netto)</span>
                         <span>{formatEur(offer.net_amount)}</span>
@@ -86,15 +105,47 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             </div>
 
             {/* Dokumente */}
-            <div className='flex items-center gap-2 px-3 py-2 bg-(--page-bg) border-t border-(--border)'>
+            <div className='flex items-center justify-between gap-2 px-3 py-2 bg-(--page-bg) border-t border-(--border)'>
+                <div className='flex items-center gap-2'>
+                    <Button loading={job?.status === 'pending' || job?.status === 'generating'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
+                        DOCX
+                    </Button>
 
-                <Button loading={job?.status === 'pending' || job?.status === 'generating'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                    DOCX
-                </Button>
+                    <Button loading={job?.status === 'pending' || job?.status === 'generating' || job?.status === 'converting'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
+                        PDF
+                    </Button>
+                </div>
 
-                <Button loading={job?.status === 'pending' || job?.status === 'generating' || job?.status === 'converting'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                    PDF
-                </Button>
+                {/* Nextcloud Upload */}
+                <div className='flex items-center gap-2'>
+                    {uploadStatus === 'uploaded' && nextcloudUrl && (
+                        <a
+                            href={nextcloudUrl}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='flex items-center gap-1.5 text-sm text-green-600 hover:text-green-700 transition-colors'
+                        >
+                            <CheckCircle2 className='size-3.5' />
+                            In Nextcloud
+                            <Link2 className='size-3' />
+                        </a>
+                    )}
+                    {uploadStatus === 'error' && (
+                        <span className='flex items-center gap-1.5 text-sm text-red-500'>
+                            <XCircle className='size-3.5' />
+                            Upload fehlgeschlagen
+                        </span>
+                    )}
+                    <Button
+                        variant='secondary'
+                        size='sm'
+                        loading={uploadStatus === 'uploading'}
+                        icon={<CloudUpload className='size-3.5' />}
+                        onClick={() => setUploadStatus('uploading')}
+                    >
+                        Nextcloud
+                    </Button>
+                </div>
             </div>
 
         </div>

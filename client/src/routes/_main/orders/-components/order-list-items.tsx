@@ -4,7 +4,7 @@ import { Loader, Pen, Plus, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
 import OrderModal from "./order-modal";
 import React, { useState } from "react";
-import type { Order, OrderPositionItem } from "@/data/types";
+import type { Order, OrderPosition } from "@/data/types";
 
 export default function OrderListItems() {
     const [isOpen, setOpen] = useState<boolean>(false);
@@ -45,7 +45,7 @@ export default function OrderListItems() {
                 </div>
                 {/* Products */}
                 <div className="">
-                    {order.orderPositions.map((position: OrderPositionItem) => (
+                    {order.orderPositions.map((position: OrderPosition) => (
                         <div className="flex items-center justify-between border-b border-(--border) px-3 py-2 ">
                             <div className="flex items-center gap-2">
                                 <p>{position.product.name}</p>

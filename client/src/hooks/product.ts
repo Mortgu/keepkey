@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createPricingAction, createProductAction, deletePricingAction, deleteProductAction, getProducts, updateProductAction } from "@/data/products.ts";
-import type { CreatePricingProps, ProductItem } from "@/data/types";
+import type { CreatePricingProps, Product } from "@/data/types";
 
 export const useProducts = () => {
     const queryClient = useQueryClient();
@@ -25,7 +25,7 @@ export const useProducts = () => {
     })
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, product }: { id: string; product: Partial<ProductItem> }) =>
+        mutationFn: ({ id, product }: { id: string; product: Partial<Product> }) =>
             updateProductAction(id, product),
         onSuccess: invalidate
     });

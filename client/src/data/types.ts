@@ -74,10 +74,10 @@ export interface BaseProduct {
     table: string;
 }
 
-export interface ProductItem extends BaseProduct {
+export interface Product extends BaseProduct {
     id: string;
 
-    productPricing: ProductItemPricing[],
+    productPricing: ProductPricing[],
 
     createdAt: Date;
     updatedAt: Date;
@@ -93,9 +93,9 @@ export interface CreatePricingProps {
     }
 }
 
-export interface ProductItemPricingBase {
+export interface BaseProductPricing {
     contract: Contract;
-    product: ProductItem,
+    product: Product,
     duration_months: number;
 
     max_quantity: number;
@@ -104,16 +104,16 @@ export interface ProductItemPricingBase {
     price: number;
 }
 
-export interface ProductItemPricing extends ProductItemPricingBase {
+export interface ProductPricing extends BaseProductPricing {
     id: string;
 }
 
-export interface OrderPositionItem {
+export interface OrderPosition {
     quantity: number;
     duration_months: number;
     contract: Contract;
 
-    product: ProductItem;
+    product: Product;
 
     price: number;
 
@@ -129,7 +129,7 @@ export interface Order {
     employee: User;
     customer: Customer;
 
-    orderPositions: OrderPositionItem[],
+    orderPositions: OrderPosition[],
 
     createdAt: Date;
 }
@@ -151,8 +151,10 @@ export interface BaseOffer {
     paymentTerm: string;
     validUntil: Date | null;
     customerId: string;
+    contactPersonId: string;
 
     supplierId: string;
+    userId: string;
 
     requestFrom: Date | null;
 }
@@ -168,18 +170,20 @@ export interface Offer extends BaseOffer {
     total_amount: number;
 
     offerPositions: OfferPosition[];
+    offerFlatRates: OfferFlatRate[];
+
     customerContactPerson: ContactPerson;
 }
 
 export interface OfferPosition {
-    offerId: String;
+    offerId: string;
     offer: Offer;
 
-    productId: String;
-    product: ProductItem;
+    productId: string;
+    product: Product;
 
     contract: Contract;
-    contractId: String;
+    contractId: string;
 
     duration_months: number;
     quantity: number;
@@ -192,15 +196,17 @@ export interface OfferPosition {
     createdAt: Date;
 }
 
-export interface FlatRateBase {
+export interface BaseFlatRate {
     name: string;
     table: string;
     total_cents: number;
 }
 
-export interface FlatRate extends FlatRateBase {
+export interface FlatRate extends BaseFlatRate {
     id: string;
 }
+
+export type OfferFlatRateInput = FlatRate & { quantity: number };
 
 export interface OfferFlatRate {
     id: string;

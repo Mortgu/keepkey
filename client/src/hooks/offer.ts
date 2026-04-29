@@ -1,5 +1,5 @@
 import { createOfferAction, deleteOfferAction, getOffersAction } from "@/data/offer";
-import type { FlatRateBase, BaseOffer } from "@/data/types";
+import type { BaseFlatRate, BaseOffer } from "@/data/types";
 import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -17,7 +17,7 @@ export const useOffer = () => {
         mutationFn: ({ offer, positions, flatrates }: {
             offer: BaseOffer,
             positions: OfferProductInput[],
-            flatrates: FlatRateBase[],
+            flatrates: BaseFlatRate[],
         }) => createOfferAction(offer, positions, flatrates),
         onSuccess: invalidate
     });

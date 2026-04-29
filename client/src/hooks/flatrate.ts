@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFlatRateAction, deleteFlatRateAction, getFlatRatesAction, updateFlatRateAction } from "@/data/flatrates";
-import type { FlatRateBase } from "@/data/types";
+import type { BaseFlatRate } from "@/data/types";
 
 export const useFlatRates = () => {
     const queryClient = useQueryClient();
@@ -13,12 +13,12 @@ export const useFlatRates = () => {
     });
 
     const createMutation = useMutation({
-        mutationFn: (flatrate: FlatRateBase) => createFlatRateAction(flatrate),
+        mutationFn: (flatrate: BaseFlatRate) => createFlatRateAction(flatrate),
         onSuccess: invalidate,
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({ id, flatrate }: { id: string; flatrate: Partial<FlatRateBase> }) =>
+        mutationFn: ({ id, flatrate }: { id: string; flatrate: Partial<BaseFlatRate> }) =>
             updateFlatRateAction(id, flatrate),
         onSuccess: invalidate,
     });
