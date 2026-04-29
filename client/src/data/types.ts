@@ -1,232 +1,232 @@
 export interface BaseContactPerson {
-    salutation: string;
-    firstName: string;
-    lastName: string;
-    email?: string;
+  salutation: string;
+  firstName: string;
+  lastName: string;
+  email?: string;
 }
 
 export interface ContactPerson extends BaseContactPerson {
-    id: string;
+  id: string;
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface BaseCustomer {
-    customerId: string;
-    companyName: string;
-    email: string;
+  customerId: string;
+  companyName: string;
+  email: string;
 
-    street: string;
-    city: string;
-    plz: string;
-    phone: string;
+  street: string;
+  city: string;
+  plz: string;
+  phone: string;
 }
 
 export interface CreateCustomer extends BaseCustomer {
-    contactPersons: BaseContactPerson[];
+  contactPersons: BaseContactPerson[];
 }
 
 export interface Customer extends BaseCustomer {
-    id: string;
+  id: string;
 
-    contactPersons?: ContactPerson[];
-    orders: Order[];
+  contactPersons?: ContactPerson[];
+  orders: Order[];
 
-    createdAt: Date;
-    updatedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface BaseUser {
-    name: string;
-    salutation: string;
-    firstName: string;
-    lastName: string;
-    email: string;
+  name: string;
+  salutation: string;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 export interface User extends BaseUser {
-    id: string;
+  id: string;
 
-    emailVerified: boolean;
-    role: string;
+  emailVerified: boolean;
+  role: string;
 
-    customer?: Customer;
-    orders?: Order[];
-    offers?: Offer[];
+  customer?: Customer;
+  orders?: Order[];
+  offers?: Offer[];
 
-    createdAt: Date;
+  createdAt: Date;
 }
 
 export interface BaseContract {
-    name: string;
-    features: string[];
+  name: string;
+  features: string[];
 }
 
 export interface Contract extends BaseContract {
-    id: string;
-    createdAt: Date;
+  id: string;
+  createdAt: Date;
 }
 
 export interface BaseProduct {
-    name: string;
-    description: string;
-    table: string;
+  name: string;
+  description: string;
+  table: string;
 }
 
 export interface Product extends BaseProduct {
-    id: string;
+  id: string;
 
-    productPricing: ProductPricing[],
+  productPricing: ProductPricing[];
 
-    createdAt: Date;
-    updatedAt: Date;
-};
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 export interface CreatePricingProps {
-    productId: string;
-    pricing: {
-        contractId: string;
-        max_quantity: number;
-        min_quantity: number;
-        duration_months: number;
-    }
+  productId: string;
+  pricing: {
+    contractId: string;
+    max_quantity: number;
+    min_quantity: number;
+    duration_months: number;
+  };
 }
 
 export interface BaseProductPricing {
-    contract: Contract;
-    product: Product,
-    duration_months: number;
+  contract: Contract;
+  product: Product;
+  duration_months: number;
 
-    max_quantity: number;
-    min_quantity: number;
+  max_quantity: number;
+  min_quantity: number;
 
-    price: number;
+  price: number;
 }
 
 export interface ProductPricing extends BaseProductPricing {
-    id: string;
+  id: string;
 }
 
 export interface OrderPosition {
-    quantity: number;
-    duration_months: number;
-    contract: Contract;
+  quantity: number;
+  duration_months: number;
+  contract: Contract;
 
-    product: Product;
+  product: Product;
 
-    price: number;
+  price: number;
 
-    id: string;
-    priceAtPurchase: number;
-    currency: string;
-    createdAt: Date;
+  id: string;
+  priceAtPurchase: number;
+  currency: string;
+  createdAt: Date;
 }
 
 export interface Order {
-    id: string;
+  id: string;
 
-    employee: User;
-    customer: Customer;
+  employee: User;
+  customer: Customer;
 
-    orderPositions: OrderPosition[],
+  orderPositions: OrderPosition[];
 
-    createdAt: Date;
+  createdAt: Date;
 }
 
 export interface DocumentJob {
-    id: string;
-    orderId: string;
-    type: string;
-    status: 'pending' | 'processing' | 'completed' | 'failed';
-    error?: string;
-    createdAt: string;
-    updatedAt: string;
+  id: string;
+  orderId: string;
+  type: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /* OFFER */
 export interface BaseOffer {
-    voucherId: string;
-    date: Date,
-    paymentTerm: string;
-    validUntil: Date | null;
-    customerId: string;
-    contactPersonId: string;
+  voucherId: string;
+  date: Date;
+  paymentTerm: string;
+  validUntil: Date | null;
+  customerId: string;
+  contactPersonId: string;
 
-    supplierId: string;
-    userId: string;
+  supplierId: string;
+  userId: string;
 
-    requestFrom: Date | null;
+  requestFrom: Date | null;
 }
 
 export interface Offer extends BaseOffer {
-    id: string;
+  id: string;
 
-    customer: Customer;
+  customer: Customer;
 
-    net_amount: number;
-    tax_rate: number;
-    tax_amount: number;
-    total_amount: number;
+  net_amount: number;
+  tax_rate: number;
+  tax_amount: number;
+  total_amount: number;
 
-    offerPositions: OfferPosition[];
-    offerFlatRates: OfferFlatRate[];
+  offerPositions: OfferPosition[];
+  offerFlatRates: OfferFlatRate[];
 
-    customerContactPerson: ContactPerson;
+  customerContactPerson: ContactPerson;
 }
 
 export interface OfferPosition {
-    offerId: string;
-    offer: Offer;
+  offerId: string;
+  offer: Offer;
 
-    productId: string;
-    product: Product;
+  productId: string;
+  product: Product;
 
-    contract: Contract;
-    contractId: string;
+  contract: Contract;
+  contractId: string;
 
-    duration_months: number;
-    quantity: number;
+  duration_months: number;
+  quantity: number;
 
-    optional: boolean;
+  optional: boolean;
 
-    total_cents: number;
-    tax_rate: number;
+  total_cents: number;
+  tax_rate: number;
 
-    createdAt: Date;
+  createdAt: Date;
 }
 
 export interface BaseFlatRate {
-    name: string;
-    table: string;
-    total_cents: number;
+  name: string;
+  table: string;
+  total_cents: number;
 }
 
 export interface FlatRate extends BaseFlatRate {
-    id: string;
+  id: string;
 }
 
 export type OfferFlatRateInput = FlatRate & { quantity: number };
 
 export interface OfferFlatRate {
-    id: string;
+  id: string;
 
-    flatRate: FlatRate;
-    flatRateId: string;
+  flatRate: FlatRate;
+  flatRateId: string;
 
-    offer: Offer;
-    offerId: string;
+  offer: Offer;
+  offerId: string;
 
-    quantity: number;
-    total_cents: number;
+  quantity: number;
+  total_cents: number;
 }
 
 /* SUPPLIER */
 export interface BaseSupplier {
-    supplierId: string;
-    name: string;
+  supplierId: string;
+  name: string;
 }
 
 export interface Supplier extends BaseSupplier {
-    id: string;
+  id: string;
 }
