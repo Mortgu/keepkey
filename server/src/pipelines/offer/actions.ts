@@ -1,9 +1,19 @@
-import { prisma } from "../lib/prisma.js";
-import { formatDate, formatDuration, formatEur } from "../utils/utils.js";
-import { TemplateOfferData, TemplateProductData } from "../utils/generation/types.js";
-import { interpolate } from "../pipelines/offer/utils.js";
+import { any, unknown } from "zod";
+import { prisma } from "../../lib/prisma.js";
+import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { OfferFetchData, OfferFormatedData } from "./context.js";
+import { customParser, deepIterate, interpolate } from "./utils.js";
+import env from "../../lib/env.js";
 
-export async function getOfferTemplateData(offerId: string) {
+import path from 'path';
+import fs from 'fs/promises';
+import PizZip from 'pizzip';
+import Docxtemplater from 'docxtemplater';
+
+import { convert as libconvert } from "libreoffice-convert";
+import { promisify } from "util";
+
+export async function fetchOfferData(offerId: string) {
     const [offer, contracts] = await Promise.all([
         await prisma.offer.findUniqueOrThrow({
             where: { id: offerId },
@@ -26,10 +36,18 @@ export async function getOfferTemplateData(offerId: string) {
         }),
 
         await prisma.contract.findMany(),
-
     ]);
 
-    const { customer, customerContactPerson: ccp, user: employee, offerPositions } = offer;
+    return { offer, contracts };
+}
+
+export async function formatFetchedData(fetchedData?: OfferFetchData) {
+    if (!fetchedData) {
+        throw new Error("Failed to format! No input fetched data!");
+    }
+
+    const offer = fetchedData.offer;
+    const { customer, customerContactPerson: ccp, user: employee, offerPositions, offerFlatRates } = offer;
 
     const products = offerPositions.map(position => ({
         contract: position.contract,
@@ -50,31 +68,27 @@ export async function getOfferTemplateData(offerId: string) {
             duration_months: first.duration_months,
             duration: formatDuration(first.duration_months),
             total: formatEur(group_total! / 100),
-            items: group?.map((item) => {
-                const price = {
+            items: group?.map((item) => ({
+                name: item.product.name,
+                description: item.product.description,
+                table: item.product.table,
+                quantity: item.quantity,
+                optional: item.optional,
+                duration_months: item.duration_months,
+                price: {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(item.total_cents / item.quantity / item.duration_months / 100),
-                };
-                const itemCtx: Record<string, unknown> = {
-                    name: item.product.name,
-                    description: item.product.description,
-                    quantity: item.quantity,
-                    optional: item.optional,
-                    duration_months: first.duration_months,
-                    duration: formatDuration(first.duration_months),
-                    price,
-                };
-                return {
-                    name: item.product.name,
-                    description: item.product.description,
-                    table: item.product.table ? interpolate(item.product.table, itemCtx) : "",
-                    quantity: item.quantity,
-                    optional: item.optional,
-                    price,
-                };
-            })
+                },
+            }))
         }
-    })
+    });
+
+    const flatRates = offerFlatRates.map(fr => ({
+        ...fr,
+        price: {
+            total: formatEur(fr.total_cents / 100),
+        }
+    }))
 
     return {
         voucherId: offer.voucherId,
@@ -114,6 +128,30 @@ export async function getOfferTemplateData(offerId: string) {
             items: [...products]
         },
 
-        flatRates: offer.offerFlatRates,
+        flatRates: flatRates,
     };
+}
+
+export async function postprocessing(formatedData?: OfferFormatedData): Promise<OfferFormatedData> {
+    if (!formatedData) throw new Error("Failed to postprocess! No formatted data!");
+    return deepIterate(formatedData as Record<string, unknown>, formatedData as Record<string, unknown>) as unknown as OfferFormatedData;
+}
+
+export async function generating(formatedData?: OfferFormatedData): Promise<Buffer> {
+    const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+    const zip = new PizZip(content);
+    const doc = new Docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+        parser: customParser,
+    });
+
+    doc.render(formatedData);
+
+    return doc.toBuffer();
+}
+
+export async function convert(docxBuffer: Buffer): Promise<Buffer> {
+    const convertAsync = promisify(libconvert);
+    return convertAsync(docxBuffer, ".pdf", undefined) as Promise<Buffer>;
 }

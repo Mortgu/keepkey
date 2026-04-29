@@ -6,6 +6,6 @@ export const flatRateSchema = z.object({
     total_cents: z.number().int().nonnegative(),
 });
 
-export const createFlatRateSchema = z.object(flatRateSchema);
+export const createFlatRateSchema = flatRateSchema;
 
-export const updateFlatRateSchema = z.object(flatRateSchema);
+export const updateFlatRateSchema = flatRateSchema;

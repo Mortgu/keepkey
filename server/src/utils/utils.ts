@@ -20,3 +20,4 @@ export const formatDuration = (value: number): string => {
             return "x Jahre";
     }
 }
+
