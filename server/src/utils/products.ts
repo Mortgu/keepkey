@@ -26,8 +26,6 @@ export default async function calculatePrice(props: PriceCalculatorProps): Promi
         return 0;
     }
 
-    console.log(matchingTier, props)
-
     const subtotal_month = quantity * matchingTier.price;
 
     return subtotal_month * duration_months;

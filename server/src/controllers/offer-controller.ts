@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
-import { OfferPosition } from "@prisma/client";
+import { FlatRates, OfferFlatRates, OfferPosition } from "@prisma/client";
 
 export const getOffers = async (request: Request, response: Response) => {
     const offers = await prisma.offer.findMany({
@@ -126,7 +126,9 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
     try {
         request.body.offer = await prisma.$transaction(async (tx) => {
-            let net_amount = positions.reduce((sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+            let net_amount_positions = positions.reduce((sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+            let net_amount_flatrates = flatRates.reduce((sum: number, p: OfferFlatRates) => sum + p.total_cents, 0);
+            let net_amount = net_amount_positions + net_amount_flatrates;
 
             const offer = await tx.offer.create({
                 data: {

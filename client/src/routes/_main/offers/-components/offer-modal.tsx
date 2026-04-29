@@ -94,8 +94,6 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
             } catch (exception: any) {
 
             }
-
-            //console.log({ offer, positions: offerProducts, flatrates: offerFlatRates });
         }
     });
 
@@ -287,8 +285,14 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                         <div className="flex flex-col gap-2">
                             {offerFlatRates.map((fr, index) => (
                                 <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
-                                    <p className="text-sm">{fr.name}</p>
-                                    <p className="text-sm">{fr.quantity}x</p>
+                                    <span className="text-sm">{fr.quantity}x {fr.name}</span>
+                                    <button
+                                        type="button"
+                                        onClick={() => setOfferFlatRates((prev) => prev.filter((_, i) => i !== index))}
+                                        className="text-gray-400 hover:text-red-500 transition-colors"
+                                    >
+                                        <Trash2 className="size-4" />
+                                    </button>
                                 </div>
                             ))}
 
@@ -296,7 +300,6 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                                 <OfferFlatRateForm
                                     flatRates={flatRates}
                                     saveFn={(data) => {
-
                                         setOfferFlatRates((prev) => [...prev, data]);
                                         setShowFlatRateForm(false);
                                     }}

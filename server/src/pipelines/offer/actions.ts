@@ -60,7 +60,9 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
     const groups = Object.groupBy(offerPositions, p => `${p.contract.id}_${p.duration_months}`);
     const grouped = Object.values(groups).map((group) => {
         const first = group![0];
-        const group_total = group?.reduce((sum, p) => sum + p.total_cents, 0);
+
+        const flatrate_total = offerFlatRates?.reduce((sum, p) => sum + p.total_cents, 0);
+        const group_total = group?.reduce((sum, p) => sum + p.total_cents, flatrate_total);
 
         return {
             names: group?.map(p => p.product.name).join(" & "),

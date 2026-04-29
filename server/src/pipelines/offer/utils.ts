@@ -7,7 +7,6 @@ const expressionParser = require("docxtemplater/expressions.js");
 import type { DXT } from "docxtemplater";
 
 export function interpolate(template: string, ctx: Record<string, unknown>): string {
-    console.log('interpolate:', template, ctx);
     return template.replace(/\{([\w.]+)\}/g, (_, key: string) => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const value = key.split('.').reduce((obj: any, k: string) => obj?.[k], ctx);
