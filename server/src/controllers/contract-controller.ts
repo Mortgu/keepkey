@@ -36,16 +36,16 @@ export const updateContract = async (request: Request, response: Response) => {
 }
 
 export const deleteContract = async (request: Request, response: Response) => {
-    const { body } = request;
+    const { id } = request.params;
 
-    if (!body || !body.id) {
+    if (!id) {
         return response.status(400).json({
             message: "Bad request", success: false
         });
     }
 
     const deletedContract = await prisma.contract.deleteMany({
-        where: { id: body.id }
+        where: { id: id as string }
     });
 
     return response.status(200).send(deletedContract);

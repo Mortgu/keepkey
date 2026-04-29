@@ -88,6 +88,7 @@ export default function FlatRateModal({ open, cancelFn, submitFn, currentItem = 
                                         </p>
                                     ))}
                                 </div>
+
                                 <textarea
                                     rows={4}
                                     id={field.name}

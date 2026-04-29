@@ -1,65 +1,22 @@
 import type { BaseFlatRate, FlatRate } from "./types";
+import {api} from "@/lib/api-client.ts";
 
-export async function getFlatRatesAction(): Promise<FlatRate[]> {
-    const response = await fetch('http://localhost:3000/api/flatrates', {
-        method: 'GET',
-        credentials: 'include',
-    });
+export const getFlatRatesAction = () =>
+    api<FlatRate[]>("/api/flatrates", { method: "GET" });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function createFlatRateAction(flatrate: BaseFlatRate): Promise<FlatRate> {
-    const response = await fetch('http://localhost:3000/api/flatrates', {
-        method: 'POST',
-        credentials: 'include',
+export const createFlatRateAction = (flatRate: BaseFlatRate) =>
+    api<FlatRate>("/api/flatrates", {
+        method: "POST",
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(flatrate),
+        body: JSON.stringify(flatRate),
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function updateFlatRateAction(id: string, flatrate: Partial<BaseFlatRate>): Promise<FlatRate> {
-    const response = await fetch(`http://localhost:3000/api/flatrates/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
+export const updateFlatRateAction = (id: string, flatRate: Partial<BaseFlatRate>) =>
+    api<FlatRate>("/api/flatrates", {
+        method: `/api/flatrates/${id}`,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(flatrate),
+        body: JSON.stringify(flatRate),
     });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function deleteFlatRateAction(id: string): Promise<void> {
-    const response = await fetch(`http://localhost:3000/api/flatrates/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
+export const deleteFlatRateAction = (id: string) =>
+    api<void>(`/api/flatrates/${id}`, { method: "DELETE" });

@@ -1,76 +1,27 @@
+import { api } from "@/lib/api-client";
 import type { CreateCustomer, Customer } from "./types";
 
-export async function getAllCustomersAction(): Promise<Customer[]> {
-    const response = await fetch('http://localhost:3000/api/customers', {
-        method: 'GET',
-        credentials: 'include',
-    });
+export const getAllCustomersAction = () =>
+  api<Customer[]>("/api/customers", { method: "GET" });
 
-    if (!response.ok) {
-        return [];
-    }
+export const getCustomerByIdAction = (id: string) =>
+  api<Customer>(`/api/customers/${id}`, { method: "GET" });
 
-    return await response.json();
-}
+export const createCustomerAction = (body: CreateCustomer) =>
+  api<Customer>("/api/customers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-export async function getCustomerByIdAction(id: string): Promise<Customer | null> {
-    const response = await fetch(`http://localhost:3000/api/customers/${id}`, {
-        method: 'GET',
-        credentials: 'include',
-    });
+export const updateCustomerByIdAction = (id: string, body: Partial<Customer>) =>
+  api<Customer>(`/api/customer/${id}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-    if (!response.ok) {
-        return null;
-    }
-
-    return await response.json();
-}
-
-export async function createCustomerAction(body: CreateCustomer) {
-    const response = await fetch('http://localhost:3000/api/customers', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message ?? 'Failed to create customer');
-    }
-
-    return result;
-}
-
-export async function updateCustomerByIdAction(id: string, body: Partial<Customer>) {
-    const response = await fetch(`http://localhost:3000/api/customers/${id}`, {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message ?? 'Failed to update customer');
-    }
-
-    return result;
-}
-
-export async function deleteCustomerAction(id: string) {
-    const response = await fetch(`http://localhost:3000/api/customers/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message ?? 'Failed to delete customer');
-    }
-
-    return result;
-}
+export const deleteCustomerAction = (id: string) =>
+  api<void>(`/api/customers/${id}`, {
+    method: "POST",
+  });

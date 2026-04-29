@@ -16,7 +16,7 @@ router.post('/', requireSession, canCreateContract, validate(createContractSchem
 /* [PUT] http://localhost:3000/api/contracts/:id */
 router.put('/:id', requireSession, canUpdateContract, validate(updateContractSchema), updateContract);
 
-/* [DELETE] http://localhost:3000/api/contracts */
-router.delete('/', requireSession, canDeleteContract, deleteContract);
+/* [DELETE] http://localhost:3000/api/contracts/:id */
+router.delete('/:id', requireSession, canDeleteContract, deleteContract);
 
 export default router;

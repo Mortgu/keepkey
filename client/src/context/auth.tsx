@@ -1,55 +1,70 @@
-import { createContext, type ReactNode, useContext } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { deleteAccountAction, getCurrentUser } from "@/data/user.ts";
+import { createContext, type ReactNode, useContext, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { getSessionUser } from "@/data/user.ts";
 import { Loader } from "lucide-react";
 import { authClient } from "@/lib/auth-client.ts";
 import type { User } from "@/data/types";
+import { useNavigate } from "@tanstack/react-router";
 
 type AuthContextType = {
-    user: User | null | undefined,
-    isLoading: boolean,
-    refetch: () => void,
-    logout: () => void,
-    deleteAccount: () => void,
-}
+  user: User | null | undefined;
+  isLoading: boolean;
+  refetch: () => void;
+  logout: () => void;
+};
 
 const AuthContext = createContext<AuthContextType>({
-    user: null, isLoading: false, refetch: () => { }, logout: () => { }, deleteAccount: () => { },
+  user: null,
+  isLoading: false,
+  refetch: () => {},
+  logout: () => {},
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-    const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-    const { data: user = null, isLoading, refetch } = useQuery({
-        queryKey: ['session'],
-        queryFn: getCurrentUser
-    });
+  const {
+    data: user = null,
+    isLoading,
+    refetch,
+    error,
+  } = useQuery({
+    queryKey: ["session"],
+    queryFn: getSessionUser,
+    retry: false,
+  });
 
-    const deleteAccountMutation = useMutation({
-        mutationFn: deleteAccountAction,
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: ['session'],
-        }),
-    })
+  const logout = async () => {
+    await authClient.signOut();
+    await navigate({ to: "/login" });
+  };
 
-
-    const logout = async () => {
-        await authClient.signOut();
-        throw window.location.reload();
+  useEffect(() => {
+    if (error) {
+      navigate({ to: "/login" });
     }
+  }, [error]);
 
-
-    if (isLoading) {
-        return (
-            <div><Loader className='animate-spin' /></div>
-        )
-    }
-
+  if (isLoading) {
     return (
-        <AuthContext.Provider value={{ user: user ? user[0] : null, logout, isLoading, refetch, deleteAccount: deleteAccountMutation.mutate }}>
-            {children}
-        </AuthContext.Provider>
-    )
+      <div>
+        <Loader className="animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <AuthContext.Provider
+      value={{
+        user: user ? user[0] : null,
+        logout,
+        isLoading,
+        refetch,
+      }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
