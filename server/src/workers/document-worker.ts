@@ -1,7 +1,7 @@
 import { Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
-import { generateOfferDocx, convertAndSaveOfferDocuments } from "../services/documentService.js";
+import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
 
 interface DocumentJobData {
     documentJobId: string;
@@ -26,19 +26,7 @@ export default function startDocumentWorker() {
                     throw new Error("Document job for offer with undefined offerId");
                 }
 
-                await prisma.documentJob.update({
-                    where: { id: documentJobId },
-                    data: { status: 'generating' },
-                });
-
-                const { docx, outDir } = await generateOfferDocx(documentJob.offerId, documentJobId);
-
-                await prisma.documentJob.update({
-                    where: { id: documentJobId },
-                    data: { status: 'converting' },
-                });
-
-                const { pdfPath, docxPath } = await convertAndSaveOfferDocuments(docx, outDir);
+                const { docxPath, pdfPath } = await generateOfferDocument(documentJob.offerId, documentJobId);
 
                 await prisma.documentJob.update({
                     where: { id: documentJobId },

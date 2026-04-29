@@ -110,7 +110,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 
-    const { offer, positions } = body;
+    const { offer, positions, flatRates } = body;
 
     if (!offer || !positions) {
         return response.status(400).json({
@@ -118,30 +118,10 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 
-    const contracts = await prisma.contract.findMany();
-
-    const includesOptionals = positions.some((p: OfferPosition) => p.optional);
-
-    if (includesOptionals) {
-        positions.push(...positions.flatMap((position: OfferPosition) =>
-            contracts.filter(c => c.id !== position.contractId).map(contract => ({
-                ...position,
-                contractId: contract.id,
-                isAlternative: true,
-            }))
-        ))
-    }
-
     for (const position of positions) {
-        const subtotal = await calculatePrice({
+        position['total_cents'] = await calculatePrice({
             ...position
         });
-
-        if (subtotal) {
-            position['total_cents'] = subtotal.total.value;
-        } else {
-            position['total_cents'] = 0;
-        }
     }
 
     try {
@@ -173,6 +153,17 @@ export const createOffer = async (request: Request, response: Response, next: Ne
                         tax_rate: 19,
                     }
                 });
+            }
+
+            for (const flatRate of flatRates) {
+                await tx.offerFlatRates.create({
+                    data: {
+                        offerId: offer.id,
+                        flatRateId: flatRate.id,
+                        quantity: flatRate.quantity,
+                        total_cents: flatRate.total_cents
+                    }
+                })
             }
 
             return offer;

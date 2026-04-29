@@ -1,5 +1,4 @@
-import type { ProductItemProps } from "@/routes/_main/products/-components/product-item";
-import type { CreatePricingProps } from "./types";
+import type { CreatePricingProps, ProductItem } from "./types";
 
 export async function getAllProducts() {
     const response = await fetch(`http://localhost:3000/api/admin/products`, {
@@ -47,8 +46,8 @@ export async function getProduct(id: string) {
 }
 
 export async function createProductAction(product: {
-    name: string, description: string, alwaysIncluded: boolean,
-}): Promise<ProductItemProps> {
+    name: string, description: string, table: string,
+}): Promise<ProductItem> {
     const response = await fetch('http://localhost:3000/api/products', {
         method: "POST",
         credentials: 'include',
@@ -112,7 +111,7 @@ export async function deletePricingAction(id: string) {
     return result;
 }
 
-export async function updateProductAction(id: string, product: Partial<ProductItemProps>) {
+export async function updateProductAction(id: string, product: Partial<ProductItem>) {
     const response = await fetch(`http://localhost:3000/api/products/${id}`, {
         method: 'PUT',
         credentials: 'include',

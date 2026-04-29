@@ -71,7 +71,7 @@ export interface Contract extends BaseContract {
 export interface BaseProduct {
     name: string;
     description: string;
-    alwaysIncluded: boolean;
+    table: string;
 }
 
 export interface ProductItem extends BaseProduct {
@@ -190,6 +190,29 @@ export interface OfferPosition {
     tax_rate: number;
 
     createdAt: Date;
+}
+
+export interface FlatRateBase {
+    name: string;
+    table: string;
+    total_cents: number;
+}
+
+export interface FlatRate extends FlatRateBase {
+    id: string;
+}
+
+export interface OfferFlatRate {
+    id: string;
+
+    flatRate: FlatRate;
+    flatRateId: string;
+
+    offer: Offer;
+    offerId: string;
+
+    quantity: number;
+    total_cents: number;
 }
 
 /* SUPPLIER */

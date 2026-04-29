@@ -19,9 +19,7 @@ const sort_options = [
 export default function OfferList() {
     const [isOpen, setOpen] = useState<boolean>(false);
     const [sort, setSort] = useState<string>(sort_options[0].value);
-
     const { offers, deleteOffer } = useOffer();
-
 
     const sortedOffers = useMemo(() => {
         return [...(offers ?? [])].sort((a, b) => {

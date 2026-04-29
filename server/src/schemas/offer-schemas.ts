@@ -8,6 +8,12 @@ const offerPositionSchema = z.object({
     optional: z.boolean().optional(),
 });
 
+const offerFlatRateSchema = z.object({
+    id: z.string().min(1), // flatRateId
+    quantity: z.number().default(1),
+    total_cents: z.number(),
+})
+
 export const createOfferSchema = z.object({
     offer: z.object({
         supplierId: z.string().min(1),
@@ -20,4 +26,5 @@ export const createOfferSchema = z.object({
         requestFrom: z.string().nullable(),
     }),
     positions: z.array(offerPositionSchema).min(1),
+    flatRates: z.array(offerFlatRateSchema).optional(),
 });

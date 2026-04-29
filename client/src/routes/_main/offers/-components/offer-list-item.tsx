@@ -34,8 +34,6 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
         }
     }
 
-    console.log(offer)
-
     return (
         <div className='grid border border-(--border) rounded-md overflow-hidden'>
 

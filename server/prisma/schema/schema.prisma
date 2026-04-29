@@ -107,70 +107,6 @@ model Verification {
   @@map("verification")
 }
 
-model Offer {
-  id String @id @default(uuid())
-
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  supplierId String
-
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String
-
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
-  contactPersonId       String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  voucherId   String
-  paymentTerm String
-
-  date        DateTime  @default(now())
-  validUntil  DateTime?
-  requestFrom DateTime?
-
-  offerPositions OfferPosition[]
-  order          Order?
-  documentJobs   DocumentJob[]
-
-  // (in cent)
-  net_amount   Int // Der reine Warenwert (netto) 
-  tax_rate     Int // Der angewendete Prozentsatz (e.g 19.00)
-  tax_amount   Int // absolute Steuerbetrag
-  total_amount Int // Finale Brutto Betrag
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
-
-  @@map("offer")
-}
-
-model OfferPosition {
-  id String @id @default(uuid())
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration_months Int
-  quantity        Int
-
-  optional Boolean? @default(false)
-
-  total_cents Int
-  tax_rate    Int
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
-
-  @@map("offer_position")
-}
-
 model Supplier {
   id String @id @default(uuid())
 
@@ -184,13 +120,23 @@ model Supplier {
   @@map("supplier")
 }
 
+model FlatRates {
+  id          String @id @default(uuid())
+  name        String
+  table       String
+  total_cents Int
+
+  offerFlatRates OfferFlatRates[]
+
+  @@map("flat_rates")
+}
+
 model Product {
   id   String @id @default(uuid())
   name String @unique
 
   description String?
-
-  alwaysIncluded Boolean? @default(false)
+  table       String?
 
   productPricing ProductPricing[]
   orderPositions OrderPosition[]

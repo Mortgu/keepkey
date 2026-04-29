@@ -1,5 +1,5 @@
 import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
-import type { BaseOffer, Offer } from "./types";
+import type { FlatRateBase, BaseOffer, Offer } from "./types";
 
 export const getOffersAction = async () => {
     const response = await fetch('http://localhost:3000/api/offers', {
@@ -14,7 +14,7 @@ export const getOffersAction = async () => {
     return await response.json();
 }
 
-export const createOfferAction = async (offer: BaseOffer, positions: OfferProductInput[]) => {
+export const createOfferAction = async (offer: BaseOffer, positions: OfferProductInput[], flatrates: FlatRateBase[]) => {
     const response = await fetch('http://localhost:3000/api/offers', {
         method: 'POST',
         credentials: 'include',
@@ -22,7 +22,7 @@ export const createOfferAction = async (offer: BaseOffer, positions: OfferProduc
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-            offer: offer, positions: positions
+            offer, positions, flatRates: flatrates
         })
     });
 

@@ -1,18 +1,30 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { BaseOffer, ContactPerson, Customer, ProductItem, Supplier, User } from "@/data/types";
+import type {
+    FlatRateBase,
+    BaseOffer,
+    ContactPerson,
+    Customer,
+    ProductItem,
+    Supplier,
+    User,
+    FlatRate
+} from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash2, X } from "lucide-react";
+import { Loader, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
+import OfferFlatRateForm from "./offer-flat-rate-form";
 import { z } from "zod";
 import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
 import { useAdmin } from "@/hooks/admin";
 import ModalDialog from "@/components/modal";
+import Checkbox from "@/components/inputs/checkbox.tsx";
+import { useFlatRates } from "@/hooks/flatrate.ts";
 
 interface OfferModalProps {
     open: boolean;
@@ -50,9 +62,13 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
     const { contracts } = useContracts();
     const { suppliers } = useSupplier();
     const { users } = useAdmin();
+    const { flatRates } = useFlatRates();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
     const [showProductForm, setShowProductForm] = useState(false);
+
+    const [offerFlatRates, setOfferFlatRates] = useState<FlatRateBase[]>([]);
+    const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
     const { createOffer, errorCreatingOffer } = useOffer();
 
@@ -69,7 +85,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
 
             try {
                 const response = await createOffer({
-                    offer: offer, positions: offerProducts
+                    offer: offer, positions: offerProducts, flatrates: offerFlatRates
                 });
 
                 cancelFn();
@@ -79,6 +95,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
 
             }
 
+            //console.log({ offer, positions: offerProducts, flatrates: offerFlatRates });
         }
     });
 
@@ -214,16 +231,10 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                     <hr className="text-gray-200" />
 
                     <div className="grid gap-2">
-                        <div className="w-full">
-                            <Button
-                                onClick={() => setShowProductForm(true)}
-                                type="button"
-                                className="float-right"
-                                variant="link"
-                                icon={<Plus className="size-4" />}
-                                size="sm"
-                                disabled={showProductForm}
-                            >
+                        <div className="flex items-center justify-between w-full">
+                            <Checkbox label="Vergleichen?" />
+                            <Button onClick={() => setShowProductForm(true)} variant="link"
+                                icon={<Plus className="size-4" />} size="sm" disabled={showProductForm}>
                                 Produkt hinzufügen
                             </Button>
                         </div>
@@ -261,6 +272,42 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
                             )}
                         </div>
                     </div>
+
+                    <hr className="text-gray-200" />
+
+                    <div className="grid gap-2">
+                        <div className="flex items-center justify-between w-full">
+                            <span className="text-sm font-medium text-gray-700">Pauschalen</span>
+                            <Button onClick={() => setShowFlatRateForm(true)} variant="link"
+                                icon={<Plus className="size-4" />} size="sm" disabled={showFlatRateForm}>
+                                Pauschale hinzufügen
+                            </Button>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                            {offerFlatRates.map((fr, index) => (
+                                <div key={index} className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2">
+                                    <p className="text-sm">{fr.name}</p>
+                                    <p className="text-sm">{fr.quantity}x</p>
+                                </div>
+                            ))}
+
+                            {showFlatRateForm && (
+                                <OfferFlatRateForm
+                                    flatRates={flatRates}
+                                    saveFn={(data) => {
+
+                                        setOfferFlatRates((prev) => [...prev, data]);
+                                        setShowFlatRateForm(false);
+                                    }}
+                                    cancelFn={() => setShowFlatRateForm(false)}
+                                />
+                            )}
+                        </div>
+                    </div>
+
+                    <hr className="text-gray-200" />
+
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
