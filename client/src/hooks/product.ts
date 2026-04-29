@@ -1,69 +1,81 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createPricingAction, createProductAction, deletePricingAction, deleteProductAction, getProducts, updateProductAction } from "@/data/products.ts";
+import {
+  createPricingAction,
+  createProductAction,
+  deletePricingAction,
+  deleteProductAction,
+  getProductsAction,
+  updateProductAction,
+} from "@/data/products.ts";
 import type { CreatePricingProps, Product } from "@/data/types";
 
 export const useProducts = () => {
-    const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
 
-    const invalidate = () => queryClient.invalidateQueries({
-        queryKey: ['products']
+  const invalidate = () =>
+    queryClient.invalidateQueries({
+      queryKey: ["products"],
     });
 
-    const { data: products = [], isPending, error } = useQuery({
-        queryKey: ['products'],
-        queryFn: getProducts,
-    });
+  const {
+    data: products = [],
+    isPending,
+    error,
+  } = useQuery({
+    queryKey: ["products"],
+    queryFn: getProductsAction,
+  });
 
-    const createMutation = useMutation({
-        mutationFn: createProductAction,
-        onSuccess: invalidate,
-    });
+  const createMutation = useMutation({
+    mutationFn: createProductAction,
+    onSuccess: invalidate,
+  });
 
-    const createPricingMutation = useMutation({
-        mutationFn: ({ productId, pricing }: CreatePricingProps) => createPricingAction({ productId, pricing }),
-        onSuccess: invalidate,
-    })
+  const createPricingMutation = useMutation({
+    mutationFn: ({ productId, pricing }: CreatePricingProps) =>
+      createPricingAction({ productId, pricing }),
+    onSuccess: invalidate,
+  });
 
-    const updateMutation = useMutation({
-        mutationFn: ({ id, product }: { id: string; product: Partial<Product> }) =>
-            updateProductAction(id, product),
-        onSuccess: invalidate
-    });
+  const updateMutation = useMutation({
+    mutationFn: ({ id, product }: { id: string; product: Partial<Product> }) =>
+      updateProductAction(id, product),
+    onSuccess: invalidate,
+  });
 
-    const deleteMutation = useMutation({
-        mutationFn: (id: string) => deleteProductAction(id),
-        onSuccess: invalidate
-    });
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteProductAction(id),
+    onSuccess: invalidate,
+  });
 
-    const deletePricingMutation = useMutation({
-        mutationFn: ({ id }: { id: string }) => deletePricingAction(id),
-        onSuccess: invalidate
-    });
+  const deletePricingMutation = useMutation({
+    mutationFn: ({ id }: { id: string }) => deletePricingAction(id),
+    onSuccess: invalidate,
+  });
 
-    return {
-        products,
-        isPending,
-        error,
+  return {
+    products,
+    isPending,
+    error,
 
-        createProduct: createMutation.mutateAsync,
-        isCreatingProduct: createMutation.isPending,
-        errorCreatingProduct: createMutation.error,
+    createProduct: createMutation.mutateAsync,
+    isCreatingProduct: createMutation.isPending,
+    errorCreatingProduct: createMutation.error,
 
-        updateProduct: updateMutation.mutate,
-        isUpdatingProduct: updateMutation.isPending,
-        errorUpdatingProduct: updateMutation.error,
+    updateProduct: updateMutation.mutate,
+    isUpdatingProduct: updateMutation.isPending,
+    errorUpdatingProduct: updateMutation.error,
 
-        deleteProduct: deleteMutation.mutateAsync,
-        isDeletingProduct: deleteMutation.isPending,
-        errorDeletingProduct: deleteMutation.error,
+    deleteProduct: deleteMutation.mutateAsync,
+    isDeletingProduct: deleteMutation.isPending,
+    errorDeletingProduct: deleteMutation.error,
 
-        createPricing: createPricingMutation.mutateAsync,
-        isCreatingPricing: createPricingMutation.isPending,
-        errorCreatingPricing: createPricingMutation.error,
+    createPricing: createPricingMutation.mutateAsync,
+    isCreatingPricing: createPricingMutation.isPending,
+    errorCreatingPricing: createPricingMutation.error,
 
-        deletePricing: deletePricingMutation.mutate,
-        isDeletingPricing: deletePricingMutation.isPending,
-        errorDeletingPricing: deletePricingMutation.error,
-
-    };
-}
+    deletePricing: deletePricingMutation.mutate,
+    isDeletingPricing: deletePricingMutation.isPending,
+    errorDeletingPricing: deletePricingMutation.error,
+  };
+};
