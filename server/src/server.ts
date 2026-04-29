@@ -10,6 +10,7 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import config from './config/config.js';
 
 import startDocumentWorker from './workers/document-worker.js';
+import { manageNextcloud } from './lib/nextcloud.js';
 
 const app: Express = express();
 
@@ -22,6 +23,8 @@ app.use(cors({
 app.all('/api/auth/*splat', toNodeHandler(auth));
 
 app.use(express.json());
+
+manageNextcloud();
 
 app.use('/api', router);
 

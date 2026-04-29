@@ -15,6 +15,10 @@ const env = createEnv({
 
         PORT: z.string(),
         NODE_ENV: z.string(),
+
+        NEXTCLOUD_URL: z.string().url(),
+        NEXTCLOUD_USER: z.string().min(1),
+        NEXTCLOUD_PASSWORD: z.string().min(1),
     },
 
     experimental__runtimeEnv: {}
