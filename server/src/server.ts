@@ -10,7 +10,6 @@ import { errorHandler } from './middlewares/errorHandler.js';
 import config from './config/config.js';
 
 import startDocumentWorker from './workers/document-worker.js';
-import { manageNextcloud } from './lib/nextcloud.js';
 import path from "path";
 
 const app: Express = express();
@@ -33,7 +32,7 @@ app.use('/api', router);
 
 app.use(express.static(path.join(process.cwd(), '../client/dist')));
 
-app.get('*', (_req, res) => {
+app.get('/*splat', (_req, res) => {
     res.sendFile(path.join(process.cwd(), '../client/dist/index.html'));
 });
 
