@@ -16,7 +16,7 @@ import path from "path";
 const app: Express = express();
 
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
     methods: ['*', 'DELETE', 'PUT', 'PATCH'],
     credentials: true
 }));
@@ -30,6 +30,12 @@ app.use(express.json());
 //manageNextcloud();
 
 app.use('/api', router);
+
+app.use(express.static(path.join(process.cwd(), '../client/dist')));
+
+app.get('*', (_req, res) => {
+    res.sendFile(path.join(process.cwd(), '../client/dist/index.html'));
+});
 
 // Global error handler
 app.use(errorHandler);
