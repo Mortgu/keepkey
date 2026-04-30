@@ -19,6 +19,8 @@ const env = createEnv({
         NEXTCLOUD_URL: z.string().url(),
         NEXTCLOUD_USER: z.string().min(1),
         NEXTCLOUD_PASSWORD: z.string().min(1),
+
+        REDIS_URL: z.string().min(1),
     },
 
     experimental__runtimeEnv: {}

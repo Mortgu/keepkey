@@ -1,7 +1,8 @@
 import { Queue } from "bullmq";
 import { Redis as IORedis } from "ioredis";
+import env from "./env.js";
 
-export const connection = new IORedis(process.env.REDIS_URL ?? 'redis://localhost:6379', {
+export const connection = new IORedis(env.REDIS_URL ?? 'redis://localhost:6379', {
   maxRetriesPerRequest: null,
 });
 
