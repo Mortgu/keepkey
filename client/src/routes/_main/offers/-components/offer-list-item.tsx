@@ -5,6 +5,7 @@ import { formatEur } from "@/utils/utils";
 import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, CloudUpload, FileText, Link2, Pen, Trash, XCircle } from "lucide-react";
 import { useState } from "react";
+import {BASE_URL} from "@/lib/api-client.ts";
 
 type NextcloudUploadStatus = null | 'uploading' | 'uploaded' | 'error';
 
@@ -16,6 +17,8 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
     const { deleteOffer } = useOffer();
     const [uploadStatus, setUploadStatus] = useState<NextcloudUploadStatus>(null);
     const [nextcloudUrl, setNextcloudUrl] = useState<string | null>(null);
+
+    console.log(offer);
 
     const { data: job } = useQuery({
         queryKey: ["documentJob", offer.id],
@@ -107,13 +110,19 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             {/* Dokumente */}
             <div className='flex items-center justify-between gap-2 px-3 py-2 bg-(--page-bg) border-t border-(--border)'>
                 <div className='flex items-center gap-2'>
-                    <Button loading={job?.status === 'pending' || job?.status === 'generating'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                        DOCX
-                    </Button>
+                    <a href={BASE_URL + "/" + offer.documentJobs[0].pdfPath}>
+                        <Button loading={job?.status === 'pending' || job?.status === 'generating'}
+                            variant='secondary' size='sm' icon={<FileText className='size-3.5'/>}>
+                            PDF
+                        </Button>
+                    </a>
 
-                    <Button loading={job?.status === 'pending' || job?.status === 'generating' || job?.status === 'converting'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                        PDF
-                    </Button>
+                    <a href={BASE_URL + "/" + offer.documentJobs[0].docxPath}>
+                        <Button loading={job?.status === 'pending' || job?.status === 'generating'}
+                                variant='secondary' size='sm' icon={<FileText className='size-3.5'/>}>
+                            DOCX
+                        </Button>
+                    </a>
                 </div>
 
                 {/* Nextcloud Upload */}

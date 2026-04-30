@@ -11,6 +11,7 @@ import config from './config/config.js';
 
 import startDocumentWorker from './workers/document-worker.js';
 import { manageNextcloud } from './lib/nextcloud.js';
+import path from "path";
 
 const app: Express = express();
 
@@ -19,6 +20,8 @@ app.use(cors({
     methods: ['*', 'DELETE', 'PUT', 'PATCH'],
     credentials: true
 }));
+
+app.use('/generated', express.static(path.join(process.cwd(), 'generated')))
 
 app.all('/api/auth/*splat', toNodeHandler(auth));
 

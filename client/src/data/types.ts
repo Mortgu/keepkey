@@ -136,10 +136,17 @@ export interface Order {
 
 export interface DocumentJob {
   id: string;
-  orderId: string;
+
+  orderId?: string;
+  offerId?: string;
+
+  docxPath?: string;
+  pdfPath?: string;
+
   type: string;
   status: "pending" | "processing" | "completed" | "failed";
   error?: string;
+
   createdAt: string;
   updatedAt: string;
 }
@@ -171,6 +178,7 @@ export interface Offer extends BaseOffer {
 
   offerPositions: OfferPosition[];
   offerFlatRates: OfferFlatRate[];
+  documentJobs: DocumentJob[];
 
   customerContactPerson: ContactPerson;
 }

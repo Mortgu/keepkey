@@ -208,11 +208,14 @@ model Order {
 }
 
 model DocumentJob {
-  id        String   @id @default(cuid())
-  orderId   String?
-  order     Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  offerId   String?
-  offer     Offer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  id String @id @default(cuid())
+
+  orderId String?
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  offerId String?
+  offer   Offer?  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+
   type      String
   status    String   @default("pending")
   isCurrent Boolean  @default(true)

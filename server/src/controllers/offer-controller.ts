@@ -10,6 +10,7 @@ export const getOffers = async (request: Request, response: Response) => {
       customer: true,
       supplier: true,
       customerContactPerson: true,
+      documentJobs: true,
       offerPositions: {
         include: {
           product: true,
