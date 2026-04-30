@@ -5,7 +5,7 @@ export const getSessionUser = () =>
   api<any>("/api/users/session", { method: "GET" });
 
 export const getAllUsersAction = () =>
-  api<any>("/api/admin/users", { method: "GET" });
+  api<any>("/api/users", { method: "GET" });
 
 export const updateUserByIdAction = (id: string, body: BaseUser) =>
   api<any>(`/api/users/${id}`, {

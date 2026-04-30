@@ -13,9 +13,7 @@ export const useProducts = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>
-    queryClient.invalidateQueries({
-      queryKey: ["products"],
-    });
+    queryClient.invalidateQueries({ queryKey: ["products"] });
 
   const {
     data: products = [],

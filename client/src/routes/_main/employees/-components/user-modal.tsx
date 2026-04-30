@@ -2,7 +2,7 @@ import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
 import ModalDialog from "@/components/modal";
 import { type User } from "@/data/types";
-import { useAdmin } from "@/hooks/admin";
+import { useUser } from "@/hooks/user";
 import { useForm } from "@tanstack/react-form";
 import { Loader } from "lucide-react";
 import type React from "react";
@@ -43,7 +43,7 @@ export default function UserModal({
 }: UserModalProps) {
   const isEdit = currentUser !== null;
 
-  const { updateUser, createUser } = useAdmin();
+  const { updateUser, createUser } = useUser();
 
   const userForm = useForm({
     defaultValues: currentUser

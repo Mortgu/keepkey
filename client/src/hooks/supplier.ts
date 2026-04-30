@@ -9,6 +9,9 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const useSupplier = () => {
   const queryClient = useQueryClient();
 
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: ["suppliers"] });
+
   const {
     data: suppliers = [],
     isPending,
@@ -20,18 +23,12 @@ export const useSupplier = () => {
 
   const createMutation = useMutation({
     mutationFn: (supplier: BaseSupplier) => createSupplierAction(supplier),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ["suppliers"],
-      }),
+    onSuccess: invalidate,
   });
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteSupplierAction(id),
-    onSuccess: () =>
-      queryClient.invalidateQueries({
-        queryKey: ["suppliers"],
-      }),
+    onSuccess: invalidate,
   });
 
   return {

@@ -15,7 +15,7 @@ export const createCustomerAction = (body: CreateCustomer) =>
   });
 
 export const updateCustomerByIdAction = (id: string, body: Partial<Customer>) =>
-  api<Customer>(`/api/customer/${id}`, {
+  api<Customer>(`/api/customers/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),

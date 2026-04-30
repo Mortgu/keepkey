@@ -1,46 +1,46 @@
-import { Router } from 'express';
+import { Router } from "express";
 
-import adminRouter from './admin.js';
-import productRouter from './products.js';
-import supplierRouter from './supplier.js';
-import userRouter from './user.js';
-import contractRouter from './contracts.js';
-import pricingRouter from './pricing.js';
-import orderRouter from './orders.js';
-import customerRouter from './customers.js';
-import offerRouter from './offer.js';
-import flatratesRoter from './flatrates.js';
+import adminRouter from "./admin.js";
+import productRouter from "./products.js";
+import supplierRouter from "./supplier.js";
+import userRouter from "./user.js";
+import contractRouter from "./contracts.js";
+import pricingRouter from "./pricing.js";
+import orderRouter from "./orders.js";
+import customerRouter from "./customers.js";
+import offerRouter from "./offer.js";
+import flatratesRoter from "./flatrates.js";
 
 const router = Router();
 
 /* /api/admin */
-router.use('/admin', adminRouter);
+router.use("/admin", adminRouter);
 
 /* /api/products */
-router.use('/products', productRouter);
+router.use("/products", productRouter);
 
 /* /api/suppliers */
-router.use('/suppliers', supplierRouter);
+router.use("/suppliers", supplierRouter);
 
 /* /api/offers */
-router.use('/offers', offerRouter);
+router.use("/offers", offerRouter);
 
 /* /api/users */
-router.use('/users', userRouter);
+router.use("/users", userRouter);
 
 /* /api/contracts */
-router.use('/contracts', contractRouter);
+router.use("/contracts", contractRouter);
 
 /* /api/pricing */
-router.use('/pricing', pricingRouter);
+router.use("/pricing", pricingRouter);
 
 /* /api/orders */
-router.use('/orders', orderRouter);
+router.use("/orders", orderRouter);
 
 /* /api/customers */
-router.use('/customers', customerRouter);
+router.use("/customers", customerRouter);
 
 /* /api/flatrates */
-router.use('/flatrates', flatratesRoter)
+router.use("/flatrates", flatratesRoter);
 
 export default router;
