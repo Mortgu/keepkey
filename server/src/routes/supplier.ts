@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
 import {
   createSupplier,
   deleteSupplier,
@@ -14,14 +13,9 @@ const router = Router();
 router.get("/", getSuppliers);
 
 /* [POST] http://localhost:3000/api/supplier */
-router.post(
-  "/",
-  requireSession,
-  validate(createSupplierSchema),
-  createSupplier,
-);
+router.post("/", validate(createSupplierSchema), createSupplier);
 
 /* [DELETE] http://localhost:3000/api/supplier/:id */
-router.delete("/:id", requireSession, deleteSupplier);
+router.delete("/:id", deleteSupplier);
 
 export default router;

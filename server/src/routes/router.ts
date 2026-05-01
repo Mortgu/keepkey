@@ -10,37 +10,38 @@ import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
 import offerRouter from "./offer.js";
 import flatratesRoter from "./flatrates.js";
+import { requireSession } from "../middlewares/auth.js";
 
 const router = Router();
 
 /* /api/admin */
-router.use("/admin", adminRouter);
+router.use("/admin", requireSession, adminRouter);
 
 /* /api/products */
-router.use("/products", productRouter);
+router.use("/products", requireSession, productRouter);
 
 /* /api/suppliers */
-router.use("/suppliers", supplierRouter);
+router.use("/suppliers", requireSession, supplierRouter);
 
 /* /api/offers */
-router.use("/offers", offerRouter);
+router.use("/offers", requireSession, offerRouter);
 
 /* /api/users */
-router.use("/users", userRouter);
+router.use("/users", requireSession, userRouter);
 
 /* /api/contracts */
-router.use("/contracts", contractRouter);
+router.use("/contracts", requireSession, contractRouter);
 
 /* /api/pricing */
-router.use("/pricing", pricingRouter);
+router.use("/pricing", requireSession, pricingRouter);
 
 /* /api/orders */
-router.use("/orders", orderRouter);
+router.use("/orders", requireSession, orderRouter);
 
 /* /api/customers */
-router.use("/customers", customerRouter);
+router.use("/customers", requireSession, customerRouter);
 
 /* /api/flatrates */
-router.use("/flatrates", flatratesRoter);
+router.use("/flatrates", requireSession, flatratesRoter);
 
 export default router;

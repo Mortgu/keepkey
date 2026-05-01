@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
 import {
   createOffer,
   createOfferDocumentJob,
@@ -15,12 +14,12 @@ import { createOfferSchema } from "../schemas/index.js";
 const router = Router();
 
 /* [GET] http://localhost:3000/api/offers */
-router.get("/", requireSession, getOffers);
+router.get("/", getOffers);
 
 /* [GET] http://localhost:3000/api/offers/:id */
 router.get("/:id", getOfferById);
 
-router.delete("/:id", requireSession, deleteOffer);
+router.delete("/:id", deleteOffer);
 
 /* [GET] http://localhost:3000/api/offers/:id/jobs */
 router.get("/:id/jobs", getOfferJobs);
@@ -31,13 +30,12 @@ router.get("/:id/jobs/:jobId", getOfferJobById);
 /* [POST] http://localhost:3000/api/offers */
 router.post(
   "/",
-  requireSession,
   validate(createOfferSchema),
   createOffer,
   createOfferDocumentJob,
 );
 
 /* [DELETE] http://localhost:3000/api/offers */
-router.delete("/", requireSession, deleteOffer);
+router.delete("/", deleteOffer);
 
 export default router;

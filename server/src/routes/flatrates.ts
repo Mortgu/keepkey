@@ -1,5 +1,4 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
 import {
   createFlatRate,
   deleteFlatRate,
@@ -22,22 +21,12 @@ router.get("/", getFlatRates);
 router.get("/:id", getFlatRate);
 
 /* [POST] http://localhost:3000/api/flatrates */
-router.post(
-  "/",
-  requireSession,
-  validate(createFlatRateSchema),
-  createFlatRate,
-);
+router.post("/", validate(createFlatRateSchema), createFlatRate);
 
 /* [PUT] http://localhost:3000/api/flatrates/:id */
-router.put(
-  "/:id",
-  requireSession,
-  validate(updateFlatRateSchema),
-  updateFlatRate,
-);
+router.put("/:id", validate(updateFlatRateSchema), updateFlatRate);
 
 /* [DELETE] http://localhost:3000/api/flatrates/:id */
-router.delete("/:id", requireSession, deleteFlatRate);
+router.delete("/:id", deleteFlatRate);
 
 export default router;

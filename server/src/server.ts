@@ -1,39 +1,41 @@
-import 'dotenv/config';
+import "dotenv/config";
 
-import express, { type Express } from 'express';
+import express, { type Express } from "express";
 import { toNodeHandler } from "better-auth/node";
-import { auth } from './lib/auth.js';
-import cors from 'cors';
+import { auth } from "./lib/auth.js";
+import cors from "cors";
 
-import router from './routes/router.js';
-import { errorHandler } from './middlewares/errorHandler.js';
-import config from './config/config.js';
+import router from "./routes/router.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
+import config from "./config/config.js";
 
-import startDocumentWorker from './workers/document-worker.js';
+import startDocumentWorker from "./workers/document-worker.js";
 import path from "path";
 
 const app: Express = express();
 
-app.use(cors({
+app.use(
+  cors({
     origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
-    methods: ['*', 'DELETE', 'PUT', 'PATCH'],
-    credentials: true
-}));
+    methods: ["*", "DELETE", "PUT", "PATCH"],
+    credentials: true,
+  }),
+);
 
-app.use('/generated', express.static(path.join(process.cwd(), 'generated')))
+app.use("/generated", express.static(path.join(process.cwd(), "generated")));
 
-app.all('/api/auth/*splat', toNodeHandler(auth));
+app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
 //manageNextcloud();
 
-app.use('/api', router);
+app.use("/api", router);
 
-app.use(express.static(path.join(process.cwd(), '../client/dist')));
+app.use(express.static(path.join(process.cwd(), "../client/dist")));
 
-app.get('/*splat', (_req, res) => {
-    res.sendFile(path.join(process.cwd(), '../client/dist/index.html'));
+app.get("/*splat", (_req, res) => {
+  res.sendFile(path.join(process.cwd(), "../client/dist/index.html"));
 });
 
 // Global error handler
@@ -43,12 +45,12 @@ app.use(errorHandler);
 const documentWorker = startDocumentWorker();
 
 const shutdown = async () => {
-    await documentWorker.close();
-    process.exit(0);
+  await documentWorker.close();
+  process.exit(0);
 };
-process.on('SIGTERM', shutdown);
-process.on('SIGINT', shutdown);
+process.on("SIGTERM", shutdown);
+process.on("SIGINT", shutdown);
 
 app.listen(config.port, () => {
-    console.log(`Server is listening on port ${config.port}`);
+  console.log(`Server is listening on port ${config.port}`);
 });
