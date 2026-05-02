@@ -214,12 +214,10 @@ export const createContactPersons = async (
       });
 
       if (!customer) {
-        return response
-          .status(400)
-          .json({
-            success: false,
-            message: "No customer linked to this account!",
-          });
+        return response.status(400).json({
+          success: false,
+          message: "No customer linked to this account!",
+        });
       }
 
       const created = await prisma.contactPerson.createMany({

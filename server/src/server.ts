@@ -11,12 +11,13 @@ import config from "./config/config.js";
 
 import startDocumentWorker from "./workers/document-worker.js";
 import path from "path";
+import env from "./lib/env.js";
 
 const app: Express = express();
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ?? "http://localhost:5173",
+    origin: env.CORS_ORIGIN ?? "http://localhost:5173",
     methods: ["*", "DELETE", "PUT", "PATCH"],
     credentials: true,
   }),

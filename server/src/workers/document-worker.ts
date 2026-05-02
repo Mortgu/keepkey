@@ -4,70 +4,79 @@ import { prisma } from "../lib/prisma.js";
 import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
 
 interface DocumentJobData {
-    documentJobId: string;
-    type: 'offer' | 'invoice';
+  documentJobId: string;
+  type: "offer" | "invoice";
 }
 
 export default function startDocumentWorker() {
-    const worker = new Worker<DocumentJobData>(documentQueueKey, async (job) => {
-        const { documentJobId, type } = job.data;
+  const worker = new Worker<DocumentJobData>(
+    documentQueueKey,
+    async (job) => {
+      const { documentJobId, type } = job.data;
 
-        const documentJob = await prisma.documentJob.findUnique({
+      const documentJob = await prisma.documentJob.findUnique({
+        where: { id: documentJobId },
+      });
+
+      if (!documentJob) {
+        throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
+      }
+
+      switch (type) {
+        case "offer": {
+          if (!documentJob.offerId) {
+            throw new Error("Document job for offer with undefined offerId");
+          }
+
+          const { docxPath, pdfPath } = await generateOfferDocument(
+            documentJob.offerId,
+            documentJobId,
+          );
+
+          await prisma.documentJob.update({
             where: { id: documentJobId },
-        });
-
-        if (!documentJob) {
-            throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
+            data: { status: "completed", docxPath, pdfPath },
+          });
+          break;
         }
+        case "invoice":
+          if (!documentJob.orderId) {
+            throw new Error("Document job for order with undefined orderId");
+          }
+          // TODO
+          break;
+        default:
+          throw new Error(
+            `Unknown document type "${type}" or missing reference ID`,
+          );
+      }
+    },
+    { connection, concurrency: 2 },
+  );
 
-        switch (type) {
-            case 'offer': {
-                if (!documentJob.offerId) {
-                    throw new Error("Document job for offer with undefined offerId");
-                }
+  worker.on("completed", async (job) => {
+    console.log(
+      `[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`,
+    );
 
-                const { docxPath, pdfPath } = await generateOfferDocument(documentJob.offerId, documentJobId);
+    if (job) {
+    }
+  });
 
-                await prisma.documentJob.update({
-                    where: { id: documentJobId },
-                    data: { status: 'completed', docxPath, pdfPath },
-                });
-                break;
-            }
-            case 'invoice':
-                if (!documentJob.orderId) {
-                    throw new Error("Document job for order with undefined orderId");
-                }
-                // TODO
-                break;
-            default:
-                throw new Error(`Unknown document type "${type}" or missing reference ID`);
-        }
+  worker.on("failed", async (job, err) => {
+    console.error(`[worker] job ${job?.id} failed:`, err);
 
-    }, { connection, concurrency: 2 });
+    if (job) {
+      await prisma.documentJob.updateMany({
+        where: { id: job.data.documentJobId },
+        data: { status: "failed", error: err.message },
+      });
+    }
+  });
 
-    worker.on('completed', async (job) => {
-        console.log(`[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`);
+  worker.on("stalled", (jobId) => {
+    console.warn(`[worker] job ${jobId} stalled`);
+  });
 
-        if (job) {
-
-        }
-    });
-
-    worker.on('failed', async (job, err) => {
-        console.error(`[worker] job ${job?.id} failed:`, err);
-
-        if (job) {
-            await prisma.documentJob.updateMany({
-                where: { id: job.data.documentJobId },
-                data: { status: 'failed', error: err.message },
-            });
-        }
-    });
-
-    worker.on('stalled', (jobId) => {
-        console.warn(`[worker] job ${jobId} stalled`);
-    });
-
-    return worker;
+  return worker;
 }
