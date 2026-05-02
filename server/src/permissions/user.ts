@@ -1,29 +1,29 @@
-import { NextFunction, Request, Response } from "express";
-import { auth } from "../lib/auth.js";
+import { requirePermission } from "../middlewares/permissions.js";
 
-export const canViewAllUsers = async (request: Request, response: Response, next: NextFunction) => {
-    const user = request.user;
+export const canViewUsers = requirePermission({
+  resource: "users",
+  action: "view",
+  statusCode: 400,
+  errorMessage: "Can't view users.",
+});
 
-    if (!user) {
-        return response.status(404).json({
-            success: false, message: 'Bad request! Missing user.',
-        });
-    }
+export const canCreateUsers = requirePermission({
+  resource: "users",
+  action: "create",
+  statusCode: 400,
+  errorMessage: "Can't create users.",
+});
 
-    const { success } = await auth.api.userHasPermission({
-        body: {
-            userId: user.id,
-            permissions: {
-                users: ['view']
-            }
-        }
-    });
+export const canUpdateUsers = requirePermission({
+  resource: "users",
+  action: "update",
+  statusCode: 400,
+  errorMessage: "Can't update users.",
+});
 
-    if (!success) {
-        return response.status(400).send({
-            success: false, message: "Permission not found",
-        })
-    }
-
-    next();
-}
+export const canDeleteUsers = requirePermission({
+  resource: "users",
+  action: "delete",
+  statusCode: 400,
+  errorMessage: "Can't delete users.",
+});

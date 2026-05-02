@@ -1,10 +1,5 @@
 import { Router } from "express";
 import {
-  canCreateProduct,
-  canDeleteProduct,
-  canUpdateProduct,
-} from "../permissions/product.js";
-import {
   createProduct,
   getProduct,
   getProducts,
@@ -23,22 +18,12 @@ router.get("/", getProducts);
 router.get("/:id", getProduct);
 
 /* [POST] http://localhost:3000/api/products */
-router.post(
-  "/",
-  canCreateProduct,
-  validate(createProductSchema),
-  createProduct,
-);
+router.post("/", validate(createProductSchema), createProduct);
 
 /* [DELETE] http://localhost:3000/api/products/{id} */
-router.delete("/:id", canDeleteProduct, deleteProduct);
+router.delete("/:id", deleteProduct);
 
 /* [PUT] http://localhost:3000/api/products/{id} */
-router.put(
-  "/:id",
-  canUpdateProduct,
-  validate(updateProductSchema),
-  updateProduct,
-);
+router.put("/:id", validate(updateProductSchema), updateProduct);
 
 export default router;

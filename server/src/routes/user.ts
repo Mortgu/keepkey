@@ -14,28 +14,31 @@ import {
   updateUserSchema,
   createContactPersonsSchema,
 } from "../schemas/index.js";
+import {
+  canCreateUsers,
+  canDeleteUsers,
+  canUpdateUsers,
+  canViewUsers,
+} from "../permissions/user.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/users */
-router.get("/", getAllUsers);
+router.get("/", canViewUsers, getAllUsers);
 
 /* [GET] http://localhost:3000/api/users/session */
 router.get("/session", getSessionUser);
 
 /* [POST] http://localhost:3000/api/users/{id} */
-router.post("/:id", validate(updateUserSchema), updateUserById);
+router.post("/:id", canUpdateUsers, validate(updateUserSchema), updateUserById);
 
 /* [POST] http://localhost:3000/api/users/ */
 /* canCreateUsers */
-router.post("/", validate(createUserSchema), createUser);
+router.post("/", canCreateUsers, validate(createUserSchema), createUser);
 
 /* [DELETE] http://localhost:3000/api/users */
 /* canDeleteUser */
-router.delete("/:id", deleteUser);
-
-/* [DELETE] http://localhost:3000/api/users */
-router.delete("/", deleteAccount);
+router.delete("/:id", canDeleteUsers, deleteUser);
 
 /* [POST] http://localhost:3000/api/users/me/contact-persons */
 router.post(
