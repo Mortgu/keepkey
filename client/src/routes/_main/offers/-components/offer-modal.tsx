@@ -8,6 +8,7 @@ import type {
   Product,
   Supplier,
   User,
+  Offer,
 } from "@/data/types";
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
@@ -28,6 +29,7 @@ import { useUser } from "@/hooks/user";
 interface OfferModalProps {
   open: boolean;
   cancelFn: () => void;
+  currentOffer?: Offer;
 }
 
 export const offerSchema = z.object({
@@ -55,13 +57,19 @@ const emptyOfferFormVlues = {
   requestFrom: null as Date | null,
 };
 
-export default function OfferModal({ open, cancelFn }: OfferModalProps) {
+export default function OfferModal({
+  open,
+  cancelFn,
+  currentOffer,
+}: OfferModalProps) {
   const { customers } = useCustomers();
   const { products } = useProducts();
   const { contracts } = useContracts();
   const { suppliers } = useSupplier();
   const { users } = useUser();
   const { flatRates } = useFlatRates();
+
+  const isEdit = currentOffer !== null;
 
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -74,7 +82,7 @@ export default function OfferModal({ open, cancelFn }: OfferModalProps) {
   const { createOffer, errorCreatingOffer } = useOffer();
 
   const offerForm = useForm({
-    defaultValues: emptyOfferFormVlues,
+    defaultValues: currentOffer || emptyOfferFormVlues,
     validators: {
       onChange: offerSchema,
       onMount: offerSchema,

@@ -1,0 +1,36 @@
+model Product {
+  id   String @id @default(uuid())
+  name String @unique
+
+  description String?
+  table       String?
+
+  productPricing ProductPricing[]
+  orderPositions OrderPosition[]
+  offerPositions OfferPosition[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+
+  @@index([name])
+  @@map("product")
+}
+
+model ProductPricing {
+  id String @id @default(uuid())
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  min_quantity Int
+  max_quantity Int? @default(0)
+
+  duration_months Int @default(12)
+
+  price Int
+
+  @@map("pricing")
+}

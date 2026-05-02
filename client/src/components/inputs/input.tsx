@@ -43,15 +43,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, variant, input_size, label, error, ...rest }, ref) => {
     return (
       <div className="w-full">
-        <div className="flex items-center justify-between mb-1">
+        <div className="flex items-center justify-between">
           {label && (
-            <label className="block text-sm font-normal text-(--text-600)">
+            <label className="block text-sm font-normal text-(--text-600) mb-1">
               {label}
             </label>
           )}
 
           {error && (
-            <label className="text-sm font-normal text-red-500">{error}</label>
+            <label className="text-sm font-normal text-red-500  mb-1">
+              {error}
+            </label>
           )}
         </div>
         <input

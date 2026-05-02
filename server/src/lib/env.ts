@@ -6,7 +6,7 @@ import "dotenv/config";
 const env = createEnv({
   server: {
     BETTER_AUTH_SECRET: z.string().min(1),
-    BETTER_AUTH_URL: z.string().url(),
+    BETTER_AUTH_URL: z.url(),
 
     TEMPLATES_DIR: z.string().min(1),
     OUTPUT_DIR: z.string().min(1),
@@ -16,7 +16,7 @@ const env = createEnv({
     PORT: z.string(),
     NODE_ENV: z.string(),
 
-    NEXTCLOUD_URL: z.string().url(),
+    NEXTCLOUD_URL: z.url(),
     NEXTCLOUD_USER: z.string().min(1),
     NEXTCLOUD_PASSWORD: z.string().min(1),
 
