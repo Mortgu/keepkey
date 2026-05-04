@@ -28,8 +28,6 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
   const [uploadStatus, setUploadStatus] = useState<NextcloudUploadStatus>(null);
   const [nextcloudUrl, setNextcloudUrl] = useState<string | null>(null);
 
-  console.log(offer);
-
   const { data: job } = useQuery({
     queryKey: ["documentJob", offer.id],
     queryFn: async () => {

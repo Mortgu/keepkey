@@ -8,7 +8,7 @@ import env from "./env.js";
 
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
-  trustedOrigins: ["http://localhost:5173"],
+  trustedOrigins: [env.CORS_ORIGIN ?? "http://localhost:5173"],
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
