@@ -6,8 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "npx tsc -b && vite build",
+    "generate:types": "npx openapi-typescript ../server/prisma/schema/openapi/openapi.yaml -o src/types/api.ts",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "prebuild": "npm run generate:types"
   },
   "dependencies": {
     "@better-auth/mongo-adapter": "^1.5.5",
@@ -22,6 +24,7 @@
     "better-auth": "^1.5.5",
     "clsx": "^2.1.1",
     "lucide-react": "^0.577.0",
+    "openapi-fetch": "^0.17.0",
     "react": "^19.2.4",
     "react-date-picker": "^12.0.2",
     "react-dom": "^19.2.4",
@@ -47,6 +50,7 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
+    "openapi-typescript": "^7.13.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.0"

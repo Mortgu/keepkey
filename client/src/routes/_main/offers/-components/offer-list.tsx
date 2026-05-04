@@ -3,9 +3,12 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useOffer } from "@/hooks/offer";
-import type { Offer } from "@/data/types";
 import { SortDropdown } from "@/components/filters";
 import OfferListItem from "./offer-list-item";
+
+import type {
+  Offer
+} from '@/types';
 
 const sort_options = [
   { value: "date-desc", label: "Date – newest first" },
@@ -23,13 +26,9 @@ export default function OfferList() {
     return [...(offers ?? [])].sort((a, b) => {
       switch (sort) {
         case "date-desc":
-          return (
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          );
+          return new Date(b?.createdAt || '').getTime() - new Date(a?.createdAt || '').getTime();
         case "date-asc":
-          return (
-            new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-          );
+          return new Date(a?.createdAt || '').getTime() - new Date(b?.createdAt || '').getTime();
         case "name-asc":
           return a.voucherId.localeCompare(b.voucherId);
         case "name-desc":

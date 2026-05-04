@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getDocumentJobsAction } from "@/data/orders";
+import { getTasksAction } from "@/data/orders";
 import { AlertCircle, Loader, Download } from "lucide-react";
 import Button from "./button/button";
 
@@ -14,7 +14,7 @@ export default function DocumentStatus({ orderId }: DocumentStatusProps) {
     error,
   } = useQuery({
     queryKey: ["document-jobs", orderId],
-    queryFn: () => getDocumentJobsAction(orderId),
+    queryFn: () => getTasksAction(orderId),
     refetchInterval: (data) => {
       if (!Array.isArray(data) || data.length === 0) return 3000;
       const allDone = data.every(

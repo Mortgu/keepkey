@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import express, { type Express } from "express";
+import express, { Request, Response, type Express } from "express";
 import { toNodeHandler } from "better-auth/node";
 import { auth } from "./lib/auth.js";
 import cors from "cors";
@@ -13,6 +13,23 @@ import startDocumentWorker from "./workers/document-worker.js";
 import path from "path";
 import env from "./lib/env.js";
 
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerui from 'swagger-ui-express';
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Meine API',
+      version: '1.0.0'
+    }
+  },
+
+  apis: ['./src/routes/*.ts', './src/schemas/*.ts'],
+}
+
+const swaggerSpec = swaggerJsdoc(options);
+
 const app: Express = express();
 
 app.use(
@@ -22,6 +39,13 @@ app.use(
     credentials: true,
   }),
 );
+
+app.use('/api-docs', swaggerui.serve, swaggerui.setup(swaggerSpec));
+
+app.get('/swagger.json', (request: Request, response: Response) => {
+  response.setHeader('Content-Type', 'application/json');
+  response.send(swaggerSpec)
+});
 
 app.use("/generated", express.static(path.join(process.cwd(), "generated")));
 

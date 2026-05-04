@@ -8,6 +8,7 @@ import {
   updateProductAction,
 } from "@/data/products.ts";
 import type { CreatePricingProps, Product } from "@/data/types";
+import type { CreateProductPricingInput } from "@/types";
 
 export const useProducts = () => {
   const queryClient = useQueryClient();
@@ -30,8 +31,13 @@ export const useProducts = () => {
   });
 
   const createPricingMutation = useMutation({
-    mutationFn: ({ productId, pricing }: CreatePricingProps) =>
-      createPricingAction({ productId, pricing }),
+    mutationFn: ({
+      productId,
+      pricing,
+    }: {
+      productId: string;
+      pricing: CreateProductPricingInput;
+    }) => createPricingAction(productId, pricing),
     onSuccess: invalidate,
   });
 

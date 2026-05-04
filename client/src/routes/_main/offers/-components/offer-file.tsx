@@ -1,5 +1,5 @@
 import Button from "@/components/button/button";
-import type { DocumentJob } from "@/data/types";
+import type { DocumentJob } from "@/types";
 import { formatDate } from "@/lib/format";
 import { Cloud, File, FileDown, RotateCw } from "lucide-react";
 

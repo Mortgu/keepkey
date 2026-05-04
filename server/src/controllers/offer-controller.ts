@@ -2,7 +2,13 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
-import { FlatRates, OfferFlatRates, OfferPosition } from "@prisma/client";
+import {
+  FlatRates,
+  OfferFlatRates,
+  OfferPosition,
+  TaskStatus,
+  TaskType,
+} from "@prisma/client";
 
 export const getOffers = async (request: Request, response: Response) => {
   const offers = await prisma.offer.findMany({
@@ -73,43 +79,44 @@ export const getOfferJobById = async (request: Request, response: Response) => {
   }
 };
 
-export const createOfferDocumentJob = async (
-  request: Request,
-  response: Response,
-) => {
-  /*response.setHeader("Content-Type", "text/event-stream");
-  response.setHeader("Cache-Control", "no-cache");
-  response.setHeader("Connection", "keep-alive");*/
-
+export const createOfferTask = async (request: Request, response: Response) => {
   const { offer } = request.body;
 
-  const documentJob = await prisma.$transaction(async (tx) => {
-    await tx.documentJob.updateMany({
-      where: { offerId: offer.id, isCurrent: true },
-      data: { isCurrent: false },
+  if (!offer) {
+    return response.status(404).json({
+      message: "Failed to create offer task. Missing offer!",
     });
+  }
 
-    return tx.documentJob.create({
+  try {
+    const task = await prisma.task.create({
       data: {
         offerId: offer.id,
-        type: "offer",
-        status: "pending",
-        isCurrent: true,
+        type: TaskType.OFFER,
+        status: TaskStatus.PENDING,
       },
     });
-  });
 
-  const job = await documentQueue.add(documentQueueKey, {
-    documentJobId: documentJob.id,
-    type: "offer",
-  });
+    const job = await documentQueue.add(
+      documentQueueKey,
+      {
+        taskId: task.id,
+        taskType: TaskType.OFFER,
+      },
+      { delay: 15000 },
+    );
 
-  await prisma.documentJob.update({
-    where: { id: documentJob.id },
-    data: { jobId: job.id },
-  });
+    await prisma.task.update({
+      where: { id: task.id },
+      data: { jobId: job.id },
+    });
 
-  return response.status(200).json(offer);
+    return response.status(200).json(offer);
+  } catch (exception: any) {
+    return response.status(500).json({
+      message: `Failed to create task for offer: ${offer.id}`,
+    });
+  }
 };
 
 export const createOffer = async (
@@ -122,7 +129,6 @@ export const createOffer = async (
   if (!body) {
     return response.status(400).json({
       message: "Bad request",
-      success: false,
     });
   }
 
@@ -131,7 +137,6 @@ export const createOffer = async (
   if (!offer || !positions) {
     return response.status(400).json({
       message: "Bad request.",
-      success: false,
     });
   }
 

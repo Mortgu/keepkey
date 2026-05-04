@@ -1,15 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type {
-  OfferFlatRateInput,
-  BaseOffer,
-  ContactPerson,
-  Customer,
-  Product,
-  Supplier,
-  User,
-  Offer,
-} from "@/data/types";
+
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
@@ -25,6 +16,17 @@ import ModalDialog from "@/components/modal";
 import Checkbox from "@/components/inputs/checkbox.tsx";
 import { useFlatRates } from "@/hooks/flatrate.ts";
 import { useUser } from "@/hooks/user";
+
+import type {
+  Offer,
+  User,
+  Supplier,
+  Customer,
+  Product,
+  ContactPerson,
+  CreateOfferInput,
+  CreateFlatRateInput,
+} from "@/types";
 
 interface OfferModalProps {
   open: boolean;
@@ -88,21 +90,21 @@ export default function OfferModal({
       onMount: offerSchema,
     },
     onSubmit: async ({ value }) => {
-      const offer: BaseOffer = {
+      const offer: CreateOfferInput = {
         ...value,
       };
 
       try {
         const response = await createOffer({
-          offer: offer,
-          positions: offerProducts,
+          offer: offer as Offer,
+          positions: offerProducts as OfferPosition,
           flatrates: offerFlatRates,
         });
 
         cancelFn();
 
         return response;
-      } catch (exception: any) {}
+      } catch (exception: any) { }
     },
   });
 
@@ -311,8 +313,8 @@ export default function OfferModal({
                     value={
                       field.state.value
                         ? new Date(field.state.value)
-                            .toISOString()
-                            .split("T")[0]
+                          .toISOString()
+                          .split("T")[0]
                         : ""
                     }
                     onChange={(e) =>
@@ -340,8 +342,8 @@ export default function OfferModal({
                     value={
                       field.state.value
                         ? new Date(field.state.value)
-                            .toISOString()
-                            .split("T")[0]
+                          .toISOString()
+                          .split("T")[0]
                         : ""
                     }
                     onChange={(e) =>

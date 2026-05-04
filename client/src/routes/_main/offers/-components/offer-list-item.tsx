@@ -1,31 +1,16 @@
 import Button from "@/components/button/button";
-import type {
-  DocumentJob,
-  Offer,
-  OfferFlatRate,
-  OfferPosition,
-} from "@/data/types";
 import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
-import { useQuery } from "@tanstack/react-query";
 import {
-  CheckCircle2,
-  CloudUpload,
-  FileText,
-  Link2,
   Pen,
   Trash,
-  XCircle,
 } from "lucide-react";
-import { useState } from "react";
-import { BASE_URL } from "@/lib/api-client.ts";
-import OfferModal from "./offer-modal";
 import Badge from "@/components/badge";
 import Collapsable from "@/components/collapsable";
 import { formatDate } from "@/lib/format";
 import OfferFile from "./offer-file";
 
-type NextcloudUploadStatus = null | "uploading" | "uploaded" | "error";
+import type { Offer, OfferPosition, DocumentJob } from '@/types';
 
 type OfferListItemProps = {
   offer: Offer;
@@ -49,7 +34,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             <h1 className="text-md">
               {offerPositions.map((i) => i.product.name).join(" & ")}
             </h1>
-            <Badge variant="generated" />
+            <Badge variant="generated">{ }</Badge>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -78,7 +63,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             {/* Created at */}
             <div className="flex items-center gap-1 text-sm font-light">
               <label className="text-(--text-secondary)">Erstellt:</label>
-              <p className="text-(--text)">{formatDate(offer.createdAt)}</p>
+              <p className="text-(--text)">{formatDate(offer.createdAt ?? '')}</p>
             </div>
 
             {/* Valid until */}
@@ -118,9 +103,15 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
                   <p className="text-sm">{op.product.name}</p>
                   <Badge variant="draft">{op.contract.name}</Badge>
                 </div>
-                <div className="flex gap-1 text-sm font-light">
-                  <span className="text-(--text-secondary)">Laufzeit:</span>
-                  <p>{op.duration_months} Monate</p>
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1 text-sm font-light">
+                    <span className="text-(--text-secondary)">Seats:</span>
+                    <p>{op.quantity}</p>
+                  </div>
+                  <div className="flex gap-1 text-sm font-light">
+                    <span className="text-(--text-secondary)">Laufzeit:</span>
+                    <p>{op.duration_months} Monate</p>
+                  </div>
                 </div>
               </div>
               <div className="flex flex-col items-end">

@@ -73,17 +73,17 @@ export const updateUserById = async (request: Request, response: Response) => {
         image,
       },
     });
+
+    return response.status(200).json({
+      success: true,
+      message: "Successfully updated user!",
+    });
   } catch (exception: any) {
     return response.status(500).json({
       success: false,
       message: `Something went wrong trying to update user! ${exception.message}`,
     });
   }
-
-  return response.status(200).json({
-    success: true,
-    message: "Successfully updated user!",
-  });
 };
 
 export const createUser = async (request: Request, response: Response) => {

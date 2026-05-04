@@ -2,53 +2,50 @@ import { Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
 import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
+import { TaskStatus, TaskType } from "@prisma/client";
 
 interface DocumentJobData {
-  documentJobId: string;
-  type: "offer" | "invoice";
+  taskId: string;
+  taskType: TaskType;
 }
 
 export default function startDocumentWorker() {
   const worker = new Worker<DocumentJobData>(
     documentQueueKey,
     async (job) => {
-      const { documentJobId, type } = job.data;
+      const { taskId, taskType } = job.data;
 
-      const documentJob = await prisma.documentJob.findUnique({
-        where: { id: documentJobId },
+      const task = await prisma.task.findUnique({
+        where: { id: taskId },
       });
 
-      if (!documentJob) {
-        throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
+      if (!task) {
+        throw new Error(`Task ${taskId} not found! Skip.`);
       }
 
-      switch (type) {
-        case "offer": {
-          if (!documentJob.offerId) {
+      switch (taskType) {
+        case TaskType.OFFER:
+          if (!task.offerId) {
             throw new Error("Document job for offer with undefined offerId");
           }
 
           const { docxPath, pdfPath } = await generateOfferDocument(
-            documentJob.offerId,
-            documentJobId,
+            task.offerId,
+            taskId,
           );
 
-          await prisma.documentJob.update({
-            where: { id: documentJobId },
-            data: { status: "completed", docxPath, pdfPath },
+          await prisma.task.update({
+            where: { id: taskId },
+            data: {
+              status: TaskStatus.COMPLETED,
+            },
           });
+
           break;
-        }
-        case "invoice":
-          if (!documentJob.orderId) {
-            throw new Error("Document job for order with undefined orderId");
-          }
-          // TODO
+        case TaskType.ORDER:
           break;
         default:
-          throw new Error(
-            `Unknown document type "${type}" or missing reference ID`,
-          );
+          throw new Error(`Task ${task.id} with unknown type propertie!`);
       }
     },
     { connection, concurrency: 2 },
@@ -56,7 +53,7 @@ export default function startDocumentWorker() {
 
   worker.on("completed", async (job) => {
     console.log(
-      `[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`,
+      `[worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
     );
 
     if (job) {
@@ -64,12 +61,12 @@ export default function startDocumentWorker() {
   });
 
   worker.on("failed", async (job, err) => {
-    console.error(`[worker] job ${job?.id} failed:`, err);
+    console.error(`[worker] job ${job?.id} failed:`, err.message);
 
     if (job) {
-      await prisma.documentJob.updateMany({
-        where: { id: job.data.documentJobId },
-        data: { status: "failed", error: err.message },
+      await prisma.task.updateMany({
+        where: { id: job.data.taskId },
+        data: { status: TaskStatus.FAILED, error: err.message },
       });
     }
   });

@@ -3,9 +3,14 @@ import {
   deleteOfferAction,
   getOffersAction,
 } from "@/data/offer";
-import type { BaseFlatRate, BaseOffer } from "@/data/types";
-import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
+
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import type {
+  CreateFlatRateInput,
+  CreateOfferPositionInput,
+  CreateOfferInput,
+} from "@/types";
 
 export const useOffer = () => {
   const queryClient = useQueryClient();
@@ -28,9 +33,9 @@ export const useOffer = () => {
       positions,
       flatrates,
     }: {
-      offer: BaseOffer;
-      positions: OfferProductInput[];
-      flatrates: BaseFlatRate[];
+      offer: CreateOfferInput;
+      positions: CreateOfferPositionInput[];
+      flatrates: CreateFlatRateInput[];
     }) => createOfferAction(offer, positions, flatrates),
     onSuccess: invalidate,
   });

@@ -1,8 +1,8 @@
 model Offer {
     id String @id @default(uuid())
 
-    supplier   Supplier @relation(fields: [supplierId], references: [id])
-    supplierId String
+    supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+    supplierId String?
 
     customer   Customer @relation(fields: [customerId], references: [id])
     customerId String
@@ -20,10 +20,14 @@ model Offer {
     validUntil  DateTime?
     requestFrom DateTime?
 
-    offerFlatRates OfferFlatRates[]
+    offerFlatRates OfferFlatRate[]
     offerPositions OfferPosition[]
     order          Order?
     documentJobs   DocumentJob[]
+
+    // New
+    documents Document[]
+    tasks     Task[]
 
     // (in cent)
     net_amount   Int // Der reine Warenwert (netto) 
@@ -31,8 +35,8 @@ model Offer {
     tax_amount   Int // absolute Steuerbetrag
     total_amount Int // Finale Brutto Betrag
 
-    createdAt DateTime? @default(now())
-    updatedAt DateTime?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @default(now())
 
     @@map("offer")
 }
@@ -63,10 +67,10 @@ model OfferPosition {
     @@map("offer_position")
 }
 
-model OfferFlatRates {
+model OfferFlatRate {
     id String @id @default(uuid())
 
-    flatRate   FlatRates @relation(fields: [flatRateId], references: [id])
+    flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
     flatRateId String
 
     offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
@@ -75,5 +79,5 @@ model OfferFlatRates {
     quantity    Int
     total_cents Int
 
-    @@map("offer_flat_rates")
+    @@map("offer_flat_rate")
 }

@@ -1,0 +1,62 @@
+enum DocumentStatus {
+  UPLOADED
+  UPLOADING
+  GENERATED
+  PROCESSING
+  PENDING
+  FAILED
+}
+
+model Document {
+  id String @id @default(cuid())
+
+  name      String
+  extension String
+  path      String
+
+  status DocumentStatus @default(PENDING)
+
+  offer   Offer?  @relation(fields: [offerId], references: [id])
+  offerId String?
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  createdAt DateTime @default(now())
+
+  @@map("document")
+}
+
+enum TaskStatus {
+  COMPLETED
+  RUNNING
+  PENDING
+  FAILED
+}
+
+enum TaskType {
+  OFFER
+  ORDER
+  RENEWAL
+}
+
+model Task {
+  id    String  @id @default(cuid())
+  jobId String? // BullMQ job id
+
+  status TaskStatus @default(PENDING)
+  type   TaskType
+
+  offer   Offer?  @relation(fields: [offerId], references: [id])
+  offerId String?
+
+  order   Order?  @relation(fields: [orderId], references: [id])
+  orderId String?
+
+  error String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now())
+
+  @@map("task")
+}

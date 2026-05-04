@@ -14,6 +14,7 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@asteasolutions/zod-to-openapi": "^8.5.0",
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
     "@t3-oss/env-nextjs": "^0.13.11",
@@ -32,14 +33,19 @@
     "pizzip": "^3.2.0",
     "prisma": "^7.5.0",
     "redis": "^5.11.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "webdav": "^5.9.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
     "angular-expressions": "^1.4.3",
     "nodemon": "^3.1.14",
+    "prisma-openapi": "^1.6.0",
     "tsx": "^4.21.0",
     "typescript": "^6.0.2"
   }

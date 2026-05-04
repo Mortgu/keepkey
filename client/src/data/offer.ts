@@ -1,14 +1,19 @@
-import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
-import type { BaseFlatRate, BaseOffer, Offer } from "./types";
 import { api } from "@/lib/api-client";
+
+import type {
+  Offer,
+  CreateOfferInput,
+  CreateFlatRateInput,
+  CreateOfferPositionInput
+} from '@/types';
 
 export const getOffersAction = () =>
   api<Offer[]>("/api/offers", { method: "GET" });
 
 export const createOfferAction = (
-  offer: BaseOffer,
-  positions: OfferProductInput[],
-  flatRates: BaseFlatRate[],
+  offer: CreateOfferInput,
+  positions: CreateOfferPositionInput[],
+  flatRates: CreateFlatRateInput[],
 ) =>
   api<Offer>("/api/offers", {
     method: "POST",

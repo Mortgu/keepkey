@@ -3,6 +3,11 @@ generator client {
   engineType = "binary"
 }
 
+generator openapi {
+  provider = "prisma-openapi"
+  output   = "./openapi"
+}
+
 datasource db {
   provider = "postgresql"
 }
@@ -33,29 +38,6 @@ model User {
   orders         Order[]
 
   @@map("user")
-}
-
-model Customer {
-  id String @id @default(uuid())
-
-  customerId  String  @unique
-  companyName String
-  email       String? @unique
-
-  orders         Order[]         @relation("CustomerRelation")
-  contactPersons ContactPerson[]
-
-  street String?
-  city   String?
-  plz    String?
-  phone  String?
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  offers    Offer[]
-  users     User[]
-
-  @@map("customer")
 }
 
 model Session {
@@ -120,15 +102,15 @@ model Supplier {
   @@map("supplier")
 }
 
-model FlatRates {
+model FlatRate {
   id          String @id @default(uuid())
   name        String
   table       String
   total_cents Int
 
-  offerFlatRates OfferFlatRates[]
+  offerFlatRates OfferFlatRate[]
 
-  @@map("flat_rates")
+  @@map("flat_rate")
 }
 
 model Contract {
@@ -169,22 +151,4 @@ model DocumentJob {
   @@index([offerId])
   @@index([status])
   @@map("document_job")
-}
-
-model ContactPerson {
-  id         String   @id @default(uuid())
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  salutation String
-  firstName  String
-  lastName   String
-  email      String?
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  offers    Offer[]
-
-  @@index([customerId])
-  @@map("contact_person")
 }

@@ -151,6 +151,13 @@ export interface DocumentJob {
   updatedAt: string;
 }
 
+export interface Task {
+  id: string;
+
+  orderId?: string;
+  offerId?: string;
+}
+
 /* OFFER */
 export interface BaseOffer {
   voucherId: string;

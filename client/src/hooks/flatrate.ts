@@ -5,7 +5,11 @@ import {
   getFlatRatesAction,
   updateFlatRateAction,
 } from "@/data/flatrates";
-import type { BaseFlatRate } from "@/data/types";
+
+import type {
+  CreateFlatRateInput,
+  UpdateFlatRateInput
+} from '@/types';
 
 export const useFlatRates = () => {
   const queryClient = useQueryClient();
@@ -23,7 +27,7 @@ export const useFlatRates = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (flatrate: BaseFlatRate) => createFlatRateAction(flatrate),
+    mutationFn: (flatrate: CreateFlatRateInput) => createFlatRateAction(flatrate),
     onSuccess: invalidate,
   });
 
@@ -33,7 +37,7 @@ export const useFlatRates = () => {
       flatrate,
     }: {
       id: string;
-      flatrate: Partial<BaseFlatRate>;
+      flatrate: UpdateFlatRateInput;
     }) => updateFlatRateAction(id, flatrate),
     onSuccess: invalidate,
   });

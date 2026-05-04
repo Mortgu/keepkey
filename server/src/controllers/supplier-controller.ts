@@ -20,6 +20,37 @@ export const createSupplier = async (request: Request, response: Response) => {
   return response.status(200).json(createdSupplier);
 };
 
+export const updateSupplier = async (request: Request, response: Response) => {
+  const { body, params } = request;
+  const { id } = params;
+
+  if (!body || !id) {
+    return response.status(400).json({
+      message: "Bad request! Missing body or id!",
+      success: false,
+    });
+  }
+
+  const { supplierId, name } = body;
+
+  try {
+    const supplier = await prisma.supplier.updateMany({
+      where: { id: id as string },
+      data: {
+        supplierId,
+        name,
+      },
+    });
+
+    return response.status(200).json(supplier);
+  } catch (exception: any) {
+    return response.status(500).json({
+      message: "Something went wrong trying to update supplier!",
+      exception,
+    });
+  }
+};
+
 export const deleteSupplier = async (request: Request, response: Response) => {
   const { id } = request.params;
 

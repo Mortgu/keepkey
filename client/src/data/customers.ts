@@ -1,5 +1,10 @@
 import { api } from "@/lib/api-client";
-import type { CreateCustomer, Customer } from "./types";
+
+import type {
+  Customer,
+  CreateCustomerInput,
+  UpdateCustomerInput
+} from "@/types";
 
 export const getAllCustomersAction = () =>
   api<Customer[]>("/api/customers", { method: "GET" });
@@ -7,14 +12,14 @@ export const getAllCustomersAction = () =>
 export const getCustomerByIdAction = (id: string) =>
   api<Customer>(`/api/customers/${id}`, { method: "GET" });
 
-export const createCustomerAction = (body: CreateCustomer) =>
+export const createCustomerAction = (body: CreateCustomerInput) =>
   api<Customer>("/api/customers", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
-export const updateCustomerByIdAction = (id: string, body: Partial<Customer>) =>
+export const updateCustomerByIdAction = (id: string, body: UpdateCustomerInput) =>
   api<Customer>(`/api/customers/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

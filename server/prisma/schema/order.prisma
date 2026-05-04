@@ -10,6 +10,10 @@ model Order {
   orderPositions OrderPosition[]
   documentJobs   DocumentJob[]
 
+  // New
+  documents Document[]
+  tasks     Task[]
+
   offer   Offer?  @relation(fields: [offerId], references: [id])
   offerId String? @unique
 

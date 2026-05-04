@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 
 export const getFlatRates = async (request: Request, response: Response) => {
-  const flatrates = await prisma.flatRates.findMany({
+  const flatrates = await prisma.flatRate.findMany({
     orderBy: { name: "asc" },
   });
   return response.status(200).json(flatrates);
@@ -11,7 +11,7 @@ export const getFlatRates = async (request: Request, response: Response) => {
 export const getFlatRate = async (request: Request, response: Response) => {
   const id = request.params.id as string;
 
-  const flatrate = await prisma.flatRates.findUnique({
+  const flatrate = await prisma.flatRate.findUnique({
     where: { id },
   });
 
@@ -32,7 +32,7 @@ export const createFlatRate = async (
   try {
     const { body } = request;
 
-    const flatrate = await prisma.flatRates.create({
+    const flatrate = await prisma.flatRate.create({
       data: { ...body },
     });
 
@@ -51,7 +51,7 @@ export const updateFlatRate = async (
     const id = request.params.id as string;
     const { body } = request;
 
-    const flatrate = await prisma.flatRates.update({
+    const flatrate = await prisma.flatRate.update({
       where: { id },
       data: { ...body },
     });
@@ -70,7 +70,7 @@ export const deleteFlatRate = async (
   try {
     const id = request.params.id as string;
 
-    await prisma.flatRates.delete({
+    await prisma.flatRate.delete({
       where: { id },
     });
 
