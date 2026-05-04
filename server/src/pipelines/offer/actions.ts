@@ -10,7 +10,6 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
 import { convert as libconvert } from "libreoffice-convert";
-import { promisify } from "util";
 
 export async function fetchOfferData(offerId: string) {
   const [offer, contracts] = await Promise.all([
@@ -181,6 +180,10 @@ export async function generating(
 }
 
 export async function converting(docxBuffer: Buffer): Promise<Buffer> {
-  const convertAsync = promisify(libconvert);
-  return convertAsync(docxBuffer, ".pdf", undefined) as Promise<Buffer>;
+  return new Promise((resolve, reject) => {
+    libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
+      if (err) reject(err);
+      else resolve(result);
+    });
+  });
 }

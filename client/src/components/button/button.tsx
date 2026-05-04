@@ -8,6 +8,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     active?: false | true,
     danger?: boolean;
     icon?: ReactNode;
+    iconPosition?: 'left' | 'right';
     iconOnly?: boolean;
     loading?: boolean;
     children?: ReactNode;
@@ -73,7 +74,8 @@ const styles = tv({
 });
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, active, danger, icon, iconOnly, loading, children, ...rest }, ref) => {
+    ({ className, variant, size, active, danger, icon, iconPosition = 'left', iconOnly, loading, children, ...rest }, ref) => {
+        const resolvedIcon = loading ? <Loader className="size-4 animate-spin" /> : icon;
         return (
             <button
                 ref={ref}
@@ -81,8 +83,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 disabled={loading || rest.disabled}
                 {...rest}
             >
-                {loading ? <Loader className="size-4 animate-spin" /> : icon}
+                {iconPosition === 'left' && resolvedIcon}
                 {!iconOnly && children}
+                {iconPosition === 'right' && resolvedIcon}
             </button>
         );
     }

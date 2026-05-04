@@ -35,9 +35,6 @@ app.use("/api", router);
 
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
 
-app.get("/*splat", (_req, res) => {
-  res.sendFile(path.join(process.cwd(), "../client/dist/index.html"));
-});
 
 // Global error handler
 app.use(errorHandler);

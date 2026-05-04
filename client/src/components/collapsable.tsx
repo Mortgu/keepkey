@@ -1,17 +1,40 @@
+import React, { useState, type ReactNode } from "react";
 import { ChevronDown } from "lucide-react";
+import Button from "./button/button";
 
-export default function Collapsable() {
+interface CollapsableProps {
+  label: ReactNode;
+  children: ReactNode;
+  className?: string;
+  defaultOpen?: boolean;
+}
+
+export default function Collapsable({
+  label,
+  children,
+  className,
+  defaultOpen = false,
+}: CollapsableProps) {
+  const [open, setOpen] = useState(defaultOpen);
+
   return (
-    <div className="border-t border-(--border)">
-      <div className="flex items-center justify-start gap-2 p-2">
-        <ChevronDown className="size-4" />
-        <p>Enterprise Unlimited</p>
-      </div>
-      <div className="border-t border-(--border) py-2 px-2 flex items-center justify-between">
-        <p>Buisness Unlimited</p>
-        <p>1 - 100</p>
-        <p>2.44€/User</p>
-      </div>
-    </div>
+    <React.Fragment>
+      <Button
+        size="sm"
+        variant="link"
+        onClick={() => setOpen((o) => !o)}
+        className={className}
+        iconPosition="right"
+        icon={
+          <ChevronDown
+            className={`size-4 shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          />
+        }
+      >
+        <span>{label}</span>
+      </Button>
+
+      {open && <div className="border-t border-(--border)">{children}</div>}
+    </React.Fragment>
   );
 }

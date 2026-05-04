@@ -181,6 +181,8 @@ export interface Offer extends BaseOffer {
   documentJobs: DocumentJob[];
 
   customerContactPerson: ContactPerson;
+
+  createdAt: Date;
 }
 
 export interface OfferPosition {

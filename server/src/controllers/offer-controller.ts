@@ -77,6 +77,10 @@ export const createOfferDocumentJob = async (
   request: Request,
   response: Response,
 ) => {
+  /*response.setHeader("Content-Type", "text/event-stream");
+  response.setHeader("Cache-Control", "no-cache");
+  response.setHeader("Connection", "keep-alive");*/
+
   const { offer } = request.body;
 
   const documentJob = await prisma.$transaction(async (tx) => {
