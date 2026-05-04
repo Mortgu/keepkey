@@ -9,6 +9,13 @@ import env from "./env.js";
 export const auth = betterAuth({
   baseURL: env.BETTER_AUTH_URL,
   trustedOrigins: [env.CORS_ORIGIN ?? "http://localhost:5173"],
+  advanced: {
+    defaultCookieAttributes: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "none",
+    },
+  },
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
