@@ -19,6 +19,6 @@ export const updateContractAction = (id: string, data: BaseContract) =>
   });
 
 export const deleteContractAction = (id: string) =>
-  api<void>(`http://localhost:3000/api/contracts/${id}`, {
+  api<void>(`/api/contracts/${id}`, {
     method: "DELETE",
   });

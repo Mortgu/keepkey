@@ -1,11 +1,12 @@
 import { createAuthClient } from "better-auth/react";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
-
 import { ac, admin, employee } from "./permissions.ts";
+import { BASE_URL } from "./api-client.ts";
+
 
 export const authClient = createAuthClient({
   /** The base URL of the server (optional if you're using the same domain) */
-  baseURL: "http://localhost:3000",
+  baseURL: BASE_URL,
   plugins: [
     inferAdditionalFields({
       user: {

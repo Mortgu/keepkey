@@ -32,7 +32,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
     queryKey: ["documentJob", offer.id],
     queryFn: async () => {
       const response = await fetch(
-        `http://localhost:3000/api/offers/${offer.id}/jobs`,
+        `${BASE_URL}/api/offers/${offer.id}/jobs`,
         {
           credentials: "include",
         },
