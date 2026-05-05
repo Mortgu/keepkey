@@ -1,23 +1,27 @@
 import Button from "@/components/button/button";
 import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
-import {
-  Pen,
-  Trash,
-} from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import Badge from "@/components/badge";
 import Collapsable from "@/components/collapsable";
 import { formatDate } from "@/lib/format";
 import OfferFile from "./offer-file";
 
-import type { Offer, OfferPosition, DocumentJob } from '@/types';
+import type {
+  Offer,
+  OfferPosition,
+  DocumentJob,
+  OfferTasks,
+  OfferTask,
+  Task,
+} from "@/types";
 
 type OfferListItemProps = {
   offer: Offer;
 };
 
 export default function OfferListItem({ offer }: OfferListItemProps) {
-  const { customerContactPerson: ccp, offerPositions, documentJobs } = offer;
+  const { customerContactPerson: ccp, offerPositions, tasks } = offer;
   const { deleteOffer } = useOffer();
 
   const handleDeleteOffer = () => {
@@ -25,6 +29,8 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
       deleteOffer({ id: offer.id });
     }
   };
+
+  console.log(offer);
 
   return (
     <div className="border border-(--border) rounded-md">
@@ -34,7 +40,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             <h1 className="text-md">
               {offerPositions.map((i) => i.product.name).join(" & ")}
             </h1>
-            <Badge variant="generated">{ }</Badge>
+            <Badge variant="generated">{}</Badge>
           </div>
 
           <div className="flex flex-wrap items-center gap-4">
@@ -63,7 +69,9 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
             {/* Created at */}
             <div className="flex items-center gap-1 text-sm font-light">
               <label className="text-(--text-secondary)">Erstellt:</label>
-              <p className="text-(--text)">{formatDate(offer.createdAt ?? '')}</p>
+              <p className="text-(--text)">
+                {formatDate(offer.createdAt ?? "")}
+              </p>
             </div>
 
             {/* Valid until */}
@@ -141,8 +149,8 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
         className="w-full bg-(--subtle-50) justify-between rounded-none"
       >
         <div className="grid gap-2 px-4 py-3">
-          {documentJobs.map((documentJob: DocumentJob, index: number) => (
-            <OfferFile key={index} document={documentJob} />
+          {offer.tasks.map((tasks: Task, index: number) => (
+            <OfferFile key={index} document={tasks} />
           ))}
         </div>
       </Collapsable>

@@ -1,18 +1,20 @@
 import Button from "@/components/button/button";
-import type { DocumentJob } from "@/types";
+import type { Task } from "@/types";
 import { formatDate } from "@/lib/format";
 import { Cloud, File, FileDown, RotateCw } from "lucide-react";
+import { formatStatus } from "@/utils/utils";
+import Badge from "@/components/badge";
 
-export default function OfferFile({ document }: { document: DocumentJob }) {
+export default function OfferFile({ document }: { document: Task }) {
   return (
     <div className="flex items-center justify-between border border-(--border) py-2 px-4 rounded-md">
       <div className="flex items-center gap-3">
         <File className="size-4" />
-        <div className="grid">
+        <div className="grid gap-1">
           <p className="text-sm">260000_AG_Kunde_keepit-workloads.pdf</p>
-          <div className="flex font-light text-sm gap-4 text-(--text-secondary)">
-            <p>{formatDate(document.createdAt)}</p>
-            <p>{document.status}</p>
+          <div className="flex font-light text-sm gap-2 text-(--text-secondary)">
+            <p>{formatDate(document?.createdAt || "")}</p>
+            <Badge variant={formatStatus(document.status)} />
           </div>
         </div>
       </div>

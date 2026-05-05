@@ -3,8 +3,8 @@ import { api } from "@/lib/api-client";
 import type {
   Offer,
   CreateOfferInput,
-  CreateFlatRateInput,
-  CreateOfferPositionInput
+  CreateOfferPositionInput,
+  CreateOfferFlatRatesInput
 } from '@/types';
 
 export const getOffersAction = () =>
@@ -13,7 +13,7 @@ export const getOffersAction = () =>
 export const createOfferAction = (
   offer: CreateOfferInput,
   positions: CreateOfferPositionInput[],
-  flatRates: CreateFlatRateInput[],
+  flatRates: CreateOfferFlatRatesInput[],
 ) =>
   api<Offer>("/api/offers", {
     method: "POST",

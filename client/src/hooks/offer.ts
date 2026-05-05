@@ -10,6 +10,7 @@ import type {
   CreateFlatRateInput,
   CreateOfferPositionInput,
   CreateOfferInput,
+  CreateOfferFlatRatesInput,
 } from "@/types";
 
 export const useOffer = () => {
@@ -28,15 +29,10 @@ export const useOffer = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: ({
-      offer,
-      positions,
-      flatrates,
-    }: {
-      offer: CreateOfferInput;
-      positions: CreateOfferPositionInput[];
-      flatrates: CreateFlatRateInput[];
-    }) => createOfferAction(offer, positions, flatrates),
+    mutationFn: ({ offer, positions, flatRates }: {
+      offer: CreateOfferInput; positions: CreateOfferPositionInput[]; flatRates: CreateOfferFlatRatesInput[];
+    }) =>
+      createOfferAction(offer, positions, flatRates),
     onSuccess: invalidate,
   });
 

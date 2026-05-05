@@ -29,11 +29,23 @@ export default function startDocumentWorker() {
             throw new Error("Document job for offer with undefined offerId");
           }
 
-          const { docxPath, pdfPath } = await generateOfferDocument(
-            task.offerId,
-            taskId,
-          );
+          /* Start the document generation */
+          const { docxPath, docxName, pdfPath, pdfName } =
+            await generateOfferDocument(task.offerId, taskId);
 
+          await prisma.document.createMany({
+            data: [
+              {
+                name: pdfName,
+                extension: "pdf",
+                path: pdfPath,
+                status: "GENERATED",
+              },
+              { name: docxName, extension: "docx", path: docxPath },
+            ],
+          });
+
+          /* Update task to status "completed" */
           await prisma.task.update({
             where: { id: taskId },
             data: {
@@ -52,11 +64,10 @@ export default function startDocumentWorker() {
   );
 
   worker.on("completed", async (job) => {
-    console.log(
-      `[worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
-    );
-
     if (job) {
+      console.log(
+        `[worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
+      );
     }
   });
 

@@ -25,7 +25,8 @@ import type {
   Product,
   ContactPerson,
   CreateOfferInput,
-  CreateFlatRateInput,
+  CreateOfferPositionInput,
+  CreateOfferFlatRatesInput,
 } from "@/types";
 
 interface OfferModalProps {
@@ -59,11 +60,9 @@ const emptyOfferFormVlues = {
   requestFrom: null as Date | null,
 };
 
-export default function OfferModal({
-  open,
-  cancelFn,
-  currentOffer,
-}: OfferModalProps) {
+export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
+  const isEdit = currentOffer !== null;
+
   const { customers } = useCustomers();
   const { products } = useProducts();
   const { contracts } = useContracts();
@@ -71,34 +70,26 @@ export default function OfferModal({
   const { users } = useUser();
   const { flatRates } = useFlatRates();
 
-  const isEdit = currentOffer !== null;
-
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
   const [showProductForm, setShowProductForm] = useState(false);
 
-  const [offerFlatRates, setOfferFlatRates] = useState<OfferFlatRateInput[]>(
-    [],
-  );
+  const [offerFlatRates, setOfferFlatRates] = useState<CreateOfferFlatRatesInput[]>([]);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
   const { createOffer, errorCreatingOffer } = useOffer();
 
   const offerForm = useForm({
-    defaultValues: currentOffer || emptyOfferFormVlues,
+    defaultValues: (currentOffer ?? emptyOfferFormVlues) as typeof emptyOfferFormVlues,
     validators: {
       onChange: offerSchema,
       onMount: offerSchema,
     },
     onSubmit: async ({ value }) => {
-      const offer: CreateOfferInput = {
-        ...value,
-      };
-
       try {
         const response = await createOffer({
-          offer: offer as Offer,
-          positions: offerProducts as OfferPosition,
-          flatrates: offerFlatRates,
+          offer: value as unknown as CreateOfferInput,
+          positions: offerProducts as CreateOfferPositionInput[],
+          flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
         });
 
         cancelFn();
@@ -131,37 +122,25 @@ export default function OfferModal({
           </div>
         )}
 
-        <form
-          id="offer-form"
-          onSubmit={handleFormSubmit}
-          className="grid gap-4"
-        >
+        <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
-            <offerForm.Field
-              name="customerId"
-              children={(field) => (
-                <div className="flex-1 grid gap-2 items-center">
-                  <label
-                    className="text-sm  text-gray-500"
-                    htmlFor={field.name}
-                  >
-                    Kunde:
-                  </label>
-                  <select
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100"
-                  >
-                    <option value="">None</option>
-                    {customers?.map((customer: Customer) => (
-                      <option key={customer.id} value={customer.id}>
-                        {customer.companyName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            />
+            <offerForm.Field name="customerId" children={(field) => (
+              <div className="flex-1 grid gap-2 items-center">
+                <label className="text-sm  text-gray-500" htmlFor={field.name}>Kunde:</label>
+                <select
+                  value={field.state.value}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100"
+                >
+                  <option value="">None</option>
+                  {customers?.map((customer: Customer) => (
+                    <option key={customer.id} value={customer.id}>
+                      {customer.companyName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )} />
 
             {/* Ihr Ansprechpartner */}
             <offerForm.Field
@@ -240,7 +219,7 @@ export default function OfferModal({
                     className="text-sm  text-gray-500"
                     htmlFor={field.name}
                   >
-                    Beleg-Nr:
+                    AG-Nr:
                   </label>
                   <Input
                     type="text"

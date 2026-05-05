@@ -3,7 +3,6 @@ import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 import {
-  FlatRates,
   OfferFlatRates,
   OfferPosition,
   TaskStatus,
@@ -16,7 +15,8 @@ export const getOffers = async (request: Request, response: Response) => {
       customer: true,
       supplier: true,
       customerContactPerson: true,
-      documentJobs: true,
+      tasks: true,
+      documents: true,
       offerPositions: {
         include: {
           product: true,
@@ -97,14 +97,10 @@ export const createOfferTask = async (request: Request, response: Response) => {
       },
     });
 
-    const job = await documentQueue.add(
-      documentQueueKey,
-      {
-        taskId: task.id,
-        taskType: TaskType.OFFER,
-      },
-      { delay: 15000 },
-    );
+    const job = await documentQueue.add(documentQueueKey, {
+      taskId: task.id,
+      taskType: TaskType.OFFER,
+    });
 
     await prisma.task.update({
       where: { id: task.id },

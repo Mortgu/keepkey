@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { requireSession } from "../middlewares/auth.js";
 
 import adminRouter from "./admin.js";
 import productRouter from "./products.js";
@@ -10,7 +11,7 @@ import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
 import offerRouter from "./offer.js";
 import flatratesRoter from "./flatrates.js";
-import { requireSession } from "../middlewares/auth.js";
+import taskRouter from "./task-route.js";
 
 const router = Router();
 
@@ -43,5 +44,8 @@ router.use("/customers", requireSession, customerRouter);
 
 /* /api/flatrates */
 router.use("/flatrates", requireSession, flatratesRoter);
+
+/* /api/task */
+router.use("/task", requireSession, taskRouter);
 
 export default router;
