@@ -6,3 +6,4 @@ export * from './collapsable/collapsable';
 export * from './navigation/nav-link';
 export * from './navigation/navigation';
 export * from './modal';
+export * from './select/select';

@@ -55,17 +55,3 @@ export const useCustomers = () => {
     isDeleting: deleteMutation.isPending,
   };
 };
-
-export const useCustomer = (id: string) => {
-  const {
-    data: customer = null,
-    isPending,
-    error,
-  } = useQuery({
-    queryKey: ["customers", id],
-    queryFn: () => getCustomerByIdAction(id),
-    enabled: !!id,
-  });
-
-  return { customer, isPending, error };
-};

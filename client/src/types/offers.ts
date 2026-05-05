@@ -25,7 +25,7 @@ export type CreateOfferInput = Omit<
   | "net_amount"
   | "tax_rate"
 >;
-export type UpdateOfferInput = Partial<CreateOfferInput> & { id: string };
+export type UpdateOfferInput = Partial<Offer>;
 
 export type CreateOfferPositionInput = Omit<
   OfferPosition,
