@@ -1,6 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import { type BaseContactPerson, type Customer } from "@/data/types";
+import type { CreateContactPersonInput, Customer } from "@/types";
 import { useCustomers } from "@/hooks/customer";
 import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
@@ -36,9 +36,12 @@ export default function CustomerModal({
   const { updateCustomer, createCustomer, errorCreatingCustomer } =
     useCustomers();
 
-  const [contactPersons, setContactPersons] = useState<BaseContactPerson[]>(
+  const [contactPersons, setContactPersons] = useState<
+    CreateContactPersonInput[]
+  >(
     currentCustomer?.contactPersons?.map(
       ({ salutation, firstName, lastName, email }) => ({
+        customerId: currentCustomer.id,
         salutation,
         firstName,
         lastName,

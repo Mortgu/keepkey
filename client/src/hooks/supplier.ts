@@ -3,7 +3,7 @@ import {
   deleteSupplierAction,
   getSuppliersAction,
 } from "@/data/supplier";
-import type { BaseSupplier } from "@/data/types";
+import type { CreateSupplierInput, UpdateSupplierInput } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useSupplier = () => {
@@ -22,7 +22,8 @@ export const useSupplier = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (supplier: BaseSupplier) => createSupplierAction(supplier),
+    mutationFn: (supplier: CreateSupplierInput) =>
+      createSupplierAction(supplier),
     onSuccess: invalidate,
   });
 

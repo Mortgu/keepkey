@@ -1,5 +1,5 @@
 import Button from "@/components/button/button";
-import type { User } from "@/data/types";
+import type { User } from "@/types";
 import { formatDate } from "@/lib/format";
 import { KeyRound, Pen, Trash } from "lucide-react";
 import React, { useState } from "react";

@@ -193,7 +193,7 @@ export const createOffer = async (
       }
 
       for (const flatRate of flatRates) {
-        await tx.offerFlatRates.create({
+        await tx.offerFlatRate.create({
           data: {
             offerId: offer.id,
             flatRateId: flatRate.id,

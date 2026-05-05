@@ -2,7 +2,7 @@ import { Loader, Plus } from "lucide-react";
 import Button from "@/components/button/button.tsx";
 import { useState } from "react";
 import { useContracts } from "@/hooks/contract.ts";
-import type { Contract } from "@/data/types";
+import type { Contract } from "@/types";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 

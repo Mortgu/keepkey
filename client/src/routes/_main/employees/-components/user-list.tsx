@@ -1,10 +1,11 @@
 import Button from "@/components/button/button";
-import type { User } from "@/data/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 import { useUser } from "@/hooks/user";
+
+import type { User } from "@/types";
 
 export default function UserList() {
   /* Create New User Modal */

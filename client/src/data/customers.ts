@@ -3,7 +3,7 @@ import { api } from "@/lib/api-client";
 import type {
   Customer,
   CreateCustomerInput,
-  UpdateCustomerInput
+  UpdateCustomerInput,
 } from "@/types";
 
 export const getAllCustomersAction = () =>
@@ -19,7 +19,10 @@ export const createCustomerAction = (body: CreateCustomerInput) =>
     body: JSON.stringify(body),
   });
 
-export const updateCustomerByIdAction = (id: string, body: UpdateCustomerInput) =>
+export const updateCustomerByIdAction = (
+  id: string,
+  body: UpdateCustomerInput,
+) =>
   api<Customer>(`/api/customers/${id}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -28,5 +31,5 @@ export const updateCustomerByIdAction = (id: string, body: UpdateCustomerInput) 
 
 export const deleteCustomerAction = (id: string) =>
   api<void>(`/api/customers/${id}`, {
-    method: "POST",
+    method: "DELETE",
   });

@@ -1,4 +1,4 @@
-import type { BaseUser } from "@/data/types";
+import type { CreateUserInput, UpdateUserInput } from "@/types";
 import {
   createUserAction,
   deleteUserAction,
@@ -7,7 +7,6 @@ import {
 } from "@/data/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import type { User } from "better-auth";
 
 export const useUser = () => {
   const queryClient = useQueryClient();
@@ -25,12 +24,12 @@ export const useUser = () => {
   });
 
   const createUserMutation = useMutation({
-    mutationFn: ({ body }: { body: Partial<User> }) => createUserAction(body),
+    mutationFn: ({ body }: { body: CreateUserInput }) => createUserAction(body),
     onSuccess: invalidate,
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: BaseUser }) =>
+    mutationFn: ({ id, body }: { id: string; body: UpdateUserInput }) =>
       updateUserByIdAction(id, body),
     onSuccess: invalidate,
   });

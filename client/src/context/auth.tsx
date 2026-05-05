@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getSessionUser } from "@/data/user.ts";
 import { Loader } from "lucide-react";
 import { authClient } from "@/lib/auth-client.ts";
-import type { User } from "@/data/types";
+import type { User } from "@/types";
 import { useNavigate } from "@tanstack/react-router";
 
 type AuthContextType = {

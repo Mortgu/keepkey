@@ -1,5 +1,5 @@
 import Button from "@/components/button/button";
-import type { Customer } from "@/data/types";
+import type { Customer } from "@/types";
 import { formatDate } from "@/lib/format";
 import { useCustomers } from "@/hooks/customer";
 import { Pen, Trash } from "lucide-react";
@@ -21,7 +21,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
         <div className="grid gap-0">
           <h1 className="text-md">{customer.companyName}</h1>
           <p className="text-sm text-gray-500">
-            {customer.customerId} · {formatDate(customer.createdAt)}
+            {customer.customerId} · {formatDate(customer.createdAt || "")}
           </p>
         </div>
 

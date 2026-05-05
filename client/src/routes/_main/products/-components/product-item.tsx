@@ -6,8 +6,7 @@ import { useState } from "react";
 import ProductModal from "./product-modal";
 import { useContracts } from "@/hooks/contract";
 import { useProducts } from "@/hooks/product";
-import type { Product } from "@/data/types";
-import type { CreateProductPricingInput, CreateSupplierInput } from "@/types";
+import type { Product, CreateProductPricingInput } from "@/types";
 
 const productPricingSchema = z.object({
   contractId: z.string().min(1),

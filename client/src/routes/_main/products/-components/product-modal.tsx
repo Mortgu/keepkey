@@ -1,15 +1,15 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
 import ModalDialog from "@/components/modal";
-import type { BaseProduct } from "@/data/types";
+import type { CreateProductInput, UpdateProductInput } from "@/types";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
 interface ProductModalProps {
   open: boolean;
   cancelFn: () => void;
-  submitFn: (value: BaseProduct) => void;
-  currentItem?: BaseProduct | null;
+  submitFn: (value: CreateProductInput) => void;
+  currentItem?: UpdateProductInput | null;
 }
 
 const productScheme = z.object({
@@ -18,7 +18,7 @@ const productScheme = z.object({
   table: z.string(),
 });
 
-const emptyData: BaseProduct = {
+const emptyData: CreateProductInput = {
   name: "",
   description: "",
   table: "",

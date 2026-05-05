@@ -5,8 +5,8 @@ import {
   getCustomerByIdAction,
   updateCustomerByIdAction,
 } from "@/data/customers";
-import type { BaseCustomer, CreateCustomer } from "@/data/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CreateCustomerInput, UpdateCustomerInput } from "@/types";
 
 export const useCustomers = () => {
   const queryClient = useQueryClient();
@@ -24,12 +24,12 @@ export const useCustomers = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (body: CreateCustomer) => createCustomerAction(body),
+    mutationFn: (body: CreateCustomerInput) => createCustomerAction(body),
     onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: BaseCustomer }) =>
+    mutationFn: ({ id, body }: { id: string; body: UpdateCustomerInput }) =>
       updateCustomerByIdAction(id, body),
     onSuccess: invalidate,
   });

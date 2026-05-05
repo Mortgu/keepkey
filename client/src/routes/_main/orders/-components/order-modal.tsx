@@ -1,11 +1,8 @@
 import Button from "@/components/button/button";
 import ModalDialog from "@/components/modal";
-import type { Offer } from "@/data/types";
+import type { Offer } from "@/types";
 import { useOffer } from "@/hooks/offer";
 import { formatDate } from "@/lib/format";
-import { useForm } from "@tanstack/react-form";
-import { Loader } from "lucide-react";
-import { z } from "zod";
 
 interface OrderModalProps {
   open: boolean;
@@ -13,23 +10,6 @@ interface OrderModalProps {
   submitFn: () => void;
   currentOrder?: any | null;
 }
-
-const orderSchema = z.object({
-  voucherId: z.string(),
-  date: z.date(),
-  paymentTerm: z.string(),
-  validUntil: z.date(),
-  customerId: z.string(),
-  supplierId: z.string(),
-  requestFrom: z.string(),
-});
-
-const emptyOrder = {
-  id: "",
-  createdAt: new Date(),
-  orderPositions: [],
-  paymentTerm: "30 Days",
-};
 
 export default function OrderModal({
   open,

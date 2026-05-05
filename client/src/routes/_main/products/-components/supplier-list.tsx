@@ -1,6 +1,6 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
-import type { Supplier } from "@/data/types";
+import type { Supplier } from "@/types";
 import { useSupplier } from "@/hooks/supplier";
 import { useForm } from "@tanstack/react-form";
 import { Pen, Plus, Trash } from "lucide-react";

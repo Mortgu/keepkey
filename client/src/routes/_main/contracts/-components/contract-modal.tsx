@@ -1,7 +1,11 @@
 import Button from "@/components/button/button";
 import Input from "@/components/inputs/input";
 import ModalDialog from "@/components/modal";
-import type { BaseContract, Contract } from "@/data/types";
+import type {
+  Contract,
+  CreateContractInput,
+  UpdateContractInput,
+} from "@/types";
 import { useContracts } from "@/hooks/contract";
 import { useForm } from "@tanstack/react-form";
 import { Loader, Plus, Trash2, X } from "lucide-react";
@@ -18,7 +22,7 @@ const contractSchema = z.object({
   features: z.array(z.string()),
 });
 
-const emptyContract: BaseContract = {
+const emptyContract: CreateContractInput = {
   name: "",
   features: [],
 };
@@ -38,9 +42,12 @@ export default function ContractModal({
     },
     onSubmit: ({ value }) => {
       if (isEdit) {
-        updateContract({ id: currentContract.id, data: value as BaseContract });
+        updateContract({
+          id: currentContract.id,
+          data: value as UpdateContractInput,
+        });
       } else {
-        createContract(value as BaseContract);
+        createContract(value as CreateContractInput);
       }
       cancelFn();
     },

@@ -1,5 +1,5 @@
 import Button from "@/components/button/button";
-import type { Customer } from "@/data/types";
+import type { Customer } from "@/types";
 import { useCustomers } from "@/hooks/customer";
 import { Plus } from "lucide-react";
 import { useState } from "react";

@@ -1,4 +1,3 @@
-import type { BaseContract } from "@/data/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createContractAction,
@@ -6,6 +5,7 @@ import {
   getContractsAction,
   updateContractAction,
 } from "@/data/contracts.ts";
+import type { CreateContractInput, UpdateContractInput } from "@/types";
 
 export const useContracts = () => {
   const queryClient = useQueryClient();
@@ -23,12 +23,12 @@ export const useContracts = () => {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data: BaseContract) => createContractAction(data),
+    mutationFn: (data: CreateContractInput) => createContractAction(data),
     onSuccess: invalidate,
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: BaseContract }) =>
+    mutationFn: ({ id, data }: { id: string; data: UpdateContractInput }) =>
       updateContractAction(id, data),
     onSuccess: invalidate,
   });

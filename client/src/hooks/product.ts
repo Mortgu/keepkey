@@ -7,8 +7,7 @@ import {
   getProductsAction,
   updateProductAction,
 } from "@/data/products.ts";
-import type { CreatePricingProps, Product } from "@/data/types";
-import type { CreateProductPricingInput } from "@/types";
+import type { Product, CreateProductPricingInput } from "@/types";
 
 export const useProducts = () => {
   const queryClient = useQueryClient();

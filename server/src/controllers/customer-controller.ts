@@ -129,7 +129,7 @@ export const updateCustomerById = async (
 };
 
 export const deleteCustomer = async (request: Request, response: Response) => {
-  const id = request.params.id as string;
+  const { id } = request.params;
 
   if (!id) {
     return response
@@ -138,7 +138,13 @@ export const deleteCustomer = async (request: Request, response: Response) => {
   }
 
   try {
-    await prisma.customer.delete({ where: { id } });
+    await prisma.customer.delete({
+      where: { id: id as string },
+    });
+
+    return response
+      .status(200)
+      .json({ success: true, message: "Successfully deleted customer!" });
   } catch (exception: any) {
     return response.status(500).json({
       success: false,
@@ -146,8 +152,4 @@ export const deleteCustomer = async (request: Request, response: Response) => {
       exception: exception.message,
     });
   }
-
-  return response
-    .status(200)
-    .json({ success: true, message: "Successfully deleted customer!" });
 };
