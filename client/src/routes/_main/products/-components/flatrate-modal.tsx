@@ -1,9 +1,8 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
-import ModalDialog from "@/components/modal";
-import type { CreateFlatRateInput, UpdateFlatRateInput } from "@/types";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+
+import type { CreateFlatRateInput, UpdateFlatRateInput } from "@/types";
+import { Button, Input, ModalDialog } from "@/components";
 
 interface FlatRateModalProps {
   open: boolean;

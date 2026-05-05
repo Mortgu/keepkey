@@ -3,8 +3,11 @@ import { api } from "@/lib/api-client";
 import type {
   Offer,
   CreateOfferInput,
+  UpdateOfferInput,
   CreateOfferPositionInput,
-  CreateOfferFlatRatesInput
+  CreateOfferFlatRatesInput,
+  UpdateOfferFlatRatesInput,
+  UpdateOfferPositionInput,
 } from '@/types';
 
 export const getOffersAction = () =>
@@ -23,3 +26,11 @@ export const createOfferAction = (
 
 export const deleteOfferAction = (id: string) =>
   api<void>(`/api/offers/${id}`, { method: "DELETE" });
+
+export const updateOfferAction = (
+  offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
+) => api<Offer>("/api/offers", {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ offer, positions, flatRates }),
+});

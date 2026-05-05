@@ -1,5 +1,5 @@
 import { Loader, Plus } from "lucide-react";
-import Button from "@/components/button/button.tsx";
+import { Button } from "@/components";
 import { useState } from "react";
 import ProductModal from "./product-modal";
 import ProductItem from "./product-item";

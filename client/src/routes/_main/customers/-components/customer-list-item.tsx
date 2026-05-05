@@ -1,10 +1,11 @@
-import Button from "@/components/button/button";
-import type { Customer } from "@/types";
-import { formatDate } from "@/lib/format";
-import { useCustomers } from "@/hooks/customer";
-import { Pen, Trash } from "lucide-react";
 import React, { useState } from "react";
+import { Pen, Trash } from "lucide-react";
 import CustomerModal from "./customer-modal";
+
+import { useCustomers } from "@/hooks/customer";
+import { formatDate } from "@/lib/format";
+import type { Customer } from "@/types";
+import { Button } from "@/components";
 
 interface CustomerListItemProps {
   customer: Customer;

@@ -1,6 +1,3 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
-
 import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
@@ -12,8 +9,7 @@ import OfferFlatRateForm from "./offer-flat-rate-form";
 import { z } from "zod";
 import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
-import ModalDialog from "@/components/modal";
-import Checkbox from "@/components/inputs/checkbox.tsx";
+import { Button, Input, Checkbox, ModalDialog } from "@/components";
 import { useFlatRates } from "@/hooks/flatrate.ts";
 import { useUser } from "@/hooks/user";
 

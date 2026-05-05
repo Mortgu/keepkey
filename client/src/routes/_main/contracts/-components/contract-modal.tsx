@@ -1,6 +1,4 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
-import ModalDialog from "@/components/modal";
+import { Input, Button, ModalDialog } from "@/components";
 import type {
   Contract,
   CreateContractInput,
@@ -8,7 +6,7 @@ import type {
 } from "@/types";
 import { useContracts } from "@/hooks/contract";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash2, X } from "lucide-react";
+import { Loader, Plus, Trash2 } from "lucide-react";
 import { z } from "zod";
 
 interface ContractModalProps {

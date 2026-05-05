@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { OfferPipelineContext } from "../pipelines/offer/context.js";
+import { runPipeline } from "../pipelines/offer/pipeline.js";
+import { offerStages } from "../pipelines/offer/stages.js";
 
 export const getAllTasks = async (request: Request, response: Response) => {
   try {
@@ -33,3 +36,13 @@ export const getTaskById = async (request: Request, response: Response) => {
     });
   }
 };
+
+export const createTask = async (request: Request, response: Response) => {
+  const ctx: OfferPipelineContext = {
+    offerId: "", taskId: ""
+  };
+
+  const pipeline = await runPipeline(ctx, offerStages);
+
+
+}

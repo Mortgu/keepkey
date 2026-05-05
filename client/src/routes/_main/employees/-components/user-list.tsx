@@ -1,4 +1,3 @@
-import Button from "@/components/button/button";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import UserModal from "./user-modal";
@@ -6,6 +5,7 @@ import UserListItem from "./user-list-item";
 import { useUser } from "@/hooks/user";
 
 import type { User } from "@/types";
+import { Button } from "@/components";
 
 export default function UserList() {
   /* Create New User Modal */

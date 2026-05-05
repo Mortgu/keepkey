@@ -1,7 +1,8 @@
-import Button from "@/components/button/button";
 import { createFileRoute } from "@tanstack/react-router";
 import { FileText, Trash2, Upload } from "lucide-react";
 import { useRef, useState } from "react";
+
+import { Button } from "@/components";
 
 type Props = {
     label: string;

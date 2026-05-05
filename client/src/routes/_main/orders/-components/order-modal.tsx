@@ -1,8 +1,8 @@
-import Button from "@/components/button/button";
-import ModalDialog from "@/components/modal";
-import type { Offer } from "@/types";
 import { useOffer } from "@/hooks/offer";
 import { formatDate } from "@/lib/format";
+
+import type { Offer } from "@/types";
+import { Button, ModalDialog } from "@/components";
 
 interface OrderModalProps {
   open: boolean;

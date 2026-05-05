@@ -33,16 +33,24 @@ export default function startDocumentWorker() {
           const { docxPath, docxName, pdfPath, pdfName } =
             await generateOfferDocument(task.offerId, taskId);
 
-          await prisma.document.createMany({
-            data: [
-              {
-                name: pdfName,
-                extension: "pdf",
-                path: pdfPath,
-                status: "GENERATED",
-              },
-              { name: docxName, extension: "docx", path: docxPath },
-            ],
+          await prisma.document.updateMany({
+            where: { AND: [{ offerId: task.offerId }, { extension: 'pdf' }] },
+            data: {
+              name: pdfName,
+              path: pdfPath,
+              offerId: task.offerId,
+              status: "GENERATED",
+            },
+          });
+
+          await prisma.document.updateMany({
+            where: { AND: [{ offerId: task.offerId }, { extension: 'docx' }] },
+            data: {
+              name: docxName,
+              path: docxPath,
+              offerId: task.offerId,
+              status: "GENERATED",
+            },
           });
 
           /* Update task to status "completed" */

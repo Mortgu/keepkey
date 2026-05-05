@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import Button from '../button/button';
+import { Button } from "@/components";
 
 export interface SortOption {
   value: string;

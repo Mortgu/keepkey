@@ -1,4 +1,4 @@
-import Button from "../button/button";
+import { Button } from "@/components";
 
 interface TabOption {
   value: string;

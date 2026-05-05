@@ -1,10 +1,10 @@
-import Button from "@/components/button/button";
 import { useOrders } from "@/hooks/order";
 import { Loader, Pen, Plus, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
 import OrderModal from "./order-modal";
 import React, { useState } from "react";
 import type { Order, OrderPosition } from "@/types";
+import { Button } from "@/components";
 
 export default function OrderListItems() {
   const [isOpen, setOpen] = useState<boolean>(false);
@@ -90,7 +90,7 @@ export default function OrderListItems() {
       <OrderModal
         open={isOpen}
         cancelFn={() => setOpen(false)}
-        submitFn={() => {}}
+        submitFn={() => { }}
         currentOrder={order}
       />
     </React.Fragment>

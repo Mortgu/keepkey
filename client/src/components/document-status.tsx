@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getTasksAction } from "@/data/orders";
 import { AlertCircle, Loader, Download } from "lucide-react";
-import Button from "./button/button";
+import { Button } from "@/components";
 
 interface DocumentStatusProps {
   orderId: string;

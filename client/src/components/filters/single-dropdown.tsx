@@ -1,7 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
-import { ChevronDown, Check } from 'lucide-react';
-import Button from '../button/button';
-import { SortIcon } from './sort-dropdown';
+import { Check } from 'lucide-react';
+import { Button } from "@/components";
 
 export interface DropdownOption {
   value: string;

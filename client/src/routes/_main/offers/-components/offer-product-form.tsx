@@ -1,8 +1,7 @@
-import Button from "@/components/button/button";
-import Checkbox from "@/components/inputs/checkbox";
-import Input from "@/components/inputs/input";
-import type { Contract, Product } from "@/types";
 import { useState } from "react";
+
+import { Input, Button, Checkbox } from "@/components";
+import type { Contract, Product } from "@/types";
 
 export type OfferProductInput = {
   productId: string;

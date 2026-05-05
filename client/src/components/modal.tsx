@@ -1,6 +1,6 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import Button from "./button/button";
+import { Button } from "@/components";
 
 interface ModalProps {
   open: boolean;
@@ -78,4 +78,4 @@ ModalDialog.Header = Header;
 ModalDialog.Content = Content;
 ModalDialog.Footer = Footer;
 
-export default ModalDialog;
+export { ModalDialog };

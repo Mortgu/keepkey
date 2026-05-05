@@ -1,9 +1,10 @@
-import Button from "@/components/button/button";
-import type { Contract } from "@/types";
 import { formatDate } from "@/lib/format";
 import { Pen, Trash } from "lucide-react";
 import { Fragment, useState } from "react";
 import ContractModal from "./contract-modal";
+
+import type { Contract } from "@/types";
+import { Button } from "@/components";
 
 interface ContractListItemProps {
   contract: Contract;

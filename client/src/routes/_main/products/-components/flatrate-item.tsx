@@ -1,4 +1,4 @@
-import Button from "@/components/button/button";
+import { Button } from "@/components";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
 import { useFlatRates } from "@/hooks/flatrate";
 import { Pen, Trash } from "lucide-react";

@@ -1,20 +1,14 @@
-import Button from "@/components/button/button";
 import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
 import { Pen, Trash } from "lucide-react";
-import Badge from "@/components/badge";
-import Collapsable from "@/components/collapsable";
 import { formatDate } from "@/lib/format";
 import OfferFile from "./offer-file";
 
-import type {
-  Offer,
-  OfferPosition,
-  DocumentJob,
-  OfferTasks,
-  OfferTask,
-  Task,
-} from "@/types";
+import { Button, Badge, Collapsable } from "@/components";
+
+import type { Offer, OfferPosition, Task } from "@/types";
+import React, { useState } from "react";
+import OfferModal from "./offer-modal";
 
 type OfferListItemProps = {
   offer: Offer;
@@ -22,6 +16,7 @@ type OfferListItemProps = {
 
 export default function OfferListItem({ offer }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, tasks } = offer;
+  const [edit, setEdit] = useState<boolean>(false);
   const { deleteOffer } = useOffer();
 
   const handleDeleteOffer = () => {
@@ -30,146 +25,154 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
     }
   };
 
-  console.log(offer);
-
   return (
-    <div className="border border-(--border) rounded-md">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
-        <div className="grid gap-1">
-          <div className="flex items-center gap-2">
-            <h1 className="text-md">
-              {offerPositions.map((i) => i.product.name).join(" & ")}
-            </h1>
-            <Badge variant="generated">{}</Badge>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Company */}
-            <div className="flex items-center gap-1 text-sm font-light">
-              <label className="text-(--text-secondary)">Firma:</label>
-              <p className="text-(--text) hover:cursor-pointer hover:underline">
-                {offer.customer.companyName}
-              </p>
+    <React.Fragment>
+      <div className="border border-(--border) rounded-md">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
+          <div className="grid gap-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-md">
+                {offerPositions.map((i) => i.product.name).join(" & ")}
+              </h1>
+              <Badge variant="generated">{ }</Badge>
             </div>
 
-            {/* Contact person */}
-            <div className="flex items-center gap-1 text-sm font-light">
-              <label className="text-(--text-secondary)">Kontakt:</label>
-              <p className="text-(--text) hover:cursor-pointer hover:underline">
-                {ccp.salutation} {ccp.firstName} {ccp.lastName}
-              </p>
-            </div>
-
-            {/* Offer-Id. */}
-            <div className="flex items-center gap-1 text-sm font-light">
-              <label className="text-(--text-secondary)">Angebots-Nr.</label>
-              <p className="text-(--text)">{offer.voucherId}</p>
-            </div>
-
-            {/* Created at */}
-            <div className="flex items-center gap-1 text-sm font-light">
-              <label className="text-(--text-secondary)">Erstellt:</label>
-              <p className="text-(--text)">
-                {formatDate(offer.createdAt ?? "")}
-              </p>
-            </div>
-
-            {/* Valid until */}
-            <div className="flex items-center gap-1 text-sm font-light">
-              <label className="text-(--text-secondary)">Gültig bis:</label>
-              <p className="text-(--text)">
-                {offer.validUntil ? formatDate(offer.validUntil) : "-"}
-              </p>
-            </div>
-          </div>
-        </div>
-        {/* Total display */}
-        <div className="flex flex-col items-end">
-          <p className="text-md font-semibold">
-            {formatEur(offer.total_amount)}
-          </p>
-          <p className="text-(--text-secondary) font-light text-sm">
-            Gesamtpreis
-          </p>
-        </div>
-      </div>
-
-      {/* Products */}
-      <Collapsable
-        label="Produkte"
-        className="w-full bg-(--subtle-50) justify-between rounded-none"
-      >
-        <div className="grid gap-2 px-4 py-3">
-          {/* Product */}
-          {offerPositions.map((op: OfferPosition, i: number) => (
-            <div
-              key={i}
-              className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md"
-            >
-              <div className="grid">
-                <div className="flex gap-2">
-                  <p className="text-sm">{op.product.name}</p>
-                  <Badge variant="draft">{op.contract.name}</Badge>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex gap-1 text-sm font-light">
-                    <span className="text-(--text-secondary)">Seats:</span>
-                    <p>{op.quantity}</p>
-                  </div>
-                  <div className="flex gap-1 text-sm font-light">
-                    <span className="text-(--text-secondary)">Laufzeit:</span>
-                    <p>{op.duration_months} Monate</p>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end">
-                <p className="text-sm font-semibold">
-                  {formatEur(op.total_cents)}
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Company */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Firma:</label>
+                <p className="text-(--text) hover:cursor-pointer hover:underline">
+                  {offer.customer.companyName}
                 </p>
-                <p className="text-(--text-secondary) font-light text-sm">
-                  Gesamtpreis (netto)
+              </div>
+
+              {/* Contact person */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Kontakt:</label>
+                <p className="text-(--text) hover:cursor-pointer hover:underline">
+                  {ccp.salutation} {ccp.firstName} {ccp.lastName}
+                </p>
+              </div>
+
+              {/* Offer-Id. */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Angebots-Nr.</label>
+                <p className="text-(--text)">{offer.voucherId}</p>
+              </div>
+
+              {/* Created at */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Erstellt:</label>
+                <p className="text-(--text)">
+                  {formatDate(offer.createdAt ?? "")}
+                </p>
+              </div>
+
+              {/* Valid until */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Gültig bis:</label>
+                <p className="text-(--text)">
+                  {offer.validUntil ? formatDate(offer.validUntil) : "-"}
                 </p>
               </div>
             </div>
-          ))}
-
-          {/* Total price */}
-          <div className="flex items-center gap-2 border border-(--border) py-2 px-3 justify-end rounded-md">
-            <span className="text-sm text-(--text-secondary) font-light">
+          </div>
+          {/* Total display */}
+          <div className="flex flex-col items-end">
+            <p className="text-md font-semibold">
+              {formatEur(offer.total_amount)}
+            </p>
+            <p className="text-(--text-secondary) font-light text-sm">
               Gesamtpreis
-            </span>{" "}
-            <p>{formatEur(offer.total_amount)}</p>
+            </p>
           </div>
         </div>
-      </Collapsable>
 
-      {/* Documents */}
-      <Collapsable
-        label="Dokumente"
-        className="w-full bg-(--subtle-50) justify-between rounded-none"
-      >
-        <div className="grid gap-2 px-4 py-3">
-          {offer.tasks.map((tasks: Task, index: number) => (
-            <OfferFile key={index} document={tasks} />
-          ))}
+        {/* Products */}
+        <Collapsable
+          label="Produkte"
+          className="w-full bg-(--subtle-50) justify-between rounded-none"
+        >
+          <div className="grid gap-2 px-4 py-3">
+            {/* Product */}
+            {offerPositions.map((op: OfferPosition, i: number) => (
+              <div
+                key={i}
+                className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md"
+              >
+                <div className="grid">
+                  <div className="flex gap-2">
+                    <p className="text-sm">{op.product.name}</p>
+                    <Badge variant="draft">{op.contract.name}</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Seats:</span>
+                      <p>{op.quantity}</p>
+                    </div>
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Laufzeit:</span>
+                      <p>{op.duration_months} Monate</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <p className="text-sm font-semibold">
+                    {formatEur(op.total_cents)}
+                  </p>
+                  <p className="text-(--text-secondary) font-light text-sm">
+                    Gesamtpreis (netto)
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {/* Total price */}
+            <div className="flex items-center gap-2 border border-(--border) py-2 px-3 justify-end rounded-md">
+              <span className="text-sm text-(--text-secondary) font-light">
+                Gesamtpreis
+              </span>{" "}
+              <p>{formatEur(offer.total_amount)}</p>
+            </div>
+          </div>
+        </Collapsable>
+
+        {/* Documents */}
+        <Collapsable
+          label="Dokumente"
+          className="w-full bg-(--subtle-50) justify-between rounded-none"
+        >
+          <div className="grid gap-2 px-4 py-3">
+            {offer.tasks.map((tasks: Task) => (
+              <OfferFile key={tasks.id} document={tasks} />
+            ))}
+          </div>
+        </Collapsable>
+
+        <div className="flex items-center justify-end px-2 border-t border-(--border)">
+          <Button
+            size="xs"
+            variant="link"
+            onClick={() => setEdit(true)}
+            icon={<Pen className="size-3" />}
+            iconOnly
+          />
+          <Button
+            onClick={handleDeleteOffer}
+            size="xs"
+            variant="link"
+            icon={<Trash className="size-3" />}
+            iconOnly
+          />
         </div>
-      </Collapsable>
-
-      <div className="flex items-center justify-end px-2 border-t border-(--border)">
-        <Button
-          size="xs"
-          variant="link"
-          icon={<Pen className="size-3" />}
-          iconOnly
-        />
-        <Button
-          onClick={handleDeleteOffer}
-          size="xs"
-          variant="link"
-          icon={<Trash className="size-3" />}
-          iconOnly
-        />
       </div>
-    </div>
+
+      <OfferModal
+        key={offer.id}
+        open={edit}
+        cancelFn={() => setEdit(false)}
+        currentOffer={offer}
+      />
+    </React.Fragment>
   );
 }

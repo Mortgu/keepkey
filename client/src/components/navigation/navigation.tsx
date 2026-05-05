@@ -2,7 +2,7 @@ import { Loader, User } from "lucide-react";
 import { authClient } from "@/lib/auth-client.ts";
 import { NavLink } from "./nav-link";
 
-export default function Navigation() {
+export function Navigation() {
   const { data: session, isPending, error } = authClient.useSession();
 
   return (

@@ -1,14 +1,6 @@
-import { type InputHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  variant?: "primary" | "secondary";
-  input_size?: "xs" | "sm" | "md";
-  /** Optional label text that will be rendered above the input element. */
-  label?: string;
-  /** Optional error message. When supplied, the input border will turn red and the message will be shown below the input. */
-  error?: string;
-}
+import type { InputComponentProps } from "./input-types";
 
 const styles = tv({
   base: [
@@ -39,7 +31,7 @@ const styles = tv({
   },
 });
 
-const Input = forwardRef<HTMLInputElement, InputProps>(
+export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
   ({ className, variant, input_size, label, error, ...rest }, ref) => {
     return (
       <div className="w-full">
@@ -72,5 +64,3 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
 );
 
 Input.displayName = "Input";
-
-export default Input;

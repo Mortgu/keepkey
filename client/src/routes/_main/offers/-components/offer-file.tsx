@@ -1,9 +1,10 @@
-import Button from "@/components/button/button";
-import type { Task } from "@/types";
 import { formatDate } from "@/lib/format";
-import { Cloud, File, FileDown, RotateCw } from "lucide-react";
 import { formatStatus } from "@/utils/utils";
-import Badge from "@/components/badge";
+
+import { Cloud, File, FileDown, RotateCw } from "lucide-react";
+import { Button, Badge } from "@/components";
+
+import type { Task } from "@/types";
 
 export default function OfferFile({ document }: { document: Task }) {
   return (
@@ -21,11 +22,8 @@ export default function OfferFile({ document }: { document: Task }) {
 
       {/* Buttons */}
       <div className="flex items-center gap-2">
-        <Button
-          variant="secondary"
-          icon={<RotateCw className="size-3.5" />}
-          size="sm"
-        >
+        <Button variant="secondary" icon={<RotateCw className="size-3.5" />}
+          size="sm">
           Neu
         </Button>
         <Button

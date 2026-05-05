@@ -2,16 +2,20 @@ import {
   createOfferAction,
   deleteOfferAction,
   getOffersAction,
+  updateOfferAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
-  CreateFlatRateInput,
   CreateOfferPositionInput,
   CreateOfferInput,
   CreateOfferFlatRatesInput,
+  UpdateOfferInput,
+  UpdateOfferPositionInput,
+  UpdateOfferFlatRatesInput,
 } from "@/types";
+
 
 export const useOffer = () => {
   const queryClient = useQueryClient();
@@ -19,11 +23,7 @@ export const useOffer = () => {
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["offers"] });
 
-  const {
-    data: offers = [],
-    isPending,
-    error,
-  } = useQuery({
+  const { data: offers = [], isPending, error } = useQuery({
     queryKey: ["offers"],
     queryFn: getOffersAction,
   });
@@ -31,8 +31,14 @@ export const useOffer = () => {
   const createMutation = useMutation({
     mutationFn: ({ offer, positions, flatRates }: {
       offer: CreateOfferInput; positions: CreateOfferPositionInput[]; flatRates: CreateOfferFlatRatesInput[];
-    }) =>
-      createOfferAction(offer, positions, flatRates),
+    }) => createOfferAction(offer, positions, flatRates),
+    onSuccess: invalidate,
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ offer, positions, flatRates }: {
+      offer: UpdateOfferInput; positions: UpdateOfferPositionInput[]; flatRates: UpdateOfferFlatRatesInput[];
+    }) => updateOfferAction(offer, positions, flatRates),
     onSuccess: invalidate,
   });
 
@@ -53,5 +59,9 @@ export const useOffer = () => {
     deleteOffer: deleteMutation.mutate,
     isDeletingOffer: deleteMutation.isPending,
     errorDeletingOffer: deleteMutation.error,
+
+    updateOffer: updateMutation.mutateAsync,
+    isUpdatingOffer: updateMutation.isPending,
+    errorUpdatingOffer: updateMutation.error,
   };
 };

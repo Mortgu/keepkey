@@ -1,12 +1,12 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
-import ModalDialog from "@/components/modal";
-import { type User } from "@/types";
-import { useUser } from "@/hooks/user";
-import { useForm } from "@tanstack/react-form";
-import { Loader } from "lucide-react";
 import type React from "react";
 import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+
+import { Loader } from "lucide-react";
+
+import { useUser } from "@/hooks/user";
+import { type User } from "@/types";
+import { Input, ModalDialog, Button } from "@/components";
 
 interface UserModalProps {
   open: boolean;
@@ -48,12 +48,12 @@ export default function UserModal({
   const userForm = useForm({
     defaultValues: currentUser
       ? {
-          salutation: currentUser.salutation ?? "",
-          firstName: currentUser.firstName ?? "",
-          lastName: currentUser.lastName ?? "",
-          email: currentUser.email ?? "",
-          password: "",
-        }
+        salutation: currentUser.salutation ?? "",
+        firstName: currentUser.firstName ?? "",
+        lastName: currentUser.lastName ?? "",
+        email: currentUser.email ?? "",
+        password: "",
+      }
       : emptyUser,
     validators: {
       onChange: isEdit ? editUserSchema : createUserSchema,

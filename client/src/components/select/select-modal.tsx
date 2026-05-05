@@ -1,7 +1,8 @@
 import { ChevronDown } from "lucide-react";
-import { useEffect, useReducer, useRef, useState, type ReactNode } from "react";
-import Input from "../inputs/input";
+import { useEffect, useRef, useState, type ReactNode } from "react";
+
 import { tv } from "tailwind-variants";
+import { Input } from "@/components";
 
 interface SelectableElement {
     id: string;

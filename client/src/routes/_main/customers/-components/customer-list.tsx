@@ -1,10 +1,11 @@
-import Button from "@/components/button/button";
-import type { Customer } from "@/types";
 import { useCustomers } from "@/hooks/customer";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
+
+import type { Customer } from "@/types";
+import { Button } from "@/components";
 
 export default function CustomerList() {
   const [isOpen, setOpen] = useState<boolean>(false);

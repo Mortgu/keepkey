@@ -1,7 +1,7 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
 import { useState } from "react";
 import { z } from "zod";
+
+import { Button, Input } from "@/components";
 
 const contactPersonSchema = z.object({
   salutation: z.string().min(1, "Anrede fehlt"),

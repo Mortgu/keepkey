@@ -1,5 +1,4 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
+import { Input, Button, ModalDialog } from "@/components";
 import type { CreateContactPersonInput, Customer } from "@/types";
 import { useCustomers } from "@/hooks/customer";
 import { useForm } from "@tanstack/react-form";
@@ -7,7 +6,6 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import ContactPersonForm from "./contact-person-form";
-import ModalDialog from "@/components/modal";
 
 interface CustomerModalProps {
   open: boolean;
@@ -72,12 +70,12 @@ export default function CustomerModal({
         try {
           updateCustomer({ id: currentCustomer.id, body });
           cancelFn();
-        } catch (exception: any) {}
+        } catch (exception: any) { }
       } else {
         try {
           createCustomer(body);
           cancelFn();
-        } catch (exception: any) {}
+        } catch (exception: any) { }
       }
     },
   });

@@ -1,12 +1,11 @@
-import Button from "@/components/button/button";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useOffer } from "@/hooks/offer";
-import { SortDropdown } from "@/components/filters";
 import OfferListItem from "./offer-list-item";
 
 import type { Offer } from "@/types";
+import { Button, SortDropdown } from "@/components";
 
 const sort_options = [
   { value: "date-desc", label: "Date – newest first" },

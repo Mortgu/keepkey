@@ -1,12 +1,5 @@
-import { type HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
-
-interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "generated" | "pending" | "failed" | "processing" | "draft";
-  format?: "pdf" | "docx" | "html";
-  count?: number | string;
-  countVariant?: "success" | "error";
-}
+import { VARIANT_LABELS, type BadgeComponentProps } from "./badge-types";
 
 const styles = tv({
   base: "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium",
@@ -38,15 +31,8 @@ const countStyles = tv({
   },
 });
 
-const VARIANT_LABELS: Record<NonNullable<BadgeProps["variant"]>, string> = {
-  generated: "Generated",
-  pending: "Pending",
-  failed: "Failed",
-  processing: "Processing",
-  draft: "Draft",
-};
 
-export default function Badge({
+export function Badge({
   variant,
   format,
   count,
@@ -54,7 +40,7 @@ export default function Badge({
   className,
   children,
   ...props
-}: BadgeProps) {
+}: BadgeComponentProps) {
   if (count !== undefined) {
     return (
       <span className={countStyles({ countVariant, className })} {...props}>

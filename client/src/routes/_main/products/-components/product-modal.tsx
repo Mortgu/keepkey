@@ -1,9 +1,7 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
-import ModalDialog from "@/components/modal";
-import type { CreateProductInput, UpdateProductInput } from "@/types";
-import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import { useForm } from "@tanstack/react-form";
+import type { CreateProductInput, UpdateProductInput } from "@/types";
+import { Input, Button, ModalDialog } from "@/components";
 
 interface ProductModalProps {
   open: boolean;
@@ -39,7 +37,7 @@ export default function ProductModal({
       onMount: productScheme,
     },
     onSubmit: ({ value }) => {
-      submitFn(value);
+      submitFn(value as CreateProductInput);
       cancelFn();
     },
   });

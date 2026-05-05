@@ -1,10 +1,10 @@
-import Button from "@/components/button/button";
 import type { User } from "@/types";
 import { formatDate } from "@/lib/format";
 import { KeyRound, Pen, Trash } from "lucide-react";
 import React, { useState } from "react";
 import UserModal from "./user-modal";
 import { useUser } from "@/hooks/user";
+import { Button } from "@/components";
 
 interface UserListItemProps {
   user: User;
@@ -37,7 +37,7 @@ export default function UserListItem({ user }: UserListItemProps) {
             ></Button>
 
             <Button
-              onClick={() => {}}
+              onClick={() => { }}
               size="sm"
               variant="ghost"
               icon={<KeyRound className="size-4" />}

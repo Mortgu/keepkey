@@ -1,10 +1,6 @@
-import { type InputHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-
-interface CheckboxProps extends InputHTMLAttributes<HTMLInputElement> {
-  error?: boolean;
-  label?: string;
-}
+import type { CheckboxComponentProps } from "./checkbox-types";
 
 const styles = tv({
   base: [
@@ -24,7 +20,7 @@ const styles = tv({
   },
 });
 
-const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
+export const Checkbox = forwardRef<HTMLInputElement, CheckboxComponentProps>(
   ({ className, label, error = false, ...rest }, ref) => {
     return (
       <div className="flex items-center gap-2">
@@ -48,5 +44,3 @@ const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 );
 
 Checkbox.displayName = "Checkbox";
-
-export default Checkbox;

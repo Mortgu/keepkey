@@ -32,11 +32,12 @@ const styles = tv({
   },
 });
 
-type StyleVariants = VariantProps<typeof styles>;
+export type StyleVariants = VariantProps<typeof styles>;
 
-type BasicLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+export type BasicLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
   variant?: StyleVariants["variant"];
 };
+
 
 const BasicLinkComponent = React.forwardRef<HTMLAnchorElement, BasicLinkProps>(
   ({ className, variant, ...props }, ref) => {

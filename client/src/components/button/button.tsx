@@ -1,18 +1,7 @@
-import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
+import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { Loader } from 'lucide-react';
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'link';
-    size?: 'xs' | 'sm' | 'md';
-    active?: false | true,
-    danger?: boolean;
-    icon?: ReactNode;
-    iconPosition?: 'left' | 'right';
-    iconOnly?: boolean;
-    loading?: boolean;
-    children?: ReactNode;
-}
+import type { ButtonComponentProps } from './button-types';
 
 const styles = tv({
     base: [
@@ -73,7 +62,7 @@ const styles = tv({
     }
 });
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
     ({ className, variant, size, active, danger, icon, iconPosition = 'left', iconOnly, loading, children, ...rest }, ref) => {
         const resolvedIcon = loading ? <Loader className="size-4 animate-spin" /> : icon;
         return (
@@ -92,5 +81,3 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = 'Button';
-
-export default Button;

@@ -1,9 +1,6 @@
-import { type InputHTMLAttributes, forwardRef } from "react";
+import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-
-interface ToggleSliderProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
-}
+import type { ToggleSliderComponentProps } from "./toggle-slider-types";
 
 const styles = tv({
   slots: {
@@ -30,7 +27,7 @@ const styles = tv({
 
 const { container, wrapper, track, thumb, input } = styles();
 
-const ToggleSlider = forwardRef<HTMLInputElement, ToggleSliderProps>(
+export const ToggleSlider = forwardRef<HTMLInputElement, ToggleSliderComponentProps>(
   ({ className, label, disabled, ...rest }, ref) => {
     return (
       <div className={container()}>
@@ -59,5 +56,3 @@ const ToggleSlider = forwardRef<HTMLInputElement, ToggleSliderProps>(
 );
 
 ToggleSlider.displayName = "ToggleSlider";
-
-export default ToggleSlider;

@@ -1,4 +1,4 @@
-import Button from "@/components/button/button";
+import { Button } from "@/components";
 import type { FlatRate } from "@/types";
 import { useFlatRates } from "@/hooks/flatrate";
 import { Loader, Plus } from "lucide-react";

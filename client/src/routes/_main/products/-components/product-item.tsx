@@ -1,4 +1,4 @@
-import Button from "@/components/button/button.tsx";
+import { Button } from "@/components";
 import { Pen, Plus, Trash } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";

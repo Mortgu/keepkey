@@ -1,5 +1,4 @@
-import Button from "@/components/button/button";
-import Input from "@/components/inputs/input";
+import { Input, Button } from "@/components";
 import type { Supplier } from "@/types";
 import { useSupplier } from "@/hooks/supplier";
 import { useForm } from "@tanstack/react-form";
@@ -70,7 +69,7 @@ export default function SupplierList() {
             <Button
               icon={<Pen className="size-3.5" />}
               iconOnly
-              onClick={() => {}}
+              onClick={() => { }}
               size="sm"
               variant="ghost"
             />

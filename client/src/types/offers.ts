@@ -20,8 +20,12 @@ export type CreateOfferInput = Omit<
   | "documentJobs"
   | "documents"
   | "tasks"
+  | "total_amount"
+  | "tax_amount"
+  | "net_amount"
+  | "tax_rate"
 >;
-export type UpdateOfferInput = Partial<CreateOfferInput>;
+export type UpdateOfferInput = Partial<CreateOfferInput> & { id: string };
 
 export type CreateOfferPositionInput = Omit<
   OfferPosition,
@@ -29,8 +33,7 @@ export type CreateOfferPositionInput = Omit<
 >;
 export type UpdateOfferPositionInput = Partial<CreateOfferPositionInput>;
 
-export type CreateOfferFlatRatesInput = Omit<
-  OfferFlatRate,
-  "id" | "flatRate" | "offer"
->;
+export type CreateOfferFlatRatesInput = Omit<OfferFlatRate,
+  "id" | "offer">;
+
 export type UpdateOfferFlatRatesInput = Partial<CreateOfferFlatRatesInput>;

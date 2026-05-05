@@ -3,7 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 import {
-  OfferFlatRates,
+  OfferFlatRate,
   OfferPosition,
   TaskStatus,
   TaskType,
@@ -107,6 +107,13 @@ export const createOfferTask = async (request: Request, response: Response) => {
       data: { jobId: job.id },
     });
 
+    await prisma.document.updateMany({
+      where: { offerId: task.offerId },
+      data: {
+        status: "PROCESSING"
+      },
+    });
+
     return response.status(200).json(offer);
   } catch (exception: any) {
     return response.status(500).json({
@@ -145,13 +152,11 @@ export const createOffer = async (
   try {
     request.body.offer = await prisma.$transaction(async (tx) => {
       let net_amount_positions = positions.reduce(
-        (sum: number, p: OfferPosition) => sum + p.total_cents,
-        0,
-      );
+        (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+
       let net_amount_flatrates = flatRates.reduce(
-        (sum: number, p: OfferFlatRates) => sum + p.total_cents,
-        0,
-      );
+        (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+
       let net_amount = net_amount_positions + net_amount_flatrates;
 
       const offer = await tx.offer.create({
@@ -165,14 +170,8 @@ export const createOffer = async (
       });
 
       for (const position of positions) {
-        const {
-          productId,
-          contractId,
-          duration_months,
-          quantity,
-          optional,
-          total_cents,
-        } = position;
+        const { productId, contractId, duration_months,
+          quantity, optional, total_cents } = position;
 
         await tx.offerPosition.create({
           data: {
@@ -198,6 +197,13 @@ export const createOffer = async (
           },
         });
       }
+
+      await tx.document.createMany({
+        data: [
+          { name: "", extension: "pdf", path: "/", offerId: offer.id, status: "PENDING", },
+          { name: "", extension: "docx", path: "/", offerId: offer.id, status: "PENDING" },
+        ],
+      });
 
       return offer;
     });
