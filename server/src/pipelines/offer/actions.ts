@@ -113,7 +113,7 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
     paymentTerm: offer.paymentTerm,
     validUntil: offer.validUntil ? formatDate(offer.validUntil) : "",
     requestFrom: offer.requestFrom ? formatDate(offer.requestFrom) : "",
-    supplierId: offer.supplierId.slice(0, 8),
+    supplierId: offer.supplierId || "",
 
     customer: {
       id: customer.customerId || "",
@@ -149,25 +149,22 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
   };
 }
 
-export async function postprocessing(
-  formatedData?: OfferFormatedData,
-): Promise<OfferFormatedData> {
-  if (!formatedData)
+export async function postprocessing(formatedData?: OfferFormatedData): Promise<OfferFormatedData> {
+  if (!formatedData) {
     throw new Error("Failed to postprocess! No formatted data!");
+  }
+
   return deepIterate(
     formatedData as Record<string, unknown>,
     formatedData as Record<string, unknown>,
   ) as unknown as OfferFormatedData;
 }
 
-export async function generating(
-  formatedData?: OfferFormatedData,
-): Promise<Buffer> {
-  const content = await fs.readFile(
-    path.join(env.TEMPLATES_DIR, "offer.docx"),
-    "binary",
-  );
+export async function generating(formatedData?: OfferFormatedData): Promise<Buffer> {
+  const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+
   const zip = new PizZip(content);
+
   const doc = new Docxtemplater(zip, {
     paragraphLoop: true,
     linebreaks: true,

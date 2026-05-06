@@ -88,6 +88,8 @@ export const getOfferTaskById = async (request: Request, response: Response) => 
 export const createOfferTask = async (request: Request, response: Response) => {
   const { offer } = request.body;
 
+  console.log(offer);
+
   if (!offer) {
     return response.status(404).json({
       message: "Failed to create offer task. Missing offer!",
@@ -261,7 +263,7 @@ export const deleteOffer = async (request: Request, response: Response) => {
   }
 };
 
-export const updateOffer = async (request: Request, response: Response) => {
+export const updateOffer = async (request: Request, response: Response, next: NextFunction) => {
   const oid = request.params.id as string;
   const data = request.body;
 
@@ -271,12 +273,6 @@ export const updateOffer = async (request: Request, response: Response) => {
     });
   }
 
-  const toDate = (val: string | null | undefined): Date | null => {
-    if (!val) return null;
-    const d = new Date(val);
-    return isNaN(d.getTime()) ? null : d;
-  };
-
   const { positions = [], flatRates = [] } = data;
   const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
 
@@ -285,14 +281,14 @@ export const updateOffer = async (request: Request, response: Response) => {
   }
 
   try {
-    await prisma.$transaction(async (tx) => {
+    const offer = await prisma.$transaction(async (tx) => {
       const net_amount_positions = positions.reduce(
         (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
       const net_amount_flatrates = flatRates.reduce(
         (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
       const net_amount = net_amount_positions + net_amount_flatrates;
 
-      await tx.offer.updateMany({
+      const offer = await tx.offer.updateManyAndReturn({
         where: { id: oid as string },
         data: {
           ...scalarFields,
@@ -301,9 +297,6 @@ export const updateOffer = async (request: Request, response: Response) => {
           validUntil: toDate(validUntil),
           requestFrom: toDate(requestFrom),
           net_amount,
-          tax_rate: 19,
-          tax_amount: net_amount * 0.19,
-          total_amount: net_amount * 1.19,
         },
       });
 
@@ -321,9 +314,13 @@ export const updateOffer = async (request: Request, response: Response) => {
           data: { offerId: oid, flatRateId: flatRate.flatRateId, quantity: flatRate.quantity, total_cents: flatRate.total_cents },
         });
       }
+
+      return offer[0];
     });
 
-    return response.status(200).json({});
+    request.body.offer = offer;
+    next();
+    //return response.status(200).json({});
   } catch (exception: any) {
     console.error('updateOffer error:', exception.message, JSON.stringify(exception, null, 2));
     return response.status(500).json({

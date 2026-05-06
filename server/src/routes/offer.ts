@@ -110,7 +110,7 @@ router.get("/", getOffers);
  */
 router.get("/:id", getOfferById);
 
-router.put('/:id', updateOffer)
+router.put('/:id', updateOffer, createOfferTask);
 
 /**
  * @openapi
