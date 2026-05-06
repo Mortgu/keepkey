@@ -9,7 +9,7 @@ import {
 } from "@/data/products.ts";
 import type { Product, CreateProductPricingInput } from "@/types";
 
-export const useProducts = () => {
+export const useProductHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

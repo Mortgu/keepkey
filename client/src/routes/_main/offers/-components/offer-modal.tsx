@@ -1,17 +1,22 @@
-import { useContracts } from "@/hooks/contract";
-import { useCustomers } from "@/hooks/customer";
-import { useProducts } from "@/hooks/product";
-import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash, Trash2, X } from "lucide-react";
+import { z } from "zod";
 import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+
+import { Loader, Plus, Trash, X } from "lucide-react";
+
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import OfferFlatRateForm from "./offer-flat-rate-form";
-import { z } from "zod";
-import { useOffer } from "@/hooks/offer";
-import { useSupplier } from "@/hooks/supplier";
+
+import {
+  useProductHook,
+  useContractHook,
+  useCustomerHook,
+  useFlatRateHook,
+  useUserHook,
+  useSupplierHook,
+  useOfferHook
+} from "@/hooks";
 import { Button, Input, Checkbox, ModalDialog, Select } from "@/components";
-import { useFlatRates } from "@/hooks/flatrate.ts";
-import { useUser } from "@/hooks/user";
 
 import type {
   Offer,
@@ -53,12 +58,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
   const isEdit = currentOffer !== undefined;
 
-  const { customers } = useCustomers();
-  const { products } = useProducts();
-  const { contracts } = useContracts();
-  const { suppliers } = useSupplier();
-  const { users } = useUser();
-  const { flatRates } = useFlatRates();
+  const { customers } = useCustomerHook();
+  const { products } = useProductHook();
+  const { contracts } = useContractHook();
+  const { suppliers } = useSupplierHook();
+  const { users } = useUserHook();
+  const { flatRates } = useFlatRateHook();
 
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
     currentOffer?.offerPositions.map((pos) => ({
@@ -77,7 +82,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const [showProductForm, setShowProductForm] = useState(false);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
-  const { createOffer, errorCreatingOffer, updateOffer } = useOffer();
+  const { createOffer, errorCreatingOffer, updateOffer } = useOfferHook();
 
   const offerForm = useForm({
     defaultValues: {

@@ -1,6 +1,6 @@
 import { Loader, Plus } from "lucide-react";
 import { useState } from "react";
-import { useContracts } from "@/hooks/contract.ts";
+import { useContractHook } from "@/hooks";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
@@ -8,7 +8,7 @@ import type { Contract } from "@/types";
 import { Button } from "@/components";
 
 export default function ContractList() {
-  const { contracts, isPending, error, deleteContract } = useContracts();
+  const { contracts, isPending, error, deleteContract } = useContractHook();
 
   const [isOpen, setOpen] = useState<boolean>(false);
 

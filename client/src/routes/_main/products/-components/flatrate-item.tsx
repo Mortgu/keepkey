@@ -1,12 +1,12 @@
+import { useFlatRateHook } from "@/hooks";
 import { Button } from "@/components";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
-import { useFlatRates } from "@/hooks/flatrate";
 import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateItem(item: FlatRate) {
-  const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRates();
+  const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRateHook();
   const [isEditing, setEditing] = useState(false);
 
   return (

@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
-import { useOffer } from "@/hooks/offer";
+import { useOfferHook } from "@/hooks";
 import OfferListItem from "./offer-list-item";
 
 import type { Offer } from "@/types";
@@ -17,7 +17,7 @@ const sort_options = [
 export default function OfferList() {
   const [isOpen, setOpen] = useState<boolean>(false);
   const [sort, setSort] = useState<string>(sort_options[0].value);
-  const { offers, deleteOffer } = useOffer();
+  const { offers, deleteOffer } = useOfferHook();
 
   const [error, setError] = useState<string | null>(null);
 

@@ -1,15 +1,18 @@
-import { Loader, Plus } from "lucide-react";
-import { Button } from "@/components";
 import { useState } from "react";
-import ProductModal from "./product-modal";
+
+import { Loader, Plus } from "lucide-react";
+
 import ProductItem from "./product-item";
-import { useProducts } from "@/hooks/product";
+import ProductModal from "./product-modal";
+
+import { Button } from "@/components";
+import { useProductHook } from "@/hooks";
 import type { Product } from "@/types";
 
 export default function ProductList() {
   const [isOpen, setOpen] = useState<boolean>(false);
 
-  const { products, isPending, error, createProduct } = useProducts();
+  const { products, isPending, error, createProduct } = useProductHook();
 
   if (isPending) {
     return <Loader className="animate-spin" />;

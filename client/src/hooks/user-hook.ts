@@ -8,7 +8,7 @@ import {
 import { useQueryClient } from "@tanstack/react-query";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
-export const useUser = () => {
+export const useUserHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

@@ -1,4 +1,4 @@
-import { useOrders } from "@/hooks/order";
+import { useOrderHook } from "@/hooks";
 import { Loader, Pen, Plus, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
 import OrderModal from "./order-modal";
@@ -8,7 +8,7 @@ import { Button } from "@/components";
 
 export default function OrderListItems() {
   const [isOpen, setOpen] = useState<boolean>(false);
-  const { orders, isPending, error, deleteOrder, isDeleting } = useOrders();
+  const { orders, isPending, error, deleteOrder, isDeleting } = useOrderHook();
 
   if (isPending) {
     return <Loader className="animate-spin" />;

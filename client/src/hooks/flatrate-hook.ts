@@ -11,7 +11,7 @@ import type {
   UpdateFlatRateInput
 } from '@/types';
 
-export const useFlatRates = () => {
+export const useFlatRateHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

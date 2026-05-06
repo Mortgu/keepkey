@@ -1,11 +1,12 @@
-import { Button } from "@/components";
-import { Pen, Plus, Trash } from "lucide-react";
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
 import { useState } from "react";
+import { z } from "zod";
+
+import { Pen, Plus, Trash } from "lucide-react";
+
 import ProductModal from "./product-modal";
-import { useContracts } from "@/hooks/contract";
-import { useProducts } from "@/hooks/product";
+import { Button } from "@/components";
+import { useContractHook, useProductHook } from "@/hooks";
 import type { Product, CreateProductPricingInput } from "@/types";
 
 const productPricingSchema = z.object({
@@ -24,8 +25,8 @@ export default function ProductItem(product: Product) {
     deletePricing,
     isDeletingPricing,
     createPricing,
-  } = useProducts();
-  const { contracts } = useContracts();
+  } = useProductHook();
+  const { contracts } = useContractHook();
 
   const [isAddingPricing, addPricing] = useState<boolean>(false);
   const [isEditing, setEdit] = useState<boolean>(false);

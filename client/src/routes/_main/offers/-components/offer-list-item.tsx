@@ -1,14 +1,15 @@
-import { useOffer } from "@/hooks/offer";
-import { formatEur } from "@/utils/utils";
-import { Pen, Trash } from "lucide-react";
-import { formatDate } from "@/lib/format";
-
-import { Button, Badge, Collapsable } from "@/components";
-
-import type { Document, Offer, OfferFlatRate, OfferPosition, Task } from "@/types";
 import React, { useState } from "react";
+import { Pen, Trash } from "lucide-react";
+
+import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
 import OfferModal from "./offer-modal";
-import { DocumentItem, TaskItem } from "./offer-items";
+import { DocumentItem } from "./offer-items";
+
+
+import { useOfferHook } from "@/hooks";
+import { Button, Badge, Collapsable } from "@/components";
+import type { Document, Offer, OfferFlatRate, OfferPosition } from "@/types";
 
 type OfferListItemProps = {
   offer: Offer;
@@ -17,7 +18,7 @@ type OfferListItemProps = {
 export default function OfferListItem({ offer }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
   const [edit, setEdit] = useState<boolean>(false);
-  const { deleteOffer } = useOffer();
+  const { deleteOffer } = useOfferHook();
 
   const handleDeleteOffer = () => {
     if (confirm("Angebot löschen")) {

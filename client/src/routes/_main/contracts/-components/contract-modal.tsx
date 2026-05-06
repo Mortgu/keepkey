@@ -4,7 +4,7 @@ import type {
   CreateContractInput,
   UpdateContractInput,
 } from "@/types";
-import { useContracts } from "@/hooks/contract";
+import { useContractHook } from "@/hooks";
 import { useForm } from "@tanstack/react-form";
 import { Loader, Plus, Trash2 } from "lucide-react";
 import { z } from "zod";
@@ -31,7 +31,7 @@ export default function ContractModal({
   currentContract = null,
 }: ContractModalProps) {
   const isEdit = currentContract !== null;
-  const { updateContract, createContract } = useContracts();
+  const { updateContract, createContract } = useContractHook();
 
   const contractForm = useForm({
     defaultValues: currentContract || emptyContract,

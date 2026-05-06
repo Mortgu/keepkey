@@ -1,6 +1,6 @@
 import { Button } from "@/components";
 import type { FlatRate } from "@/types";
-import { useFlatRates } from "@/hooks/flatrate";
+import { useFlatRateHook } from "@/hooks";
 import { Loader, Plus } from "lucide-react";
 import { useState } from "react";
 import FlatRateItem from "./flatrate-item";
@@ -8,7 +8,7 @@ import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateList() {
   const [isOpen, setOpen] = useState(false);
-  const { flatRates, isPending, error, createFlatRate } = useFlatRates();
+  const { flatRates, isPending, error, createFlatRate } = useFlatRateHook();
 
   if (isPending) {
     return <Loader className="animate-spin" />;

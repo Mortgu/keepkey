@@ -7,7 +7,7 @@ import {
 } from "@/data/contracts.ts";
 import type { CreateContractInput, UpdateContractInput } from "@/types";
 
-export const useContracts = () => {
+export const useContractHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

@@ -17,7 +17,7 @@ import type {
 } from "@/types";
 
 
-export const useOffer = () => {
+export const useOfferHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

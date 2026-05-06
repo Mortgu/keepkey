@@ -1,10 +1,12 @@
-import type { User } from "@/types";
-import { formatDate } from "@/lib/format";
-import { KeyRound, Pen, Trash } from "lucide-react";
 import React, { useState } from "react";
+
+import { KeyRound, Pen, Trash } from "lucide-react";
 import UserModal from "./user-modal";
-import { useUser } from "@/hooks/user";
+
+import { formatDate } from "@/lib/format";
+import { useUserHook } from "@/hooks";
 import { Button } from "@/components";
+import type { User } from "@/types";
 
 interface UserListItemProps {
   user: User;
@@ -14,7 +16,7 @@ export default function UserListItem({ user }: UserListItemProps) {
   /* Edit User Modal */
   const [isOpen, setOpen] = useState<boolean>(false);
 
-  const { deleteUser, isDeletingUser } = useUser();
+  const { deleteUser, isDeletingUser } = useUserHook();
 
   return (
     <React.Fragment>

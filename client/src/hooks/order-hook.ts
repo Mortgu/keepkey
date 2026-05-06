@@ -1,7 +1,7 @@
 import { deleteOrderAction, getOrdersAction } from "@/data/orders";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useOrders = () => {
+export const useOrderHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

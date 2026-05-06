@@ -1,11 +1,14 @@
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+
+import { Plus, Trash2 } from "lucide-react";
+
+import ContactPersonForm from "./contact-person-form";
+
+import { useCustomerHook } from "@/hooks";
 import { Input, Button, ModalDialog } from "@/components";
 import type { CreateContactPersonInput, Customer } from "@/types";
-import { useCustomers } from "@/hooks/customer";
-import { useForm } from "@tanstack/react-form";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
-import ContactPersonForm from "./contact-person-form";
 
 interface CustomerModalProps {
   open: boolean;
@@ -32,7 +35,7 @@ export default function CustomerModal({
   const isEdit = currentCustomer !== null;
 
   const { updateCustomer, createCustomer, errorCreatingCustomer } =
-    useCustomers();
+    useCustomerHook();
 
   const [contactPersons, setContactPersons] = useState<
     CreateContactPersonInput[]

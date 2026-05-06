@@ -1,4 +1,4 @@
-import { useOffer } from "@/hooks/offer";
+import { useOfferHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
 
 import type { Offer } from "@/types";
@@ -17,7 +17,7 @@ export default function OrderModal({
   submitFn,
   currentOrder,
 }: OrderModalProps) {
-  const { offers } = useOffer();
+  const { offers } = useOfferHook();
 
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>

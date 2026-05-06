@@ -1,10 +1,12 @@
-import { Input, Button } from "@/components";
-import type { Supplier } from "@/types";
-import { useSupplier } from "@/hooks/supplier";
-import { useForm } from "@tanstack/react-form";
-import { Pen, Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+
+import { Pen, Plus, Trash } from "lucide-react";
+import { useForm } from "@tanstack/react-form";
+
+import { Input, Button } from "@/components";
+import type { Supplier } from "@/types";
+import { useSupplierHook } from "@/hooks";
 
 const supplierSchema = z.object({
   name: z.string().min(1, "Lieferant braucht mindestens ein Zeichen!"),
@@ -19,7 +21,7 @@ export default function SupplierList() {
     deleteSupplier,
     isCreatingSupplier,
     isDeletingSupplier,
-  } = useSupplier();
+  } = useSupplierHook();
 
   const supplierForm = useForm({
     defaultValues: { name: "", supplierId: "" },

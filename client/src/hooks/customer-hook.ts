@@ -2,13 +2,12 @@ import {
   createCustomerAction,
   deleteCustomerAction,
   getAllCustomersAction,
-  getCustomerByIdAction,
   updateCustomerByIdAction,
 } from "@/data/customers";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateCustomerInput, UpdateCustomerInput } from "@/types";
 
-export const useCustomers = () => {
+export const useCustomerHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>

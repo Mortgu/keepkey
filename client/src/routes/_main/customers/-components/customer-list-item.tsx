@@ -2,9 +2,10 @@ import React, { useState } from "react";
 import { Pen, Trash } from "lucide-react";
 import CustomerModal from "./customer-modal";
 
-import { useCustomers } from "@/hooks/customer";
 import { formatDate } from "@/lib/format";
+
 import type { Customer } from "@/types";
+import { useCustomerHook } from "@/hooks";
 import { Button } from "@/components";
 
 interface CustomerListItemProps {
@@ -14,7 +15,7 @@ interface CustomerListItemProps {
 export default function CustomerListItem({ customer }: CustomerListItemProps) {
   const [isOpen, setOpen] = useState<boolean>(false);
 
-  const { deleteCustomer, isDeleting } = useCustomers();
+  const { deleteCustomer, isDeleting } = useCustomerHook();
 
   return (
     <React.Fragment>

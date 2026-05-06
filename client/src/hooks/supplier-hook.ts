@@ -6,7 +6,7 @@ import {
 import type { CreateSupplierInput, UpdateSupplierInput } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-export const useSupplier = () => {
+export const useSupplierHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>
