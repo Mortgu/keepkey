@@ -57,7 +57,6 @@ app.use("/api", router);
 
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
 
-
 // Global error handler
 app.use(errorHandler);
 
