@@ -10,11 +10,16 @@ enum DocumentStatus {
 model Document {
   id String @id @default(cuid())
 
-  name      String
-  extension String
-  path      String
+  name String?
 
-  status DocumentStatus @default(PENDING)
+  pdfName  String?
+  docxName String?
+
+  pdfPath  String?
+  docxPath String?
+
+  status    DocumentStatus @default(PENDING)
+  isCurrent Boolean
 
   offer   Offer?  @relation(fields: [offerId], references: [id])
   offerId String?

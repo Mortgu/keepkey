@@ -19,6 +19,8 @@ export default function OfferList() {
   const [sort, setSort] = useState<string>(sort_options[0].value);
   const { offers, deleteOffer } = useOffer();
 
+  const [error, setError] = useState<string | null>(null);
+
   const sortedOffers = useMemo(() => {
     return [...(offers ?? [])].sort((a, b) => {
       switch (sort) {
@@ -70,6 +72,12 @@ export default function OfferList() {
           </Button>
         </div>
       </div>
+
+      {error && (
+        <div className="">
+          <p className="text-(--destructive)">{error}</p>
+        </div>
+      )}
 
       <div className="grid gap-2">
         {sortedOffers.map((offer: Offer) => (

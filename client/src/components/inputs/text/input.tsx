@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
   ({ className, variant, input_size, label, error, ...rest }, ref) => {
     return (
       <div className="w-full">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between">
           {label && (
             <label className="block text-sm font-normal text-(--text-600) mb-1">
               {label}
@@ -48,14 +48,9 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
             </label>
           )}
         </div>
-        <input
-          ref={ref}
-          className={styles({
-            variant,
-            input_size,
-            error: !!error,
-            className,
-          })}
+        <input ref={ref} className={styles({
+          variant, input_size, error: !!error, className,
+        })}
           {...rest}
         />
       </div>

@@ -2,11 +2,10 @@ import { useOffer } from "@/hooks/offer";
 import { formatEur } from "@/utils/utils";
 import { Pen, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format";
-import OfferFile from "./offer-file";
 
 import { Button, Badge, Collapsable } from "@/components";
 
-import type { Offer, OfferPosition, Task } from "@/types";
+import type { Document, Offer, OfferPosition, Task } from "@/types";
 import React, { useState } from "react";
 import OfferModal from "./offer-modal";
 import { DocumentItem, TaskItem } from "./offer-items";
@@ -139,35 +138,22 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
         </Collapsable>
 
         {/* Documents */}
-        <Collapsable
-          label="Dokumente"
-          className="w-full bg-(--subtle-50) justify-between rounded-none"
-        >
+        <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
           <div className="grid gap-2 px-4 py-3">
-            <TaskItem />
-            <DocumentItem />
-
-            {offer.tasks.map((tasks: Task) => (
-              <OfferFile key={tasks.id} document={tasks} />
+            {offer.documents.map((document: Document) => (
+              <DocumentItem key={document.id} document={document} />
             ))}
           </div>
         </Collapsable>
 
         <div className="flex items-center justify-end px-2 border-t border-(--border)">
-          <Button
-            size="xs"
-            variant="link"
-            onClick={() => setEdit(true)}
-            icon={<Pen className="size-3" />}
-            iconOnly
-          />
-          <Button
-            onClick={handleDeleteOffer}
-            size="xs"
-            variant="link"
-            icon={<Trash className="size-3" />}
-            iconOnly
-          />
+
+          <Button size="xs" variant="link" onClick={() => setEdit(true)}
+            icon={<Pen className="size-3" />} iconOnly />
+
+          <Button size="xs" variant="link" onClick={handleDeleteOffer}
+            icon={<Trash className="size-3" />} iconOnly />
+
         </div>
       </div>
 

@@ -13,11 +13,7 @@ import type {
 export const getOffersAction = () =>
   api<Offer[]>("/api/offers", { method: "GET" });
 
-export const createOfferAction = (
-  offer: CreateOfferInput,
-  positions: CreateOfferPositionInput[],
-  flatRates: CreateOfferFlatRatesInput[],
-) =>
+export const createOfferAction = (offer: CreateOfferInput, positions: CreateOfferPositionInput[], flatRates: CreateOfferFlatRatesInput[]) =>
   api<Offer>("/api/offers", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

@@ -1,7 +1,14 @@
 import { Button } from "@/components";
-import { Cloud, File, FileDown, RotateCw } from "lucide-react";
+import { BASE_URL } from "@/lib/api-client";
+import { formatDate } from "@/lib/format";
+import type { Document } from "@/types";
+import { File } from "lucide-react";
 
-export function DocumentItem() {
+type Props = {
+    document: Document;
+}
+
+export function DocumentItem({ document }: Props) {
     return (
         <div className="flex items-center justify-between border border-(--border) py-2 px-2 rounded-md">
             <div className="flex items-center gap-3">
@@ -9,18 +16,20 @@ export function DocumentItem() {
                     <File className="size-4" />
                 </div>
                 <div className="flex flex-col justify-between">
-                    <h1 className="text-md">260000_AG_Kunde_Keepit-workloads_M365+EntraID</h1>
+                    <h1 className="text-md">{document.pdfName}</h1>
                     <div className="flex font-light text-sm gap-2 text-(--text-secondary)">
-                        <p>05. Mai 2026</p>
+                        <p>{formatDate(document.createdAt)}</p>
                     </div>
                 </div>
             </div>
 
             <div className="flex items-center gap-2">
-                <Button variant="secondary" size="sm" icon={<Cloud className="size-3.5" />}>
-                    NextCloud
-                </Button>
-                <Button variant="secondary" size="sm" icon={<FileDown className="size-3.5" />} iconOnly />
+                <a target="_blank" href={BASE_URL + "/" + document.pdfPath}>
+                    <Button variant="secondary" size="sm">PDF</Button>
+                </a>
+                <a href={BASE_URL + "/" + document.docxPath} download={document.docxName}>
+                    <Button variant="secondary" size="sm">DOCX</Button>
+                </a>
             </div>
         </div>
     )

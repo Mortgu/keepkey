@@ -95,14 +95,18 @@ components:
       properties:
         id:
           type: string
-        name:
+        pdfName:
           type: string
-        extension:
+        docxName:
           type: string
-        path:
+        pdfPath:
+          type: string
+        docxPath:
           type: string
         status:
           $ref: "#/components/schemas/DocumentStatus"
+        isCurrent:
+          type: boolean
         offer:
           $ref: "#/components/schemas/Offer"
         offerId:
@@ -116,10 +120,8 @@ components:
           format: date-time
       required:
         - id
-        - name
-        - extension
-        - path
         - status
+        - isCurrent
         - createdAt
     Task:
       type: object

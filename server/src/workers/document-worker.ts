@@ -27,31 +27,30 @@ export default function startDocumentWorker() {
           throw new Error("Document job for offer with undefined offerId");
         }
 
-        /* Start the document generation */
+        await prisma.document.updateMany({
+          where: { AND: [{ offerId: task.offerId }, { isCurrent: true }] },
+          data: {
+            status: "PROCESSING"
+          },
+        });
+
+        // 1. Generate docx document and convert to pdf
         const { docxPath, docxName, pdfPath, pdfName } =
           await generateOfferDocument(task.offerId, taskId);
 
+        // 2. Update the document in the database 
         await prisma.document.updateMany({
-          where: { AND: [{ offerId: task.offerId }, { extension: 'pdf' }] },
+          where: { AND: [{ offerId: task.offerId }, { isCurrent: true }] },
           data: {
-            name: pdfName,
-            path: pdfPath,
-            offerId: task.offerId,
-            status: "GENERATED",
-          },
-        });
+            pdfName,
+            pdfPath,
+            docxName,
+            docxPath,
+            status: "GENERATED"
+          }
+        })
 
-        await prisma.document.updateMany({
-          where: { AND: [{ offerId: task.offerId }, { extension: 'docx' }] },
-          data: {
-            name: docxName,
-            path: docxPath,
-            offerId: task.offerId,
-            status: "GENERATED",
-          },
-        });
-
-        /* Update task to status "completed" */
+        // 1. Update the status of the task to "completed"
         await prisma.task.update({
           where: { id: taskId },
           data: {

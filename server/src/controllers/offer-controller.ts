@@ -94,6 +94,7 @@ export const createOfferTask = async (request: Request, response: Response) => {
   }
 
   try {
+    // 1. Create task in db
     const task = await prisma.task.create({
       data: {
         offerId: offer.id,
@@ -102,22 +103,34 @@ export const createOfferTask = async (request: Request, response: Response) => {
       },
     });
 
+    // 2. Create a new document (pdf, docx) in db
+    await prisma.document.updateMany({
+      where: { AND: [{ offerId: offer.id }, { isCurrent: true }] },
+      data: {
+        isCurrent: false
+      }
+    });
+
+    await prisma.document.create({
+      data: {
+        offerId: offer.id,
+        status: "PENDING",
+        isCurrent: true
+      }
+    })
+
+    // 3. Enqueue the job for bullmq
     const job = await documentQueue.add(documentQueueKey, {
       taskId: task.id,
       taskType: TaskType.OFFER,
     });
 
+    // 4. Update the task to include the id of the enqued job
     await prisma.task.update({
       where: { id: task.id },
       data: { jobId: job.id },
     });
 
-    await prisma.document.updateMany({
-      where: { offerId: task.offerId },
-      data: {
-        status: "PROCESSING"
-      },
-    });
 
     return response.status(200).json(offer);
   } catch (exception: any) {
@@ -209,13 +222,6 @@ export const createOffer = async (request: Request, response: Response, next: Ne
           },
         });
       }
-
-      await tx.document.createMany({
-        data: [
-          { name: "", extension: "pdf", path: "/", offerId: offer.id, status: "PENDING", },
-          { name: "", extension: "docx", path: "/", offerId: offer.id, status: "PENDING" },
-        ],
-      });
 
       return offer;
     });

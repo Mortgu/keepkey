@@ -35,19 +35,21 @@ interface OfferModalProps {
 }
 
 export const offerSchema = z.object({
-  voucherId: z.string().min(1),
-  date: z.string().min(1),
-  paymentTerm: z.string().min(1),
-  validUntil: z.string().nullable(),
-  customerId: z.string().min(1),
-  supplierId: z.string().min(1),
-  contactPersonId: z.string().min(1),
-  requestFrom: z.string().nullable(),
-  userId: z.string().min(1),
+  customerId: z.string().min(1, "Required!"),
+  contactPersonId: z.string().min(1, "Required!"),
+  userId: z.string().min(1, "Required!"),
+  voucherId: z.string().min(1, "Required!"),
+
+  supplierId: z.string().nullable(),
+  paymentTerm: z.string().nullable(),
+
+  validUntil: z.string().datetime().nullable(),
+  requestFrom: z.string().datetime().nullable(),
 });
 
-
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
+  if (!open) return null;
+
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomers();
@@ -82,9 +84,10 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
       contactPersonId: currentOffer?.contactPersonId ?? '',
       userId: currentOffer?.userId ?? '',
       voucherId: currentOffer?.voucherId ?? '',
-      supplierId: currentOffer?.supplierId ?? '',
-      paymentTerm: currentOffer?.paymentTerm ?? '',
-      date: currentOffer?.date ?? '',
+
+      supplierId: currentOffer?.supplierId ?? null,
+      paymentTerm: currentOffer?.paymentTerm ?? null,
+
       validUntil: currentOffer?.validUntil ?? null,
       requestFrom: currentOffer?.requestFrom ?? null,
     },
@@ -128,15 +131,6 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
         <h1 className="text-lg">Neues Angebot erstellen</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
-        {errorCreatingOffer && (
-          <div className="pb-8 ">
-            <p className="text-(--destructive) bg-(--destructive-subtle) p-2 rounded-md border border-(--destructive)">
-              {errorCreatingOffer.message}
-            </p>
-          </div>
-        )}
-
-
         <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
 
@@ -245,8 +239,16 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
                 <Input label="Angebot gültig bis" type="date" input_size="sm" placeholder="Gültig bis..."
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  value={field.state.value as string}
-                  onChange={(e) => field.handleChange(e.target.value as string)}
+                  value={field.state.value?.split('T')[0] ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (!val) {
+                      field.handleChange(null);
+                      return;
+                    }
+                    field.handleChange(`${val}T00:00:00.000Z`);
+                  }}
                 />
 
               </div>
@@ -259,8 +261,16 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
                 <Input label="Ihre Anfrage vom" type="date" input_size="sm" placeholder="Ihre Anfrage vom..."
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  value={field.state.value as string}
-                  onChange={(e) => field.handleChange(e.target.value as string)}
+                  value={field.state.value?.split('T')[0] ?? ''}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (!val) {
+                      field.handleChange(null);
+                      return;
+                    }
+                    field.handleChange(`${val}T00:00:00.000Z`);
+                  }}
                 />
 
               </div>
@@ -386,30 +396,28 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             </div>
           </div>
 
-          <hr className="text-gray-200" />
         </form>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
-          Abbrechen
-        </Button>
-        <offerForm.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              form="offer-form"
-              disabled={!canSubmit}
-              type="submit"
-              size="sm"
-            >
-              {isSubmitting ? (
-                <Loader className="size-4 animate-spin" />
-              ) : (
-                "Speichern"
-              )}
+        <div className="w-full flex items-center justify-between">
+          <p className="text-(--destructive)">
+            {errorCreatingOffer && (
+              `${errorCreatingOffer.message}`
+            )}
+          </p>
+          <div className="flex gap-2">
+            <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+              Abbrechen
             </Button>
-          )}
-        />
+            <offerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+              <Button form="offer-form" disabled={!canSubmit} type="submit" size="sm">
+                {isSubmitting && <Loader className="size-4 animate-spin" />}
+                Speichern
+              </Button>
+            )}
+            />
+          </div>
+        </div>
       </ModalDialog.Footer>
     </ModalDialog>
   );
