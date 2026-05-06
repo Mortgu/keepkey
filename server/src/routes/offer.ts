@@ -4,8 +4,8 @@ import {
   createOfferTask,
   deleteOffer,
   getOfferById,
-  getOfferJobById,
-  getOfferJobs,
+  getOfferTaskById,
+  getOfferTasks,
   getOffers,
 } from "../controllers/offer-controller.js";
 import { validate } from "../middlewares/validate.js";
@@ -149,7 +149,7 @@ router.delete("/:id", deleteOffer);
  *       200:
  *         description: Der aktuelle Dokumenten-Job oder null
  */
-router.get("/:id/jobs", getOfferJobs);
+router.get("/:id/jobs", getOfferTasks);
 
 /**
  * @openapi
@@ -175,7 +175,7 @@ router.get("/:id/jobs", getOfferJobs);
  *       404:
  *         description: Job nicht gefunden
  */
-router.get("/:id/jobs/:jobId", getOfferJobById);
+router.get("/:id/jobs/:jobId", getOfferTaskById);
 
 /**
  * @openapi

@@ -8,7 +8,6 @@ model Order {
   userId String
 
   orderPositions OrderPosition[]
-  documentJobs   DocumentJob[]
 
   // New
   documents Document[]

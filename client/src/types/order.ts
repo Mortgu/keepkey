@@ -11,7 +11,6 @@ export type CreateOrderInput = Omit<
     | "customer"
     | "user"
     | "orderPositions"
-    | "documentJobs"
     | "documents"
     | "tasks"
     | "offer"

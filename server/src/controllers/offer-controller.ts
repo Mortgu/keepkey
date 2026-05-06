@@ -40,7 +40,8 @@ export const getOfferById = async (request: Request, response: Response) => {
     const offer = await prisma.offer.findFirstOrThrow({
       where: { id: id as string },
       include: {
-        documentJobs: true,
+        tasks: true,
+        documents: true,
       },
     });
 
@@ -52,26 +53,30 @@ export const getOfferById = async (request: Request, response: Response) => {
   }
 };
 
-export const getOfferJobs = async (request: Request, response: Response) => {
+export const getOfferTasks = async (request: Request, response: Response) => {
   const { id } = request.params;
-  const job = await prisma.documentJob.findFirst({
-    where: { offerId: id as string, isCurrent: true },
+
+  const job = await prisma.task.findFirst({
+    where: { offerId: id as string },
   });
 
-  return response.status(200).json(job ?? null);
+  return response.status(200).json(job);
 };
 
-export const getOfferJobById = async (request: Request, response: Response) => {
+export const getOfferTaskById = async (request: Request, response: Response) => {
   const { id, jobId } = request.params;
 
   try {
-    const documentJob = await prisma.documentJob.findFirstOrThrow({
+    const offerTask = await prisma.task.findFirstOrThrow({
       where: {
-        AND: [{ id: jobId as string }, { offerId: id as string }],
+        AND: [
+          { id: jobId as string },
+          { offerId: id as string }
+        ],
       },
     });
 
-    return response.status(200).json(documentJob);
+    return response.status(200).json(offerTask);
   } catch (exception: any) {
     return response.status(404).json({
       message: "Job not found!",

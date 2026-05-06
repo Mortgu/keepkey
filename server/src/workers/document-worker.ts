@@ -4,70 +4,68 @@ import { prisma } from "../lib/prisma.js";
 import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
 import { TaskStatus, TaskType } from "@prisma/client";
 
-interface DocumentJobData {
+interface TaskData {
   taskId: string;
   taskType: TaskType;
 }
 
 export default function startDocumentWorker() {
-  const worker = new Worker<DocumentJobData>(
-    documentQueueKey,
-    async (job) => {
-      const { taskId, taskType } = job.data;
+  const worker = new Worker<TaskData>(documentQueueKey, async (job) => {
+    const { taskId, taskType } = job.data;
 
-      const task = await prisma.task.findUnique({
-        where: { id: taskId },
-      });
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+    });
 
-      if (!task) {
-        throw new Error(`Task ${taskId} not found! Skip.`);
-      }
+    if (!task) {
+      throw new Error(`Task ${taskId} not found! Skip.`);
+    }
 
-      switch (taskType) {
-        case TaskType.OFFER:
-          if (!task.offerId) {
-            throw new Error("Document job for offer with undefined offerId");
-          }
+    switch (taskType) {
+      case TaskType.OFFER:
+        if (!task.offerId) {
+          throw new Error("Document job for offer with undefined offerId");
+        }
 
-          /* Start the document generation */
-          const { docxPath, docxName, pdfPath, pdfName } =
-            await generateOfferDocument(task.offerId, taskId);
+        /* Start the document generation */
+        const { docxPath, docxName, pdfPath, pdfName } =
+          await generateOfferDocument(task.offerId, taskId);
 
-          await prisma.document.updateMany({
-            where: { AND: [{ offerId: task.offerId }, { extension: 'pdf' }] },
-            data: {
-              name: pdfName,
-              path: pdfPath,
-              offerId: task.offerId,
-              status: "GENERATED",
-            },
-          });
+        await prisma.document.updateMany({
+          where: { AND: [{ offerId: task.offerId }, { extension: 'pdf' }] },
+          data: {
+            name: pdfName,
+            path: pdfPath,
+            offerId: task.offerId,
+            status: "GENERATED",
+          },
+        });
 
-          await prisma.document.updateMany({
-            where: { AND: [{ offerId: task.offerId }, { extension: 'docx' }] },
-            data: {
-              name: docxName,
-              path: docxPath,
-              offerId: task.offerId,
-              status: "GENERATED",
-            },
-          });
+        await prisma.document.updateMany({
+          where: { AND: [{ offerId: task.offerId }, { extension: 'docx' }] },
+          data: {
+            name: docxName,
+            path: docxPath,
+            offerId: task.offerId,
+            status: "GENERATED",
+          },
+        });
 
-          /* Update task to status "completed" */
-          await prisma.task.update({
-            where: { id: taskId },
-            data: {
-              status: TaskStatus.COMPLETED,
-            },
-          });
+        /* Update task to status "completed" */
+        await prisma.task.update({
+          where: { id: taskId },
+          data: {
+            status: TaskStatus.COMPLETED,
+          },
+        });
 
-          break;
-        case TaskType.ORDER:
-          break;
-        default:
-          throw new Error(`Task ${task.id} with unknown type propertie!`);
-      }
-    },
+        break;
+      case TaskType.ORDER:
+        break;
+      default:
+        throw new Error(`Task ${task.id} with unknown type propertie!`);
+    }
+  },
     { connection, concurrency: 2 },
   );
 

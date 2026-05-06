@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
   getOrderById,
-  getOrderDocumentJobs,
+  getOrderTasks,
   getAllOrders,
   deleteOrderById,
 } from "../controllers/order-controller.js";
@@ -13,7 +13,7 @@ router.get("/", getAllOrders);
 
 router.get("/:orderId", getOrderById);
 
-router.get("/:orderId/documents", getOrderDocumentJobs);
+router.get("/:orderId/documents", getOrderTasks);
 
 router.delete("/:id", deleteOrderById);
 

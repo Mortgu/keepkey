@@ -67,23 +67,20 @@ export default function ContractModal({
       </ModalDialog.Header>
       <ModalDialog.Content>
         <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4">
-          <contractForm.Field
-            name="name"
-            children={(field) => (
-              <div className="grid gap-2">
-                <Input
-                  id={field.name}
-                  value={field.state.value}
-                  label="Name"
-                  error={field.state.meta.errors
-                    .map((e) => e?.message)
-                    .join(" & ")}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  onBlur={field.handleBlur}
-                />
-              </div>
-            )}
-          />
+          <contractForm.Field name="name" children={(field) => (
+            <div className="grid gap-2">
+              <Input
+                id={field.name}
+                value={field.state.value}
+                label="Name"
+                error={field.state.meta.errors
+                  .map((e) => e?.message)
+                  .join(" & ")}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+              />
+            </div>
+          )} />
 
           <contractForm.Field
             name="features"

@@ -9,6 +9,7 @@ import { Button, Badge, Collapsable } from "@/components";
 import type { Offer, OfferPosition, Task } from "@/types";
 import React, { useState } from "react";
 import OfferModal from "./offer-modal";
+import { DocumentItem, TaskItem } from "./offer-items";
 
 type OfferListItemProps = {
   offer: Offer;
@@ -143,6 +144,9 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
           className="w-full bg-(--subtle-50) justify-between rounded-none"
         >
           <div className="grid gap-2 px-4 py-3">
+            <TaskItem />
+            <DocumentItem />
+
             {offer.tasks.map((tasks: Task) => (
               <OfferFile key={tasks.id} document={tasks} />
             ))}

@@ -9,7 +9,7 @@ import OfferFlatRateForm from "./offer-flat-rate-form";
 import { z } from "zod";
 import { useOffer } from "@/hooks/offer";
 import { useSupplier } from "@/hooks/supplier";
-import { Button, Input, Checkbox, ModalDialog } from "@/components";
+import { Button, Input, Checkbox, ModalDialog, Select } from "@/components";
 import { useFlatRates } from "@/hooks/flatrate.ts";
 import { useUser } from "@/hooks/user";
 
@@ -28,33 +28,21 @@ import type {
 interface OfferModalProps {
   open: boolean;
   cancelFn: () => void;
-  currentOffer?: Offer;
+  currentOffer?: CreateOfferInput;
 }
 
 export const offerSchema = z.object({
   voucherId: z.string().min(1),
-  date: z.date(),
+  date: z.coerce.date(),
   paymentTerm: z.string().min(1),
-  validUntil: z.date().nullable(),
+  validUntil: z.coerce.date().nullable(),
   customerId: z.string().min(1),
   supplierId: z.string().min(1),
   contactPersonId: z.string().min(1),
-  requestFrom: z.date().nullable(),
+  requestFrom: z.coerce.date().nullable(),
   userId: z.string().min(1),
 });
 
-const emptyOfferFormVlues = {
-  voucherId: "",
-  supplierId: "",
-  customerId: "",
-  contactPersonId: "",
-  userId: "",
-
-  date: new Date(),
-  paymentTerm: "30 Tage",
-  validUntil: null as Date | null,
-  requestFrom: null as Date | null,
-};
 
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
   const isEdit = currentOffer !== null;
@@ -67,31 +55,36 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const { flatRates } = useFlatRates();
 
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
-  const [showProductForm, setShowProductForm] = useState(false);
-
   const [offerFlatRates, setOfferFlatRates] = useState<CreateOfferFlatRatesInput[]>([]);
+
+  const [showProductForm, setShowProductForm] = useState(false);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
   const { createOffer, errorCreatingOffer } = useOffer();
 
   const offerForm = useForm({
-    defaultValues: (currentOffer ?? emptyOfferFormVlues) as typeof emptyOfferFormVlues,
+    defaultValues: currentOffer || {
+      customerId: customers[0]?.id || '',
+    },
     validators: {
       onChange: offerSchema,
       onMount: offerSchema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        const response = await createOffer({
-          offer: value as unknown as CreateOfferInput,
-          positions: offerProducts as CreateOfferPositionInput[],
-          flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
-        });
+      console.log(value)
+      if (!isEdit) {
+        try {
+          const response = await createOffer({
+            offer: value as unknown as CreateOfferInput,
+            positions: offerProducts as CreateOfferPositionInput[],
+            flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
+          });
 
-        cancelFn();
+          cancelFn();
 
-        return response;
-      } catch (exception: any) { }
+          return response;
+        } catch (exception: any) { }
+      }
     },
   });
 
@@ -118,218 +111,135 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
           </div>
         )}
 
+
         <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
+
             <offerForm.Field name="customerId" children={(field) => (
-              <div className="flex-1 grid gap-2 items-center">
-                <label className="text-sm  text-gray-500" htmlFor={field.name}>Kunde:</label>
-                <select
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100"
-                >
+              <div className="flex-1">
+                <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  value={field.state.value as string} onChange={(e) => field.handleChange(e.target.value)} >
                   <option value="">None</option>
                   {customers?.map((customer: Customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.companyName}
                     </option>
                   ))}
-                </select>
+                </Select>
               </div>
             )} />
 
             {/* Ihr Ansprechpartner */}
-            <offerForm.Field
-              name="contactPersonId"
-              children={(field) => (
-                <div className="flex-1 grid gap-2 items-center">
-                  <label
-                    className="text-sm  text-gray-500"
-                    htmlFor={field.name}
-                  >
-                    Ansprechpartner Kunde:
-                  </label>
-                  <offerForm.Subscribe
-                    selector={(state) => state.values.customerId}
-                    children={(customerId) => {
-                      const selectedCustomer = customers?.find(
-                        (c: Customer) => c.id === customerId,
-                      );
-                      const contactPersons =
-                        selectedCustomer?.contactPersons ?? [];
+            <offerForm.Field name="contactPersonId" children={(field) => (
+              <div className="flex-1">
+                <offerForm.Subscribe selector={(state) => state.values.customerId} children={(customerId) => {
+                  const selectedCustomer = customers?.find((c: Customer) => c.id === customerId);
+                  const contactPersons = selectedCustomer?.contactPersons ?? [];
 
-                      return (
-                        <select
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(e.target.value)}
-                          disabled={!customerId}
-                          className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100 disabled:opacity-50"
-                        >
-                          <option value="">None</option>
-                          {contactPersons.map((cp: ContactPerson) => (
-                            <option key={cp.id} value={cp.id}>
-                              {cp.firstName} {cp.lastName}
-                            </option>
-                          ))}
-                        </select>
-                      );
-                    }}
-                  />
-                </div>
-              )}
+                  return (
+                    <Select label="Ansprechpartner Kunde" value={field.state.value as string}
+                      error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                      onChange={(e) => field.handleChange(e.target.value)} disabled={!customerId}>
+                      <option value="">None</option>
+                      {contactPersons.map((cp: ContactPerson) => (
+                        <option key={cp.id} value={cp.id}>
+                          {cp.firstName} {cp.lastName}
+                        </option>
+                      ))}
+                    </Select>
+                  );
+                }}
+                />
+              </div>
+            )}
             />
 
-            <offerForm.Field
-              name="userId"
-              children={(field) => (
-                <div className="flex-1 grid gap-2 items-center">
-                  <label
-                    className="text-sm  text-gray-500"
-                    htmlFor={field.name}
-                  >
-                    Unser Ansprechpartner:
-                  </label>
-                  <select
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100 disabled:opacity-50"
-                  >
-                    <option value="">None</option>
-                    {users.map((user: User) => (
-                      <option key={user.id} value={user.id}>
-                        {user.firstName} {user.lastName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            />
+            <offerForm.Field name="userId" children={(field) => (
+              <div className="flex-1">
+                <Select label="Unser Ansprechpartner" value={field.state.value as string}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  onChange={(e) => field.handleChange(e.target.value)}>
+                  <option value="">None</option>
+                  {users.map((user: User) => (
+                    <option key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )} />
+
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
-            <offerForm.Field
-              name="voucherId"
-              children={(field) => (
-                <div className="flex-1 grid gap-2 items-center">
-                  <label
-                    className="text-sm  text-gray-500"
-                    htmlFor={field.name}
-                  >
-                    AG-Nr:
-                  </label>
-                  <Input
-                    type="text"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
+            <offerForm.Field name="voucherId" children={(field) => (
+              <div className="flex-1 grid gap-2 items-center">
+                <Input label="AG-Nr." value={field.state.value as string}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )}
             />
 
             {/* Lieferant / Supplier */}
-            <offerForm.Field
-              name="supplierId"
-              children={(field) => (
-                <div className="flex-1 grid gap-2 items-center">
-                  <label
-                    className="text-sm  text-gray-500"
-                    htmlFor={field.name}
-                  >
-                    Lieferant:
-                  </label>
-                  <select
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                    className="w-full rounded-lg border border-(--border) transition-all duration-200 px-3 py-2 text-base outline-none focus:bg-gray-100"
-                  >
-                    <option value="">None</option>
-                    {suppliers?.map((supplier: Supplier) => (
-                      <option key={supplier.id} value={supplier.id}>
-                        {supplier.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
+            <offerForm.Field name="supplierId" children={(field) => (
+              <div className="flex-1 grid gap-2 items-center">
+                <Select label="Lieferant" value={field.state.value as string}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  onChange={(e) => field.handleChange(e.target.value)}>
+                  <option value="">None</option>
+                  {suppliers?.map((supplier: Supplier) => (
+                    <option key={supplier.id} value={supplier.id}>
+                      {supplier.name}
+                    </option>
+                  ))}
+                </Select>
+              </div>
+            )}
             />
 
             {/* Zahlungsbedingung */}
-            <offerForm.Field
-              name="paymentTerm"
-              children={(field) => (
-                <div className="flex-1 grid gap-2">
-                  <label className="text-sm text-gray-500" htmlFor="">
-                    Zahlungsbedingung:
-                  </label>
-                  <Input
-                    input_size="sm"
-                    placeholder="Zahlungsbedingung..."
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
+            <offerForm.Field name="paymentTerm" children={(field) => (
+              <div className="flex-1 grid gap-2">
+
+                <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  value={field.state.value as string}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )}
             />
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
             {/* Angebot Gültig bis */}
-            <offerForm.Field
-              name="validUntil"
-              children={(field) => (
-                <div className="flex-1 grid gap-2">
-                  <label className="text-sm text-gray-500" htmlFor="">
-                    Angebot gültig bis:
-                  </label>
-                  <Input
-                    type="date"
-                    input_size="sm"
-                    placeholder="Gültig bis..."
-                    value={
-                      field.state.value
-                        ? new Date(field.state.value)
-                          .toISOString()
-                          .split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) =>
-                      field.handleChange(
-                        e.target.value ? new Date(e.target.value) : null,
-                      )
-                    }
-                  />
-                </div>
-              )}
+            <offerForm.Field name="validUntil" children={(field) => (
+              <div className="flex-1 grid gap-2">
+
+                <Input label="Angebot gültig bis" type="date" input_size="sm" placeholder="Gültig bis..."
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  value={field.state.value as string}
+                  onChange={(e) => field.handleChange(e.target.value as string)}
+                />
+
+              </div>
+            )}
             />
 
             {/* Ihre Anfrage vom */}
-            <offerForm.Field
-              name="requestFrom"
-              children={(field) => (
-                <div className="flex-1 grid gap-2">
-                  <label className="text-sm text-gray-500" htmlFor="">
-                    Ihre Anfrage vom:
-                  </label>
-                  <Input
-                    type="date"
-                    input_size="sm"
-                    placeholder="Ihre Anfrage vom..."
-                    value={
-                      field.state.value
-                        ? new Date(field.state.value)
-                          .toISOString()
-                          .split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) =>
-                      field.handleChange(
-                        e.target.value ? new Date(e.target.value) : null,
-                      )
-                    }
-                  />
-                </div>
-              )}
-            />
+            <offerForm.Field name="requestFrom" children={(field) => (
+              <div className="flex-1 grid gap-2">
+
+                <Input label="Ihre Anfrage vom" type="date" input_size="sm" placeholder="Ihre Anfrage vom..."
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  value={field.state.value as string}
+                  onChange={(e) => field.handleChange(e.target.value as string)}
+                />
+
+              </div>
+            )} />
           </div>
 
           <hr className="text-gray-200" />

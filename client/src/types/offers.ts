@@ -17,7 +17,6 @@ export type CreateOfferInput = Omit<
   | "offerFlatRates"
   | "offerPositions"
   | "order"
-  | "documentJobs"
   | "documents"
   | "tasks"
   | "total_amount"

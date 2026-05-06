@@ -69,8 +69,8 @@ export interface components {
         };
         Offer: {
             id: string;
-            supplier: components["schemas"]["Supplier"];
-            supplierId: string;
+            supplier?: components["schemas"]["Supplier"];
+            supplierId?: string;
             customer: components["schemas"]["Customer"];
             customerId: string;
             customerContactPerson: components["schemas"]["ContactPerson"];
@@ -88,7 +88,6 @@ export interface components {
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             offerPositions: components["schemas"]["OfferPosition"][];
             order?: components["schemas"]["Order"];
-            documentJobs: components["schemas"]["DocumentJob"][];
             documents: components["schemas"]["Document"][];
             tasks: components["schemas"]["Task"][];
             /** Format: int32 */
@@ -100,9 +99,9 @@ export interface components {
             /** Format: int32 */
             total_amount: number;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         OfferPosition: {
             id: string;
@@ -144,7 +143,6 @@ export interface components {
             user: components["schemas"]["User"];
             userId: string;
             orderPositions: components["schemas"]["OrderPosition"][];
-            documentJobs: components["schemas"]["DocumentJob"][];
             documents: components["schemas"]["Document"][];
             tasks: components["schemas"]["Task"][];
             offer?: components["schemas"]["Offer"];
@@ -302,24 +300,6 @@ export interface components {
             offerPositions: components["schemas"]["OfferPosition"][];
             /** Format: date-time */
             createdAt?: string;
-        };
-        DocumentJob: {
-            id: string;
-            orderId?: string;
-            order?: components["schemas"]["Order"];
-            offerId?: string;
-            offer?: components["schemas"]["Offer"];
-            type: string;
-            status: string;
-            isCurrent: boolean;
-            docxPath?: string;
-            pdfPath?: string;
-            error?: string;
-            jobId?: string;
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
         };
         /** @enum {string} */
         DocumentStatus: "UPLOADED" | "UPLOADING" | "GENERATED" | "PROCESSING" | "PENDING" | "FAILED";

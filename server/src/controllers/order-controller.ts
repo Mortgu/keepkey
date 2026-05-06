@@ -56,13 +56,10 @@ export const getOrderById = async (
  * Get document jobs for an order
  * [GET] http://localhost:3000/api/orders/:orderId/documents
  */
-export const getOrderDocumentJobs = async (
-  request: Request,
-  response: Response,
-) => {
+export const getOrderTasks = async (request: Request, response: Response) => {
   const { orderId } = request.params;
 
-  const jobs = await prisma.documentJob.findMany({
+  const jobs = await prisma.task.findMany({
     where: { orderId: orderId as string },
     orderBy: { createdAt: "desc" },
   });

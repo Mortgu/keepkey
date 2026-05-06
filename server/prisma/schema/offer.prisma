@@ -23,7 +23,6 @@ model Offer {
     offerFlatRates OfferFlatRate[]
     offerPositions OfferPosition[]
     order          Order?
-    documentJobs   DocumentJob[]
 
     // New
     documents Document[]
