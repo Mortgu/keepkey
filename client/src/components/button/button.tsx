@@ -27,9 +27,9 @@ const styles = tv({
                 'focus:ring-2 focus:ring-gray-300',
             ],
             link: [
+                'p-0',
                 'bg-transparent text-gray-700 cursor-pointer',
                 'hover:text-(--primary) active:text-(--primary)',
-                '',
             ]
         },
         active: {
@@ -44,6 +44,10 @@ const styles = tv({
             false: ''
         },
         size: {
+            fit_xs: 'h-fit p-0 w-fit text-xs',
+            fit_sm: 'h-fit p-0 w-fit text-sm',
+            fit_md: 'h-fit p-0 w-fit text-md',
+
             xs: 'h-[34px] px-[12px] py-[5px] text-xs',
             sm: 'h-[38px] px-[16px] py-[7px] text-sm',
             md: 'h-[42px] px-[22px] py-[10px] text-md',

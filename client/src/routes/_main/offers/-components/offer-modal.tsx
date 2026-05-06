@@ -2,7 +2,7 @@ import { useContracts } from "@/hooks/contract";
 import { useCustomers } from "@/hooks/customer";
 import { useProducts } from "@/hooks/product";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash2 } from "lucide-react";
+import { Loader, Plus, Trash, Trash2, X } from "lucide-react";
 import { useState } from "react";
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import OfferFlatRateForm from "./offer-flat-rate-form";
@@ -27,6 +27,7 @@ import type {
   UpdateOfferPositionInput,
   UpdateOfferFlatRatesInput,
 } from "@/types";
+import { formatEur } from "@/utils/utils";
 
 interface OfferModalProps {
   open: boolean;
@@ -279,16 +280,11 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
           <hr className="text-gray-200" />
 
-          <div className="grid gap-2">
+          <div className="grid gap-4">
             <div className="flex items-center justify-between w-full">
               <Checkbox label="Vergleichen?" />
-              <Button
-                onClick={() => setShowProductForm(true)}
-                variant="link"
-                icon={<Plus className="size-4" />}
-                size="sm"
-                disabled={showProductForm}
-              >
+              <Button variant="link" size="fit_sm" disabled={showProductForm} icon={<Plus className="size-4" />}
+                onClick={() => setShowProductForm(true)}>
                 Produkt hinzufügen
               </Button>
             </div>
@@ -301,31 +297,27 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
             <div className="flex flex-col gap-2">
               {offerProducts.map((op, index) => {
-                const product = products?.find(
-                  (p: Product) => p.id === op.productId,
-                );
+                const product = products.find((f) => f.id == op.productId);
+                const contract = contracts.find((c) => c.id == op.contractId);
+
+                if (!product || !contract) return null;
+
                 return (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2"
-                  >
-                    <span className="text-sm text-gray-700">
-                      {product?.name} · {op.duration_months} · Menge:{" "}
-                      {op.quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setOfferProducts((prev) =>
-                          prev.filter((_, i) => i !== index),
-                        )
-                      }
-                      className="text-gray-400 hover:text-red-500 transition-colors"
-                    >
-                      <Trash2 className="size-4" />
-                    </button>
+                  <div key={index} className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
+                    <div className="grid">
+                      <p className="flex items-center gap-1 text-sm">{op.quantity} <X className="size-3" /> {product.name}</p>
+                      <div className="flex items-center">
+                        <p className="text-xs text-(--text-secondary)">{contract.name} | {op.duration_months} Monate</p>
+                      </div>
+                    </div>
+
+                    <div>
+                      <Button type="button" size="xs" variant="secondary"
+                        icon={<Trash className="size-3" />} iconOnly
+                        onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))} />
+                    </div>
                   </div>
-                );
+                )
               })}
 
               {showProductForm && (
@@ -344,54 +336,37 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
           <hr className="text-gray-200" />
 
-          <div className="grid gap-2">
+          <div className="grid gap-4">
             <div className="flex items-center justify-between w-full">
               <span className="text-sm font-medium text-gray-700">
                 Pauschalen
               </span>
-              <Button
-                onClick={() => setShowFlatRateForm(true)}
-                variant="link"
-                icon={<Plus className="size-4" />}
-                size="sm"
-                disabled={showFlatRateForm}
-              >
+              <Button variant="link" size="fit_sm" disabled={showFlatRateForm}
+                icon={<Plus className="size-4" />} onClick={() => setShowFlatRateForm(true)}>
                 Pauschale hinzufügen
               </Button>
             </div>
 
             <div className="flex flex-col gap-2">
-              {offerFlatRates.map((fr, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2"
-                >
-                  <span className="text-sm">
-                    {fr.quantity}x {fr.flatRate.name}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setOfferFlatRates((prev) =>
-                        prev.filter((_, i) => i !== index),
-                      )
-                    }
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
+              {offerFlatRates.map((flatRate, index) => (
+                <div key={index} className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
+                  <div className="grid">
+                    <p className="flex items-center gap-1 text-sm">{flatRate.quantity} <X className="size-3" /> {flatRate.flatRate.name}</p>
+                    <p className="text-xs text-(--text-secondary)">{formatEur(flatRate.total_cents)}</p>
+                  </div>
+                  <div>
+                    <Button type="button" size="xs" variant="secondary"
+                      icon={<Trash className="size-3" />} iconOnly
+                      onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))} />
+                  </div>
                 </div>
               ))}
 
               {showFlatRateForm && (
-                <OfferFlatRateForm
-                  flatRates={flatRates}
-                  saveFn={(data) => {
-                    setOfferFlatRates((prev) => [...prev, data]);
-                    setShowFlatRateForm(false);
-                  }}
-                  cancelFn={() => setShowFlatRateForm(false)}
-                />
+                <OfferFlatRateForm flatRates={flatRates} saveFn={(data) => {
+                  setOfferFlatRates((prev) => [...prev, data]);
+                  setShowFlatRateForm(false);
+                }} cancelFn={() => setShowFlatRateForm(false)} />
               )}
             </div>
           </div>
