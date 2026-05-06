@@ -7,6 +7,7 @@ import {
   getOfferTaskById,
   getOfferTasks,
   getOffers,
+  updateOffer,
 } from "../controllers/offer-controller.js";
 import { validate } from "../middlewares/validate.js";
 import { createOfferSchema } from "../schemas/index.js";
@@ -108,6 +109,8 @@ router.get("/", getOffers);
  *         description: Angebot nicht gefunden
  */
 router.get("/:id", getOfferById);
+
+router.put('/:id', updateOffer)
 
 /**
  * @openapi

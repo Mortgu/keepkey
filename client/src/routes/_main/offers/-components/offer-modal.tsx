@@ -23,29 +23,32 @@ import type {
   CreateOfferInput,
   CreateOfferPositionInput,
   CreateOfferFlatRatesInput,
+  UpdateOfferInput,
+  UpdateOfferPositionInput,
+  UpdateOfferFlatRatesInput,
 } from "@/types";
 
 interface OfferModalProps {
   open: boolean;
   cancelFn: () => void;
-  currentOffer?: CreateOfferInput;
+  currentOffer?: Offer;
 }
 
 export const offerSchema = z.object({
   voucherId: z.string().min(1),
-  date: z.coerce.date(),
+  date: z.string().min(1),
   paymentTerm: z.string().min(1),
-  validUntil: z.coerce.date().nullable(),
+  validUntil: z.string().nullable(),
   customerId: z.string().min(1),
   supplierId: z.string().min(1),
   contactPersonId: z.string().min(1),
-  requestFrom: z.coerce.date().nullable(),
+  requestFrom: z.string().nullable(),
   userId: z.string().min(1),
 });
 
 
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
-  const isEdit = currentOffer !== null;
+  const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomers();
   const { products } = useProducts();
@@ -54,37 +57,59 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const { users } = useUser();
   const { flatRates } = useFlatRates();
 
-  const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>([]);
-  const [offerFlatRates, setOfferFlatRates] = useState<CreateOfferFlatRatesInput[]>([]);
+  const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
+    currentOffer?.offerPositions.map((pos) => ({
+      productId: pos.productId,
+      contractId: pos.contractId,
+      duration_months: pos.duration_months,
+      quantity: pos.quantity,
+      optional: pos.optional ?? false,
+    })) ?? []
+  );
+
+  const [offerFlatRates, setOfferFlatRates] = useState<CreateOfferFlatRatesInput[]>(
+    currentOffer?.offerFlatRates.map(({ id: _id, offer: _offer, ...fr }) => fr) ?? []
+  );
 
   const [showProductForm, setShowProductForm] = useState(false);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
-  const { createOffer, errorCreatingOffer } = useOffer();
+  const { createOffer, errorCreatingOffer, updateOffer } = useOffer();
 
   const offerForm = useForm({
-    defaultValues: currentOffer || {
-      customerId: customers[0]?.id || '',
+    defaultValues: {
+      customerId: currentOffer?.customerId ?? customers[0]?.id ?? '',
+      contactPersonId: currentOffer?.contactPersonId ?? '',
+      userId: currentOffer?.userId ?? '',
+      voucherId: currentOffer?.voucherId ?? '',
+      supplierId: currentOffer?.supplierId ?? '',
+      paymentTerm: currentOffer?.paymentTerm ?? '',
+      date: currentOffer?.date ?? '',
+      validUntil: currentOffer?.validUntil ?? null,
+      requestFrom: currentOffer?.requestFrom ?? null,
     },
     validators: {
       onChange: offerSchema,
       onMount: offerSchema,
     },
     onSubmit: async ({ value }) => {
-      console.log(value)
-      if (!isEdit) {
-        try {
-          const response = await createOffer({
-            offer: value as unknown as CreateOfferInput,
+      try {
+        if (isEdit) {
+          await updateOffer({
+            id: currentOffer.id,
+            offer: { ...value, id: currentOffer!.id } as UpdateOfferInput,
+            positions: offerProducts as UpdateOfferPositionInput[],
+            flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
+          });
+        } else {
+          await createOffer({
+            offer: value as CreateOfferInput,
             positions: offerProducts as CreateOfferPositionInput[],
             flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
           });
-
-          cancelFn();
-
-          return response;
-        } catch (exception: any) { }
-      }
+        }
+        cancelFn();
+      } catch (exception: any) { }
     },
   });
 
@@ -332,7 +357,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
                   className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2"
                 >
                   <span className="text-sm">
-                    {fr.quantity}x {fr.name}
+                    {fr.quantity}x {fr.flatRate.name}
                   </span>
                   <button
                     type="button"

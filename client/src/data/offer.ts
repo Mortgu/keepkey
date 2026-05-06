@@ -28,8 +28,8 @@ export const deleteOfferAction = (id: string) =>
   api<void>(`/api/offers/${id}`, { method: "DELETE" });
 
 export const updateOfferAction = (
-  offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
-) => api<Offer>("/api/offers", {
+  id: string, offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
+) => api<Offer>(`/api/offers/${id}`, {
   method: "PUT",
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ offer, positions, flatRates }),

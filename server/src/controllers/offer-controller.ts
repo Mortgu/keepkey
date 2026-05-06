@@ -127,11 +127,7 @@ export const createOfferTask = async (request: Request, response: Response) => {
   }
 };
 
-export const createOffer = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
-) => {
+export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
   const { body } = request;
 
   if (!body) {
@@ -164,9 +160,20 @@ export const createOffer = async (
 
       let net_amount = net_amount_positions + net_amount_flatrates;
 
+      const toDate = (val: string | null | undefined): Date | null => {
+        if (!val) return null;
+        const d = new Date(val);
+        return isNaN(d.getTime()) ? null : d;
+      };
+
+      const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
       const offer = await tx.offer.create({
         data: {
-          ...body.offer,
+          ...offerFields,
+          date: toDate(date) ?? new Date(),
+          supplierId: supplierId || null,
+          validUntil: toDate(validUntil),
+          requestFrom: toDate(requestFrom),
           net_amount: net_amount,
           tax_rate: 19,
           tax_amount: net_amount * 0.19,
@@ -255,3 +262,76 @@ export const deleteOffer = async (request: Request, response: Response) => {
     });
   }
 };
+
+export const updateOffer = async (request: Request, response: Response) => {
+  const oid = request.params.id as string;
+  const data = request.body;
+
+  if (!data) {
+    return response.status(400).json({
+      message: 'Bad request! Missing body!'
+    });
+  }
+
+  const toDate = (val: string | null | undefined): Date | null => {
+    if (!val) return null;
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? null : d;
+  };
+
+  const { positions = [], flatRates = [] } = data;
+  const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
+
+  for (const position of positions) {
+    position["total_cents"] = await calculatePrice({ ...position });
+  }
+
+  try {
+    await prisma.$transaction(async (tx) => {
+      const net_amount_positions = positions.reduce(
+        (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+      const net_amount_flatrates = flatRates.reduce(
+        (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+      const net_amount = net_amount_positions + net_amount_flatrates;
+
+      await tx.offer.updateMany({
+        where: { id: oid as string },
+        data: {
+          ...scalarFields,
+          date: toDate(date) ?? new Date(),
+          supplierId: supplierId || null,
+          validUntil: toDate(validUntil),
+          requestFrom: toDate(requestFrom),
+          net_amount,
+          tax_rate: 19,
+          tax_amount: net_amount * 0.19,
+          total_amount: net_amount * 1.19,
+        },
+      });
+
+      await tx.offerPosition.deleteMany({ where: { offerId: oid } });
+      for (const position of positions) {
+        const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
+        await tx.offerPosition.create({
+          data: { offerId: oid, productId, contractId, duration_months, quantity, total_cents, optional, tax_rate: 19 },
+        });
+      }
+
+      await tx.offerFlatRate.deleteMany({ where: { offerId: oid } });
+      for (const flatRate of flatRates) {
+        await tx.offerFlatRate.create({
+          data: { offerId: oid, flatRateId: flatRate.flatRateId, quantity: flatRate.quantity, total_cents: flatRate.total_cents },
+        });
+      }
+    });
+
+    return response.status(200).json({});
+  } catch (exception: any) {
+    console.error('updateOffer error:', exception.message, JSON.stringify(exception, null, 2));
+    return response.status(500).json({
+      message: 'Something went wrong trying to update offer',
+      detail: exception.message,
+      exception
+    });
+  }
+}

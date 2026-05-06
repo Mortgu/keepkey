@@ -36,9 +36,9 @@ export const useOffer = () => {
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ offer, positions, flatRates }: {
-      offer: UpdateOfferInput; positions: UpdateOfferPositionInput[]; flatRates: UpdateOfferFlatRatesInput[];
-    }) => updateOfferAction(offer, positions, flatRates),
+    mutationFn: ({ id, offer, positions, flatRates }: {
+      id: string, offer: UpdateOfferInput; positions: UpdateOfferPositionInput[]; flatRates: UpdateOfferFlatRatesInput[];
+    }) => updateOfferAction(id, offer, positions, flatRates),
     onSuccess: invalidate,
   });
 
