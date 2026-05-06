@@ -2,72 +2,101 @@ import { Worker } from "bullmq";
 import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
 import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
+import { TaskStatus, TaskType } from "@prisma/client";
 
-interface DocumentJobData {
-    documentJobId: string;
-    type: 'offer' | 'invoice';
+interface TaskData {
+  taskId: string;
+  taskType: TaskType;
 }
 
 export default function startDocumentWorker() {
-    const worker = new Worker<DocumentJobData>(documentQueueKey, async (job) => {
-        const { documentJobId, type } = job.data;
+  const worker = new Worker<TaskData>(documentQueueKey, async (job) => {
+    const { taskId, taskType } = job.data;
 
-        const documentJob = await prisma.documentJob.findUnique({
-            where: { id: documentJobId },
+    const task = await prisma.task.findUnique({
+      where: { id: taskId },
+    });
+
+    if (!task) {
+      throw new Error(`Task ${taskId} not found! Skip.`);
+    }
+
+    switch (taskType) {
+      case TaskType.OFFER:
+        if (!task.offerId) {
+          throw new Error("Document job for offer with undefined offerId");
+        }
+
+        const document = await prisma.document.findFirst({
+          where: { offerId: task.offerId, isCurrent: true },
+          select: { id: true, version: true },
         });
 
-        if (!documentJob) {
-            throw new Error(`DocumentJob "${documentJobId}" not found — skipping`);
+        if (!document) {
+          throw new Error(
+            `No current document row found for offer ${task.offerId}`,
+          );
         }
 
-        switch (type) {
-            case 'offer': {
-                if (!documentJob.offerId) {
-                    throw new Error("Document job for offer with undefined offerId");
-                }
+        await prisma.document.update({
+          where: { id: document.id },
+          data: { status: "PROCESSING" },
+        });
 
-                const { docxPath, pdfPath } = await generateOfferDocument(documentJob.offerId, documentJobId);
+        const { displayName } = await generateOfferDocument(
+          task.offerId,
+          taskId,
+          document.id,
+          document.version,
+        );
 
-                await prisma.documentJob.update({
-                    where: { id: documentJobId },
-                    data: { status: 'completed', docxPath, pdfPath },
-                });
-                break;
-            }
-            case 'invoice':
-                if (!documentJob.orderId) {
-                    throw new Error("Document job for order with undefined orderId");
-                }
-                // TODO
-                break;
-            default:
-                throw new Error(`Unknown document type "${type}" or missing reference ID`);
-        }
+        await prisma.document.update({
+          where: { id: document.id },
+          data: {
+            displayName,
+            pdfReady: true,
+            docxReady: true,
+            status: "GENERATED",
+          },
+        });
 
-    }, { connection, concurrency: 2 });
+        await prisma.task.update({
+          where: { id: taskId },
+          data: { status: TaskStatus.COMPLETED },
+        });
 
-    worker.on('completed', async (job) => {
-        console.log(`[worker] job ${job.id} completed (documentJobId: ${job.data.documentJobId})`);
+        break;
+      case TaskType.ORDER:
+        break;
+      default:
+        throw new Error(`Task ${task.id} with unknown type propertie!`);
+    }
+  },
+    { connection, concurrency: 2 },
+  );
 
-        if (job) {
+  worker.on("completed", async (job) => {
+    if (job) {
+      console.log(
+        `[worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
+      );
+    }
+  });
 
-        }
-    });
+  worker.on("failed", async (job, err) => {
+    console.error(`[worker] job ${job?.id} failed:`, err.message);
 
-    worker.on('failed', async (job, err) => {
-        console.error(`[worker] job ${job?.id} failed:`, err);
+    if (job) {
+      await prisma.task.updateMany({
+        where: { id: job.data.taskId },
+        data: { status: TaskStatus.FAILED, error: err.message },
+      });
+    }
+  });
 
-        if (job) {
-            await prisma.documentJob.updateMany({
-                where: { id: job.data.documentJobId },
-                data: { status: 'failed', error: err.message },
-            });
-        }
-    });
+  worker.on("stalled", (jobId) => {
+    console.warn(`[worker] job ${jobId} stalled`);
+  });
 
-    worker.on('stalled', (jobId) => {
-        console.warn(`[worker] job ${jobId} stalled`);
-    });
-
-    return worker;
+  return worker;
 }

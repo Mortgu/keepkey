@@ -1,49 +1,12 @@
-import type { DocumentJob } from "./types";
+import { api } from "@/lib/api-client";
 
+import type { Order, Task } from "@/types";
 
+export const getOrdersAction = () =>
+  api<Order[]>("/api/orders", { method: "GET" });
 
-export async function getOrdersAction() {
-    const response = await fetch('http://localhost:3000/api/orders', {
-        method: 'GET',
-        credentials: 'include',
-    });
+export const deleteOrderAction = (id: string) =>
+  api<void>(`/api/orders/${id}`, { method: "DELETE" });
 
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-
-export async function deleteOrderAction(orderId: string) {
-    const response = await fetch(`http://localhost:3000/api/orders/${orderId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function getDocumentJobsAction(orderId: string): Promise<DocumentJob[]> {
-    const response = await fetch(`http://localhost:3000/api/orders/${orderId}/documents`, {
-        method: 'GET',
-        credentials: 'include',
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
+export const getTasksAction = (orderId: string) =>
+  api<Task[]>(`api/orders/${orderId}/documents`, { method: "DELETE" });

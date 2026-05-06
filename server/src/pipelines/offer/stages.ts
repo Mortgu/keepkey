@@ -1,79 +1,95 @@
 import path from "path";
-import fs from 'fs/promises';
+import fs from "fs/promises";
 
 import env from "../../lib/env.js";
-import { fetchOfferData, formatFetchedData, postprocessing, generating, converting } from "./actions.js";
+import {
+  fetchOfferData,
+  formatFetchedData,
+  postprocessing,
+  generating,
+  converting,
+} from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
 import { Stage } from "./pipeline.js";
+import { TaskStatus } from "@prisma/client";
 
 const fetch: Stage<OfferPipelineContext> = {
-    name: "fetch",
-    status: "fetching",
-    run: async (context) => {
-        context.fetchedData = await fetchOfferData(context.offerId);
-    }
-}
+  name: "fetch",
+  status: TaskStatus.RUNNING,
+  run: async (context) => {
+    context.fetchedData = await fetchOfferData(context.offerId);
+  },
+};
 
 const preprocess: Stage<OfferPipelineContext> = {
-    name: "preprocess",
-    status: "formatting",
-    run: async (context) => {
-        context.formatedData = await formatFetchedData(context.fetchedData);
-    }
-}
+  name: "preprocess",
+  run: async (context) => {
+    context.formatedData = await formatFetchedData(context.fetchedData);
+  },
+};
 
 const postprocess: Stage<OfferPipelineContext> = {
-    name: 'postprocess',
-    status: 'postprocessing',
-    run: async (context) => {
-        context.formatedData = await postprocessing(context.formatedData);
-    }
-}
+  name: "postprocess",
+  run: async (context) => {
+    context.formatedData = await postprocessing(context.formatedData);
+  },
+};
 
 const prepare: Stage<OfferPipelineContext> = {
-    name: "prepare",
-    run: async (ctx) => {
-        ctx.outDir = path.join(env.OUTPUT_DIR, ctx.documentJobId);
-        await fs.mkdir(ctx.outDir, { recursive: true });
-    },
+  name: "prepare",
+  run: async () => {
+    await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
+  },
 };
 
 const generate: Stage<OfferPipelineContext> = {
-    name: 'generate',
-    status: 'generating',
-    run: async (context) => {
-        context.docxBuffer = await generating(context.formatedData);
-    }
-}
+  name: "generate",
+  run: async (context) => {
+    context.docxBuffer = await generating(context.formatedData);
+  },
+};
 
 const convert: Stage<OfferPipelineContext> = {
-    name: 'convert',
-    status: 'converting',
-    run: async (context) => {
-        context.pdfBuffer = await converting(context.docxBuffer!);
-    }
-}
+  name: "convert",
+  run: async (context) => {
+    context.pdfBuffer = await converting(context.docxBuffer!);
+  },
+};
 
 const write: Stage<OfferPipelineContext> = {
-    name: 'write',
-    status: 'writing',
-    run: async (context) => {
-        context.docxPath = path.join(context.outDir!, "angebot.docx");
-        context.pdfPath = path.join(context.outDir!, "angebot.pdf");
+  name: "write",
+  run: async (context) => {
+    const offer = context?.fetchedData?.offer;
 
-        await Promise.all([
-            fs.writeFile(context.docxPath, context.docxBuffer!),
-            fs.writeFile(context.pdfPath, context.pdfBuffer!),
-        ]);
+    if (!offer) {
+      throw new Error("Offer is null!");
     }
-}
+
+    const { voucherId, customer, offerPositions } = offer;
+    const { companyName } = customer;
+    const workloads = offerPositions
+      .map((i) => i.product.name.replaceAll(" ", ""))
+      .join("+");
+
+    const baseName = `${voucherId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
+    context.displayName = `${baseName}_v${context.version}`;
+
+    const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);
+    const pdfPath = path.join(env.OUTPUT_DIR, `${context.documentId}.pdf`);
+
+    await Promise.all([
+      fs.writeFile(docxPath, context.docxBuffer!),
+      fs.writeFile(pdfPath, context.pdfBuffer!),
+    ]);
+  },
+};
 
 export const offerStages: Stage<OfferPipelineContext>[] = [
-    fetch,
-    preprocess,
-    postprocess,
-    prepare,
-    generate,
-    convert,
-    write,
-]
+  fetch,
+  preprocess,
+  postprocess,
+  prepare,
+  generate,
+  convert,
+  write,
+];

@@ -1,17 +1,7 @@
-import { type ButtonHTMLAttributes, forwardRef, type ReactNode } from 'react';
+import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { Loader } from 'lucide-react';
-
-interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'ghost' | 'link';
-    size?: 'xs' | 'sm' | 'md';
-    active?: false | true,
-    danger?: boolean;
-    icon?: ReactNode;
-    iconOnly?: boolean;
-    loading?: boolean;
-    children?: ReactNode;
-}
+import type { ButtonComponentProps } from './button-types';
 
 const styles = tv({
     base: [
@@ -37,9 +27,9 @@ const styles = tv({
                 'focus:ring-2 focus:ring-gray-300',
             ],
             link: [
+                'p-0',
                 'bg-transparent text-gray-700 cursor-pointer',
                 'hover:text-(--primary) active:text-(--primary)',
-                '',
             ]
         },
         active: {
@@ -54,6 +44,10 @@ const styles = tv({
             false: ''
         },
         size: {
+            fit_xs: 'h-fit p-0 w-fit text-xs',
+            fit_sm: 'h-fit p-0 w-fit text-sm',
+            fit_md: 'h-fit p-0 w-fit text-md',
+
             xs: 'h-[34px] px-[12px] py-[5px] text-xs',
             sm: 'h-[38px] px-[16px] py-[7px] text-sm',
             md: 'h-[42px] px-[22px] py-[10px] text-md',
@@ -72,8 +66,9 @@ const styles = tv({
     }
 });
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-    ({ className, variant, size, active, danger, icon, iconOnly, loading, children, ...rest }, ref) => {
+export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
+    ({ className, variant, size, active, danger, icon, iconPosition = 'left', iconOnly, loading, children, ...rest }, ref) => {
+        const resolvedIcon = loading ? <Loader className="size-4 animate-spin" /> : icon;
         return (
             <button
                 ref={ref}
@@ -81,13 +76,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
                 disabled={loading || rest.disabled}
                 {...rest}
             >
-                {loading ? <Loader className="size-4 animate-spin" /> : icon}
+                {iconPosition === 'left' && resolvedIcon}
                 {!iconOnly && children}
+                {iconPosition === 'right' && resolvedIcon}
             </button>
         );
     }
 );
 
 Button.displayName = 'Button';
-
-export default Button;

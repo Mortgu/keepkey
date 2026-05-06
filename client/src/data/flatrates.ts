@@ -1,65 +1,30 @@
-import type { FlatRateBase, FlatRate } from "./types";
+import { api } from "@/lib/api-client.ts";
 
-export async function getFlatRatesAction(): Promise<FlatRate[]> {
-    const response = await fetch('http://localhost:3000/api/flatrates', {
-        method: 'GET',
-        credentials: 'include',
-    });
+import type {
+  FlatRate,
+  CreateFlatRateInput,
+  UpdateFlatRateInput,
+} from '@/types';
 
-    const result = await response.json();
+export const getFlatRatesAction = () =>
+  api<FlatRate[]>("/api/flatrates", { method: "GET" });
 
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
+export const createFlatRateAction = (flatRate: CreateFlatRateInput) =>
+  api<FlatRate>("/api/flatrates", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(flatRate),
+  });
 
-    return result;
-}
+export const updateFlatRateAction = (
+  id: string,
+  flatRate: Partial<UpdateFlatRateInput>,
+) =>
+  api<FlatRate>(`/api/flatrates/${id}`, {
+    method: `PUT`,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(flatRate),
+  });
 
-export async function createFlatRateAction(flatrate: FlatRateBase): Promise<FlatRate> {
-    const response = await fetch('http://localhost:3000/api/flatrates', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(flatrate),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function updateFlatRateAction(id: string, flatrate: Partial<FlatRateBase>): Promise<FlatRate> {
-    const response = await fetch(`http://localhost:3000/api/flatrates/${id}`, {
-        method: 'PUT',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(flatrate),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function deleteFlatRateAction(id: string): Promise<void> {
-    const response = await fetch(`http://localhost:3000/api/flatrates/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
+export const deleteFlatRateAction = (id: string) =>
+  api<void>(`/api/flatrates/${id}`, { method: "DELETE" });

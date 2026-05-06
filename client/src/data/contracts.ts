@@ -1,66 +1,29 @@
-import type { BaseContract, Contract } from "./types";
+import { api } from "@/lib/api-client.ts";
 
-export async function getContractsAction(): Promise<Contract[]> {
-    const response = await fetch("http://localhost:3000/api/contracts", {
-        method: "GET",
-    });
+import type {
+  Contract,
+  CreateContractInput,
+  UpdateContractInput,
+} from "@/types";
 
-    const result = await response.json();
+export const getContractsAction = () =>
+  api<Contract[]>("/api/contracts", { method: "GET" });
 
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
+export const createContractAction = (data: CreateContractInput) =>
+  api<Contract>("/api/contracts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-    return result;
-}
+export const updateContractAction = (id: string, data: UpdateContractInput) =>
+  api<Contract>(`/api/contracts/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 
-export async function createContractAction(data: BaseContract): Promise<Contract> {
-    const response = await fetch("http://localhost:3000/api/contracts", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function updateContractAction(id: string, data: BaseContract): Promise<Contract> {
-    const response = await fetch(`http://localhost:3000/api/contracts/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
-
-export async function deleteContractAction(id: string) {
-    const response = await fetch("http://localhost:3000/api/contracts", {
-        method: "DELETE",
-        credentials: "include",
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ id })
-    });
-
-    const result = await response.json();
-
-    if (!response.ok) {
-        throw new Error(result.message);
-    }
-
-    return result;
-}
+export const deleteContractAction = (id: string) =>
+  api<void>(`/api/contracts/${id}`, {
+    method: "DELETE",
+  });

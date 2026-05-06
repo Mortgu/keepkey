@@ -1,6 +1,7 @@
-import Navigation from '@/components/navigation'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
-import React from 'react'
+import React from 'react';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+
+import { Navigation } from '@/components';
 
 export const Route = createFileRoute('/_main')({
     component: MainLayoutComponent,

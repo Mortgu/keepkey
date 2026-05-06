@@ -1,27 +1,34 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
-import { createOffer, createOfferDocumentJob, deleteOffer, getOfferById, getOfferJobById, getOfferJobs, getOffers } from "../controllers/offer-controller.js";
+import {
+  createOffer,
+  createOfferTask,
+  deleteOffer,
+  downloadOfferDocument,
+  getOfferById,
+  getOfferTaskById,
+  getOfferTasks,
+  getOffers,
+  updateOffer,
+} from "../controllers/offer-controller.js";
 import { validate } from "../middlewares/validate.js";
 import { createOfferSchema } from "../schemas/index.js";
 
 const router = Router();
 
-/* [GET] http://localhost:3000/api/offers */
-router.get('/', requireSession, getOffers);
+router.get("/", getOffers);
 
-/* [GET] http://localhost:3000/api/offers/:id */
-router.get('/:id', getOfferById);
+router.get("/:id", getOfferById);
 
-/* [GET] http://localhost:3000/api/offers/:id/jobs */
-router.get('/:id/jobs', getOfferJobs);
+router.put('/:id', updateOffer, createOfferTask);
 
-/* [GET] http://localhost:3000/api/offers/:id/jobs/:jobId */
-router.get('/:id/jobs/:jobId', getOfferJobById);
+router.delete("/:id", deleteOffer);
 
-/* [POST] http://localhost:3000/api/offers */
-router.post('/', requireSession, validate(createOfferSchema), createOffer, createOfferDocumentJob);
+router.get("/:id/jobs", getOfferTasks);
 
-/* [DELETE] http://localhost:3000/api/offers */
-router.delete('/', requireSession, deleteOffer);
+router.get("/:id/jobs/:jobId", getOfferTaskById);
+
+router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
+
+router.post("/", validate(createOfferSchema), createOffer, createOfferTask);
 
 export default router;

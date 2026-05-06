@@ -1,102 +1,190 @@
-import Button from "@/components/button/button";
-import type { Offer, OfferPosition } from "@/data/types";
-import { useOffer } from "@/hooks/offer";
+import React, { useState } from "react";
+import { Pen, Trash } from "lucide-react";
+
+import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { useQuery } from "@tanstack/react-query";
-import { FileText, Pen, Trash } from "lucide-react";
+import OfferModal from "./offer-modal";
+import { DocumentItem } from "./offer-items";
+
+
+import { useOfferHook } from "@/hooks";
+import { Button, Badge, Collapsable } from "@/components";
+import type { Document, Offer, OfferFlatRate, OfferPosition } from "@/types";
 
 type OfferListItemProps = {
-    offer: Offer;
-}
+  offer: Offer;
+};
 
 export default function OfferListItem({ offer }: OfferListItemProps) {
-    const { deleteOffer } = useOffer();
+  const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
+  const [edit, setEdit] = useState<boolean>(false);
+  const { deleteOffer } = useOfferHook();
 
-    const { data: job } = useQuery({
-        queryKey: ["documentJob", offer.id],
-        queryFn: async () => {
-            const response = await fetch(`http://localhost:3000/api/offers/${offer.id}/jobs`, {
-                credentials: 'include'
-            });
-            if (!response.ok) return null;
-            return await response.json();
-        },
-        refetchInterval: (query) => {
-            const status = query.state.data?.status;
-            if (status === "completed" || status === "failed") return false;
-            return 3000;
-        }
-    })
-
-    const handleDeleteOffer = (id: string) => {
-        if (confirm("Angebot löschen?")) {
-            deleteOffer({ id });
-        }
+  const handleDeleteOffer = () => {
+    if (confirm("Angebot löschen")) {
+      deleteOffer({ id: offer.id });
     }
+  };
 
-    return (
-        <div className='grid border border-(--border) rounded-md overflow-hidden'>
-
-            {/* Header */}
-            <div className='flex items-center justify-between border-b border-(--border) px-3 py-2'>
-                <div className='flex items-center gap-4'>
-                    <div>
-                        <p className='text-base font-medium'>{offer.voucherId}</p>
-                        <p className='text-sm text-gray-500'>{offer.customer.companyName} · {offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}</p>
-                    </div>
-                    <div className='hidden sm:block text-sm text-gray-500'>
-                        {/*<p>Gültig bis: {formatDate(offer.validUntil)}</p>
-                                    <p>Anfrage vom: {formatDate(offer.requestFrom)}</p>*/}
-                    </div>
-                </div>
-                <div className="flex items-center">
-                    <Button size="sm" variant="ghost" icon={<Pen className="size-4" />} iconOnly />
-                    <Button onClick={() => handleDeleteOffer(offer.id)} size="sm" variant="ghost" icon={<Trash className="size-4" />} iconOnly />
-                </div>
+  return (
+    <React.Fragment>
+      <div className="border border-(--border) rounded-md">
+        <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
+          <div className="grid gap-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-md">
+                {offerPositions.map((i) => i.product.name).join(" & ")}
+              </h1>
+              <Badge variant="generated">{ }</Badge>
             </div>
 
-            {/* Position */}
-            <div className="flex items-center">
-                <div className="grid flex-1">
-                    {offer.offerPositions.map((pos: OfferPosition, i) => (
-                        <div key={i} className="flex items-center justify-between even:bg-gray-50 px-3 py-2">
-                            <div className='flex items-center gap-2'>
-                                <p className='text-sm'>{pos.product.name} {pos.optional && "(optional)"}</p>
-                                <p className='text-sm text-gray-400'>({pos.contract.name} / {String(pos.duration_months)} Monate)</p>
-                            </div>
-                            <div className='flex items-center gap-4 text-sm text-gray-500'>
-                                <span className='w-20 text-right font-medium text-gray-700'>{formatEur((pos.total_cents))}</span>
-                            </div>
-                        </div>
-                    ))}
+            <div className="flex flex-wrap items-center gap-4">
+              {/* Company */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Firma:</label>
+                <p className="text-(--text) hover:cursor-pointer hover:underline">
+                  {offer.customer.companyName}
+                </p>
+              </div>
 
-                    <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
-                        <span className=''>Zwischensumme (Netto)</span>
-                        <span>{formatEur(offer.net_amount)}</span>
+              {/* Contact person */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Kontakt:</label>
+                <p className="text-(--text) hover:cursor-pointer hover:underline">
+                  {ccp.salutation} {ccp.firstName} {ccp.lastName}
+                </p>
+              </div>
+
+              {/* Offer-Id. */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Angebots-Nr.</label>
+                <p className="text-(--text)">{offer.voucherId}</p>
+              </div>
+
+              {/* Created at */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Erstellt:</label>
+                <p className="text-(--text)">
+                  {formatDate(offer.createdAt ?? "")}
+                </p>
+              </div>
+
+              {/* Valid until */}
+              <div className="flex items-center gap-1 text-sm font-light">
+                <label className="text-(--text-secondary)">Gültig bis:</label>
+                <p className="text-(--text)">
+                  {offer.validUntil ? formatDate(offer.validUntil) : "-"}
+                </p>
+              </div>
+            </div>
+          </div>
+          {/* Total display */}
+          <div className="flex flex-col items-end">
+            <p className="text-md font-semibold">
+              {formatEur(offer.net_amount)}
+            </p>
+            <p className="text-(--text-secondary) font-light text-sm">
+              Gesamtpreis
+            </p>
+          </div>
+        </div>
+
+        {/* Products */}
+        <Collapsable
+          label="Produkte"
+          className="w-full bg-(--subtle-50) justify-between rounded-none"
+        >
+          <div className="grid gap-2 px-4 py-3">
+            {/* Product */}
+            {offerPositions.map((op: OfferPosition, i: number) => (
+              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
+                <div className="grid">
+                  <div className="flex gap-2">
+                    <p className="text-sm">{op.product.name}</p>
+                    <Badge variant="draft">{op.contract.name}</Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Seats:</span>
+                      <p>{op.quantity}</p>
                     </div>
-                    <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
-                        <span className=''>+ Steuern</span>
-                        <span>+ {formatEur(offer.tax_amount)}</span>
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Laufzeit:</span>
+                      <p>{op.duration_months} Monate</p>
                     </div>
-                    <div className='flex items-center justify-between px-3 py-2 text-sm font-medium'>
-                        <span className=''>Gesamt (Brutto)</span>
-                        <span>{formatEur(offer.total_amount)}</span>
-                    </div>
+                  </div>
                 </div>
+                <div className="flex flex-col items-end">
+                  <p className="text-sm font-semibold">
+                    {formatEur(op.total_cents)}
+                  </p>
+                  <p className="text-(--text-secondary) font-light text-sm">
+                    Gesamtpreis (netto)
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {offerFlatRates.map((fr: OfferFlatRate, i: number) => (
+              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
+                <div className="grid">
+                  <div className="flex gap-2">
+                    <p className="text-sm">{fr.flatRate.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Anzahl:</span>
+                      <p>{fr.quantity}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <p className="text-sm font-semibold">
+                    {formatEur(fr.total_cents)}
+                  </p>
+                  <p className="text-(--text-secondary) font-light text-sm">
+                    Gesamtpreis (netto)
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {/* Total price */}
+            <div className="flex items-center gap-2 border border-(--border) py-2 px-3 justify-end rounded-md">
+              <span className="text-sm text-(--text-secondary) font-light">
+                Gesamtpreis
+              </span>{" "}
+              <p>{formatEur(offer.net_amount)}</p>
             </div>
+          </div>
+        </Collapsable>
 
-            {/* Dokumente */}
-            <div className='flex items-center gap-2 px-3 py-2 bg-(--page-bg) border-t border-(--border)'>
+        {/* Documents */}
+        <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
+          <div className="grid gap-2 px-4 py-3">
+            {offer.documents.map((document: Document) => (
+              <DocumentItem key={document.id} document={document} />
+            ))}
+          </div>
+        </Collapsable>
 
-                <Button loading={job?.status === 'pending' || job?.status === 'generating'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                    DOCX
-                </Button>
+        <div className="flex items-center justify-end px-2 border-t border-(--border)">
 
-                <Button loading={job?.status === 'pending' || job?.status === 'generating' || job?.status === 'converting'} variant='secondary' size='sm' icon={<FileText className='size-3.5' />}>
-                    PDF
-                </Button>
-            </div>
+          <Button size="xs" variant="link" onClick={() => setEdit(true)}
+            icon={<Pen className="size-3" />} iconOnly />
+
+          <Button size="xs" variant="link" onClick={handleDeleteOffer}
+            icon={<Trash className="size-3" />} iconOnly />
 
         </div>
-    )
+      </div>
+
+      <OfferModal
+        key={offer.id}
+        open={edit}
+        cancelFn={() => setEdit(false)}
+        currentOffer={offer}
+      />
+    </React.Fragment>
+  );
 }

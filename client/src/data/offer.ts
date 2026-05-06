@@ -1,54 +1,32 @@
-import type { OfferProductInput } from "@/routes/_main/offers/-components/offer-product-form";
-import type { FlatRateBase, BaseOffer, Offer } from "./types";
+import { api } from "@/lib/api-client";
 
-export const getOffersAction = async () => {
-    const response = await fetch('http://localhost:3000/api/offers', {
-        method: 'GET',
-        credentials: 'include',
-    });
+import type {
+  Offer,
+  CreateOfferInput,
+  UpdateOfferInput,
+  CreateOfferPositionInput,
+  CreateOfferFlatRatesInput,
+  UpdateOfferFlatRatesInput,
+  UpdateOfferPositionInput,
+} from '@/types';
 
-    if (!response.ok) {
-        return []
-    }
+export const getOffersAction = () =>
+  api<Offer[]>("/api/offers", { method: "GET" });
 
-    return await response.json();
-}
+export const createOfferAction = (offer: CreateOfferInput, positions: CreateOfferPositionInput[], flatRates: CreateOfferFlatRatesInput[]) =>
+  api<Offer>("/api/offers", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ offer, positions, flatRates }),
+  });
 
-export const createOfferAction = async (offer: BaseOffer, positions: OfferProductInput[], flatrates: FlatRateBase[]) => {
-    const response = await fetch('http://localhost:3000/api/offers', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            offer, positions, flatRates: flatrates
-        })
-    });
+export const deleteOfferAction = (id: string) =>
+  api<void>(`/api/offers/${id}`, { method: "DELETE" });
 
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-    }
-
-    return await response.json();
-}
-
-export const deleteOfferAction = async (id: string) => {
-    const response = await fetch('http://localhost:3000/api/offers', {
-        method: 'DELETE',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            id: id
-        })
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to delete offer!");
-    }
-
-    return await response.json();
-}
+export const updateOfferAction = (
+  id: string, offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
+) => api<Offer>(`/api/offers/${id}`, {
+  method: "PUT",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ offer, positions, flatRates }),
+});

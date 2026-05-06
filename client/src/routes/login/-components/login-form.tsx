@@ -3,9 +3,9 @@ import { useForm } from "@tanstack/react-form";
 import { authClient } from "@/lib/auth-client.ts";
 import { Eye, EyeOff } from "lucide-react";
 import { z } from 'zod';
-import Input from "@/components/inputs/input.tsx";
-import Button from "@/components/button/button.tsx";
 import { Route } from "../";
+
+import { Input, Button } from "@/components";
 
 export function LoginFormComponent() {
     const [error, setError] = useState<string | undefined>(undefined);

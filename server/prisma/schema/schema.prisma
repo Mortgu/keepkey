@@ -3,6 +3,11 @@ generator client {
   engineType = "binary"
 }
 
+generator openapi {
+  provider = "prisma-openapi"
+  output   = "./openapi"
+}
+
 datasource db {
   provider = "postgresql"
 }
@@ -33,29 +38,6 @@ model User {
   orders         Order[]
 
   @@map("user")
-}
-
-model Customer {
-  id String @id @default(uuid())
-
-  customerId  String  @unique
-  companyName String
-  email       String? @unique
-
-  orders         Order[]         @relation("CustomerRelation")
-  contactPersons ContactPerson[]
-
-  street String?
-  city   String?
-  plz    String?
-  phone  String?
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  offers    Offer[]
-  users     User[]
-
-  @@map("customer")
 }
 
 model Session {
@@ -120,33 +102,15 @@ model Supplier {
   @@map("supplier")
 }
 
-model FlatRates {
+model FlatRate {
   id          String @id @default(uuid())
   name        String
   table       String
   total_cents Int
 
-  offerFlatRates OfferFlatRates[]
+  offerFlatRates OfferFlatRate[]
 
-  @@map("flat_rates")
-}
-
-model Product {
-  id   String @id @default(uuid())
-  name String @unique
-
-  description String?
-  table       String?
-
-  productPricing ProductPricing[]
-  orderPositions OrderPosition[]
-  offerPositions OfferPosition[]
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
-
-  @@index([name])
-  @@map("product")
+  @@map("flat_rate")
 }
 
 model Contract {
@@ -162,110 +126,4 @@ model Contract {
   createdAt DateTime? @default(now())
 
   @@map("contract")
-}
-
-model ProductPricing {
-  id String @id @default(uuid())
-
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
-
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-
-  min_quantity Int
-  max_quantity Int? @default(0)
-
-  duration_months Int @default(12)
-
-  price Int
-
-  @@map("pricing")
-}
-
-model Order {
-  id String @id @default(uuid())
-
-  customer   Customer @relation("CustomerRelation", fields: [customerId], references: [id], onDelete: Restrict)
-  customerId String
-
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
-
-  orderPositions OrderPosition[]
-  documentJobs   DocumentJob[]
-
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String? @unique
-
-  employee   User?   @relation("EmployeeRelation", fields: [employeeId], references: [id])
-  employeeId String?
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @default(now())
-
-  @@map("order")
-}
-
-model DocumentJob {
-  id        String   @id @default(cuid())
-  orderId   String?
-  order     Order?   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  offerId   String?
-  offer     Offer?   @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  type      String
-  status    String   @default("pending")
-  isCurrent Boolean  @default(true)
-  docxPath  String?
-  pdfPath   String?
-  error     String?
-  jobId     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([orderId])
-  @@index([offerId])
-  @@index([status])
-  @@map("document_job")
-}
-
-model OrderPosition {
-  id String @id @default(uuid())
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
-  orderId String
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration_months Int
-  quantity        Int
-
-  priceAtPurchase Float
-  currency        String @default("EUR")
-
-  createdAt DateTime? @default(now())
-
-  @@map("order_position")
-}
-
-model ContactPerson {
-  id         String   @id @default(uuid())
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  salutation String
-  firstName  String
-  lastName   String
-  email      String?
-
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
-  offers    Offer[]
-
-  @@index([customerId])
-  @@map("contact_person")
 }

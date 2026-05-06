@@ -1,120 +1,122 @@
 @import "tailwindcss";
 
 @theme {
-    --font-sans: 'DM Sans', sans-serif;
-    --font-mono: 'DM Mono', monospace;
+  --font-sans: "DM Sans", sans-serif;
+  --font-mono: "DM Mono", monospace;
 }
 
 :root {
-    --viewport: 1280px;
+  --viewport: 1280px;
 
-    --primary: #00683F;
+  --primary: #00683f;
 
-    --primary-900: #002E1C;
-    --primary-800: #004A2E;
-    --primary-700: #005432;
-    --primary-600: #00683F;
-    --primary-500: #1A7F54;
-    --primary-400: #3D9E74;
-    --primary-300: #72BF9B;
-    --primary-200: #A8D9C0;
-    --primary-100: #D4EDE1;
-    --primary-50: #E6F2EC;
+  --primary-900: #002e1c;
+  --primary-800: #004a2e;
+  --primary-700: #005432;
+  --primary-600: #00683f;
+  --primary-500: #1a7f54;
+  --primary-400: #3d9e74;
+  --primary-300: #72bf9b;
+  --primary-200: #a8d9c0;
+  --primary-100: #d4ede1;
+  --primary-50: #e6f2ec;
 
-    --fg-2: #4B5C52;
-    --fg-3: #8A9E93;
+  --fg-2: #4b5c52;
+  --fg-3: #8a9e93;
 
-    --border-200: #C4CFC8;
-    --border: #E0E4E1;
+  --border-200: #c4cfc8;
+  --border: #e0e4e1;
 
-    --text: #111A14;
+  --text: #111a14;
+  --text-600: #4b5c52;
+  --text-secondary: rgb(138, 158, 147);
 
-    --neutral-900: #1E2D23;
-    --neutral-800: #2D4035;
-    --neutral-400: #6B7D72;
+  --neutral-900: #1e2d23;
+  --neutral-800: #2d4035;
+  --neutral-400: #6b7d72;
 
-    --subtle-50: #F0F4F1;
+  --subtle-50: #f0f4f1;
 
-    --page-bg: #F7F8F7;
+  --page-bg: #f7f8f7;
 
-    --destructive: #C0392B;
-    --destructive-subtle: #FDECEA;
+  --destructive: #c0392b;
+  --destructive-subtle: #fdecea;
 
-    --warning: #B45309;
-    --warning-subtle: #FEF3C7;
+  --warning: #b45309;
+  --warning-subtle: #fef3c7;
 
-    --info: #1D6FA4;
-    --info-subtle: #E1F0FA;
+  --info: #1d6fa4;
+  --info-subtle: #e1f0fa;
 
-    --success: #00683F;
-    --success-subtle: #E6F2EC;
+  --success: #00683f;
+  --success-subtle: #e6f2ec;
 }
 
 html,
 body {
-    /*background-color: var(--page-bg);*/
-    font-family: var(--font-sans);
-    color: var(--text);
+  /*background-color: var(--page-bg);*/
+  font-family: var(--font-sans);
+  color: var(--text);
 }
 
 * {
-    box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 *::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 #root {
-    min-height: 100vh;
+  min-height: 100vh;
 }
 
 #app {
-    min-height: 100%;
+  min-height: 100%;
 }
 
 li {
-    list-style: disc;
+  list-style: disc;
 }
 
 @layer components {
-    /* Type scale */
-    .text-display {
-        font-size: 36px;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-        line-height: 1.2;
-    }
-    .text-h1 {
-        font-size: 24px;
-        font-weight: 600;
-        letter-spacing: -0.02em;
-    }
-    .text-h2 {
-        font-size: 20px;
-        font-weight: 600;
-        letter-spacing: -0.01em;
-    }
-    .text-h3 {
-        font-size: 17px;
-        font-weight: 500;
-    }
-    .text-h4 {
-        font-size: 14px;
-        font-weight: 600;
-    }
-    .text-body {
-        font-size: 14px;
-        font-weight: 400;
-    }
-    .text-small {
-        font-size: 13px;
-        font-weight: 400;
-    }
-    .text-caption {
-        font-size: 11px;
-        font-weight: 500;
-        letter-spacing: 0.06em;
-        text-transform: uppercase;
-    }
+  /* Type scale */
+  .text-display {
+    font-size: 36px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .text-h1 {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .text-h2 {
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  .text-h3 {
+    font-size: 17px;
+    font-weight: 500;
+  }
+  .text-h4 {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .text-body {
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .text-small {
+    font-size: 13px;
+    font-weight: 400;
+  }
+  .text-caption {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
 }

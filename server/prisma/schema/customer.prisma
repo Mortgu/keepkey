@@ -1,0 +1,40 @@
+model Customer {
+  id String @id @default(uuid())
+
+  customerId  String  @unique
+  companyName String
+  email       String? @unique
+
+  orders         Order[]         @relation("CustomerRelation")
+  contactPersons ContactPerson[]
+
+  street String?
+  city   String?
+  plz    String?
+  phone  String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  offers    Offer[]
+  users     User[]
+
+  @@map("customer")
+}
+
+model ContactPerson {
+  id         String   @id @default(uuid())
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  salutation String
+  firstName  String
+  lastName   String
+  email      String?
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+  offers    Offer[]
+
+  @@index([customerId])
+  @@map("contact_person")
+}

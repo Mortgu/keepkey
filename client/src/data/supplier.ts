@@ -1,48 +1,34 @@
-import type { BaseSupplier, Supplier } from "./types";
+import { api } from "@/lib/api-client";
 
-export async function getSuppliers(): Promise<Supplier[]> {
-    const response = await fetch('http://localhost:3000/api/suppliers', {
-        method: "GET",
-        credentials: 'include'
-    });
+import type {
+  Supplier,
+  CreateSupplierInput,
+  UpdateSupplierInput,
+} from "@/types";
 
-    if (!response.ok) {
-        return [];
-    }
+export const getSuppliersAction = () =>
+  api<Supplier[]>("/api/suppliers", { method: "GET" });
 
-    return await response.json();
-}
+export const createSupplierAction = (supplier: CreateSupplierInput) =>
+  api<Supplier>("/api/suppliers", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...supplier }),
+  });
 
-export async function createSupplier(supplier: BaseSupplier) {
-    const response = await fetch('http://localhost:3000/api/suppliers', {
-        method: "POST",
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ ...supplier })
-    });
+export const UpdateSupplierAction = (
+  supplierId: string,
+  data: UpdateSupplierInput,
+) =>
+  api<Supplier>(`/api/suppliers/${supplierId}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ ...data }),
+  });
 
-    if (!response.ok) {
-        throw new Error("Failed to create supplier!")
-    }
-
-    return await response.json();
-}
-
-export async function deleteSupplier(id: string) {
-    const response = await fetch('http://localhost:3000/api/suppliers', {
-        method: "DELETE",
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id })
-    });
-
-    if (!response.ok) {
-        throw new Error("Failed to delete supplier!")
-    }
-
-    return true;
-}
+export const deleteSupplierAction = (id: string) =>
+  api<void>(`/api/suppliers/${id}`, { method: "DELETE" });

@@ -1,22 +1,31 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
-import { canCreateContract, canDeleteContract, canUpdateContract } from "../permissions/contract.js";
-import { createContract, deleteContract, getAllContracts, updateContract } from "../controllers/contract-controller.js";
+
+import {
+  createContract,
+  deleteContract,
+  getAllContracts,
+  updateContract,
+} from "../controllers/contract-controller.js";
+
 import { validate } from "../middlewares/validate.js";
-import { createContractSchema, updateContractSchema } from "../schemas/index.js";
+
+import {
+  createContractSchema,
+  updateContractSchema,
+} from "../schemas/index.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/contracts */
-router.get('/', getAllContracts);
+router.get("/", getAllContracts);
 
 /* [POST] http://localhost:3000/api/contracts */
-router.post('/', requireSession, canCreateContract, validate(createContractSchema), createContract);
+router.post("/", validate(createContractSchema), createContract);
 
 /* [PUT] http://localhost:3000/api/contracts/:id */
-router.put('/:id', requireSession, canUpdateContract, validate(updateContractSchema), updateContract);
+router.put("/:id", validate(updateContractSchema), updateContract);
 
-/* [DELETE] http://localhost:3000/api/contracts */
-router.delete('/', requireSession, canDeleteContract, deleteContract);
+/* [DELETE] http://localhost:3000/api/contracts/:id */
+router.delete("/:id", deleteContract);
 
 export default router;

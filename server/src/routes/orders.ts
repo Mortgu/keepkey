@@ -1,29 +1,20 @@
-import type { Request, Response } from "express";
 import { Router } from "express";
-import { prisma } from "../lib/prisma.js";
-import { requireSession } from "../middlewares/auth.js";
-import {getOrderById, getSessionOrders, getOrderDocumentJobs, getAllOrders} from "../controllers/order-controller.js";
-import { documentQueue, documentQueueKey } from "../lib/queues.js";
+import {
+  getOrderById,
+  getOrderTasks,
+  getAllOrders,
+  deleteOrderById,
+} from "../controllers/order-controller.js";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/orders */
-router.get('/', requireSession, getAllOrders);
+router.get("/", getAllOrders);
 
-router.get('/:orderId', getOrderById);
+router.get("/:orderId", getOrderById);
 
-router.get('/:orderId/documents', requireSession, getOrderDocumentJobs);
+router.get("/:orderId/documents", getOrderTasks);
 
-router.delete('/:id', requireSession, async (request: Request, response: Response) => {
-    const { id } = request.params;
-
-    await prisma.order.delete({
-        where: { id: id as string }
-    });
-
-    return response.status(200).send({
-        message: 'Deletion successfully', success: true
-    });
-})
+router.delete("/:id", deleteOrderById);
 
 export default router;
