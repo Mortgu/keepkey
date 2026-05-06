@@ -41,14 +41,10 @@ type Result = {
   displayName: string;
 };
 
-export async function generateOfferDocument(
-  offerId: string,
-  taskId: string,
-  documentId: string,
-  version: number,
-): Promise<Result> {
+export async function generateOfferDocument(offerId: string, taskId: string, documentId: string, version: number): Promise<Result> {
   const ctx: OfferPipelineContext = { offerId, taskId, documentId, version };
   const result = await runPipeline(ctx, offerStages);
+
   return {
     displayName: result.displayName!,
   };

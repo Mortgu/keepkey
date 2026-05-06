@@ -36,13 +36,3 @@ export const getTaskById = async (request: Request, response: Response) => {
     });
   }
 };
-
-export const createTask = async (request: Request, response: Response) => {
-  const ctx: OfferPipelineContext = {
-    offerId: "", taskId: ""
-  };
-
-  const pipeline = await runPipeline(ctx, offerStages);
-
-
-}
