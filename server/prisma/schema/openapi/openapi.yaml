@@ -95,6 +95,8 @@ components:
       properties:
         id:
           type: string
+        name:
+          type: string
         pdfName:
           type: string
         docxName:
@@ -211,15 +213,6 @@ components:
         net_amount:
           type: integer
           format: int32
-        tax_rate:
-          type: integer
-          format: int32
-        tax_amount:
-          type: integer
-          format: int32
-        total_amount:
-          type: integer
-          format: int32
         createdAt:
           type: string
           format: date-time
@@ -242,9 +235,6 @@ components:
         - documents
         - tasks
         - net_amount
-        - tax_rate
-        - tax_amount
-        - total_amount
         - createdAt
         - updatedAt
     OfferPosition:

@@ -27,3 +27,9 @@ export const formatDuration = (value: number): string => {
       return "x Jahre";
   }
 };
+
+export const toDate = (val: string | null | undefined): Date | null => {
+  if (!val) return null;
+  const d = new Date(val);
+  return isNaN(d.getTime()) ? null : d;
+};

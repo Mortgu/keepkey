@@ -5,7 +5,7 @@ import { formatDate } from "@/lib/format";
 
 import { Button, Badge, Collapsable } from "@/components";
 
-import type { Document, Offer, OfferPosition, Task } from "@/types";
+import type { Document, Offer, OfferFlatRate, OfferPosition, Task } from "@/types";
 import React, { useState } from "react";
 import OfferModal from "./offer-modal";
 import { DocumentItem, TaskItem } from "./offer-items";
@@ -15,7 +15,7 @@ type OfferListItemProps = {
 };
 
 export default function OfferListItem({ offer }: OfferListItemProps) {
-  const { customerContactPerson: ccp, offerPositions, tasks } = offer;
+  const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
   const [edit, setEdit] = useState<boolean>(false);
   const { deleteOffer } = useOffer();
 
@@ -80,7 +80,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
           {/* Total display */}
           <div className="flex flex-col items-end">
             <p className="text-md font-semibold">
-              {formatEur(offer.total_amount)}
+              {formatEur(offer.net_amount)}
             </p>
             <p className="text-(--text-secondary) font-light text-sm">
               Gesamtpreis
@@ -96,10 +96,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
           <div className="grid gap-2 px-4 py-3">
             {/* Product */}
             {offerPositions.map((op: OfferPosition, i: number) => (
-              <div
-                key={i}
-                className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md"
-              >
+              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
                 <div className="grid">
                   <div className="flex gap-2">
                     <p className="text-sm">{op.product.name}</p>
@@ -127,12 +124,36 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
               </div>
             ))}
 
+            {offerFlatRates.map((fr: OfferFlatRate, i: number) => (
+              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
+                <div className="grid">
+                  <div className="flex gap-2">
+                    <p className="text-sm">{fr.flatRate.name}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="flex gap-1 text-sm font-light">
+                      <span className="text-(--text-secondary)">Anzahl:</span>
+                      <p>{fr.quantity}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex flex-col items-end">
+                  <p className="text-sm font-semibold">
+                    {formatEur(fr.total_cents)}
+                  </p>
+                  <p className="text-(--text-secondary) font-light text-sm">
+                    Gesamtpreis (netto)
+                  </p>
+                </div>
+              </div>
+            ))}
+
             {/* Total price */}
             <div className="flex items-center gap-2 border border-(--border) py-2 px-3 justify-end rounded-md">
               <span className="text-sm text-(--text-secondary) font-light">
                 Gesamtpreis
               </span>{" "}
-              <p>{formatEur(offer.total_amount)}</p>
+              <p>{formatEur(offer.net_amount)}</p>
             </div>
           </div>
         </Collapsable>

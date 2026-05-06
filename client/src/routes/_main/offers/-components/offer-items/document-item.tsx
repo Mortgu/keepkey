@@ -2,7 +2,7 @@ import { Button } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import type { Document } from "@/types";
-import { File } from "lucide-react";
+import { File, RotateCw } from "lucide-react";
 
 type Props = {
     document: Document;
@@ -30,6 +30,8 @@ export function DocumentItem({ document }: Props) {
                 <a href={BASE_URL + "/" + document.docxPath} download={document.docxName}>
                     <Button variant="secondary" size="sm">DOCX</Button>
                 </a>
+
+                {/*<Button variant="secondary" size="sm" icon={<RotateCw className="size-3.5" />} iconOnly /> */}
             </div>
         </div>
     )

@@ -8,6 +8,7 @@ import {
   TaskStatus,
   TaskType,
 } from "@prisma/client";
+import { toDate } from "../utils/utils.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const offers = await prisma.offer.findMany({
@@ -173,12 +174,6 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
       let net_amount = net_amount_positions + net_amount_flatrates;
 
-      const toDate = (val: string | null | undefined): Date | null => {
-        if (!val) return null;
-        const d = new Date(val);
-        return isNaN(d.getTime()) ? null : d;
-      };
-
       const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
       const offer = await tx.offer.create({
         data: {
@@ -188,9 +183,6 @@ export const createOffer = async (request: Request, response: Response, next: Ne
           validUntil: toDate(validUntil),
           requestFrom: toDate(requestFrom),
           net_amount: net_amount,
-          tax_rate: 19,
-          tax_amount: net_amount * 0.19,
-          total_amount: net_amount * 1.19,
         },
       });
 

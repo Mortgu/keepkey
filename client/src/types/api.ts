@@ -41,6 +41,7 @@ export interface components {
         };
         Document: {
             id: string;
+            name?: string;
             pdfName?: string;
             docxName?: string;
             pdfPath?: string;
@@ -94,12 +95,6 @@ export interface components {
             tasks: components["schemas"]["Task"][];
             /** Format: int32 */
             net_amount: number;
-            /** Format: int32 */
-            tax_rate: number;
-            /** Format: int32 */
-            tax_amount: number;
-            /** Format: int32 */
-            total_amount: number;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

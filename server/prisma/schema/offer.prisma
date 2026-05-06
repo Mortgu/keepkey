@@ -24,15 +24,10 @@ model Offer {
     offerPositions OfferPosition[]
     order          Order?
 
-    // New
     documents Document[]
     tasks     Task[]
 
-    // (in cent)
-    net_amount   Int // Der reine Warenwert (netto) 
-    tax_rate     Int // Der angewendete Prozentsatz (e.g 19.00)
-    tax_amount   Int // absolute Steuerbetrag
-    total_amount Int // Finale Brutto Betrag
+    net_amount Int // Der reine Warenwert (netto) in cent
 
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
