@@ -47,8 +47,6 @@ app.get('/swagger.json', (request: Request, response: Response) => {
   response.send(swaggerSpec)
 });
 
-app.use("/generated", express.static(path.join(process.cwd(), "generated")));
-
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());

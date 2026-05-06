@@ -5,15 +5,13 @@ import { offerStages } from "./stages.js";
 
 export type PipelineContext = {
   taskId: string;
+  documentId: string;
+  version: number;
+
   docxBuffer?: Buffer;
   pdfBuffer?: Buffer;
-  outDir?: string;
 
-  docxPath?: string;
-  docxName?: string;
-
-  pdfPath?: string;
-  pdfName?: string;
+  displayName?: string;
 };
 
 export type Stage<T extends PipelineContext = PipelineContext> = {
@@ -40,23 +38,18 @@ export async function runPipeline<T extends PipelineContext>(
 }
 
 type Result = {
-  docxPath: string;
-  docxName: string;
-  pdfPath: string;
-  pdfName: string;
+  displayName: string;
 };
 
 export async function generateOfferDocument(
   offerId: string,
   taskId: string,
+  documentId: string,
+  version: number,
 ): Promise<Result> {
-  const ctx: OfferPipelineContext = { offerId, taskId };
+  const ctx: OfferPipelineContext = { offerId, taskId, documentId, version };
   const result = await runPipeline(ctx, offerStages);
   return {
-    docxPath: result.docxPath!,
-    docxName: result.docxName!,
-
-    pdfPath: result.pdfPath!,
-    pdfName: result.pdfName!,
+    displayName: result.displayName!,
   };
 }

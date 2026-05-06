@@ -41,11 +41,11 @@ export interface components {
         };
         Document: {
             id: string;
-            name?: string;
-            pdfName?: string;
-            docxName?: string;
-            pdfPath?: string;
-            docxPath?: string;
+            /** Format: int32 */
+            version: number;
+            displayName?: string;
+            pdfReady: boolean;
+            docxReady: boolean;
             status: components["schemas"]["DocumentStatus"];
             isCurrent: boolean;
             offer?: components["schemas"]["Offer"];

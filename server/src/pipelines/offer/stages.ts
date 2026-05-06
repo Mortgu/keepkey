@@ -37,9 +37,8 @@ const postprocess: Stage<OfferPipelineContext> = {
 
 const prepare: Stage<OfferPipelineContext> = {
   name: "prepare",
-  run: async (ctx) => {
-    ctx.outDir = path.join(env.OUTPUT_DIR, ctx.taskId);
-    await fs.mkdir(ctx.outDir, { recursive: true });
+  run: async () => {
+    await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
   },
 };
 
@@ -72,17 +71,15 @@ const write: Stage<OfferPipelineContext> = {
       .map((i) => i.product.name.replaceAll(" ", ""))
       .join("+");
 
-    const fileName = `${voucherId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
+    const baseName = `${voucherId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
+    context.displayName = `${baseName}_v${context.version}`;
 
-    context.docxName = `${fileName}.docx`;
-    context.docxPath = path.join(context.outDir!, context.docxName);
-
-    context.pdfName = `${fileName}.pdf`;
-    context.pdfPath = path.join(context.outDir!, context.pdfName);
+    const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);
+    const pdfPath = path.join(env.OUTPUT_DIR, `${context.documentId}.pdf`);
 
     await Promise.all([
-      fs.writeFile(context.docxPath, context.docxBuffer!),
-      fs.writeFile(context.pdfPath, context.pdfBuffer!),
+      fs.writeFile(docxPath, context.docxBuffer!),
+      fs.writeFile(pdfPath, context.pdfBuffer!),
     ]);
   },
 };

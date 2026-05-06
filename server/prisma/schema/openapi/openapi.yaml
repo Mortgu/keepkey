@@ -95,16 +95,15 @@ components:
       properties:
         id:
           type: string
-        name:
+        version:
+          type: integer
+          format: int32
+        displayName:
           type: string
-        pdfName:
-          type: string
-        docxName:
-          type: string
-        pdfPath:
-          type: string
-        docxPath:
-          type: string
+        pdfReady:
+          type: boolean
+        docxReady:
+          type: boolean
         status:
           $ref: "#/components/schemas/DocumentStatus"
         isCurrent:
@@ -122,6 +121,9 @@ components:
           format: date-time
       required:
         - id
+        - version
+        - pdfReady
+        - docxReady
         - status
         - isCurrent
         - createdAt

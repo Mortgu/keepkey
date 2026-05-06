@@ -10,13 +10,11 @@ enum DocumentStatus {
 model Document {
   id String @id @default(cuid())
 
-  name String?
+  version     Int
+  displayName String?
 
-  pdfName  String?
-  docxName String?
-
-  pdfPath  String?
-  docxPath String?
+  pdfReady  Boolean @default(false)
+  docxReady Boolean @default(false)
 
   status    DocumentStatus @default(PENDING)
   isCurrent Boolean
@@ -29,6 +27,7 @@ model Document {
 
   createdAt DateTime @default(now())
 
+  @@unique([offerId, version])
   @@map("document")
 }
 

@@ -1,3 +1,4 @@
+import path from "path";
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
@@ -9,6 +10,7 @@ import {
   TaskType,
 } from "@prisma/client";
 import { toDate } from "../utils/utils.js";
+import env from "../lib/env.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const offers = await prisma.offer.findMany({
@@ -31,6 +33,7 @@ export const getOffers = async (request: Request, response: Response) => {
       },
     },
   });
+
   return response.status(200).json(offers);
 };
 
@@ -42,7 +45,11 @@ export const getOfferById = async (request: Request, response: Response) => {
       where: { id: id as string },
       include: {
         tasks: true,
-        documents: true,
+        documents: {
+          orderBy: {
+            createdAt: 'desc'
+          }
+        },
       },
     });
 
@@ -97,7 +104,6 @@ export const createOfferTask = async (request: Request, response: Response) => {
   }
 
   try {
-    // 1. Create task in db
     const task = await prisma.task.create({
       data: {
         offerId: offer.id,
@@ -106,34 +112,38 @@ export const createOfferTask = async (request: Request, response: Response) => {
       },
     });
 
-    // 2. Create a new document (pdf, docx) in db
-    await prisma.document.updateMany({
-      where: { AND: [{ offerId: offer.id }, { isCurrent: true }] },
-      data: {
-        isCurrent: false
-      }
+    await prisma.$transaction(async (tx) => {
+      await tx.document.updateMany({
+        where: { offerId: offer.id, isCurrent: true },
+        data: { isCurrent: false },
+      });
+
+      const latest = await tx.document.findFirst({
+        where: { offerId: offer.id },
+        orderBy: { version: "desc" },
+        select: { version: true },
+      });
+      const nextVersion = (latest?.version ?? 0) + 1;
+
+      await tx.document.create({
+        data: {
+          offerId: offer.id,
+          version: nextVersion,
+          status: "PENDING",
+          isCurrent: true,
+        },
+      });
     });
 
-    await prisma.document.create({
-      data: {
-        offerId: offer.id,
-        status: "PENDING",
-        isCurrent: true
-      }
-    })
-
-    // 3. Enqueue the job for bullmq
     const job = await documentQueue.add(documentQueueKey, {
       taskId: task.id,
       taskType: TaskType.OFFER,
     });
 
-    // 4. Update the task to include the id of the enqued job
     await prisma.task.update({
       where: { id: task.id },
       data: { jobId: job.id },
     });
-
 
     return response.status(200).json(offer);
   } catch (exception: any) {
@@ -141,6 +151,43 @@ export const createOfferTask = async (request: Request, response: Response) => {
       message: `Failed to create task for offer: ${offer.id}`,
     });
   }
+};
+
+export const downloadOfferDocument = async (
+  request: Request,
+  response: Response,
+) => {
+  const offerId = request.params.id as string;
+  const documentId = request.params.documentId as string;
+  const format = request.params.format as string;
+
+  if (format !== "pdf" && format !== "docx") {
+    return response.status(400).json({ message: "Invalid format" });
+  }
+
+  const document = await prisma.document.findFirst({
+    where: { id: documentId, offerId },
+    select: {
+      id: true,
+      displayName: true,
+      pdfReady: true,
+      docxReady: true,
+    },
+  });
+
+  if (!document) {
+    return response.status(404).json({ message: "Document not found" });
+  }
+
+  const ready = format === "pdf" ? document.pdfReady : document.docxReady;
+  if (!ready) {
+    return response.status(409).json({ message: "Document not yet generated" });
+  }
+
+  const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
+  const downloadName = `${document.displayName ?? document.id}.${format}`;
+
+  return response.download(filePath, downloadName);
 };
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
