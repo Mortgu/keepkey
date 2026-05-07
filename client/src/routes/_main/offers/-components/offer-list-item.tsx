@@ -35,7 +35,6 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
               <h1 className="text-md">
                 {offerPositions.map((i) => i.product.name).join(" & ")}
               </h1>
-              <Badge variant="generated">{ }</Badge>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -78,6 +77,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
               </div>
             </div>
           </div>
+
           {/* Total display */}
           <div className="flex flex-col items-end">
             <p className="text-md font-semibold">
@@ -87,14 +87,13 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
               Gesamtpreis
             </p>
           </div>
+
         </div>
 
         {/* Products */}
-        <Collapsable
-          label="Produkte"
-          className="w-full bg-(--subtle-50) justify-between rounded-none"
-        >
+        <Collapsable label="Produkte" className="w-full bg-(--subtle-50) justify-between rounded-none">
           <div className="grid gap-2 px-4 py-3">
+
             {/* Product */}
             {offerPositions.map((op: OfferPosition, i: number) => (
               <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">

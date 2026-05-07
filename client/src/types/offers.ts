@@ -19,10 +19,7 @@ export type CreateOfferInput = Omit<
   | "order"
   | "documents"
   | "tasks"
-  | "total_amount"
-  | "tax_amount"
   | "net_amount"
-  | "tax_rate"
 >;
 export type UpdateOfferInput = Partial<Offer>;
 

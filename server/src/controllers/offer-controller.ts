@@ -20,21 +20,21 @@ export const getOffers = async (request: Request, response: Response) => {
     voucherId?: { contains: string };
     customerId?: { in: string[] };
     contactPersonId?: { in: string[] };
-   } = {};
+  } = {};
 
   if (search && typeof search === "string") {
     where.voucherId = { contains: search };
-   }
+  }
 
   if (companyIds) {
     const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
     where.customerId = { in: ids as string[] };
-   }
+  }
 
   if (contactPersonIds) {
     const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
     where.contactPersonId = { in: ids as string[] };
-   }
+  }
 
   const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
 
@@ -51,15 +51,15 @@ export const getOffers = async (request: Request, response: Response) => {
         include: {
           product: true,
           contract: true,
-         },
-       },
+        },
+      },
       offerFlatRates: {
         include: {
           flatRate: true,
-         },
-       },
-     },
-   });
+        },
+      },
+    },
+  });
 
   return response.status(200).json(offers);
 };
@@ -275,7 +275,6 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             quantity,
             total_cents,
             optional,
-            tax_rate: 19,
           },
         });
       }
@@ -378,7 +377,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
       for (const position of positions) {
         const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
         await tx.offerPosition.create({
-          data: { offerId: oid, productId, contractId, duration_months, quantity, total_cents, optional, tax_rate: 19 },
+          data: { offerId: oid, productId, contractId, duration_months, quantity, total_cents, optional },
         });
       }
 

@@ -1,15 +1,10 @@
 import { useState } from "react";
 
 import { Input, Button, Checkbox } from "@/components";
-import type { Contract, Product } from "@/types";
+import type { Contract, CreateOfferPositionInput, Product } from "@/types";
+import { useContractHook, useProductHook } from "@/hooks";
 
-export type OfferProductInput = {
-  productId: string;
-  contractId: string;
-  duration_months: number;
-  quantity: number;
-  optional: boolean;
-};
+export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
 
 const DURATIONS: { value: 12 | 24 | 36; label: string }[] = [
   { value: 12, label: "12 Monate" },
@@ -18,24 +13,27 @@ const DURATIONS: { value: 12 | 24 | 36; label: string }[] = [
 ];
 
 interface Props {
-  products: Product[];
-  contracts: Contract[];
   onSave: (data: OfferProductInput) => void;
   onCancel: () => void;
+  currentProduct?: OfferProductInput;
 }
 
-export default function OfferProductForm({
-  products,
-  contracts,
-  onSave,
-  onCancel,
-}: Props) {
-  const [productId, setProductId] = useState(products[0]?.id ?? "");
-  const [contractId, setContractId] = useState(contracts[0]?.id ?? "");
-  const [duration_months, setDurationMonths] =
-    useState<OfferProductInput["duration_months"]>(12);
-  const [quantity, setQuantity] = useState(1);
-  const [optional, setOptional] = useState<boolean>(false);
+export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
+  const isEdit = currentProduct !== undefined;
+
+  console.log(currentProduct);
+
+  const { products } = useProductHook();
+  const { contracts } = useContractHook();
+
+  const [productId, setProductId] = useState(currentProduct?.productId ?? products[0]?.id ?? "");
+  const [contractId, setContractId] = useState(currentProduct?.contractId ?? contracts[0]?.id ?? "");
+
+  const [duration_months, setDurationMonths] = useState<number>(currentProduct?.duration_months ?? 12);
+  const [quantity, setQuantity] = useState<number>(currentProduct?.quantity ?? 1);
+
+  const [optional, setOptional] = useState<boolean>(currentProduct?.optional ?? false);
+
   const [error, setError] = useState("");
 
   const handleSave = () => {
@@ -51,7 +49,7 @@ export default function OfferProductForm({
       setError("Menge muss mindestens 1 sein.");
       return;
     }
-    onSave({ productId, contractId, duration_months, quantity, optional });
+    onSave({ productId, contractId, duration_months, quantity, optional, total_cents: 0 });
   };
 
   const selectClass =

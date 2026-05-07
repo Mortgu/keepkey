@@ -53,7 +53,6 @@ model OfferPosition {
     optional Boolean? @default(false)
 
     total_cents Int
-    tax_rate    Int
 
     createdAt DateTime? @default(now())
     updatedAt DateTime? @default(now())

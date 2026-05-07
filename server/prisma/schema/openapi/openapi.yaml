@@ -267,9 +267,6 @@ components:
         total_cents:
           type: integer
           format: int32
-        tax_rate:
-          type: integer
-          format: int32
         createdAt:
           type: string
           format: date-time
@@ -287,7 +284,6 @@ components:
         - duration_months
         - quantity
         - total_cents
-        - tax_rate
     OfferFlatRate:
       type: object
       properties:

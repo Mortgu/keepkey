@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import calculatePrice from "../utils/products.js";
 
 export const getPrice = async (request: Request, response: Response) => {
   const { productId, contractId, duration_months, quantity } = request.query;
@@ -27,8 +28,13 @@ export const getPrice = async (request: Request, response: Response) => {
       });
   }
 
-  //const result = await calculatePrice(productId as string, contractId as string, duration_months, quantityNum);
-  const result = null;
+  const result = await calculatePrice({
+    productId: productId as string,
+    contractId: contractId as string,
+    duration_months: durationNum,
+    quantity: quantityNum,
+  });
+  //const result = null;
 
   if (!result) {
     return response

@@ -1,5 +1,4 @@
 import { api } from "@/lib/api-client";
-import type { CreatePricingProps } from "./types";
 
 import type {
   Product,
@@ -46,3 +45,8 @@ export const deleteProductAction = (id: string) =>
 
 export const deletePricingAction = (id: string) =>
   api<void>(`/api/pricing/${id}`, { method: "DELETE" });
+
+export const getPrice = (productId: string, contractId: string, duration: number, quantity: number) =>
+  api<number>(`/api/pricing?productId=${productId}&contractId=${contractId}&duration_months=${duration}&quantity=${quantity}`, {
+    method: 'GET'
+  });

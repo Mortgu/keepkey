@@ -115,10 +115,6 @@ export interface components {
             optional?: boolean;
             /** Format: int32 */
             total_cents: number;
-            /** Format: int32 */
-            tax_rate: number;
-            /** Format: date-time */
-            createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
         };

@@ -35,7 +35,7 @@ router.use("/users", requireSession, userRouter);
 router.use("/contracts", requireSession, contractRouter);
 
 /* /api/pricing */
-router.use("/pricing", requireSession, pricingRouter);
+router.use("/pricing", pricingRouter);
 
 /* /api/orders */
 router.use("/orders", requireSession, orderRouter);

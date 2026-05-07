@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 
-import { Loader, Plus, Trash, X } from "lucide-react";
+import { DollarSign, Loader, Pen, Plus, Trash, X } from "lucide-react";
 
 import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import OfferFlatRateForm from "./offer-flat-rate-form";
@@ -33,6 +33,10 @@ import type {
   UpdateOfferFlatRatesInput,
 } from "@/types";
 import { formatEur } from "@/utils/utils";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import { getPrice } from "@/data/products";
+import ProductModalSection from "./modal-items/product-section";
 
 interface OfferModalProps {
   open: boolean;
@@ -72,6 +76,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
       duration_months: pos.duration_months,
       quantity: pos.quantity,
       optional: pos.optional ?? false,
+      total_cents: pos.total_cents ?? 0,
     })) ?? []
   );
 
@@ -283,61 +288,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             )} />
           </div>
 
-          <hr className="text-gray-200" />
-
-          <div className="grid gap-4">
-            <div className="flex items-center justify-between w-full">
-              <Checkbox label="Vergleichen?" />
-              <Button variant="link" size="fit_sm" disabled={showProductForm} icon={<Plus className="size-4" />}
-                onClick={() => setShowProductForm(true)}>
-                Produkt hinzufügen
-              </Button>
-            </div>
-
-            {offerProducts.length === 0 && !showProductForm && (
-              <p className="text-sm text-gray-500 text-center py-2">
-                Noch kein Produkt hinzugefügt
-              </p>
-            )}
-
-            <div className="flex flex-col gap-2">
-              {offerProducts.map((op, index) => {
-                const product = products.find((f) => f.id == op.productId);
-                const contract = contracts.find((c) => c.id == op.contractId);
-
-                if (!product || !contract) return null;
-
-                return (
-                  <div key={index} className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
-                    <div className="grid">
-                      <p className="flex items-center gap-1 text-sm">{op.quantity} <X className="size-3" /> {product.name}</p>
-                      <div className="flex items-center">
-                        <p className="text-xs text-(--text-secondary)">{contract.name} | {op.duration_months} Monate</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Button type="button" size="xs" variant="secondary"
-                        icon={<Trash className="size-3" />} iconOnly
-                        onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))} />
-                    </div>
-                  </div>
-                )
-              })}
-
-              {showProductForm && (
-                <OfferProductForm
-                  products={products ?? []}
-                  contracts={contracts ?? []}
-                  onSave={(data) => {
-                    setOfferProducts((prev) => [...prev, data]);
-                    setShowProductForm(false);
-                  }}
-                  onCancel={() => setShowProductForm(false)}
-                />
-              )}
-            </div>
-          </div>
+          <ProductModalSection offerProducts={offerProducts} setOfferProducts={setOfferProducts} />
 
           <hr className="text-gray-200" />
 
