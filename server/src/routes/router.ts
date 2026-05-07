@@ -12,6 +12,7 @@ import customerRouter from "./customers.js";
 import offerRouter from "./offer.js";
 import flatratesRoter from "./flatrates.js";
 import taskRouter from "./task-route.js";
+import contactPersonRouter from "./contact-persons.js";
 
 const router = Router();
 
@@ -47,5 +48,8 @@ router.use("/flatrates", requireSession, flatratesRoter);
 
 /* /api/task */
 router.use("/task", requireSession, taskRouter);
+
+/* /api/contact-persons */
+router.use("/contact-persons", requireSession, contactPersonRouter);
 
 export default router;

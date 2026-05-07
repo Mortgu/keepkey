@@ -2,6 +2,7 @@ import { api } from "@/lib/api-client";
 
 import type {
   Offer,
+  ContactPerson,
   CreateOfferInput,
   UpdateOfferInput,
   CreateOfferPositionInput,
@@ -10,8 +11,26 @@ import type {
   UpdateOfferPositionInput,
 } from '@/types';
 
-export const getOffersAction = () =>
-  api<Offer[]>("/api/offers", { method: "GET" });
+interface GetOffersParams {
+  search?: string;
+  companyIds?: string[];
+  contactPersonIds?: string[];
+  sort?: string;
+}
+
+export const getContactPersonsAction = () =>
+  api<ContactPerson[]>("/api/contact-persons", { method: "GET" });
+
+export const getOffersAction = (params?: GetOffersParams) => {
+  const urlParams = new URLSearchParams();
+  if (params?.search) urlParams.set("search", params.search);
+  if (params?.companyIds) params.companyIds.forEach(id => urlParams.append("companyIds", id));
+  if (params?.contactPersonIds) params.contactPersonIds.forEach(id => urlParams.append("contactPersonIds", id));
+  if (params?.sort) urlParams.set("sort", params.sort);
+  const query = urlParams.toString();
+  const url = query ? `/api/offers?${query}` : "/api/offers";
+  return api<Offer[]>(url, { method: "GET" });
+};
 
 export const createOfferAction = (offer: CreateOfferInput, positions: CreateOfferPositionInput[], flatRates: CreateOfferFlatRatesInput[]) =>
   api<Offer>("/api/offers", {

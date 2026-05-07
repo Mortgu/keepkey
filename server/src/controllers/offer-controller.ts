@@ -13,7 +13,34 @@ import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
 
 export const getOffers = async (request: Request, response: Response) => {
+  const { search, companyIds, contactPersonIds, sort } = request.query;
+
+  const where: {
+    AND?: any[];
+    voucherId?: { contains: string };
+    customerId?: { in: string[] };
+    contactPersonId?: { in: string[] };
+   } = {};
+
+  if (search && typeof search === "string") {
+    where.voucherId = { contains: search };
+   }
+
+  if (companyIds) {
+    const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
+    where.customerId = { in: ids as string[] };
+   }
+
+  if (contactPersonIds) {
+    const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
+    where.contactPersonId = { in: ids as string[] };
+   }
+
+  const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+
   const offers = await prisma.offer.findMany({
+    where: Object.keys(where).length > 0 ? where : undefined,
+    orderBy,
     include: {
       customer: true,
       supplier: true,
@@ -24,15 +51,15 @@ export const getOffers = async (request: Request, response: Response) => {
         include: {
           product: true,
           contract: true,
-        },
-      },
+         },
+       },
       offerFlatRates: {
         include: {
           flatRate: true,
-        },
-      },
-    },
-  });
+         },
+       },
+     },
+   });
 
   return response.status(200).json(offers);
 };

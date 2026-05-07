@@ -2,12 +2,14 @@ import {
   createOfferAction,
   deleteOfferAction,
   getOffersAction,
+  getContactPersonsAction,
   updateOfferAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
+  ContactPerson,
   CreateOfferPositionInput,
   CreateOfferInput,
   CreateOfferFlatRatesInput,
@@ -16,16 +18,27 @@ import type {
   UpdateOfferFlatRatesInput,
 } from "@/types";
 
+interface OfferQueryParams {
+  search?: string;
+  companyIds?: string[];
+  contactPersonIds?: string[];
+  sort?: string;
+}
 
-export const useOfferHook = () => {
+export const useOfferHook = (params?: OfferQueryParams) => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["offers"] });
 
   const { data: offers = [], isPending, error } = useQuery({
-    queryKey: ["offers"],
-    queryFn: getOffersAction,
+    queryKey: ["offers", params],
+    queryFn: () => getOffersAction(params),
+  });
+
+  const { data: contactPersons = [] } = useQuery({
+    queryKey: ["contact-persons"],
+    queryFn: getContactPersonsAction,
   });
 
   const createMutation = useMutation({
@@ -49,6 +62,7 @@ export const useOfferHook = () => {
 
   return {
     offers,
+    contactPersons,
     isPending,
     error,
 
