@@ -47,7 +47,7 @@ export const offerSchema = z.object({
   voucherId: z.string().min(1, "Required!"),
 
   supplierId: z.string().nullable(),
-  paymentTerm: z.string().nullable(),
+  paymentTerm: z.string(),
 
   validUntil: z.string().datetime().nullable(),
   requestFrom: z.string().datetime().nullable(),
@@ -87,12 +87,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const offerForm = useForm({
     defaultValues: {
       customerId: currentOffer?.customerId ?? customers[0]?.id ?? '',
-      contactPersonId: currentOffer?.contactPersonId ?? '',
-      userId: currentOffer?.userId ?? '',
+      contactPersonId: currentOffer?.contactPersonId ?? customers[0]?.contactPersons[0]?.id ?? '',
+      userId: currentOffer?.userId ?? users[0]?.id ?? '',
       voucherId: currentOffer?.voucherId ?? '',
 
-      supplierId: currentOffer?.supplierId ?? null,
-      paymentTerm: currentOffer?.paymentTerm ?? null,
+      supplierId: currentOffer?.supplierId ?? null, //suppliers[0]?.id
+      paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
 
       validUntil: currentOffer?.validUntil ?? null,
       requestFrom: currentOffer?.requestFrom ?? null,
@@ -144,12 +144,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
               <div className="flex-1">
                 <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   value={field.state.value as string} onChange={(e) => field.handleChange(e.target.value)} >
-                  <option value="">None</option>
                   {customers?.map((customer: Customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.companyName}
                     </option>
                   ))}
+                  {customers.length <= 0 && <option value="">None</option>}
                 </Select>
               </div>
             )} />
@@ -165,12 +165,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
                     <Select label="Ansprechpartner Kunde" value={field.state.value as string}
                       error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                       onChange={(e) => field.handleChange(e.target.value)} disabled={!customerId}>
-                      <option value="">None</option>
                       {contactPersons.map((cp: ContactPerson) => (
                         <option key={cp.id} value={cp.id}>
                           {cp.firstName} {cp.lastName}
                         </option>
                       ))}
+                      {contactPersons.length <= 0 && <option value="">None</option>}
                     </Select>
                   );
                 }}
@@ -184,12 +184,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
                 <Select label="Unser Ansprechpartner" value={field.state.value as string}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   onChange={(e) => field.handleChange(e.target.value)}>
-                  <option value="">None</option>
                   {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName} {user.lastName}
                     </option>
                   ))}
+                  {users.length <= 0 && <option value="">None</option>}
                 </Select>
               </div>
             )} />

@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react';
+import { Input } from '../inputs';
 
 interface SearchBarProps {
   value: string;
@@ -11,7 +12,7 @@ export function SearchBar({ value, onChange, placeholder, className }: SearchBar
   return (
     <div className={`relative flex-1 ${className ?? ''}`}>
       <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-(--fg-3) pointer-events-none" />
-      <input
+      <Input
         value={value}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}

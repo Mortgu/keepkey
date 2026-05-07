@@ -14,8 +14,8 @@ export function Navigation() {
           <NavLink to="/contracts">Tarife</NavLink>
           <NavLink to="/employees">Nutzer</NavLink>
           <NavLink to="/customers">Kunden</NavLink>
-          <NavLink to="/orders">Bestellungen</NavLink>
           <NavLink to="/offers">Angebote</NavLink>
+          <NavLink to="/orders">Bestellungen</NavLink>
         </div>
 
         <div className="flex h-full">
