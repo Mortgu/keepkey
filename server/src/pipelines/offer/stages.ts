@@ -13,7 +13,7 @@ import { OfferPipelineContext } from "./context.js";
 import { Stage } from "./pipeline.js";
 import { TaskStatus } from "@prisma/client";
 
-const fetch: Stage<OfferPipelineContext> = {
+const loadOfferData: Stage<OfferPipelineContext> = {
   name: "fetch",
   status: TaskStatus.RUNNING,
   run: async (context) => {
@@ -85,7 +85,7 @@ const write: Stage<OfferPipelineContext> = {
 };
 
 export const offerStages: Stage<OfferPipelineContext>[] = [
-  fetch,
+  loadOfferData,
   preprocess,
   postprocess,
   prepare,
