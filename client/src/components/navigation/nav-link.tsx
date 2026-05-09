@@ -4,14 +4,14 @@ import * as React from "react";
 import { tv } from "tailwind-variants";
 
 const itemStyles = tv({
-  base: "mx-1.5 flex items-center gap-2.5 rounded-[5px] px-3.5 py-1.5 text-[13px] font-normal text-(--fg-2) transition-colors hover:bg-(--subtle-50) hover:text-(--text)",
+  base: "mx-1.5 flex items-center gap-2.5 rounded-[5px] px-3.5 py-1.5 text-[15px] font-light text-(--text-inv) transition-colors hover:bg-(--fg-3) hover:text-(--text-inv)",
   variants: {
     indent: {
       true: "py-1.5 pl-[38px] pr-3.5",
       false: "",
     },
     isActive: {
-      true: "bg-(--primary-50) font-medium text-(--primary) hover:bg-(--primary-50) hover:text-(--primary)",
+      true: "bg-(--fg-2)  text-(--text-inv) hover:bg-(--fg-3) hover:text-(--text-inv)",
       false: "",
     },
   },
@@ -22,8 +22,8 @@ const iconStyles = tv({
   base: "flex shrink-0",
   variants: {
     isActive: {
-      true: "text-(--primary)",
-      false: "text-(--fg-3)",
+      true: "text-(--text-inv)",
+      false: "text-(--text-inv)",
     },
   },
 });
@@ -154,9 +154,8 @@ export function NavGroup({
           <ChevronDown
             size={11}
             strokeWidth={2.4}
-            className={`text-(--fg-3) transition-transform duration-150 ${
-              open ? "" : "-rotate-90"
-            }`}
+            className={`text-(--fg-3) transition-transform duration-150 ${open ? "" : "-rotate-90"
+              }`}
           />
         }
       />

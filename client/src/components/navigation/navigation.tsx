@@ -30,7 +30,7 @@ function Section({ title, collapsible = false, children }: SectionProps) {
       <button
         type="button"
         onClick={() => collapsible && setCollapsed((v) => !v)}
-        className="flex select-none items-center justify-between px-3.5 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-(--fg-3)"
+        className="flex select-none items-center justify-between px-3.5 pb-1 pt-2.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-(--fg-3)"
         style={{ cursor: collapsible ? "pointer" : "default" }}
       >
         <span>{title}</span>
@@ -49,7 +49,7 @@ function Section({ title, collapsible = false, children }: SectionProps) {
 }
 
 function SectionDivider() {
-  return <div className="mx-3.5 mt-2 h-px bg-(--border)" />;
+  return <div className="mx-3.5 mt-2 h-px bg-(--fg-2)" />;
 }
 
 function UserFooter() {
@@ -69,12 +69,12 @@ function UserFooter() {
       : user?.name ?? "—";
 
   return (
-    <div className="flex items-center gap-2.5 border-t border-(--border) px-3.5 py-2.5">
+    <div className="flex items-center gap-2.5 border-t border-(--fg-3) px-3.5 py-2.5">
       <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary) text-[11px] font-semibold text-white">
         {initials || <UserCircle2 size={16} />}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[13px] font-medium text-(--text)">
+        <div className="truncate text-[13px] font-medium text-(--text-inv)">
           {displayName}
         </div>
         <div className="truncate text-[11px] text-(--fg-3)">
@@ -95,10 +95,10 @@ function UserFooter() {
 
 export function Navigation() {
   return (
-    <aside className="flex h-screen w-60 flex-col overflow-hidden border-r border-(--border) bg-white">
+    <aside className="flex h-screen w-65 flex-col overflow-hidden">
       <div className="flex items-center gap-2 px-4 pb-2.5 pt-4">
 
-        <span className="text-[14px] font-semibold tracking-[-0.01em] text-(--text)">
+        <span className="text-[14px] font-semibold tracking-[-0.01em] text-(--text-inv)">
           Dignum
         </span>
       </div>

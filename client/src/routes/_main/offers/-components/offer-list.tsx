@@ -27,7 +27,7 @@ export default function OfferList() {
     companyIds: customerFilter.length > 0 ? customerFilter : undefined,
     contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
     sort,
-   }), [searchInput, customerFilter, contactPersonFilter, sort]);
+  }), [searchInput, customerFilter, contactPersonFilter, sort]);
 
   const { offers, contactPersons } = useOfferHook(params);
   const { customers } = useCustomerHook();
@@ -36,21 +36,21 @@ export default function OfferList() {
     customers.map((c: Customer) => ({
       value: c.id,
       label: c.companyName,
-     })),
-   [customers]);
+    })),
+    [customers]);
 
   const contactPersonFilterOptions = useMemo(() =>
     contactPersons.map((cp: ContactPerson) => ({
       value: cp.id,
       label: `${cp.firstName} ${cp.lastName}`,
-     })),
-   [contactPersons]);
+    })),
+    [contactPersons]);
 
   const activeFilterCount = customerFilter.length + contactPersonFilter.length;
 
   const handleSearch = () => {
     setSearchInput(searchInput);
-   };
+  };
 
   return (
     <div className="grid gap-4">
