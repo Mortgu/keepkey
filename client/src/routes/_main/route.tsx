@@ -11,7 +11,7 @@ function MainLayoutComponent() {
     return (
         <React.Fragment>
             <Navigation />
-            <div id="app" className='max-w-(--viewport) m-auto p-4 h-full'>
+            <div id="app" className='max-w-(--viewport) w-full m-auto p-4 h-full'>
                 <Outlet />
             </div>
         </React.Fragment>

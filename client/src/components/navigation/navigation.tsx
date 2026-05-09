@@ -1,49 +1,162 @@
-import { Loader, User } from "lucide-react";
-import { authClient } from "@/lib/auth-client.ts";
-import { NavLink } from "./nav-link";
+import {
+  ChevronDown,
+  FileText,
+  LayoutGrid,
+  LogOut,
+  Package,
+  Settings,
+  ShoppingCart,
+  Users,
+  UserCircle2,
+} from "lucide-react";
 
-export function Navigation() {
-  const { data: session, isPending, error } = authClient.useSession();
+import { authClient } from "@/lib/auth-client.ts";
+import { NavGroup, NavLink } from "./nav-link";
+import { useMemo, useState, type ReactNode } from "react";
+
+const ICON_SIZE = 14;
+
+type SectionProps = {
+  title: string;
+  collapsible?: boolean;
+  children: ReactNode;
+};
+
+function Section({ title, collapsible = false, children }: SectionProps) {
+  const [collapsed, setCollapsed] = useState(false);
 
   return (
-    <div className="h-18 w-full border-b border-(--border) bg-white">
-      <div className="flex max-w-(--viewport) m-auto px-4 items-center h-full justify-between">
-        <div className="flex h-full gap-8">
-          <NavLink to="/">Dashboard</NavLink>
-          <NavLink to="/products">Products</NavLink>
-          <NavLink to="/contracts">Tarife</NavLink>
-          <NavLink to="/employees">Nutzer</NavLink>
-          <NavLink to="/customers">Kunden</NavLink>
-          <NavLink to="/offers">Angebote</NavLink>
-          <NavLink to="/orders">Bestellungen</NavLink>
-        </div>
+    <>
+      <button
+        type="button"
+        onClick={() => collapsible && setCollapsed((v) => !v)}
+        className="flex select-none items-center justify-between px-3.5 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-(--fg-3)"
+        style={{ cursor: collapsible ? "pointer" : "default" }}
+      >
+        <span>{title}</span>
+        {collapsible && (
+          <ChevronDown
+            size={11}
+            strokeWidth={2.4}
+            className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""
+              }`}
+          />
+        )}
+      </button>
+      {!collapsed && <div className="flex flex-col gap-0.5">{children}</div>}
+    </>
+  );
+}
 
-        <div className="flex h-full">
-          {isPending ? (
-            <Loader className="animate-spin" />
-          ) : error ? (
-            "Error"
-          ) : session ? (
-            <NavigationActions />
-          ) : (
-            <div className="flex items-center gap-2">
-              <NavLink to="/login">Login</NavLink>
-            </div>
-          )}
+function SectionDivider() {
+  return <div className="mx-3.5 mt-2 h-px bg-(--border)" />;
+}
+
+function UserFooter() {
+  const { data: session } = authClient.useSession();
+  const user = session?.user;
+
+  const initials = useMemo(() => {
+    if (!user) return "";
+    const first = user.firstName?.[0] ?? user.name?.[0] ?? "";
+    const last = user.lastName?.[0] ?? "";
+    return (first + last).toUpperCase();
+  }, [user]);
+
+  const displayName =
+    user && (user.firstName || user.lastName)
+      ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
+      : user?.name ?? "—";
+
+  return (
+    <div className="flex items-center gap-2.5 border-t border-(--border) px-3.5 py-2.5">
+      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary) text-[11px] font-semibold text-white">
+        {initials || <UserCircle2 size={16} />}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="truncate text-[13px] font-medium text-(--text)">
+          {displayName}
+        </div>
+        <div className="truncate text-[11px] text-(--fg-3)">
+          {user?.email ?? ""}
         </div>
       </div>
+      <button
+        type="button"
+        title="Abmelden"
+        onClick={() => authClient.signOut()}
+        className="flex rounded p-1.5 text-(--fg-3) transition-colors hover:bg-(--subtle-50) hover:text-(--destructive)"
+      >
+        <LogOut size={ICON_SIZE} />
+      </button>
     </div>
   );
 }
 
-function NavigationActions() {
+export function Navigation() {
   return (
-    <div className="flex gap-4">
-      <div className="w-8 h-full m-auto hover:text-(--primary) cursor-pointer">
-        <NavLink to="/user">
-          <User className="size-6" />
-        </NavLink>
+    <aside className="flex h-screen w-60 flex-col overflow-hidden border-r border-(--border) bg-white">
+      <div className="flex items-center gap-2 px-4 pb-2.5 pt-4">
+
+        <span className="text-[14px] font-semibold tracking-[-0.01em] text-(--text)">
+          Dignum
+        </span>
       </div>
-    </div>
+
+      <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
+        <Section title="Übersicht">
+          <NavLink to="/" icon={<LayoutGrid size={ICON_SIZE} />} label="Dashboard" />
+        </Section>
+
+        <SectionDivider />
+        <Section title="Katalog" collapsible>
+          <NavGroup
+            icon={<Package size={ICON_SIZE} />}
+            label="Produkte"
+            defaultOpen
+          >
+            <NavLink to="/products" indent label="Alle Produkte" />
+            <NavLink to="/products/pricing" indent label="Preise" />
+            <NavLink to="/products/flatrates" indent label="Flatrates" />
+            <NavLink to="/products/suppliers" indent label="Lieferanten" />
+          </NavGroup>
+        </Section>
+
+        <SectionDivider />
+        <Section title="Vertrieb" collapsible>
+          <NavLink
+            to="/customers"
+            icon={<Users size={ICON_SIZE} />}
+            label="Kunden"
+          />
+          <NavLink
+            to="/offers"
+            icon={<FileText size={ICON_SIZE} />}
+            label="Angebote"
+          />
+          <NavLink
+            to="/orders"
+            icon={<ShoppingCart size={ICON_SIZE} />}
+            label="Bestellungen"
+          />
+        </Section>
+
+        <SectionDivider />
+        <Section title="Verwaltung" collapsible>
+          <NavLink
+            to="/employees"
+            icon={<UserCircle2 size={ICON_SIZE} />}
+            label="Mitarbeiter"
+          />
+          <NavLink
+            to="/user"
+            icon={<Settings size={ICON_SIZE} />}
+            label="Einstellungen"
+          />
+        </Section>
+      </nav>
+
+      <UserFooter />
+    </aside>
   );
 }

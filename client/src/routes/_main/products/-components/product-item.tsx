@@ -5,9 +5,10 @@ import { z } from "zod";
 import { Pen, Plus, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
-import { Button } from "@/components";
+import { Badge, Button } from "@/components";
 import { useContractHook, useProductHook } from "@/hooks";
 import type { Product, CreateProductPricingInput } from "@/types";
+import { formatEur } from "@/utils/utils";
 
 const productPricingSchema = z.object({
   contractId: z.string().min(1),
@@ -106,7 +107,7 @@ export default function ProductItem(product: Product) {
                 className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)"
               >
                 <p className="text-sm text-gray-700 truncate">
-                  {pricing?.contract?.name}
+                  <Badge variant="generated">{pricing?.contract?.name}</Badge>
                 </p>
                 <p className="text-sm text-gray-600 text-center">
                   {pricing.min_quantity}–{pricing.max_quantity}
@@ -115,7 +116,7 @@ export default function ProductItem(product: Product) {
                   {pricing.duration_months} Monate
                 </p>
                 <p className="text-sm font-medium text-gray-900 text-right">
-                  {(pricing.price / 100).toFixed(2)} €
+                  {formatEur(pricing.price)}
                 </p>
                 <div className="flex items-center gap-0.5 justify-end">
                   <Button
