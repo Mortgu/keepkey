@@ -18,19 +18,18 @@ interface ContractModalProps {
 const contractSchema = z.object({
   name: z.string().min(1, "Mindestens 1 Zeichen!"),
   features: z.array(z.string()),
+  table: z.string(),
 });
 
 const emptyContract: CreateContractInput = {
   name: "",
   features: [],
+  table: "",
 };
 
-export default function ContractModal({
-  open,
-  cancelFn,
-  currentContract = null,
-}: ContractModalProps) {
+export default function ContractModal({ open, cancelFn, currentContract = null }: ContractModalProps) {
   const isEdit = currentContract !== null;
+
   const { updateContract, createContract } = useContractHook();
 
   const contractForm = useForm({
@@ -128,7 +127,19 @@ export default function ContractModal({
             )}
           />
 
-          <div className="flex gap-2"></div>
+          <contractForm.Field name="table" children={(field) => (
+            <div className="grid gap-1">
+              <label htmlFor={field.name} className="text-sm text-gray-500">
+                Tabelle
+              </label>
+              <textarea id={field.name} name={field.name} rows={5}
+                className="flex-1 outline-none border border-(--border) p-2 rounded-md"
+                value={field.state.value} placeholder="Datenvolumen"
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </div>
+          )} />
+
         </form>
       </ModalDialog.Content>
       <ModalDialog.Footer>
@@ -138,12 +149,7 @@ export default function ContractModal({
         <contractForm.Subscribe
           selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
-            <Button
-              form="contract-form"
-              disabled={!canSubmit}
-              type="submit"
-              size="xs"
-            >
+            <Button form="contract-form" disabled={!canSubmit} type="submit" size="xs">
               {isSubmitting ? <Loader className="size-4" /> : "Speichern"}
             </Button>
           )}

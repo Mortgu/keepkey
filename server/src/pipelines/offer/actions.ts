@@ -89,6 +89,7 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
         table: item.product.table,
         quantity: item.quantity,
         optional: item.optional,
+        contract: item.contract,
         duration_months: item.duration_months,
         price: {
           total: formatEur(item.total_cents / 100),

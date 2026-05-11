@@ -19,7 +19,6 @@ export const getCustomerById = async (request: Request, response: Response) => {
     where: { id },
     include: {
       contactPersons: true,
-      orders: true,
     },
   });
 

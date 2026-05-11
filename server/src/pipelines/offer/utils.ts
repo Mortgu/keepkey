@@ -29,7 +29,7 @@ export const deepIterate = (obj: Record<string, unknown>, root: Record<string, u
                 }
             });
         } else if (value !== null && typeof value === 'object') {
-            deepIterate(value as Record<string, unknown>, root);
+            deepIterate(value as Record<string, unknown>, root, obj);
         } else if (typeof value === 'string') {
             obj[key] = interpolate(value, ctx);
         }

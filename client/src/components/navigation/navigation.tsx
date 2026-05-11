@@ -120,6 +120,12 @@ export function Navigation() {
             <NavLink to="/products/flatrates" indent label="Flatrates" />
             <NavLink to="/products/suppliers" indent label="Lieferanten" />
           </NavGroup>
+
+          <NavLink
+            to="/contracts"
+            icon={<Users size={ICON_SIZE} />}
+            label="Verträge"
+          />
         </Section>
 
         <SectionDivider />

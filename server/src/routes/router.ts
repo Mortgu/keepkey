@@ -13,6 +13,7 @@ import offerRouter from "./offer.js";
 import flatratesRoter from "./flatrates.js";
 import taskRouter from "./task-route.js";
 import contactPersonRouter from "./contact-persons.js";
+import tariffRouter from './tariff.js';
 
 const router = Router();
 
@@ -51,5 +52,7 @@ router.use("/task", requireSession, taskRouter);
 
 /* /api/contact-persons */
 router.use("/contact-persons", requireSession, contactPersonRouter);
+
+router.use('/tariff', tariffRouter)
 
 export default router;

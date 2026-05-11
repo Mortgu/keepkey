@@ -47,6 +47,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
+        productPricing:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductPricing"
+        tariffCustomer:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
       required:
         - id
         - customerId
@@ -55,6 +63,8 @@ components:
         - contactPersons
         - offers
         - users
+        - productPricing
+        - tariffCustomer
     ContactPerson:
       type: object
       properties:
@@ -431,12 +441,22 @@ components:
         updatedAt:
           type: string
           format: date-time
+        tariffProducts:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffProduct"
+        tariffCustomers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
       required:
         - id
         - name
         - productPricing
         - orderPositions
         - offerPositions
+        - tariffProducts
+        - tariffCustomers
     ProductPricing:
       type: object
       properties:
@@ -449,6 +469,10 @@ components:
         product:
           $ref: "#/components/schemas/Product"
         productId:
+          type: string
+        customer:
+          $ref: "#/components/schemas/Customer"
+        customerId:
           type: string
         min_quantity:
           type: integer
@@ -470,6 +494,111 @@ components:
         - productId
         - min_quantity
         - duration_months
+        - price
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffProduct"
+        customers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
+      required:
+        - id
+        - products
+        - customers
+    TariffProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        product:
+          $ref: "#/components/schemas/Product"
+        productId:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+        contractId:
+          type: string
+        duration:
+          type: integer
+          format: int32
+        min_quantity:
+          type: integer
+          format: int32
+        max_quantity:
+          type: integer
+          format: int32
+        price:
+          type: integer
+          format: int32
+      required:
+        - id
+        - tariff
+        - tariffId
+        - product
+        - productId
+        - contract
+        - contractId
+        - duration
+        - min_quantity
+        - max_quantity
+        - price
+    TariffCustomer:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        product:
+          $ref: "#/components/schemas/Product"
+        productId:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+        contractId:
+          type: string
+        customer:
+          $ref: "#/components/schemas/Customer"
+        customerId:
+          type: string
+        duration:
+          type: integer
+          format: int32
+        min_quantity:
+          type: integer
+          format: int32
+        max_quantity:
+          type: integer
+          format: int32
+        price:
+          type: integer
+          format: int32
+      required:
+        - id
+        - tariff
+        - tariffId
+        - product
+        - productId
+        - contract
+        - contractId
+        - customer
+        - customerId
+        - duration
+        - min_quantity
+        - max_quantity
         - price
     User:
       type: object
@@ -703,6 +832,8 @@ components:
           type: array
           items:
             type: string
+        table:
+          type: string
         productPricing:
           type: array
           items:
@@ -715,6 +846,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferPosition"
+        tariffProduct:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffProduct"
+        tariffCustomers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
         createdAt:
           type: string
           format: date-time
@@ -722,9 +861,12 @@ components:
         - id
         - name
         - features
+        - table
         - productPricing
         - orderPositions
         - offerPositions
+        - tariffProduct
+        - tariffCustomers
     DocumentStatus:
       type: string
       enum:

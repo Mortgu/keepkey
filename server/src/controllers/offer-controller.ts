@@ -237,6 +237,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
   for (const position of positions) {
     position["total_cents"] = await calculatePrice({
       ...position,
+      customerId: offer.customerId,
     });
   }
 
@@ -350,7 +351,10 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
   const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
 
   for (const position of positions) {
-    position["total_cents"] = await calculatePrice({ ...position });
+    position["total_cents"] = await calculatePrice({
+      ...position,
+      customerId: data.offer?.customerId,
+    });
   }
 
   try {

@@ -10,6 +10,7 @@ export const getAllUsers = async (request: Request, response: Response) => {
       offers: true,
     },
   });
+
   return response.status(200).json(users);
 };
 
@@ -96,14 +97,17 @@ export const createUser = async (request: Request, response: Response) => {
     });
   }
 
+  console.log(body)
+
   try {
-    const createdUser = await auth.api.createUser({
+    const createdUser = await auth.api.signUpEmail({
       body: {
         email: body.email,
-        password: "",
+        password: body.password,
         name: `${body.firstName} ${body.lastName}`,
-        role: "user",
-        data: { ...body },
+        firstName: body.firstName,
+        lastName: body.lastName,
+        salutation: body.salutation,
       },
     });
 

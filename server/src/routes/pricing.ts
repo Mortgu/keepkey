@@ -4,15 +4,16 @@ import {
   createPricing,
   deletePricing,
   getPrice,
+  updatePricing,
 } from "../controllers/pricing-controller.js";
 import { validate } from "../middlewares/validate.js";
-import { createPricingSchema } from "../schemas/index.js";
+import { createPricingSchema, updatePricingSchema } from "../schemas/index.js";
 
 const router = Router();
 
 /*
  * Route for retreiving the price of a configuration
- * [GET] /api/pricing?productId=&contractId=&duration_months=&quantity=
+ * [GET] /api/pricing?productId=&contractId=&duration_months=&quantity=&customerId=
  */
 router.get("/", getPrice);
 
@@ -21,6 +22,12 @@ router.get("/", getPrice);
  *  [POST] /api/pricing/:product_id
  */
 router.post("/:product_id", validate(createPricingSchema), createPricing);
+
+/*
+ *  Route for updating an existing pricing entry
+ *  [PUT] /api/pricing/:id
+ */
+router.put("/:id", validate(updatePricingSchema), updatePricing);
 
 router.delete("/:id", deletePricing);
 

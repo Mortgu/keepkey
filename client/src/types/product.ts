@@ -22,6 +22,6 @@ export type UpdateFlatRateInput = Partial<CreateFlatRateInput>;
 
 export type CreateContractInput = Omit<
   Contract,
-  "id" | "createdAt" | "productPricing" | "orderPositions" | "offerPositions"
+  "id" | "createdAt" | "productPricing" | "orderPositions" | "offerPositions" | "tariffCustomers" | "tariffProduct"
 >;
 export type UpdateContractInput = Partial<CreateContractInput>;

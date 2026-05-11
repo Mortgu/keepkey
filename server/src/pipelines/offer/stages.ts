@@ -31,6 +31,7 @@ const preprocess: Stage<OfferPipelineContext> = {
 const postprocess: Stage<OfferPipelineContext> = {
   name: "postprocess",
   run: async (context) => {
+    console.dir(context, { depth: null });
     context.formatedData = await postprocessing(context.formatedData);
   },
 };

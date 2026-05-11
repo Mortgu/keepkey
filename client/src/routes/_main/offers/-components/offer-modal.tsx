@@ -63,11 +63,11 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();
-  const { products } = useProductHook();
-  const { contracts } = useContractHook();
   const { suppliers } = useSupplierHook();
   const { users } = useUserHook();
   const { flatRates } = useFlatRateHook();
+
+  console.log(users)
 
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
     currentOffer?.offerPositions.map((pos) => ({

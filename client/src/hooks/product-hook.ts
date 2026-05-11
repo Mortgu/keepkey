@@ -5,9 +5,10 @@ import {
   deletePricingAction,
   deleteProductAction,
   getProductsAction,
+  updatePricingAction,
   updateProductAction,
 } from "@/data/products.ts";
-import type { Product, CreateProductPricingInput } from "@/types";
+import type { Product, CreateProductPricingInput, UpdateProductPricingInput } from "@/types";
 
 export const useProductHook = () => {
   const queryClient = useQueryClient();
@@ -37,6 +38,12 @@ export const useProductHook = () => {
       productId: string;
       pricing: CreateProductPricingInput;
     }) => createPricingAction(productId, pricing),
+    onSuccess: invalidate,
+  });
+
+  const updatePricingMutation = useMutation({
+    mutationFn: ({ id, pricing }: { id: string; pricing: UpdateProductPricingInput }) =>
+      updatePricingAction(id, pricing),
     onSuccess: invalidate,
   });
 
@@ -76,6 +83,10 @@ export const useProductHook = () => {
     createPricing: createPricingMutation.mutateAsync,
     isCreatingPricing: createPricingMutation.isPending,
     errorCreatingPricing: createPricingMutation.error,
+
+    updatePricing: updatePricingMutation.mutateAsync,
+    isUpdatingPricing: updatePricingMutation.isPending,
+    errorUpdatingPricing: updatePricingMutation.error,
 
     deletePricing: deletePricingMutation.mutate,
     isDeletingPricing: deletePricingMutation.isPending,
