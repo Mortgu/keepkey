@@ -1,16 +1,16 @@
 # Graph Report - keepit  (2026-05-11)
 
 ## Corpus Check
-- 175 files · ~27,000 words
+- 179 files · ~29,118 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 933 nodes · 1336 edges · 100 communities (60 shown, 40 thin omitted)
-- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 130 edges (avg confidence: 0.8)
+- 992 nodes · 1439 edges · 115 communities (76 shown, 39 thin omitted)
+- Extraction: 90% EXTRACTED · 10% INFERRED · 0% AMBIGUOUS · INFERRED: 150 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `3d917713`
+- Built from commit: `915cc914`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -68,6 +68,8 @@
 - [[_COMMUNITY_Single Dropdown|Single Dropdown]]
 - [[_COMMUNITY_Search Bar|Search Bar]]
 - [[_COMMUNITY_Collapsable Component|Collapsable Component]]
+- [[_COMMUNITY_Format Utilities|Format Utilities]]
+- [[_COMMUNITY_API Response Helpers|API Response Helpers]]
 - [[_COMMUNITY_Order Schemas|Order Schemas]]
 - [[_COMMUNITY_Supplier Schemas|Supplier Schemas]]
 - [[_COMMUNITY_Product Schemas|Product Schemas]]
@@ -82,36 +84,49 @@
 - [[_COMMUNITY_Database Migrations & Seed|Database Migrations & Seed]]
 - [[_COMMUNITY_Key Naming Utility|Key Naming Utility]]
 - [[_COMMUNITY_Pricing Schema|Pricing Schema]]
-- [[_COMMUNITY_Flat Rate Schema|Flat Rate Schema]]
 - [[_COMMUNITY_OpenAPI Route|OpenAPI Route]]
+- [[_COMMUNITY_CSS Utility|CSS Utility]]
+- [[_COMMUNITY_Session Guard|Session Guard]]
+- [[_COMMUNITY_Task Item Component|Task Item Component]]
+- [[_COMMUNITY_Supplier Item Component|Supplier Item Component]]
 - [[_COMMUNITY_Select Types|Select Types]]
 - [[_COMMUNITY_Brand Assets|Brand Assets]]
+- [[_COMMUNITY_Prisma Config|Prisma Config]]
+- [[_COMMUNITY_Tailwind Config|Tailwind Config]]
+- [[_COMMUNITY_Vite Config|Vite Config]]
+- [[_COMMUNITY_Hooks Index|Hooks Index]]
+- [[_COMMUNITY_Components Index|Components Index]]
+- [[_COMMUNITY_Schemas Index|Schemas Index]]
+- [[_COMMUNITY_Prisma Config Alt|Prisma Config Alt]]
 - [[_COMMUNITY_Key Name Helper|Key Name Helper]]
-- [[_COMMUNITY_Response Helpers|Response Helpers]]
-- [[_COMMUNITY_OpenAPI Route Handler|OpenAPI Route Handler]]
-- [[_COMMUNITY_Contracts Route|Contracts Route]]
-- [[_COMMUNITY_Customers Route|Customers Route]]
 - [[_COMMUNITY_Employees Route|Employees Route]]
 - [[_COMMUNITY_Offers Route|Offers Route]]
-- [[_COMMUNITY_Orders Route|Orders Route]]
-- [[_COMMUNITY_Products Route|Products Route]]
-- [[_COMMUNITY_User Settings Route|User Settings Route]]
-- [[_COMMUNITY_Badge Types|Badge Types]]
-- [[_COMMUNITY_Badge Component Alt|Badge Component Alt]]
-- [[_COMMUNITY_Supplier List Item|Supplier List Item]]
-- [[_COMMUNITY_OpenAPI Schema Source|OpenAPI Schema Source]]
+- [[_COMMUNITY_Community 101|Community 101]]
+- [[_COMMUNITY_Community 102|Community 102]]
+- [[_COMMUNITY_Community 103|Community 103]]
+- [[_COMMUNITY_Community 104|Community 104]]
+- [[_COMMUNITY_Community 105|Community 105]]
+- [[_COMMUNITY_Community 106|Community 106]]
+- [[_COMMUNITY_Community 107|Community 107]]
+- [[_COMMUNITY_Community 108|Community 108]]
+- [[_COMMUNITY_Community 109|Community 109]]
+- [[_COMMUNITY_Community 110|Community 110]]
+- [[_COMMUNITY_Community 111|Community 111]]
+- [[_COMMUNITY_Community 112|Community 112]]
+- [[_COMMUNITY_Community 113|Community 113]]
+- [[_COMMUNITY_Community 114|Community 114]]
 
 ## God Nodes (most connected - your core abstractions)
-1. `api()` - 41 edges
-2. `prisma` - 19 edges
-3. `schemas/index` - 16 edges
-4. `api() HTTP Client` - 16 edges
+1. `api()` - 52 edges
+2. `prisma` - 20 edges
+3. `api() HTTP Client` - 17 edges
+4. `schemas/index` - 16 edges
 5. `MainRouter` - 13 edges
 6. `FlatRate: dignum Dienstleistung Onboarding (300 EUR einmalig)` - 11 edges
-7. `OpenAPI Schema: Offer` - 10 edges
-8. `validate()` - 9 edges
+7. `validate()` - 10 edges
+8. `OpenAPI Schema: Offer` - 10 edges
 9. `components` - 9 edges
-10. `Product: Keepit Backup für Microsoft 365` - 9 edges
+10. `useContractHook()` - 9 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `ContactPersonForm component` --shares_data_with--> `OpenAPI Schema: ContactPerson`  [INFERRED]
@@ -159,211 +174,275 @@
 - **All offers issued to Dignum GmbH / Armin Sammet** — offer_cmotz1j160003ppw8ldtj4to8, offer_cmou0fvcy000135w8clihlq7n, offer_cmotywjvr0001ppw8sn865umo, company_dignum_gmbh, person_armin_sammet [EXTRACTED 1.00]
 - **Keepit backup product suite offered by dignum GmbH** — product_keepit_m365_backup, product_keepit_entraid_backup, product_dignum_onboarding [INFERRED 0.85]
 
-## Communities (100 total, 40 thin omitted)
+## Communities (115 total, 39 thin omitted)
 
 ### Community 0 - "Server Data Access Layer"
-Cohesion: 0.05
-Nodes (55): getAllContactPersons(), createContract(), deleteContract(), getAllContracts(), updateContract(), createCustomer(), deleteCustomer(), getAllCustomers() (+47 more)
+Cohesion: 0.06
+Nodes (57): AdminRoute, Auth lib (better-auth), requireSession middleware, calculatePrice utility, contact-person-controller, contactPersonSchema, ContactPersonsRoute, contract-controller (+49 more)
 
 ### Community 1 - "Client Data & API Hooks"
-Cohesion: 0.05
-Nodes (60): api() HTTP Client, authClient (better-auth), useContractHook, Contract Data Actions, useCustomerHook, Customer Data Actions, createContractAction(), deleteContractAction() (+52 more)
-
-### Community 2 - "Server Routes & Auth"
 Cohesion: 0.06
 Nodes (39): OfferFile(), getAllTasks(), getTaskById(), env, converting(), fetchOfferData(), formatFetchedData(), generating() (+31 more)
 
-### Community 3 - "Offer Pipeline & Tasks"
+### Community 2 - "Server Routes & Auth"
 Cohesion: 0.05
-Nodes (32): ContractListItemProps, ContractList(), ContractModal(), ContractModalProps, contractSchema, emptyContract, Props, OfferModal() (+24 more)
+Nodes (31): ContactPersonData, ContactPersonForm(), contactPersonSchema, Props, CustomerList(), CustomerListItem(), CustomerListItemProps, CustomerModal() (+23 more)
 
-### Community 4 - "Client Lib & Config"
+### Community 3 - "Offer Pipeline & Tasks"
 Cohesion: 0.07
 Nodes (31): Config, createContactPersons(), createUser(), deleteAccount(), deleteUser(), getAllUsers(), getSessionUser(), getUserById() (+23 more)
 
-### Community 5 - "Auth Context & Core Components"
+### Community 4 - "Client Lib & Config"
 Cohesion: 0.08
 Nodes (41): lib/auth-client.ts, context/auth.tsx - AuthProvider, useAuth, components/index.ts, data/orders.ts - getTasksAction, data/user.ts - getSessionUser, components/document-status.tsx, components/filters/filter-tab-bar.tsx - FilterTabBar, client/src/main.tsx (+33 more)
 
-### Community 6 - "Contract & Employee UI"
-Cohesion: 0.06
-Nodes (33): Button, ButtonComponentProps, Checkbox, CheckboxComponentProps, Collapsable, CollapsableComponentProps, OfferListItem(), OfferListItemProps (+25 more)
-
-### Community 7 - "Document Templates & Login"
+### Community 5 - "Auth Context & Core Components"
 Cohesion: 0.08
 Nodes (23): Route, FileRoutesByFullPath, FileRoutesById, FileRoutesByPath, FileRoutesByTo, FileRouteTypes, LoginIndexRoute, MainContractsIndexRoute (+15 more)
 
-### Community 8 - "Customer Offer Documents"
+### Community 6 - "Contract & Employee UI"
+Cohesion: 0.12
+Nodes (25): ContractListItem Component, ContractList Component, ContractModal Component, Employees Route, FlatRateItem Component, FlatRateList Component, FlatRateModal Component, Format Utilities (+17 more)
+
+### Community 7 - "Document Templates & Login"
 Cohesion: 0.11
 Nodes (25): Invoice Copy Document Template (invoice copy.docx), Invoice Document Template (invoice.docx), LoginFormComponent, Login Route, Offer Document Template (offer.docx), OpenAPI Schema: Account, OpenAPI Schema: ContactPerson, OpenAPI Schema: Contract (+17 more)
 
-### Community 9 - "UI Primitive Components"
+### Community 8 - "Customer Offer Documents"
 Cohesion: 0.17
 Nodes (25): dignum GmbH, Test AG, Customer: Dignum GmbH (Herr Armin Sammet, Starnberg), Customer: Test AG (Herr Müller Milch), Angebot 202600 - Keepit M365 & EntraID Backup (Dignum GmbH / Armin Sammet), Angebot 202600 - Keepit M365 Backup (Dignum GmbH / Armin Sammet), Angebot dwadwa - Keepit M365 Backup test (Dignum GmbH / Armin Sammet), Angebot dawdad - Keepit M365 & EntraID Backup (Test AG / Müller Milch) (+17 more)
+
+### Community 9 - "UI Primitive Components"
+Cohesion: 0.15
+Nodes (21): addTariffConfig(), addTariffCustomer(), createTariff(), deleteTariff(), deleteTariffConfig(), deleteTariffCustomer(), getAllTariffs(), getTariffById() (+13 more)
 
 ### Community 10 - "Router Configuration"
 Cohesion: 0.11
 Nodes (16): badgeStyles, BasicLinkComponent, BasicLinkProps, CreatedLinkComponent, iconStyles, itemStyles, NavButton, NavButtonProps (+8 more)
 
 ### Community 11 - "Customer Management UI"
-Cohesion: 0.15
-Nodes (21): ContractListItem Component, ContractList Component, ContractModal Component, Employees Route, Format Utilities, ModalDialog Component, OrderList Component, OrderListItems Component (+13 more)
+Cohesion: 0.16
+Nodes (21): createPricingAction(), createProductAction(), deletePricingAction(), deleteProductAction(), getPrice(), getProductAction(), getProductsAction(), updatePricingAction() (+13 more)
 
 ### Community 12 - "Offer & Customer Components"
-Cohesion: 0.16
-Nodes (11): ContactPersonData, ContactPersonForm(), contactPersonSchema, Props, CustomerList(), CustomerListItem(), CustomerListItemProps, CustomerModal() (+3 more)
+Cohesion: 0.09
+Nodes (21): Contract, CreateContractInput, CreateFlatRateInput, CreateProductInput, CreateProductPricingInput, CreateTariffConfigInput, CreateTariffCustomerInput, CreateTariffInput (+13 more)
 
 ### Community 13 - "Order & Queue Processing"
-Cohesion: 0.18
-Nodes (17): ContactPersonForm component, CustomerList component, CustomerListItem component, CustomerModal component, DocumentItem component with polling, offer data actions, OfferFile component, OfferFlatRateForm component (+9 more)
+Cohesion: 0.11
+Nodes (14): ConfigRow, pricingFormSchema, PricingModal(), PricingModalProps, TariffConfigModal(), TariffConfigModalProps, TariffCustomerModal(), TariffCustomerModalProps (+6 more)
 
 ### Community 14 - "Offer Modal Interface"
-Cohesion: 0.17
-Nodes (9): deleteOrderById(), getAllOrders(), getOrderById(), getOrderTasks(), connection, documentQueue, uploadQueue, router (+1 more)
+Cohesion: 0.16
+Nodes (18): api() HTTP Client, authClient (better-auth), useContractHook, Contract Data Actions, useCustomerHook, Customer Data Actions, useFlatRateHook, FlatRate Data Actions (+10 more)
 
 ### Community 15 - "Product & Contract Types"
-Cohesion: 0.19
-Nodes (15): requireSession middleware, contact-person-controller, ContactPersonsRoute, ContractsRoute, CustomersRoute, FlatratesRoute, OfferRoute, PricingRoute (+7 more)
+Cohesion: 0.15
+Nodes (12): Props, OfferModalProps, offerSchema, DURATIONS, OfferProductInput, Props, OfferProduct, ProductSectionItem() (+4 more)
 
 ### Community 16 - "Employee User Management"
-Cohesion: 0.21
-Nodes (15): contract-controller, documentQueue (BullMQ), document-worker, flatrate-controller, lib/auth, lib/env, lib/nextcloud, lib/permissions (+7 more)
+Cohesion: 0.16
+Nodes (16): Button, ButtonComponentProps, Collapsable, CollapsableComponentProps, sort_options, DropdownOption, FilterChip, filters/index (+8 more)
 
 ### Community 17 - "Product & Supplier Hooks"
 Cohesion: 0.18
-Nodes (14): AdminRoute, Auth lib (better-auth), calculatePrice utility, CustomerController, documentQueue lib, OfferPipelineContext, Offer pipeline stages, OrderController (+6 more)
+Nodes (17): ContactPersonForm component, CustomerList component, CustomerListItem component, CustomerModal component, DocumentItem component with polling, offer data actions, OfferFile component, OfferFlatRateForm component (+9 more)
 
 ### Community 18 - "Offer Data Types"
-Cohesion: 0.15
-Nodes (12): Contract, CreateContractInput, CreateFlatRateInput, CreateProductInput, CreateProductPricingInput, FlatRate, Product, ProductPricing (+4 more)
+Cohesion: 0.17
+Nodes (9): deleteOrderById(), getAllOrders(), getOrderById(), getOrderTasks(), connection, documentQueue, uploadQueue, router (+1 more)
 
 ### Community 19 - "Document & Task Types"
-Cohesion: 0.19
-Nodes (9): UserListItem(), UserListItemProps, UserList(), createUserSchema, editUserSchema, emptyUser, UserModal(), UserModalProps (+1 more)
+Cohesion: 0.16
+Nodes (7): FlatRateItem(), FlatRateList(), emptyData, FlatRateModalProps, flatRateSchema, useFlatRateHook(), Route
 
 ### Community 20 - "Flat Rate Management"
+Cohesion: 0.18
+Nodes (8): OfferProductForm(), ProductItem(), productPricingSchema, ProductList(), emptyData, ProductModalProps, productScheme, useProductHook()
+
+### Community 21 - "OpenAPI Type Definitions"
+Cohesion: 0.26
+Nodes (9): createPricing(), deletePricing(), getPrice(), updatePricing(), router, calculatePrice(), findMatchingTier(), PriceCalculatorProps (+1 more)
+
+### Community 22 - "Navigation Components"
+Cohesion: 0.3
+Nodes (10): createOffer(), createOfferTask(), deleteOffer(), downloadOfferDocument(), getOfferById(), getOffers(), getOfferTaskById(), getOfferTasks() (+2 more)
+
+### Community 23 - "Contract List UI"
+Cohesion: 0.2
+Nodes (7): ContractListItemProps, ContractList(), ContractModal(), ContractModalProps, contractSchema, emptyContract, useContractHook()
+
+### Community 24 - "Product Catalog UI"
 Cohesion: 0.2
 Nodes (9): CreateDocumentInput, CreateTaskInput, Document, DocumentStatus, UpdateDocumentInput, UpdateTaskInput, Task, TaskStatus (+1 more)
 
-### Community 21 - "OpenAPI Type Definitions"
+### Community 25 - "Offer List UI"
 Cohesion: 0.18
 Nodes (10): CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFlatRate, OfferPosition, OfferTask, UpdateOfferFlatRatesInput (+2 more)
 
-### Community 22 - "Navigation Components"
-Cohesion: 0.22
-Nodes (6): FlatRateItem(), FlatRateList(), emptyData, FlatRateModalProps, flatRateSchema, useFlatRateHook()
-
-### Community 23 - "Contract List UI"
+### Community 26 - "Validation Schemas"
 Cohesion: 0.22
 Nodes (8): components, $defs, operations, paths, webhooks, CreateSupplierInput, Supplier, UpdateSupplierInput
 
-### Community 24 - "Product Catalog UI"
-Cohesion: 0.29
-Nodes (10): contactPersonSchema, contract-schemas, customer-schemas, flatrate-schemas, order-schemas, pricing-schemas, product-schemas, schemas/index (+2 more)
-
-### Community 25 - "Offer List UI"
+### Community 27 - "Auth & Settings"
 Cohesion: 0.25
 Nodes (7): contactPersonSchema, createCustomerSchema, updateCustomerSchema, createContactPersonsSchema, createUserSchema, updateUserSchema, upsertAddressSchema
 
-### Community 26 - "Validation Schemas"
+### Community 28 - "Button & Dropdown UI"
+Cohesion: 0.36
+Nodes (6): createContract(), deleteContract(), getAllContracts(), updateContract(), validate(), router
+
+### Community 29 - "Order List UI"
 Cohesion: 0.22
 Nodes (4): SupplierList(), supplierSchema, Route, Route
 
-### Community 27 - "Auth & Settings"
+### Community 30 - "Badge Component"
 Cohesion: 0.28
 Nodes (5): Button, styles, ButtonComponentProps, DropdownOption, MultiDropdownProps
 
-### Community 28 - "Button & Dropdown UI"
+### Community 31 - "Main Layout Route"
+Cohesion: 0.43
+Nodes (6): createCustomer(), deleteCustomer(), getAllCustomers(), getCustomerById(), updateCustomerById(), router
+
+### Community 32 - "Order Types"
+Cohesion: 0.43
+Nodes (6): createProduct(), deleteProduct(), getProduct(), getProducts(), updateProduct(), router
+
+### Community 33 - "Customer Types"
+Cohesion: 0.43
+Nodes (6): createFlatRate(), deleteFlatRate(), getFlatRate(), getFlatRates(), updateFlatRate(), router
+
+### Community 34 - "User & Session Types"
+Cohesion: 0.39
+Nodes (5): createSupplier(), deleteSupplier(), getSuppliers(), updateSupplier(), router
+
+### Community 35 - "Offer Pipeline Core"
 Cohesion: 0.25
 Nodes (5): Route, Route, main layout route with navigation, Route, root route component
 
-### Community 29 - "Order List UI"
+### Community 36 - "Template Management"
 Cohesion: 0.43
 Nodes (6): Badge(), countStyles, formatStyles, styles, BadgeComponentProps, VARIANT_LABELS
 
-### Community 30 - "Badge Component"
+### Community 37 - "Modal Component"
 Cohesion: 0.29
-Nodes (6): CreateOrderInput, CreateOrderPositionInput, Order, OrderPosition, UpdateOrderInput, UpdateOrderPositionInput
+Nodes (8): Checkbox, CheckboxComponentProps, Input, InputComponentProps, inputs/index, SearchBar, ToggleSlider, ToggleSliderComponentProps
 
-### Community 31 - "Main Layout Route"
+### Community 38 - "Select Component"
+Cohesion: 0.38
+Nodes (4): getAllContactPersons(), adapter, prisma, router
+
+### Community 39 - "Toggle Slider Component"
 Cohesion: 0.29
 Nodes (6): Account, CreateUserInput, Session, UpdateUserInput, User, Verification
 
-### Community 32 - "Order Types"
+### Community 40 - "Server Middleware Config"
 Cohesion: 0.29
 Nodes (6): ContactPerson, CreateContactPersonInput, CreateCustomerInput, Customer, UpdateContactPersonInput, UpdateCustomerInput
 
-### Community 33 - "Customer Types"
+### Community 41 - "App Entry Point"
+Cohesion: 0.29
+Nodes (6): CreateOrderInput, CreateOrderPositionInput, Order, OrderPosition, UpdateOrderInput, UpdateOrderPositionInput
+
+### Community 42 - "Login Page"
+Cohesion: 0.29
+Nodes (6): createOfferAction(), deleteOfferAction(), getContactPersonsAction(), getOffersAction(), GetOffersParams, updateOfferAction()
+
+### Community 43 - "Sort Dropdown"
 Cohesion: 0.29
 Nodes (4): SettingsPage(), AuthContext, AuthContextType, useAuth()
 
-### Community 34 - "User & Session Types"
+### Community 44 - "Checkbox Component"
 Cohesion: 0.43
 Nodes (7): actions.ts / fetchOfferData, formatFetchedData, postprocessing, generating, converting, context.ts / OfferPipelineContext, pipeline.ts / runPipeline & generateOfferDocument, stages.ts / offerStages, utils.ts / interpolate, deepIterate, customParser, products.ts / calculatePrice, utils.ts / formatDate, formatEur, formatDuration, toDate
 
-### Community 35 - "Offer Pipeline Core"
-Cohesion: 0.38
-Nodes (7): FlatRateItem Component, FlatRateList Component, FlatRateModal Component, ProductsRoute, SupplierList Component, useFlatRateHook, useSupplierHook
-
-### Community 36 - "Template Management"
+### Community 45 - "Text Input Component"
 Cohesion: 0.33
 Nodes (3): Props, TEMPLATES, TemplateType
 
-### Community 38 - "Select Component"
+### Community 47 - "Root Route"
 Cohesion: 0.4
 Nodes (4): Select, styles, SelectComponentProps, SelectOption
 
-### Community 39 - "Toggle Slider Component"
+### Community 48 - "Document Status Component"
 Cohesion: 0.4
 Nodes (4): { container, wrapper, track, thumb, input }, styles, ToggleSlider, ToggleSliderComponentProps
 
-### Community 40 - "Server Middleware Config"
+### Community 49 - "Filter Tab Bar"
+Cohesion: 0.33
+Nodes (5): createUserAction(), deleteUserAction(), getAllUsersAction(), getSessionUser(), updateUserByIdAction()
+
+### Community 50 - "Single Dropdown"
+Cohesion: 0.33
+Nodes (5): createCustomerAction(), deleteCustomerAction(), getAllCustomersAction(), getCustomerByIdAction(), updateCustomerByIdAction()
+
+### Community 51 - "Search Bar"
 Cohesion: 0.4
 Nodes (6): config.ts / Config, auth.ts / requireSession, errorHandler.ts / errorHandler, permissions.ts / requirePermission, user.ts / canViewUsers, canCreateUsers, canUpdateUsers, canDeleteUsers, server.ts / Express App
 
-### Community 41 - "App Entry Point"
-Cohesion: 0.6
-Nodes (3): LoginFormComponent(), loginSearchSchema, Route
+### Community 52 - "Collapsable Component"
+Cohesion: 0.5
+Nodes (3): Request, requireSession(), router
 
-### Community 42 - "Login Page"
+### Community 53 - "Format Utilities"
 Cohesion: 0.4
 Nodes (4): Register, root, router, routeTree
 
-### Community 44 - "Checkbox Component"
+### Community 54 - "API Response Helpers"
+Cohesion: 0.6
+Nodes (3): LoginFormComponent(), loginSearchSchema, Route
+
+### Community 56 - "Supplier Schemas"
 Cohesion: 0.5
 Nodes (3): Checkbox, styles, CheckboxComponentProps
 
-### Community 45 - "Text Input Component"
+### Community 57 - "Product Schemas"
 Cohesion: 0.5
 Nodes (3): Input, styles, InputComponentProps
 
-### Community 46 - "Offer Validation Schemas"
+### Community 58 - "Contract Schemas"
+Cohesion: 0.4
+Nodes (4): createFlatRateAction(), deleteFlatRateAction(), getFlatRatesAction(), updateFlatRateAction()
+
+### Community 59 - "Frontend Config Files"
+Cohesion: 0.4
+Nodes (4): createContractAction(), deleteContractAction(), getContractsAction(), updateContractAction()
+
+### Community 60 - "Customers Route"
+Cohesion: 0.4
+Nodes (4): createSupplierAction(), deleteSupplierAction(), getSuppliersAction(), UpdateSupplierAction()
+
+### Community 61 - "Products Route"
 Cohesion: 0.5
 Nodes (3): createOfferSchema, offerFlatRateSchema, offerPositionSchema
+
+### Community 69 - "Pricing Schema"
+Cohesion: 0.5
+Nodes (3): deleteOrderAction(), getOrdersAction(), getTasksAction()
 
 ## Ambiguous Edges - Review These
 - `Collapsable` → `Navigation`  [AMBIGUOUS]
   client/src/components/navigation/navigation.tsx · relation: conceptually_related_to
 
 ## Knowledge Gaps
-- **291 isolated node(s):** `options`, `swaggerSpec`, `app`, `documentWorker`, `Config` (+286 more)
+- **308 isolated node(s):** `options`, `swaggerSpec`, `app`, `documentWorker`, `Config` (+303 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **40 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **39 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **What is the exact relationship between `Collapsable` and `Navigation`?**
   _Edge tagged AMBIGUOUS (relation: conceptually_related_to) - confidence is low._
-- **Why does `api() HTTP Client` connect `Client Data & API Hooks` to `Offer Pipeline & Tasks`?**
-  _High betweenness centrality (0.197) - this node is a cross-community bridge._
-- **Why does `api()` connect `Client Data & API Hooks` to `Server Routes & Auth`, `Client Lib & Config`?**
-  _High betweenness centrality (0.168) - this node is a cross-community bridge._
-- **Why does `fetch` connect `Server Routes & Auth` to `Client Data & API Hooks`?**
-  _High betweenness centrality (0.141) - this node is a cross-community bridge._
-- **Are the 40 inferred relationships involving `api()` (e.g. with `getAllCustomersAction()` and `getCustomerByIdAction()`) actually correct?**
-  _`api()` has 40 INFERRED edges - model-reasoned connections that need verification._
+- **Why does `api() HTTP Client` connect `Offer Modal Interface` to `Pricing Schema`, `Login Page`, `Customer Management UI`, `Product & Contract Types`, `Tailwind Config`, `Filter Tab Bar`, `Single Dropdown`, `Customers Route`?**
+  _High betweenness centrality (0.206) - this node is a cross-community bridge._
+- **Why does `api()` connect `Customer Management UI` to `Client Data & API Hooks`, `Offer Pipeline & Tasks`, `Pricing Schema`, `Login Page`, `Filter Tab Bar`, `Single Dropdown`, `Contract Schemas`, `Frontend Config Files`, `Customers Route`?**
+  _High betweenness centrality (0.179) - this node is a cross-community bridge._
+- **Why does `fetch` connect `Client Data & API Hooks` to `Customer Management UI`?**
+  _High betweenness centrality (0.152) - this node is a cross-community bridge._
+- **Are the 51 inferred relationships involving `api()` (e.g. with `getAllCustomersAction()` and `getCustomerByIdAction()`) actually correct?**
+  _`api()` has 51 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `options`, `swaggerSpec`, `app` to the rest of the system?**
-  _291 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _308 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Server Data Access Layer` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06 - nodes in this community are weakly interconnected._
