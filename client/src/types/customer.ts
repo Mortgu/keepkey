@@ -5,7 +5,7 @@ export type ContactPerson = components["schemas"]["ContactPerson"];
 
 export type CreateCustomerInput = Omit<
     Customer,
-    "id" | "createdAt" | "updatedAt" | "orders" | "contactPersons" | "offers" | "users"
+    "id" | "createdAt" | "updatedAt" | "orders" | "contactPersons" | "offers" | "users" | "tariffCustomers"
 >;
 export type UpdateCustomerInput = Partial<CreateCustomerInput>;
 

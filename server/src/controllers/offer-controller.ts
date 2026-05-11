@@ -122,8 +122,6 @@ export const getOfferTaskById = async (request: Request, response: Response) => 
 export const createOfferTask = async (request: Request, response: Response) => {
   const { offer } = request.body;
 
-  console.log(offer);
-
   if (!offer) {
     return response.status(404).json({
       message: "Failed to create offer task. Missing offer!",
@@ -236,7 +234,10 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
   for (const position of positions) {
     position["total_cents"] = await calculatePrice({
-      ...position,
+      productId: position.productId,
+      contractId: position.contractId,
+      duration: position.duration_months,
+      quantity: position.quantity,
       customerId: offer.customerId,
     });
   }
@@ -352,7 +353,10 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
 
   for (const position of positions) {
     position["total_cents"] = await calculatePrice({
-      ...position,
+      productId: position.productId,
+      contractId: position.contractId,
+      duration: position.duration_months,
+      quantity: position.quantity,
       customerId: data.offer?.customerId,
     });
   }

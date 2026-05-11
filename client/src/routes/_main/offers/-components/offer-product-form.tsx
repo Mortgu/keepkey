@@ -21,8 +21,6 @@ interface Props {
 export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
   const isEdit = currentProduct !== undefined;
 
-  console.log(currentProduct);
-
   const { products } = useProductHook();
   const { contracts } = useContractHook();
 

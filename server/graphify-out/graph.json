@@ -1,0 +1,6388 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "server.ts",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L1",
+      "id": "server_ts",
+      "community": 7,
+      "norm_label": "server.ts"
+    },
+    {
+      "label": "options",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L19",
+      "id": "src_server_options",
+      "community": 7,
+      "norm_label": "options"
+    },
+    {
+      "label": "swaggerSpec",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L31",
+      "id": "src_server_swaggerspec",
+      "community": 7,
+      "norm_label": "swaggerspec"
+    },
+    {
+      "label": "app",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L33",
+      "id": "src_server_app",
+      "community": 7,
+      "norm_label": "app"
+    },
+    {
+      "label": "documentWorker",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L64",
+      "id": "src_server_documentworker",
+      "community": 7,
+      "norm_label": "documentworker"
+    },
+    {
+      "label": "shutdown()",
+      "file_type": "code",
+      "source_file": "server.ts",
+      "source_location": "L66",
+      "id": "src_server_shutdown",
+      "community": 7,
+      "norm_label": "shutdown()"
+    },
+    {
+      "label": "config.ts",
+      "file_type": "code",
+      "source_file": "config/config.ts",
+      "source_location": "L1",
+      "id": "config_config_ts",
+      "community": 7,
+      "norm_label": "config.ts"
+    },
+    {
+      "label": "Config",
+      "file_type": "code",
+      "source_file": "config/config.ts",
+      "source_location": "L5",
+      "id": "config_config_config",
+      "community": 7,
+      "norm_label": "config"
+    },
+    {
+      "label": "errorHandler.ts",
+      "file_type": "code",
+      "source_file": "middlewares/errorHandler.ts",
+      "source_location": "L1",
+      "id": "middlewares_errorhandler_ts",
+      "community": 7,
+      "norm_label": "errorhandler.ts"
+    },
+    {
+      "label": "AppError",
+      "file_type": "code",
+      "source_file": "middlewares/errorHandler.ts",
+      "source_location": "L3",
+      "id": "middlewares_errorhandler_apperror",
+      "community": 7,
+      "norm_label": "apperror"
+    },
+    {
+      "label": "errorHandler()",
+      "file_type": "code",
+      "source_file": "middlewares/errorHandler.ts",
+      "source_location": "L7",
+      "id": "middlewares_errorhandler_errorhandler",
+      "community": 7,
+      "norm_label": "errorhandler()"
+    },
+    {
+      "label": "permissions.ts",
+      "file_type": "code",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L1",
+      "id": "middlewares_permissions_ts",
+      "community": 2,
+      "norm_label": "permissions.ts"
+    },
+    {
+      "label": "PermissionOptions",
+      "file_type": "code",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L11",
+      "id": "middlewares_permissions_permissionoptions",
+      "community": 2,
+      "norm_label": "permissionoptions"
+    },
+    {
+      "label": "requirePermission()",
+      "file_type": "code",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L25",
+      "id": "middlewares_permissions_requirepermission",
+      "community": 2,
+      "norm_label": "requirepermission()"
+    },
+    {
+      "label": "validate.ts",
+      "file_type": "code",
+      "source_file": "middlewares/validate.ts",
+      "source_location": "L1",
+      "id": "middlewares_validate_ts",
+      "community": 3,
+      "norm_label": "validate.ts"
+    },
+    {
+      "label": "validate()",
+      "file_type": "code",
+      "source_file": "middlewares/validate.ts",
+      "source_location": "L4",
+      "id": "middlewares_validate_validate",
+      "community": 3,
+      "norm_label": "validate()"
+    },
+    {
+      "label": "auth.ts",
+      "file_type": "code",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L1",
+      "id": "middlewares_auth_ts",
+      "community": 4,
+      "norm_label": "auth.ts"
+    },
+    {
+      "label": "Request",
+      "file_type": "code",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L9",
+      "id": "middlewares_auth_request",
+      "community": 4,
+      "norm_label": "request"
+    },
+    {
+      "label": "requireSession()",
+      "file_type": "code",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L15",
+      "id": "middlewares_auth_requiresession",
+      "community": 4,
+      "norm_label": "requiresession()"
+    },
+    {
+      "label": "pipeline.ts",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L1",
+      "id": "pipelines_offer_pipeline_ts",
+      "community": 1,
+      "norm_label": "pipeline.ts"
+    },
+    {
+      "label": "PipelineContext",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L6",
+      "id": "offer_pipeline_pipelinecontext",
+      "community": 0,
+      "norm_label": "pipelinecontext"
+    },
+    {
+      "label": "Stage",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L17",
+      "id": "offer_pipeline_stage",
+      "community": 0,
+      "norm_label": "stage"
+    },
+    {
+      "label": "runPipeline()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L23",
+      "id": "offer_pipeline_runpipeline",
+      "community": 1,
+      "norm_label": "runpipeline()"
+    },
+    {
+      "label": "Result",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L40",
+      "id": "offer_pipeline_result",
+      "community": 1,
+      "norm_label": "result"
+    },
+    {
+      "label": "generateOfferDocument()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L44",
+      "id": "offer_pipeline_generateofferdocument",
+      "community": 1,
+      "norm_label": "generateofferdocument()"
+    },
+    {
+      "label": "context.ts",
+      "file_type": "code",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L1",
+      "id": "pipelines_offer_context_ts",
+      "community": 0,
+      "norm_label": "context.ts"
+    },
+    {
+      "label": "OfferFetchData",
+      "file_type": "code",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L4",
+      "id": "offer_context_offerfetchdata",
+      "community": 0,
+      "norm_label": "offerfetchdata"
+    },
+    {
+      "label": "OfferFormatedData",
+      "file_type": "code",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L5",
+      "id": "offer_context_offerformateddata",
+      "community": 0,
+      "norm_label": "offerformateddata"
+    },
+    {
+      "label": "OfferPipelineContext",
+      "file_type": "code",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L7",
+      "id": "offer_context_offerpipelinecontext",
+      "community": 1,
+      "norm_label": "offerpipelinecontext"
+    },
+    {
+      "label": "utils.ts",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L1",
+      "id": "pipelines_offer_utils_ts",
+      "community": 0,
+      "norm_label": "utils.ts"
+    },
+    {
+      "label": "require",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L4",
+      "id": "offer_utils_require",
+      "community": 0,
+      "norm_label": "require"
+    },
+    {
+      "label": "expressionParser",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L5",
+      "id": "offer_utils_expressionparser",
+      "community": 0,
+      "norm_label": "expressionparser"
+    },
+    {
+      "label": "interpolate()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L9",
+      "id": "offer_utils_interpolate",
+      "community": 0,
+      "norm_label": "interpolate()"
+    },
+    {
+      "label": "deepIterate()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L17",
+      "id": "offer_utils_deepiterate",
+      "community": 0,
+      "norm_label": "deepiterate()"
+    },
+    {
+      "label": "parser",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L42",
+      "id": "offer_utils_parser",
+      "community": 0,
+      "norm_label": "parser"
+    },
+    {
+      "label": "ParserResult",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L44",
+      "id": "offer_utils_parserresult",
+      "community": 0,
+      "norm_label": "parserresult"
+    },
+    {
+      "label": "expr",
+      "file_type": "code",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L53",
+      "id": "offer_utils_expr",
+      "community": 0,
+      "norm_label": "expr"
+    },
+    {
+      "label": "stages.ts",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L1",
+      "id": "pipelines_offer_stages_ts",
+      "community": 0,
+      "norm_label": "stages.ts"
+    },
+    {
+      "label": "loadOfferData",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L16",
+      "id": "offer_stages_loadofferdata",
+      "community": 0,
+      "norm_label": "loadofferdata"
+    },
+    {
+      "label": "preprocess",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L24",
+      "id": "offer_stages_preprocess",
+      "community": 0,
+      "norm_label": "preprocess"
+    },
+    {
+      "label": "postprocess",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L31",
+      "id": "offer_stages_postprocess",
+      "community": 0,
+      "norm_label": "postprocess"
+    },
+    {
+      "label": "prepare",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L39",
+      "id": "offer_stages_prepare",
+      "community": 0,
+      "norm_label": "prepare"
+    },
+    {
+      "label": "generate",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L46",
+      "id": "offer_stages_generate",
+      "community": 0,
+      "norm_label": "generate"
+    },
+    {
+      "label": "convert",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L53",
+      "id": "offer_stages_convert",
+      "community": 0,
+      "norm_label": "convert"
+    },
+    {
+      "label": "write",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L60",
+      "id": "offer_stages_write",
+      "community": 0,
+      "norm_label": "write"
+    },
+    {
+      "label": "offerStages",
+      "file_type": "code",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L88",
+      "id": "offer_stages_offerstages",
+      "community": 1,
+      "norm_label": "offerstages"
+    },
+    {
+      "label": "actions.ts",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L1",
+      "id": "pipelines_offer_actions_ts",
+      "community": 0,
+      "norm_label": "actions.ts"
+    },
+    {
+      "label": "fetchOfferData()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L14",
+      "id": "offer_actions_fetchofferdata",
+      "community": 0,
+      "norm_label": "fetchofferdata()"
+    },
+    {
+      "label": "formatFetchedData()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L42",
+      "id": "offer_actions_formatfetcheddata",
+      "community": 0,
+      "norm_label": "formatfetcheddata()"
+    },
+    {
+      "label": "postprocessing()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L153",
+      "id": "offer_actions_postprocessing",
+      "community": 0,
+      "norm_label": "postprocessing()"
+    },
+    {
+      "label": "generating()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L164",
+      "id": "offer_actions_generating",
+      "community": 0,
+      "norm_label": "generating()"
+    },
+    {
+      "label": "converting()",
+      "file_type": "code",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L180",
+      "id": "offer_actions_converting",
+      "community": 0,
+      "norm_label": "converting()"
+    },
+    {
+      "label": "utils.ts",
+      "file_type": "code",
+      "source_file": "utils/utils.ts",
+      "source_location": "L1",
+      "id": "utils_utils_ts",
+      "community": 0,
+      "norm_label": "utils.ts"
+    },
+    {
+      "label": "formatDate()",
+      "file_type": "code",
+      "source_file": "utils/utils.ts",
+      "source_location": "L1",
+      "id": "utils_utils_formatdate",
+      "community": 0,
+      "norm_label": "formatdate()"
+    },
+    {
+      "label": "formatEur()",
+      "file_type": "code",
+      "source_file": "utils/utils.ts",
+      "source_location": "L9",
+      "id": "utils_utils_formateur",
+      "community": 0,
+      "norm_label": "formateur()"
+    },
+    {
+      "label": "formatDuration()",
+      "file_type": "code",
+      "source_file": "utils/utils.ts",
+      "source_location": "L18",
+      "id": "utils_utils_formatduration",
+      "community": 0,
+      "norm_label": "formatduration()"
+    },
+    {
+      "label": "toDate()",
+      "file_type": "code",
+      "source_file": "utils/utils.ts",
+      "source_location": "L31",
+      "id": "utils_utils_todate",
+      "community": 0,
+      "norm_label": "todate()"
+    },
+    {
+      "label": "products.ts",
+      "file_type": "code",
+      "source_file": "utils/products.ts",
+      "source_location": "L1",
+      "id": "utils_products_ts",
+      "community": 6,
+      "norm_label": "products.ts"
+    },
+    {
+      "label": "PriceCalculatorProps",
+      "file_type": "code",
+      "source_file": "utils/products.ts",
+      "source_location": "L3",
+      "id": "utils_products_pricecalculatorprops",
+      "community": 6,
+      "norm_label": "pricecalculatorprops"
+    },
+    {
+      "label": "Tier",
+      "file_type": "code",
+      "source_file": "utils/products.ts",
+      "source_location": "L11",
+      "id": "utils_products_tier",
+      "community": 6,
+      "norm_label": "tier"
+    },
+    {
+      "label": "findMatchingTier()",
+      "file_type": "code",
+      "source_file": "utils/products.ts",
+      "source_location": "L17",
+      "id": "utils_products_findmatchingtier",
+      "community": 6,
+      "norm_label": "findmatchingtier()"
+    },
+    {
+      "label": "calculatePrice()",
+      "file_type": "code",
+      "source_file": "utils/products.ts",
+      "source_location": "L26",
+      "id": "utils_products_calculateprice",
+      "community": 6,
+      "norm_label": "calculateprice()"
+    },
+    {
+      "label": "keys.ts",
+      "file_type": "code",
+      "source_file": "utils/keys.ts",
+      "source_location": "L1",
+      "id": "utils_keys_ts",
+      "community": 16,
+      "norm_label": "keys.ts"
+    },
+    {
+      "label": "getKeyName()",
+      "file_type": "code",
+      "source_file": "utils/keys.ts",
+      "source_location": "L1",
+      "id": "utils_keys_getkeyname",
+      "community": 16,
+      "norm_label": "getkeyname()"
+    },
+    {
+      "label": "responses.ts",
+      "file_type": "code",
+      "source_file": "utils/responses.ts",
+      "source_location": "L1",
+      "id": "utils_responses_ts",
+      "community": 11,
+      "norm_label": "responses.ts"
+    },
+    {
+      "label": "successResponse()",
+      "file_type": "code",
+      "source_file": "utils/responses.ts",
+      "source_location": "L3",
+      "id": "utils_responses_successresponse",
+      "community": 11,
+      "norm_label": "successresponse()"
+    },
+    {
+      "label": "errorResponse()",
+      "file_type": "code",
+      "source_file": "utils/responses.ts",
+      "source_location": "L11",
+      "id": "utils_responses_errorresponse",
+      "community": 11,
+      "norm_label": "errorresponse()"
+    },
+    {
+      "label": "user.ts",
+      "file_type": "code",
+      "source_file": "permissions/user.ts",
+      "source_location": "L1",
+      "id": "permissions_user_ts",
+      "community": 2,
+      "norm_label": "user.ts"
+    },
+    {
+      "label": "canViewUsers",
+      "file_type": "code",
+      "source_file": "permissions/user.ts",
+      "source_location": "L3",
+      "id": "permissions_user_canviewusers",
+      "community": 2,
+      "norm_label": "canviewusers"
+    },
+    {
+      "label": "canCreateUsers",
+      "file_type": "code",
+      "source_file": "permissions/user.ts",
+      "source_location": "L10",
+      "id": "permissions_user_cancreateusers",
+      "community": 2,
+      "norm_label": "cancreateusers"
+    },
+    {
+      "label": "canUpdateUsers",
+      "file_type": "code",
+      "source_file": "permissions/user.ts",
+      "source_location": "L17",
+      "id": "permissions_user_canupdateusers",
+      "community": 2,
+      "norm_label": "canupdateusers"
+    },
+    {
+      "label": "canDeleteUsers",
+      "file_type": "code",
+      "source_file": "permissions/user.ts",
+      "source_location": "L24",
+      "id": "permissions_user_candeleteusers",
+      "community": 2,
+      "norm_label": "candeleteusers"
+    },
+    {
+      "label": "checkout-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/checkout-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_checkout_schemas_ts",
+      "community": 17,
+      "norm_label": "checkout-schemas.ts"
+    },
+    {
+      "label": "checkoutSchema",
+      "file_type": "code",
+      "source_file": "schemas/checkout-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_checkout_schemas_checkoutschema",
+      "community": 17,
+      "norm_label": "checkoutschema"
+    },
+    {
+      "label": "offer-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_offer_schemas_ts",
+      "community": 10,
+      "norm_label": "offer-schemas.ts"
+    },
+    {
+      "label": "offerPositionSchema",
+      "file_type": "code",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_offer_schemas_offerpositionschema",
+      "community": 10,
+      "norm_label": "offerpositionschema"
+    },
+    {
+      "label": "offerFlatRateSchema",
+      "file_type": "code",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L11",
+      "id": "schemas_offer_schemas_offerflatrateschema",
+      "community": 10,
+      "norm_label": "offerflatrateschema"
+    },
+    {
+      "label": "createOfferSchema",
+      "file_type": "code",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L17",
+      "id": "schemas_offer_schemas_createofferschema",
+      "community": 10,
+      "norm_label": "createofferschema"
+    },
+    {
+      "label": "order-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/order-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_order_schemas_ts",
+      "community": 12,
+      "norm_label": "order-schemas.ts"
+    },
+    {
+      "label": "orderPositionSchema",
+      "file_type": "code",
+      "source_file": "schemas/order-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_order_schemas_orderpositionschema",
+      "community": 12,
+      "norm_label": "orderpositionschema"
+    },
+    {
+      "label": "createOrderSchema",
+      "file_type": "code",
+      "source_file": "schemas/order-schemas.ts",
+      "source_location": "L11",
+      "id": "schemas_order_schemas_createorderschema",
+      "community": 12,
+      "norm_label": "createorderschema"
+    },
+    {
+      "label": "tariffs-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_tariffs_schemas_ts",
+      "community": 5,
+      "norm_label": "tariffs-schemas.ts"
+    },
+    {
+      "label": "createTariffSchema",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_tariffs_schemas_createtariffschema",
+      "community": 5,
+      "norm_label": "createtariffschema"
+    },
+    {
+      "label": "tariffEntryBase",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L7",
+      "id": "schemas_tariffs_schemas_tariffentrybase",
+      "community": 5,
+      "norm_label": "tariffentrybase"
+    },
+    {
+      "label": "createTariffProductSchema",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L16",
+      "id": "schemas_tariffs_schemas_createtariffproductschema",
+      "community": 5,
+      "norm_label": "createtariffproductschema"
+    },
+    {
+      "label": "updateTariffProductSchema",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L18",
+      "id": "schemas_tariffs_schemas_updatetariffproductschema",
+      "community": 5,
+      "norm_label": "updatetariffproductschema"
+    },
+    {
+      "label": "createTariffCustomerSchema",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L27",
+      "id": "schemas_tariffs_schemas_createtariffcustomerschema",
+      "community": 5,
+      "norm_label": "createtariffcustomerschema"
+    },
+    {
+      "label": "updateTariffCustomerSchema",
+      "file_type": "code",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L32",
+      "id": "schemas_tariffs_schemas_updatetariffcustomerschema",
+      "community": 5,
+      "norm_label": "updatetariffcustomerschema"
+    },
+    {
+      "label": "supplier-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/supplier-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_supplier_schemas_ts",
+      "community": 13,
+      "norm_label": "supplier-schemas.ts"
+    },
+    {
+      "label": "createSupplierSchema",
+      "file_type": "code",
+      "source_file": "schemas/supplier-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_supplier_schemas_createsupplierschema",
+      "community": 13,
+      "norm_label": "createsupplierschema"
+    },
+    {
+      "label": "updateSupplierSchema",
+      "file_type": "code",
+      "source_file": "schemas/supplier-schemas.ts",
+      "source_location": "L8",
+      "id": "schemas_supplier_schemas_updatesupplierschema",
+      "community": 13,
+      "norm_label": "updatesupplierschema"
+    },
+    {
+      "label": "product-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/product-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_product_schemas_ts",
+      "community": 14,
+      "norm_label": "product-schemas.ts"
+    },
+    {
+      "label": "createProductSchema",
+      "file_type": "code",
+      "source_file": "schemas/product-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_product_schemas_createproductschema",
+      "community": 14,
+      "norm_label": "createproductschema"
+    },
+    {
+      "label": "updateProductSchema",
+      "file_type": "code",
+      "source_file": "schemas/product-schemas.ts",
+      "source_location": "L9",
+      "id": "schemas_product_schemas_updateproductschema",
+      "community": 14,
+      "norm_label": "updateproductschema"
+    },
+    {
+      "label": "user-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_user_schemas_ts",
+      "community": 8,
+      "norm_label": "user-schemas.ts"
+    },
+    {
+      "label": "createUserSchema",
+      "file_type": "code",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L4",
+      "id": "schemas_user_schemas_createuserschema",
+      "community": 8,
+      "norm_label": "createuserschema"
+    },
+    {
+      "label": "updateUserSchema",
+      "file_type": "code",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L12",
+      "id": "schemas_user_schemas_updateuserschema",
+      "community": 8,
+      "norm_label": "updateuserschema"
+    },
+    {
+      "label": "upsertAddressSchema",
+      "file_type": "code",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L26",
+      "id": "schemas_user_schemas_upsertaddressschema",
+      "community": 8,
+      "norm_label": "upsertaddressschema"
+    },
+    {
+      "label": "createContactPersonsSchema",
+      "file_type": "code",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L33",
+      "id": "schemas_user_schemas_createcontactpersonsschema",
+      "community": 8,
+      "norm_label": "createcontactpersonsschema"
+    },
+    {
+      "label": "index.ts",
+      "file_type": "code",
+      "source_file": "schemas/index.ts",
+      "source_location": "L1",
+      "id": "schemas_index_ts",
+      "community": 3,
+      "norm_label": "index.ts"
+    },
+    {
+      "label": "contract-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/contract-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_contract_schemas_ts",
+      "community": 15,
+      "norm_label": "contract-schemas.ts"
+    },
+    {
+      "label": "createContractSchema",
+      "file_type": "code",
+      "source_file": "schemas/contract-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_contract_schemas_createcontractschema",
+      "community": 15,
+      "norm_label": "createcontractschema"
+    },
+    {
+      "label": "updateContractSchema",
+      "file_type": "code",
+      "source_file": "schemas/contract-schemas.ts",
+      "source_location": "L8",
+      "id": "schemas_contract_schemas_updatecontractschema",
+      "community": 15,
+      "norm_label": "updatecontractschema"
+    },
+    {
+      "label": "customer-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_customer_schemas_ts",
+      "community": 8,
+      "norm_label": "customer-schemas.ts"
+    },
+    {
+      "label": "contactPersonSchema",
+      "file_type": "code",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_customer_schemas_contactpersonschema",
+      "community": 8,
+      "norm_label": "contactpersonschema"
+    },
+    {
+      "label": "createCustomerSchema",
+      "file_type": "code",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L10",
+      "id": "schemas_customer_schemas_createcustomerschema",
+      "community": 8,
+      "norm_label": "createcustomerschema"
+    },
+    {
+      "label": "updateCustomerSchema",
+      "file_type": "code",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L17",
+      "id": "schemas_customer_schemas_updatecustomerschema",
+      "community": 8,
+      "norm_label": "updatecustomerschema"
+    },
+    {
+      "label": "flatrate-schemas.ts",
+      "file_type": "code",
+      "source_file": "schemas/flatrate-schemas.ts",
+      "source_location": "L1",
+      "id": "schemas_flatrate_schemas_ts",
+      "community": 18,
+      "norm_label": "flatrate-schemas.ts"
+    },
+    {
+      "label": "flatRateSchema",
+      "file_type": "code",
+      "source_file": "schemas/flatrate-schemas.ts",
+      "source_location": "L3",
+      "id": "schemas_flatrate_schemas_flatrateschema",
+      "community": 18,
+      "norm_label": "flatrateschema"
+    },
+    {
+      "label": "prisma.ts",
+      "file_type": "code",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L1",
+      "id": "lib_prisma_ts",
+      "community": 1,
+      "norm_label": "prisma.ts"
+    },
+    {
+      "label": "adapter",
+      "file_type": "code",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L5",
+      "id": "lib_prisma_adapter",
+      "community": 1,
+      "norm_label": "adapter"
+    },
+    {
+      "label": "prisma",
+      "file_type": "code",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L9",
+      "id": "lib_prisma_prisma",
+      "community": 1,
+      "norm_label": "prisma"
+    },
+    {
+      "label": "permissions.ts",
+      "file_type": "code",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L1",
+      "id": "lib_permissions_ts",
+      "community": 2,
+      "norm_label": "permissions.ts"
+    },
+    {
+      "label": "statement",
+      "file_type": "code",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L3",
+      "id": "lib_permissions_statement",
+      "community": 2,
+      "norm_label": "statement"
+    },
+    {
+      "label": "ac",
+      "file_type": "code",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L7",
+      "id": "lib_permissions_ac",
+      "community": 2,
+      "norm_label": "ac"
+    },
+    {
+      "label": "employee",
+      "file_type": "code",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L9",
+      "id": "lib_permissions_employee",
+      "community": 2,
+      "norm_label": "employee"
+    },
+    {
+      "label": "admin",
+      "file_type": "code",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L13",
+      "id": "lib_permissions_admin",
+      "community": 2,
+      "norm_label": "admin"
+    },
+    {
+      "label": "nextcloud.ts",
+      "file_type": "code",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L1",
+      "id": "lib_nextcloud_ts",
+      "community": 7,
+      "norm_label": "nextcloud.ts"
+    },
+    {
+      "label": "getNextCloudClient()",
+      "file_type": "code",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L6",
+      "id": "lib_nextcloud_getnextcloudclient",
+      "community": 7,
+      "norm_label": "getnextcloudclient()"
+    },
+    {
+      "label": "manageNextcloud()",
+      "file_type": "code",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L16",
+      "id": "lib_nextcloud_managenextcloud",
+      "community": 7,
+      "norm_label": "managenextcloud()"
+    },
+    {
+      "label": "env.ts",
+      "file_type": "code",
+      "source_file": "lib/env.ts",
+      "source_location": "L1",
+      "id": "lib_env_ts",
+      "community": 7,
+      "norm_label": "env.ts"
+    },
+    {
+      "label": "env",
+      "file_type": "code",
+      "source_file": "lib/env.ts",
+      "source_location": "L6",
+      "id": "lib_env_env",
+      "community": 7,
+      "norm_label": "env"
+    },
+    {
+      "label": "queues.ts",
+      "file_type": "code",
+      "source_file": "lib/queues.ts",
+      "source_location": "L1",
+      "id": "lib_queues_ts",
+      "community": 1,
+      "norm_label": "queues.ts"
+    },
+    {
+      "label": "connection",
+      "file_type": "code",
+      "source_file": "lib/queues.ts",
+      "source_location": "L5",
+      "id": "lib_queues_connection",
+      "community": 1,
+      "norm_label": "connection"
+    },
+    {
+      "label": "documentQueue",
+      "file_type": "code",
+      "source_file": "lib/queues.ts",
+      "source_location": "L14",
+      "id": "lib_queues_documentqueue",
+      "community": 1,
+      "norm_label": "documentqueue"
+    },
+    {
+      "label": "uploadQueue",
+      "file_type": "code",
+      "source_file": "lib/queues.ts",
+      "source_location": "L20",
+      "id": "lib_queues_uploadqueue",
+      "community": 1,
+      "norm_label": "uploadqueue"
+    },
+    {
+      "label": "auth.ts",
+      "file_type": "code",
+      "source_file": "lib/auth.ts",
+      "source_location": "L1",
+      "id": "lib_auth_ts",
+      "community": 2,
+      "norm_label": "auth.ts"
+    },
+    {
+      "label": "auth",
+      "file_type": "code",
+      "source_file": "lib/auth.ts",
+      "source_location": "L9",
+      "id": "lib_auth_auth",
+      "community": 2,
+      "norm_label": "auth"
+    },
+    {
+      "label": "upload-worker.ts",
+      "file_type": "code",
+      "source_file": "workers/upload-worker.ts",
+      "source_location": "L1",
+      "id": "workers_upload_worker_ts",
+      "community": 1,
+      "norm_label": "upload-worker.ts"
+    },
+    {
+      "label": "startUploadWorker()",
+      "file_type": "code",
+      "source_file": "workers/upload-worker.ts",
+      "source_location": "L9",
+      "id": "workers_upload_worker_startuploadworker",
+      "community": 1,
+      "norm_label": "startuploadworker()"
+    },
+    {
+      "label": "document-worker.ts",
+      "file_type": "code",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L1",
+      "id": "workers_document_worker_ts",
+      "community": 1,
+      "norm_label": "document-worker.ts"
+    },
+    {
+      "label": "TaskData",
+      "file_type": "code",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L7",
+      "id": "workers_document_worker_taskdata",
+      "community": 1,
+      "norm_label": "taskdata"
+    },
+    {
+      "label": "startDocumentWorker()",
+      "file_type": "code",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L12",
+      "id": "workers_document_worker_startdocumentworker",
+      "community": 1,
+      "norm_label": "startdocumentworker()"
+    },
+    {
+      "label": "offer-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_offer_controller_ts",
+      "community": 6,
+      "norm_label": "offer-controller.ts"
+    },
+    {
+      "label": "getOffers()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L15",
+      "id": "controllers_offer_controller_getoffers",
+      "community": 6,
+      "norm_label": "getoffers()"
+    },
+    {
+      "label": "getOfferById()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L67",
+      "id": "controllers_offer_controller_getofferbyid",
+      "community": 6,
+      "norm_label": "getofferbyid()"
+    },
+    {
+      "label": "getOfferTasks()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L91",
+      "id": "controllers_offer_controller_getoffertasks",
+      "community": 6,
+      "norm_label": "getoffertasks()"
+    },
+    {
+      "label": "getOfferTaskById()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L101",
+      "id": "controllers_offer_controller_getoffertaskbyid",
+      "community": 6,
+      "norm_label": "getoffertaskbyid()"
+    },
+    {
+      "label": "createOfferTask()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L122",
+      "id": "controllers_offer_controller_createoffertask",
+      "community": 6,
+      "norm_label": "createoffertask()"
+    },
+    {
+      "label": "downloadOfferDocument()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L181",
+      "id": "controllers_offer_controller_downloadofferdocument",
+      "community": 6,
+      "norm_label": "downloadofferdocument()"
+    },
+    {
+      "label": "createOffer()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L218",
+      "id": "controllers_offer_controller_createoffer",
+      "community": 6,
+      "norm_label": "createoffer()"
+    },
+    {
+      "label": "deleteOffer()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L307",
+      "id": "controllers_offer_controller_deleteoffer",
+      "community": 6,
+      "norm_label": "deleteoffer()"
+    },
+    {
+      "label": "updateOffer()",
+      "file_type": "code",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L341",
+      "id": "controllers_offer_controller_updateoffer",
+      "community": 6,
+      "norm_label": "updateoffer()"
+    },
+    {
+      "label": "flatrate-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_flatrate_controller_ts",
+      "community": 9,
+      "norm_label": "flatrate-controller.ts"
+    },
+    {
+      "label": "getFlatRates()",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L4",
+      "id": "controllers_flatrate_controller_getflatrates",
+      "community": 9,
+      "norm_label": "getflatrates()"
+    },
+    {
+      "label": "getFlatRate()",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L11",
+      "id": "controllers_flatrate_controller_getflatrate",
+      "community": 9,
+      "norm_label": "getflatrate()"
+    },
+    {
+      "label": "createFlatRate()",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L27",
+      "id": "controllers_flatrate_controller_createflatrate",
+      "community": 9,
+      "norm_label": "createflatrate()"
+    },
+    {
+      "label": "updateFlatRate()",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L45",
+      "id": "controllers_flatrate_controller_updateflatrate",
+      "community": 9,
+      "norm_label": "updateflatrate()"
+    },
+    {
+      "label": "deleteFlatRate()",
+      "file_type": "code",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L65",
+      "id": "controllers_flatrate_controller_deleteflatrate",
+      "community": 9,
+      "norm_label": "deleteflatrate()"
+    },
+    {
+      "label": "product-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_product_controller_ts",
+      "community": 4,
+      "norm_label": "product-controller.ts"
+    },
+    {
+      "label": "getProducts()",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L8",
+      "id": "controllers_product_controller_getproducts",
+      "community": 4,
+      "norm_label": "getproducts()"
+    },
+    {
+      "label": "getProduct()",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L32",
+      "id": "controllers_product_controller_getproduct",
+      "community": 4,
+      "norm_label": "getproduct()"
+    },
+    {
+      "label": "createProduct()",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L54",
+      "id": "controllers_product_controller_createproduct",
+      "community": 4,
+      "norm_label": "createproduct()"
+    },
+    {
+      "label": "deleteProduct()",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L83",
+      "id": "controllers_product_controller_deleteproduct",
+      "community": 4,
+      "norm_label": "deleteproduct()"
+    },
+    {
+      "label": "updateProduct()",
+      "file_type": "code",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L108",
+      "id": "controllers_product_controller_updateproduct",
+      "community": 4,
+      "norm_label": "updateproduct()"
+    },
+    {
+      "label": "contract-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_contract_controller_ts",
+      "community": 3,
+      "norm_label": "contract-controller.ts"
+    },
+    {
+      "label": "getAllContracts()",
+      "file_type": "code",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L4",
+      "id": "controllers_contract_controller_getallcontracts",
+      "community": 3,
+      "norm_label": "getallcontracts()"
+    },
+    {
+      "label": "createContract()",
+      "file_type": "code",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L9",
+      "id": "controllers_contract_controller_createcontract",
+      "community": 3,
+      "norm_label": "createcontract()"
+    },
+    {
+      "label": "updateContract()",
+      "file_type": "code",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L23",
+      "id": "controllers_contract_controller_updatecontract",
+      "community": 3,
+      "norm_label": "updatecontract()"
+    },
+    {
+      "label": "deleteContract()",
+      "file_type": "code",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L41",
+      "id": "controllers_contract_controller_deletecontract",
+      "community": 3,
+      "norm_label": "deletecontract()"
+    },
+    {
+      "label": "contact-person-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/contact-person-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_contact_person_controller_ts",
+      "community": 1,
+      "norm_label": "contact-person-controller.ts"
+    },
+    {
+      "label": "getAllContactPersons()",
+      "file_type": "code",
+      "source_file": "controllers/contact-person-controller.ts",
+      "source_location": "L4",
+      "id": "controllers_contact_person_controller_getallcontactpersons",
+      "community": 1,
+      "norm_label": "getallcontactpersons()"
+    },
+    {
+      "label": "customer-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_customer_controller_ts",
+      "community": 3,
+      "norm_label": "customer-controller.ts"
+    },
+    {
+      "label": "getAllCustomers()",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L4",
+      "id": "controllers_customer_controller_getallcustomers",
+      "community": 3,
+      "norm_label": "getallcustomers()"
+    },
+    {
+      "label": "getCustomerById()",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L15",
+      "id": "controllers_customer_controller_getcustomerbyid",
+      "community": 3,
+      "norm_label": "getcustomerbyid()"
+    },
+    {
+      "label": "createCustomer()",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L34",
+      "id": "controllers_customer_controller_createcustomer",
+      "community": 3,
+      "norm_label": "createcustomer()"
+    },
+    {
+      "label": "updateCustomerById()",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L82",
+      "id": "controllers_customer_controller_updatecustomerbyid",
+      "community": 3,
+      "norm_label": "updatecustomerbyid()"
+    },
+    {
+      "label": "deleteCustomer()",
+      "file_type": "code",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L130",
+      "id": "controllers_customer_controller_deletecustomer",
+      "community": 3,
+      "norm_label": "deletecustomer()"
+    },
+    {
+      "label": "supplier-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_supplier_controller_ts",
+      "community": 3,
+      "norm_label": "supplier-controller.ts"
+    },
+    {
+      "label": "getSuppliers()",
+      "file_type": "code",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L4",
+      "id": "controllers_supplier_controller_getsuppliers",
+      "community": 3,
+      "norm_label": "getsuppliers()"
+    },
+    {
+      "label": "createSupplier()",
+      "file_type": "code",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L9",
+      "id": "controllers_supplier_controller_createsupplier",
+      "community": 3,
+      "norm_label": "createsupplier()"
+    },
+    {
+      "label": "updateSupplier()",
+      "file_type": "code",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L23",
+      "id": "controllers_supplier_controller_updatesupplier",
+      "community": 3,
+      "norm_label": "updatesupplier()"
+    },
+    {
+      "label": "deleteSupplier()",
+      "file_type": "code",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L54",
+      "id": "controllers_supplier_controller_deletesupplier",
+      "community": 3,
+      "norm_label": "deletesupplier()"
+    },
+    {
+      "label": "user-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_user_controller_ts",
+      "community": 2,
+      "norm_label": "user-controller.ts"
+    },
+    {
+      "label": "getAllUsers()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L5",
+      "id": "controllers_user_controller_getallusers",
+      "community": 2,
+      "norm_label": "getallusers()"
+    },
+    {
+      "label": "getUserById()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L17",
+      "id": "controllers_user_controller_getuserbyid",
+      "community": 4,
+      "norm_label": "getuserbyid()"
+    },
+    {
+      "label": "updateUserById()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L35",
+      "id": "controllers_user_controller_updateuserbyid",
+      "community": 2,
+      "norm_label": "updateuserbyid()"
+    },
+    {
+      "label": "createUser()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L90",
+      "id": "controllers_user_controller_createuser",
+      "community": 2,
+      "norm_label": "createuser()"
+    },
+    {
+      "label": "deleteUser()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L127",
+      "id": "controllers_user_controller_deleteuser",
+      "community": 2,
+      "norm_label": "deleteuser()"
+    },
+    {
+      "label": "getSessionUser()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L155",
+      "id": "controllers_user_controller_getsessionuser",
+      "community": 2,
+      "norm_label": "getsessionuser()"
+    },
+    {
+      "label": "deleteAccount()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L172",
+      "id": "controllers_user_controller_deleteaccount",
+      "community": 2,
+      "norm_label": "deleteaccount()"
+    },
+    {
+      "label": "createContactPersons()",
+      "file_type": "code",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L192",
+      "id": "controllers_user_controller_createcontactpersons",
+      "community": 2,
+      "norm_label": "createcontactpersons()"
+    },
+    {
+      "label": "tariff-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_tariff_controller_ts",
+      "community": 5,
+      "norm_label": "tariff-controller.ts"
+    },
+    {
+      "label": "getTariffPrice()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L5",
+      "id": "controllers_tariff_controller_gettariffprice",
+      "community": 5,
+      "norm_label": "gettariffprice()"
+    },
+    {
+      "label": "getAllTariffs()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L32",
+      "id": "controllers_tariff_controller_getalltariffs",
+      "community": 5,
+      "norm_label": "getalltariffs()"
+    },
+    {
+      "label": "getTariffById()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L42",
+      "id": "controllers_tariff_controller_gettariffbyid",
+      "community": 5,
+      "norm_label": "gettariffbyid()"
+    },
+    {
+      "label": "createTariff()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L57",
+      "id": "controllers_tariff_controller_createtariff",
+      "community": 5,
+      "norm_label": "createtariff()"
+    },
+    {
+      "label": "deleteTariff()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L89",
+      "id": "controllers_tariff_controller_deletetariff",
+      "community": 5,
+      "norm_label": "deletetariff()"
+    },
+    {
+      "label": "addTariffProduct()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L101",
+      "id": "controllers_tariff_controller_addtariffproduct",
+      "community": 5,
+      "norm_label": "addtariffproduct()"
+    },
+    {
+      "label": "updateTariffProduct()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L126",
+      "id": "controllers_tariff_controller_updatetariffproduct",
+      "community": 5,
+      "norm_label": "updatetariffproduct()"
+    },
+    {
+      "label": "deleteTariffProduct()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L141",
+      "id": "controllers_tariff_controller_deletetariffproduct",
+      "community": 5,
+      "norm_label": "deletetariffproduct()"
+    },
+    {
+      "label": "addTariffCustomer()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L153",
+      "id": "controllers_tariff_controller_addtariffcustomer",
+      "community": 5,
+      "norm_label": "addtariffcustomer()"
+    },
+    {
+      "label": "updateTariffCustomer()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L186",
+      "id": "controllers_tariff_controller_updatetariffcustomer",
+      "community": 5,
+      "norm_label": "updatetariffcustomer()"
+    },
+    {
+      "label": "deleteTariffCustomer()",
+      "file_type": "code",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L201",
+      "id": "controllers_tariff_controller_deletetariffcustomer",
+      "community": 5,
+      "norm_label": "deletetariffcustomer()"
+    },
+    {
+      "label": "task-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_task_controller_ts",
+      "community": 1,
+      "norm_label": "task-controller.ts"
+    },
+    {
+      "label": "getAllTasks()",
+      "file_type": "code",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L7",
+      "id": "controllers_task_controller_getalltasks",
+      "community": 1,
+      "norm_label": "getalltasks()"
+    },
+    {
+      "label": "getTaskById()",
+      "file_type": "code",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L18",
+      "id": "controllers_task_controller_gettaskbyid",
+      "community": 1,
+      "norm_label": "gettaskbyid()"
+    },
+    {
+      "label": "order-controller.ts",
+      "file_type": "code",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L1",
+      "id": "controllers_order_controller_ts",
+      "community": 4,
+      "norm_label": "order-controller.ts"
+    },
+    {
+      "label": "getAllOrders()",
+      "file_type": "code",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L9",
+      "id": "controllers_order_controller_getallorders",
+      "community": 4,
+      "norm_label": "getallorders()"
+    },
+    {
+      "label": "getOrderById()",
+      "file_type": "code",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L32",
+      "id": "controllers_order_controller_getorderbyid",
+      "community": 4,
+      "norm_label": "getorderbyid()"
+    },
+    {
+      "label": "getOrderTasks()",
+      "file_type": "code",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L59",
+      "id": "controllers_order_controller_getordertasks",
+      "community": 4,
+      "norm_label": "getordertasks()"
+    },
+    {
+      "label": "deleteOrderById()",
+      "file_type": "code",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L70",
+      "id": "controllers_order_controller_deleteorderbyid",
+      "community": 4,
+      "norm_label": "deleteorderbyid()"
+    },
+    {
+      "label": "task-route.ts",
+      "file_type": "code",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L1",
+      "id": "routes_task_route_ts",
+      "community": 1,
+      "norm_label": "task-route.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L4",
+      "id": "routes_task_route_router",
+      "community": 1,
+      "norm_label": "router"
+    },
+    {
+      "label": "customers.ts",
+      "file_type": "code",
+      "source_file": "routes/customers.ts",
+      "source_location": "L1",
+      "id": "routes_customers_ts",
+      "community": 3,
+      "norm_label": "customers.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/customers.ts",
+      "source_location": "L15",
+      "id": "routes_customers_router",
+      "community": 3,
+      "norm_label": "router"
+    },
+    {
+      "label": "router.ts",
+      "file_type": "code",
+      "source_file": "routes/router.ts",
+      "source_location": "L1",
+      "id": "routes_router_ts",
+      "community": 4,
+      "norm_label": "router.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/router.ts",
+      "source_location": "L17",
+      "id": "routes_router_router",
+      "community": 4,
+      "norm_label": "router"
+    },
+    {
+      "label": "supplier.ts",
+      "file_type": "code",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L1",
+      "id": "routes_supplier_ts",
+      "community": 3,
+      "norm_label": "supplier.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L14",
+      "id": "routes_supplier_router",
+      "community": 3,
+      "norm_label": "router"
+    },
+    {
+      "label": "contracts.ts",
+      "file_type": "code",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L1",
+      "id": "routes_contracts_ts",
+      "community": 3,
+      "norm_label": "contracts.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L17",
+      "id": "routes_contracts_router",
+      "community": 3,
+      "norm_label": "router"
+    },
+    {
+      "label": "contact-persons.ts",
+      "file_type": "code",
+      "source_file": "routes/contact-persons.ts",
+      "source_location": "L1",
+      "id": "routes_contact_persons_ts",
+      "community": 1,
+      "norm_label": "contact-persons.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/contact-persons.ts",
+      "source_location": "L4",
+      "id": "routes_contact_persons_router",
+      "community": 1,
+      "norm_label": "router"
+    },
+    {
+      "label": "admin.ts",
+      "file_type": "code",
+      "source_file": "routes/admin.ts",
+      "source_location": "L1",
+      "id": "routes_admin_ts",
+      "community": 4,
+      "norm_label": "admin.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/admin.ts",
+      "source_location": "L6",
+      "id": "routes_admin_router",
+      "community": 4,
+      "norm_label": "router"
+    },
+    {
+      "label": "products.ts",
+      "file_type": "code",
+      "source_file": "routes/products.ts",
+      "source_location": "L1",
+      "id": "routes_products_ts",
+      "community": 4,
+      "norm_label": "products.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/products.ts",
+      "source_location": "L12",
+      "id": "routes_products_router",
+      "community": 4,
+      "norm_label": "router"
+    },
+    {
+      "label": "orders.ts",
+      "file_type": "code",
+      "source_file": "routes/orders.ts",
+      "source_location": "L1",
+      "id": "routes_orders_ts",
+      "community": 4,
+      "norm_label": "orders.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/orders.ts",
+      "source_location": "L9",
+      "id": "routes_orders_router",
+      "community": 4,
+      "norm_label": "router"
+    },
+    {
+      "label": "flatrates.ts",
+      "file_type": "code",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L1",
+      "id": "routes_flatrates_ts",
+      "community": 9,
+      "norm_label": "flatrates.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L15",
+      "id": "routes_flatrates_router",
+      "community": 9,
+      "norm_label": "router"
+    },
+    {
+      "label": "openapi.ts",
+      "file_type": "code",
+      "source_file": "routes/openapi.ts",
+      "source_location": "L1",
+      "id": "routes_openapi_ts",
+      "community": 19,
+      "norm_label": "openapi.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/openapi.ts",
+      "source_location": "L9",
+      "id": "routes_openapi_router",
+      "community": 19,
+      "norm_label": "router"
+    },
+    {
+      "label": "tariff.ts",
+      "file_type": "code",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L1",
+      "id": "routes_tariff_ts",
+      "community": 5,
+      "norm_label": "tariff.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L24",
+      "id": "routes_tariff_router",
+      "community": 5,
+      "norm_label": "router"
+    },
+    {
+      "label": "offer.ts",
+      "file_type": "code",
+      "source_file": "routes/offer.ts",
+      "source_location": "L1",
+      "id": "routes_offer_ts",
+      "community": 6,
+      "norm_label": "offer.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/offer.ts",
+      "source_location": "L16",
+      "id": "routes_offer_router",
+      "community": 6,
+      "norm_label": "router"
+    },
+    {
+      "label": "user.ts",
+      "file_type": "code",
+      "source_file": "routes/user.ts",
+      "source_location": "L1",
+      "id": "routes_user_ts",
+      "community": 2,
+      "norm_label": "user.ts"
+    },
+    {
+      "label": "router",
+      "file_type": "code",
+      "source_file": "routes/user.ts",
+      "source_location": "L24",
+      "id": "routes_user_router",
+      "community": 2,
+      "norm_label": "router"
+    }
+  ],
+  "links": [
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "lib_auth_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "lib_auth_auth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "routes_router_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "middlewares_errorhandler_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "middlewares_errorhandler_errorhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "config_config_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "workers_document_worker_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L19",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "src_server_options",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "src_server_swaggerspec",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "src_server_app",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L64",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "src_server_documentworker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "server.ts",
+      "source_location": "L66",
+      "weight": 1.0,
+      "source": "server_ts",
+      "target": "src_server_shutdown",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "config/config.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "config_config_ts",
+      "target": "config_config_config",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/errorHandler.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "middlewares_errorhandler_ts",
+      "target": "middlewares_errorhandler_apperror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/errorHandler.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "middlewares_errorhandler_ts",
+      "target": "middlewares_errorhandler_errorhandler",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "middlewares_permissions_ts",
+      "target": "lib_auth_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "middlewares_permissions_ts",
+      "target": "lib_auth_auth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "middlewares_permissions_ts",
+      "target": "middlewares_permissions_permissionoptions",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/permissions.ts",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "middlewares_permissions_ts",
+      "target": "middlewares_permissions_requirepermission",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "middlewares_permissions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "middlewares_permissions_requirepermission",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/validate.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "middlewares_validate_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "middlewares_validate_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "middlewares_validate_validate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "middlewares_auth_ts",
+      "target": "lib_auth_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "middlewares_auth_ts",
+      "target": "lib_auth_auth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "middlewares_auth_ts",
+      "target": "middlewares_auth_request",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "middlewares/auth.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "middlewares_auth_ts",
+      "target": "middlewares_auth_requiresession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "middlewares_auth_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "middlewares_auth_requiresession",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "pipelines_offer_pipeline_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_context_offerpipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "pipelines_offer_pipeline_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_stages_offerstages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_pipeline_pipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_pipeline_stage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_pipeline_runpipeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L40",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_pipeline_result",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "pipelines_offer_pipeline_ts",
+      "target": "offer_pipeline_generateofferdocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "pipelines_offer_pipeline_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "pipelines_offer_pipeline_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_pipeline_pipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_pipeline_stage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/pipeline.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "offer_pipeline_generateofferdocument",
+      "target": "offer_pipeline_runpipeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "offer_pipeline_runpipeline",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "offer_pipeline_generateofferdocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "pipelines_offer_context_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_actions_fetchofferdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_actions_formatfetcheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_context_offerfetchdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_context_offerformateddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/context.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "pipelines_offer_context_ts",
+      "target": "offer_context_offerpipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "pipelines_offer_context_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "pipelines_offer_context_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_context_offerfetchdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_context_offerformateddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_context_offerpipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "offer_context_offerpipelinecontext",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_require",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_expressionparser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_interpolate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_deepiterate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_parser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L44",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_parserresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "pipelines_offer_utils_ts",
+      "target": "offer_utils_expr",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "pipelines_offer_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/utils.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "offer_utils_deepiterate",
+      "target": "offer_utils_interpolate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_utils_interpolate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_utils_deepiterate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "offer_actions_postprocessing",
+      "target": "offer_utils_deepiterate"
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "pipelines_offer_actions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_actions_fetchofferdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_actions_formatfetcheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_actions_postprocessing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_actions_generating",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_actions_converting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_loadofferdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_preprocess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_postprocess",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L39",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_prepare",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L46",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_generate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L53",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_convert",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L60",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_write",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/stages.ts",
+      "source_location": "L88",
+      "weight": 1.0,
+      "source": "pipelines_offer_stages_ts",
+      "target": "offer_stages_offerstages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "pipelines_offer_stages_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "offer_stages_offerstages",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "utils_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "utils_utils_formatdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "utils_utils_formatduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "utils_utils_formateur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_actions_fetchofferdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_actions_formatfetcheddata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_actions_postprocessing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_actions_generating",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "pipelines_offer_actions_ts",
+      "target": "offer_actions_converting",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "pipelines/offer/actions.ts",
+      "source_location": "L113",
+      "weight": 1.0,
+      "source": "offer_actions_formatfetcheddata",
+      "target": "utils_utils_formatdate"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/utils.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_utils_ts",
+      "target": "utils_utils_formatdate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/utils.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "utils_utils_ts",
+      "target": "utils_utils_formateur",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/utils.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "utils_utils_ts",
+      "target": "utils_utils_formatduration",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/utils.ts",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "utils_utils_ts",
+      "target": "utils_utils_todate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "utils_utils_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "utils_utils_todate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "utils_products_pricecalculatorprops",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "utils_products_tier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "utils_products_findmatchingtier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "utils_products_ts",
+      "target": "utils_products_calculateprice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "utils_products_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "utils_products_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/products.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "utils_products_calculateprice",
+      "target": "utils_products_findmatchingtier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L236",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_createoffer",
+      "target": "utils_products_calculateprice"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L355",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_updateoffer",
+      "target": "utils_products_calculateprice"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L22",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_gettariffprice",
+      "target": "utils_products_calculateprice"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/keys.ts",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "utils_keys_ts",
+      "target": "utils_keys_getkeyname",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/responses.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "utils_responses_ts",
+      "target": "utils_responses_successresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "utils/responses.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "utils_responses_ts",
+      "target": "utils_responses_errorresponse",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "permissions_user_canviewusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "permissions_user_cancreateusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "permissions_user_canupdateusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "permissions/user.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "permissions_user_ts",
+      "target": "permissions_user_candeleteusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "permissions_user_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "permissions_user_canviewusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "permissions_user_cancreateusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "permissions_user_canupdateusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "permissions_user_candeleteusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/checkout-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_checkout_schemas_ts",
+      "target": "schemas_checkout_schemas_checkoutschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_offer_schemas_ts",
+      "target": "schemas_offer_schemas_offerpositionschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "schemas_offer_schemas_ts",
+      "target": "schemas_offer_schemas_offerflatrateschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/offer-schemas.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "schemas_offer_schemas_ts",
+      "target": "schemas_offer_schemas_createofferschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/order-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_order_schemas_ts",
+      "target": "schemas_order_schemas_orderpositionschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/order-schemas.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "schemas_order_schemas_ts",
+      "target": "schemas_order_schemas_createorderschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_createtariffschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_tariffentrybase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_createtariffproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_updatetariffproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_createtariffcustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/tariffs-schemas.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "schemas_tariffs_schemas_ts",
+      "target": "schemas_tariffs_schemas_updatetariffcustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_createtariffschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_createtariffproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_updatetariffproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_createtariffcustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "schemas_tariffs_schemas_updatetariffcustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/supplier-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_supplier_schemas_ts",
+      "target": "schemas_supplier_schemas_createsupplierschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/supplier-schemas.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "schemas_supplier_schemas_ts",
+      "target": "schemas_supplier_schemas_updatesupplierschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/product-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_product_schemas_ts",
+      "target": "schemas_product_schemas_createproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/product-schemas.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "schemas_product_schemas_ts",
+      "target": "schemas_product_schemas_updateproductschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_customer_schemas_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_customer_schemas_contactpersonschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_user_schemas_createuserschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_user_schemas_updateuserschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_user_schemas_upsertaddressschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/user-schemas.ts",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "schemas_user_schemas_ts",
+      "target": "schemas_user_schemas_createcontactpersonsschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "schemas_index_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/contract-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_contract_schemas_ts",
+      "target": "schemas_contract_schemas_createcontractschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/contract-schemas.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "schemas_contract_schemas_ts",
+      "target": "schemas_contract_schemas_updatecontractschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_customer_schemas_ts",
+      "target": "schemas_customer_schemas_contactpersonschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "schemas_customer_schemas_ts",
+      "target": "schemas_customer_schemas_createcustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/customer-schemas.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "schemas_customer_schemas_ts",
+      "target": "schemas_customer_schemas_updatecustomerschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "schemas/flatrate-schemas.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "schemas_flatrate_schemas_ts",
+      "target": "schemas_flatrate_schemas_flatrateschema",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "lib_prisma_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "lib_prisma_ts",
+      "target": "lib_prisma_adapter",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/prisma.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "lib_prisma_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contact-person-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_contact_person_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "lib_prisma_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contact-person-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_contact_person_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "lib_prisma_prisma",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "lib_permissions_ts",
+      "target": "lib_permissions_statement",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "lib_permissions_ts",
+      "target": "lib_permissions_ac",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "lib_permissions_ts",
+      "target": "lib_permissions_employee",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/permissions.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "lib_permissions_ts",
+      "target": "lib_permissions_admin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_permissions_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_permissions_ac",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_permissions_employee",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_permissions_admin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "lib_nextcloud_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_nextcloud_ts",
+      "target": "lib_nextcloud_getnextcloudclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/nextcloud.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "lib_nextcloud_ts",
+      "target": "lib_nextcloud_managenextcloud",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/env.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "lib_env_ts",
+      "target": "lib_env_env",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/queues.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "lib_queues_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "lib_env_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/queues.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "lib_queues_ts",
+      "target": "lib_queues_connection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/queues.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "lib_queues_ts",
+      "target": "lib_queues_documentqueue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/queues.ts",
+      "source_location": "L20",
+      "weight": 1.0,
+      "source": "lib_queues_ts",
+      "target": "lib_queues_uploadqueue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/upload-worker.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "workers_upload_worker_ts",
+      "target": "lib_queues_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "lib_queues_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "lib_queues_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "lib_queues_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "lib_queues_connection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "lib_queues_documentqueue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "lib_queues_documentqueue",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/auth.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "lib_auth_ts",
+      "target": "lib_auth_auth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "lib_auth_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "lib_auth_auth",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/upload-worker.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "workers_upload_worker_ts",
+      "target": "workers_upload_worker_startuploadworker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "workers_document_worker_taskdata",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "workers/document-worker.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "workers_document_worker_ts",
+      "target": "workers_document_worker_startdocumentworker",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_getoffers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L67",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_getofferbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L91",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_getoffertasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_getoffertaskbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L122",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_createoffertask",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_downloadofferdocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L218",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_createoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L307",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_deleteoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/offer-controller.ts",
+      "source_location": "L341",
+      "weight": 1.0,
+      "source": "controllers_offer_controller_ts",
+      "target": "controllers_offer_controller_updateoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_getoffers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_getofferbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_getoffertasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_getoffertaskbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_createoffertask",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_downloadofferdocument",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_createoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_deleteoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "controllers_offer_controller_updateoffer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "controllers_flatrate_controller_getflatrates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "controllers_flatrate_controller_getflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "controllers_flatrate_controller_createflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L45",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "controllers_flatrate_controller_updateflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/flatrate-controller.ts",
+      "source_location": "L65",
+      "weight": 1.0,
+      "source": "controllers_flatrate_controller_ts",
+      "target": "controllers_flatrate_controller_deleteflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_getflatrates",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_getflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_createflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_updateflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "controllers_flatrate_controller_deleteflatrate",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "controllers_product_controller_getproducts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "controllers_product_controller_getproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "controllers_product_controller_createproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L83",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "controllers_product_controller_deleteproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/product-controller.ts",
+      "source_location": "L108",
+      "weight": 1.0,
+      "source": "controllers_product_controller_ts",
+      "target": "controllers_product_controller_updateproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_product_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_product_controller_getproducts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_getproducts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_getproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_createproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_deleteproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "controllers_product_controller_updateproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "controllers_contract_controller_getallcontracts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "controllers_contract_controller_createcontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "controllers_contract_controller_updatecontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contract-controller.ts",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "controllers_contract_controller_ts",
+      "target": "controllers_contract_controller_deletecontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "controllers_contract_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "controllers_contract_controller_getallcontracts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "controllers_contract_controller_createcontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "controllers_contract_controller_updatecontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "controllers_contract_controller_deletecontract",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/contact-person-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_contact_person_controller_ts",
+      "target": "controllers_contact_person_controller_getallcontactpersons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contact-persons.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_contact_persons_ts",
+      "target": "controllers_contact_person_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contact-persons.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_contact_persons_ts",
+      "target": "controllers_contact_person_controller_getallcontactpersons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "controllers_customer_controller_getallcustomers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "controllers_customer_controller_getcustomerbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L34",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "controllers_customer_controller_createcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "controllers_customer_controller_updatecustomerbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/customer-controller.ts",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "controllers_customer_controller_ts",
+      "target": "controllers_customer_controller_deletecustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_getallcustomers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_getcustomerbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_createcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_updatecustomerbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "controllers_customer_controller_deletecustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "controllers_supplier_controller_getsuppliers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "controllers_supplier_controller_createsupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L23",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "controllers_supplier_controller_updatesupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/supplier-controller.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "controllers_supplier_controller_ts",
+      "target": "controllers_supplier_controller_deletesupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "controllers_supplier_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "controllers_supplier_controller_getsuppliers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "controllers_supplier_controller_createsupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "controllers_supplier_controller_updatesupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "controllers_supplier_controller_deletesupplier",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_getallusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_getuserbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_updateuserbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L90",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_createuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L127",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_deleteuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L155",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_getsessionuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_deleteaccount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/user-controller.ts",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "controllers_user_controller_ts",
+      "target": "controllers_user_controller_createcontactpersons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_user_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_user_controller_getallusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_getallusers",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_user_controller_getuserbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_updateuserbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_createuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_deleteuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_getsessionuser",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_deleteaccount",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "controllers_user_controller_createcontactpersons",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_gettariffprice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_getalltariffs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_gettariffbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L57",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_createtariff",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L89",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_deletetariff",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L101",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_addtariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_updatetariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L141",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_deletetariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L153",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_addtariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L186",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_updatetariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/tariff-controller.ts",
+      "source_location": "L201",
+      "weight": 1.0,
+      "source": "controllers_tariff_controller_ts",
+      "target": "controllers_tariff_controller_deletetariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_gettariffprice",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_getalltariffs",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_gettariffbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_createtariff",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_deletetariff",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_addtariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_updatetariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_deletetariffproduct",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_addtariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_updatetariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "controllers_tariff_controller_deletetariffcustomer",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "controllers_task_controller_getalltasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/task-controller.ts",
+      "source_location": "L18",
+      "weight": 1.0,
+      "source": "controllers_task_controller_ts",
+      "target": "controllers_task_controller_gettaskbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_task_route_ts",
+      "target": "controllers_task_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_task_route_ts",
+      "target": "controllers_task_controller_getalltasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_task_route_ts",
+      "target": "controllers_task_controller_gettaskbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "controllers_order_controller_getallorders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "controllers_order_controller_getorderbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L59",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "controllers_order_controller_getordertasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "controllers/order-controller.ts",
+      "source_location": "L70",
+      "weight": 1.0,
+      "source": "controllers_order_controller_ts",
+      "target": "controllers_order_controller_deleteorderbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_order_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "controllers_order_controller_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "controllers_order_controller_getallorders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "controllers_order_controller_getallorders",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "controllers_order_controller_getorderbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "controllers_order_controller_getordertasks",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "controllers_order_controller_deleteorderbyid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/task-route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_task_route_ts",
+      "target": "routes_task_route_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_task_route_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/customers.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "routes_customers_ts",
+      "target": "routes_customers_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_customers_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_admin_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_products_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_supplier_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_user_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_contracts_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_orders_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_offer_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_flatrates_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_contact_persons_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_tariff_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/router.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_router_ts",
+      "target": "routes_router_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/supplier.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "routes_supplier_ts",
+      "target": "routes_supplier_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contracts.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "routes_contracts_ts",
+      "target": "routes_contracts_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/contact-persons.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "routes_contact_persons_ts",
+      "target": "routes_contact_persons_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/admin.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "routes_admin_ts",
+      "target": "routes_admin_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/products.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "routes_products_ts",
+      "target": "routes_products_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/orders.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_orders_ts",
+      "target": "routes_orders_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/flatrates.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "routes_flatrates_ts",
+      "target": "routes_flatrates_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/openapi.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "routes_openapi_ts",
+      "target": "routes_openapi_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/tariff.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "routes_tariff_ts",
+      "target": "routes_tariff_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/offer.ts",
+      "source_location": "L16",
+      "weight": 1.0,
+      "source": "routes_offer_ts",
+      "target": "routes_offer_router",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "routes/user.ts",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "routes_user_ts",
+      "target": "routes_user_router",
+      "confidence_score": 1.0
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "3d9177130e17df8a7768c2fe698c7e0c5dc3e900"
+}

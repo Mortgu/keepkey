@@ -4,5 +4,6 @@ export * from './flatrate-hook';
 export * from './offer-hook';
 export * from './order-hook';
 export * from './product-hook';
+export * from './tariff-hook';
 export * from './user-hook';
 export * from './supplier-hook';

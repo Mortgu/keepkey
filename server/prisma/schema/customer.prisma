@@ -16,12 +16,9 @@ model Customer {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  offers         Offer[]
-  users          User[]
-  productPricing ProductPricing[]
-
-  // test
-  tariffCustomer TariffCustomer[]
+  offers          Offer[]
+  users           User[]
+  tariffCustomers TariffCustomer[]
 
   @@map("customer")
 }

@@ -35,7 +35,6 @@ import type {
 import { formatEur } from "@/utils/utils";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import { getPrice } from "@/data/products";
 import ProductModalSection from "./modal-items/product-section";
 
 interface OfferModalProps {
@@ -66,8 +65,6 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   const { suppliers } = useSupplierHook();
   const { users } = useUserHook();
   const { flatRates } = useFlatRateHook();
-
-  console.log(users)
 
   const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
     currentOffer?.offerPositions.map((pos) => ({

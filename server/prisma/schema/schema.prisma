@@ -121,12 +121,10 @@ model Contract {
 
   table String @default("")
 
-  productPricing ProductPricing[]
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
 
-  // test
-  tariffProduct   TariffProduct[]
+  tariffConfigs   TariffConfig[]
   tariffCustomers TariffCustomer[]
 
   createdAt DateTime? @default(now())

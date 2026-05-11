@@ -2,7 +2,7 @@ import { tv } from "tailwind-variants";
 import { VARIANT_LABELS, type BadgeComponentProps } from "./badge-types";
 
 const styles = tv({
-  base: "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium",
+  base: "inline-flex items-center justify-center px-2 py-0.5 rounded-full text-xs font-medium w-fit",
   variants: {
     variant: {
       generated: "bg-[#E6F2EC] text-[#00683F]",

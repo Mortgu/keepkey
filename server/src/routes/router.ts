@@ -6,7 +6,6 @@ import productRouter from "./products.js";
 import supplierRouter from "./supplier.js";
 import userRouter from "./user.js";
 import contractRouter from "./contracts.js";
-import pricingRouter from "./pricing.js";
 import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
 import offerRouter from "./offer.js";
@@ -35,9 +34,6 @@ router.use("/users", requireSession, userRouter);
 /* /api/contracts */
 router.use("/contracts", requireSession, contractRouter);
 
-/* /api/pricing */
-router.use("/pricing", pricingRouter);
-
 /* /api/orders */
 router.use("/orders", requireSession, orderRouter);
 
@@ -53,6 +49,6 @@ router.use("/task", requireSession, taskRouter);
 /* /api/contact-persons */
 router.use("/contact-persons", requireSession, contactPersonRouter);
 
-router.use('/tariff', tariffRouter)
+router.use("/tariffs", requireSession, tariffRouter);
 
 export default router;

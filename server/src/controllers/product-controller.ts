@@ -13,10 +13,9 @@ export const getProducts = async (
   const products = await prisma.product.findMany({
     orderBy: { createdAt: "asc" },
     include: {
-      productPricing: {
+      tariff: {
         include: {
-          product: true,
-          contract: true,
+          configs: { include: { contract: true } },
         },
       },
     },

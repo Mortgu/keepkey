@@ -97,8 +97,6 @@ export const createUser = async (request: Request, response: Response) => {
     });
   }
 
-  console.log(body)
-
   try {
     const createdUser = await auth.api.signUpEmail({
       body: {

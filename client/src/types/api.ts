@@ -24,8 +24,7 @@ export interface components {
             updatedAt?: string;
             offers: components["schemas"]["Offer"][];
             users: components["schemas"]["User"][];
-            productPricing: components["schemas"]["ProductPricing"][];
-            tariffCustomer: components["schemas"]["TariffCustomer"][];
+            tariffCustomers: components["schemas"]["TariffCustomer"][];
         };
         ContactPerson: {
             id: string;
@@ -174,44 +173,30 @@ export interface components {
             name: string;
             description?: string;
             table?: string;
-            productPricing: components["schemas"]["ProductPricing"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
+            tariff?: components["schemas"]["Tariff"];
+            tariffId?: string;
+            tariffCustomers: components["schemas"]["TariffCustomer"][];
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
-            tariffProducts: components["schemas"]["TariffProduct"][];
-            tariffCustomers: components["schemas"]["TariffCustomer"][];
-        };
-        ProductPricing: {
-            id: string;
-            contract: components["schemas"]["Contract"];
-            contractId: string;
-            product: components["schemas"]["Product"];
-            productId: string;
-            customer?: components["schemas"]["Customer"];
-            customerId?: string;
-            /** Format: int32 */
-            min_quantity: number;
-            /** Format: int32 */
-            max_quantity?: number;
-            /** Format: int32 */
-            duration_months: number;
-            /** Format: int32 */
-            price: number;
         };
         Tariff: {
             id: string;
-            products: components["schemas"]["TariffProduct"][];
+            products: components["schemas"]["Product"][];
+            configs: components["schemas"]["TariffConfig"][];
             customers: components["schemas"]["TariffCustomer"][];
+            /** Format: date-time */
+            createdAt?: string;
+            /** Format: date-time */
+            updatedAt?: string;
         };
-        TariffProduct: {
+        TariffConfig: {
             id: string;
             tariff: components["schemas"]["Tariff"];
             tariffId: string;
-            product: components["schemas"]["Product"];
-            productId: string;
             contract: components["schemas"]["Contract"];
             contractId: string;
             /** Format: int32 */
@@ -219,7 +204,7 @@ export interface components {
             /** Format: int32 */
             min_quantity: number;
             /** Format: int32 */
-            max_quantity: number;
+            max_quantity?: number;
             /** Format: int32 */
             price: number;
         };
@@ -238,7 +223,7 @@ export interface components {
             /** Format: int32 */
             min_quantity: number;
             /** Format: int32 */
-            max_quantity: number;
+            max_quantity?: number;
             /** Format: int32 */
             price: number;
         };
@@ -338,10 +323,9 @@ export interface components {
             name: string;
             features: string[];
             table: string;
-            productPricing: components["schemas"]["ProductPricing"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
-            tariffProduct: components["schemas"]["TariffProduct"][];
+            tariffConfigs: components["schemas"]["TariffConfig"][];
             tariffCustomers: components["schemas"]["TariffCustomer"][];
             /** Format: date-time */
             createdAt?: string;

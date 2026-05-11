@@ -34,7 +34,7 @@ export function MultiDropdown({ label, options, values, onChange, className }: M
   const count = values.length;
 
   return (
-    <div ref={ref} className={`relative select-none ${className ?? ''}`}>
+    <div ref={ref} className={`w-fit relative select-none ${className ?? ''}`}>
       <Button
         variant="secondary"
         type="button"

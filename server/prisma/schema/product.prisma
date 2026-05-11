@@ -5,93 +5,73 @@ model Product {
   description String?
   table       String?
 
-  productPricing ProductPricing[]
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
 
-  createdAt       DateTime?        @default(now())
-  updatedAt       DateTime?
-  tariffProducts  TariffProduct[]
+  tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+  tariffId String?
+
   tariffCustomers TariffCustomer[]
 
+  createdAt DateTime? @default(now())
+  updatedAt DateTime?
+
   @@index([name])
+  @@index([tariffId])
   @@map("product")
-}
-
-model ProductPricing {
-  id String @id @default(uuid())
-
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
-
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
-
-  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  customerId String?
-
-  min_quantity Int
-  max_quantity Int? @default(0)
-
-  duration_months Int @default(12)
-
-  price Int
-
-  @@map("pricing")
 }
 
 model Tariff {
   id String @id @default(cuid())
 
-  products  TariffProduct[]
+  products  Product[]
+  configs   TariffConfig[]
   customers TariffCustomer[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
 
   @@map("tariff")
 }
 
-model TariffProduct {
-  id String @unique @default(cuid())
+model TariffConfig {
+  id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id])
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  contract   Contract @relation(fields: [contractId], references: [id])
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
 
-  duration Int @default(12)
-
+  duration     Int  @default(12)
   min_quantity Int
-  max_quantity Int
+  max_quantity Int?
   price        Int
 
-  @@id([tariffId, productId, duration, contractId])
-  @@map("tariff_product")
+  @@unique([tariffId, contractId, duration, min_quantity])
+  @@map("tariff_config")
 }
 
 model TariffCustomer {
-  id String @unique @default(cuid())
+  id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id])
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  product   Product @relation(fields: [productId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
-  contract   Contract @relation(fields: [contractId], references: [id])
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
 
-  customer   Customer @relation(fields: [customerId], references: [id])
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId String
 
-  duration Int @default(12)
-
+  duration     Int  @default(12)
   min_quantity Int
-  max_quantity Int
+  max_quantity Int?
   price        Int
 
-  @@id([tariffId, productId, customerId, duration, contractId])
+  @@unique([tariffId, productId, customerId, contractId, duration, min_quantity])
   @@map("tariff_customer")
 }
