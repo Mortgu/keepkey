@@ -66,13 +66,13 @@ const write: Stage<OfferPipelineContext> = {
       throw new Error("Offer is null!");
     }
 
-    const { voucherId, customer, offerPositions } = offer;
+    const { quoteId, customer, offerPositions } = offer;
     const { companyName } = customer;
     const workloads = offerPositions
       .map((i) => i.product.name.replaceAll(" ", ""))
       .join("+");
 
-    const baseName = `${voucherId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
+    const baseName = `${quoteId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
     context.displayName = `${baseName}_v${context.version}`;
 
     const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);

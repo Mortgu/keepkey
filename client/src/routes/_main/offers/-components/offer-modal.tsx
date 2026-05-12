@@ -43,7 +43,7 @@ export const offerSchema = z.object({
   customerId: z.string().min(1, "Required!"),
   contactPersonId: z.string().min(1, "Required!"),
   userId: z.string().min(1, "Required!"),
-  voucherId: z.string().min(1, "Required!"),
+  quoteId: z.string().min(1, "Required!"),
 
   supplierId: z.string().nullable(),
   paymentTerm: z.string(),
@@ -84,7 +84,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
       customerId: currentOffer?.customerId ?? customers[0]?.id ?? '',
       contactPersonId: currentOffer?.contactPersonId ?? customers[0]?.contactPersons[0]?.id ?? '',
       userId: currentOffer?.userId ?? users[0]?.id ?? '',
-      voucherId: currentOffer?.voucherId ?? '',
+      quoteId: currentOffer?.quoteId ?? '',
 
       supplierId: currentOffer?.supplierId ?? null, //suppliers[0]?.id
       paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
@@ -192,7 +192,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
-            <offerForm.Field name="voucherId" children={(field) => (
+            <offerForm.Field name="quoteId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Input label="AG-Nr." value={field.state.value as string}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}

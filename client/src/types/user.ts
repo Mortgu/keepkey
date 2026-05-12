@@ -12,7 +12,7 @@ export type CreateUserInput = Omit<
     | "updatedAt"
     | "sessions"
     | "accounts"
-    | "employeeOrders"
+    | "orders"
     | "customer"
     | "offers"
     | "orders"

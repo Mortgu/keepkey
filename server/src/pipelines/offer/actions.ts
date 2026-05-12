@@ -109,7 +109,7 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
   }));
 
   return {
-    voucherId: offer.voucherId,
+    quoteId: offer.quoteId,
     date: formatDate(offer.date),
     paymentTerm: offer.paymentTerm,
     validUntil: offer.validUntil ? formatDate(offer.validUntil) : "",

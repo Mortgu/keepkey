@@ -18,13 +18,13 @@ export const getOffers = async (request: Request, response: Response) => {
 
   const where: {
     AND?: any[];
-    voucherId?: { contains: string };
+    quoteId?: { contains: string };
     customerId?: { in: string[] };
     contactPersonId?: { in: string[] };
   } = {};
 
   if (search && typeof search === "string") {
-    where.voucherId = { contains: search };
+    where.quoteId = { contains: search };
   }
 
   if (companyIds) {

@@ -5,7 +5,7 @@ import { auth } from "../lib/auth.js";
 export const getAllUsers = async (request: Request, response: Response) => {
   const users = await prisma.user.findMany({
     include: {
-      employeeOrders: true,
+      orders: true,
       customer: true,
       offers: true,
     },
@@ -20,7 +20,7 @@ export const getUserById = async (request: Request, response: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: id as string },
     include: {
-      employeeOrders: true,
+      orders: true,
       customer: {
         include: {
           contactPersons: true,

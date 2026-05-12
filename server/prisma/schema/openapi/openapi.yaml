@@ -17,14 +17,6 @@ components:
           type: string
         email:
           type: string
-        orders:
-          type: array
-          items:
-            $ref: "#/components/schemas/Order"
-        contactPersons:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContactPerson"
         street:
           type: string
         city:
@@ -39,10 +31,18 @@ components:
         updatedAt:
           type: string
           format: date-time
+        contactPersons:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContactPerson"
         offers:
           type: array
           items:
             $ref: "#/components/schemas/Offer"
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
         users:
           type: array
           items:
@@ -55,9 +55,9 @@ components:
         - id
         - customerId
         - companyName
-        - orders
         - contactPersons
         - offers
+        - orders
         - users
         - tariffCustomers
     ContactPerson:
@@ -87,6 +87,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Offer"
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
       required:
         - id
         - customerId
@@ -95,6 +99,7 @@ components:
         - firstName
         - lastName
         - offers
+        - orders
     Document:
       type: object
       properties:
@@ -186,7 +191,7 @@ components:
           $ref: "#/components/schemas/User"
         userId:
           type: string
-        voucherId:
+        quoteId:
           type: string
         paymentTerm:
           type: string
@@ -207,8 +212,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferPosition"
-        order:
-          $ref: "#/components/schemas/Order"
         documents:
           type: array
           items:
@@ -217,6 +220,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Task"
+        orders:
+          $ref: "#/components/schemas/Order"
         net_amount:
           type: integer
           format: int32
@@ -234,7 +239,7 @@ components:
         - contactPersonId
         - user
         - userId
-        - voucherId
+        - quoteId
         - paymentTerm
         - date
         - offerFlatRates
@@ -321,13 +326,34 @@ components:
       properties:
         id:
           type: string
+        orderId:
+          type: string
+        date:
+          type: string
+          format: date-time
+        paymentTerm:
+          type: string
+        projectId:
+          type: string
         customer:
           $ref: "#/components/schemas/Customer"
         customerId:
           type: string
-        user:
+        supplier:
+          $ref: "#/components/schemas/Supplier"
+        supplierId:
+          type: string
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
+        customerContactPerson:
+          $ref: "#/components/schemas/ContactPerson"
+        contactPersonId:
+          type: string
+        employee:
           $ref: "#/components/schemas/User"
-        userId:
+        employeeId:
           type: string
         orderPositions:
           type: array
@@ -341,14 +367,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Task"
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
-          type: string
-        employee:
-          $ref: "#/components/schemas/User"
-        employeeId:
-          type: string
         createdAt:
           type: string
           format: date-time
@@ -357,10 +375,18 @@ components:
           format: date-time
       required:
         - id
+        - orderId
+        - date
+        - paymentTerm
+        - projectId
         - customer
         - customerId
-        - user
-        - userId
+        - offer
+        - offerId
+        - customerContactPerson
+        - contactPersonId
+        - employee
+        - employeeId
         - orderPositions
         - documents
         - tasks
@@ -387,11 +413,15 @@ components:
         quantity:
           type: integer
           format: int32
-        priceAtPurchase:
-          type: number
-          format: double
-        currency:
-          type: string
+        unit_price:
+          type: integer
+          format: int32
+        discount:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int32
         createdAt:
           type: string
           format: date-time
@@ -405,8 +435,9 @@ components:
         - contractId
         - duration_months
         - quantity
-        - priceAtPurchase
-        - currency
+        - unit_price
+        - discount
+        - total
     Product:
       type: object
       properties:
@@ -598,10 +629,6 @@ components:
         banExpires:
           type: string
           format: date-time
-        employeeOrders:
-          type: array
-          items:
-            $ref: "#/components/schemas/Order"
         customer:
           $ref: "#/components/schemas/Customer"
         customerId:
@@ -626,7 +653,6 @@ components:
         - updatedAt
         - sessions
         - accounts
-        - employeeOrders
         - offers
         - orders
     Session:
@@ -748,11 +774,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Offer"
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
       required:
         - id
         - supplierId
         - name
         - offers
+        - orders
     FlatRate:
       type: object
       properties:

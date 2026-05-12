@@ -1,4 +1,4 @@
-import { useOfferHook } from "@/hooks";
+import { useOfferHook, useOrderHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
 
 import type { Offer } from "@/types";
@@ -11,13 +11,10 @@ interface OrderModalProps {
   currentOrder?: any | null;
 }
 
-export default function OrderModal({
-  open,
-  cancelFn,
-  submitFn,
-  currentOrder,
-}: OrderModalProps) {
+export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: OrderModalProps) {
   const { offers } = useOfferHook();
+  const { createOrder, errorCreatingOrder } = useOrderHook();
+
 
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>
@@ -26,9 +23,10 @@ export default function OrderModal({
       </ModalDialog.Header>
       <ModalDialog.Content>
         {offers.map((offer: Offer) => (
-          <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)">
+          <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
+            onClick={() => createOrder({ offerId: offer.id })}>
             <div className="grid">
-              <p className="text-(--text) font-normal">{offer.voucherId}</p>
+              <p className="text-(--text) font-normal">{offer.quoteId}</p>
               <p className="text-(--neutral-400) text-sm font-light">
                 {formatDate(offer.date)}
               </p>

@@ -5,9 +5,6 @@ model Customer {
   companyName String
   email       String? @unique
 
-  orders         Order[]         @relation("CustomerRelation")
-  contactPersons ContactPerson[]
-
   street String?
   city   String?
   plz    String?
@@ -16,7 +13,11 @@ model Customer {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
 
-  offers          Offer[]
+  contactPersons ContactPerson[]
+
+  offers Offer[]
+  orders Order[]
+
   users           User[]
   tariffCustomers TariffCustomer[]
 
@@ -36,6 +37,7 @@ model ContactPerson {
   createdAt DateTime? @default(now())
   updatedAt DateTime? @updatedAt
   offers    Offer[]
+  orders    Order[]
 
   @@index([customerId])
   @@map("contact_person")

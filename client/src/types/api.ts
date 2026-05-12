@@ -12,8 +12,6 @@ export interface components {
             customerId: string;
             companyName: string;
             email?: string;
-            orders: components["schemas"]["Order"][];
-            contactPersons: components["schemas"]["ContactPerson"][];
             street?: string;
             city?: string;
             plz?: string;
@@ -22,7 +20,9 @@ export interface components {
             createdAt?: string;
             /** Format: date-time */
             updatedAt?: string;
+            contactPersons: components["schemas"]["ContactPerson"][];
             offers: components["schemas"]["Offer"][];
+            orders: components["schemas"]["Order"][];
             users: components["schemas"]["User"][];
             tariffCustomers: components["schemas"]["TariffCustomer"][];
         };
@@ -39,6 +39,7 @@ export interface components {
             /** Format: date-time */
             updatedAt?: string;
             offers: components["schemas"]["Offer"][];
+            orders: components["schemas"]["Order"][];
         };
         Document: {
             id: string;
@@ -81,7 +82,7 @@ export interface components {
             contactPersonId: string;
             user: components["schemas"]["User"];
             userId: string;
-            voucherId: string;
+            quoteId: string;
             paymentTerm: string;
             /** Format: date-time */
             date: string;
@@ -91,9 +92,9 @@ export interface components {
             requestFrom?: string;
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             offerPositions: components["schemas"]["OfferPosition"][];
-            order?: components["schemas"]["Order"];
             documents: components["schemas"]["Document"][];
             tasks: components["schemas"]["Task"][];
+            orders?: components["schemas"]["Order"];
             /** Format: int32 */
             net_amount: number;
             /** Format: date-time */
@@ -134,17 +135,24 @@ export interface components {
         };
         Order: {
             id: string;
+            orderId: string;
+            /** Format: date-time */
+            date: string;
+            paymentTerm: string;
+            projectId: string;
             customer: components["schemas"]["Customer"];
             customerId: string;
-            user: components["schemas"]["User"];
-            userId: string;
+            supplier?: components["schemas"]["Supplier"];
+            supplierId?: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            customerContactPerson: components["schemas"]["ContactPerson"];
+            contactPersonId: string;
+            employee: components["schemas"]["User"];
+            employeeId: string;
             orderPositions: components["schemas"]["OrderPosition"][];
             documents: components["schemas"]["Document"][];
             tasks: components["schemas"]["Task"][];
-            offer?: components["schemas"]["Offer"];
-            offerId?: string;
-            employee?: components["schemas"]["User"];
-            employeeId?: string;
             /** Format: date-time */
             createdAt?: string;
             /** Format: date-time */
@@ -162,9 +170,12 @@ export interface components {
             duration_months: number;
             /** Format: int32 */
             quantity: number;
-            /** Format: double */
-            priceAtPurchase: number;
-            currency: string;
+            /** Format: int32 */
+            unit_price: number;
+            /** Format: int32 */
+            discount: number;
+            /** Format: int32 */
+            total: number;
             /** Format: date-time */
             createdAt?: string;
         };
@@ -248,7 +259,6 @@ export interface components {
             banReason?: string;
             /** Format: date-time */
             banExpires?: string;
-            employeeOrders: components["schemas"]["Order"][];
             customer?: components["schemas"]["Customer"];
             customerId?: string;
             offers: components["schemas"]["Offer"][];
@@ -309,6 +319,7 @@ export interface components {
             /** Format: date-time */
             updatedAt?: string;
             offers: components["schemas"]["Offer"][];
+            orders: components["schemas"]["Order"][];
         };
         FlatRate: {
             id: string;

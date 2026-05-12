@@ -1,25 +1,34 @@
 model Order {
   id String @id @default(uuid())
 
-  customer   Customer @relation("CustomerRelation", fields: [customerId], references: [id], onDelete: Restrict)
-  customerId String
+  orderId     String // Beleg-Nr.
+  date        DateTime @default(now()) // Datum
+  paymentTerm String   @default("") // Zahlungsbedingung
+  projectId   String // Projekt-Nr.
 
-  user   User   @relation(fields: [userId], references: [id])
-  userId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String // Kunden-Nr.
+
+  supplier   Supplier? @relation(fields: [supplierId], references: [id])
+  supplierId String? // Lieferanten-Nr.
+
+  offer   Offer  @relation(fields: [offerId], references: [id])
+  offerId String @unique // One-to-one relation
+
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  contactPersonId       String // Ihr Ansprechpartner
+
+  employee   User   @relation(fields: [employeeId], references: [id])
+  employeeId String // Unser Ansprechpartner
 
   orderPositions OrderPosition[]
 
-  // New
+  // Fehlt: Summe Netto EUR, MwSt. 19.00%, Summe Brutto EUR
+
   documents Document[]
   tasks     Task[]
 
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String? @unique
-
-  employee   User?   @relation("EmployeeRelation", fields: [employeeId], references: [id])
-  employeeId String?
-
-  createdAt DateTime? @default(now())
+  createdAt DateTime  @default(now())
   updatedAt DateTime? @default(now())
 
   @@map("order")
@@ -28,7 +37,7 @@ model Order {
 model OrderPosition {
   id String @id @default(uuid())
 
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
 
   product   Product @relation(fields: [productId], references: [id])
@@ -40,10 +49,11 @@ model OrderPosition {
   duration_months Int
   quantity        Int
 
-  priceAtPurchase Float
-  currency        String @default("EUR")
+  unit_price Int
+  discount   Int
+  total      Int
 
-  createdAt DateTime? @default(now())
+  createdAt DateTime @default(now())
 
   @@map("order_position")
 }

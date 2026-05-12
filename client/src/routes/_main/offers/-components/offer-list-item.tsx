@@ -57,7 +57,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
               {/* Offer-Id. */}
               <div className="flex items-center gap-1 text-sm font-light">
                 <label className="text-(--text-secondary)">Angebots-Nr.</label>
-                <p className="text-(--text)">{offer.voucherId}</p>
+                <p className="text-(--text)">{offer.quoteId}</p>
               </div>
 
               {/* Created at */}
