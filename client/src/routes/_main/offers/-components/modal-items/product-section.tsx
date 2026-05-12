@@ -54,11 +54,11 @@ export default function ProductModalSection({ offerProducts, setOfferProducts }:
                         const product = products.find((f) => f.id == offerProduct.productId);
                         const contract = contracts.find((c) => c.id == offerProduct.contractId);
 
-                        if (!product || !contract) return null;
+                        if (!product || !contract) return '';
 
                         const op = Object.assign(offerProduct, product);
 
-                        return <ProductSectionItem offerProduct={op} offerContract={contract} setOfferProducts={setOfferProducts}
+                        return <ProductSectionItem key={offerProduct.productId} offerProduct={op} offerContract={contract} setOfferProducts={setOfferProducts}
                             index={index} onUpdate={async (data) => {
                                 setOfferProducts(offerProducts.filter((p, i) => i !== index))
 

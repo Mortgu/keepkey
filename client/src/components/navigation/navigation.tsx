@@ -8,6 +8,7 @@ import {
   ShoppingCart,
   Users,
   UserCircle2,
+  Truck,
 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client.ts";
@@ -110,22 +111,16 @@ export function Navigation() {
 
         <SectionDivider />
         <Section title="Katalog" collapsible>
-          <NavGroup
-            icon={<Package size={ICON_SIZE} />}
-            label="Produkte"
-            defaultOpen
-          >
+
+          <NavGroup label="Produkte" defaultOpen icon={<Package size={ICON_SIZE} />}>
             <NavLink to="/products" indent label="Alle Produkte" />
             <NavLink to="/products/pricing" indent label="Preise" />
             <NavLink to="/products/flatrates" indent label="Flatrates" />
-            <NavLink to="/products/suppliers" indent label="Lieferanten" />
           </NavGroup>
 
-          <NavLink
-            to="/contracts"
-            icon={<Users size={ICON_SIZE} />}
-            label="Verträge"
-          />
+          <NavLink to="/suppliers" label="Lieferanten" icon={<Truck size={ICON_SIZE} />} />
+          <NavLink to="/contracts" label="Verträge" icon={<Users size={ICON_SIZE} />} />
+
         </Section>
 
         <SectionDivider />

@@ -41,7 +41,7 @@ export function LoginFormComponent() {
     });
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="absolute min-w-screen min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-sm">
                 <div className="bg-white border border-(--border) rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-7 py-8">
 

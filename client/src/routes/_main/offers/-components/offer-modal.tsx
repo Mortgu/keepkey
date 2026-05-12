@@ -53,8 +53,6 @@ export const offerSchema = z.object({
 });
 
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
-  if (!open) return null;
-
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();

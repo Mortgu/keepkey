@@ -61,10 +61,10 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
           {footer ?? (
             <>
               <Button onClick={cancelFn} variant="secondary" size="sm">
-                Close
+                Abbrechen
               </Button>
               <Button onClick={primaryFn} variant="primary" size="sm">
-                Save
+                Speichern
               </Button>
             </>
           )}
