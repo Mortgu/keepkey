@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { Input, Button, Checkbox } from "@/components";
-import type { Contract, CreateOfferPositionInput, Product } from "@/types";
+import { Input, Button, Checkbox, Select } from "@/components";
+import type { CreateOfferPositionInput } from "@/types";
 import { useContractHook, useProductHook } from "@/hooks";
 
 export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
@@ -19,8 +19,6 @@ interface Props {
 }
 
 export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
-  const isEdit = currentProduct !== undefined;
-
   const { products } = useProductHook();
   const { contracts } = useContractHook();
 
@@ -50,69 +48,45 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
     onSave({ productId, contractId, duration_months, quantity, optional, total_cents: 0 });
   };
 
-  const selectClass =
-    "w-full rounded-lg border border-(--border) bg-white transition-all duration-200 px-3 py-2 text-sm outline-none focus:bg-gray-100";
-
   return (
     <div className="bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-2 rounded-md">
       <div className="flex items-end gap-3">
         <div className="flex-2 grid gap-1">
-          <label className="text-sm text-gray-600">Produkt</label>
-          <select
-            value={productId}
-            onChange={(e) => setProductId(e.target.value)}
-            className={selectClass}
-          >
+          <Select label="Produkt" value={productId} onChange={(e) => setProductId(e.target.value)} className="bg-white">
             {products.map((p) => (
               <option key={p.id} value={p.id}>
                 {p.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex-2 grid gap-1">
-          <label className="text-sm text-gray-600">Vertrag</label>
-          <select
-            value={contractId}
-            onChange={(e) => setContractId(e.target.value)}
-            className={selectClass}
-          >
+          <Select label="Vertrag" value={contractId} onChange={(e) => setContractId(e.target.value)} className="bg-white">
             {contracts.map((c) => (
               <option key={c.id} value={c.id}>
                 {c.name}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="flex-1 grid gap-1">
-          <label className="text-sm text-gray-600">Laufzeit</label>
-          <select
-            value={duration_months}
-            onChange={(e) =>
-              setDurationMonths(
-                Number(e.target.value) as OfferProductInput["duration_months"],
-              )
-            }
-            className={selectClass}
-          >
+          <Select label="Laufzeit" value={duration_months} onChange={(e) =>
+            setDurationMonths(Number(e.target.value) as OfferProductInput["duration_months"])} className="bg-white">
             {DURATIONS.map((d) => (
               <option key={d.value} value={d.value}>
                 {d.label}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="w-20 grid gap-1">
-          <label className="text-sm text-gray-600">Menge</label>
-          <Input
-            type="number"
-            value={quantity}
+          <Input label="Menge" type="number" value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
-            className="bg-white"
-          />
+            className="bg-white" />
+
         </div>
       </div>
 
@@ -121,12 +95,7 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
       <div className="flex items-center justify-between gap-2">
         <Checkbox label="Optional?" onChange={() => setOptional(!optional)} />
         <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={onCancel}
-          >
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
             Abbrechen
           </Button>
           <Button type="button" size="sm" onClick={handleSave}>

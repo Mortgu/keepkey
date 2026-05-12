@@ -639,7 +639,7 @@
       "source_file": "server/src/middlewares/validate.ts",
       "source_location": "L1",
       "id": "server_src_middlewares_validate_ts",
-      "community": 28,
+      "community": 29,
       "norm_label": "validate.ts"
     },
     {
@@ -648,7 +648,7 @@
       "source_file": "server/src/middlewares/validate.ts",
       "source_location": "L4",
       "id": "middlewares_validate_validate",
-      "community": 28,
+      "community": 29,
       "norm_label": "validate()"
     },
     {
@@ -657,7 +657,7 @@
       "source_file": "server/src/middlewares/auth.ts",
       "source_location": "L1",
       "id": "server_src_middlewares_auth_ts",
-      "community": 52,
+      "community": 28,
       "norm_label": "auth.ts"
     },
     {
@@ -666,7 +666,7 @@
       "source_file": "server/src/middlewares/auth.ts",
       "source_location": "L9",
       "id": "middlewares_auth_request",
-      "community": 52,
+      "community": 28,
       "norm_label": "request"
     },
     {
@@ -675,7 +675,7 @@
       "source_file": "server/src/middlewares/auth.ts",
       "source_location": "L15",
       "id": "middlewares_auth_requiresession",
-      "community": 52,
+      "community": 28,
       "norm_label": "requiresession()"
     },
     {
@@ -1071,7 +1071,7 @@
       "source_file": "server/src/utils/keys.ts",
       "source_location": "L1",
       "id": "server_src_utils_keys_ts",
-      "community": 83,
+      "community": 81,
       "norm_label": "keys.ts"
     },
     {
@@ -1080,7 +1080,7 @@
       "source_file": "server/src/utils/keys.ts",
       "source_location": "L1",
       "id": "utils_keys_getkeyname",
-      "community": 83,
+      "community": 81,
       "norm_label": "getkeyname()"
     },
     {
@@ -1089,7 +1089,7 @@
       "source_file": "server/src/utils/responses.ts",
       "source_location": "L1",
       "id": "server_src_utils_responses_ts",
-      "community": 70,
+      "community": 69,
       "norm_label": "responses.ts"
     },
     {
@@ -1098,7 +1098,7 @@
       "source_file": "server/src/utils/responses.ts",
       "source_location": "L3",
       "id": "utils_responses_successresponse",
-      "community": 70,
+      "community": 69,
       "norm_label": "successresponse()"
     },
     {
@@ -1107,7 +1107,7 @@
       "source_file": "server/src/utils/responses.ts",
       "source_location": "L11",
       "id": "utils_responses_errorresponse",
-      "community": 70,
+      "community": 69,
       "norm_label": "errorresponse()"
     },
     {
@@ -1161,7 +1161,7 @@
       "source_file": "server/src/schemas/checkout-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_checkout_schemas_ts",
-      "community": 84,
+      "community": 82,
       "norm_label": "checkout-schemas.ts"
     },
     {
@@ -1170,7 +1170,7 @@
       "source_file": "server/src/schemas/checkout-schemas.ts",
       "source_location": "L3",
       "id": "schemas_checkout_schemas_checkoutschema",
-      "community": 84,
+      "community": 82,
       "norm_label": "checkoutschema"
     },
     {
@@ -1179,7 +1179,7 @@
       "source_file": "server/src/schemas/offer-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_offer_schemas_ts",
-      "community": 61,
+      "community": 60,
       "norm_label": "offer-schemas.ts"
     },
     {
@@ -1188,7 +1188,7 @@
       "source_file": "server/src/schemas/offer-schemas.ts",
       "source_location": "L3",
       "id": "schemas_offer_schemas_offerpositionschema",
-      "community": 61,
+      "community": 60,
       "norm_label": "offerpositionschema"
     },
     {
@@ -1197,7 +1197,7 @@
       "source_file": "server/src/schemas/offer-schemas.ts",
       "source_location": "L11",
       "id": "schemas_offer_schemas_offerflatrateschema",
-      "community": 61,
+      "community": 60,
       "norm_label": "offerflatrateschema"
     },
     {
@@ -1206,7 +1206,7 @@
       "source_file": "server/src/schemas/offer-schemas.ts",
       "source_location": "L17",
       "id": "schemas_offer_schemas_createofferschema",
-      "community": 61,
+      "community": 60,
       "norm_label": "createofferschema"
     },
     {
@@ -1215,7 +1215,7 @@
       "source_file": "server/src/schemas/order-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_order_schemas_ts",
-      "community": 71,
+      "community": 70,
       "norm_label": "order-schemas.ts"
     },
     {
@@ -1224,7 +1224,7 @@
       "source_file": "server/src/schemas/order-schemas.ts",
       "source_location": "L3",
       "id": "schemas_order_schemas_orderpositionschema",
-      "community": 71,
+      "community": 70,
       "norm_label": "orderpositionschema"
     },
     {
@@ -1233,7 +1233,7 @@
       "source_file": "server/src/schemas/order-schemas.ts",
       "source_location": "L11",
       "id": "schemas_order_schemas_createorderschema",
-      "community": 71,
+      "community": 70,
       "norm_label": "createorderschema"
     },
     {
@@ -1314,7 +1314,7 @@
       "source_file": "server/src/schemas/supplier-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_supplier_schemas_ts",
-      "community": 72,
+      "community": 71,
       "norm_label": "supplier-schemas.ts"
     },
     {
@@ -1323,7 +1323,7 @@
       "source_file": "server/src/schemas/supplier-schemas.ts",
       "source_location": "L3",
       "id": "schemas_supplier_schemas_createsupplierschema",
-      "community": 72,
+      "community": 71,
       "norm_label": "createsupplierschema"
     },
     {
@@ -1332,7 +1332,7 @@
       "source_file": "server/src/schemas/supplier-schemas.ts",
       "source_location": "L8",
       "id": "schemas_supplier_schemas_updatesupplierschema",
-      "community": 72,
+      "community": 71,
       "norm_label": "updatesupplierschema"
     },
     {
@@ -1341,7 +1341,7 @@
       "source_file": "server/src/schemas/product-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_product_schemas_ts",
-      "community": 73,
+      "community": 72,
       "norm_label": "product-schemas.ts"
     },
     {
@@ -1350,7 +1350,7 @@
       "source_file": "server/src/schemas/product-schemas.ts",
       "source_location": "L3",
       "id": "schemas_product_schemas_createproductschema",
-      "community": 73,
+      "community": 72,
       "norm_label": "createproductschema"
     },
     {
@@ -1359,7 +1359,7 @@
       "source_file": "server/src/schemas/product-schemas.ts",
       "source_location": "L9",
       "id": "schemas_product_schemas_updateproductschema",
-      "community": 73,
+      "community": 72,
       "norm_label": "updateproductschema"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "server/src/schemas/index.ts",
       "source_location": "L1",
       "id": "server_src_schemas_index_ts",
-      "community": 34,
+      "community": 33,
       "norm_label": "index.ts"
     },
     {
@@ -1422,7 +1422,7 @@
       "source_file": "server/src/schemas/contract-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_contract_schemas_ts",
-      "community": 74,
+      "community": 73,
       "norm_label": "contract-schemas.ts"
     },
     {
@@ -1431,7 +1431,7 @@
       "source_file": "server/src/schemas/contract-schemas.ts",
       "source_location": "L3",
       "id": "schemas_contract_schemas_createcontractschema",
-      "community": 74,
+      "community": 73,
       "norm_label": "createcontractschema"
     },
     {
@@ -1440,7 +1440,7 @@
       "source_file": "server/src/schemas/contract-schemas.ts",
       "source_location": "L8",
       "id": "schemas_contract_schemas_updatecontractschema",
-      "community": 74,
+      "community": 73,
       "norm_label": "updatecontractschema"
     },
     {
@@ -1485,7 +1485,7 @@
       "source_file": "server/src/schemas/flatrate-schemas.ts",
       "source_location": "L1",
       "id": "server_src_schemas_flatrate_schemas_ts",
-      "community": 85,
+      "community": 83,
       "norm_label": "flatrate-schemas.ts"
     },
     {
@@ -1494,7 +1494,7 @@
       "source_file": "server/src/schemas/flatrate-schemas.ts",
       "source_location": "L3",
       "id": "schemas_flatrate_schemas_flatrateschema",
-      "community": 85,
+      "community": 83,
       "norm_label": "flatrateschema"
     },
     {
@@ -1503,7 +1503,7 @@
       "source_file": "server/src/lib/prisma.ts",
       "source_location": "L1",
       "id": "server_src_lib_prisma_ts",
-      "community": 38,
+      "community": 15,
       "norm_label": "prisma.ts"
     },
     {
@@ -1512,7 +1512,7 @@
       "source_file": "server/src/lib/prisma.ts",
       "source_location": "L5",
       "id": "lib_prisma_adapter",
-      "community": 38,
+      "community": 15,
       "norm_label": "adapter"
     },
     {
@@ -1521,7 +1521,7 @@
       "source_file": "server/src/lib/prisma.ts",
       "source_location": "L9",
       "id": "lib_prisma_prisma",
-      "community": 38,
+      "community": 15,
       "norm_label": "prisma"
     },
     {
@@ -1620,7 +1620,7 @@
       "source_file": "server/src/lib/queues.ts",
       "source_location": "L1",
       "id": "server_src_lib_queues_ts",
-      "community": 18,
+      "community": 15,
       "norm_label": "queues.ts"
     },
     {
@@ -1629,7 +1629,7 @@
       "source_file": "server/src/lib/queues.ts",
       "source_location": "L5",
       "id": "lib_queues_connection",
-      "community": 18,
+      "community": 15,
       "norm_label": "connection"
     },
     {
@@ -1638,7 +1638,7 @@
       "source_file": "server/src/lib/queues.ts",
       "source_location": "L14",
       "id": "lib_queues_documentqueue",
-      "community": 18,
+      "community": 15,
       "norm_label": "documentqueue"
     },
     {
@@ -1647,7 +1647,7 @@
       "source_file": "server/src/lib/queues.ts",
       "source_location": "L20",
       "id": "lib_queues_uploadqueue",
-      "community": 18,
+      "community": 15,
       "norm_label": "uploadqueue"
     },
     {
@@ -1674,7 +1674,7 @@
       "source_file": "server/src/workers/upload-worker.ts",
       "source_location": "L1",
       "id": "server_src_workers_upload_worker_ts",
-      "community": 18,
+      "community": 15,
       "norm_label": "upload-worker.ts"
     },
     {
@@ -1683,7 +1683,7 @@
       "source_file": "server/src/workers/upload-worker.ts",
       "source_location": "L9",
       "id": "workers_upload_worker_startuploadworker",
-      "community": 18,
+      "community": 15,
       "norm_label": "startuploadworker()"
     },
     {
@@ -1692,7 +1692,7 @@
       "source_file": "server/src/workers/document-worker.ts",
       "source_location": "L1",
       "id": "server_src_workers_document_worker_ts",
-      "community": 18,
+      "community": 15,
       "norm_label": "document-worker.ts"
     },
     {
@@ -1701,7 +1701,7 @@
       "source_file": "server/src/workers/document-worker.ts",
       "source_location": "L7",
       "id": "workers_document_worker_taskdata",
-      "community": 18,
+      "community": 15,
       "norm_label": "taskdata"
     },
     {
@@ -1710,7 +1710,7 @@
       "source_file": "server/src/workers/document-worker.ts",
       "source_location": "L12",
       "id": "workers_document_worker_startdocumentworker",
-      "community": 18,
+      "community": 15,
       "norm_label": "startdocumentworker()"
     },
     {
@@ -1809,7 +1809,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_flatrate_controller_ts",
-      "community": 33,
+      "community": 34,
       "norm_label": "flatrate-controller.ts"
     },
     {
@@ -1818,7 +1818,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L4",
       "id": "controllers_flatrate_controller_getflatrates",
-      "community": 33,
+      "community": 34,
       "norm_label": "getflatrates()"
     },
     {
@@ -1827,7 +1827,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L11",
       "id": "controllers_flatrate_controller_getflatrate",
-      "community": 33,
+      "community": 34,
       "norm_label": "getflatrate()"
     },
     {
@@ -1836,7 +1836,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L27",
       "id": "controllers_flatrate_controller_createflatrate",
-      "community": 33,
+      "community": 34,
       "norm_label": "createflatrate()"
     },
     {
@@ -1845,7 +1845,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L45",
       "id": "controllers_flatrate_controller_updateflatrate",
-      "community": 33,
+      "community": 34,
       "norm_label": "updateflatrate()"
     },
     {
@@ -1854,7 +1854,7 @@
       "source_file": "server/src/controllers/flatrate-controller.ts",
       "source_location": "L65",
       "id": "controllers_flatrate_controller_deleteflatrate",
-      "community": 33,
+      "community": 34,
       "norm_label": "deleteflatrate()"
     },
     {
@@ -1917,7 +1917,7 @@
       "source_file": "server/src/controllers/contract-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_contract_controller_ts",
-      "community": 28,
+      "community": 29,
       "norm_label": "contract-controller.ts"
     },
     {
@@ -1926,7 +1926,7 @@
       "source_file": "server/src/controllers/contract-controller.ts",
       "source_location": "L4",
       "id": "controllers_contract_controller_getallcontracts",
-      "community": 28,
+      "community": 29,
       "norm_label": "getallcontracts()"
     },
     {
@@ -1935,7 +1935,7 @@
       "source_file": "server/src/controllers/contract-controller.ts",
       "source_location": "L9",
       "id": "controllers_contract_controller_createcontract",
-      "community": 28,
+      "community": 29,
       "norm_label": "createcontract()"
     },
     {
@@ -1944,7 +1944,7 @@
       "source_file": "server/src/controllers/contract-controller.ts",
       "source_location": "L23",
       "id": "controllers_contract_controller_updatecontract",
-      "community": 28,
+      "community": 29,
       "norm_label": "updatecontract()"
     },
     {
@@ -1953,7 +1953,7 @@
       "source_file": "server/src/controllers/contract-controller.ts",
       "source_location": "L41",
       "id": "controllers_contract_controller_deletecontract",
-      "community": 28,
+      "community": 29,
       "norm_label": "deletecontract()"
     },
     {
@@ -1962,7 +1962,7 @@
       "source_file": "server/src/controllers/contact-person-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_contact_person_controller_ts",
-      "community": 38,
+      "community": 28,
       "norm_label": "contact-person-controller.ts"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "server/src/controllers/contact-person-controller.ts",
       "source_location": "L4",
       "id": "controllers_contact_person_controller_getallcontactpersons",
-      "community": 38,
+      "community": 28,
       "norm_label": "getallcontactpersons()"
     },
     {
@@ -1980,7 +1980,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_customer_controller_ts",
-      "community": 31,
+      "community": 35,
       "norm_label": "customer-controller.ts"
     },
     {
@@ -1989,7 +1989,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L4",
       "id": "controllers_customer_controller_getallcustomers",
-      "community": 31,
+      "community": 35,
       "norm_label": "getallcustomers()"
     },
     {
@@ -1998,7 +1998,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L15",
       "id": "controllers_customer_controller_getcustomerbyid",
-      "community": 31,
+      "community": 35,
       "norm_label": "getcustomerbyid()"
     },
     {
@@ -2007,7 +2007,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L34",
       "id": "controllers_customer_controller_createcustomer",
-      "community": 31,
+      "community": 35,
       "norm_label": "createcustomer()"
     },
     {
@@ -2016,7 +2016,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L82",
       "id": "controllers_customer_controller_updatecustomerbyid",
-      "community": 31,
+      "community": 35,
       "norm_label": "updatecustomerbyid()"
     },
     {
@@ -2025,7 +2025,7 @@
       "source_file": "server/src/controllers/customer-controller.ts",
       "source_location": "L130",
       "id": "controllers_customer_controller_deletecustomer",
-      "community": 31,
+      "community": 35,
       "norm_label": "deletecustomer()"
     },
     {
@@ -2034,7 +2034,7 @@
       "source_file": "server/src/controllers/supplier-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_supplier_controller_ts",
-      "community": 34,
+      "community": 33,
       "norm_label": "supplier-controller.ts"
     },
     {
@@ -2043,7 +2043,7 @@
       "source_file": "server/src/controllers/supplier-controller.ts",
       "source_location": "L4",
       "id": "controllers_supplier_controller_getsuppliers",
-      "community": 34,
+      "community": 33,
       "norm_label": "getsuppliers()"
     },
     {
@@ -2052,7 +2052,7 @@
       "source_file": "server/src/controllers/supplier-controller.ts",
       "source_location": "L9",
       "id": "controllers_supplier_controller_createsupplier",
-      "community": 34,
+      "community": 33,
       "norm_label": "createsupplier()"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "server/src/controllers/supplier-controller.ts",
       "source_location": "L23",
       "id": "controllers_supplier_controller_updatesupplier",
-      "community": 34,
+      "community": 33,
       "norm_label": "updatesupplier()"
     },
     {
@@ -2070,7 +2070,7 @@
       "source_file": "server/src/controllers/supplier-controller.ts",
       "source_location": "L54",
       "id": "controllers_supplier_controller_deletesupplier",
-      "community": 34,
+      "community": 33,
       "norm_label": "deletesupplier()"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "server/src/controllers/order-controller.ts",
       "source_location": "L1",
       "id": "server_src_controllers_order_controller_ts",
-      "community": 18,
+      "community": 15,
       "norm_label": "order-controller.ts"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "server/src/controllers/order-controller.ts",
       "source_location": "L9",
       "id": "controllers_order_controller_getallorders",
-      "community": 18,
+      "community": 15,
       "norm_label": "getallorders()"
     },
     {
@@ -2331,7 +2331,7 @@
       "source_file": "server/src/controllers/order-controller.ts",
       "source_location": "L32",
       "id": "controllers_order_controller_getorderbyid",
-      "community": 18,
+      "community": 15,
       "norm_label": "getorderbyid()"
     },
     {
@@ -2340,7 +2340,7 @@
       "source_file": "server/src/controllers/order-controller.ts",
       "source_location": "L59",
       "id": "controllers_order_controller_getordertasks",
-      "community": 18,
+      "community": 15,
       "norm_label": "getordertasks()"
     },
     {
@@ -2349,7 +2349,7 @@
       "source_file": "server/src/controllers/order-controller.ts",
       "source_location": "L70",
       "id": "controllers_order_controller_deleteorderbyid",
-      "community": 18,
+      "community": 15,
       "norm_label": "deleteorderbyid()"
     },
     {
@@ -2376,7 +2376,7 @@
       "source_file": "server/src/routes/customers.ts",
       "source_location": "L1",
       "id": "server_src_routes_customers_ts",
-      "community": 31,
+      "community": 35,
       "norm_label": "customers.ts"
     },
     {
@@ -2385,7 +2385,7 @@
       "source_file": "server/src/routes/customers.ts",
       "source_location": "L15",
       "id": "routes_customers_router",
-      "community": 31,
+      "community": 35,
       "norm_label": "router"
     },
     {
@@ -2394,7 +2394,7 @@
       "source_file": "server/src/routes/router.ts",
       "source_location": "L1",
       "id": "server_src_routes_router_ts",
-      "community": 52,
+      "community": 28,
       "norm_label": "router.ts"
     },
     {
@@ -2403,7 +2403,7 @@
       "source_file": "server/src/routes/router.ts",
       "source_location": "L17",
       "id": "routes_router_router",
-      "community": 52,
+      "community": 28,
       "norm_label": "router"
     },
     {
@@ -2412,7 +2412,7 @@
       "source_file": "server/src/routes/supplier.ts",
       "source_location": "L1",
       "id": "server_src_routes_supplier_ts",
-      "community": 34,
+      "community": 33,
       "norm_label": "supplier.ts"
     },
     {
@@ -2421,7 +2421,7 @@
       "source_file": "server/src/routes/supplier.ts",
       "source_location": "L14",
       "id": "routes_supplier_router",
-      "community": 34,
+      "community": 33,
       "norm_label": "router"
     },
     {
@@ -2430,7 +2430,7 @@
       "source_file": "server/src/routes/contracts.ts",
       "source_location": "L1",
       "id": "server_src_routes_contracts_ts",
-      "community": 28,
+      "community": 29,
       "norm_label": "contracts.ts"
     },
     {
@@ -2439,7 +2439,7 @@
       "source_file": "server/src/routes/contracts.ts",
       "source_location": "L17",
       "id": "routes_contracts_router",
-      "community": 28,
+      "community": 29,
       "norm_label": "router"
     },
     {
@@ -2448,7 +2448,7 @@
       "source_file": "server/src/routes/contact-persons.ts",
       "source_location": "L1",
       "id": "server_src_routes_contact_persons_ts",
-      "community": 38,
+      "community": 28,
       "norm_label": "contact-persons.ts"
     },
     {
@@ -2457,7 +2457,7 @@
       "source_file": "server/src/routes/contact-persons.ts",
       "source_location": "L4",
       "id": "routes_contact_persons_router",
-      "community": 38,
+      "community": 28,
       "norm_label": "router"
     },
     {
@@ -2502,7 +2502,7 @@
       "source_file": "server/src/routes/orders.ts",
       "source_location": "L1",
       "id": "server_src_routes_orders_ts",
-      "community": 18,
+      "community": 15,
       "norm_label": "orders.ts"
     },
     {
@@ -2511,7 +2511,7 @@
       "source_file": "server/src/routes/orders.ts",
       "source_location": "L9",
       "id": "routes_orders_router",
-      "community": 18,
+      "community": 15,
       "norm_label": "router"
     },
     {
@@ -2520,7 +2520,7 @@
       "source_file": "server/src/routes/flatrates.ts",
       "source_location": "L1",
       "id": "server_src_routes_flatrates_ts",
-      "community": 33,
+      "community": 34,
       "norm_label": "flatrates.ts"
     },
     {
@@ -2529,7 +2529,7 @@
       "source_file": "server/src/routes/flatrates.ts",
       "source_location": "L15",
       "id": "routes_flatrates_router",
-      "community": 33,
+      "community": 34,
       "norm_label": "router"
     },
     {
@@ -2538,7 +2538,7 @@
       "source_file": "server/src/routes/openapi.ts",
       "source_location": "L1",
       "id": "server_src_routes_openapi_ts",
-      "community": 86,
+      "community": 84,
       "norm_label": "openapi.ts"
     },
     {
@@ -2547,7 +2547,7 @@
       "source_file": "server/src/routes/openapi.ts",
       "source_location": "L9",
       "id": "routes_openapi_router",
-      "community": 86,
+      "community": 84,
       "norm_label": "router"
     },
     {
@@ -2889,7 +2889,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L1",
       "id": "client_src_types_customer_ts",
-      "community": 40,
+      "community": 39,
       "norm_label": "customer.ts"
     },
     {
@@ -2898,7 +2898,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L3",
       "id": "types_customer_customer",
-      "community": 40,
+      "community": 39,
       "norm_label": "customer"
     },
     {
@@ -2907,7 +2907,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L4",
       "id": "types_customer_contactperson",
-      "community": 40,
+      "community": 39,
       "norm_label": "contactperson"
     },
     {
@@ -2916,7 +2916,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L6",
       "id": "types_customer_createcustomerinput",
-      "community": 40,
+      "community": 39,
       "norm_label": "createcustomerinput"
     },
     {
@@ -2925,7 +2925,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L10",
       "id": "types_customer_updatecustomerinput",
-      "community": 40,
+      "community": 39,
       "norm_label": "updatecustomerinput"
     },
     {
@@ -2934,7 +2934,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L12",
       "id": "types_customer_createcontactpersoninput",
-      "community": 40,
+      "community": 39,
       "norm_label": "createcontactpersoninput"
     },
     {
@@ -2943,7 +2943,7 @@
       "source_file": "client/src/types/customer.ts",
       "source_location": "L16",
       "id": "types_customer_updatecontactpersoninput",
-      "community": 40,
+      "community": 39,
       "norm_label": "updatecontactpersoninput"
     },
     {
@@ -3402,7 +3402,7 @@
       "source_file": "client/src/types/index.ts",
       "source_location": "L1",
       "id": "client_src_types_index_ts",
-      "community": 93,
+      "community": 91,
       "norm_label": "index.ts"
     },
     {
@@ -3411,7 +3411,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L1",
       "id": "client_src_types_user_ts",
-      "community": 39,
+      "community": 40,
       "norm_label": "user.ts"
     },
     {
@@ -3420,7 +3420,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L3",
       "id": "types_user_user",
-      "community": 39,
+      "community": 40,
       "norm_label": "user"
     },
     {
@@ -3429,7 +3429,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L4",
       "id": "types_user_session",
-      "community": 39,
+      "community": 40,
       "norm_label": "session"
     },
     {
@@ -3438,7 +3438,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L5",
       "id": "types_user_account",
-      "community": 39,
+      "community": 40,
       "norm_label": "account"
     },
     {
@@ -3447,7 +3447,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L6",
       "id": "types_user_verification",
-      "community": 39,
+      "community": 40,
       "norm_label": "verification"
     },
     {
@@ -3456,7 +3456,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L8",
       "id": "types_user_createuserinput",
-      "community": 39,
+      "community": 40,
       "norm_label": "createuserinput"
     },
     {
@@ -3465,7 +3465,7 @@
       "source_file": "client/src/types/user.ts",
       "source_location": "L20",
       "id": "types_user_updateuserinput",
-      "community": 39,
+      "community": 40,
       "norm_label": "updateuserinput"
     },
     {
@@ -3573,7 +3573,7 @@
       "source_file": "client/src/components/document-status.tsx",
       "source_location": "L1",
       "id": "client_src_components_document_status_tsx",
-      "community": 63,
+      "community": 62,
       "norm_label": "document-status.tsx"
     },
     {
@@ -3582,7 +3582,7 @@
       "source_file": "client/src/components/document-status.tsx",
       "source_location": "L6",
       "id": "components_document_status_documentstatusprops",
-      "community": 63,
+      "community": 62,
       "norm_label": "documentstatusprops"
     },
     {
@@ -3591,7 +3591,7 @@
       "source_file": "client/src/components/document-status.tsx",
       "source_location": "L10",
       "id": "components_document_status_documentstatus",
-      "community": 63,
+      "community": 62,
       "norm_label": "documentstatus()"
     },
     {
@@ -3600,7 +3600,7 @@
       "source_file": "client/src/components/document-status.tsx",
       "source_location": "L85",
       "id": "components_document_status_formatjobtype",
-      "community": 63,
+      "community": 62,
       "norm_label": "formatjobtype()"
     },
     {
@@ -3609,7 +3609,7 @@
       "source_file": "client/src/components/index.ts",
       "source_location": "L1",
       "id": "client_src_components_index_ts",
-      "community": 94,
+      "community": 92,
       "norm_label": "index.ts"
     },
     {
@@ -3672,7 +3672,7 @@
       "source_file": "client/src/components/filters/filter-tab-bar.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_filter_tab_bar_tsx",
-      "community": 64,
+      "community": 63,
       "norm_label": "filter-tab-bar.tsx"
     },
     {
@@ -3681,7 +3681,7 @@
       "source_file": "client/src/components/filters/filter-tab-bar.tsx",
       "source_location": "L3",
       "id": "filters_filter_tab_bar_taboption",
-      "community": 64,
+      "community": 63,
       "norm_label": "taboption"
     },
     {
@@ -3690,7 +3690,7 @@
       "source_file": "client/src/components/filters/filter-tab-bar.tsx",
       "source_location": "L8",
       "id": "filters_filter_tab_bar_filtertabbarprops",
-      "community": 64,
+      "community": 63,
       "norm_label": "filtertabbarprops"
     },
     {
@@ -3699,7 +3699,7 @@
       "source_file": "client/src/components/filters/filter-tab-bar.tsx",
       "source_location": "L16",
       "id": "filters_filter_tab_bar_filtertabbar",
-      "community": 64,
+      "community": 63,
       "norm_label": "filtertabbar()"
     },
     {
@@ -3708,7 +3708,7 @@
       "source_file": "client/src/components/filters/multi-dropdown.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_multi_dropdown_tsx",
-      "community": 30,
+      "community": 31,
       "norm_label": "multi-dropdown.tsx"
     },
     {
@@ -3717,7 +3717,7 @@
       "source_file": "client/src/components/filters/multi-dropdown.tsx",
       "source_location": "L5",
       "id": "filters_multi_dropdown_dropdownoption",
-      "community": 30,
+      "community": 31,
       "norm_label": "dropdownoption"
     },
     {
@@ -3726,7 +3726,7 @@
       "source_file": "client/src/components/filters/multi-dropdown.tsx",
       "source_location": "L11",
       "id": "filters_multi_dropdown_multidropdownprops",
-      "community": 30,
+      "community": 31,
       "norm_label": "multidropdownprops"
     },
     {
@@ -3735,7 +3735,7 @@
       "source_file": "client/src/components/filters/multi-dropdown.tsx",
       "source_location": "L19",
       "id": "filters_multi_dropdown_multidropdown",
-      "community": 30,
+      "community": 31,
       "norm_label": "multidropdown()"
     },
     {
@@ -3744,7 +3744,7 @@
       "source_file": "client/src/components/filters/single-dropdown.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_single_dropdown_tsx",
-      "community": 65,
+      "community": 64,
       "norm_label": "single-dropdown.tsx"
     },
     {
@@ -3753,7 +3753,7 @@
       "source_file": "client/src/components/filters/single-dropdown.tsx",
       "source_location": "L5",
       "id": "filters_single_dropdown_dropdownoption",
-      "community": 65,
+      "community": 64,
       "norm_label": "dropdownoption"
     },
     {
@@ -3762,7 +3762,7 @@
       "source_file": "client/src/components/filters/single-dropdown.tsx",
       "source_location": "L11",
       "id": "filters_single_dropdown_singledropdownprops",
-      "community": 65,
+      "community": 64,
       "norm_label": "singledropdownprops"
     },
     {
@@ -3771,7 +3771,7 @@
       "source_file": "client/src/components/filters/single-dropdown.tsx",
       "source_location": "L19",
       "id": "filters_single_dropdown_singledropdown",
-      "community": 65,
+      "community": 64,
       "norm_label": "singledropdown()"
     },
     {
@@ -3780,7 +3780,7 @@
       "source_file": "client/src/components/filters/sort-dropdown.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_sort_dropdown_tsx",
-      "community": 55,
+      "community": 54,
       "norm_label": "sort-dropdown.tsx"
     },
     {
@@ -3789,7 +3789,7 @@
       "source_file": "client/src/components/filters/sort-dropdown.tsx",
       "source_location": "L5",
       "id": "filters_sort_dropdown_sortoption",
-      "community": 55,
+      "community": 54,
       "norm_label": "sortoption"
     },
     {
@@ -3798,7 +3798,7 @@
       "source_file": "client/src/components/filters/sort-dropdown.tsx",
       "source_location": "L10",
       "id": "filters_sort_dropdown_sortdropdownprops",
-      "community": 55,
+      "community": 54,
       "norm_label": "sortdropdownprops"
     },
     {
@@ -3807,7 +3807,7 @@
       "source_file": "client/src/components/filters/sort-dropdown.tsx",
       "source_location": "L17",
       "id": "filters_sort_dropdown_sorticon",
-      "community": 55,
+      "community": 54,
       "norm_label": "sorticon()"
     },
     {
@@ -3816,7 +3816,7 @@
       "source_file": "client/src/components/filters/sort-dropdown.tsx",
       "source_location": "L40",
       "id": "filters_sort_dropdown_sortdropdown",
-      "community": 55,
+      "community": 54,
       "norm_label": "sortdropdown()"
     },
     {
@@ -3825,7 +3825,7 @@
       "source_file": "client/src/components/filters/filter-chip.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_filter_chip_tsx",
-      "community": 78,
+      "community": 77,
       "norm_label": "filter-chip.tsx"
     },
     {
@@ -3834,7 +3834,7 @@
       "source_file": "client/src/components/filters/filter-chip.tsx",
       "source_location": "L3",
       "id": "filters_filter_chip_filterchipprops",
-      "community": 78,
+      "community": 77,
       "norm_label": "filterchipprops"
     },
     {
@@ -3843,7 +3843,7 @@
       "source_file": "client/src/components/filters/filter-chip.tsx",
       "source_location": "L10",
       "id": "filters_filter_chip_filterchip",
-      "community": 78,
+      "community": 77,
       "norm_label": "filterchip()"
     },
     {
@@ -3852,7 +3852,7 @@
       "source_file": "client/src/components/filters/search-bar.tsx",
       "source_location": "L1",
       "id": "client_src_components_filters_search_bar_tsx",
-      "community": 67,
+      "community": 66,
       "norm_label": "search-bar.tsx"
     },
     {
@@ -3861,7 +3861,7 @@
       "source_file": "client/src/components/filters/search-bar.tsx",
       "source_location": "L4",
       "id": "filters_search_bar_searchbarprops",
-      "community": 67,
+      "community": 66,
       "norm_label": "searchbarprops"
     },
     {
@@ -3870,7 +3870,7 @@
       "source_file": "client/src/components/filters/search-bar.tsx",
       "source_location": "L12",
       "id": "filters_search_bar_searchbar",
-      "community": 67,
+      "community": 66,
       "norm_label": "searchbar()"
     },
     {
@@ -3879,7 +3879,7 @@
       "source_file": "client/src/components/filters/index.ts",
       "source_location": "L1",
       "id": "client_src_components_filters_index_ts",
-      "community": 95,
+      "community": 93,
       "norm_label": "index.ts"
     },
     {
@@ -3888,7 +3888,7 @@
       "source_file": "client/src/components/collapsable/collapsable.tsx",
       "source_location": "L1",
       "id": "client_src_components_collapsable_collapsable_tsx",
-      "community": 66,
+      "community": 65,
       "norm_label": "collapsable.tsx"
     },
     {
@@ -3897,7 +3897,7 @@
       "source_file": "client/src/components/collapsable/collapsable.tsx",
       "source_location": "L6",
       "id": "collapsable_collapsable_collapsable",
-      "community": 66,
+      "community": 65,
       "norm_label": "collapsable()"
     },
     {
@@ -3906,7 +3906,7 @@
       "source_file": "client/src/components/collapsable/collapsable-types.tsx",
       "source_location": "L1",
       "id": "client_src_components_collapsable_collapsable_types_tsx",
-      "community": 66,
+      "community": 65,
       "norm_label": "collapsable-types.tsx"
     },
     {
@@ -3915,7 +3915,7 @@
       "source_file": "client/src/components/collapsable/collapsable-types.tsx",
       "source_location": "L3",
       "id": "collapsable_collapsable_types_collapsablecomponentprops",
-      "community": 66,
+      "community": 65,
       "norm_label": "collapsablecomponentprops"
     },
     {
@@ -4104,7 +4104,7 @@
       "source_file": "client/src/components/button/button-types.tsx",
       "source_location": "L1",
       "id": "client_src_components_button_button_types_tsx",
-      "community": 30,
+      "community": 31,
       "norm_label": "button-types.tsx"
     },
     {
@@ -4113,7 +4113,7 @@
       "source_file": "client/src/components/button/button-types.tsx",
       "source_location": "L3",
       "id": "button_button_types_buttoncomponentprops",
-      "community": 30,
+      "community": 31,
       "norm_label": "buttoncomponentprops"
     },
     {
@@ -4122,7 +4122,7 @@
       "source_file": "client/src/components/button/button.tsx",
       "source_location": "L1",
       "id": "client_src_components_button_button_tsx",
-      "community": 30,
+      "community": 31,
       "norm_label": "button.tsx"
     },
     {
@@ -4131,7 +4131,7 @@
       "source_file": "client/src/components/button/button.tsx",
       "source_location": "L6",
       "id": "button_button_styles",
-      "community": 30,
+      "community": 31,
       "norm_label": "styles"
     },
     {
@@ -4140,7 +4140,7 @@
       "source_file": "client/src/components/button/button.tsx",
       "source_location": "L69",
       "id": "button_button_button",
-      "community": 30,
+      "community": 31,
       "norm_label": "button"
     },
     {
@@ -4203,7 +4203,7 @@
       "source_file": "client/src/components/inputs/index.ts",
       "source_location": "L1",
       "id": "client_src_components_inputs_index_ts",
-      "community": 67,
+      "community": 66,
       "norm_label": "index.ts"
     },
     {
@@ -4212,7 +4212,7 @@
       "source_file": "client/src/components/inputs/checkbox/checkbox-types.tsx",
       "source_location": "L1",
       "id": "client_src_components_inputs_checkbox_checkbox_types_tsx",
-      "community": 56,
+      "community": 55,
       "norm_label": "checkbox-types.tsx"
     },
     {
@@ -4221,7 +4221,7 @@
       "source_file": "client/src/components/inputs/checkbox/checkbox-types.tsx",
       "source_location": "L3",
       "id": "checkbox_checkbox_types_checkboxcomponentprops",
-      "community": 56,
+      "community": 55,
       "norm_label": "checkboxcomponentprops"
     },
     {
@@ -4230,7 +4230,7 @@
       "source_file": "client/src/components/inputs/checkbox/checkbox.tsx",
       "source_location": "L1",
       "id": "client_src_components_inputs_checkbox_checkbox_tsx",
-      "community": 56,
+      "community": 55,
       "norm_label": "checkbox.tsx"
     },
     {
@@ -4239,7 +4239,7 @@
       "source_file": "client/src/components/inputs/checkbox/checkbox.tsx",
       "source_location": "L5",
       "id": "checkbox_checkbox_styles",
-      "community": 56,
+      "community": 55,
       "norm_label": "styles"
     },
     {
@@ -4248,7 +4248,7 @@
       "source_file": "client/src/components/inputs/checkbox/checkbox.tsx",
       "source_location": "L23",
       "id": "checkbox_checkbox_checkbox",
-      "community": 56,
+      "community": 55,
       "norm_label": "checkbox"
     },
     {
@@ -4311,7 +4311,7 @@
       "source_file": "client/src/components/inputs/text/input-types.tsx",
       "source_location": "L1",
       "id": "client_src_components_inputs_text_input_types_tsx",
-      "community": 57,
+      "community": 56,
       "norm_label": "input-types.tsx"
     },
     {
@@ -4320,7 +4320,7 @@
       "source_file": "client/src/components/inputs/text/input-types.tsx",
       "source_location": "L3",
       "id": "text_input_types_inputcomponentprops",
-      "community": 57,
+      "community": 56,
       "norm_label": "inputcomponentprops"
     },
     {
@@ -4329,7 +4329,7 @@
       "source_file": "client/src/components/inputs/text/input.tsx",
       "source_location": "L1",
       "id": "client_src_components_inputs_text_input_tsx",
-      "community": 57,
+      "community": 56,
       "norm_label": "input.tsx"
     },
     {
@@ -4338,7 +4338,7 @@
       "source_file": "client/src/components/inputs/text/input.tsx",
       "source_location": "L5",
       "id": "text_input_styles",
-      "community": 57,
+      "community": 56,
       "norm_label": "styles"
     },
     {
@@ -4347,7 +4347,7 @@
       "source_file": "client/src/components/inputs/text/input.tsx",
       "source_location": "L34",
       "id": "text_input_input",
-      "community": 57,
+      "community": 56,
       "norm_label": "input"
     },
     {
@@ -4356,7 +4356,7 @@
       "source_file": "client/src/components/badge/badge-types.tsx",
       "source_location": "L1",
       "id": "client_src_components_badge_badge_types_tsx",
-      "community": 36,
+      "community": 37,
       "norm_label": "badge-types.tsx"
     },
     {
@@ -4365,7 +4365,7 @@
       "source_file": "client/src/components/badge/badge-types.tsx",
       "source_location": "L3",
       "id": "badge_badge_types_badgecomponentprops",
-      "community": 36,
+      "community": 37,
       "norm_label": "badgecomponentprops"
     },
     {
@@ -4374,7 +4374,7 @@
       "source_file": "client/src/components/badge/badge-types.tsx",
       "source_location": "L10",
       "id": "badge_badge_types_variant_labels",
-      "community": 36,
+      "community": 37,
       "norm_label": "variant_labels"
     },
     {
@@ -4383,7 +4383,7 @@
       "source_file": "client/src/components/badge/badge.tsx",
       "source_location": "L1",
       "id": "client_src_components_badge_badge_tsx",
-      "community": 36,
+      "community": 37,
       "norm_label": "badge.tsx"
     },
     {
@@ -4392,7 +4392,7 @@
       "source_file": "client/src/components/badge/badge.tsx",
       "source_location": "L4",
       "id": "badge_badge_styles",
-      "community": 36,
+      "community": 37,
       "norm_label": "styles"
     },
     {
@@ -4401,7 +4401,7 @@
       "source_file": "client/src/components/badge/badge.tsx",
       "source_location": "L17",
       "id": "badge_badge_formatstyles",
-      "community": 36,
+      "community": 37,
       "norm_label": "formatstyles"
     },
     {
@@ -4410,7 +4410,7 @@
       "source_file": "client/src/components/badge/badge.tsx",
       "source_location": "L21",
       "id": "badge_badge_countstyles",
-      "community": 36,
+      "community": 37,
       "norm_label": "countstyles"
     },
     {
@@ -4419,7 +4419,7 @@
       "source_file": "client/src/components/badge/badge.tsx",
       "source_location": "L35",
       "id": "badge_badge_badge",
-      "community": 36,
+      "community": 37,
       "norm_label": "badge()"
     },
     {
@@ -4464,7 +4464,7 @@
       "source_file": "client/src/hooks/tariff-hook.ts",
       "source_location": "L1",
       "id": "client_src_hooks_tariff_hook_ts",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariff-hook.ts"
     },
     {
@@ -4473,7 +4473,7 @@
       "source_file": "client/src/hooks/tariff-hook.ts",
       "source_location": "L23",
       "id": "hooks_tariff_hook_usetariffhook",
-      "community": 13,
+      "community": 14,
       "norm_label": "usetariffhook()"
     },
     {
@@ -4599,7 +4599,7 @@
       "source_file": "client/src/hooks/index.ts",
       "source_location": "L1",
       "id": "client_src_hooks_index_ts",
-      "community": 96,
+      "community": 94,
       "norm_label": "index.ts"
     },
     {
@@ -4635,7 +4635,7 @@
       "source_file": "client/src/lib/utils.ts",
       "source_location": "L1",
       "id": "client_src_lib_utils_ts",
-      "community": 87,
+      "community": 85,
       "norm_label": "utils.ts"
     },
     {
@@ -4644,7 +4644,7 @@
       "source_file": "client/src/lib/utils.ts",
       "source_location": "L4",
       "id": "lib_utils_cn",
-      "community": 87,
+      "community": 85,
       "norm_label": "cn()"
     },
     {
@@ -4653,7 +4653,7 @@
       "source_file": "client/src/lib/format.ts",
       "source_location": "L1",
       "id": "client_src_lib_format_ts",
-      "community": 68,
+      "community": 67,
       "norm_label": "format.ts"
     },
     {
@@ -4662,7 +4662,7 @@
       "source_file": "client/src/lib/format.ts",
       "source_location": "L1",
       "id": "lib_format_formatdate",
-      "community": 68,
+      "community": 67,
       "norm_label": "formatdate()"
     },
     {
@@ -4671,7 +4671,7 @@
       "source_file": "client/src/lib/format.ts",
       "source_location": "L7",
       "id": "lib_format_sumitems",
-      "community": 68,
+      "community": 67,
       "norm_label": "sumitems()"
     },
     {
@@ -4680,7 +4680,7 @@
       "source_file": "client/src/lib/format.ts",
       "source_location": "L11",
       "id": "lib_format_formatcurrency",
-      "community": 68,
+      "community": 67,
       "norm_label": "formatcurrency()"
     },
     {
@@ -4689,7 +4689,7 @@
       "source_file": "client/src/lib/session.ts",
       "source_location": "L1",
       "id": "client_src_lib_session_ts",
-      "community": 88,
+      "community": 86,
       "norm_label": "session.ts"
     },
     {
@@ -4698,7 +4698,7 @@
       "source_file": "client/src/lib/session.ts",
       "source_location": "L3",
       "id": "lib_session_requiresession",
-      "community": 88,
+      "community": 86,
       "norm_label": "requiresession()"
     },
     {
@@ -4725,7 +4725,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L1",
       "id": "client_src_data_customers_ts",
-      "community": 50,
+      "community": 49,
       "norm_label": "customers.ts"
     },
     {
@@ -4734,7 +4734,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L9",
       "id": "data_customers_getallcustomersaction",
-      "community": 50,
+      "community": 49,
       "norm_label": "getallcustomersaction()"
     },
     {
@@ -4743,7 +4743,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L12",
       "id": "data_customers_getcustomerbyidaction",
-      "community": 50,
+      "community": 49,
       "norm_label": "getcustomerbyidaction()"
     },
     {
@@ -4752,7 +4752,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L15",
       "id": "data_customers_createcustomeraction",
-      "community": 50,
+      "community": 49,
       "norm_label": "createcustomeraction()"
     },
     {
@@ -4761,7 +4761,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L22",
       "id": "data_customers_updatecustomerbyidaction",
-      "community": 50,
+      "community": 49,
       "norm_label": "updatecustomerbyidaction()"
     },
     {
@@ -4770,7 +4770,7 @@
       "source_file": "client/src/data/customers.ts",
       "source_location": "L32",
       "id": "data_customers_deletecustomeraction",
-      "community": 50,
+      "community": 49,
       "norm_label": "deletecustomeraction()"
     },
     {
@@ -4779,7 +4779,7 @@
       "source_file": "client/src/data/supplier.ts",
       "source_location": "L1",
       "id": "client_src_data_supplier_ts",
-      "community": 60,
+      "community": 57,
       "norm_label": "supplier.ts"
     },
     {
@@ -4788,7 +4788,7 @@
       "source_file": "client/src/data/supplier.ts",
       "source_location": "L9",
       "id": "data_supplier_getsuppliersaction",
-      "community": 60,
+      "community": 57,
       "norm_label": "getsuppliersaction()"
     },
     {
@@ -4797,7 +4797,7 @@
       "source_file": "client/src/data/supplier.ts",
       "source_location": "L12",
       "id": "data_supplier_createsupplieraction",
-      "community": 60,
+      "community": 57,
       "norm_label": "createsupplieraction()"
     },
     {
@@ -4806,7 +4806,7 @@
       "source_file": "client/src/data/supplier.ts",
       "source_location": "L21",
       "id": "data_supplier_updatesupplieraction",
-      "community": 60,
+      "community": 57,
       "norm_label": "updatesupplieraction()"
     },
     {
@@ -4815,7 +4815,7 @@
       "source_file": "client/src/data/supplier.ts",
       "source_location": "L33",
       "id": "data_supplier_deletesupplieraction",
-      "community": 60,
+      "community": 57,
       "norm_label": "deletesupplieraction()"
     },
     {
@@ -4923,7 +4923,7 @@
       "source_file": "client/src/data/orders.ts",
       "source_location": "L1",
       "id": "client_src_data_orders_ts",
-      "community": 69,
+      "community": 68,
       "norm_label": "orders.ts"
     },
     {
@@ -4932,7 +4932,7 @@
       "source_file": "client/src/data/orders.ts",
       "source_location": "L5",
       "id": "data_orders_getordersaction",
-      "community": 69,
+      "community": 68,
       "norm_label": "getordersaction()"
     },
     {
@@ -4941,7 +4941,7 @@
       "source_file": "client/src/data/orders.ts",
       "source_location": "L8",
       "id": "data_orders_deleteorderaction",
-      "community": 69,
+      "community": 68,
       "norm_label": "deleteorderaction()"
     },
     {
@@ -4950,7 +4950,7 @@
       "source_file": "client/src/data/orders.ts",
       "source_location": "L11",
       "id": "data_orders_gettasksaction",
-      "community": 69,
+      "community": 68,
       "norm_label": "gettasksaction()"
     },
     {
@@ -5067,7 +5067,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L1",
       "id": "client_src_data_user_ts",
-      "community": 49,
+      "community": 50,
       "norm_label": "user.ts"
     },
     {
@@ -5076,7 +5076,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L5",
       "id": "data_user_getsessionuser",
-      "community": 49,
+      "community": 50,
       "norm_label": "getsessionuser()"
     },
     {
@@ -5085,7 +5085,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L8",
       "id": "data_user_getallusersaction",
-      "community": 49,
+      "community": 50,
       "norm_label": "getallusersaction()"
     },
     {
@@ -5094,7 +5094,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L11",
       "id": "data_user_createuseraction",
-      "community": 49,
+      "community": 50,
       "norm_label": "createuseraction()"
     },
     {
@@ -5103,7 +5103,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L18",
       "id": "data_user_updateuserbyidaction",
-      "community": 49,
+      "community": 50,
       "norm_label": "updateuserbyidaction()"
     },
     {
@@ -5112,7 +5112,7 @@
       "source_file": "client/src/data/user.ts",
       "source_location": "L25",
       "id": "data_user_deleteuseraction",
-      "community": 49,
+      "community": 50,
       "norm_label": "deleteuseraction()"
     },
     {
@@ -5229,7 +5229,7 @@
       "source_file": "client/src/routes/__root.tsx",
       "source_location": "L1",
       "id": "client_src_routes_root_tsx",
-      "community": 62,
+      "community": 61,
       "norm_label": "__root.tsx"
     },
     {
@@ -5238,7 +5238,7 @@
       "source_file": "client/src/routes/__root.tsx",
       "source_location": "L6",
       "id": "routes_root_queryclient",
-      "community": 62,
+      "community": 61,
       "norm_label": "queryclient"
     },
     {
@@ -5247,7 +5247,7 @@
       "source_file": "client/src/routes/__root.tsx",
       "source_location": "L8",
       "id": "routes_root_route",
-      "community": 62,
+      "community": 61,
       "norm_label": "route"
     },
     {
@@ -5256,7 +5256,7 @@
       "source_file": "client/src/routes/__root.tsx",
       "source_location": "L13",
       "id": "routes_root_rootcomponent",
-      "community": 62,
+      "community": 61,
       "norm_label": "rootcomponent()"
     },
     {
@@ -5283,7 +5283,7 @@
       "source_file": "client/src/routes/_main/index.tsx",
       "source_location": "L15",
       "id": "main_index_route",
-      "community": 35,
+      "community": 36,
       "norm_label": "route"
     },
     {
@@ -5328,7 +5328,7 @@
       "source_file": "client/src/routes/_main/route.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_route_tsx",
-      "community": 76,
+      "community": 74,
       "norm_label": "route.tsx"
     },
     {
@@ -5337,7 +5337,7 @@
       "source_file": "client/src/routes/_main/route.tsx",
       "source_location": "L6",
       "id": "main_route_route",
-      "community": 76,
+      "community": 74,
       "norm_label": "route"
     },
     {
@@ -5346,7 +5346,7 @@
       "source_file": "client/src/routes/_main/route.tsx",
       "source_location": "L10",
       "id": "main_route_mainlayoutcomponent",
-      "community": 76,
+      "community": 74,
       "norm_label": "mainlayoutcomponent()"
     },
     {
@@ -5355,7 +5355,7 @@
       "source_file": "client/src/routes/_main/customers/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_customers_index_tsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "index.tsx"
     },
     {
@@ -5364,7 +5364,7 @@
       "source_file": "client/src/routes/_main/customers/index.tsx",
       "source_location": "L4",
       "id": "customers_index_route",
-      "community": 35,
+      "community": 36,
       "norm_label": "route"
     },
     {
@@ -5499,7 +5499,7 @@
       "source_file": "client/src/routes/_main/offers/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_index_tsx",
-      "community": 35,
+      "community": 36,
       "norm_label": "index.tsx"
     },
     {
@@ -5508,7 +5508,7 @@
       "source_file": "client/src/routes/_main/offers/index.tsx",
       "source_location": "L4",
       "id": "offers_index_route",
-      "community": 35,
+      "community": 36,
       "norm_label": "route"
     },
     {
@@ -5517,7 +5517,7 @@
       "source_file": "client/src/routes/_main/offers/index.tsx",
       "source_location": "L8",
       "id": "offers_index_routecomponent",
-      "community": 35,
+      "community": 36,
       "norm_label": "routecomponent()"
     },
     {
@@ -5553,7 +5553,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-flat-rate-form.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_flat_rate_form_tsx",
-      "community": 15,
+      "community": 16,
       "norm_label": "offer-flat-rate-form.tsx"
     },
     {
@@ -5562,7 +5562,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-flat-rate-form.tsx",
       "source_location": "L6",
       "id": "components_offer_flat_rate_form_props",
-      "community": 15,
+      "community": 16,
       "norm_label": "props"
     },
     {
@@ -5571,7 +5571,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-flat-rate-form.tsx",
       "source_location": "L12",
       "id": "components_offer_flat_rate_form_offerflatrateform",
-      "community": 15,
+      "community": 16,
       "norm_label": "offerflatrateform()"
     },
     {
@@ -5580,7 +5580,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-modal.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_modal_tsx",
-      "community": 15,
+      "community": 16,
       "norm_label": "offer-modal.tsx"
     },
     {
@@ -5589,7 +5589,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-modal.tsx",
       "source_location": "L40",
       "id": "components_offer_modal_offermodalprops",
-      "community": 15,
+      "community": 16,
       "norm_label": "offermodalprops"
     },
     {
@@ -5598,7 +5598,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-modal.tsx",
       "source_location": "L46",
       "id": "components_offer_modal_offerschema",
-      "community": 15,
+      "community": 16,
       "norm_label": "offerschema"
     },
     {
@@ -5616,7 +5616,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-list.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_list_tsx",
-      "community": 16,
+      "community": 17,
       "norm_label": "offer-list.tsx"
     },
     {
@@ -5625,7 +5625,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-list.tsx",
       "source_location": "L12",
       "id": "components_offer_list_sort_options",
-      "community": 16,
+      "community": 17,
       "norm_label": "sort_options"
     },
     {
@@ -5643,7 +5643,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-product-form.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_product_form_tsx",
-      "community": 15,
+      "community": 16,
       "norm_label": "offer-product-form.tsx"
     },
     {
@@ -5652,7 +5652,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-product-form.tsx",
       "source_location": "L7",
       "id": "components_offer_product_form_offerproductinput",
-      "community": 15,
+      "community": 16,
       "norm_label": "offerproductinput"
     },
     {
@@ -5661,7 +5661,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-product-form.tsx",
       "source_location": "L9",
       "id": "components_offer_product_form_durations",
-      "community": 15,
+      "community": 16,
       "norm_label": "durations"
     },
     {
@@ -5670,7 +5670,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-product-form.tsx",
       "source_location": "L15",
       "id": "components_offer_product_form_props",
-      "community": 15,
+      "community": 16,
       "norm_label": "props"
     },
     {
@@ -5715,7 +5715,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-items/task-item.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_items_task_item_tsx",
-      "community": 89,
+      "community": 87,
       "norm_label": "task-item.tsx"
     },
     {
@@ -5724,7 +5724,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-items/task-item.tsx",
       "source_location": "L1",
       "id": "offer_items_task_item_taskitem",
-      "community": 89,
+      "community": 87,
       "norm_label": "taskitem()"
     },
     {
@@ -5733,7 +5733,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-items/document-item.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_offer_items_document_item_tsx",
-      "community": 79,
+      "community": 13,
       "norm_label": "document-item.tsx"
     },
     {
@@ -5742,7 +5742,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-items/document-item.tsx",
       "source_location": "L11",
       "id": "offer_items_document_item_props",
-      "community": 79,
+      "community": 13,
       "norm_label": "props"
     },
     {
@@ -5751,7 +5751,7 @@
       "source_file": "client/src/routes/_main/offers/-components/offer-items/document-item.tsx",
       "source_location": "L15",
       "id": "offer_items_document_item_documentitem",
-      "community": 79,
+      "community": 13,
       "norm_label": "documentitem()"
     },
     {
@@ -5760,7 +5760,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section-item.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_modal_items_product_section_item_tsx",
-      "community": 15,
+      "community": 16,
       "norm_label": "product-section-item.tsx"
     },
     {
@@ -5769,7 +5769,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section-item.tsx",
       "source_location": "L10",
       "id": "modal_items_product_section_item_offerproduct",
-      "community": 15,
+      "community": 16,
       "norm_label": "offerproduct"
     },
     {
@@ -5778,7 +5778,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section-item.tsx",
       "source_location": "L12",
       "id": "modal_items_product_section_item_props",
-      "community": 15,
+      "community": 16,
       "norm_label": "props"
     },
     {
@@ -5787,7 +5787,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section-item.tsx",
       "source_location": "L23",
       "id": "modal_items_product_section_item_styles",
-      "community": 15,
+      "community": 16,
       "norm_label": "styles"
     },
     {
@@ -5796,7 +5796,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section-item.tsx",
       "source_location": "L33",
       "id": "modal_items_product_section_item_productsectionitem",
-      "community": 15,
+      "community": 16,
       "norm_label": "productsectionitem()"
     },
     {
@@ -5805,7 +5805,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_offers_components_modal_items_product_section_tsx",
-      "community": 15,
+      "community": 16,
       "norm_label": "product-section.tsx"
     },
     {
@@ -5814,7 +5814,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section.tsx",
       "source_location": "L11",
       "id": "modal_items_product_section_props",
-      "community": 15,
+      "community": 16,
       "norm_label": "props"
     },
     {
@@ -5823,7 +5823,7 @@
       "source_file": "client/src/routes/_main/offers/-components/modal-items/product-section.tsx",
       "source_location": "L16",
       "id": "modal_items_product_section_productmodalsection",
-      "community": 15,
+      "community": 16,
       "norm_label": "productmodalsection()"
     },
     {
@@ -5832,7 +5832,7 @@
       "source_file": "client/src/routes/_main/products/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_index_tsx",
-      "community": 29,
+      "community": 30,
       "norm_label": "index.tsx"
     },
     {
@@ -5841,7 +5841,7 @@
       "source_file": "client/src/routes/_main/products/index.tsx",
       "source_location": "L4",
       "id": "products_index_route",
-      "community": 29,
+      "community": 30,
       "norm_label": "route"
     },
     {
@@ -5850,7 +5850,7 @@
       "source_file": "client/src/routes/_main/products/index.tsx",
       "source_location": "L8",
       "id": "products_index_routecomponent",
-      "community": 29,
+      "community": 30,
       "norm_label": "routecomponent()"
     },
     {
@@ -5859,7 +5859,7 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_pricing_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "pricing.tsx"
     },
     {
@@ -5868,7 +5868,7 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L13",
       "id": "products_pricing_route",
-      "community": 13,
+      "community": 14,
       "norm_label": "route"
     },
     {
@@ -5877,7 +5877,7 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L17",
       "id": "products_pricing_overridetarget",
-      "community": 13,
+      "community": 14,
       "norm_label": "overridetarget"
     },
     {
@@ -5886,7 +5886,7 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L28",
       "id": "products_pricing_tarifftitle",
-      "community": 13,
+      "community": 14,
       "norm_label": "tarifftitle()"
     },
     {
@@ -5895,7 +5895,7 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L33",
       "id": "products_pricing_routecomponent",
-      "community": 13,
+      "community": 14,
       "norm_label": "routecomponent()"
     },
     {
@@ -5904,7 +5904,7 @@
       "source_file": "client/src/routes/_main/products/suppliers.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_suppliers_tsx",
-      "community": 29,
+      "community": 30,
       "norm_label": "suppliers.tsx"
     },
     {
@@ -5913,7 +5913,7 @@
       "source_file": "client/src/routes/_main/products/suppliers.tsx",
       "source_location": "L4",
       "id": "products_suppliers_route",
-      "community": 29,
+      "community": 30,
       "norm_label": "route"
     },
     {
@@ -5922,7 +5922,7 @@
       "source_file": "client/src/routes/_main/products/suppliers.tsx",
       "source_location": "L8",
       "id": "products_suppliers_routecomponent",
-      "community": 29,
+      "community": 30,
       "norm_label": "routecomponent()"
     },
     {
@@ -5976,7 +5976,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-customer-modal.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_tariff_customer_modal_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariff-customer-modal.tsx"
     },
     {
@@ -5985,7 +5985,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-customer-modal.tsx",
       "source_location": "L5",
       "id": "components_tariff_customer_modal_tariffcustomermodalprops",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffcustomermodalprops"
     },
     {
@@ -5994,7 +5994,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-customer-modal.tsx",
       "source_location": "L18",
       "id": "components_tariff_customer_modal_tariffcustomermodal",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffcustomermodal()"
     },
     {
@@ -6021,7 +6021,7 @@
       "source_file": "client/src/routes/_main/products/-components/supplier-list.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_supplier_list_tsx",
-      "community": 29,
+      "community": 30,
       "norm_label": "supplier-list.tsx"
     },
     {
@@ -6030,7 +6030,7 @@
       "source_file": "client/src/routes/_main/products/-components/supplier-list.tsx",
       "source_location": "L11",
       "id": "components_supplier_list_supplierschema",
-      "community": 29,
+      "community": 30,
       "norm_label": "supplierschema"
     },
     {
@@ -6039,7 +6039,7 @@
       "source_file": "client/src/routes/_main/products/-components/supplier-list.tsx",
       "source_location": "L16",
       "id": "components_supplier_list_supplierlist",
-      "community": 29,
+      "community": 30,
       "norm_label": "supplierlist()"
     },
     {
@@ -6048,7 +6048,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-config-modal.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_tariff_config_modal_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariff-config-modal.tsx"
     },
     {
@@ -6057,7 +6057,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-config-modal.tsx",
       "source_location": "L5",
       "id": "components_tariff_config_modal_tariffconfigmodalprops",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffconfigmodalprops"
     },
     {
@@ -6066,7 +6066,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-config-modal.tsx",
       "source_location": "L11",
       "id": "components_tariff_config_modal_tariffconfigmodal",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffconfigmodal()"
     },
     {
@@ -6183,7 +6183,7 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_pricing_modal_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "pricing-modal.tsx"
     },
     {
@@ -6192,7 +6192,7 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L7",
       "id": "components_pricing_modal_pricingmodalprops",
-      "community": 13,
+      "community": 14,
       "norm_label": "pricingmodalprops"
     },
     {
@@ -6201,7 +6201,7 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L12",
       "id": "components_pricing_modal_configrow",
-      "community": 13,
+      "community": 14,
       "norm_label": "configrow"
     },
     {
@@ -6210,7 +6210,7 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L20",
       "id": "components_pricing_modal_emptyrow",
-      "community": 13,
+      "community": 14,
       "norm_label": "emptyrow()"
     },
     {
@@ -6219,7 +6219,7 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L28",
       "id": "components_pricing_modal_pricingmodal",
-      "community": 13,
+      "community": 14,
       "norm_label": "pricingmodal()"
     },
     {
@@ -6246,7 +6246,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_tariff_products_modal_tsx",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariff-products-modal.tsx"
     },
     {
@@ -6255,7 +6255,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L7",
       "id": "components_tariff_products_modal_tariffproductsmodalprops",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffproductsmodalprops"
     },
     {
@@ -6264,7 +6264,7 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L13",
       "id": "components_tariff_products_modal_tariffproductsmodal",
-      "community": 13,
+      "community": 14,
       "norm_label": "tariffproductsmodal()"
     },
     {
@@ -6273,7 +6273,7 @@
       "source_file": "client/src/routes/_main/products/-components/supplier-item.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_products_components_supplier_item_tsx",
-      "community": 90,
+      "community": 88,
       "norm_label": "supplier-item.tsx"
     },
     {
@@ -6282,7 +6282,7 @@
       "source_file": "client/src/routes/_main/products/-components/supplier-item.tsx",
       "source_location": "L1",
       "id": "components_supplier_item_supplierlistitem",
-      "community": 90,
+      "community": 88,
       "norm_label": "supplierlistitem()"
     },
     {
@@ -6435,7 +6435,7 @@
       "source_file": "client/src/routes/_main/orders/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_orders_index_tsx",
-      "community": 75,
+      "community": 76,
       "norm_label": "index.tsx"
     },
     {
@@ -6444,7 +6444,7 @@
       "source_file": "client/src/routes/_main/orders/index.tsx",
       "source_location": "L4",
       "id": "orders_index_route",
-      "community": 75,
+      "community": 76,
       "norm_label": "route"
     },
     {
@@ -6453,7 +6453,7 @@
       "source_file": "client/src/routes/_main/orders/index.tsx",
       "source_location": "L8",
       "id": "orders_index_routecomponent",
-      "community": 75,
+      "community": 76,
       "norm_label": "routecomponent()"
     },
     {
@@ -6525,7 +6525,7 @@
       "source_file": "client/src/routes/_main/employees/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_main_employees_index_tsx",
-      "community": 77,
+      "community": 75,
       "norm_label": "index.tsx"
     },
     {
@@ -6534,7 +6534,7 @@
       "source_file": "client/src/routes/_main/employees/index.tsx",
       "source_location": "L4",
       "id": "employees_index_route",
-      "community": 77,
+      "community": 75,
       "norm_label": "route"
     },
     {
@@ -6543,7 +6543,7 @@
       "source_file": "client/src/routes/_main/employees/index.tsx",
       "source_location": "L8",
       "id": "employees_index_routecomponent",
-      "community": 77,
+      "community": 75,
       "norm_label": "routecomponent()"
     },
     {
@@ -6660,7 +6660,7 @@
       "source_file": "client/src/routes/login/index.tsx",
       "source_location": "L1",
       "id": "client_src_routes_login_index_tsx",
-      "community": 54,
+      "community": 52,
       "norm_label": "index.tsx"
     },
     {
@@ -6669,7 +6669,7 @@
       "source_file": "client/src/routes/login/index.tsx",
       "source_location": "L5",
       "id": "login_index_loginsearchschema",
-      "community": 54,
+      "community": 52,
       "norm_label": "loginsearchschema"
     },
     {
@@ -6678,7 +6678,7 @@
       "source_file": "client/src/routes/login/index.tsx",
       "source_location": "L9",
       "id": "login_index_route",
-      "community": 54,
+      "community": 52,
       "norm_label": "route"
     },
     {
@@ -6687,7 +6687,7 @@
       "source_file": "client/src/routes/login/-components/login-form.tsx",
       "source_location": "L1",
       "id": "client_src_routes_login_components_login_form_tsx",
-      "community": 54,
+      "community": 52,
       "norm_label": "login-form.tsx"
     },
     {
@@ -6696,7 +6696,7 @@
       "source_file": "client/src/routes/login/-components/login-form.tsx",
       "source_location": "L10",
       "id": "components_login_form_loginformcomponent",
-      "community": 54,
+      "community": 52,
       "norm_label": "loginformcomponent()"
     },
     {
@@ -6704,7 +6704,7 @@
       "file_type": "code",
       "source_file": "server/src/schemas/pricing-schemas.ts",
       "source_location": "L1",
-      "community": 80,
+      "community": 78,
       "norm_label": "pricing-schemas.ts",
       "id": "server_src_schemas_pricing_schemas_ts"
     },
@@ -6713,7 +6713,7 @@
       "file_type": "code",
       "source_file": "server/src/schemas/pricing-schemas.ts",
       "source_location": "L3",
-      "community": 80,
+      "community": 78,
       "norm_label": "createpricingschema",
       "id": "schemas_pricing_schemas_createpricingschema"
     },
@@ -6722,7 +6722,7 @@
       "file_type": "code",
       "source_file": "server/src/schemas/pricing-schemas.ts",
       "source_location": "L12",
-      "community": 80,
+      "community": 78,
       "norm_label": "updatepricingschema",
       "id": "schemas_pricing_schemas_updatepricingschema"
     },
@@ -6857,7 +6857,7 @@
       "file_type": "code",
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L14",
-      "community": 13,
+      "community": 14,
       "norm_label": "pricingformschema",
       "id": "components_pricing_modal_pricingformschema"
     },
@@ -6902,7 +6902,7 @@
       "file_type": "code",
       "source_file": "server/prisma.config.js",
       "source_location": "L1",
-      "community": 97,
+      "community": 95,
       "norm_label": "prisma.config.js",
       "id": "server_prisma_config_js"
     },
@@ -6956,7 +6956,7 @@
       "file_type": "code",
       "source_file": "client/tailwind.config.ts",
       "source_location": "L1",
-      "community": 98,
+      "community": 96,
       "norm_label": "tailwind.config.ts",
       "id": "client_tailwind_config_ts"
     },
@@ -6965,7 +6965,7 @@
       "file_type": "code",
       "source_file": "client/eslint.config.js",
       "source_location": "L1",
-      "community": 82,
+      "community": 80,
       "norm_label": "eslint.config.js",
       "id": "client_eslint_config_js"
     },
@@ -6974,7 +6974,7 @@
       "file_type": "code",
       "source_file": "client/vite.config.ts",
       "source_location": "L1",
-      "community": 99,
+      "community": 97,
       "norm_label": "vite.config.ts",
       "id": "client_vite_config_ts"
     },
@@ -6987,7 +6987,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 100,
+      "community": 98,
       "norm_label": "prisma.config.js",
       "id": "prisma_config"
     },
@@ -7000,7 +7000,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 81,
+      "community": 79,
       "norm_label": "seed.ts / main()",
       "id": "seed_main"
     },
@@ -7013,7 +7013,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 81,
+      "community": 79,
       "norm_label": "init migration (user/session/account/verification)",
       "id": "migration_init"
     },
@@ -7026,7 +7026,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 81,
+      "community": 79,
       "norm_label": "add_address_and_contact_person migration",
       "id": "migration_address_contact"
     },
@@ -7208,7 +7208,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 101,
+      "community": 99,
       "norm_label": "keys.ts / getkeyname",
       "id": "utils_keys"
     },
@@ -7221,7 +7221,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 102,
+      "community": 100,
       "norm_label": "responses.ts / successresponse, errorresponse",
       "id": "utils_responses"
     },
@@ -7832,7 +7832,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 103,
+      "community": 101,
       "norm_label": "openapiroute",
       "id": "openapi_route"
     },
@@ -7871,7 +7871,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 82,
+      "community": 80,
       "norm_label": "tailwindconfig",
       "id": "tailwind_config"
     },
@@ -7884,7 +7884,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 82,
+      "community": 80,
       "norm_label": "eslintconfig",
       "id": "eslint_config"
     },
@@ -8534,7 +8534,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 104,
+      "community": 102,
       "norm_label": "route: /contracts",
       "id": "route_contracts"
     },
@@ -8547,7 +8547,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 105,
+      "community": 103,
       "norm_label": "route: /customers",
       "id": "route_customers"
     },
@@ -8560,7 +8560,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 106,
+      "community": 104,
       "norm_label": "route: /employees",
       "id": "route_employees"
     },
@@ -8573,7 +8573,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 107,
+      "community": 105,
       "norm_label": "route: /offers",
       "id": "route_offers"
     },
@@ -8586,7 +8586,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 108,
+      "community": 106,
       "norm_label": "route: /orders",
       "id": "route_orders"
     },
@@ -8599,7 +8599,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 109,
+      "community": 107,
       "norm_label": "route: /products",
       "id": "route_products"
     },
@@ -8612,7 +8612,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 110,
+      "community": 108,
       "norm_label": "route: /user",
       "id": "route_user"
     },
@@ -8625,7 +8625,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "multidropdown",
       "id": "multi_dropdown"
     },
@@ -8638,7 +8638,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "singledropdown",
       "id": "single_dropdown"
     },
@@ -8651,7 +8651,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "sortdropdown",
       "id": "sort_dropdown"
     },
@@ -8664,7 +8664,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "sorticon",
       "id": "sort_icon"
     },
@@ -8677,7 +8677,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "filterchip",
       "id": "filter_chip"
     },
@@ -8690,7 +8690,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "searchbar",
       "id": "search_bar"
     },
@@ -8703,7 +8703,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "filters/index",
       "id": "filters_index"
     },
@@ -8716,7 +8716,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "collapsable",
       "id": "collapsable"
     },
@@ -8729,7 +8729,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "collapsablecomponentprops",
       "id": "collapsable_types"
     },
@@ -8742,7 +8742,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "navlink",
       "id": "nav_link"
     },
@@ -8755,7 +8755,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "navigation",
       "id": "navigation"
     },
@@ -8768,7 +8768,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "buttoncomponentprops",
       "id": "button_types"
     },
@@ -8781,7 +8781,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "button",
       "id": "button"
     },
@@ -8794,7 +8794,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 89,
       "norm_label": "selectcomponentprops",
       "id": "select_types"
     },
@@ -8807,7 +8807,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 91,
+      "community": 89,
       "norm_label": "select",
       "id": "select"
     },
@@ -8820,7 +8820,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "inputs/index",
       "id": "inputs_index"
     },
@@ -8833,7 +8833,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "checkboxcomponentprops",
       "id": "checkbox_types"
     },
@@ -8846,7 +8846,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "checkbox",
       "id": "checkbox"
     },
@@ -8859,7 +8859,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "toggleslider",
       "id": "toggle_slider"
     },
@@ -8872,7 +8872,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "toggleslidercomponentprops",
       "id": "toggle_slider_types"
     },
@@ -8885,7 +8885,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "inputcomponentprops",
       "id": "input_types"
     },
@@ -8898,7 +8898,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 37,
+      "community": 38,
       "norm_label": "input",
       "id": "input"
     },
@@ -8911,7 +8911,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 111,
+      "community": 109,
       "norm_label": "badgecomponentprops",
       "id": "badge_types"
     },
@@ -8924,7 +8924,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "dropdownoption",
       "id": "dropdown_option"
     },
@@ -8937,7 +8937,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "selectoption",
       "id": "select_option"
     },
@@ -8950,7 +8950,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 16,
+      "community": 17,
       "norm_label": "sortoption",
       "id": "sort_option"
     },
@@ -8963,7 +8963,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 112,
+      "community": 110,
       "norm_label": "badge component",
       "id": "badge_component"
     },
@@ -8976,7 +8976,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "usecustomerhook",
       "id": "customer_hook"
     },
@@ -8989,7 +8989,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "usecontracthook",
       "id": "contract_hook"
     },
@@ -9002,7 +9002,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "useofferhook",
       "id": "offer_hook"
     },
@@ -9015,7 +9015,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "useproducthook",
       "id": "product_hook"
     },
@@ -9028,7 +9028,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "useflatratehook",
       "id": "flatrate_hook"
     },
@@ -9041,7 +9041,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "useuserhook",
       "id": "user_hook"
     },
@@ -9054,7 +9054,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "usesupplierhook",
       "id": "supplier_hook"
     },
@@ -9067,7 +9067,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "useorderhook",
       "id": "order_hook"
     },
@@ -9080,7 +9080,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "hooks index barrel",
       "id": "hooks_index"
     },
@@ -9093,7 +9093,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "api() http client",
       "id": "api_client"
     },
@@ -9106,7 +9106,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "permissions (better-auth ac)",
       "id": "permissions_lib"
     },
@@ -9145,7 +9145,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "requiresession()",
       "id": "session_lib"
     },
@@ -9158,7 +9158,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "authclient (better-auth)",
       "id": "auth_client"
     },
@@ -9171,7 +9171,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "customer data actions",
       "id": "customers_data"
     },
@@ -9184,7 +9184,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "supplier data actions",
       "id": "supplier_data"
     },
@@ -9197,7 +9197,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "contract data actions",
       "id": "contracts_data"
     },
@@ -9210,7 +9210,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "product data actions",
       "id": "products_data"
     },
@@ -9223,7 +9223,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "order data actions",
       "id": "orders_data"
     },
@@ -9236,7 +9236,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 14,
+      "community": 13,
       "norm_label": "flatrate data actions",
       "id": "flatrates_data"
     },
@@ -9249,7 +9249,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offer data actions",
       "id": "offer_data"
     },
@@ -9262,7 +9262,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "user data actions",
       "id": "user_data"
     },
@@ -9275,7 +9275,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 36,
       "norm_label": "root route component",
       "id": "root_route"
     },
@@ -9288,7 +9288,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 35,
+      "community": 36,
       "norm_label": "main layout route with navigation",
       "id": "main_layout_route"
     },
@@ -9301,7 +9301,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "customerlistitem component",
       "id": "customer_list_item"
     },
@@ -9314,7 +9314,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "customermodal component",
       "id": "customer_modal"
     },
@@ -9327,7 +9327,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "customerlist component",
       "id": "customer_list"
     },
@@ -9340,7 +9340,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "contactpersonform component",
       "id": "contact_person_form"
     },
@@ -9353,7 +9353,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offerlistitem component",
       "id": "offer_list_item"
     },
@@ -9366,7 +9366,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offerflatrateform component",
       "id": "offer_flat_rate_form"
     },
@@ -9379,7 +9379,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offermodal component",
       "id": "offer_modal"
     },
@@ -9392,7 +9392,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offerlist component",
       "id": "offer_list"
     },
@@ -9405,7 +9405,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offerproductform component",
       "id": "offer_product_form"
     },
@@ -9418,7 +9418,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offerfile component",
       "id": "offer_file"
     },
@@ -9431,7 +9431,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "offer-items barrel export",
       "id": "offer_items_index"
     },
@@ -9444,7 +9444,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "taskitem skeleton component",
       "id": "task_item"
     },
@@ -9457,7 +9457,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "documentitem component with polling",
       "id": "document_item"
     },
@@ -9470,7 +9470,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "productsectionitem modal item",
       "id": "product_section_item"
     },
@@ -9483,7 +9483,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 17,
+      "community": 18,
       "norm_label": "productmodalsection component",
       "id": "product_modal_section"
     },
@@ -9587,7 +9587,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 113,
+      "community": 111,
       "norm_label": "supplierlistitem component",
       "id": "supplier_item"
     },
@@ -9886,7 +9886,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 114,
+      "community": 112,
       "norm_label": "openapi/prisma schema",
       "id": "openapi_schema"
     },
@@ -10510,7 +10510,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 92,
+      "community": 90,
       "norm_label": "ui icon sprite: bluesky, discord, documentation, github, social, x (twitter) icons",
       "id": "svg_icons"
     },
@@ -10523,7 +10523,7 @@
       "captured_at": null,
       "author": null,
       "contributor": null,
-      "community": 92,
+      "community": 90,
       "norm_label": "app favicon: lightning bolt / zap shape in purple gradient (#863bff) with blue accent highlights - keepit brand logo",
       "id": "svg_favicon"
     }
@@ -10833,9 +10833,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "server_src_middlewares_validate_ts",
-      "confidence_score": 1.0
+      "target": "server_src_middlewares_validate_ts"
     },
     {
       "relation": "imports_from",
@@ -10932,9 +10932,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "middlewares_validate_validate",
-      "confidence_score": 1.0
+      "target": "middlewares_validate_validate"
     },
     {
       "relation": "imports",
@@ -11928,9 +11928,9 @@
       "source_file": "server/src/utils/products.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_utils_products_ts",
-      "target": "utils_products_tier",
-      "confidence_score": 1.0
+      "target": "utils_products_tier"
     },
     {
       "relation": "contains",
@@ -11970,9 +11970,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "server_src_utils_products_ts",
-      "confidence_score": 1.0
+      "target": "server_src_utils_products_ts"
     },
     {
       "relation": "imports_from",
@@ -12231,9 +12231,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L3",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_createtariffschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffschema"
     },
     {
       "relation": "contains",
@@ -12241,9 +12241,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_updatetariffschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffschema"
     },
     {
       "relation": "contains",
@@ -12251,9 +12251,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_configbase",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_configbase"
     },
     {
       "relation": "contains",
@@ -12261,9 +12261,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_createtariffconfigschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffconfigschema"
     },
     {
       "relation": "contains",
@@ -12271,9 +12271,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L21",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_updatetariffconfigschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffconfigschema"
     },
     {
       "relation": "contains",
@@ -12281,9 +12281,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_createtariffcustomerschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffcustomerschema"
     },
     {
       "relation": "contains",
@@ -12291,9 +12291,9 @@
       "source_file": "server/src/schemas/tariffs-schemas.ts",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_schemas_tariffs_schemas_ts",
-      "target": "schemas_tariffs_schemas_updatetariffcustomerschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffcustomerschema"
     },
     {
       "relation": "imports_from",
@@ -12302,9 +12302,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "server_src_schemas_tariffs_schemas_ts",
-      "confidence_score": 1.0
+      "target": "server_src_schemas_tariffs_schemas_ts"
     },
     {
       "relation": "imports",
@@ -12313,9 +12313,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_createtariffschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffschema"
     },
     {
       "relation": "imports",
@@ -12324,9 +12324,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_updatetariffschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffschema"
     },
     {
       "relation": "imports",
@@ -12335,9 +12335,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_createtariffconfigschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffconfigschema"
     },
     {
       "relation": "imports",
@@ -12346,9 +12346,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_updatetariffconfigschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffconfigschema"
     },
     {
       "relation": "imports",
@@ -12357,9 +12357,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_createtariffcustomerschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_createtariffcustomerschema"
     },
     {
       "relation": "imports",
@@ -12368,9 +12368,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "schemas_tariffs_schemas_updatetariffcustomerschema",
-      "confidence_score": 1.0
+      "target": "schemas_tariffs_schemas_updatetariffcustomerschema"
     },
     {
       "relation": "contains",
@@ -12770,9 +12770,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "server_src_lib_prisma_ts",
-      "confidence_score": 1.0
+      "target": "server_src_lib_prisma_ts"
     },
     {
       "relation": "imports_from",
@@ -12946,9 +12946,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "lib_prisma_prisma",
-      "confidence_score": 1.0
+      "target": "lib_prisma_prisma"
     },
     {
       "relation": "imports",
@@ -14426,9 +14426,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_tariffinclude",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_tariffinclude"
     },
     {
       "relation": "contains",
@@ -14436,9 +14436,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_getalltariffs",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_getalltariffs"
     },
     {
       "relation": "contains",
@@ -14446,9 +14446,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_gettariffbyid",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_gettariffbyid"
     },
     {
       "relation": "contains",
@@ -14456,9 +14456,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_createtariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_createtariff"
     },
     {
       "relation": "contains",
@@ -14466,9 +14466,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L62",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_updatetariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariff"
     },
     {
       "relation": "contains",
@@ -14476,9 +14476,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L103",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_deletetariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariff"
     },
     {
       "relation": "contains",
@@ -14486,9 +14486,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L115",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_addtariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_addtariffconfig"
     },
     {
       "relation": "contains",
@@ -14496,9 +14496,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L138",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_updatetariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariffconfig"
     },
     {
       "relation": "contains",
@@ -14506,9 +14506,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L153",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_deletetariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariffconfig"
     },
     {
       "relation": "contains",
@@ -14516,9 +14516,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L165",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_addtariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_addtariffcustomer"
     },
     {
       "relation": "contains",
@@ -14526,9 +14526,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L198",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_updatetariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariffcustomer"
     },
     {
       "relation": "contains",
@@ -14536,9 +14536,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L213",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_deletetariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariffcustomer"
     },
     {
       "relation": "contains",
@@ -14546,9 +14546,9 @@
       "source_file": "server/src/controllers/tariff-controller.ts",
       "source_location": "L225",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_controllers_tariff_controller_ts",
-      "target": "controllers_tariff_controller_gettariffprice",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_gettariffprice"
     },
     {
       "relation": "imports_from",
@@ -14557,9 +14557,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "server_src_controllers_tariff_controller_ts",
-      "confidence_score": 1.0
+      "target": "server_src_controllers_tariff_controller_ts"
     },
     {
       "relation": "imports",
@@ -14568,9 +14568,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_getalltariffs",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_getalltariffs"
     },
     {
       "relation": "imports",
@@ -14579,9 +14579,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_gettariffbyid",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_gettariffbyid"
     },
     {
       "relation": "imports",
@@ -14590,9 +14590,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_createtariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_createtariff"
     },
     {
       "relation": "imports",
@@ -14601,9 +14601,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_updatetariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariff"
     },
     {
       "relation": "imports",
@@ -14612,9 +14612,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_deletetariff",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariff"
     },
     {
       "relation": "imports",
@@ -14623,9 +14623,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_addtariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_addtariffconfig"
     },
     {
       "relation": "imports",
@@ -14634,9 +14634,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_updatetariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariffconfig"
     },
     {
       "relation": "imports",
@@ -14645,9 +14645,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_deletetariffconfig",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariffconfig"
     },
     {
       "relation": "imports",
@@ -14656,9 +14656,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_addtariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_addtariffcustomer"
     },
     {
       "relation": "imports",
@@ -14667,9 +14667,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_updatetariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_updatetariffcustomer"
     },
     {
       "relation": "imports",
@@ -14678,9 +14678,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_deletetariffcustomer",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_deletetariffcustomer"
     },
     {
       "relation": "imports",
@@ -14689,9 +14689,9 @@
       "source_file": "server/src/routes/tariff.ts",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "server_src_routes_tariff_ts",
-      "target": "controllers_tariff_controller_gettariffprice",
-      "confidence_score": 1.0
+      "target": "controllers_tariff_controller_gettariffprice"
     },
     {
       "relation": "contains",
@@ -15898,9 +15898,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L4",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_tariff",
-      "confidence_score": 1.0
+      "target": "types_product_tariff"
     },
     {
       "relation": "contains",
@@ -15908,9 +15908,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_tariffconfig",
-      "confidence_score": 1.0
+      "target": "types_product_tariffconfig"
     },
     {
       "relation": "contains",
@@ -15918,9 +15918,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L6",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_tariffcustomer",
-      "confidence_score": 1.0
+      "target": "types_product_tariffcustomer"
     },
     {
       "relation": "contains",
@@ -15968,9 +15968,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L16",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_createtariffinput",
-      "confidence_score": 1.0
+      "target": "types_product_createtariffinput"
     },
     {
       "relation": "contains",
@@ -15978,9 +15978,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_updatetariffinput",
-      "confidence_score": 1.0
+      "target": "types_product_updatetariffinput"
     },
     {
       "relation": "contains",
@@ -15988,9 +15988,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_createtariffconfiginput",
-      "confidence_score": 1.0
+      "target": "types_product_createtariffconfiginput"
     },
     {
       "relation": "contains",
@@ -15998,9 +15998,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_updatetariffconfiginput",
-      "confidence_score": 1.0
+      "target": "types_product_updatetariffconfiginput"
     },
     {
       "relation": "contains",
@@ -16008,9 +16008,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_createtariffcustomerinput",
-      "confidence_score": 1.0
+      "target": "types_product_createtariffcustomerinput"
     },
     {
       "relation": "contains",
@@ -16018,9 +16018,9 @@
       "source_file": "client/src/types/product.ts",
       "source_location": "L29",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_types_product_ts",
-      "target": "types_product_updatetariffcustomerinput",
-      "confidence_score": 1.0
+      "target": "types_product_updatetariffcustomerinput"
     },
     {
       "relation": "contains",
@@ -17854,9 +17854,9 @@
       "source_file": "client/src/hooks/tariff-hook.ts",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_hooks_tariff_hook_ts",
-      "target": "hooks_tariff_hook_usetariffhook",
-      "confidence_score": 1.0
+      "target": "hooks_tariff_hook_usetariffhook"
     },
     {
       "relation": "calls",
@@ -19340,9 +19340,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "api_client",
-      "confidence_score": 1.0
+      "target": "api_client"
     },
     {
       "relation": "contains",
@@ -19350,9 +19350,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L15",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_getalltariffsaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_getalltariffsaction"
     },
     {
       "relation": "contains",
@@ -19360,9 +19360,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_createtariffaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_createtariffaction"
     },
     {
       "relation": "contains",
@@ -19370,9 +19370,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L25",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_updatetariffaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_updatetariffaction"
     },
     {
       "relation": "contains",
@@ -19380,9 +19380,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L32",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_deletetariffaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_deletetariffaction"
     },
     {
       "relation": "contains",
@@ -19390,9 +19390,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_addtariffconfigaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_addtariffconfigaction"
     },
     {
       "relation": "contains",
@@ -19400,9 +19400,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L45",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_updatetariffconfigaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_updatetariffconfigaction"
     },
     {
       "relation": "contains",
@@ -19410,9 +19410,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L56",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_deletetariffconfigaction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_deletetariffconfigaction"
     },
     {
       "relation": "contains",
@@ -19420,9 +19420,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L61",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_addtariffcustomeraction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_addtariffcustomeraction"
     },
     {
       "relation": "contains",
@@ -19430,9 +19430,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_updatetariffcustomeraction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_updatetariffcustomeraction"
     },
     {
       "relation": "contains",
@@ -19440,9 +19440,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_deletetariffcustomeraction",
-      "confidence_score": 1.0
+      "target": "data_tariffs_deletetariffcustomeraction"
     },
     {
       "relation": "contains",
@@ -19450,9 +19450,9 @@
       "source_file": "client/src/data/tariffs.ts",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_data_tariffs_ts",
-      "target": "data_tariffs_gettariffprice",
-      "confidence_score": 1.0
+      "target": "data_tariffs_gettariffprice"
     },
     {
       "relation": "contains",
@@ -20349,9 +20349,9 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L8",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_pricing_tsx",
-      "target": "client_src_routes_main_products_components_tariff_config_modal_tsx",
-      "confidence_score": 1.0
+      "target": "client_src_routes_main_products_components_tariff_config_modal_tsx"
     },
     {
       "relation": "imports_from",
@@ -20360,9 +20360,9 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L9",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_pricing_tsx",
-      "target": "client_src_routes_main_products_components_tariff_customer_modal_tsx",
-      "confidence_score": 1.0
+      "target": "client_src_routes_main_products_components_tariff_customer_modal_tsx"
     },
     {
       "relation": "imports_from",
@@ -20371,9 +20371,9 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_pricing_tsx",
-      "target": "client_src_routes_main_products_components_tariff_products_modal_tsx",
-      "confidence_score": 1.0
+      "target": "client_src_routes_main_products_components_tariff_products_modal_tsx"
     },
     {
       "relation": "contains",
@@ -20391,9 +20391,9 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L17",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_pricing_tsx",
-      "target": "products_pricing_overridetarget",
-      "confidence_score": 1.0
+      "target": "products_pricing_overridetarget"
     },
     {
       "relation": "contains",
@@ -20401,9 +20401,9 @@
       "source_file": "client/src/routes/_main/products/pricing.tsx",
       "source_location": "L28",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_pricing_tsx",
-      "target": "products_pricing_tarifftitle",
-      "confidence_score": 1.0
+      "target": "products_pricing_tarifftitle"
     },
     {
       "relation": "contains",
@@ -20526,9 +20526,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-customer-modal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_customer_modal_tsx",
-      "target": "components_tariff_customer_modal_tariffcustomermodalprops",
-      "confidence_score": 1.0
+      "target": "components_tariff_customer_modal_tariffcustomermodalprops"
     },
     {
       "relation": "contains",
@@ -20536,9 +20536,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-customer-modal.tsx",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_customer_modal_tsx",
-      "target": "components_tariff_customer_modal_tariffcustomermodal",
-      "confidence_score": 1.0
+      "target": "components_tariff_customer_modal_tariffcustomermodal"
     },
     {
       "relation": "imports_from",
@@ -20598,9 +20598,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-config-modal.tsx",
       "source_location": "L5",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_config_modal_tsx",
-      "target": "components_tariff_config_modal_tariffconfigmodalprops",
-      "confidence_score": 1.0
+      "target": "components_tariff_config_modal_tariffconfigmodalprops"
     },
     {
       "relation": "contains",
@@ -20608,9 +20608,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-config-modal.tsx",
       "source_location": "L11",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_config_modal_tsx",
-      "target": "components_tariff_config_modal_tariffconfigmodal",
-      "confidence_score": 1.0
+      "target": "components_tariff_config_modal_tariffconfigmodal"
     },
     {
       "relation": "contains",
@@ -20751,9 +20751,9 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L12",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_pricing_modal_tsx",
-      "target": "components_pricing_modal_configrow",
-      "confidence_score": 1.0
+      "target": "components_pricing_modal_configrow"
     },
     {
       "relation": "contains",
@@ -20761,9 +20761,9 @@
       "source_file": "client/src/routes/_main/products/-components/pricing-modal.tsx",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_pricing_modal_tsx",
-      "target": "components_pricing_modal_emptyrow",
-      "confidence_score": 1.0
+      "target": "components_pricing_modal_emptyrow"
     },
     {
       "relation": "contains",
@@ -20812,9 +20812,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L2",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_products_modal_tsx",
-      "target": "multi_dropdown",
-      "confidence_score": 1.0
+      "target": "multi_dropdown"
     },
     {
       "relation": "contains",
@@ -20822,9 +20822,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L7",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_products_modal_tsx",
-      "target": "components_tariff_products_modal_tariffproductsmodalprops",
-      "confidence_score": 1.0
+      "target": "components_tariff_products_modal_tariffproductsmodalprops"
     },
     {
       "relation": "contains",
@@ -20832,9 +20832,9 @@
       "source_file": "client/src/routes/_main/products/-components/tariff-products-modal.tsx",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "client_src_routes_main_products_components_tariff_products_modal_tsx",
-      "target": "components_tariff_products_modal_tariffproductsmodal",
-      "confidence_score": 1.0
+      "target": "components_tariff_products_modal_tariffproductsmodal"
     },
     {
       "relation": "contains",
@@ -25922,5 +25922,5 @@
       "source_file": "server/generated/cmovbm9qd0001e7w81m3dbnu4.pdf"
     }
   ],
-  "built_at_commit": "915cc9140a07025c009df894f570ecb20dfe6b81"
+  "built_at_commit": "2fbce614656d37f2d1644626ef7a477fcf0ffd7f"
 }

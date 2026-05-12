@@ -33,30 +33,16 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
           </p>
 
           <div className="flex items-center">
-            <Button
-              onClick={() => setOpen(true)}
-              size="sm"
-              variant="ghost"
-              icon={<Pen className="size-4" />}
-              iconOnly
-            />
-            <Button
-              onClick={() => deleteCustomer({ id: customer.id })}
-              size="sm"
-              variant="ghost"
-              loading={isDeleting}
-              icon={<Trash className="size-4" />}
-              iconOnly
-            />
+            <Button variant="ghost" size="sm" icon={<Pen className="size-4" />}
+              iconOnly onClick={() => setOpen(true)} />
+            <Button variant="ghost" size="sm" loading={isDeleting}
+              icon={<Trash className="size-4" />} iconOnly
+              onClick={() => deleteCustomer({ id: customer.id })} />
           </div>
         </div>
       </div>
 
-      <CustomerModal
-        currentCustomer={customer}
-        open={isOpen}
-        cancelFn={() => setOpen(false)}
-      />
+      <CustomerModal currentCustomer={customer} open={isOpen} cancelFn={() => setOpen(false)} />
     </React.Fragment>
   );
 }

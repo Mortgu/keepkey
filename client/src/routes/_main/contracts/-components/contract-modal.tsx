@@ -68,63 +68,36 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
         <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4">
           <contractForm.Field name="name" children={(field) => (
             <div className="grid gap-2">
-              <Input
-                id={field.name}
-                value={field.state.value}
-                label="Name"
-                error={field.state.meta.errors
-                  .map((e) => e?.message)
-                  .join(" & ")}
+              <Input id={field.name} value={field.state.value} label="Name"
+                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />
             </div>
           )} />
 
-          <contractForm.Field
-            name="features"
-            children={(field) => (
+          <contractForm.Field name="features" children={(field) => (
+            <div className="grid gap-2">
+              <label className="text-sm text-gray-500">Features:</label>
               <div className="grid gap-2">
-                <label className="text-sm text-gray-500">Features:</label>
-                <div className="grid gap-2">
-                  {field.state.value.map((_, index) => (
-                    <contractForm.Field
-                      key={index}
-                      name={`features[${index}]`}
-                      children={(itemField) => (
-                        <div className="flex gap-2">
-                          <Input
-                            value={itemField.state.value}
-                            onChange={(e) =>
-                              itemField.handleChange(e.target.value)
-                            }
-                            onBlur={itemField.handleBlur}
-                            placeholder={`Feature ${index + 1}`}
-                          />
-                          <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            icon={<Trash2 className="size-4" />}
-                            iconOnly
-                            onClick={() => field.removeValue(index)}
-                          />
-                        </div>
-                      )}
-                    />
-                  ))}
-                </div>
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  icon={<Plus className="size-4" />}
-                  onClick={() => field.pushValue("")}
-                >
-                  Feature hinzufügen
-                </Button>
+                {field.state.value.map((_, index) => (
+                  <contractForm.Field key={index} name={`features[${index}]`} children={(itemField) => (
+                    <div className="flex gap-2">
+                      <Input value={itemField.state.value} onChange={(e) => itemField.handleChange(e.target.value)}
+                        onBlur={itemField.handleBlur} placeholder={`Feature ${index + 1}`} />
+                      <Button variant="secondary" size="sm" type="button"
+                        icon={<Trash2 className="size-4" />} iconOnly
+                        onClick={() => field.removeValue(index)} />
+                    </div>
+                  )} />
+                ))}
               </div>
-            )}
+              <Button type="button" variant="secondary" size="sm"
+                icon={<Plus className="size-4" />} onClick={() => field.pushValue("")}>
+                Feature hinzufügen
+              </Button>
+            </div>
+          )}
           />
 
           <contractForm.Field name="table" children={(field) => (
@@ -146,11 +119,10 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
         <Button onClick={cancelFn} type="button" size="xs" variant="secondary">
           Abbrechen
         </Button>
-        <contractForm.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
+        <contractForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
           children={([canSubmit, isSubmitting]) => (
-            <Button form="contract-form" disabled={!canSubmit} type="submit" size="xs">
-              {isSubmitting ? <Loader className="size-4" /> : "Speichern"}
+            <Button form="contract-form" disabled={!canSubmit} type="submit" size="xs" loading={isSubmitting}>
+              Speichern
             </Button>
           )}
         />

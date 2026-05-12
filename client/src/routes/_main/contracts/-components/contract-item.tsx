@@ -11,10 +11,7 @@ interface ContractListItemProps {
   deleteContract: (id: string) => void;
 }
 
-export default function ContractListItem({
-  contract,
-  deleteContract,
-}: ContractListItemProps) {
+export default function ContractListItem({ contract, deleteContract }: ContractListItemProps) {
   const [isOpen, setOpen] = useState<boolean>(false);
 
   return (
@@ -29,20 +26,11 @@ export default function ContractListItem({
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              icon={<Pen className="size-3.5" />}
-              iconOnly
-              onClick={() => setOpen(true)}
-              size="sm"
-            />
-            <Button
-              variant="ghost"
-              icon={<Trash className="size-3.5" />}
-              iconOnly
-              onClick={() => deleteContract(contract.id)}
-              size="sm"
-            />
+            <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />} iconOnly
+              onClick={() => setOpen(true)} />
+
+            <Button variant="ghost" size="sm" icon={<Trash className="size-3.5" />} iconOnly
+              onClick={() => deleteContract(contract.id)} />
           </div>
         </div>
 
@@ -50,10 +38,7 @@ export default function ContractListItem({
         <div className="px-4 py-3.5">
           <ul className="flex flex-col gap-1.5">
             {contract.features.map((feature) => (
-              <li
-                key={feature}
-                className="flex items-start gap-2 text-sm text-(--text) leading-snug"
-              >
+              <li key={feature} className="flex items-start gap-2 text-sm text-(--text) leading-snug">
                 <span className="w-1.25 h-1.25 rounded-full bg-(--text) shrink-0 mt-1.5" />
                 {feature}
               </li>
@@ -62,11 +47,7 @@ export default function ContractListItem({
         </div>
       </div>
 
-      <ContractModal
-        open={isOpen}
-        cancelFn={() => setOpen(false)}
-        currentContract={contract}
-      />
+      <ContractModal open={isOpen} cancelFn={() => setOpen(false)} currentContract={contract} />
     </Fragment>
   );
 }

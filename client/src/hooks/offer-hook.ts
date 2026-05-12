@@ -1,6 +1,7 @@
 import {
   createOfferAction,
   deleteOfferAction,
+  deleteOfferDocumentAction,
   getOffersAction,
   getContactPersonsAction,
   updateOfferAction,
@@ -60,6 +61,12 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     onSuccess: invalidate,
   });
 
+  const deleteDocumentMutation = useMutation({
+    mutationFn: ({ offerId, documentId }: { offerId: string; documentId: string }) =>
+      deleteOfferDocumentAction(offerId, documentId),
+    onSuccess: invalidate,
+  });
+
   return {
     offers,
     contactPersons,
@@ -73,6 +80,10 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     deleteOffer: deleteMutation.mutate,
     isDeletingOffer: deleteMutation.isPending,
     errorDeletingOffer: deleteMutation.error,
+
+    deleteDocument: deleteDocumentMutation.mutate,
+    isDeletingDocument: deleteDocumentMutation.isPending,
+    errorDeletingDocument: deleteDocumentMutation.error,
 
     updateOffer: updateMutation.mutateAsync,
     isUpdatingOffer: updateMutation.isPending,

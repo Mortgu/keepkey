@@ -44,9 +44,7 @@ export default function ProductSectionItem({ offerProduct, offerContract, setOff
                 </div>
 
                 <div className="flex gap-1">
-                    <Button type="button" size="xs" variant="secondary"
-                        icon={<DollarSign className="size-3" />}
-                        onClick={() => { }}>
+                    <Button type="button" size="xs" variant="link" icon={<DollarSign className="size-3" />}>
                         {formatEur(offerProduct.total_cents)}
                     </Button>
 

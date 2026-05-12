@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
+import { useOfferHook } from "@/hooks";
 import type { Document } from "@/types";
 import { File, Loader, Trash, TriangleAlert } from "lucide-react";
 
@@ -14,6 +15,7 @@ type Props = {
 
 export function DocumentItem({ document }: Props) {
     const queryClient = useQueryClient();
+    const { deleteDocument, isDeletingDocument } = useOfferHook();
     const isGenerated = document.status === "GENERATED";
     const isFailed = document.status === "FAILED";
     const isPolling = !isGenerated && !isFailed;
@@ -69,7 +71,18 @@ export function DocumentItem({ document }: Props) {
                     <Button variant="secondary" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
 
-                <Button variant="secondary" size="sm" disabled={!isGenerated} icon={<Trash className="size-3" />} iconOnly />
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<Trash className="size-3" />}
+                    iconOnly
+                    loading={isDeletingDocument}
+                    disabled={!document.offerId || isDeletingDocument}
+                    onClick={() =>
+                        document.offerId &&
+                        deleteDocument({ offerId: document.offerId, documentId: document.id })
+                    }
+                />
             </div>
         </div>
     )

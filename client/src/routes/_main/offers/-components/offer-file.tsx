@@ -22,23 +22,15 @@ export default function OfferFile({ document }: { document: Task }) {
 
       {/* Buttons */}
       <div className="flex items-center gap-2">
-        <Button variant="secondary" icon={<RotateCw className="size-3.5" />}
-          size="sm">
+        <Button variant="secondary" icon={<RotateCw className="size-3.5" />} size="sm">
           Neu
         </Button>
-        <Button
-          variant="secondary"
-          icon={<Cloud className="size-3.5" />}
-          size="sm"
-        >
+
+        <Button variant="secondary" icon={<Cloud className="size-3.5" />} size="sm">
           NextCloud
         </Button>
-        <Button
-          variant="secondary"
-          icon={<FileDown className="size-4" />}
-          size="sm"
-          iconOnly
-        />
+
+        <Button variant="secondary" icon={<FileDown className="size-4" />} size="sm" iconOnly />
       </div>
     </div>
   );

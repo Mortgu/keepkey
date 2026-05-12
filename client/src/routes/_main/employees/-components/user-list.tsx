@@ -20,11 +20,7 @@ export default function UserList() {
           Users ({users.length})
         </h1>
 
-        <Button
-          onClick={() => setOpen(true)}
-          size="sm"
-          icon={<Plus className="size-4" />}
-        >
+        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setOpen(true)} >
           Nutzer hinzufügen
         </Button>
       </div>
@@ -35,11 +31,7 @@ export default function UserList() {
         ))}
       </div>
 
-      <UserModal
-        currentUser={null}
-        open={isOpen}
-        cancelFn={() => setOpen(false)}
-      />
+      <UserModal currentUser={null} open={isOpen} cancelFn={() => setOpen(false)} />
     </div>
   );
 }

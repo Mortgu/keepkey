@@ -37,11 +37,7 @@ export default function ContractList() {
       </div>
       <div className="grid gap-2">
         {contracts.map((contract: Contract, index) => (
-          <ContractListItem
-            key={index}
-            contract={contract}
-            deleteContract={deleteContract}
-          />
+          <ContractListItem key={index} contract={contract} deleteContract={deleteContract} />
         ))}
       </div>
 

@@ -42,6 +42,9 @@ export const createOfferAction = (offer: CreateOfferInput, positions: CreateOffe
 export const deleteOfferAction = (id: string) =>
   api<void>(`/api/offers/${id}`, { method: "DELETE" });
 
+export const deleteOfferDocumentAction = (offerId: string, documentId: string) =>
+  api<void>(`/api/offers/${offerId}/documents/${documentId}`, { method: "DELETE" });
+
 export const updateOfferAction = (
   id: string, offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
 ) => api<Offer>(`/api/offers/${id}`, {

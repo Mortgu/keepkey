@@ -3,6 +3,7 @@ import {
   createOffer,
   createOfferTask,
   deleteOffer,
+  deleteOfferDocument,
   downloadOfferDocument,
   getOfferById,
   getOfferTaskById,
@@ -28,6 +29,8 @@ router.get("/:id/jobs", getOfferTasks);
 router.get("/:id/jobs/:jobId", getOfferTaskById);
 
 router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
+
+router.delete("/:id/documents/:documentId", deleteOfferDocument);
 
 router.post("/", validate(createOfferSchema), createOffer, createOfferTask);
 

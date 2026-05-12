@@ -1,11 +1,10 @@
 import { Button, Checkbox } from "@/components";
-import { DollarSign, Loader, Pen, Plus, Trash, X } from "lucide-react";
-import { useEffect, useState } from "react"
+import { Plus } from "lucide-react";
+import { useState } from "react"
 import OfferProductForm, { type OfferProductInput } from "../offer-product-form";
 import { useContractHook, useProductHook } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { getPrice } from "@/data/products";
-import { formatEur } from "@/utils/utils";
 import ProductSectionItem from "./product-section-item";
 
 type Props = {

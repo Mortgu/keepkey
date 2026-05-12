@@ -2,6 +2,7 @@ import { useState } from "react";
 import { z } from "zod";
 
 import { Button, Input } from "@/components";
+import type { CreateContactPersonInput } from "@/types";
 
 const contactPersonSchema = z.object({
   salutation: z.string().min(1, "Anrede fehlt"),
@@ -10,15 +11,8 @@ const contactPersonSchema = z.object({
   email: z.email().optional(),
 });
 
-type ContactPersonData = {
-  salutation: string;
-  firstName: string;
-  lastName: string;
-  email?: string;
-};
-
 interface Props {
-  onSave: (data: ContactPersonData) => void;
+  onSave: (data: CreateContactPersonInput) => void;
   onCancel: () => void;
 }
 
@@ -44,19 +38,15 @@ export default function ContactPersonForm({ onSave, onCancel }: Props) {
       );
       return;
     }
-    onSave({ salutation, firstName, lastName, email: email || undefined });
+    onSave({ salutation, firstName, lastName, email, customerId: "" });
   };
 
   return (
-    <div className="bg-gray-100 w-full grid gap-3 border border-(--border) p-2 rounded-md">
-      <div className="flex items-center gap-3">
+    <div className="bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-3 rounded-md">
+      <div className="flex items-center gap-2">
         <div className="flex-1">
-          <Input
-            value={salutation}
-            label="Anrede"
-            onChange={(e) => setSalutation(e.target.value)}
-            className="bg-white"
-          />
+          <Input value={salutation} label="Anrede" className="bg-white"
+            onChange={(e) => setSalutation(e.target.value)} />
         </div>
 
         <div className="flex-1">
@@ -88,17 +78,20 @@ export default function ContactPersonForm({ onSave, onCancel }: Props) {
         </div>
       </div>
 
-      {errors.length > 0 && (
-        <p className="text-sm text-red-400">{errors.join(" & ")}</p>
-      )}
 
-      <div className="flex gap-2 ml-auto mt-3">
-        <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
-          Abbrechen
-        </Button>
-        <Button type="button" size="sm" onClick={handleSave}>
-          Speichern
-        </Button>
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-red-400">
+          {errors.length > 0 && errors.join(" & ")}
+        </p>
+        <div className="flex gap-2">
+          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
+            Abbrechen
+          </Button>
+          <Button type="button" size="sm" onClick={handleSave}>
+            Speichern
+          </Button>
+        </div>
       </div>
     </div>
   );

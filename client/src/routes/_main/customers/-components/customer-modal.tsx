@@ -8,7 +8,7 @@ import ContactPersonForm from "./contact-person-form";
 
 import { useCustomerHook } from "@/hooks";
 import { Input, Button, ModalDialog } from "@/components";
-import type { CreateContactPersonInput, Customer } from "@/types";
+import type { ContactPerson, CreateContactPersonInput, Customer } from "@/types";
 
 interface CustomerModalProps {
   open: boolean;
@@ -37,19 +37,15 @@ export default function CustomerModal({
   const { updateCustomer, createCustomer, errorCreatingCustomer } =
     useCustomerHook();
 
-  const [contactPersons, setContactPersons] = useState<
-    CreateContactPersonInput[]
-  >(
-    currentCustomer?.contactPersons?.map(
-      ({ salutation, firstName, lastName, email }) => ({
-        customerId: currentCustomer.id,
-        salutation,
-        firstName,
-        lastName,
-        email: email ?? undefined,
-      }),
-    ) ?? [],
-  );
+  const [contactPersons, setContactPersons] = useState<CreateContactPersonInput[]>(
+    currentCustomer?.contactPersons?.map(({ salutation, firstName, lastName, email }) => ({
+      customerId: currentCustomer.id,
+      salutation,
+      firstName,
+      lastName,
+      email: email ?? undefined,
+    })) ?? []);
+
   const [showContactForm, setShowContactForm] = useState(false);
 
   const customerForm = useForm({
@@ -89,7 +85,7 @@ export default function CustomerModal({
     customerForm.handleSubmit();
   };
 
-  const handleAddContactPerson = (data: BaseContactPerson) => {
+  const handleAddContactPerson = (data: CreateContactPersonInput) => {
     setContactPersons((prev) => [...prev, data]);
     setShowContactForm(false);
   };
@@ -115,149 +111,81 @@ export default function CustomerModal({
 
         <form id="customer-form" onSubmit={handleSubmit} className="grid gap-4">
           <div className="flex items-center gap-4">
-            <customerForm.Field
-              name="customerId"
-              children={(field) => (
-                <div className="flex gap-2">
-                  <Input
-                    id={field.name}
-                    label="Kunden-Nr."
-                    input_size="sm"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+            <customerForm.Field name="customerId" children={(field) => (
+              <div className="flex gap-2">
+                <Input id={field.name} label="Kunden-Nr." input_size="sm"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
 
-            <customerForm.Field
-              name="companyName"
-              children={(field) => (
-                <div className="flex-3 grid gap-2">
-                  <Input
-                    id={field.name}
-                    label="Firmenname"
-                    input_size="sm"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+            <customerForm.Field name="companyName" children={(field) => (
+              <div className="flex-3 grid gap-2">
+                <Input id={field.name} label="Firmenname" input_size="sm"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
           </div>
 
           <div className="flex items-center gap-4">
-            <customerForm.Field
-              name="email"
-              children={(field) => (
-                <div className="flex-2 grid gap-2">
-                  <Input
-                    id={field.name}
-                    label="E-Mail"
-                    input_size="sm"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+            <customerForm.Field name="email" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <Input id={field.name} label="E-Mail" input_size="sm"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
 
-            <customerForm.Field
-              name="phone"
-              children={(field) => (
-                <div className="flex-2 grid gap-2">
-                  <Input
-                    id={field.name}
-                    label="Telefonnummer:"
-                    input_size="sm"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
+
+            <customerForm.Field name="phone" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <Input id={field.name} label="Telefonnummer" input_size="sm"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
           </div>
 
           <div className="flex items-center gap-4">
-            <customerForm.Field
-              name="street"
-              children={(field) => (
-                <div className="flex-2 grid gap-2">
-                  <Input
-                    id={field.name}
-                    input_size="sm"
-                    label="Straße"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
-            <customerForm.Field
-              name="city"
-              children={(field) => (
-                <div className="flex-2 grid gap-2">
-                  <Input
-                    id={field.name}
-                    input_size="sm"
-                    label="Stadt"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+            <customerForm.Field name="street" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <Input id={field.name} input_size="sm" label="Straße"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
 
-            <customerForm.Field
-              name="plz"
-              children={(field) => (
-                <div className="flex-1 grid gap-2">
-                  <Input
-                    id={field.name}
-                    input_size="sm"
-                    label="Postleitzahl"
-                    error={field.state.meta.errors
-                      .map((e) => e?.message)
-                      .join(" & ")}
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
-              )}
-            />
+            <customerForm.Field name="city" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <Input id={field.name} input_size="sm" label="Stadt"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
+
+            <customerForm.Field name="plz" children={(field) => (
+              <div className="flex-1 grid gap-2">
+                <Input id={field.name} input_size="sm" label="Postleitzahl"
+                  value={field.state.value} error={field.state.meta.errors[0]?.message}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )} />
           </div>
 
           <hr className="h-px text-transparent bg-gray-200" />
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-4">
             <div className="w-full">
-              <Button
-                onClick={() => setShowContactForm(true)}
-                type="button"
-                className="float-right"
-                variant="link"
-                icon={<Plus className="size-4" />}
-                size="sm"
-                disabled={showContactForm}
-              >
+              <Button variant="link" type="button" size="fit_sm" disabled={showContactForm}
+                icon={<Plus className="size-4" />} onClick={() => setShowContactForm(true)} className="float-right">
                 Kontaktperson hinzufügen
               </Button>
             </div>
@@ -269,30 +197,24 @@ export default function CustomerModal({
             )}
 
             <div className="flex flex-col gap-2 w-full">
-              {contactPersons.map((cp, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between bg-gray-50 border border-(--border) rounded-md px-3 py-2"
-                >
-                  <span className="text-sm text-gray-700">
-                    {cp.salutation} {cp.firstName} {cp.lastName}
-                    {cp.email ? ` · ${cp.email}` : ""}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => handleRemoveContactPerson(index)}
-                    className="text-gray-400 hover:text-red-500 transition-colors"
-                  >
-                    <Trash2 className="size-4" />
-                  </button>
-                </div>
-              ))}
+              {contactPersons.map((cp, index) => {
+                const { salutation, firstName, lastName, email } = cp;
+
+                return (
+                  <div key={index} className="flex items-center justify-between bg-(--subtle-50) border border-(--border) rounded-md px-3 py-2">
+                    <div className="grid">
+                      <p className="text-sm font-semibold">{salutation} {firstName} {lastName}</p>
+                      <p className="text-sm text-(--text-secondary)">{email}</p>
+                    </div>
+
+                    <Button variant="secondary" icon={<Trash2 className="size-3.5" />} iconOnly
+                      onClick={() => handleRemoveContactPerson(index)} />
+                  </div>
+                )
+              })}
 
               {showContactForm && (
-                <ContactPersonForm
-                  onSave={handleAddContactPerson}
-                  onCancel={() => setShowContactForm(false)}
-                />
+                <ContactPersonForm onSave={handleAddContactPerson} onCancel={() => setShowContactForm(false)} />
               )}
             </div>
           </div>
@@ -302,19 +224,11 @@ export default function CustomerModal({
         <Button onClick={cancelFn} variant="secondary" size="xs">
           Abbrechen
         </Button>
-        <customerForm.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              form="customer-form"
-              disabled={!canSubmit}
-              size="xs"
-              loading={isSubmitting}
-            >
-              Speichern
-            </Button>
-          )}
-        />
+        <customerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+          <Button size="xs" form="customer-form" disabled={!canSubmit} loading={isSubmitting}>
+            Speichern
+          </Button>
+        )} />
       </ModalDialog.Footer>
     </ModalDialog>
   );

@@ -1,29 +1,26 @@
 import { z } from "zod";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 
-import { DollarSign, Loader, Pen, Plus, Trash, X } from "lucide-react";
+import { Loader, Plus, Trash, X } from "lucide-react";
 
-import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
+import { type OfferProductInput } from "./offer-product-form";
 import OfferFlatRateForm from "./offer-flat-rate-form";
 
 import {
-  useProductHook,
-  useContractHook,
   useCustomerHook,
   useFlatRateHook,
   useUserHook,
   useSupplierHook,
   useOfferHook
 } from "@/hooks";
-import { Button, Input, Checkbox, ModalDialog, Select } from "@/components";
+import { Button, Input, ModalDialog, Select } from "@/components";
 
 import type {
   Offer,
   User,
   Supplier,
   Customer,
-  Product,
   ContactPerson,
   CreateOfferInput,
   CreateOfferPositionInput,
@@ -32,9 +29,8 @@ import type {
   UpdateOfferPositionInput,
   UpdateOfferFlatRatesInput,
 } from "@/types";
+
 import { formatEur } from "@/utils/utils";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api-client";
 import ProductModalSection from "./modal-items/product-section";
 
 interface OfferModalProps {
@@ -81,7 +77,6 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
     currentOffer?.offerFlatRates.map(({ id: _id, offer: _offer, ...fr }) => fr) ?? []
   );
 
-  const [showProductForm, setShowProductForm] = useState(false);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
   const { createOffer, errorCreatingOffer, updateOffer } = useOfferHook();
