@@ -5,10 +5,11 @@ export const getAllContactPersons = async (request: Request, response: Response)
   const contactPersons = await prisma.contactPerson.findMany({
     include: {
       customer: true,
-     },
+    },
     orderBy: {
       lastName: "asc",
-     },
-   });
+    },
+  });
+
   return response.status(200).json(contactPersons);
 };

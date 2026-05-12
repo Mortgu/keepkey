@@ -15,6 +15,8 @@ import env from "./lib/env.js";
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
+import morganMiddleware from "./middlewares/morgan.js";
+import logger from "./middlewares/logger.js";
 
 const options = {
   definition: {
@@ -31,6 +33,9 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 const app: Express = express();
+
+// Logging
+app.use(morganMiddleware);
 
 app.use(
   cors({
@@ -71,5 +76,5 @@ process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
 app.listen(config.port, () => {
-  console.log(`Server is listening on port ${config.port}`);
+  logger.info(`Server is listening on port ${config.port}`);
 });
