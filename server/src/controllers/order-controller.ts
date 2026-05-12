@@ -3,6 +3,7 @@ import { prisma } from "../lib/prisma.js";
 import { documentQueue, documentQueueKey } from "../lib/queues.js";
 import { toDate } from "../utils/utils.js";
 import { disconnect } from "node:cluster";
+import { TaskStatus, TaskType } from "@prisma/client";
 
 /*
  * Get all orders
@@ -24,7 +25,7 @@ export const getAllOrders = async (request: Request, response: Response) => {
   return response.status(200).json(orders);
 };
 
-export const createOrder = async (request: Request, response: Response) => {
+export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
   const { id } = request.body;
 
   const existingOffer = await prisma.offer.findUnique({
@@ -75,10 +76,71 @@ export const createOrder = async (request: Request, response: Response) => {
       return order;
     });
 
-    return response.status(200).json(order);
+    request.body.order = order;
+    next();
   } catch (exception: any) {
     return response.status(500).json({
       message: 'Something went wrong trying to create order from offer!',
+    });
+  }
+}
+
+export const createOrderTask = async (request: Request, response: Response) => {
+  const { order } = request.body;
+
+  if (!order) {
+    return response.status(404).json({
+      message: "Failed to create order task. Missing order in body!",
+    });
+  }
+
+  try {
+    const task = await prisma.task.create({
+      data: {
+        orderId: order.id,
+        type: TaskType.ORDER,
+        status: TaskStatus.PENDING,
+      }
+    });
+
+    await prisma.$transaction(async (tx) => {
+      await tx.document.updateMany({
+        where: { orderId: order.id, isCurrent: true },
+        data: { isCurrent: false },
+      });
+
+      const latest = await tx.document.findFirst({
+        where: { orderId: order.id },
+        orderBy: { version: 'desc' },
+        select: { version: true },
+      });
+
+      const nextVersion = (latest?.version ?? 0) + 1;
+
+      await tx.document.create({
+        data: {
+          orderId: order.id,
+          version: nextVersion,
+          status: "PENDING",
+          isCurrent: true,
+        }
+      });
+    });
+
+    const job = await documentQueue.add(documentQueueKey, {
+      taskId: task.id,
+      taskType: TaskType.ORDER,
+    });
+
+    await prisma.task.update({
+      where: { id: task.id },
+      data: { jobId: job.id },
+    });
+
+    return response.status(200).json(order);
+  } catch (exception: any) {
+    return response.status(500).json({
+      message: `Failed to create task for order: ${order.id}`,
     });
   }
 }

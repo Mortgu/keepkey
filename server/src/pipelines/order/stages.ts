@@ -10,6 +10,13 @@ const loadOrderData: PipelineStage<OrderPipelineContext> = {
     }
 }
 
+const preprocess: PipelineStage<OrderPipelineContext> = {
+    name: 'preprocess',
+    run: async (context) => {
+
+    }
+}
+
 export const orderStages: PipelineStage<OrderPipelineContext>[] = [
     loadOrderData
 ];

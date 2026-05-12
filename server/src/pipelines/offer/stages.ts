@@ -10,10 +10,10 @@ import {
   converting,
 } from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
-import { Stage } from "./pipeline.js";
-import { TaskStatus } from "@prisma/client";
+import { OfferPosition, TaskStatus } from "@prisma/client";
+import { PipelineStage } from "../pipeline.js";
 
-const loadOfferData: Stage<OfferPipelineContext> = {
+const loadOfferData: PipelineStage<OfferPipelineContext> = {
   name: "fetch",
   status: TaskStatus.RUNNING,
   run: async (context) => {
@@ -21,14 +21,14 @@ const loadOfferData: Stage<OfferPipelineContext> = {
   },
 };
 
-const preprocess: Stage<OfferPipelineContext> = {
+const preprocess: PipelineStage<OfferPipelineContext> = {
   name: "preprocess",
   run: async (context) => {
     context.formatedData = await formatFetchedData(context.fetchedData);
   },
 };
 
-const postprocess: Stage<OfferPipelineContext> = {
+const postprocess: PipelineStage<OfferPipelineContext> = {
   name: "postprocess",
   run: async (context) => {
     console.dir(context, { depth: null });
@@ -36,28 +36,28 @@ const postprocess: Stage<OfferPipelineContext> = {
   },
 };
 
-const prepare: Stage<OfferPipelineContext> = {
+const prepare: PipelineStage<OfferPipelineContext> = {
   name: "prepare",
   run: async () => {
     await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
   },
 };
 
-const generate: Stage<OfferPipelineContext> = {
+const generate: PipelineStage<OfferPipelineContext> = {
   name: "generate",
   run: async (context) => {
     context.docxBuffer = await generating(context.formatedData);
   },
 };
 
-const convert: Stage<OfferPipelineContext> = {
+const convert: PipelineStage<OfferPipelineContext> = {
   name: "convert",
   run: async (context) => {
     context.pdfBuffer = await converting(context.docxBuffer!);
   },
 };
 
-const write: Stage<OfferPipelineContext> = {
+const write: PipelineStage<OfferPipelineContext> = {
   name: "write",
   run: async (context) => {
     const offer = context?.fetchedData?.offer;
@@ -85,7 +85,7 @@ const write: Stage<OfferPipelineContext> = {
   },
 };
 
-export const offerStages: Stage<OfferPipelineContext>[] = [
+export const offerStages: PipelineStage<OfferPipelineContext>[] = [
   loadOfferData,
   preprocess,
   postprocess,

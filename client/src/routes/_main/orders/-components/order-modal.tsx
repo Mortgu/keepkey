@@ -2,7 +2,8 @@ import { useOfferHook, useOrderHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
 
 import type { Offer } from "@/types";
-import { Button, ModalDialog } from "@/components";
+import { Button, Input, ModalDialog } from "@/components";
+import { ArrowRightIcon, Search } from "lucide-react";
 
 interface OrderModalProps {
   open: boolean;
@@ -22,17 +23,26 @@ export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: O
         <h1 className="text-lg">Neue Bestellung erstellen</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
-        {offers.map((offer: Offer) => (
-          <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
-            onClick={() => createOrder({ offerId: offer.id })}>
-            <div className="grid">
-              <p className="text-(--text) font-normal">{offer.quoteId}</p>
-              <p className="text-(--neutral-400) text-sm font-light">
-                {formatDate(offer.date)}
-              </p>
+        <div className="grid gap-2">
+
+          <Input placeholder="Suchen..." rightButton={{
+            icon: <Search className="size-4" />,
+            variant: "ghost",
+            onClick: () => { },
+          }} />
+
+          {offers.map((offer: Offer) => (
+            <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
+              onClick={() => createOrder({ offerId: offer.id })}>
+              <div className="grid">
+                <p className="text-(--text) font-normal">{offer.quoteId}</p>
+                <p className="text-(--neutral-400) text-sm font-light">
+                  {formatDate(offer.date)}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
         <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
