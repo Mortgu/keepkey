@@ -1,7 +1,6 @@
 import { useOrderHook } from "@/hooks";
-import { Loader, Pen, Plus, Trash } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
-import OrderModal from "./order-modal";
 import React, { useState } from "react";
 import type { Order, OrderPosition } from "@/types";
 import { Button } from "@/components";
@@ -17,6 +16,9 @@ export default function OrderListItems({ order }: Props) {
 
   return (
     <React.Fragment >
+      {errorDeletingOrder && (
+        <p className="text-(--destructive) text-md">{errorDeletingOrder.message}</p>
+      )}
       <div className="grid border border-(--border) rounded-md">
         <div className="flex items-center justify-between border-b border-(--border) px-3 py-2">
           <div className="flex-1">

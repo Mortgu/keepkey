@@ -154,7 +154,7 @@ export interface components {
             documents: components["schemas"]["Document"][];
             tasks: components["schemas"]["Task"][];
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
             updatedAt?: string;
         };
@@ -177,7 +177,7 @@ export interface components {
             /** Format: int32 */
             total: number;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
         };
         Product: {
             id: string;

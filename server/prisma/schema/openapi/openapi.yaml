@@ -390,6 +390,7 @@ components:
         - orderPositions
         - documents
         - tasks
+        - createdAt
     OrderPosition:
       type: object
       properties:
@@ -438,6 +439,7 @@ components:
         - unit_price
         - discount
         - total
+        - createdAt
     Product:
       type: object
       properties:
