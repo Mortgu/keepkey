@@ -12,6 +12,7 @@ import {
 import { OfferPipelineContext } from "./context.js";
 import { OfferPosition, TaskStatus } from "@prisma/client";
 import { PipelineStage } from "../pipeline.js";
+import { uploadToNextCloud } from "../../lib/nextcloud.js";
 
 const loadOfferData: PipelineStage<OfferPipelineContext> = {
   name: "fetch",
@@ -82,6 +83,8 @@ const write: PipelineStage<OfferPipelineContext> = {
       fs.writeFile(docxPath, context.docxBuffer!),
       fs.writeFile(pdfPath, context.pdfBuffer!),
     ]);
+
+    uploadToNextCloud(`PDF/${context.displayName}.pdf`, context.pdfBuffer)
   },
 };
 

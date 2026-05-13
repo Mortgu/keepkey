@@ -44,7 +44,7 @@ export default function ProductSectionItem({ offerProduct, offerContract, setOff
                 </div>
 
                 <div className="flex gap-1">
-                    <Button type="button" size="xs" variant="link" icon={<DollarSign className="size-3" />}>
+                    <Button type="button" size="xs" variant="link">
                         {formatEur(offerProduct.total_cents)}
                     </Button>
 
@@ -58,12 +58,14 @@ export default function ProductSectionItem({ offerProduct, offerContract, setOff
                 </div>
             </div>
 
-            {edit && (
-                <OfferProductForm currentProduct={offerProduct} onSave={(data) => {
-                    onUpdate(data);
-                    setEdit(false);
-                }} onCancel={() => setEdit(false)} />
-            )}
-        </div>
+            {
+                edit && (
+                    <OfferProductForm currentProduct={offerProduct} onSave={(data) => {
+                        onUpdate(data);
+                        setEdit(false);
+                    }} onCancel={() => setEdit(false)} />
+                )
+            }
+        </div >
     )
 }

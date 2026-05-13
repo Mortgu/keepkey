@@ -4,14 +4,18 @@ import * as React from "react";
 import { tv } from "tailwind-variants";
 
 const itemStyles = tv({
-  base: "mx-1.5 flex items-center gap-2.5 rounded-[5px] px-3.5 py-1.5 text-[15px] font-light text-(--text-inv) transition-colors hover:bg-(--fg-3) hover:text-(--text-inv)",
+  base: [
+    "flex items-center rounded-md text-sm font-light text-(--text-inv)",
+    "mx-1.5 px-3.5 py-1.5 gap-2.5",
+    "transition-colors hover:bg-(--fg-2) hover:text-(--text-inv)",
+  ],
   variants: {
     indent: {
       true: "py-1.5 pl-[38px] pr-3.5",
       false: "",
     },
     isActive: {
-      true: "bg-(--fg-2)  text-(--text-inv) hover:bg-(--fg-3) hover:text-(--text-inv)",
+      true: "bg-(--fg-2)  text-(--text-inv) hover:bg-(--fg-2) hover:text-(--text-inv)",
       false: "",
     },
   },

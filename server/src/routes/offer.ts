@@ -5,6 +5,7 @@ import {
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
+  getNextQuoteId,
   getOfferById,
   getOfferTaskById,
   getOfferTasks,
@@ -17,6 +18,8 @@ import { createOfferSchema } from "../schemas/index.js";
 const router = Router();
 
 router.get("/", getOffers);
+
+router.get('/next', getNextQuoteId);
 
 router.get("/:id", getOfferById);
 

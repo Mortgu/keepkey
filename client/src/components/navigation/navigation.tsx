@@ -9,11 +9,16 @@ import {
   Users,
   UserCircle2,
   Truck,
+  Cuboid,
+  DollarSign,
+  Paperclip,
+  ContrastIcon,
 } from "lucide-react";
 
 import { authClient } from "@/lib/auth-client.ts";
 import { NavGroup, NavLink } from "./nav-link";
 import { useMemo, useState, type ReactNode } from "react";
+import { Button } from "../button/button";
 
 const ICON_SIZE = 14;
 
@@ -28,10 +33,8 @@ function Section({ title, collapsible = false, children }: SectionProps) {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => collapsible && setCollapsed((v) => !v)}
-        className="flex select-none items-center justify-between px-3.5 pb-1 pt-2.5 text-[12px] font-semibold uppercase tracking-[0.08em] text-(--fg-3)"
+      <button type="button" onClick={() => collapsible && setCollapsed((v) => !v)}
+        className="flex select-none items-center justify-between px-3.5 pb-1 pt-3 text-[12px] font-normal uppercase tracking-[0.08em] text-(--fg-3)"
         style={{ cursor: collapsible ? "pointer" : "default" }}
       >
         <span>{title}</span>
@@ -82,14 +85,7 @@ function UserFooter() {
           {user?.email ?? ""}
         </div>
       </div>
-      <button
-        type="button"
-        title="Abmelden"
-        onClick={() => authClient.signOut()}
-        className="flex rounded p-1.5 text-(--fg-3) transition-colors hover:bg-(--subtle-50) hover:text-(--destructive)"
-      >
-        <LogOut size={ICON_SIZE} />
-      </button>
+      <Button variant="primary" size="sm" onClick={() => authClient.signOut()} icon={<LogOut size={ICON_SIZE} />} iconOnly className="text-white" />
     </div>
   );
 }
@@ -109,21 +105,21 @@ export function Navigation() {
           <NavLink to="/" icon={<LayoutGrid size={ICON_SIZE} />} label="Dashboard" />
         </Section>
 
-        <SectionDivider />
         <Section title="Katalog" collapsible>
 
+          {/*
           <NavGroup label="Produkte" defaultOpen icon={<Package size={ICON_SIZE} />}>
-            <NavLink to="/products" indent label="Alle Produkte" />
-            <NavLink to="/products/pricing" indent label="Preise" />
-            <NavLink to="/products/flatrates" indent label="Flatrates" />
-          </NavGroup>
+          </NavGroup>*/}
+
+          <NavLink to="/products" label="Produkte" icon={<Package size={ICON_SIZE} />} />
+          <NavLink to="/products/pricing" label="Preise" icon={<DollarSign size={ICON_SIZE} />} />
+          <NavLink to="/products/flatrates" label="Pauschalen" icon={<DollarSign size={ICON_SIZE} />} />
 
           <NavLink to="/suppliers" label="Lieferanten" icon={<Truck size={ICON_SIZE} />} />
           <NavLink to="/contracts" label="Verträge" icon={<Users size={ICON_SIZE} />} />
 
         </Section>
 
-        <SectionDivider />
         <Section title="Vertrieb" collapsible>
           <NavLink
             to="/customers"
@@ -141,8 +137,6 @@ export function Navigation() {
             label="Bestellungen"
           />
         </Section>
-
-        <SectionDivider />
         <Section title="Verwaltung" collapsible>
           <NavLink
             to="/employees"

@@ -12,6 +12,7 @@ import {
 } from "@prisma/client";
 import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
+import { getLatestQuoteId } from "../lib/nextcloud.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const { search, companyIds, contactPersonIds, sort } = request.query;
@@ -98,6 +99,11 @@ export const getOfferTasks = async (request: Request, response: Response) => {
 
   return response.status(200).json(job);
 };
+
+export const getNextQuoteId = async (request: Request, response: Response) => {
+  const quoteId = await getLatestQuoteId();
+  return response.status(200).json(quoteId + 1)
+}
 
 export const getOfferTaskById = async (request: Request, response: Response) => {
   const { id, jobId } = request.params;
@@ -366,6 +372,7 @@ export const deleteOffer = async (request: Request, response: Response) => {
   } catch (exception: any) {
     return response.status(500).json({
       message: "Something went wrong trying to delete offer!",
+      exception,
       success: false,
     });
   }

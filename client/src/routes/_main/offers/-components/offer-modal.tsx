@@ -32,6 +32,8 @@ import type {
 
 import { formatEur } from "@/utils/utils";
 import ProductModalSection from "./modal-items/product-section";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 
 interface OfferModalProps {
   open: boolean;
@@ -53,6 +55,41 @@ export const offerSchema = z.object({
 });
 
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
+  const isEdit = currentOffer !== undefined;
+
+  const { data: nextQuoteId, isPending: isNextQuoteIdPending } = useQuery({
+    queryKey: ['nextQuoteId'],
+    queryFn: async () => api<number>('/api/offers/next', { method: 'GET' }),
+    enabled: !isEdit,
+  });
+
+  if (!isEdit && isNextQuoteIdPending) {
+    return (
+      <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog.Content>
+          <div className="flex items-center justify-center py-8">
+            <Loader className="size-5 animate-spin" />
+          </div>
+        </ModalDialog.Content>
+      </ModalDialog>
+    );
+  }
+
+  return (
+    <OfferModalForm
+      open={open}
+      cancelFn={cancelFn}
+      currentOffer={currentOffer}
+      latestQuoteId={nextQuoteId}
+    />
+  );
+}
+
+interface OfferModalFormProps extends OfferModalProps {
+  latestQuoteId: number | undefined;
+}
+
+function OfferModalForm({ open, cancelFn, currentOffer, latestQuoteId: nextQuoteId }: OfferModalFormProps) {
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();
@@ -79,12 +116,15 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
 
   const { createOffer, errorCreatingOffer, updateOffer } = useOfferHook();
 
+  const initialCustomerId = currentOffer?.customerId ?? customers[0]?.id ?? '';
+  const initialCustomer = customers.find((c: Customer) => c.id === initialCustomerId);
+
   const offerForm = useForm({
     defaultValues: {
-      customerId: currentOffer?.customerId ?? customers[0]?.id ?? '',
-      contactPersonId: currentOffer?.contactPersonId ?? customers[0]?.contactPersons[0]?.id ?? '',
+      customerId: initialCustomerId,
+      contactPersonId: currentOffer?.contactPersonId ?? initialCustomer?.contactPersons[0]?.id ?? '',
       userId: currentOffer?.userId ?? users[0]?.id ?? '',
-      quoteId: currentOffer?.quoteId ?? '',
+      quoteId: currentOffer?.quoteId ?? (nextQuoteId != null ? String(nextQuoteId) : ''),
 
       supplierId: currentOffer?.supplierId ?? null, //suppliers[0]?.id
       paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
@@ -138,7 +178,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             <offerForm.Field name="customerId" children={(field) => (
               <div className="flex-1">
                 <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  value={field.state.value as string} onChange={(e) => field.handleChange(e.target.value)} >
+                  value={field.state.value as string} onChange={(e) => {
+                    const newCustomerId = e.target.value;
+                    field.handleChange(newCustomerId);
+                    const newCustomer = customers.find((c: Customer) => c.id === newCustomerId);
+                    offerForm.setFieldValue('contactPersonId', newCustomer?.contactPersons[0]?.id ?? '');
+                  }} >
                   {customers?.map((customer: Customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.companyName}
@@ -205,9 +250,9 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             {/* Lieferant / Supplier */}
             <offerForm.Field name="supplierId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
-                <Select label="Lieferant" value={field.state.value as string}
+                <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  onChange={(e) => field.handleChange(e.target.value)}>
+                  onChange={(e) => field.handleChange(e.target.value || null)}>
                   <option value="">None</option>
                   {suppliers?.map((supplier: Supplier) => (
                     <option key={supplier.id} value={supplier.id}>

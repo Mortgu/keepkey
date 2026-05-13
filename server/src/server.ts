@@ -17,6 +17,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
+import { getLatestQuoteId } from "./lib/nextcloud.js";
 
 const options = {
   definition: {
@@ -55,8 +56,6 @@ app.get('/swagger.json', (request: Request, response: Response) => {
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
-
-//manageNextcloud();
 
 app.use("/api", router);
 

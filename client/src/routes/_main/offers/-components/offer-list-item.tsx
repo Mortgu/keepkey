@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import { Pen, Trash } from "lucide-react";
 
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import OfferModal from "./offer-modal";
 import { DocumentItem } from "./offer-items";
 
 
@@ -13,11 +12,11 @@ import type { Document, Offer, OfferFlatRate, OfferPosition } from "@/types";
 
 type OfferListItemProps = {
   offer: Offer;
+  onEdit: (offer: Offer) => void;
 };
 
-export default function OfferListItem({ offer }: OfferListItemProps) {
+export default function OfferListItem({ offer, onEdit }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
-  const [edit, setEdit] = useState<boolean>(false);
   const { deleteOffer } = useOfferHook();
 
   const handleDeleteOffer = () => {
@@ -169,7 +168,7 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
 
         <div className="flex items-center justify-end px-2 border-t border-(--border)">
 
-          <Button size="xs" variant="link" onClick={() => setEdit(true)}
+          <Button size="xs" variant="link" onClick={() => onEdit(offer)}
             icon={<Pen className="size-3" />} iconOnly />
 
           <Button size="xs" variant="link" onClick={handleDeleteOffer}
@@ -177,13 +176,6 @@ export default function OfferListItem({ offer }: OfferListItemProps) {
 
         </div>
       </div>
-
-      <OfferModal
-        key={offer.id}
-        open={edit}
-        cancelFn={() => setEdit(false)}
-        currentOffer={offer}
-      />
     </React.Fragment>
   );
 }

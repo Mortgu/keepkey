@@ -1,7 +1,7 @@
 {
   "/Users/oskar/Programming/keepit/server/src/server.ts": {
-    "mtime": 1778152088.4328485,
-    "hash": "6ddd703ecef80d2e2fc8fe150c02c85c"
+    "mtime": 1778596912.2368052,
+    "hash": "5ad95a6ed8214957f6dfaa4475964a36"
   },
   "/Users/oskar/Programming/keepit/server/src/config/config.ts": {
     "mtime": 1777709493.4633405,
@@ -18,6 +18,14 @@
   "/Users/oskar/Programming/keepit/server/src/middlewares/validate.ts": {
     "mtime": 1778495881.1286688,
     "hash": "dc9cdd6f8c00554d17ed56d41279f693"
+  },
+  "/Users/oskar/Programming/keepit/server/src/middlewares/morgan.ts": {
+    "mtime": 1778597620.1921992,
+    "hash": "467e3398d8e12fa5e87b3adc6e979c51"
+  },
+  "/Users/oskar/Programming/keepit/server/src/middlewares/logger.ts": {
+    "mtime": 1778597506.58039,
+    "hash": "0e7e77d37a9f4e5f3b2a69f045585cd2"
   },
   "/Users/oskar/Programming/keepit/server/src/middlewares/auth.ts": {
     "mtime": 1777709450.4806175,
@@ -176,8 +184,8 @@
     "hash": "97ddf27141c33b4a235c093222c52352"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/contact-person-controller.ts": {
-    "mtime": 1778173796.3865325,
-    "hash": "a6c02404e6f29a649956dd702bfd60fd"
+    "mtime": 1778597014.2037199,
+    "hash": "6322f8c22e4ea1d912d386cd7b367f51"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/customer-controller.ts": {
     "mtime": 1778488288.7205577,

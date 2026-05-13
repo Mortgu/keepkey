@@ -4,7 +4,7 @@ import OfferModal from "./offer-modal";
 import { useCustomerHook, useOfferHook } from "@/hooks";
 import OfferListItem from "./offer-list-item";
 
-import type { ContactPerson, Customer } from "@/types";
+import type { ContactPerson, Customer, Offer } from "@/types";
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
@@ -15,7 +15,7 @@ const sort_options = [
 ];
 
 export default function OfferList() {
-  const [isOpen, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Offer | null | undefined>(undefined);
 
   const [searchInput, setSearchInput] = useState("");
   const [sort, setSort] = useState(sort_options[0].value);
@@ -89,7 +89,7 @@ export default function OfferList() {
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={() => setOpen(true)} size="sm">
+          <Button onClick={() => setEditing(null)} size="sm">
             Erstellen <Plus className="size-4" />
           </Button>
         </div>
@@ -127,11 +127,18 @@ export default function OfferList() {
 
       <div className="grid gap-2">
         {offers.map((offer) => (
-          <OfferListItem key={offer.id} offer={offer} />
+          <OfferListItem key={offer.id} offer={offer} onEdit={setEditing} />
         ))}
       </div>
 
-      <OfferModal open={isOpen} cancelFn={() => setOpen(false)} />
+      {editing !== undefined && (
+        <OfferModal
+          key={editing?.id ?? 'create'}
+          open={true}
+          cancelFn={() => setEditing(undefined)}
+          currentOffer={editing ?? undefined}
+        />
+      )}
     </div>
   );
 }
