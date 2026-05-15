@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import logger from "../middlewares/logger.js";
 
 export const getAllCustomers = async (request: Request, response: Response) => {
   const customers = await prisma.customer.findMany({
@@ -155,13 +156,20 @@ export const updateCustomerById = async (
 export const deleteCustomer = async (request: Request, response: Response) => {
   const { id } = request.params;
 
-  await prisma.customer.delete({
-    where: { id: id as string },
-  });
+  try {
+    await prisma.customer.delete({
+      where: { id: id as string },
+    });
 
-  return response.status(200).json({
-    message: "Successfully deleted customer!"
-  });
+    return response.status(200).json({
+      message: "Successfully deleted customer!"
+    });
+  } catch (exception: any) {
+    logger.error(exception.message);
+    return response.status(500).json({
+      message: 'Somthing went wrong trying to delete customer!', exception: exception.message,
+    })
+  }
 };
 
 export const updateContact = async (request: Request, response: Response) => {
@@ -189,11 +197,18 @@ export const updateContact = async (request: Request, response: Response) => {
 export const deleteContactById = async (request: Request, response: Response) => {
   const { cid } = request.params;
 
-  await prisma.contactPerson.delete({
-    where: { id: cid as string }
-  });
+  try {
+    await prisma.contactPerson.delete({
+      where: { id: cid as string }
+    });
 
-  return response.status(200).json({
-    message: 'Successfully deleted customer contact.'
-  });
+    return response.status(200).json({
+      message: 'Successfully deleted customer contact.'
+    });
+  } catch (exception: any) {
+    logger.error(exception);
+    return response.status(500).json({
+      message: 'Something went wrong trying to delete contact!'
+    })
+  }
 }

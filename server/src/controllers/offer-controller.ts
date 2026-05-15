@@ -13,6 +13,7 @@ import {
 import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
 import { getLatestQuoteId, reserveQuoteIdInNextCloud } from "../lib/nextcloud.js";
+import logger from "../middlewares/logger.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const { search, companyIds, contactPersonIds, sort } = request.query;
@@ -116,8 +117,10 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
 
   try {
     reserveQuoteIdInNextCloud(quoteId);
+    next()
   } catch (exception: any) {
-    return next(exception);
+    logger.error(exception);
+    next();
   }
 }
 

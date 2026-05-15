@@ -63,7 +63,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
     enabled: !isEdit,
   });
 
-  const { data: reserve, isPending: isReserving, error: errorReserving } = useQuery({
+  /*const { data: reserve, isPending: isReserving, error: errorReserving } = useQuery({
     queryKey: ['reserveId'],
     queryFn: async () => api<string | null>('/api/offers/reserve', {
       method: 'POST',
@@ -71,9 +71,9 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
       body: JSON.stringify({ quoteId: nextQuoteId }),
     }),
     enabled: !isEdit,
-  })
+  })*/
 
-  if (!isEdit && (isNextQuoteIdPending || isReserving)) {
+  if (!isEdit && (isNextQuoteIdPending)) {
     return (
       <ModalDialog open={open} cancelFn={cancelFn}>
         <ModalDialog.Header>
@@ -86,20 +86,6 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
         </ModalDialog.Content>
       </ModalDialog>
     );
-  }
-
-  if (!isEdit && errorReserving) {
-    return (
-      <ModalDialog open={open} cancelFn={cancelFn}>
-        <ModalDialog.Header>
-          <h1 className="text-lg">Neues Angebot erstellen</h1>
-        </ModalDialog.Header>
-        <ModalDialog.Content>
-          <p className="text-(--destructive)">{errorReserving.message}</p>
-          <p className="text-(--destructive)">{errorReserving.name}</p>
-        </ModalDialog.Content>
-      </ModalDialog>
-    )
   }
 
 

@@ -51,33 +51,7 @@ export async function uploadToNextCloud(
 }
 
 export async function reserveQuoteIdInNextCloud(quoteId: string): Promise<void> {
-  const path = `${env.NEXTCLOUD_OFFER_PATH}/${quoteId}.reserved`;
 
-  try {
-
-
-    const created = await getClient().putFileContents(path, Buffer.alloc(0), {
-      overwrite: false,
-    });
-
-    if (!created) {
-      throw new QuoteIdAlreadyReservedError(quoteId);
-    }
-
-    logger.info(`Reserved quoteId ${quoteId} in NextCloud`);
-  } catch (error: any) {
-    if (error instanceof QuoteIdAlreadyReservedError) throw error;
-    const status = error?.status ?? error?.response?.status;
-    if (status === 412 || status === 409) {
-      throw new QuoteIdAlreadyReservedError(quoteId);
-    }
-    logger.error(`NextCloud reservation failed for ${quoteId}: ${error?.message ?? error}`);
-    throw new NextCloudError(
-      `Reservation failed for ${quoteId}: ${error?.message ?? error}`,
-      status,
-      error,
-    );
-  }
 }
 
 export async function getLatestQuoteId(): Promise<number> {
