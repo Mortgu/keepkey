@@ -11,29 +11,41 @@ import {
 } from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
 import { OfferPosition, TaskStatus } from "@prisma/client";
-import { PipelineStage } from "../pipeline.js";
+import { PipelineStage, PipelineStageError } from "../pipeline.js";
 import { uploadToNextCloud } from "../../lib/nextcloud.js";
+import logger from "../../middlewares/logger.js";
 
 const loadOfferData: PipelineStage<OfferPipelineContext> = {
   name: "fetch",
   status: TaskStatus.RUNNING,
   run: async (context) => {
-    context.fetchedData = await fetchOfferData(context.offerId);
+    try {
+      context.fetchedData = await fetchOfferData(context.offerId);
+    } catch (exception: any) {
+      throw new PipelineStageError("Failed to fetch offer data!", 500, exception.message)
+    }
   },
 };
 
 const preprocess: PipelineStage<OfferPipelineContext> = {
   name: "preprocess",
   run: async (context) => {
-    context.formatedData = await formatFetchedData(context.fetchedData);
+    try {
+      context.formatedData = await formatFetchedData(context.fetchedData);
+    } catch (exception: any) {
+      throw new PipelineStageError("Preprocess step in pipeline failed", 500, exception.message);
+    }
   },
 };
 
 const postprocess: PipelineStage<OfferPipelineContext> = {
   name: "postprocess",
   run: async (context) => {
-    console.dir(context, { depth: null });
-    context.formatedData = await postprocessing(context.formatedData);
+    try {
+      context.formatedData = await postprocessing(context.formatedData);
+    } catch (exception: any) {
+      throw new PipelineStageError("Postprocess step in pipeline failed", 500, exception.message);
+    }
   },
 };
 
@@ -87,6 +99,11 @@ const write: PipelineStage<OfferPipelineContext> = {
     uploadToNextCloud(`PDF/${context.displayName}.pdf`, context.pdfBuffer)
   },
 };
+
+const upload: PipelineStage<OfferPipelineContext> = {
+  name: 'upload',
+  run: async (context) => { }
+}
 
 export const offerStages: PipelineStage<OfferPipelineContext>[] = [
   loadOfferData,

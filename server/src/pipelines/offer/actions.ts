@@ -10,6 +10,7 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
 import { convert as libconvert } from "libreoffice-convert";
+import { PipelineStageError } from "../pipeline.js";
 
 export async function fetchOfferData(offerId: string) {
   const [offer, contracts] = await Promise.all([

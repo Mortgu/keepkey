@@ -1,9 +1,12 @@
 import { api } from "@/lib/api-client";
 
-import type {
-  Customer,
-  CreateCustomerInput,
-  UpdateCustomerInput,
+import {
+  type Customer,
+  type CreateCustomerInput,
+  type UpdateCustomerInput,
+  type UpdateContactPersonInput,
+  type ContactPerson,
+  type CreateContactPersonInput,
 } from "@/types";
 
 export const getAllCustomersAction = () =>
@@ -19,12 +22,23 @@ export const createCustomerAction = (body: CreateCustomerInput) =>
     body: JSON.stringify(body),
   });
 
-export const updateCustomerByIdAction = (
-  id: string,
-  body: UpdateCustomerInput,
-) =>
+export const createContactAction = (body: CreateContactPersonInput) =>
+  api<ContactPerson>("/api/customers/contacts", {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  })
+
+export const updateCustomerByIdAction = (id: string, body: UpdateCustomerInput) =>
   api<Customer>(`/api/customers/${id}`, {
-    method: "POST",
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+export const updateContactAction = (id: string, body: UpdateContactPersonInput) =>
+  api<ContactPerson>(`/api/customers/contacts/${id}`, {
+    method: 'PATCH',
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
@@ -32,4 +46,9 @@ export const updateCustomerByIdAction = (
 export const deleteCustomerAction = (id: string) =>
   api<void>(`/api/customers/${id}`, {
     method: "DELETE",
+  });
+
+export const deleteContactAction = (id: string) =>
+  api<void>(`/api/customers/contacts/${id}`, {
+    method: 'DELETE',
   });

@@ -10,16 +10,19 @@ import {
   getOfferTaskById,
   getOfferTasks,
   getOffers,
+  reserveQuoteId,
   updateOffer,
 } from "../controllers/offer-controller.js";
 import { validate } from "../middlewares/validate.js";
-import { createOfferSchema } from "../schemas/index.js";
+import { createOfferSchema, reserveQuoteIdSchema } from "../schemas/index.js";
 
 const router = Router();
 
 router.get("/", getOffers);
 
 router.get('/next', getNextQuoteId);
+
+router.post('/reserve', validate(reserveQuoteIdSchema), reserveQuoteId)
 
 router.get("/:id", getOfferById);
 

@@ -5,28 +5,46 @@ import {
   createCustomer,
   updateCustomerById,
   deleteCustomer,
+  getAllCustomerContacts,
+  updateContact,
+  deleteContactById,
+  createContact,
 } from "../controllers/customer-controller.js";
 import { validate } from "../middlewares/validate.js";
 import {
+  createContactSchema,
   createCustomerSchema,
+  updateContactSchema,
   updateCustomerSchema,
 } from "../schemas/index.js";
 
 const router = Router();
 
-/* [GET] http://localhost:3000/api/customers */
+/* [GET] /api/customers */
 router.get("/", getAllCustomers);
 
-/* [GET] http://localhost:3000/api/customers/:id */
+/* [GET] /api/customers/:id */
 router.get("/:id", getCustomerById);
 
-/* [POST] http://localhost:3000/api/customers */
+/* [GET] /api/customers/:id/contacts */
+router.get('/:id/contacts', getAllCustomerContacts);
+
+/* [POST] /api/customers */
 router.post("/", validate(createCustomerSchema), createCustomer);
 
-/* [POST] http://localhost:3000/api/customers/:id */
-router.post("/:id", validate(updateCustomerSchema), updateCustomerById);
+/* [POST] /api/customers/contacts */
+router.post('/contacts', validate(createContactSchema), createContact);
 
-/* [DELETE] http://localhost:3000/api/customers/:id */
+/* [PATCH] /api/customers/:id */
+router.patch("/:id", validate(updateCustomerSchema), updateCustomerById);
+
+/* [PATCH] /api/customers/contacts/:cid */
+router.patch('/contacts/:cid', validate(updateContactSchema), updateContact);
+
+/* [DELETE] /api/customers/:id */
 router.delete("/:id", deleteCustomer);
+
+/* [DELETE] /api/customers/contacts/:cid */
+router.delete('/contacts/:cid', deleteContactById);
 
 export default router;

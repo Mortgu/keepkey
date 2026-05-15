@@ -13,11 +13,7 @@ export const useContractHook = () => {
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["contracts"] });
 
-  const {
-    data: contracts = [],
-    isPending,
-    error,
-  } = useQuery({
+  const { data: contracts = [], isPending, error } = useQuery({
     queryKey: ["contracts"],
     queryFn: getContractsAction,
   });

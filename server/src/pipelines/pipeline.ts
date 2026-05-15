@@ -1,5 +1,16 @@
 import { TaskStatus } from "@prisma/client";
 import { prisma } from "../lib/prisma.js";
+import logger from "../middlewares/logger.js";
+
+export class PipelineStageError extends Error {
+    constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
+        super(`[PipelineStageError] ${message}`);
+        super.cause = cause;
+        super.name = "PiplineStageError";
+
+        logger.error(message, cause);
+    }
+}
 
 export interface PipelineContext {
     taskId: string;
@@ -27,8 +38,13 @@ export async function runPipeline<T extends PipelineContext>(ctx: T, stages: Pip
             });
         }
 
-        console.log(`[pipeline] stage: ${stage.name}`);
-        await stage.run(ctx);
+        logger.info(`[pipeline] stage: ${stage.name}`);
+
+        try {
+            await stage.run(ctx);
+        } catch (PipelineStageError) {
+
+        }
     }
 
     return ctx;

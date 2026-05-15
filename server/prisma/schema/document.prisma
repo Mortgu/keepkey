@@ -42,6 +42,7 @@ enum TaskType {
   OFFER
   ORDER
   RENEWAL
+  RESERVATION
 }
 
 model Task {

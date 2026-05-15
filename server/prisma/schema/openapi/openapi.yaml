@@ -871,6 +871,7 @@ components:
         - OFFER
         - ORDER
         - RENEWAL
+        - RESERVATION
   responses: {}
   parameters: {}
   examples: {}

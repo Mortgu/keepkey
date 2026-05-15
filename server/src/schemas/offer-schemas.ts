@@ -29,3 +29,7 @@ export const createOfferSchema = z.object({
   positions: z.array(offerPositionSchema).min(1, "Füge mindestens ein Produkt hinzu!"),
   flatRates: z.array(offerFlatRateSchema).optional(),
 });
+
+export const reserveQuoteIdSchema = z.object({
+  quoteId: z.number().int(),
+});

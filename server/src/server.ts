@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import config from "./config/config.js";
 
 import startDocumentWorker from "./workers/document-worker.js";
+import startUploadWorker from "./workers/upload-worker.js";
 import path from "path";
 import env from "./lib/env.js";
 
@@ -66,9 +67,10 @@ app.use(errorHandler);
 
 // Start document generation worker
 const documentWorker = startDocumentWorker();
+const uploadWorker = startUploadWorker();
 
 const shutdown = async () => {
-  await documentWorker.close();
+  await Promise.all([documentWorker.close(), uploadWorker.close()]);
   process.exit(0);
 };
 process.on("SIGTERM", shutdown);

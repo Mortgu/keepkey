@@ -12,6 +12,25 @@ export const getAllCustomers = async (request: Request, response: Response) => {
   return response.status(200).json(customers);
 };
 
+export const getAllCustomerContacts = async (request: Request, response: Response) => {
+  const { id } = request.params;
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: id as string },
+    include: {
+      contactPersons: true
+    }
+  });
+
+  if (!customer) {
+    return response.status(404).json({
+      message: 'Customer not found!'
+    });
+  }
+
+  return response.status(200).json(customer.contactPersons);
+}
+
 export const getCustomerById = async (request: Request, response: Response) => {
   const id = request.params.id as string;
 
@@ -73,11 +92,17 @@ export const createCustomer = async (request: Request, response: Response) => {
       exception: exception.message,
     });
   }
-
-  return response
-    .status(200)
-    .json({ success: true, message: "Successfully created customer!" });
 };
+
+export const createContact = async (request: Request, response: Response) => {
+  const body = request.body;
+
+  const createdContact = await prisma.contactPerson.create({
+    data: { ...body }
+  });
+
+  return response.status(200).json(createdContact);
+}
 
 export const updateCustomerById = async (
   request: Request,
@@ -122,33 +147,53 @@ export const updateCustomerById = async (
     });
   }
 
-  return response
-    .status(200)
-    .json({ success: true, message: "Successfully updated customer!" });
+  return response.status(200).json({
+    message: "Successfully updated customer!"
+  });
 };
 
 export const deleteCustomer = async (request: Request, response: Response) => {
   const { id } = request.params;
 
-  if (!id) {
-    return response
-      .status(400)
-      .json({ success: false, message: "Missing customer id!" });
-  }
+  await prisma.customer.delete({
+    where: { id: id as string },
+  });
 
-  try {
-    await prisma.customer.delete({
-      where: { id: id as string },
-    });
-
-    return response
-      .status(200)
-      .json({ success: true, message: "Successfully deleted customer!" });
-  } catch (exception: any) {
-    return response.status(500).json({
-      success: false,
-      message: "Failed to delete customer!",
-      exception: exception.message,
-    });
-  }
+  return response.status(200).json({
+    message: "Successfully deleted customer!"
+  });
 };
+
+export const updateContact = async (request: Request, response: Response) => {
+  const { cid } = request.params;
+  const body = request.body;
+
+  console.log(body)
+
+  const contact = await prisma.contactPerson.update({
+    where: { id: cid as string },
+    data: {
+      ...body
+    }
+  });
+
+  if (!contact) {
+    return response.status(404).json({
+      message: 'Contact not found! Invalid id!'
+    });
+  }
+
+  return response.status(200).json(contact);
+}
+
+export const deleteContactById = async (request: Request, response: Response) => {
+  const { cid } = request.params;
+
+  await prisma.contactPerson.delete({
+    where: { id: cid as string }
+  });
+
+  return response.status(200).json({
+    message: 'Successfully deleted customer contact.'
+  });
+}

@@ -63,9 +63,22 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
     enabled: !isEdit,
   });
 
-  if (!isEdit && isNextQuoteIdPending) {
+  const { data: reserve, isPending: isReserving, error: errorReserving } = useQuery({
+    queryKey: ['reserveId'],
+    queryFn: async () => api<string | null>('/api/offers/reserve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quoteId: nextQuoteId }),
+    }),
+    enabled: !isEdit,
+  })
+
+  if (!isEdit && (isNextQuoteIdPending || isReserving)) {
     return (
       <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog.Header>
+          <h1 className="text-lg">Neues Angebot erstellen</h1>
+        </ModalDialog.Header>
         <ModalDialog.Content>
           <div className="flex items-center justify-center py-8">
             <Loader className="size-5 animate-spin" />
@@ -75,21 +88,36 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
     );
   }
 
+  if (!isEdit && errorReserving) {
+    return (
+      <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog.Header>
+          <h1 className="text-lg">Neues Angebot erstellen</h1>
+        </ModalDialog.Header>
+        <ModalDialog.Content>
+          <p className="text-(--destructive)">{errorReserving.message}</p>
+          <p className="text-(--destructive)">{errorReserving.name}</p>
+        </ModalDialog.Content>
+      </ModalDialog>
+    )
+  }
+
+
   return (
     <OfferModalForm
       open={open}
       cancelFn={cancelFn}
       currentOffer={currentOffer}
-      latestQuoteId={nextQuoteId}
+      nextQuoteId={nextQuoteId}
     />
   );
 }
 
 interface OfferModalFormProps extends OfferModalProps {
-  latestQuoteId: number | undefined;
+  nextQuoteId: number | undefined;
 }
 
-function OfferModalForm({ open, cancelFn, currentOffer, latestQuoteId: nextQuoteId }: OfferModalFormProps) {
+function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModalFormProps) {
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();
@@ -169,7 +197,7 @@ function OfferModalForm({ open, cancelFn, currentOffer, latestQuoteId: nextQuote
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>
       <ModalDialog.Header>
-        <h1 className="text-lg">Neues Angebot erstellen</h1>
+        <h1 className="text-lg">Angebot bearbeiten</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
         <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">

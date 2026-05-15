@@ -3,7 +3,7 @@ import fs from "fs";
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
-import { documentQueue, documentQueueKey } from "../lib/queues.js";
+import { documentQueue, documentQueueKey, uploadQueue, uploadQueueKey } from "../lib/queues.js";
 import {
   OfferFlatRate,
   OfferPosition,
@@ -12,7 +12,7 @@ import {
 } from "@prisma/client";
 import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
-import { getLatestQuoteId } from "../lib/nextcloud.js";
+import { getLatestQuoteId, reserveQuoteIdInNextCloud } from "../lib/nextcloud.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const { search, companyIds, contactPersonIds, sort } = request.query;
@@ -100,9 +100,25 @@ export const getOfferTasks = async (request: Request, response: Response) => {
   return response.status(200).json(job);
 };
 
-export const getNextQuoteId = async (request: Request, response: Response) => {
-  const quoteId = await getLatestQuoteId();
-  return response.status(200).json(quoteId + 1)
+export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
+  try {
+    const quoteId = await getLatestQuoteId();
+    return response.status(200).json(quoteId + 1);
+  } catch (exception: any) {
+    return next(exception);
+  }
+};
+
+export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
+  const { quoteId } = request.body;
+
+  console.log(quoteId)
+
+  try {
+    reserveQuoteIdInNextCloud(quoteId);
+  } catch (exception: any) {
+    return next(exception);
+  }
 }
 
 export const getOfferTaskById = async (request: Request, response: Response) => {
@@ -333,6 +349,36 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
       return offer;
     });
+
+    const createdOffer = request.body.offer;
+    try {
+      const reservationTask = await prisma.task.create({
+        data: {
+          offerId: createdOffer.id,
+          type: TaskType.RESERVATION,
+          status: TaskStatus.PENDING,
+        },
+      });
+      const reservationJob = await uploadQueue.add(
+        uploadQueueKey,
+        {
+          type: "QUOTE_RESERVATION",
+          taskId: reservationTask.id,
+          offerId: createdOffer.id,
+          quoteId: createdOffer.quoteId,
+        },
+        { attempts: 5, backoff: { type: "exponential", delay: 2000 } },
+      );
+      await prisma.task.update({
+        where: { id: reservationTask.id },
+        data: { jobId: reservationJob.id },
+      });
+    } catch (queueErr: any) {
+      // Reservation enqueue failure must not break offer creation;
+      // surface via task status if possible.
+      console.error("Failed to enqueue quoteId reservation:", queueErr?.message);
+    }
+
     next();
   } catch (exception: any) {
     return response.status(408).json({

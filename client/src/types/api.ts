@@ -346,7 +346,7 @@ export interface components {
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */
-        TaskType: "OFFER" | "ORDER" | "RENEWAL";
+        TaskType: "OFFER" | "ORDER" | "RENEWAL" | "RESERVATION";
     };
     responses: never;
     parameters: never;

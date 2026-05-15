@@ -2,53 +2,110 @@ import { createClient, type WebDAVClient } from "webdav";
 import env from "./env.js";
 import logger from "../middlewares/logger.js";
 
+export class NextCloudError extends Error {
+  constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
+    super(message);
+    this.name = "NextCloudError";
+  }
+}
+
+export class QuoteIdAlreadyReservedError extends NextCloudError {
+  constructor(public readonly quoteId: string) {
+    super(`QuoteId ${quoteId} is already reserved in NextCloud`, 412);
+    this.name = "QuoteIdAlreadyReservedError";
+  }
+}
+
 let client: WebDAVClient | null = null;
 
-export function getNextCloudClient(): WebDAVClient {
+function getClient(): WebDAVClient {
   if (!client) {
-    client = createClient(env.NEXTCLOUD_URL, {
-      username: env.NEXTCLOUD_USER,
-      password: env.NEXTCLOUD_PASSWORD,
-    });
+    client = createClient(
+      `${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`,
+      { username: env.NEXTCLOUD_USER, password: env.NEXTCLOUD_PASSWORD },
+    );
   }
   return client;
 }
 
-export async function uploadToNextCloud(fileName: string, document: Buffer<ArrayBufferLike> | undefined) {
+export async function uploadToNextCloud(
+  fileName: string,
+  document: Buffer<ArrayBufferLike> | undefined,
+) {
   if (document === undefined) return;
 
-  const client = createClient(`${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`,
-    { username: env.NEXTCLOUD_USER, password: env.NEXTCLOUD_PASSWORD },
-  );
+  try {
+    await getClient().putFileContents(
+      `${env.NEXTCLOUD_OFFER_PATH}/${fileName}`,
+      document,
+    );
+    logger.info(`NextCloud upload successful: ${fileName}`);
+  } catch (error: any) {
+    logger.error(`NextCloud upload failed for ${fileName}: ${error?.message ?? error}`);
+    throw new NextCloudError(
+      `Upload failed for ${fileName}: ${error?.message ?? error}`,
+      error?.status,
+      error,
+    );
+  }
+}
+
+export async function reserveQuoteIdInNextCloud(quoteId: string): Promise<void> {
+  const path = `${env.NEXTCLOUD_OFFER_PATH}/${quoteId}.reserved`;
 
   try {
-    // 1. Dateinamen lesen
-    const directoryItems = await client.getDirectoryContents(env.NEXTCLOUD_OFFER_PATH);
-    console.log("Dateien im Ordner:");
-    directoryItems.forEach((item) => console.log(item.filename));
 
-    // 2. Datei hochladen
-    await client.putFileContents(env.NEXTCLOUD_OFFER_PATH + "/" + fileName, document);
-    console.log("Upload erfolgreich.");
+
+    const created = await getClient().putFileContents(path, Buffer.alloc(0), {
+      overwrite: false,
+    });
+
+    if (!created) {
+      throw new QuoteIdAlreadyReservedError(quoteId);
+    }
+
+    logger.info(`Reserved quoteId ${quoteId} in NextCloud`);
   } catch (error: any) {
-    console.error("Fehler bei der Kommunikation:", error.status);
+    if (error instanceof QuoteIdAlreadyReservedError) throw error;
+    const status = error?.status ?? error?.response?.status;
+    if (status === 412 || status === 409) {
+      throw new QuoteIdAlreadyReservedError(quoteId);
+    }
+    logger.error(`NextCloud reservation failed for ${quoteId}: ${error?.message ?? error}`);
+    throw new NextCloudError(
+      `Reservation failed for ${quoteId}: ${error?.message ?? error}`,
+      status,
+      error,
+    );
   }
 }
 
 export async function getLatestQuoteId(): Promise<number> {
-  const client = createClient(`${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`,
-    { username: env.NEXTCLOUD_USER, password: env.NEXTCLOUD_PASSWORD },
-  );
+  const c = getClient();
 
-  try {
-    const dirItems = await client.getDirectoryContents(env.NEXTCLOUD_OFFER_PATH + "/PDF").then((contents) => {
-      contents.sort((a, b) => b.basename.localeCompare(a.basename));
-      return contents;
-    });
+  const [pdfItems, reservedItems] = await Promise.all([
+    c.getDirectoryContents(`${env.NEXTCLOUD_OFFER_PATH}/PDF`).catch((e: any) => {
+      logger.error(`Failed to read PDF dir: ${e?.message ?? e}`);
+      throw new NextCloudError(`Failed to read PDF dir: ${e?.message ?? e}`, e?.status, e);
+    }),
+    c.getDirectoryContents(env.NEXTCLOUD_OFFER_PATH).catch((e: any) => {
+      logger.error(`Failed to read offer dir: ${e?.message ?? e}`);
+      throw new NextCloudError(`Failed to read offer dir: ${e?.message ?? e}`, e?.status, e);
+    }),
+  ]);
 
-    return parseInt(dirItems[0].basename.slice(0, 6));
-  } catch (exception: any) {
-    logger.error("Error trying to fetch latest quote nummber");
-    return 0;
+  const ids: number[] = [];
+
+  for (const item of Array.isArray(pdfItems) ? pdfItems : []) {
+    const n = parseInt(item.basename.slice(0, 6), 10);
+    if (!Number.isNaN(n)) ids.push(n);
   }
+
+  for (const item of Array.isArray(reservedItems) ? reservedItems : []) {
+    if (!item.basename.endsWith(".reserved")) continue;
+    const n = parseInt(item.basename.slice(0, 6), 10);
+    if (!Number.isNaN(n)) ids.push(n);
+  }
+
+  return ids.length > 0 ? Math.max(...ids) : 0;
 }

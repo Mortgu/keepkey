@@ -11,6 +11,6 @@ export type UpdateCustomerInput = Partial<CreateCustomerInput>;
 
 export type CreateContactPersonInput = Omit<
     ContactPerson,
-    "id" | "createdAt" | "updatedAt" | "customer" | "offers"
+    "id" | "createdAt" | "updatedAt" | "customer" | "offers" | "orders"
 >;
 export type UpdateContactPersonInput = Partial<CreateContactPersonInput>;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Pen, Trash } from "lucide-react";
+import { AlertTriangle, Loader, Pen, Trash } from "lucide-react";
 
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
@@ -10,6 +10,8 @@ import { useOfferHook } from "@/hooks";
 import { Button, Badge, Collapsable } from "@/components";
 import type { Document, Offer, OfferFlatRate, OfferPosition } from "@/types";
 
+type Task = Offer["tasks"][number];
+
 type OfferListItemProps = {
   offer: Offer;
   onEdit: (offer: Offer) => void;
@@ -18,6 +20,8 @@ type OfferListItemProps = {
 export default function OfferListItem({ offer, onEdit }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
   const { deleteOffer } = useOfferHook();
+
+  const reservationTask = tasks.find((t: Task) => t.type === "RESERVATION");
 
   const handleDeleteOffer = () => {
     if (confirm("Angebot löschen")) {
@@ -57,6 +61,19 @@ export default function OfferListItem({ offer, onEdit }: OfferListItemProps) {
               <div className="flex items-center gap-1 text-sm font-light">
                 <label className="text-(--text-secondary)">Angebots-Nr.</label>
                 <p className="text-(--text)">{offer.quoteId}</p>
+                {reservationTask && (reservationTask.status === "PENDING" || reservationTask.status === "RUNNING") && (
+                  <span className="flex items-center gap-1 text-(--text-secondary) text-xs ml-1" title="Reservierung in NextCloud läuft…">
+                    <Loader className="size-3 animate-spin" />
+                    Reservierung…
+                  </span>
+                )}
+                {reservationTask?.status === "FAILED" && (
+                  <span className="flex items-center gap-1 text-(--destructive) text-xs ml-1"
+                    title={reservationTask.error ?? "Unbekannter Fehler"}>
+                    <AlertTriangle className="size-3" />
+                    Reservierung fehlgeschlagen
+                  </span>
+                )}
               </div>
 
               {/* Created at */}
