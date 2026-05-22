@@ -1,10 +1,10 @@
 import type { Contract, Product } from "@/types";
-import type { OfferProductInput } from "../offer-product-form";
+import type { OfferProductInput } from "./offer-product-form";
 import { DollarSign, Loader, Pen, Trash, X } from "lucide-react";
 import { formatEur } from "@/utils/utils";
 import { Button } from "@/components";
 import { Fragment, useState } from "react";
-import OfferProductForm from "../offer-product-form";
+import OfferProductForm from "./offer-product-form";
 import { tv } from "tailwind-variants";
 
 type OfferProduct = Product & OfferProductInput;

@@ -3,19 +3,22 @@ import { formatDate } from "@/lib/format";
 
 import type { Offer } from "@/types";
 import { Button, Input, ModalDialog } from "@/components";
-import { ArrowRightIcon, Search } from "lucide-react";
+import { Search } from "lucide-react";
 
 interface OrderModalProps {
   open: boolean;
   cancelFn: () => void;
-  submitFn: () => void;
   currentOrder?: any | null;
 }
 
-export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: OrderModalProps) {
+export default function OrderModal({ open, cancelFn, currentOrder }: OrderModalProps) {
   const { offers } = useOfferHook();
   const { createOrder, errorCreatingOrder } = useOrderHook();
 
+  const handleCreateOrder = (offer: Offer) => {
+    createOrder({ offerId: offer.id });
+    cancelFn();
+  }
 
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>
@@ -33,9 +36,18 @@ export default function OrderModal({ open, cancelFn, submitFn, currentOrder }: O
 
           {offers.map((offer: Offer) => (
             <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
-              onClick={() => createOrder({ offerId: offer.id })}>
+              onClick={() => handleCreateOrder(offer)}>
               <div className="grid">
-                <p className="text-(--text) font-normal">{offer.quoteId}</p>
+                <div className="flex items-center gap-2">
+                  <p className="text-(--text) font-normal">
+                    {offer.customer.companyName}
+                  </p>
+                  -
+                  <p className="text-(--text) font-normal">
+                    {offer.quoteId}
+                  </p>
+                </div>
+
                 <p className="text-(--neutral-400) text-sm font-light">
                   {formatDate(offer.date)}
                 </p>

@@ -808,6 +808,20 @@ components:
         - table
         - total_cents
         - offerFlatRates
+    AppSetting:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - key
+        - value
+        - updatedAt
     Contract:
       type: object
       properties:

@@ -1,7 +1,7 @@
 import { Button, Checkbox } from "@/components";
 import { Plus } from "lucide-react";
 import { useState } from "react"
-import OfferProductForm, { type OfferProductInput } from "../offer-product-form";
+import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
 import { useContractHook, useProductHook } from "@/hooks";
 import { useMutation } from "@tanstack/react-query";
 import { getPrice } from "@/data/products";

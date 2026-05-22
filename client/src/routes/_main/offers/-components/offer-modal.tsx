@@ -4,8 +4,8 @@ import { useForm } from "@tanstack/react-form";
 
 import { Loader, Plus, Trash, X } from "lucide-react";
 
-import { type OfferProductInput } from "./offer-product-form";
-import OfferFlatRateForm from "./offer-flat-rate-form";
+import { type OfferProductInput } from "./modal-components/offer-product-form";
+import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
 import {
   useCustomerHook,
@@ -31,7 +31,7 @@ import type {
 } from "@/types";
 
 import { formatEur } from "@/utils/utils";
-import ProductModalSection from "./modal-items/product-section";
+import ProductModalSection from "./modal-components/product-section";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 

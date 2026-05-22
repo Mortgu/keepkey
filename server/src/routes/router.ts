@@ -14,6 +14,8 @@ import taskRouter from "./task-route.js";
 import contactPersonRouter from "./contact-persons.js";
 import tariffRouter from './tariff.js';
 import documentRouter from './documents.js';
+import nextCloudRouter from './nextcould-router.js';
+import settingsRouter from './settings-router.js';
 
 const router = Router();
 
@@ -54,6 +56,12 @@ router.use("/contact-persons", requireSession, contactPersonRouter);
 router.use("/tariffs", requireSession, tariffRouter);
 
 /* /api/documents */
-router.use('/documents', documentRouter)
+router.use('/documents', documentRouter);
+
+/* /api/nextcloud */
+router.use('/nextcloud', nextCloudRouter);
+
+/* /api/settings */
+router.use('/settings', settingsRouter);
 
 export default router;

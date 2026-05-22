@@ -12,7 +12,7 @@ import {
 import { OfferPipelineContext } from "./context.js";
 import { OfferPosition, TaskStatus } from "@prisma/client";
 import { PipelineStage, PipelineStageError } from "../pipeline.js";
-import { uploadToNextCloud } from "../../lib/nextcloud.js";
+import { uploadToNextCloud, getNextcloudPaths } from "../../lib/nextcloud.js";
 import logger from "../../middlewares/logger.js";
 
 const loadOfferData: PipelineStage<OfferPipelineContext> = {
@@ -96,7 +96,14 @@ const write: PipelineStage<OfferPipelineContext> = {
       fs.writeFile(pdfPath, context.pdfBuffer!),
     ]);
 
-    uploadToNextCloud(`PDF/${context.displayName}.pdf`, context.pdfBuffer)
+    getNextcloudPaths().then(({ pdfPath, docxPath }) =>
+      Promise.all([
+        uploadToNextCloud(`${pdfPath}/${context.displayName}.pdf`, context.pdfBuffer),
+        uploadToNextCloud(`${docxPath}/${context.displayName}.docx`, context.docxBuffer),
+      ])
+    ).catch((err) => {
+      logger.warn(`[offer-pipeline] Nextcloud upload skipped: ${err?.message ?? err}`);
+    });
   },
 };
 

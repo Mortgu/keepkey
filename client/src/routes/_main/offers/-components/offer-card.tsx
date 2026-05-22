@@ -3,7 +3,7 @@ import { AlertTriangle, Loader, Pen, Trash } from "lucide-react";
 
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { DocumentItem } from "./offer-items";
+import { DocumentItem } from "./card-components";
 
 
 import { useOfferHook } from "@/hooks";
@@ -17,7 +17,7 @@ type OfferListItemProps = {
   onEdit: (offer: Offer) => void;
 };
 
-export default function OfferListItem({ offer, onEdit }: OfferListItemProps) {
+export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
   const { deleteOffer } = useOfferHook();
 
@@ -35,19 +35,14 @@ export default function OfferListItem({ offer, onEdit }: OfferListItemProps) {
         <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
           <div className="grid gap-1">
             <div className="flex items-center gap-2">
-              <h1 className="text-md">
-                {offerPositions.map((i) => i.product.name).join(" & ")}
-              </h1>
+              <div className="flex items-center gap-2 text-md">
+                <a className="text-(--text) hover:cursor-pointer hover:underline">{offer.customer.companyName}</a>
+                -
+                <a>{offer.quoteId}</a>
+              </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
-              {/* Company */}
-              <div className="flex items-center gap-1 text-sm font-light">
-                <label className="text-(--text-secondary)">Firma:</label>
-                <p className="text-(--text) hover:cursor-pointer hover:underline">
-                  {offer.customer.companyName}
-                </p>
-              </div>
 
               {/* Contact person */}
               <div className="flex items-center gap-1 text-sm font-light">

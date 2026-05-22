@@ -9,7 +9,7 @@ type Props = {
   order: Order
 };
 
-export default function OrderListItems({ order }: Props) {
+export default function OrderCard({ order }: Props) {
   const { deleteOrder, errorCreatingOrder, errorDeletingOrder, isDeleting, isCreatingOrder } = useOrderHook();
 
   const [isOpen, setOpen] = useState<boolean>(false);

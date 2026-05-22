@@ -114,6 +114,14 @@ model FlatRate {
   @@map("flat_rate")
 }
 
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("app_setting")
+}
+
 model Contract {
   id String @id @default(uuid())
 

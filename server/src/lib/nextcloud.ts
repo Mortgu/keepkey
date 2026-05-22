@@ -1,6 +1,7 @@
 import { createClient, type WebDAVClient } from "webdav";
 import env from "./env.js";
 import logger from "../middlewares/logger.js";
+import { prisma } from "./prisma.js";
 
 export class NextCloudError extends Error {
   constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
@@ -52,6 +53,57 @@ export async function uploadToNextCloud(
 
 export async function reserveQuoteIdInNextCloud(quoteId: string): Promise<void> {
 
+}
+
+export async function getNextcloudPaths(): Promise<{ pdfPath: string; docxPath: string }> {
+  const [pdf, docx] = await Promise.all([
+    prisma.appSetting.findUnique({ where: { key: "nextcloud.pdfPath" } }),
+    prisma.appSetting.findUnique({ where: { key: "nextcloud.docxPath" } }),
+  ]);
+  return {
+    pdfPath: pdf?.value ?? env.NEXTCLOUD_OFFER_PATH,
+    docxPath: docx?.value ?? env.NEXTCLOUD_OFFER_PATH,
+  };
+}
+
+export async function saveNextcloudPaths(pdfPath: string, docxPath: string): Promise<void> {
+  await Promise.all([
+    prisma.appSetting.upsert({
+      where: { key: "nextcloud.pdfPath" },
+      update: { value: pdfPath },
+      create: { key: "nextcloud.pdfPath", value: pdfPath },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "nextcloud.docxPath" },
+      update: { value: docxPath },
+      create: { key: "nextcloud.docxPath", value: docxPath },
+    }),
+  ]);
+}
+
+export type NextcloudStatus = "connected" | "failed" | "auth_expired" | "not_configured";
+
+export async function checkNextcloudConnection(): Promise<{
+  status: NextcloudStatus;
+  detail?: string;
+}> {
+  if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
+    return { status: "not_configured" };
+  }
+  try {
+    const c = getClient();
+    await c.getDirectoryContents("/");
+    return {
+      status: "connected",
+      detail: `Verbunden als ${env.NEXTCLOUD_USER}`,
+    };
+  } catch (error: any) {
+    const status = error?.status ?? error?.response?.status;
+    if (status === 401 || status === 403) {
+      return { status: "auth_expired", detail: "Authentifizierung abgelaufen oder ungültig" };
+    }
+    return { status: "failed", detail: error?.message ?? "Verbindung fehlgeschlagen" };
+  }
 }
 
 export async function getLatestQuoteId(): Promise<number> {

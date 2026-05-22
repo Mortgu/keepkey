@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
 import { useCustomerHook, useOfferHook } from "@/hooks";
-import OfferListItem from "./offer-list-item";
+import OfferCard from "./offer-card";
 
 import type { ContactPerson, Customer, Offer } from "@/types";
 import { Button, FilterChip, SearchBar } from "@/components";
@@ -53,12 +53,9 @@ export default function OfferList() {
   };
 
   return (
-    <div className="grid gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">Angebote</h1>
-      </div>
-
+    <>
       <div className="flex justify-between items-center gap-4">
+        {/* Filters */}
         <div className="w-full flex items-center gap-4">
           <SortDropdown
             value={sort}
@@ -127,7 +124,7 @@ export default function OfferList() {
 
       <div className="grid gap-2">
         {offers.map((offer) => (
-          <OfferListItem key={offer.id} offer={offer} onEdit={setEditing} />
+          <OfferCard key={offer.id} offer={offer} onEdit={setEditing} />
         ))}
       </div>
 
@@ -139,6 +136,6 @@ export default function OfferList() {
           currentOffer={editing ?? undefined}
         />
       )}
-    </div>
+    </>
   );
 }
