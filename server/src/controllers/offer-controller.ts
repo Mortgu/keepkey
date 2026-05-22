@@ -427,6 +427,18 @@ export const deleteOffer = async (request: Request, response: Response) => {
   }
 };
 
+export const getOfferRevisions = async (request: Request, response: Response) => {
+  const { id } = request.params;
+
+  const revisions = await prisma.offerRevision.findMany({
+    where: { offerId: id as string },
+    orderBy: { version: 'desc' },
+    select: { id: true, version: true, changedBy: true, createdAt: true },
+  });
+
+  return response.status(200).json(revisions);
+};
+
 export const updateOffer = async (request: Request, response: Response, next: NextFunction) => {
   const oid = request.params.id as string;
   const data = request.body;
@@ -458,6 +470,20 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
         (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
       const net_amount = net_amount_positions + net_amount_flatrates;
 
+      const current = await tx.offer.findFirstOrThrow({
+        where: { id: oid },
+        include: { offerPositions: true, offerFlatRates: true },
+      });
+
+      await tx.offerRevision.create({
+        data: {
+          offerId: oid,
+          version: current.version,
+          changedBy: data.offer?.userId ?? null,
+          snapshot: current as any,
+        },
+      });
+
       const offer = await tx.offer.updateManyAndReturn({
         where: { id: oid as string },
         data: {
@@ -467,6 +493,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
           validUntil: toDate(validUntil),
           requestFrom: toDate(requestFrom),
           net_amount,
+          version: { increment: 1 },
         },
       });
 

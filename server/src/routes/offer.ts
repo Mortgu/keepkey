@@ -7,6 +7,7 @@ import {
   downloadOfferDocument,
   getNextQuoteId,
   getOfferById,
+  getOfferRevisions,
   getOfferTaskById,
   getOfferTasks,
   getOffers,
@@ -23,6 +24,8 @@ router.get("/", getOffers);
 router.get('/next', getNextQuoteId);
 
 router.post('/reserve', validate(reserveQuoteIdSchema), reserveQuoteId)
+
+router.get("/:id/revisions", getOfferRevisions);
 
 router.get("/:id", getOfferById);
 

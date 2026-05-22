@@ -29,10 +29,27 @@ model Offer {
 
     net_amount Int // Der reine Warenwert (netto) in cent
 
+    version   Int             @default(1)
+    revisions OfferRevision[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @default(now())
 
     @@map("offer")
+}
+
+model OfferRevision {
+    id      String @id @default(uuid())
+    offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+    offerId String
+
+    version   Int
+    snapshot  Json
+    changedBy String?
+
+    createdAt DateTime @default(now())
+
+    @@map("offer_revision")
 }
 
 model OfferPosition {
