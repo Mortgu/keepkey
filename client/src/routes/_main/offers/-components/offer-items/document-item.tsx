@@ -1,11 +1,12 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components";
+import { Button, Input } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { useOfferHook } from "@/hooks";
 import type { Document } from "@/types";
-import { File, Loader, Trash, TriangleAlert } from "lucide-react";
+import { Check, File, Loader, Pen, Trash, TriangleAlert } from "lucide-react";
+import { tv } from "tailwind-variants";
 
 const MAX_POLLS = 10;
 
@@ -13,9 +14,36 @@ type Props = {
     document: Document;
 }
 
+const styles = tv({
+    base: [
+        "flex items-center justify-between border border-(--border) py-2 px-2 rounded-md"
+    ],
+    variants: {
+        current: {
+            true: [
+                "border-(--primary-300)"
+            ],
+            false: [
+                "bg-white"
+            ]
+        }
+    }
+})
+
 export function DocumentItem({ document }: Props) {
     const queryClient = useQueryClient();
-    const { deleteDocument, isDeletingDocument } = useOfferHook();
+
+    const [isRenaming, setRenaming] = useState<boolean>(false);
+    const [newName, setNewName] = useState<string>("");
+    const { deleteDocument, isDeletingDocument, renameDocument, isRenamingDocument } = useOfferHook();
+
+    const handleRename = async () => {
+        if (!newName.trim()) return;
+        await renameDocument({ document_id: document.id, displayName: newName.trim() });
+        setRenaming(false);
+        setNewName("");
+    };
+
     const isGenerated = document.status === "GENERATED";
     const isFailed = document.status === "FAILED";
     const isPolling = !isGenerated && !isFailed;
@@ -36,10 +64,9 @@ export function DocumentItem({ document }: Props) {
         return () => clearInterval(interval);
     }, [isPolling, queryClient]);
 
-    const bg = document.isCurrent ? 'bg-(--primary-100)' : 'bg-white'
 
     return (
-        <div className={"flex items-center justify-between border border-(--border) py-2 px-2 rounded-md " + bg}>
+        <div className={styles({ current: document.isCurrent })}>
             <div className="flex items-center gap-3">
                 <div className="p-3 bg-(--subtle-50) rounded-full">
                     {isGenerated ? (
@@ -51,15 +78,36 @@ export function DocumentItem({ document }: Props) {
                     )}
                 </div>
                 <div className="flex flex-col justify-between">
-                    <h1 className="text-md">
-                        {document.displayName ?? `Version ${document.version}`}
-                    </h1>
-                    <div className="flex font-light text-sm gap-2 text-(--text-secondary)">
-                        <p>{formatDate(document.createdAt)}</p>
-                        {!isGenerated && (
-                            <p className="capitalize">{document.status.toLowerCase()}</p>
-                        )}
-                    </div>
+                    {!isRenaming && (
+                        <>
+                            <h1 className="text-md">{document.displayName}</h1>
+
+                            <div className="flex font-light text-sm gap-2 text-(--text-secondary)">
+                                <p>{formatDate(document.createdAt)}</p>
+                                {!isGenerated && (
+                                    <p className="capitalize">{document.status.toLowerCase()}</p>
+                                )}
+                            </div>
+                        </>
+                    )}
+
+                    {isRenaming && (
+                        <Input
+                            input_size="xs"
+                            placeholder={document.displayName}
+                            value={newName}
+                            onChange={(e) => setNewName(e.target.value)}
+                            onKeyDown={(e) => e.key === "Enter" && handleRename()}
+                            rightButton={{
+                                icon: isRenamingDocument ? <Loader className="size-4 animate-spin" /> : <Check className="size-4" />,
+                                variant: "secondary",
+                                onClick: handleRename,
+                                disabled: isRenamingDocument || !newName.trim(),
+                            }}
+                        />
+                    )}
+
+
                 </div>
             </div>
 
@@ -70,6 +118,9 @@ export function DocumentItem({ document }: Props) {
                 <a href={`${BASE_URL}/api/offers/${document.offerId}/documents/${document.id}/docx`}>
                     <Button variant="secondary" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
+
+                <Button variant="secondary" size="sm" icon={<Pen className="size-3" />}
+                    iconOnly onClick={() => { setNewName(document.displayName ?? ""); setRenaming(true); }} />
 
                 <Button
                     variant="secondary"

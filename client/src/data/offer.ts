@@ -1,14 +1,15 @@
 import { api } from "@/lib/api-client";
 
-import type {
-  Offer,
-  ContactPerson,
-  CreateOfferInput,
-  UpdateOfferInput,
-  CreateOfferPositionInput,
-  CreateOfferFlatRatesInput,
-  UpdateOfferFlatRatesInput,
-  UpdateOfferPositionInput,
+import {
+  type Offer,
+  type ContactPerson,
+  type CreateOfferInput,
+  type UpdateOfferInput,
+  type CreateOfferPositionInput,
+  type CreateOfferFlatRatesInput,
+  type UpdateOfferFlatRatesInput,
+  type UpdateOfferPositionInput,
+  type Document,
 } from '@/types';
 
 interface GetOffersParams {
@@ -52,3 +53,12 @@ export const updateOfferAction = (
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ offer, positions, flatRates }),
 });
+
+export const renameDocumentAction = (document_id: string, displayName: string) =>
+  api<Document>(`/api/documents/${document_id}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      displayName
+    })
+  });

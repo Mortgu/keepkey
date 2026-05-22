@@ -5,6 +5,7 @@ import {
   getOffersAction,
   getContactPersonsAction,
   updateOfferAction,
+  renameDocumentAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -67,6 +68,12 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     onSuccess: invalidate,
   });
 
+  const renameDocumentMutation = useMutation({
+    mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
+      renameDocumentAction(document_id, displayName),
+    onSuccess: invalidate,
+  })
+
   return {
     offers,
     contactPersons,
@@ -88,5 +95,9 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     updateOffer: updateMutation.mutateAsync,
     isUpdatingOffer: updateMutation.isPending,
     errorUpdatingOffer: updateMutation.error,
+
+    renameDocument: renameDocumentMutation.mutateAsync,
+    isRenamingDocument: renameDocumentMutation.isPending,
+    errorRenamingDocument: renameDocumentMutation.error,
   };
 };
