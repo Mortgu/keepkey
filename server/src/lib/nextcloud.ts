@@ -1,38 +1,137 @@
 import { createClient, type WebDAVClient } from "webdav";
 import env from "./env.js";
+import logger from "../middlewares/logger.js";
+import { prisma } from "./prisma.js";
+
+export class NextCloudError extends Error {
+  constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
+    super(message);
+    this.name = "NextCloudError";
+  }
+}
+
+export class QuoteIdAlreadyReservedError extends NextCloudError {
+  constructor(public readonly quoteId: string) {
+    super(`QuoteId ${quoteId} is already reserved in NextCloud`, 412);
+    this.name = "QuoteIdAlreadyReservedError";
+  }
+}
 
 let client: WebDAVClient | null = null;
 
-export function getNextCloudClient(): WebDAVClient {
+function getClient(): WebDAVClient {
   if (!client) {
-    client = createClient(env.NEXTCLOUD_URL, {
-      username: env.NEXTCLOUD_USER,
-      password: env.NEXTCLOUD_PASSWORD,
-    });
+    client = createClient(
+      `${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`,
+      { username: env.NEXTCLOUD_USER, password: env.NEXTCLOUD_PASSWORD },
+    );
   }
   return client;
 }
 
-export async function manageNextcloud() {
-  const client = createClient(
-    `${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`,
-    {
-      username: env.NEXTCLOUD_USER,
-      password: env.NEXTCLOUD_PASSWORD,
-    },
-  );
+export async function uploadToNextCloud(
+  fileName: string,
+  document: Buffer<ArrayBufferLike> | undefined,
+) {
+  if (document === undefined) return;
 
   try {
-    // 1. Dateinamen lesen
-    const directoryItems = await client.getDirectoryContents("/Documents");
-    console.log("Dateien im Ordner:");
-    directoryItems.forEach((item) => console.log(item.filename));
-
-    // 2. Datei hochladen
-    /*const content = "Hallo Nextcloud, gesendet von Node.js";
-        await client.putFileContents("/MeinOrdner/test.txt", content);
-        console.log("Upload erfolgreich.");*/
+    await getClient().putFileContents(
+      `${env.NEXTCLOUD_OFFER_PATH}/${fileName}`,
+      document,
+    );
+    logger.info(`NextCloud upload successful: ${fileName}`);
   } catch (error: any) {
-    console.error("Fehler bei der Kommunikation:", error.status);
+    logger.error(`NextCloud upload failed for ${fileName}: ${error?.message ?? error}`);
+    throw new NextCloudError(
+      `Upload failed for ${fileName}: ${error?.message ?? error}`,
+      error?.status,
+      error,
+    );
   }
+}
+
+export async function reserveQuoteIdInNextCloud(quoteId: string): Promise<void> {
+
+}
+
+export async function getNextcloudPaths(): Promise<{ pdfPath: string; docxPath: string }> {
+  const [pdf, docx] = await Promise.all([
+    prisma.appSetting.findUnique({ where: { key: "nextcloud.pdfPath" } }),
+    prisma.appSetting.findUnique({ where: { key: "nextcloud.docxPath" } }),
+  ]);
+  return {
+    pdfPath: pdf?.value ?? env.NEXTCLOUD_OFFER_PATH,
+    docxPath: docx?.value ?? env.NEXTCLOUD_OFFER_PATH,
+  };
+}
+
+export async function saveNextcloudPaths(pdfPath: string, docxPath: string): Promise<void> {
+  await Promise.all([
+    prisma.appSetting.upsert({
+      where: { key: "nextcloud.pdfPath" },
+      update: { value: pdfPath },
+      create: { key: "nextcloud.pdfPath", value: pdfPath },
+    }),
+    prisma.appSetting.upsert({
+      where: { key: "nextcloud.docxPath" },
+      update: { value: docxPath },
+      create: { key: "nextcloud.docxPath", value: docxPath },
+    }),
+  ]);
+}
+
+export type NextcloudStatus = "connected" | "failed" | "auth_expired" | "not_configured";
+
+export async function checkNextcloudConnection(): Promise<{
+  status: NextcloudStatus;
+  detail?: string;
+}> {
+  if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
+    return { status: "not_configured" };
+  }
+  try {
+    const c = getClient();
+    await c.getDirectoryContents("/");
+    return {
+      status: "connected",
+      detail: `Verbunden als ${env.NEXTCLOUD_USER}`,
+    };
+  } catch (error: any) {
+    const status = error?.status ?? error?.response?.status;
+    if (status === 401 || status === 403) {
+      return { status: "auth_expired", detail: "Authentifizierung abgelaufen oder ungültig" };
+    }
+    return { status: "failed", detail: error?.message ?? "Verbindung fehlgeschlagen" };
+  }
+}
+
+export async function getLatestQuoteId(): Promise<number> {
+  const c = getClient();
+
+  const [pdfItems, reservedItems] = await Promise.all([
+    c.getDirectoryContents(`${env.NEXTCLOUD_OFFER_PATH}/PDF`).catch((e: any) => {
+      logger.error(`Failed to read PDF dir: ${e?.message ?? e}`);
+      throw new NextCloudError(`Failed to read PDF dir: ${e?.message ?? e}`, e?.status, e);
+    }),
+    c.getDirectoryContents(env.NEXTCLOUD_OFFER_PATH).catch((e: any) => {
+      logger.error(`Failed to read offer dir: ${e?.message ?? e}`);
+      throw new NextCloudError(`Failed to read offer dir: ${e?.message ?? e}`, e?.status, e);
+    }),
+  ]);
+
+  const ids: number[] = [];
+
+  for (const item of Array.isArray(pdfItems) ? pdfItems : []) {
+    const n = parseInt(item.basename.slice(0, 6), 10);
+    if (!Number.isNaN(n)) ids.push(n);
+  }
+
+  for (const item of Array.isArray(reservedItems) ? reservedItems : []) {
+    if (!item.basename.endsWith(".reserved")) continue;
+    const n = parseInt(item.basename.slice(0, 6), 10);
+    if (!Number.isNaN(n)) ids.push(n);
+  }
+
+  return ids.length > 0 ? Math.max(...ids) : 0;
 }

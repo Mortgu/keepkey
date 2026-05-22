@@ -1,34 +1,52 @@
 import { prisma } from "../lib/prisma.js";
-import { formatEur } from "./utils.js";
 
 interface PriceCalculatorProps {
   productId: string;
   contractId: string;
-  duration_months: number;
+  duration: number;
   quantity: number;
+  customerId?: string;
 }
 
-export default async function calculatePrice(
-  props: PriceCalculatorProps,
-): Promise<number> {
-  const { productId, contractId, duration_months, quantity } = props;
+interface Tier {
+  min_quantity: number;
+  max_quantity: number | null;
+  price: number;
+}
 
-  const tiers = await prisma.productPricing.findMany({
-    where: { productId, contractId, duration_months },
-  });
-
-  const matchingTier = tiers.find((tier) => {
+function findMatchingTier<T extends Tier>(tiers: T[], quantity: number): T | undefined {
+  return tiers.find((tier) => {
     const withinMin = quantity >= tier.min_quantity;
     const noUpperLimit = tier.max_quantity === null || tier.max_quantity === 0;
     const withinMax = noUpperLimit || quantity <= tier.max_quantity!;
     return withinMin && withinMax;
   });
+}
 
-  if (!matchingTier) {
-    return 0;
+export default async function calculatePrice(
+  props: PriceCalculatorProps,
+): Promise<number> {
+  const { productId, contractId, duration, quantity, customerId } = props;
+
+  if (customerId) {
+    const customerTiers = await prisma.tariffCustomer.findMany({
+      where: { productId, contractId, duration, customerId },
+    });
+    const tier = findMatchingTier(customerTiers, quantity);
+    if (tier) return tier.price * quantity * duration;
   }
 
-  const subtotal_month = quantity * matchingTier.price;
-
-  return subtotal_month * duration_months;
+  const product = await prisma.product.findUnique({
+    where: { id: productId },
+    select: {
+      tariff: {
+        select: {
+          configs: { where: { contractId, duration } },
+        },
+      },
+    },
+  });
+  const configs = product?.tariff?.configs ?? [];
+  const tier = findMatchingTier(configs, quantity);
+  return tier ? tier.price * quantity * duration : 0;
 }

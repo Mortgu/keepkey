@@ -1,13 +1,17 @@
 import {
   createOfferAction,
   deleteOfferAction,
+  deleteOfferDocumentAction,
   getOffersAction,
+  getContactPersonsAction,
   updateOfferAction,
+  renameDocumentAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
+  ContactPerson,
   CreateOfferPositionInput,
   CreateOfferInput,
   CreateOfferFlatRatesInput,
@@ -16,16 +20,27 @@ import type {
   UpdateOfferFlatRatesInput,
 } from "@/types";
 
+interface OfferQueryParams {
+  search?: string;
+  companyIds?: string[];
+  contactPersonIds?: string[];
+  sort?: string;
+}
 
-export const useOfferHook = () => {
+export const useOfferHook = (params?: OfferQueryParams) => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["offers"] });
 
   const { data: offers = [], isPending, error } = useQuery({
-    queryKey: ["offers"],
-    queryFn: getOffersAction,
+    queryKey: ["offers", params],
+    queryFn: () => getOffersAction(params),
+  });
+
+  const { data: contactPersons = [] } = useQuery({
+    queryKey: ["contact-persons"],
+    queryFn: getContactPersonsAction,
   });
 
   const createMutation = useMutation({
@@ -47,8 +62,21 @@ export const useOfferHook = () => {
     onSuccess: invalidate,
   });
 
+  const deleteDocumentMutation = useMutation({
+    mutationFn: ({ offerId, documentId }: { offerId: string; documentId: string }) =>
+      deleteOfferDocumentAction(offerId, documentId),
+    onSuccess: invalidate,
+  });
+
+  const renameDocumentMutation = useMutation({
+    mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
+      renameDocumentAction(document_id, displayName),
+    onSuccess: invalidate,
+  })
+
   return {
     offers,
+    contactPersons,
     isPending,
     error,
 
@@ -60,8 +88,16 @@ export const useOfferHook = () => {
     isDeletingOffer: deleteMutation.isPending,
     errorDeletingOffer: deleteMutation.error,
 
+    deleteDocument: deleteDocumentMutation.mutate,
+    isDeletingDocument: deleteDocumentMutation.isPending,
+    errorDeletingDocument: deleteDocumentMutation.error,
+
     updateOffer: updateMutation.mutateAsync,
     isUpdatingOffer: updateMutation.isPending,
     errorUpdatingOffer: updateMutation.error,
+
+    renameDocument: renameDocumentMutation.mutateAsync,
+    isRenamingDocument: renameDocumentMutation.isPending,
+    errorRenamingDocument: renameDocumentMutation.error,
   };
 };

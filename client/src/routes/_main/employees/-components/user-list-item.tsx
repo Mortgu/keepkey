@@ -30,39 +30,18 @@ export default function UserListItem({ user }: UserListItemProps) {
 
         <div className="flex items-center gap-12">
           <div className="flex items-center ">
-            <Button
-              onClick={() => setOpen(true)}
-              size="sm"
-              variant="ghost"
-              icon={<Pen className="size-4" />}
-              iconOnly
-            ></Button>
+            <Button variant="ghost" size="sm" icon={<Pen className="size-4" />}
+              iconOnly onClick={() => setOpen(true)} />
 
-            <Button
-              onClick={() => { }}
-              size="sm"
-              variant="ghost"
-              icon={<KeyRound className="size-4" />}
-              iconOnly
-            />
+            {/*<Button variant="ghost" size="sm" icon={<KeyRound className="size-4" />} iconOnly /> */}
 
-            <Button
-              onClick={() => deleteUser({ id: user.id })}
-              size="sm"
-              variant="ghost"
-              icon={<Trash className="size-4" />}
-              iconOnly
-              loading={isDeletingUser}
-            />
+            <Button variant="ghost" size="sm" icon={<Trash className="size-4" />}
+              iconOnly onClick={() => deleteUser({ id: user.id })} loading={isDeletingUser} />
           </div>
         </div>
       </div>
 
-      <UserModal
-        currentUser={user}
-        open={isOpen}
-        cancelFn={() => setOpen(false)}
-      />
+      <UserModal currentUser={user} open={isOpen} cancelFn={() => setOpen(false)} />
     </React.Fragment>
   );
 }

@@ -4,3 +4,9 @@
 .idea/modules.xml
 .idea/vcs.xml
 /server/generated
+
+# graphify - machine-specific, regeneratable
+graphify-out/.graphify_python
+graphify-out/.graphify_root
+graphify-out/cache/
+*.tex

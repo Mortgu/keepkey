@@ -12,9 +12,10 @@ export type CreateUserInput = Omit<
     | "updatedAt"
     | "sessions"
     | "accounts"
-    | "employeeOrders"
+    | "orders"
     | "customer"
     | "offers"
     | "orders"
+    | "emailVerified"
 >;
 export type UpdateUserInput = Partial<CreateUserInput>;

@@ -5,11 +5,12 @@ import { auth } from "../lib/auth.js";
 export const getAllUsers = async (request: Request, response: Response) => {
   const users = await prisma.user.findMany({
     include: {
-      employeeOrders: true,
+      orders: true,
       customer: true,
       offers: true,
     },
   });
+
   return response.status(200).json(users);
 };
 
@@ -19,7 +20,7 @@ export const getUserById = async (request: Request, response: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: id as string },
     include: {
-      employeeOrders: true,
+      orders: true,
       customer: {
         include: {
           contactPersons: true,
@@ -97,13 +98,14 @@ export const createUser = async (request: Request, response: Response) => {
   }
 
   try {
-    const createdUser = await auth.api.createUser({
+    const createdUser = await auth.api.signUpEmail({
       body: {
         email: body.email,
-        password: "",
+        password: body.password,
         name: `${body.firstName} ${body.lastName}`,
-        role: "user",
-        data: { ...body },
+        firstName: body.firstName,
+        lastName: body.lastName,
+        salutation: body.salutation,
       },
     });
 

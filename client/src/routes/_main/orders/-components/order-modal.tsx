@@ -1,23 +1,24 @@
-import { useOfferHook } from "@/hooks";
+import { useOfferHook, useOrderHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
 
 import type { Offer } from "@/types";
-import { Button, ModalDialog } from "@/components";
+import { Button, Input, ModalDialog } from "@/components";
+import { Search } from "lucide-react";
 
 interface OrderModalProps {
   open: boolean;
   cancelFn: () => void;
-  submitFn: () => void;
   currentOrder?: any | null;
 }
 
-export default function OrderModal({
-  open,
-  cancelFn,
-  submitFn,
-  currentOrder,
-}: OrderModalProps) {
+export default function OrderModal({ open, cancelFn, currentOrder }: OrderModalProps) {
   const { offers } = useOfferHook();
+  const { createOrder, errorCreatingOrder } = useOrderHook();
+
+  const handleCreateOrder = (offer: Offer) => {
+    createOrder({ offerId: offer.id });
+    cancelFn();
+  }
 
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>
@@ -25,16 +26,35 @@ export default function OrderModal({
         <h1 className="text-lg">Neue Bestellung erstellen</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
-        {offers.map((offer: Offer) => (
-          <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)">
-            <div className="grid">
-              <p className="text-(--text) font-normal">{offer.voucherId}</p>
-              <p className="text-(--neutral-400) text-sm font-light">
-                {formatDate(offer.date)}
-              </p>
+        <div className="grid gap-2">
+
+          <Input placeholder="Suchen..." rightButton={{
+            icon: <Search className="size-4" />,
+            variant: "ghost",
+            onClick: () => { },
+          }} />
+
+          {offers.map((offer: Offer) => (
+            <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
+              onClick={() => handleCreateOrder(offer)}>
+              <div className="grid">
+                <div className="flex items-center gap-2">
+                  <p className="text-(--text) font-normal">
+                    {offer.customer.companyName}
+                  </p>
+                  -
+                  <p className="text-(--text) font-normal">
+                    {offer.quoteId}
+                  </p>
+                </div>
+
+                <p className="text-(--neutral-400) text-sm font-light">
+                  {formatDate(offer.date)}
+                </p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
         <Button onClick={cancelFn} type="button" size="sm" variant="secondary">

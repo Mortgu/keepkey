@@ -10,11 +10,15 @@ import { errorHandler } from "./middlewares/errorHandler.js";
 import config from "./config/config.js";
 
 import startDocumentWorker from "./workers/document-worker.js";
+import startUploadWorker from "./workers/upload-worker.js";
 import path from "path";
 import env from "./lib/env.js";
 
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
+import morganMiddleware from "./middlewares/morgan.js";
+import logger from "./middlewares/logger.js";
+import { getLatestQuoteId } from "./lib/nextcloud.js";
 
 const options = {
   definition: {
@@ -31,6 +35,9 @@ const options = {
 const swaggerSpec = swaggerJsdoc(options);
 
 const app: Express = express();
+
+// Logging
+app.use(morganMiddleware);
 
 app.use(
   cors({
@@ -51,26 +58,24 @@ app.all("/api/auth/*splat", toNodeHandler(auth));
 
 app.use(express.json());
 
-//manageNextcloud();
-
 app.use("/api", router);
 
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
-
 
 // Global error handler
 app.use(errorHandler);
 
 // Start document generation worker
 const documentWorker = startDocumentWorker();
+const uploadWorker = startUploadWorker();
 
 const shutdown = async () => {
-  await documentWorker.close();
+  await Promise.all([documentWorker.close(), uploadWorker.close()]);
   process.exit(0);
 };
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
 
 app.listen(config.port, () => {
-  console.log(`Server is listening on port ${config.port}`);
+  logger.info(`Server is listening on port ${config.port}`);
 });

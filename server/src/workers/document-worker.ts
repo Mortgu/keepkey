@@ -3,6 +3,7 @@ import { connection, documentQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
 import { generateOfferDocument } from "../pipelines/offer/pipeline.js";
 import { TaskStatus, TaskType } from "@prisma/client";
+import { generateOrderDocument } from "../pipelines/order/pipeline.js";
 
 interface TaskData {
   taskId: string;
@@ -27,31 +28,31 @@ export default function startDocumentWorker() {
           throw new Error("Document job for offer with undefined offerId");
         }
 
-        const document = await prisma.document.findFirst({
+        const offerDocument = await prisma.document.findFirst({
           where: { offerId: task.offerId, isCurrent: true },
           select: { id: true, version: true },
         });
 
-        if (!document) {
+        if (!offerDocument) {
           throw new Error(
             `No current document row found for offer ${task.offerId}`,
           );
         }
 
         await prisma.document.update({
-          where: { id: document.id },
+          where: { id: offerDocument.id },
           data: { status: "PROCESSING" },
         });
 
         const { displayName } = await generateOfferDocument(
           task.offerId,
           taskId,
-          document.id,
-          document.version,
+          offerDocument.id,
+          offerDocument.version,
         );
 
         await prisma.document.update({
-          where: { id: document.id },
+          where: { id: offerDocument.id },
           data: {
             displayName,
             pdfReady: true,
@@ -67,6 +68,46 @@ export default function startDocumentWorker() {
 
         break;
       case TaskType.ORDER:
+        if (!task.orderId) {
+          throw new Error("Document job for order with undefined orderId!");
+        }
+
+        const orderDocument = await prisma.document.findFirst({
+          where: { orderId: task.orderId, isCurrent: true },
+          select: { id: true, version: true },
+        });
+
+        if (!orderDocument) {
+          throw new Error(`No current document row found for order ${task.orderId}`);
+        }
+
+        await prisma.document.update({
+          where: { id: orderDocument.id },
+          data: { status: "PROCESSING" },
+        });
+
+        const { displayName: orderDisplayName } = await generateOrderDocument(
+          task.orderId,
+          taskId,
+          orderDocument.id,
+          orderDocument.version,
+        );
+
+        await prisma.document.update({
+          where: { id: orderDocument.id },
+          data: {
+            displayName: orderDisplayName,
+            pdfReady: true,
+            docxReady: true,
+            status: "GENERATED",
+          },
+        });
+
+        await prisma.task.update({
+          where: { id: taskId },
+          data: { status: TaskStatus.COMPLETED },
+        });
+
         break;
       default:
         throw new Error(`Task ${task.id} with unknown type propertie!`);

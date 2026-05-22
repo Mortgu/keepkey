@@ -2,6 +2,7 @@ import {
   createSupplierAction,
   deleteSupplierAction,
   getSuppliersAction,
+  UpdateSupplierAction,
 } from "@/data/supplier";
 import type { CreateSupplierInput, UpdateSupplierInput } from "@/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -12,11 +13,7 @@ export const useSupplierHook = () => {
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["suppliers"] });
 
-  const {
-    data: suppliers = [],
-    isPending,
-    error,
-  } = useQuery({
+  const { data: suppliers = [], isPending, error } = useQuery({
     queryKey: ["suppliers"],
     queryFn: getSuppliersAction,
   });
@@ -26,6 +23,12 @@ export const useSupplierHook = () => {
       createSupplierAction(supplier),
     onSuccess: invalidate,
   });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, supplier }: { id: string, supplier: UpdateSupplierInput }) =>
+      UpdateSupplierAction(id, supplier),
+    onSuccess: invalidate,
+  })
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteSupplierAction(id),
@@ -38,9 +41,15 @@ export const useSupplierHook = () => {
     error,
 
     createSupplier: createMutation.mutateAsync,
-    deleteSupplier: deleteMutation.mutate,
-
     isCreatingSupplier: createMutation.isPending,
+    errorCreatingSupplier: createMutation.error,
+
+    deleteSupplier: deleteMutation.mutate,
     isDeletingSupplier: deleteMutation.isPending,
+    errorDeletingSupplier: deleteMutation.error,
+
+    updateSupplier: updateMutation.mutate,
+    isUpdatingSupplier: updateMutation.isPending,
+    errorUpdateingSupplier: updateMutation.error,
   };
 };

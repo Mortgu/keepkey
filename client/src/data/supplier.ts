@@ -18,10 +18,7 @@ export const createSupplierAction = (supplier: CreateSupplierInput) =>
     body: JSON.stringify({ ...supplier }),
   });
 
-export const UpdateSupplierAction = (
-  supplierId: string,
-  data: UpdateSupplierInput,
-) =>
+export const UpdateSupplierAction = (supplierId: string, data: UpdateSupplierInput) =>
   api<Supplier>(`/api/suppliers/${supplierId}`, {
     method: "PUT",
     headers: {

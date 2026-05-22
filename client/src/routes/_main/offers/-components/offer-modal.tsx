@@ -4,26 +4,23 @@ import { useForm } from "@tanstack/react-form";
 
 import { Loader, Plus, Trash, X } from "lucide-react";
 
-import OfferProductForm, { type OfferProductInput } from "./offer-product-form";
-import OfferFlatRateForm from "./offer-flat-rate-form";
+import { type OfferProductInput } from "./modal-components/offer-product-form";
+import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
 import {
-  useProductHook,
-  useContractHook,
   useCustomerHook,
   useFlatRateHook,
   useUserHook,
   useSupplierHook,
   useOfferHook
 } from "@/hooks";
-import { Button, Input, Checkbox, ModalDialog, Select } from "@/components";
+import { Button, Input, ModalDialog, Select } from "@/components";
 
 import type {
   Offer,
   User,
   Supplier,
   Customer,
-  Product,
   ContactPerson,
   CreateOfferInput,
   CreateOfferPositionInput,
@@ -32,7 +29,11 @@ import type {
   UpdateOfferPositionInput,
   UpdateOfferFlatRatesInput,
 } from "@/types";
+
 import { formatEur } from "@/utils/utils";
+import ProductModalSection from "./modal-components/product-section";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
 
 interface OfferModalProps {
   open: boolean;
@@ -44,23 +45,68 @@ export const offerSchema = z.object({
   customerId: z.string().min(1, "Required!"),
   contactPersonId: z.string().min(1, "Required!"),
   userId: z.string().min(1, "Required!"),
-  voucherId: z.string().min(1, "Required!"),
+  quoteId: z.string().min(1, "Required!"),
 
   supplierId: z.string().nullable(),
-  paymentTerm: z.string().nullable(),
+  paymentTerm: z.string(),
 
   validUntil: z.string().datetime().nullable(),
   requestFrom: z.string().datetime().nullable(),
 });
 
 export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
-  if (!open) return null;
+  const isEdit = currentOffer !== undefined;
 
+  const { data: nextQuoteId, isPending: isNextQuoteIdPending } = useQuery({
+    queryKey: ['nextQuoteId'],
+    queryFn: async () => api<number>('/api/offers/next', { method: 'GET' }),
+    enabled: !isEdit,
+  });
+
+  /*const { data: reserve, isPending: isReserving, error: errorReserving } = useQuery({
+    queryKey: ['reserveId'],
+    queryFn: async () => api<string | null>('/api/offers/reserve', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ quoteId: nextQuoteId }),
+    }),
+    enabled: !isEdit,
+  })*/
+
+  if (!isEdit && (isNextQuoteIdPending)) {
+    return (
+      <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog.Header>
+          <h1 className="text-lg">Neues Angebot erstellen</h1>
+        </ModalDialog.Header>
+        <ModalDialog.Content>
+          <div className="flex items-center justify-center py-8">
+            <Loader className="size-5 animate-spin" />
+          </div>
+        </ModalDialog.Content>
+      </ModalDialog>
+    );
+  }
+
+
+  return (
+    <OfferModalForm
+      open={open}
+      cancelFn={cancelFn}
+      currentOffer={currentOffer}
+      nextQuoteId={nextQuoteId}
+    />
+  );
+}
+
+interface OfferModalFormProps extends OfferModalProps {
+  nextQuoteId: number | undefined;
+}
+
+function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModalFormProps) {
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();
-  const { products } = useProductHook();
-  const { contracts } = useContractHook();
   const { suppliers } = useSupplierHook();
   const { users } = useUserHook();
   const { flatRates } = useFlatRateHook();
@@ -72,6 +118,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
       duration_months: pos.duration_months,
       quantity: pos.quantity,
       optional: pos.optional ?? false,
+      total_cents: pos.total_cents ?? 0,
     })) ?? []
   );
 
@@ -79,20 +126,22 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
     currentOffer?.offerFlatRates.map(({ id: _id, offer: _offer, ...fr }) => fr) ?? []
   );
 
-  const [showProductForm, setShowProductForm] = useState(false);
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
   const { createOffer, errorCreatingOffer, updateOffer } = useOfferHook();
 
+  const initialCustomerId = currentOffer?.customerId ?? customers[0]?.id ?? '';
+  const initialCustomer = customers.find((c: Customer) => c.id === initialCustomerId);
+
   const offerForm = useForm({
     defaultValues: {
-      customerId: currentOffer?.customerId ?? customers[0]?.id ?? '',
-      contactPersonId: currentOffer?.contactPersonId ?? '',
-      userId: currentOffer?.userId ?? '',
-      voucherId: currentOffer?.voucherId ?? '',
+      customerId: initialCustomerId,
+      contactPersonId: currentOffer?.contactPersonId ?? initialCustomer?.contactPersons[0]?.id ?? '',
+      userId: currentOffer?.userId ?? users[0]?.id ?? '',
+      quoteId: currentOffer?.quoteId ?? (nextQuoteId != null ? String(nextQuoteId) : ''),
 
-      supplierId: currentOffer?.supplierId ?? null,
-      paymentTerm: currentOffer?.paymentTerm ?? null,
+      supplierId: currentOffer?.supplierId ?? null, //suppliers[0]?.id
+      paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
 
       validUntil: currentOffer?.validUntil ?? null,
       requestFrom: currentOffer?.requestFrom ?? null,
@@ -134,7 +183,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
   return (
     <ModalDialog open={open} cancelFn={cancelFn}>
       <ModalDialog.Header>
-        <h1 className="text-lg">Neues Angebot erstellen</h1>
+        <h1 className="text-lg">Angebot bearbeiten</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
         <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
@@ -143,13 +192,18 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             <offerForm.Field name="customerId" children={(field) => (
               <div className="flex-1">
                 <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  value={field.state.value as string} onChange={(e) => field.handleChange(e.target.value)} >
-                  <option value="">None</option>
+                  value={field.state.value as string} onChange={(e) => {
+                    const newCustomerId = e.target.value;
+                    field.handleChange(newCustomerId);
+                    const newCustomer = customers.find((c: Customer) => c.id === newCustomerId);
+                    offerForm.setFieldValue('contactPersonId', newCustomer?.contactPersons[0]?.id ?? '');
+                  }} >
                   {customers?.map((customer: Customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.companyName}
                     </option>
                   ))}
+                  {customers.length <= 0 && <option value="">None</option>}
                 </Select>
               </div>
             )} />
@@ -165,12 +219,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
                     <Select label="Ansprechpartner Kunde" value={field.state.value as string}
                       error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                       onChange={(e) => field.handleChange(e.target.value)} disabled={!customerId}>
-                      <option value="">None</option>
                       {contactPersons.map((cp: ContactPerson) => (
                         <option key={cp.id} value={cp.id}>
                           {cp.firstName} {cp.lastName}
                         </option>
                       ))}
+                      {contactPersons.length <= 0 && <option value="">None</option>}
                     </Select>
                   );
                 }}
@@ -184,12 +238,12 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
                 <Select label="Unser Ansprechpartner" value={field.state.value as string}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   onChange={(e) => field.handleChange(e.target.value)}>
-                  <option value="">None</option>
                   {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName} {user.lastName}
                     </option>
                   ))}
+                  {users.length <= 0 && <option value="">None</option>}
                 </Select>
               </div>
             )} />
@@ -197,7 +251,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
-            <offerForm.Field name="voucherId" children={(field) => (
+            <offerForm.Field name="quoteId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Input label="AG-Nr." value={field.state.value as string}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
@@ -210,9 +264,9 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             {/* Lieferant / Supplier */}
             <offerForm.Field name="supplierId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
-                <Select label="Lieferant" value={field.state.value as string}
+                <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
-                  onChange={(e) => field.handleChange(e.target.value)}>
+                  onChange={(e) => field.handleChange(e.target.value || null)}>
                   <option value="">None</option>
                   {suppliers?.map((supplier: Supplier) => (
                     <option key={supplier.id} value={supplier.id}>
@@ -283,61 +337,7 @@ export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalP
             )} />
           </div>
 
-          <hr className="text-gray-200" />
-
-          <div className="grid gap-4">
-            <div className="flex items-center justify-between w-full">
-              <Checkbox label="Vergleichen?" />
-              <Button variant="link" size="fit_sm" disabled={showProductForm} icon={<Plus className="size-4" />}
-                onClick={() => setShowProductForm(true)}>
-                Produkt hinzufügen
-              </Button>
-            </div>
-
-            {offerProducts.length === 0 && !showProductForm && (
-              <p className="text-sm text-gray-500 text-center py-2">
-                Noch kein Produkt hinzugefügt
-              </p>
-            )}
-
-            <div className="flex flex-col gap-2">
-              {offerProducts.map((op, index) => {
-                const product = products.find((f) => f.id == op.productId);
-                const contract = contracts.find((c) => c.id == op.contractId);
-
-                if (!product || !contract) return null;
-
-                return (
-                  <div key={index} className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
-                    <div className="grid">
-                      <p className="flex items-center gap-1 text-sm">{op.quantity} <X className="size-3" /> {product.name}</p>
-                      <div className="flex items-center">
-                        <p className="text-xs text-(--text-secondary)">{contract.name} | {op.duration_months} Monate</p>
-                      </div>
-                    </div>
-
-                    <div>
-                      <Button type="button" size="xs" variant="secondary"
-                        icon={<Trash className="size-3" />} iconOnly
-                        onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))} />
-                    </div>
-                  </div>
-                )
-              })}
-
-              {showProductForm && (
-                <OfferProductForm
-                  products={products ?? []}
-                  contracts={contracts ?? []}
-                  onSave={(data) => {
-                    setOfferProducts((prev) => [...prev, data]);
-                    setShowProductForm(false);
-                  }}
-                  onCancel={() => setShowProductForm(false)}
-                />
-              )}
-            </div>
-          </div>
+          <ProductModalSection offerProducts={offerProducts} setOfferProducts={setOfferProducts} />
 
           <hr className="text-gray-200" />
 

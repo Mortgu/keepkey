@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { Button } from '../button/button';
 
 export interface DropdownOption {
   value: string;
@@ -33,26 +34,24 @@ export function MultiDropdown({ label, options, values, onChange, className }: M
   const count = values.length;
 
   return (
-    <div ref={ref} className={`relative select-none ${className ?? ''}`}>
-      <button
+    <div ref={ref} className={`w-fit relative select-none ${className ?? ''}`}>
+      <Button
+        variant="secondary"
         type="button"
+        size="sm"
         onClick={() => setOpen(o => !o)}
-        className={[
-          'flex items-center gap-1.5 py-[6px] pl-3 pr-2.5 border rounded-md cursor-pointer font-medium text-sm whitespace-nowrap min-w-[130px] transition-[border-color,box-shadow] duration-[120ms]',
-          open ? 'bg-(--subtle-50) ring-3 ring-(--primary-600)/12' : 'bg-white',
-          open || count > 0 ? 'border-(--primary-600)' : 'border-(--border)',
-        ].join(' ')}
+
       >
         <span className={`flex-1 text-left ${count > 0 ? 'text-(--text)' : 'text-(--fg-3)'}`}>
           {count > 0 ? `${label}: ${count} selected` : label}
         </span>
         {count > 0 && (
-          <span className="bg-(--primary-600) text-white rounded-full text-[10px] font-semibold px-1.5 py-px min-w-[18px] text-center">
+          <span className="bg-(--primary-600) text-white rounded-full text-xs aspect-square px-1.5 py-px min-w-[18px] text-center">
             {count}
           </span>
         )}
         <ChevronDown className="size-3 shrink-0" />
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[200px] overflow-hidden py-1">

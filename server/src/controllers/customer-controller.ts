@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import logger from "../middlewares/logger.js";
 
 export const getAllCustomers = async (request: Request, response: Response) => {
   const customers = await prisma.customer.findMany({
@@ -12,6 +13,25 @@ export const getAllCustomers = async (request: Request, response: Response) => {
   return response.status(200).json(customers);
 };
 
+export const getAllCustomerContacts = async (request: Request, response: Response) => {
+  const { id } = request.params;
+
+  const customer = await prisma.customer.findUnique({
+    where: { id: id as string },
+    include: {
+      contactPersons: true
+    }
+  });
+
+  if (!customer) {
+    return response.status(404).json({
+      message: 'Customer not found!'
+    });
+  }
+
+  return response.status(200).json(customer.contactPersons);
+}
+
 export const getCustomerById = async (request: Request, response: Response) => {
   const id = request.params.id as string;
 
@@ -19,7 +39,6 @@ export const getCustomerById = async (request: Request, response: Response) => {
     where: { id },
     include: {
       contactPersons: true,
-      orders: true,
     },
   });
 
@@ -57,8 +76,8 @@ export const createCustomer = async (request: Request, response: Response) => {
       if (contactPersons?.length > 0) {
         await tx.contactPerson.createMany({
           data: contactPersons.map((p: any) => ({
-            customerId: customer.id,
             ...p,
+            customerId: customer.id,
           })),
         });
       }
@@ -74,11 +93,17 @@ export const createCustomer = async (request: Request, response: Response) => {
       exception: exception.message,
     });
   }
-
-  return response
-    .status(200)
-    .json({ success: true, message: "Successfully created customer!" });
 };
+
+export const createContact = async (request: Request, response: Response) => {
+  const body = request.body;
+
+  const createdContact = await prisma.contactPerson.create({
+    data: { ...body }
+  });
+
+  return response.status(200).json(createdContact);
+}
 
 export const updateCustomerById = async (
   request: Request,
@@ -123,33 +148,67 @@ export const updateCustomerById = async (
     });
   }
 
-  return response
-    .status(200)
-    .json({ success: true, message: "Successfully updated customer!" });
+  return response.status(200).json({
+    message: "Successfully updated customer!"
+  });
 };
 
 export const deleteCustomer = async (request: Request, response: Response) => {
   const { id } = request.params;
-
-  if (!id) {
-    return response
-      .status(400)
-      .json({ success: false, message: "Missing customer id!" });
-  }
 
   try {
     await prisma.customer.delete({
       where: { id: id as string },
     });
 
-    return response
-      .status(200)
-      .json({ success: true, message: "Successfully deleted customer!" });
-  } catch (exception: any) {
-    return response.status(500).json({
-      success: false,
-      message: "Failed to delete customer!",
-      exception: exception.message,
+    return response.status(200).json({
+      message: "Successfully deleted customer!"
     });
+  } catch (exception: any) {
+    logger.error(exception.message);
+    return response.status(500).json({
+      message: 'Somthing went wrong trying to delete customer!', exception: exception.message,
+    })
   }
 };
+
+export const updateContact = async (request: Request, response: Response) => {
+  const { cid } = request.params;
+  const body = request.body;
+
+  console.log(body)
+
+  const contact = await prisma.contactPerson.update({
+    where: { id: cid as string },
+    data: {
+      ...body
+    }
+  });
+
+  if (!contact) {
+    return response.status(404).json({
+      message: 'Contact not found! Invalid id!'
+    });
+  }
+
+  return response.status(200).json(contact);
+}
+
+export const deleteContactById = async (request: Request, response: Response) => {
+  const { cid } = request.params;
+
+  try {
+    await prisma.contactPerson.delete({
+      where: { id: cid as string }
+    });
+
+    return response.status(200).json({
+      message: 'Successfully deleted customer contact.'
+    });
+  } catch (exception: any) {
+    logger.error(exception);
+    return response.status(500).json({
+      message: 'Something went wrong trying to delete contact!'
+    })
+  }
+}

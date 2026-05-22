@@ -1,91 +1,141 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
-import { useOfferHook } from "@/hooks";
-import OfferListItem from "./offer-list-item";
+import { useCustomerHook, useOfferHook } from "@/hooks";
+import OfferCard from "./offer-card";
 
-import type { Offer } from "@/types";
-import { Button, SortDropdown } from "@/components";
+import type { ContactPerson, Customer, Offer } from "@/types";
+import { Button, FilterChip, SearchBar } from "@/components";
+import { MultiDropdown } from "@/components/filters/multi-dropdown";
+import { SortDropdown } from "@/components/filters/sort-dropdown";
 
 const sort_options = [
-  { value: "date-desc", label: "Date – newest first" },
-  { value: "date-asc", label: "Date – oldest first" },
-  { value: "name-asc", label: "Name – A to Z" },
-  { value: "name-desc", label: "Name – Z to A" },
+  { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
+  { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
 ];
 
 export default function OfferList() {
-  const [isOpen, setOpen] = useState<boolean>(false);
-  const [sort, setSort] = useState<string>(sort_options[0].value);
-  const { offers, deleteOffer } = useOfferHook();
+  const [editing, setEditing] = useState<Offer | null | undefined>(undefined);
 
-  const [error, setError] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState("");
+  const [sort, setSort] = useState(sort_options[0].value);
+  const [customerFilter, setCustomerFilter] = useState<string[]>([]);
+  const [contactPersonFilter, setContactPersonFilter] = useState<string[]>([]);
 
-  const sortedOffers = useMemo(() => {
-    return [...(offers ?? [])].sort((a, b) => {
-      switch (sort) {
-        case "date-desc":
-          return (
-            new Date(b?.createdAt || "").getTime() -
-            new Date(a?.createdAt || "").getTime()
-          );
-        case "date-asc":
-          return (
-            new Date(a?.createdAt || "").getTime() -
-            new Date(b?.createdAt || "").getTime()
-          );
-        case "name-asc":
-          return a.voucherId.localeCompare(b.voucherId);
-        case "name-desc":
-          return b.voucherId.localeCompare(a.voucherId);
-        default:
-          return 0;
-      }
-    });
-  }, [offers, sort]);
+  const params = useMemo(() => ({
+    search: searchInput || undefined,
+    companyIds: customerFilter.length > 0 ? customerFilter : undefined,
+    contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
+    sort,
+  }), [searchInput, customerFilter, contactPersonFilter, sort]);
 
-  const handleDeleteOffer = (id: string) => {
-    if (confirm("Angebot löschen?")) {
-      deleteOffer({ id });
-    } else {
-    }
+  const { offers, contactPersons } = useOfferHook(params);
+  const { customers } = useCustomerHook();
+
+  const customerFilterOptions = useMemo(() =>
+    customers.map((c: Customer) => ({
+      value: c.id,
+      label: c.companyName,
+    })),
+    [customers]);
+
+  const contactPersonFilterOptions = useMemo(() =>
+    contactPersons.map((cp: ContactPerson) => ({
+      value: cp.id,
+      label: `${cp.firstName} ${cp.lastName}`,
+    })),
+    [contactPersons]);
+
+  const activeFilterCount = customerFilter.length + contactPersonFilter.length;
+
+  const handleSearch = () => {
+    setSearchInput(searchInput);
   };
 
   return (
-    <div className="grid gap-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-medium">Angebote</h1>
-      </div>
-
-      <div className="flex justify-between items-center">
+    <>
+      <div className="flex justify-between items-center gap-4">
+        {/* Filters */}
         <div className="w-full flex items-center gap-4">
           <SortDropdown
             value={sort}
             onChange={setSort}
             options={sort_options}
           />
+
+          <MultiDropdown
+            label="Kunde"
+            options={customerFilterOptions}
+            values={customerFilter}
+            onChange={setCustomerFilter}
+          />
+
+          <MultiDropdown
+            label="Kontakt"
+            options={contactPersonFilterOptions}
+            values={contactPersonFilter}
+            onChange={setContactPersonFilter}
+          />
+
+          <SearchBar
+            value={searchInput}
+            onChange={setSearchInput}
+            onSubmit={handleSearch}
+            placeholder="AG-Nr. Suchen..."
+          />
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={() => setOpen(true)} size="sm">
+          <Button onClick={() => setEditing(null)} size="sm">
             Erstellen <Plus className="size-4" />
           </Button>
         </div>
       </div>
 
-      {error && (
-        <div className="">
-          <p className="text-(--destructive)">{error}</p>
+      {activeFilterCount > 0 && (
+        <div className="flex gap-2 w-fit flex-wrap">
+          {customerFilter.map((id) => {
+            const option = customerFilterOptions.find(i => i.value === id);
+            if (!option) return null;
+            return (
+              <FilterChip
+                key={`customer-${id}`}
+                label="Kunde"
+                value={option.label}
+                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))}
+              />
+            );
+          })}
+
+          {contactPersonFilter.map((id) => {
+            const option = contactPersonFilterOptions.find(i => i.value === id);
+            if (!option) return null;
+            return (
+              <FilterChip
+                key={`contact-${id}`}
+                label="Kontakt"
+                value={option.label}
+                onRemove={() => setContactPersonFilter(contactPersonFilter.filter(i => i !== id))}
+              />
+            );
+          })}
         </div>
       )}
 
       <div className="grid gap-2">
-        {sortedOffers.map((offer: Offer) => (
-          <OfferListItem key={offer.id} offer={offer} />
+        {offers.map((offer) => (
+          <OfferCard key={offer.id} offer={offer} onEdit={setEditing} />
         ))}
       </div>
 
-      <OfferModal open={isOpen} cancelFn={() => setOpen(false)} />
-    </div>
+      {editing !== undefined && (
+        <OfferModal
+          key={editing?.id ?? 'create'}
+          open={true}
+          cancelFn={() => setEditing(undefined)}
+          currentOffer={editing ?? undefined}
+        />
+      )}
+    </>
   );
 }

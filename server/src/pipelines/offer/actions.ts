@@ -10,6 +10,7 @@ import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
 import { convert as libconvert } from "libreoffice-convert";
+import { PipelineStageError } from "../pipeline.js";
 
 export async function fetchOfferData(offerId: string) {
   const [offer, contracts] = await Promise.all([
@@ -89,6 +90,7 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
         table: item.product.table,
         quantity: item.quantity,
         optional: item.optional,
+        contract: item.contract,
         duration_months: item.duration_months,
         price: {
           total: formatEur(item.total_cents / 100),
@@ -108,7 +110,7 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
   }));
 
   return {
-    voucherId: offer.voucherId,
+    quoteId: offer.quoteId,
     date: formatDate(offer.date),
     paymentTerm: offer.paymentTerm,
     validUntil: offer.validUntil ? formatDate(offer.validUntil) : "",

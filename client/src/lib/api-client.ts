@@ -5,10 +5,11 @@ export const api = async <T = unknown>(endpoint: string, options: RequestInit = 
     credentials: "include", ...options,
   });
 
-  const json = await res.json();
+  const text = await res.text();
+  const json = text.length > 0 ? JSON.parse(text) : undefined;
 
   if (!res.ok) {
-    const error: any = new Error(json.message ?? "API error");
+    const error: any = new Error(json?.message ?? "API error");
     error.status = res.status;
     throw error;
   }

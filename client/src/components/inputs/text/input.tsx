@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { InputComponentProps } from "./input-types";
+import { Button } from "@/components/button/button";
 
 const styles = tv({
   base: [
@@ -23,16 +24,39 @@ const styles = tv({
       true: "border-red-500",
       false: "",
     },
+    adornment: {
+      none: "",
+      icon: "pr-9",
+      button: "pr-11",
+    },
   },
   defaultVariants: {
     variant: "primary",
     input_size: "sm",
     error: false,
+    adornment: "none",
   },
 });
 
+const adornmentButtonClass =
+  "absolute right-1 top-1/2 -translate-y-1/2 h-[26px] w-7 rounded-md";
+
 export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
-  ({ className, variant, input_size, label, error, ...rest }, ref) => {
+  (
+    {
+      className,
+      variant,
+      input_size,
+      label,
+      error,
+      rightIcon,
+      rightButton,
+      ...rest
+    },
+    ref,
+  ) => {
+    const adornment = rightButton ? "button" : rightIcon ? "icon" : "none";
+
     return (
       <div className="w-full">
         <div className="flex flex-wrap items-center justify-between">
@@ -48,11 +72,39 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
             </label>
           )}
         </div>
-        <input ref={ref} className={styles({
-          variant, input_size, error: !!error, className,
-        })}
-          {...rest}
-        />
+        <div className="relative">
+          <input
+            ref={ref}
+            className={styles({
+              variant,
+              input_size,
+              error: !!error,
+              adornment,
+              className,
+            })}
+            {...rest}
+          />
+
+          {rightButton && (() => {
+            const { icon, className: btnClassName, type, ...btnRest } = rightButton;
+            return (
+              <Button
+                size="xs"
+                type={type ?? "button"}
+                {...btnRest}
+                icon={icon}
+                iconOnly
+                className={`${adornmentButtonClass} ${btnClassName ?? ""}`.trim()}
+              />
+            );
+          })()}
+
+          {!rightButton && rightIcon && (
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-gray-500">
+              {rightIcon}
+            </span>
+          )}
+        </div>
       </div>
     );
   },

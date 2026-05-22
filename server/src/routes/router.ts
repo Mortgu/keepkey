@@ -6,12 +6,16 @@ import productRouter from "./products.js";
 import supplierRouter from "./supplier.js";
 import userRouter from "./user.js";
 import contractRouter from "./contracts.js";
-import pricingRouter from "./pricing.js";
 import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
 import offerRouter from "./offer.js";
 import flatratesRoter from "./flatrates.js";
 import taskRouter from "./task-route.js";
+import contactPersonRouter from "./contact-persons.js";
+import tariffRouter from './tariff.js';
+import documentRouter from './documents.js';
+import nextCloudRouter from './nextcould-router.js';
+import settingsRouter from './settings-router.js';
 
 const router = Router();
 
@@ -33,9 +37,6 @@ router.use("/users", requireSession, userRouter);
 /* /api/contracts */
 router.use("/contracts", requireSession, contractRouter);
 
-/* /api/pricing */
-router.use("/pricing", requireSession, pricingRouter);
-
 /* /api/orders */
 router.use("/orders", requireSession, orderRouter);
 
@@ -47,5 +48,20 @@ router.use("/flatrates", requireSession, flatratesRoter);
 
 /* /api/task */
 router.use("/task", requireSession, taskRouter);
+
+/* /api/contact-persons */
+router.use("/contact-persons", requireSession, contactPersonRouter);
+
+/* /api/tariffs */
+router.use("/tariffs", requireSession, tariffRouter);
+
+/* /api/documents */
+router.use('/documents', documentRouter);
+
+/* /api/nextcloud */
+router.use('/nextcloud', nextCloudRouter);
+
+/* /api/settings */
+router.use('/settings', settingsRouter);
 
 export default router;

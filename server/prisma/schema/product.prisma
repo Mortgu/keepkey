@@ -5,32 +5,73 @@ model Product {
   description String?
   table       String?
 
-  productPricing ProductPricing[]
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
+
+  tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+  tariffId String?
+
+  tariffCustomers TariffCustomer[]
 
   createdAt DateTime? @default(now())
   updatedAt DateTime?
 
   @@index([name])
+  @@index([tariffId])
   @@map("product")
 }
 
-model ProductPricing {
-  id String @id @default(uuid())
+model Tariff {
+  id String @id @default(cuid())
+
+  products  Product[]
+  configs   TariffConfig[]
+  customers TariffCustomer[]
+
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+
+  @@map("tariff")
+}
+
+model TariffConfig {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
 
   contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
   contractId String
 
+  duration     Int  @default(12)
+  min_quantity Int
+  max_quantity Int?
+  price        Int
+
+  @@unique([tariffId, contractId, duration, min_quantity])
+  @@map("tariff_config")
+}
+
+model TariffCustomer {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
+
   product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String
 
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+
+  duration     Int  @default(12)
   min_quantity Int
-  max_quantity Int? @default(0)
+  max_quantity Int?
+  price        Int
 
-  duration_months Int @default(12)
-
-  price Int
-
-  @@map("pricing")
+  @@unique([tariffId, productId, customerId, contractId, duration, min_quantity])
+  @@map("tariff_customer")
 }

@@ -4,7 +4,11 @@ import {
   getOrderTasks,
   getAllOrders,
   deleteOrderById,
+  createOrder,
+  createOrderTask,
 } from "../controllers/order-controller.js";
+import { validate } from "../middlewares/validate.js";
+import { createOrderSchema } from "../schemas/order-schemas.js";
 
 const router = Router();
 
@@ -14,6 +18,8 @@ router.get("/", getAllOrders);
 router.get("/:orderId", getOrderById);
 
 router.get("/:orderId/documents", getOrderTasks);
+
+router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
 
 router.delete("/:id", deleteOrderById);
 

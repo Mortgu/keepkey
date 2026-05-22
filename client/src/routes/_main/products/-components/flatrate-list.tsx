@@ -27,7 +27,7 @@ export default function FlatRateList() {
     <div>
       <div className="mb-4 flex items-center justify-between">
         <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-          Flatrates ({flatRates?.length})
+          Flatrates
         </h1>
         <Button onClick={() => setOpen(true)} size="sm">
           Erstellen <Plus className="size-4" />

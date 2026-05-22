@@ -19,7 +19,7 @@ export const createOfferSchema = z.object({
     customerId: z.string().min(1),
     contactPersonId: z.string().min(1),
     userId: z.string().min(1),
-    voucherId: z.string().min(1),
+    quoteId: z.string().min(1),
 
     supplierId: z.string().nullable(),
     paymentTerm: z.string().nullable(),
@@ -28,4 +28,8 @@ export const createOfferSchema = z.object({
   }),
   positions: z.array(offerPositionSchema).min(1, "Füge mindestens ein Produkt hinzu!"),
   flatRates: z.array(offerFlatRateSchema).optional(),
+});
+
+export const reserveQuoteIdSchema = z.object({
+  quoteId: z.number().int(),
 });

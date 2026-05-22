@@ -43,7 +43,7 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
 
   return (
     <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
-      <div className="overflow-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-2xl max-h-[90vh] overflow-y-scroll flex flex-col">
+      <div className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
         <div className="flex items-center justify-between pt-5 px-5">
           {header}
           <Button
@@ -55,16 +55,16 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
           />
         </div>
 
-        <div className="py-5 px-5">{content}</div>
+        <div className="scrollbar-none py-5 px-5">{content}</div>
 
         <div className="flex items-center justify-end gap-2 py-3.5 px-5 border-t border-(--border) bg-(--subtle-50)">
           {footer ?? (
             <>
               <Button onClick={cancelFn} variant="secondary" size="sm">
-                Close
+                Abbrechen
               </Button>
               <Button onClick={primaryFn} variant="primary" size="sm">
-                Save
+                Speichern
               </Button>
             </>
           )}

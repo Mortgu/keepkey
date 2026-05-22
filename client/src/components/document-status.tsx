@@ -8,11 +8,7 @@ interface DocumentStatusProps {
 }
 
 export default function DocumentStatus({ orderId }: DocumentStatusProps) {
-  const {
-    data: jobs,
-    isPending,
-    error,
-  } = useQuery({
+  const { data: jobs, isPending, error } = useQuery({
     queryKey: ["document-jobs", orderId],
     queryFn: () => getTasksAction(orderId),
     refetchInterval: (data) => {
@@ -48,33 +44,23 @@ export default function DocumentStatus({ orderId }: DocumentStatusProps) {
     <div className="flex gap-2 h-full">
       {jobs.map((job) => (
         <div key={job.id} className="">
-          {job.status === "pending" && (
+          {job.status === "PENDING" && (
             <>
-              <Button
-                className="text-amber-400"
-                disabled={true}
-                size="sm"
-                variant="ghost"
-              >
+              <Button className="text-amber-400" disabled={true} size="sm" variant="ghost">
                 <Loader className="animate-spin size-4" />
                 Pending
               </Button>
             </>
           )}
-          {job.status === "processing" && (
+          {job.status === "RUNNING" && (
             <>
-              <Button
-                className="text-amber-400"
-                disabled={true}
-                size="sm"
-                variant="ghost"
-              >
+              <Button className="text-amber-400" disabled={true} size="sm" variant="ghost">
                 <Loader className="animate-spin size-4" />
                 Processing
               </Button>
             </>
           )}
-          {job.status === "completed" && (
+          {job.status === "COMPLETED" && (
             <>
               <Button className="" disabled={false} size="sm" variant="ghost">
                 <Download className="size-4" />
@@ -82,14 +68,9 @@ export default function DocumentStatus({ orderId }: DocumentStatusProps) {
               </Button>
             </>
           )}
-          {job.status === "failed" && (
+          {job.status === "FAILED" && (
             <>
-              <Button
-                className="text-red-400"
-                disabled={false}
-                size="sm"
-                variant="ghost"
-              >
+              <Button className="text-red-400" disabled={false} size="sm" variant="ghost">
                 <AlertCircle className="size-4" />
                 {formatJobType(job.type)}
               </Button>

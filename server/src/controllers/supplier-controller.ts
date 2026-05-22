@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
 
 export const getSuppliers = async (request: Request, response: Response) => {
-  const suppliers = await prisma.supplier.findMany();
+  const suppliers = await prisma.supplier.findMany({
+    include: {
+      offers: true,
+    }
+  });
   return response.status(200).json(suppliers);
 };
 

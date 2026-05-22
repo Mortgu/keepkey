@@ -27,15 +27,14 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  role           String?
-  banned         Boolean?  @default(false)
-  banReason      String?
-  banExpires     DateTime?
-  employeeOrders Order[]   @relation("EmployeeRelation")
-  customer       Customer? @relation(fields: [customerId], references: [id])
-  customerId     String?
-  offers         Offer[]
-  orders         Order[]
+  role       String?
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+  offers     Offer[]
+  orders     Order[]
 
   @@map("user")
 }
@@ -97,7 +96,9 @@ model Supplier {
 
   createdAt DateTime? @default(now())
   updatedAt DateTime?
-  offers    Offer[]
+
+  offers Offer[]
+  orders Order[]
 
   @@map("supplier")
 }
@@ -113,15 +114,27 @@ model FlatRate {
   @@map("flat_rate")
 }
 
+model AppSetting {
+  key       String   @id
+  value     String
+  updatedAt DateTime @updatedAt
+
+  @@map("app_setting")
+}
+
 model Contract {
   id String @id @default(uuid())
 
   name     String
   features String[]
 
-  productPricing ProductPricing[]
+  table String @default("")
+
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
+
+  tariffConfigs   TariffConfig[]
+  tariffCustomers TariffCustomer[]
 
   createdAt DateTime? @default(now())
 

@@ -20,11 +20,7 @@ export default function CustomerList() {
           Kunden ({customers.length})
         </h1>
 
-        <Button
-          onClick={() => setOpen(true)}
-          size="sm"
-          icon={<Plus className="size-4" />}
-        >
+        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setOpen(true)}>
           Kunde hinzufügen
         </Button>
       </div>

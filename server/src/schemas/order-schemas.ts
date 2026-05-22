@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+export const createOrderSchema = z.object({
+  id: z.string().min(1),
+});
+
 const orderPositionSchema = z.object({
   productId: z.string().min(1),
   contractId: z.string().min(1),
@@ -8,4 +12,3 @@ const orderPositionSchema = z.object({
   price: z.number().optional(),
 });
 
-export const createOrderSchema = z.array(orderPositionSchema).min(1);

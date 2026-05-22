@@ -10,53 +10,67 @@ import {
   converting,
 } from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
-import { Stage } from "./pipeline.js";
-import { TaskStatus } from "@prisma/client";
+import { OfferPosition, TaskStatus } from "@prisma/client";
+import { PipelineStage, PipelineStageError } from "../pipeline.js";
+import { uploadToNextCloud, getNextcloudPaths } from "../../lib/nextcloud.js";
+import logger from "../../middlewares/logger.js";
 
-const fetch: Stage<OfferPipelineContext> = {
+const loadOfferData: PipelineStage<OfferPipelineContext> = {
   name: "fetch",
   status: TaskStatus.RUNNING,
   run: async (context) => {
-    context.fetchedData = await fetchOfferData(context.offerId);
+    try {
+      context.fetchedData = await fetchOfferData(context.offerId);
+    } catch (exception: any) {
+      throw new PipelineStageError("Failed to fetch offer data!", 500, exception.message)
+    }
   },
 };
 
-const preprocess: Stage<OfferPipelineContext> = {
+const preprocess: PipelineStage<OfferPipelineContext> = {
   name: "preprocess",
   run: async (context) => {
-    context.formatedData = await formatFetchedData(context.fetchedData);
+    try {
+      context.formatedData = await formatFetchedData(context.fetchedData);
+    } catch (exception: any) {
+      throw new PipelineStageError("Preprocess step in pipeline failed", 500, exception.message);
+    }
   },
 };
 
-const postprocess: Stage<OfferPipelineContext> = {
+const postprocess: PipelineStage<OfferPipelineContext> = {
   name: "postprocess",
   run: async (context) => {
-    context.formatedData = await postprocessing(context.formatedData);
+    try {
+      context.formatedData = await postprocessing(context.formatedData);
+    } catch (exception: any) {
+      throw new PipelineStageError("Postprocess step in pipeline failed", 500, exception.message);
+    }
   },
 };
 
-const prepare: Stage<OfferPipelineContext> = {
+const prepare: PipelineStage<OfferPipelineContext> = {
   name: "prepare",
   run: async () => {
     await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
   },
 };
 
-const generate: Stage<OfferPipelineContext> = {
+const generate: PipelineStage<OfferPipelineContext> = {
   name: "generate",
   run: async (context) => {
     context.docxBuffer = await generating(context.formatedData);
   },
 };
 
-const convert: Stage<OfferPipelineContext> = {
+const convert: PipelineStage<OfferPipelineContext> = {
   name: "convert",
   run: async (context) => {
     context.pdfBuffer = await converting(context.docxBuffer!);
   },
 };
 
-const write: Stage<OfferPipelineContext> = {
+const write: PipelineStage<OfferPipelineContext> = {
   name: "write",
   run: async (context) => {
     const offer = context?.fetchedData?.offer;
@@ -65,13 +79,13 @@ const write: Stage<OfferPipelineContext> = {
       throw new Error("Offer is null!");
     }
 
-    const { voucherId, customer, offerPositions } = offer;
+    const { quoteId, customer, offerPositions } = offer;
     const { companyName } = customer;
     const workloads = offerPositions
       .map((i) => i.product.name.replaceAll(" ", ""))
       .join("+");
 
-    const baseName = `${voucherId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
+    const baseName = `${quoteId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
     context.displayName = `${baseName}_v${context.version}`;
 
     const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);
@@ -81,11 +95,25 @@ const write: Stage<OfferPipelineContext> = {
       fs.writeFile(docxPath, context.docxBuffer!),
       fs.writeFile(pdfPath, context.pdfBuffer!),
     ]);
+
+    getNextcloudPaths().then(({ pdfPath, docxPath }) =>
+      Promise.all([
+        uploadToNextCloud(`${pdfPath}/${context.displayName}.pdf`, context.pdfBuffer),
+        uploadToNextCloud(`${docxPath}/${context.displayName}.docx`, context.docxBuffer),
+      ])
+    ).catch((err) => {
+      logger.warn(`[offer-pipeline] Nextcloud upload skipped: ${err?.message ?? err}`);
+    });
   },
 };
 
-export const offerStages: Stage<OfferPipelineContext>[] = [
-  fetch,
+const upload: PipelineStage<OfferPipelineContext> = {
+  name: 'upload',
+  run: async (context) => { }
+}
+
+export const offerStages: PipelineStage<OfferPipelineContext>[] = [
+  loadOfferData,
   preprocess,
   postprocess,
   prepare,
