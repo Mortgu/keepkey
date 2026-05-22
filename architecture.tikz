@@ -1,0 +1,119 @@
+\documentclass[tikz, border=10pt]{standalone}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning, fit, backgrounds, shadows}
+
+\tikzset{
+  block/.style={
+    rectangle,
+    draw=black,
+    fill=white,
+    minimum width=2.5cm,
+    minimum height=0.8cm,
+    font=\small\sffamily,
+    text centered
+  },
+  container/.style={
+    rectangle,
+    draw=black,
+    fill=lightgray!20,
+    minimum width=5cm,
+    minimum height=3cm,
+    font=\small\sffamily,
+    rounded corners=0.1cm,
+    thick
+  },
+  arrow/.style={
+    ->,
+    >=Stealth,
+    thick
+  },
+  dasharrow/.style={
+    ->,
+    >=Stealth,
+    thick,
+    dashed
+  }
+}
+
+\begin{document}
+
+\begin{tikzpicture}[node distance=1.5cm]
+
+  % Frontend Layer
+  \node[container] (frontend) at (0, 4) {
+    \textbf{Frontend (React)}
+  };
+  \node[block] (components) at (-1.5, 5.5) {UI Komponenten};
+  \node[block] (router) at (0, 5.5) {TanStack Router};
+  \node[block] (query) at (1.5, 5.5) {TanStack Query};
+  \node[block] (apiclient) at (0, 4.3) {API Client};
+
+  % Backend Layer
+  \node[container] (backend) at (0, 0.5) {
+    \textbf{Backend (Node.js + Express)}
+  };
+  \node[block] (routes) at (-1.5, 2.3) {Express Routes};
+  \node[block] (controllers) at (0, 2.3) {Controller};
+  \node[block] (prisma) at (1.5, 2.3) {Prisma ORM};
+  \node[block] (auth) at (-1.5, 1.2) {Auth Middleware};
+  \node[block] (validation) at (0, 1.2) {Validierung};
+  \node[block] (errorhandler) at (1.5, 1.2) {Error Handler};
+
+  % Database
+  \node[block, fill=blue!15] (postgres) at (0, -1) {PostgreSQL};
+
+  % Async Pipeline
+  \node[container] (pipeline) at (5, 2) {
+    \textbf{Asynchrone Pipeline (BullMQ)}
+  };
+  \node[block] (docqueue) at (4, 3.3) {Document Queue};
+  \node[block] (uploadqueue) at (6, 3.3) {Upload Queue};
+  \node[block] (docworker) at (4, 2) {Document Worker};
+  \node[block] (uploadworker) at (6, 2) {Upload Worker};
+
+  % External Services
+  \node[block, fill=green!15] (nextcloud) at (5, 0.2) {NextCloud API};
+
+  % Arrows - Frontend Internal
+  \draw[arrow] (components) -- (router);
+  \draw[arrow] (router) -- (query);
+  \draw[arrow] (query) -- (apiclient);
+
+  % Arrows - Frontend to Backend
+  \draw[arrow] (apiclient) -- (0, 3.2) node[midway, right] {HTTPS};
+  \draw[arrow] (0, 3.2) -- (routes);
+
+  % Arrows - Backend Internal
+  \draw[arrow] (routes) -- (auth);
+  \draw[arrow] (routes) -- (validation);
+  \draw[arrow] (routes) -- (controllers);
+  \draw[arrow] (controllers) -- (prisma);
+  \draw[arrow] (prisma) -- (postgres);
+
+  % Arrows - Backend to Response
+  \draw[arrow] (postgres) -- (prisma);
+  \draw[arrow] (prisma) -- (0, 3.2);
+
+  % Arrows - Controllers to Queues
+  \draw[dasharrow] (controllers) -- (4.5, 2.5) node[midway, above] {enqueue};
+  \draw[dasharrow] (controllers) -- (5.5, 2.5) node[midway, above] {enqueue};
+
+  % Arrows - Queues to Workers
+  \draw[arrow] (docqueue) -- (docworker);
+  \draw[arrow] (uploadqueue) -- (uploadworker);
+
+  % Arrows - Worker to Database
+  \draw[dasharrow] (docworker) -- (1, 1.5);
+  \draw[dasharrow] (uploadworker) -- (1, 1.5);
+
+  % Arrows - Worker to NextCloud
+  \draw[arrow] (uploadworker) -- (nextcloud) node[midway, right] {WebDAV};
+
+  % Labels
+  \node[anchor=south] at (0, 6.5) {\large\textbf{Client-Seite}};
+  \node[anchor=south] at (0, 3) {\large\textbf{Server-Seite}};
+  \node[anchor=south] at (5, 4) {\large\textbf{Worker \& Extern}};
+
+\end{tikzpicture}
+
+\end{document}
