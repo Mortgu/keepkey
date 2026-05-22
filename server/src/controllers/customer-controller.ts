@@ -76,8 +76,8 @@ export const createCustomer = async (request: Request, response: Response) => {
       if (contactPersons?.length > 0) {
         await tx.contactPerson.createMany({
           data: contactPersons.map((p: any) => ({
-            customerId: customer.id,
             ...p,
+            customerId: customer.id,
           })),
         });
       }
