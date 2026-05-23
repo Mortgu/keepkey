@@ -4,6 +4,7 @@ import { AlertTriangle, Loader, Pen, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 import { DocumentItem } from "./card-components";
+import OfferRevisionHistory from "./card-components/offer-revision-history";
 
 
 import { useOfferHook } from "@/hooks";
@@ -39,6 +40,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 <a className="text-(--text) hover:cursor-pointer hover:underline">{offer.customer.companyName}</a>
                 -
                 <a>{offer.quoteId}</a>
+                <span className="text-xs text-(--text-secondary) font-light">v{offer.version}</span>
               </div>
             </div>
 
@@ -176,6 +178,11 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
               <DocumentItem key={document.id} document={document} />
             ))}
           </div>
+        </Collapsable>
+
+        {/* Revision history */}
+        <Collapsable label="Versionshistorie" className="w-full bg-(--subtle-50) justify-between rounded-none">
+          <OfferRevisionHistory offerId={offer.id} />
         </Collapsable>
 
         <div className="flex items-center justify-end px-2 border-t border-(--border)">

@@ -2,6 +2,7 @@ import { api } from "@/lib/api-client";
 
 import {
   type Offer,
+  type OfferRevision,
   type ContactPerson,
   type CreateOfferInput,
   type UpdateOfferInput,
@@ -53,6 +54,9 @@ export const updateOfferAction = (
   headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ offer, positions, flatRates }),
 });
+
+export const getOfferRevisionsAction = (offerId: string) =>
+  api<OfferRevision[]>(`/api/offers/${offerId}/revisions`, { method: "GET" });
 
 export const renameDocumentAction = (document_id: string, displayName: string) =>
   api<Document>(`/api/documents/${document_id}`, {

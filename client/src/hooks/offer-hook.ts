@@ -2,6 +2,7 @@ import {
   createOfferAction,
   deleteOfferAction,
   deleteOfferDocumentAction,
+  getOfferRevisionsAction,
   getOffersAction,
   getContactPersonsAction,
   updateOfferAction,
@@ -26,6 +27,16 @@ interface OfferQueryParams {
   contactPersonIds?: string[];
   sort?: string;
 }
+
+export const useOfferRevisionsHook = (offerId: string) => {
+  const { data: revisions = [] } = useQuery({
+    queryKey: ["offers", offerId, "revisions"],
+    queryFn: () => getOfferRevisionsAction(offerId),
+    enabled: !!offerId,
+  });
+
+  return { revisions };
+};
 
 export const useOfferHook = (params?: OfferQueryParams) => {
   const queryClient = useQueryClient();

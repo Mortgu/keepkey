@@ -97,10 +97,24 @@ export interface components {
             orders?: components["schemas"]["Order"];
             /** Format: int32 */
             net_amount: number;
+            /** Format: int32 */
+            version: number;
+            revisions: components["schemas"]["OfferRevision"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        OfferRevision: {
+            id: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            /** Format: int32 */
+            version: number;
+            snapshot: Record<string, never>;
+            changedBy?: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         OfferPosition: {
             id: string;
@@ -328,6 +342,12 @@ export interface components {
             /** Format: int32 */
             total_cents: number;
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
+        };
+        AppSetting: {
+            key: string;
+            value: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Contract: {
             id: string;
