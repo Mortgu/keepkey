@@ -34,6 +34,7 @@ import { formatEur } from "@/utils/utils";
 import ProductModalSection from "./modal-components/product-section";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
+import { useAuth } from "@/context/auth";
 
 interface OfferModalProps {
   onClose: () => void;
@@ -53,8 +54,36 @@ export const offerSchema = z.object({
   requestFrom: z.string().datetime().nullable(),
 });
 
+const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.infer<typeof offerSchema>>): z.infer<typeof offerSchema> => {
+  if (currentOffer !== undefined) {
+    return {
+      customerId: currentOffer.customerId,
+      contactPersonId: currentOffer.contactPersonId,
+      userId: currentOffer.userId,
+      quoteId: currentOffer.quoteId,
+      supplierId: currentOffer.supplierId ?? null,
+      paymentTerm: currentOffer.paymentTerm,
+      validUntil: currentOffer.validUntil ?? null,
+      requestFrom: currentOffer.requestFrom ?? null,
+    }
+  }
+
+  return {
+    customerId: defaults?.customerId ?? "",
+    contactPersonId: defaults?.contactPersonId ?? "",
+    userId: defaults?.userId ?? "",
+    quoteId: defaults?.quoteId ?? "",
+    supplierId: defaults?.supplierId ?? null,
+    paymentTerm: defaults?.paymentTerm ?? "30 Tage",
+    validUntil: defaults?.validUntil ?? null,
+    requestFrom: defaults?.requestFrom ?? null,
+  }
+}
+
 export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
   const isEdit = currentOffer !== undefined;
+
+  const { user } = useAuth();
 
   const { customers } = useCustomerHook();
   const { suppliers } = useSupplierHook();
@@ -93,22 +122,15 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
     enabled: !isEdit,
   });
 
-  const initialCustomerId = currentOffer?.customerId ?? customers[0]?.id ?? '';
-  const initialCustomer = customers.find((c: Customer) => c.id === initialCustomerId);
-
   console.log(users)
 
   const offerForm = useForm({
-    defaultValues: {
-      customerId: initialCustomerId,
-      contactPersonId: currentOffer?.contactPersonId ?? initialCustomer?.contactPersons[0]?.id ?? '',
-      userId: currentOffer?.userId ?? users[0]?.id ?? '',
-      quoteId: currentOffer?.quoteId ?? (nextQuoteId != null ? String(nextQuoteId) : ''),
-      supplierId: currentOffer?.supplierId ?? null,
-      paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
-      validUntil: currentOffer?.validUntil ?? null,
-      requestFrom: currentOffer?.requestFrom ?? null,
-    },
+    defaultValues: getFormDefaults(currentOffer, {
+      customerId: customers[0]?.id,
+      contactPersonId: customers[0]?.contactPersons[0]?.id,
+      userId: user?.id,
+      supplierId: suppliers[0]?.id,
+    }),
     validators: {
       onChange: offerSchema,
       onMount: offerSchema,
@@ -158,7 +180,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
           <div className="flex flex-wrap justify-between items-center gap-4">
             <offerForm.Field name="customerId" children={(field) => (
               <div className="flex-1">
-                <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                <Select label="Kunde" error={field.state.meta.errors[0]?.message}
                   value={field.state.value as string} onChange={(e) => {
                     const newCustomerId = e.target.value;
                     field.handleChange(newCustomerId);
@@ -183,7 +205,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
 
                   return (
                     <Select label="Ansprechpartner Kunde" value={field.state.value as string}
-                      error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                      error={field.state.meta.errors[0]?.message}
                       onChange={(e) => field.handleChange(e.target.value)} disabled={!customerId}>
                       {contactPersons.map((cp: ContactPerson) => (
                         <option key={cp.id} value={cp.id}>
@@ -200,7 +222,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="userId" children={(field) => (
               <div className="flex-1">
                 <Select label="Unser Ansprechpartner" value={field.state.value as string}
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}>
                   {users.map((user: User) => (
                     <option key={user.id} value={user.id}>
@@ -228,7 +250,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="supplierId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value || null)}>
                   <option value="">None</option>
                   {suppliers?.map((supplier: Supplier) => (
@@ -243,7 +265,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="paymentTerm" children={(field) => (
               <div className="flex-1 grid gap-2">
                 <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors[0]?.message}
                   value={field.state.value as string}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -255,7 +277,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="validUntil" children={(field) => (
               <div className="flex-1 grid gap-2">
                 <Input label="Angebot gültig bis" type="date" input_size="sm" placeholder="Gültig bis..."
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors[0]?.message}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}
                   onChange={(e) => {
@@ -270,7 +292,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="requestFrom" children={(field) => (
               <div className="flex-1 grid gap-2">
                 <Input label="Ihre Anfrage vom" type="date" input_size="sm" placeholder="Ihre Anfrage vom..."
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors[0]?.message}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}
                   onChange={(e) => {

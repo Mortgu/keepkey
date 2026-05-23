@@ -26,3 +26,4 @@ export const getNextcloudStatusHandler = async (_req: Request, res: Response) =>
   const result = await checkNextcloudConnection();
   return res.status(200).json(result);
 };
+

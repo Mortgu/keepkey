@@ -113,6 +113,8 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
 export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
   const { id } = request.params;
 
+
+
   return response.status(500).json({
     file: `${id}.reserved`, message: 'Reservation Failed'
   });

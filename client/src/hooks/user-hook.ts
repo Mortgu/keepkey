@@ -14,11 +14,7 @@ export const useUserHook = () => {
   const invalidate = () =>
     queryClient.invalidateQueries({ queryKey: ["users"] });
 
-  const {
-    data: users = [],
-    isPending,
-    error,
-  } = useQuery({
+  const { data: users = [], isPending, error } = useQuery({
     queryKey: ["users"],
     queryFn: getAllUsersAction,
   });

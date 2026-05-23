@@ -162,8 +162,8 @@ export const getSessionUser = async (request: Request, response: Response) => {
     });
   }
 
-  const databaseUser = await prisma.user.findMany({
-    where: { id: user!.id },
+  const databaseUser = await prisma.user.findUnique({
+    where: { id: user.id as string },
   });
 
   return response.status(200).json(databaseUser);
