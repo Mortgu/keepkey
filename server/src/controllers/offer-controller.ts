@@ -14,6 +14,7 @@ import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
 import { getLatestQuoteId, reserveQuoteIdInNextCloud } from "../lib/nextcloud.js";
 import logger from "../middlewares/logger.js";
+import { NextCloudReservationFailedException } from "../exceptions/exceptions.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const { search, companyIds, contactPersonIds, sort } = request.query;
@@ -114,9 +115,8 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
   const { id } = request.params;
 
 
-
-  return response.status(500).json({
-    file: `${id}.reserved`, message: 'Reservation Failed'
+  return response.status(200).json({
+    file: `${id}.reserved`, message: 'Reservation Failed', cause: ""
   });
 }
 

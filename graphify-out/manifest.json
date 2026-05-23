@@ -188,16 +188,16 @@
     "hash": "8b2ccf7a185e4989771d63d24ddfe106"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/nextcloud-controller.ts": {
-    "mtime": 1779461641.9180815,
-    "hash": "553d20c657b2298a838cb0610b08db51"
+    "mtime": 1779526871.846684,
+    "hash": "ec791e45cb69a6c07f828583abeaa6fc"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/documents-controller.ts": {
     "mtime": 1779461641.9180024,
     "hash": "a5d9b3524222148de5f3d247c0f99dbb"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/offer-controller.ts": {
-    "mtime": 1779523690.175143,
-    "hash": "2e4e22d3827889d5c843d2db649064d7"
+    "mtime": 1779526874.5710642,
+    "hash": "4ea88ec5690b0da0e043cafd9fdcf4a5"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/settings-controller.ts": {
     "mtime": 1779461641.9185555,
@@ -228,8 +228,8 @@
     "hash": "e0bfa118d039c8a7a2f9dd56cc726ec2"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/user-controller.ts": {
-    "mtime": 1779461641.919011,
-    "hash": "9a22caa3c48c713491e724c7154ed8ef"
+    "mtime": 1779535452.5773613,
+    "hash": "7f2188e25379e30aab748112772df7ee"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/tariff-controller.ts": {
     "mtime": 1779461641.9187503,
@@ -340,7 +340,7 @@
     "hash": "7c3aa24f682be25e1557b3440f86a88a"
   },
   "/Users/oskar/Programming/keepit/client/src/types/offers.ts": {
-    "mtime": 1779518369.0092597,
+    "mtime": 1779534526.1245382,
     "hash": "4c2b4b23fd520735835ccef9ac96f98c"
   },
   "/Users/oskar/Programming/keepit/client/src/types/order.ts": {
@@ -360,8 +360,8 @@
     "hash": "6e60124a1e343bfe3ef4da941f0240d6"
   },
   "/Users/oskar/Programming/keepit/client/src/context/auth.tsx": {
-    "mtime": 1777965416.59086,
-    "hash": "62498c473493d720991a5a103645d3c6"
+    "mtime": 1779535471.099388,
+    "hash": "5f14c10bd29f9c8001937fdc40650987"
   },
   "/Users/oskar/Programming/keepit/client/src/utils/utils.ts": {
     "mtime": 1777973521.2283869,
@@ -468,7 +468,7 @@
     "hash": "2d0b6d5330243945eb61755d2b192294"
   },
   "/Users/oskar/Programming/keepit/client/src/components/inputs/text/input.tsx": {
-    "mtime": 1779522879.502707,
+    "mtime": 1779534810.6606412,
     "hash": "5e0e0b0ab9b49dbabf45a6a7e13527f5"
   },
   "/Users/oskar/Programming/keepit/client/src/components/badge/badge-types.tsx": {
@@ -512,8 +512,8 @@
     "hash": "867453beea7b57101ce6b87594c45467"
   },
   "/Users/oskar/Programming/keepit/client/src/hooks/user-hook.ts": {
-    "mtime": 1778063149.337025,
-    "hash": "ea7a727a08067c254c6795bebedfd9b5"
+    "mtime": 1779534660.1385236,
+    "hash": "1830b275bc2b17829e46c5cef3e048df"
   },
   "/Users/oskar/Programming/keepit/client/src/hooks/supplier-hook.ts": {
     "mtime": 1779461641.9008014,
@@ -644,8 +644,8 @@
     "hash": "5c28481238e1ba65db064d67ddb071d5"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-modal.tsx": {
-    "mtime": 1779526646.2764318,
-    "hash": "932ef69dfdc4ba1746c4a837a374bf66"
+    "mtime": 1779535639.3074062,
+    "hash": "52d8f0e72eafa1d3b1942d8e7d9ae8e0"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-card.tsx": {
     "mtime": 1779518369.0088294,
@@ -659,6 +659,10 @@
     "mtime": 1779526181.9592443,
     "hash": "8348fac67a41585ece69d0d1e221a4fc"
   },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/modal-components/edit-modal-form.tsx": {
+    "mtime": 1779532504.4729764,
+    "hash": "43c4ee3ffa066404093b4c6d6946b0ed"
+  },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/modal-components/offer-flat-rate-form.tsx": {
     "mtime": 1779461641.903965,
     "hash": "f4855f382fae21bd713d4795d4ca645d"
@@ -668,8 +672,12 @@
     "hash": "ed05a7a9aac2b9bed55c47410cd549eb"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/modal-components/product-section.tsx": {
-    "mtime": 1779461641.9043345,
+    "mtime": 1779534490.209765,
     "hash": "25c37eb0c3ddfc5cb0bbdece86d3c654"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/modal-components/create-modal-form.tsx": {
+    "mtime": 1779532149.4387283,
+    "hash": "a1fdc9cb6ab81aed5e3964a529cdc543"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/modal-components/offer-product-form.tsx": {
     "mtime": 1779461641.9041014,

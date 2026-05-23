@@ -14,3 +14,10 @@ export class AppException extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
+
+export class NextCloudReservationFailedException extends AppException {
+
+    constructor(cause: string) {
+        super("Reservation failed!", 409, cause)
+    }
+}

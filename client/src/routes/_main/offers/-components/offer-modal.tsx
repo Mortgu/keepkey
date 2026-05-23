@@ -239,7 +239,8 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
             <offerForm.Field name="quoteId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Input label="AG-Nr." value={field.state.value as string}
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ") || errorCreatingReservation?.message}
+                  warning={field.state.meta.errors[0]?.message || errorCreatingReservation?.message}
+                  warningTooltip={String(JSON.stringify(errorCreatingReservation))}
                   onChange={(e) => field.handleChange(e.target.value)}
                   loading={isCreatingReservation || fetchingNextQuiteId}
                   disabled={isCreatingReservation || fetchingNextQuiteId}

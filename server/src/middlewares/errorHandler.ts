@@ -18,24 +18,10 @@ export const errorHandler = (err: AppException, req: Request, res: Response, nex
     logger.error("UNHANDLED ERROR: ", err);
   }
 
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
-    const mapped = prismaErrorMap[err.code];
-
-    if (mapped) {
-      return res.status(mapped.status).json({
-        message: mapped.message, code: err.code
-      });
-    }
-
-    return res.status(400).json({
-      message: "Datenbankfehler", code: err.code,
-    });
-  }
-
   res.status(statusCode).json({
-    status: 'error',
-    code: err.code ?? 'INTERNAL_ERROR',
     message: isOperational ? err.message : 'Something went wrong!',
+    code: err.code ?? 'INTERNAL_ERROR',
+
     ...(env.NODE_ENV === "development" && { stack: err.stack }),
   });
 };
