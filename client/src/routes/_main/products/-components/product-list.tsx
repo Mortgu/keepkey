@@ -6,11 +6,11 @@ import ProductItem from "./product-item";
 import ProductModal from "./product-modal";
 
 import { Button, SearchBar } from "@/components";
-import { useProductHook } from "@/hooks";
+import { useModal, useProductHook } from "@/hooks";
 import type { Product } from "@/types";
 
 export default function ProductList() {
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal();
   const [searchQuery, setSearchQuery] = useState<string>("");
 
   const { products, isPending, error, createProduct } = useProductHook();
@@ -36,17 +36,14 @@ export default function ProductList() {
 
       <div className="flex justify-between items-center gap-4">
         <div className="w-full flex items-center gap-4">
-
           <SearchBar value={searchQuery} onChange={setSearchQuery}
             onSubmit={() => { }} placeholder="Nach Produkt Namen suchen" />
 
-
           <div className="flex items-center gap-2">
-            <Button onClick={() => setOpen(true)} size="sm">
+            <Button onClick={() => modal.open()} size="sm">
               Erstellen <Plus className="size-4" />
             </Button>
           </div>
-
         </div>
       </div>
 
@@ -56,10 +53,10 @@ export default function ProductList() {
         ))}
       </div>
 
-      {/* Product Modal */}
-      <ProductModal open={isOpen} cancelFn={() => setOpen(false)}
-        submitFn={(value) => createProduct({ ...value })} />
-
+      {modal.isOpen && (
+        <ProductModal key={modal.key} onClose={modal.close}
+          submitFn={(value) => createProduct({ ...value })} />
+      )}
     </div>
   );
 }

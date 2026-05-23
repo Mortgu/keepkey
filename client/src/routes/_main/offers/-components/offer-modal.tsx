@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
 
 import { Loader, Plus, Trash, X } from "lucide-react";
@@ -36,8 +36,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 
 interface OfferModalProps {
-  open: boolean;
-  cancelFn: () => void;
+  onClose: () => void;
   currentOffer?: Offer;
 }
 
@@ -54,56 +53,7 @@ export const offerSchema = z.object({
   requestFrom: z.string().datetime().nullable(),
 });
 
-export default function OfferModal({ open, cancelFn, currentOffer }: OfferModalProps) {
-  const isEdit = currentOffer !== undefined;
-
-  const { data: nextQuoteId, isPending: isNextQuoteIdPending } = useQuery({
-    queryKey: ['nextQuoteId'],
-    queryFn: async () => api<number>('/api/offers/next', { method: 'GET' }),
-    enabled: !isEdit,
-  });
-
-  /*const { data: reserve, isPending: isReserving, error: errorReserving } = useQuery({
-    queryKey: ['reserveId'],
-    queryFn: async () => api<string | null>('/api/offers/reserve', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ quoteId: nextQuoteId }),
-    }),
-    enabled: !isEdit,
-  })*/
-
-  if (!isEdit && (isNextQuoteIdPending)) {
-    return (
-      <ModalDialog open={open} cancelFn={cancelFn}>
-        <ModalDialog.Header>
-          <h1 className="text-lg">Neues Angebot erstellen</h1>
-        </ModalDialog.Header>
-        <ModalDialog.Content>
-          <div className="flex items-center justify-center py-8">
-            <Loader className="size-5 animate-spin" />
-          </div>
-        </ModalDialog.Content>
-      </ModalDialog>
-    );
-  }
-
-
-  return (
-    <OfferModalForm
-      open={open}
-      cancelFn={cancelFn}
-      currentOffer={currentOffer}
-      nextQuoteId={nextQuoteId}
-    />
-  );
-}
-
-interface OfferModalFormProps extends OfferModalProps {
-  nextQuoteId: number | undefined;
-}
-
-function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModalFormProps) {
+export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
   const isEdit = currentOffer !== undefined;
 
   const { customers } = useCustomerHook();
@@ -128,10 +78,25 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
 
   const [showFlatRateForm, setShowFlatRateForm] = useState(false);
 
-  const { createOffer, errorCreatingOffer, updateOffer } = useOfferHook();
+  const {
+    createOffer,
+    errorCreatingOffer,
+    updateOffer,
+    createReservation,
+    isCreatingReservation,
+    errorCreatingReservation,
+  } = useOfferHook();
+
+  const { data: nextQuoteId, isPending: fetchingNextQuiteId } = useQuery({
+    queryKey: ['nextQuoteId'],
+    queryFn: async () => api<number>('/api/offers/next', { method: 'GET' }),
+    enabled: !isEdit,
+  });
 
   const initialCustomerId = currentOffer?.customerId ?? customers[0]?.id ?? '';
   const initialCustomer = customers.find((c: Customer) => c.id === initialCustomerId);
+
+  console.log(users)
 
   const offerForm = useForm({
     defaultValues: {
@@ -139,10 +104,8 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
       contactPersonId: currentOffer?.contactPersonId ?? initialCustomer?.contactPersons[0]?.id ?? '',
       userId: currentOffer?.userId ?? users[0]?.id ?? '',
       quoteId: currentOffer?.quoteId ?? (nextQuoteId != null ? String(nextQuoteId) : ''),
-
-      supplierId: currentOffer?.supplierId ?? null, //suppliers[0]?.id
+      supplierId: currentOffer?.supplierId ?? null,
       paymentTerm: currentOffer?.paymentTerm ?? '30 Tage',
-
       validUntil: currentOffer?.validUntil ?? null,
       requestFrom: currentOffer?.requestFrom ?? null,
     },
@@ -160,16 +123,21 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
             flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
           });
         } else {
+          const reservation = await createReservation({ offer_id: "dwa" });
+          console.log(reservation);
+
           await createOffer({
             offer: value as CreateOfferInput,
             positions: offerProducts as CreateOfferPositionInput[],
             flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
           });
         }
-        cancelFn();
+        onClose();
       } catch (exception: any) { }
     },
   });
+
+  useEffect(() => offerForm.setFieldValue('quoteId', String(nextQuoteId)), [nextQuoteId]);
 
   const handleFormSubmit = (e: {
     preventDefault(): void;
@@ -181,14 +149,13 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
   };
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
-        <h1 className="text-lg">Angebot bearbeiten</h1>
+        <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
         <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
           <div className="flex flex-wrap justify-between items-center gap-4">
-
             <offerForm.Field name="customerId" children={(field) => (
               <div className="flex-1">
                 <Select label="Kunde" error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
@@ -197,7 +164,7 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                     field.handleChange(newCustomerId);
                     const newCustomer = customers.find((c: Customer) => c.id === newCustomerId);
                     offerForm.setFieldValue('contactPersonId', newCustomer?.contactPersons[0]?.id ?? '');
-                  }} >
+                  }}>
                   {customers?.map((customer: Customer) => (
                     <option key={customer.id} value={customer.id}>
                       {customer.companyName}
@@ -208,7 +175,6 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
               </div>
             )} />
 
-            {/* Ihr Ansprechpartner */}
             <offerForm.Field name="contactPersonId" children={(field) => (
               <div className="flex-1">
                 <offerForm.Subscribe selector={(state) => state.values.customerId} children={(customerId) => {
@@ -227,11 +193,9 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                       {contactPersons.length <= 0 && <option value="">None</option>}
                     </Select>
                   );
-                }}
-                />
+                }} />
               </div>
-            )}
-            />
+            )} />
 
             <offerForm.Field name="userId" children={(field) => (
               <div className="flex-1">
@@ -247,21 +211,20 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                 </Select>
               </div>
             )} />
-
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
             <offerForm.Field name="quoteId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Input label="AG-Nr." value={field.state.value as string}
-                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ") || errorCreatingReservation?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
+                  loading={isCreatingReservation || fetchingNextQuiteId}
+                  disabled={isCreatingReservation || fetchingNextQuiteId}
                 />
               </div>
-            )}
-            />
+            )} />
 
-            {/* Lieferant / Supplier */}
             <offerForm.Field name="supplierId" children={(field) => (
               <div className="flex-1 grid gap-2 items-center">
                 <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
@@ -275,64 +238,47 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                   ))}
                 </Select>
               </div>
-            )}
-            />
+            )} />
 
-            {/* Zahlungsbedingung */}
             <offerForm.Field name="paymentTerm" children={(field) => (
               <div className="flex-1 grid gap-2">
-
                 <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   value={field.state.value as string}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
               </div>
-            )}
-            />
+            )} />
           </div>
 
           <div className="flex flex-wrap justify-between items-center gap-4">
-            {/* Angebot Gültig bis */}
             <offerForm.Field name="validUntil" children={(field) => (
               <div className="flex-1 grid gap-2">
-
                 <Input label="Angebot gültig bis" type="date" input_size="sm" placeholder="Gültig bis..."
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (!val) {
-                      field.handleChange(null);
-                      return;
-                    }
+                    if (!val) { field.handleChange(null); return; }
                     field.handleChange(`${val}T00:00:00.000Z`);
                   }}
                 />
-
               </div>
-            )}
-            />
+            )} />
 
-            {/* Ihre Anfrage vom */}
             <offerForm.Field name="requestFrom" children={(field) => (
               <div className="flex-1 grid gap-2">
-
                 <Input label="Ihre Anfrage vom" type="date" input_size="sm" placeholder="Ihre Anfrage vom..."
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (!val) {
-                      field.handleChange(null);
-                      return;
-                    }
+                    if (!val) { field.handleChange(null); return; }
                     field.handleChange(`${val}T00:00:00.000Z`);
                   }}
                 />
-
               </div>
             )} />
           </div>
@@ -343,9 +289,7 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
 
           <div className="grid gap-4">
             <div className="flex items-center justify-between w-full">
-              <span className="text-sm font-medium text-gray-700">
-                Pauschalen
-              </span>
+              <span className="text-sm font-medium text-gray-700">Pauschalen</span>
               <Button variant="link" size="fit_sm" disabled={showFlatRateForm}
                 icon={<Plus className="size-4" />} onClick={() => setShowFlatRateForm(true)}>
                 Pauschale hinzufügen
@@ -362,7 +306,7 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                   <div>
                     <Button type="button" size="xs" variant="secondary"
                       icon={<Trash className="size-3" />} iconOnly
-                      onClick={() => setOfferProducts((prev) => prev.filter((_, i) => i !== index))} />
+                      onClick={() => setOfferFlatRates((prev) => prev.filter((_, i) => i !== index))} />
                   </div>
                 </div>
               ))}
@@ -375,18 +319,15 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
               )}
             </div>
           </div>
-
         </form>
       </ModalDialog.Content>
       <ModalDialog.Footer>
         <div className="w-full flex items-center justify-between">
           <p className="text-(--destructive)">
-            {errorCreatingOffer && (
-              `${errorCreatingOffer.message}`
-            )}
+            {errorCreatingOffer && `${errorCreatingOffer.message}`}
           </p>
           <div className="flex gap-2">
-            <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+            <Button onClick={onClose} type="button" size="sm" variant="secondary">
               Abbrechen
             </Button>
             <offerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
@@ -394,8 +335,7 @@ function OfferModalForm({ open, cancelFn, currentOffer, nextQuoteId }: OfferModa
                 {isSubmitting && <Loader className="size-4 animate-spin" />}
                 Speichern
               </Button>
-            )}
-            />
+            )} />
           </div>
         </div>
       </ModalDialog.Footer>

@@ -3,9 +3,7 @@ import { useEffect } from "react";
 import { Button } from "@/components";
 
 interface ModalProps {
-  open: boolean;
-  cancelFn?: () => void;
-  primaryFn?: () => void;
+  onClose: () => void;
   children?: React.ReactNode;
   className?: string;
 }
@@ -22,19 +20,15 @@ function Footer({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
+function ModalDialog({ onClose, children }: ModalProps) {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        if (cancelFn) cancelFn();
-      }
+      if (e.key === "Escape") onClose();
     };
 
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, cancelFn]);
-
-  if (!open) return null;
+  }, [onClose]);
 
   const childArray = Array.isArray(children) ? children : [children];
   const header = childArray.find((c: any) => c?.type === Header);
@@ -47,7 +41,7 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
         <div className="flex items-center justify-between pt-5 px-5">
           {header}
           <Button
-            onClick={cancelFn}
+            onClick={onClose}
             variant="secondary"
             size="xs"
             icon={<X className="size-4" />}
@@ -60,10 +54,10 @@ function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
         <div className="flex items-center justify-end gap-2 py-3.5 px-5 border-t border-(--border) bg-(--subtle-50)">
           {footer ?? (
             <>
-              <Button onClick={cancelFn} variant="secondary" size="sm">
+              <Button onClick={onClose} variant="secondary" size="sm">
                 Abbrechen
               </Button>
-              <Button onClick={primaryFn} variant="primary" size="sm">
+              <Button variant="primary" size="sm">
                 Speichern
               </Button>
             </>

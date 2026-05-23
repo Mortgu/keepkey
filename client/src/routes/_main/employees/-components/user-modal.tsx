@@ -7,8 +7,7 @@ import { type User } from "@/types";
 import { Input, ModalDialog, Button } from "@/components";
 
 interface UserModalProps {
-  open: boolean;
-  cancelFn: () => void;
+  onClose: () => void;
   currentUser: User | null;
 }
 
@@ -32,7 +31,7 @@ const emptyUser = {
   password: "",
 };
 
-export default function UserModal({ open, cancelFn, currentUser }: UserModalProps) {
+export default function UserModal({ onClose, currentUser }: UserModalProps) {
   const isEdit = currentUser !== null;
 
   const { updateUser, createUser } = useUserHook();
@@ -56,7 +55,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
       } else {
         await createUser({ body: { ...value, name } });
       }
-      cancelFn();
+      onClose();
     },
   });
 
@@ -67,11 +66,10 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
   };
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
         <h1 className="text-lg">
-          {isEdit && "Nutzer bearbeiten"}
-          {!isEdit && "Neuen Nutzer anlegen"}
+          {isEdit ? "Nutzer bearbeiten" : "Neuen Nutzer anlegen"}
         </h1>
       </ModalDialog.Header>
 
@@ -80,10 +78,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
           <div className="flex items-center gap-4">
             <userForm.Field name="salutation" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input
-                  id={field.name}
-                  label="Anrede"
-                  input_size="sm"
+                <Input id={field.name} label="Anrede" input_size="sm"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -94,10 +89,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
 
             <userForm.Field name="firstName" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input
-                  id={field.name}
-                  input_size="sm"
-                  label="Vorname"
+                <Input id={field.name} input_size="sm" label="Vorname"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -108,10 +100,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
 
             <userForm.Field name="lastName" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input
-                  id={field.name}
-                  input_size="sm"
-                  label="Nachname"
+                <Input id={field.name} input_size="sm" label="Nachname"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -124,10 +113,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
           <div className="flex items-center gap-4">
             <userForm.Field name="email" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input
-                  id={field.name}
-                  label="E-Mail"
-                  input_size="sm"
+                <Input id={field.name} label="E-Mail" input_size="sm"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -138,11 +124,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
 
             <userForm.Field name="password" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input
-                  id={field.name}
-                  type="password"
-                  input_size="sm"
-                  label="Passwort"
+                <Input id={field.name} type="password" input_size="sm" label="Passwort"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -155,7 +137,7 @@ export default function UserModal({ open, cancelFn, currentUser }: UserModalProp
       </ModalDialog.Content>
 
       <ModalDialog.Footer>
-        <Button variant="secondary" size="xs" onClick={cancelFn}>
+        <Button variant="secondary" size="xs" onClick={onClose}>
           Abbrechen
         </Button>
         <userForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (

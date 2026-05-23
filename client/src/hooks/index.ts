@@ -1,3 +1,4 @@
+export * from './use-modal';
 export * from './contract-hook';
 export * from './customer-hook';
 export * from './flatrate-hook';

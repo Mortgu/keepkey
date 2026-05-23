@@ -3,8 +3,7 @@ import { useCustomerHook, useTariffHook } from "@/hooks";
 import { useState, type SyntheticEvent } from "react";
 
 interface TariffCustomerModalProps {
-    open: boolean;
-    cancelFn: () => void;
+    onClose: () => void;
     tariffId: string;
     productOptions: { id: string; name: string }[];
     contractId: string;
@@ -16,8 +15,7 @@ interface TariffCustomerModalProps {
 }
 
 export default function TariffCustomerModal({
-    open,
-    cancelFn,
+    onClose,
     tariffId,
     productOptions,
     contractId,
@@ -53,11 +51,11 @@ export default function TariffCustomerModal({
                 price,
             },
         });
-        cancelFn();
+        onClose();
     };
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
                 <h1 className="text-lg">Kunden-Override anlegen</h1>
             </ModalDialog.Header>
@@ -70,11 +68,8 @@ export default function TariffCustomerModal({
                     </p>
                     <label className="grid gap-1 text-sm">
                         Kunde
-                        <select
-                            value={customerId}
-                            onChange={(e) => setCustomerId(e.target.value)}
-                            className="h-8.5 px-2 border border-(--border) rounded-md text-sm bg-white"
-                        >
+                        <select value={customerId} onChange={(e) => setCustomerId(e.target.value)}
+                            className="h-8.5 px-2 border border-(--border) rounded-md text-sm bg-white">
                             <option value="">— wählen —</option>
                             {customers.map((c) => (
                                 <option key={c.id} value={c.id}>
@@ -94,45 +89,24 @@ export default function TariffCustomerModal({
                         </Select>
                     </label>
                     <div className="grid grid-cols-4 gap-2">
-                        <Input label="Min"
-                            type="number"
-                            value={overrideMin}
-                            onChange={(e) => setOverrideMin(parseInt(e.target.value) || 0)}
-                        />
-                        <Input label="Max"
-                            type="number"
-                            value={overrideMax ?? ""}
-                            onChange={(e) =>
-                                setOverrideMax(
-                                    e.target.value ? parseInt(e.target.value) : null,
-                                )
-                            }
-                        />
-                        <Input label="Laufzeit" type="number"
-                            value={overrideDuration}
-                            onChange={(e) =>
-                                setOverrideDuration(parseInt(e.target.value) || 0)
-                            }
-                        />
-                        <Input label="Preis (Cent)"
-                            type="number"
-                            value={price}
-                            onChange={(e) => setPrice(parseInt(e.target.value) || 0)}
-                        />
+                        <Input label="Min" type="number" value={overrideMin}
+                            onChange={(e) => setOverrideMin(parseInt(e.target.value) || 0)} />
+                        <Input label="Max" type="number" value={overrideMax ?? ""}
+                            onChange={(e) => setOverrideMax(e.target.value ? parseInt(e.target.value) : null)} />
+                        <Input label="Laufzeit" type="number" value={overrideDuration}
+                            onChange={(e) => setOverrideDuration(parseInt(e.target.value) || 0)} />
+                        <Input label="Preis (Cent)" type="number" value={price}
+                            onChange={(e) => setPrice(parseInt(e.target.value) || 0)} />
                     </div>
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+                <Button onClick={onClose} type="button" size="sm" variant="secondary">
                     Abbrechen
                 </Button>
-                <Button
-                    form="tariff-customer-form"
-                    type="submit"
-                    size="sm"
+                <Button form="tariff-customer-form" type="submit" size="sm"
                     disabled={!customerId || !productId || isAddingCustomerOverride}
-                    loading={isAddingCustomerOverride}
-                >
+                    loading={isAddingCustomerOverride}>
                     Speichern
                 </Button>
             </ModalDialog.Footer>

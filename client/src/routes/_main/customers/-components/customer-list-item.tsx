@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
-import { Pen, Trash, User, Users } from "lucide-react";
+import React, { useEffect } from "react";
+import { Pen, Trash, Users } from "lucide-react";
 import CustomerModal from "./customer-modal";
 
 import { formatDate } from "@/lib/format";
 
 import type { Customer } from "@/types";
-import { useCustomerHook } from "@/hooks";
+import { useCustomerHook, useModal } from "@/hooks";
 import { Button } from "@/components";
 import ContactPersonModal from "./contact-person-modal";
 import { ToastContainer, toast } from 'react-toastify';
@@ -15,13 +15,10 @@ interface CustomerListItemProps {
 }
 
 export default function CustomerListItem({ customer }: CustomerListItemProps) {
-  const [edit, setEdit] = useState<boolean>(false);
-  const [adding, setAdding] = useState<boolean>(false);
+  const editModal = useModal<Customer>();
+  const contactModal = useModal();
 
   const { deleteCustomer, isDeleting, errorDeleting } = useCustomerHook();
-
-  if (errorDeleting) {
-  }
 
   useEffect(() => {
     toast.error(errorDeleting?.message)
@@ -44,10 +41,10 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
 
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" icon={<Pen className="size-3.5" />}
-              iconOnly onClick={() => setEdit(true)} />
+              iconOnly onClick={() => editModal.open(customer)} />
 
             <Button variant="secondary" size="sm" icon={<Users className="size-3.5" />}
-              iconOnly onClick={() => setAdding(true)} />
+              iconOnly onClick={() => contactModal.open()} />
 
             <Button variant="secondary" size="sm" loading={isDeleting}
               icon={<Trash className="size-3.5" />} iconOnly
@@ -56,9 +53,14 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
         </div>
       </div>
 
-      <CustomerModal currentCustomer={customer} open={edit} cancelFn={() => setEdit(false)} />
-      <ContactPersonModal open={adding} cancelFn={() => setAdding(false)}
-        currentCustomerId={customer.id} currentContactPersons={customer.contactPersons ?? []} />
+      {editModal.isOpen && (
+        <CustomerModal key={editModal.key} currentCustomer={editModal.data} onClose={editModal.close} />
+      )}
+
+      {contactModal.isOpen && (
+        <ContactPersonModal key={contactModal.key} onClose={contactModal.close}
+          currentCustomerId={customer.id} currentContactPersons={customer.contactPersons ?? []} />
+      )}
     </React.Fragment>
   );
 }

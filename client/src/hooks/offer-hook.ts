@@ -7,12 +7,12 @@ import {
   getContactPersonsAction,
   updateOfferAction,
   renameDocumentAction,
+  createReservationAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import type {
-  ContactPerson,
   CreateOfferPositionInput,
   CreateOfferInput,
   CreateOfferFlatRatesInput,
@@ -83,7 +83,14 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
       renameDocumentAction(document_id, displayName),
     onSuccess: invalidate,
-  })
+  });
+
+  const createReservationMutation = useMutation({
+    mutationFn: ({ offer_id }: { offer_id: string }) => createReservationAction(offer_id),
+    onSuccess: invalidate,
+  });
+
+
 
   return {
     offers,
@@ -110,5 +117,9 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     renameDocument: renameDocumentMutation.mutateAsync,
     isRenamingDocument: renameDocumentMutation.isPending,
     errorRenamingDocument: renameDocumentMutation.error,
+
+    createReservation: createReservationMutation.mutate,
+    isCreatingReservation: createReservationMutation.isPending,
+    errorCreatingReservation: createReservationMutation.error,
   };
 };

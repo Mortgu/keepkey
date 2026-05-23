@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 
-import { KeyRound, Pen, Trash } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import UserModal from "./user-modal";
 
 import { formatDate } from "@/lib/format";
-import { useUserHook } from "@/hooks";
+import { useModal, useUserHook } from "@/hooks";
 import { Button } from "@/components";
 import type { User } from "@/types";
 
@@ -13,8 +13,7 @@ interface UserListItemProps {
 }
 
 export default function UserListItem({ user }: UserListItemProps) {
-  /* Edit User Modal */
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal<User>();
 
   const { deleteUser, isDeletingUser } = useUserHook();
 
@@ -31,9 +30,7 @@ export default function UserListItem({ user }: UserListItemProps) {
         <div className="flex items-center gap-12">
           <div className="flex items-center ">
             <Button variant="ghost" size="sm" icon={<Pen className="size-4" />}
-              iconOnly onClick={() => setOpen(true)} />
-
-            {/*<Button variant="ghost" size="sm" icon={<KeyRound className="size-4" />} iconOnly /> */}
+              iconOnly onClick={() => modal.open(user)} />
 
             <Button variant="ghost" size="sm" icon={<Trash className="size-4" />}
               iconOnly onClick={() => deleteUser({ id: user.id })} loading={isDeletingUser} />
@@ -41,7 +38,9 @@ export default function UserListItem({ user }: UserListItemProps) {
         </div>
       </div>
 
-      <UserModal currentUser={user} open={isOpen} cancelFn={() => setOpen(false)} />
+      {modal.isOpen && (
+        <UserModal key={modal.key} currentUser={modal.data} onClose={modal.close} />
+      )}
     </React.Fragment>
   );
 }

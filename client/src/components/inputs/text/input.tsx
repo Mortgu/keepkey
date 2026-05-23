@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
+import { Loader2 } from "lucide-react";
 import type { InputComponentProps } from "./input-types";
 import { Button } from "@/components/button/button";
 
@@ -51,11 +52,12 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
       error,
       rightIcon,
       rightButton,
+      loading,
       ...rest
     },
     ref,
   ) => {
-    const adornment = rightButton ? "button" : rightIcon ? "icon" : "none";
+    const adornment = loading || rightButton ? (loading ? "icon" : "button") : rightIcon ? "icon" : "none";
 
     return (
       <div className="w-full">
@@ -85,7 +87,13 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
             {...rest}
           />
 
-          {rightButton && (() => {
+          {loading && (
+            <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-gray-400">
+              <Loader2 size={16} className="animate-spin" />
+            </span>
+          )}
+
+          {!loading && rightButton && (() => {
             const { icon, className: btnClassName, type, ...btnRest } = rightButton;
             return (
               <Button
@@ -99,7 +107,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
             );
           })()}
 
-          {!rightButton && rightIcon && (
+          {!loading && !rightButton && rightIcon && (
             <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-gray-500">
               {rightIcon}
             </span>

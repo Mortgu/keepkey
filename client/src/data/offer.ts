@@ -66,3 +66,8 @@ export const renameDocumentAction = (document_id: string, displayName: string) =
       displayName
     })
   });
+
+export const createReservationAction = (offer_id: string) =>
+  api<String>(`/api/offers/${offer_id}/reserve`, {
+    method: 'POST',
+  });

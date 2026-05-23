@@ -29,10 +29,7 @@ function getClient(): WebDAVClient {
   return client;
 }
 
-export async function uploadToNextCloud(
-  fileName: string,
-  document: Buffer<ArrayBufferLike> | undefined,
-) {
+export async function uploadToNextCloud(fileName: string, document: Buffer<ArrayBufferLike> | undefined) {
   if (document === undefined) return;
 
   try {

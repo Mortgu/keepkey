@@ -1,13 +1,11 @@
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import { useCustomerHook } from "@/hooks";
 import { Input, Button, ModalDialog } from "@/components";
-import type { CreateContactPersonInput, Customer } from "@/types";
+import type { Customer } from "@/types";
 
 interface CustomerModalProps {
-  open: boolean;
-  cancelFn: () => void;
+  onClose: () => void;
   currentCustomer?: Customer | null;
 }
 
@@ -15,14 +13,13 @@ const customerSchema = z.object({
   customerId: z.string().min(1, "min. 1 Zeichen!"),
   companyName: z.string().min(1, "min. 1 Zeichen!"),
   email: z.email(),
-
   street: z.string(),
   city: z.string(),
   plz: z.string(),
   phone: z.string(),
 });
 
-export default function CustomerModal({ open, cancelFn, currentCustomer = null }: CustomerModalProps) {
+export default function CustomerModal({ onClose, currentCustomer = null }: CustomerModalProps) {
   const isEdit = currentCustomer !== null;
 
   const { updateCustomer, createCustomer, errorCreatingCustomer } = useCustomerHook();
@@ -32,7 +29,6 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
       customerId: currentCustomer?.customerId ?? "",
       companyName: currentCustomer?.companyName ?? "",
       email: currentCustomer?.email ?? "",
-
       street: currentCustomer?.street || "",
       city: currentCustomer?.city || "",
       plz: currentCustomer?.plz || "",
@@ -45,12 +41,12 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
       if (isEdit) {
         try {
           updateCustomer({ id: currentCustomer.id, body: value });
-          cancelFn();
+          onClose();
         } catch (exception: any) { }
       } else {
         try {
           createCustomer(value);
-          cancelFn();
+          onClose();
         } catch (exception: any) { }
       }
     },
@@ -63,11 +59,10 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
   };
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
         <h1 className="text-lg">
-          {isEdit && "Kunden bearbeiten"}
-          {!isEdit && "Neuen Kunden anlegen"}
+          {isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"}
         </h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
@@ -103,7 +98,6 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
               <div className="flex-2 grid gap-2">
                 <Input id={field.name} label="E-Mail" input_size="sm"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
-
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
               </div>
@@ -150,7 +144,7 @@ export default function CustomerModal({ open, cancelFn, currentCustomer = null }
         </form>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button onClick={cancelFn} variant="secondary" size="sm">
+        <Button onClick={onClose} variant="secondary" size="sm">
           Abbrechen
         </Button>
         <customerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (

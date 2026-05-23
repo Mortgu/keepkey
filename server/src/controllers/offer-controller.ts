@@ -111,17 +111,11 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
 };
 
 export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-  const { quoteId } = request.body;
+  const { id } = request.params;
 
-  console.log(quoteId)
-
-  try {
-    reserveQuoteIdInNextCloud(quoteId);
-    next()
-  } catch (exception: any) {
-    logger.error(exception);
-    next();
-  }
+  return response.status(500).json({
+    file: `${id}.reserved`, message: 'Reservation Failed'
+  });
 }
 
 export const getOfferTaskById = async (request: Request, response: Response) => {

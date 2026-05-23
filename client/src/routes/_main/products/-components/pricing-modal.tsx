@@ -5,8 +5,7 @@ import { Plus, Trash } from "lucide-react";
 import { useMemo, useState, type SyntheticEvent } from "react";
 
 interface PricingModalProps {
-    open: boolean;
-    cancelFn: () => void;
+    onClose: () => void;
 }
 
 interface ConfigRow {
@@ -25,7 +24,7 @@ const emptyRow = (contractId: string): ConfigRow => ({
     price: 0,
 });
 
-export default function PricingModal({ open, cancelFn }: PricingModalProps) {
+export default function PricingModal({ onClose }: PricingModalProps) {
     const { products } = useProductHook();
     const { contracts } = useContractHook();
     const { createTariff, addConfig, isCreating } = useTariffHook();
@@ -38,12 +37,6 @@ export default function PricingModal({ open, cancelFn }: PricingModalProps) {
         () => products.map((p) => ({ value: p.id, label: p.name })),
         [products],
     );
-
-    const reset = () => {
-        setProductIds([]);
-        setRows([]);
-        setSubmitting(false);
-    };
 
     const addRow = () =>
         setRows((rs) => [...rs, emptyRow(contracts[0]?.id ?? "")]);
@@ -74,8 +67,7 @@ export default function PricingModal({ open, cancelFn }: PricingModalProps) {
                     },
                 });
             }
-            reset();
-            cancelFn();
+            onClose();
         } finally {
             setSubmitting(false);
         }
@@ -84,7 +76,7 @@ export default function PricingModal({ open, cancelFn }: PricingModalProps) {
     const canSubmit = productIds.length > 0 && rows.length > 0 && !submitting && !isCreating;
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
                 <h1 className="text-lg">Preistabelle hinzufügen</h1>
             </ModalDialog.Header>
@@ -119,74 +111,34 @@ export default function PricingModal({ open, cancelFn }: PricingModalProps) {
                                         </option>
                                     ))}
                                 </Select>
-                                <Input
-                                    type="number"
-                                    placeholder="Min"
-                                    value={row.min_quantity}
-                                    onChange={(e) =>
-                                        updateRow(i, {
-                                            min_quantity: parseInt(e.target.value) || 0,
-                                        })
-                                    }
-
+                                <Input type="number" placeholder="Min" value={row.min_quantity}
+                                    onChange={(e) => updateRow(i, { min_quantity: parseInt(e.target.value) || 0 })}
                                 />
-                                <Input
-                                    type="number"
-                                    placeholder="Max"
-                                    value={row.max_quantity ?? ""}
-                                    onChange={(e) =>
-                                        updateRow(i, {
-                                            max_quantity: e.target.value
-                                                ? parseInt(e.target.value)
-                                                : null,
-                                        })
-                                    }
+                                <Input type="number" placeholder="Max" value={row.max_quantity ?? ""}
+                                    onChange={(e) => updateRow(i, { max_quantity: e.target.value ? parseInt(e.target.value) : null })}
                                 />
-                                <Input
-                                    type="number"
-                                    placeholder="Laufzeit"
-                                    value={row.duration}
-                                    onChange={(e) =>
-                                        updateRow(i, { duration: parseInt(e.target.value) || 0 })
-                                    }
+                                <Input type="number" placeholder="Laufzeit" value={row.duration}
+                                    onChange={(e) => updateRow(i, { duration: parseInt(e.target.value) || 0 })}
                                 />
-                                <Input
-                                    type="number"
-                                    placeholder="Preis (Cent)"
-                                    value={row.price}
-                                    onChange={(e) =>
-                                        updateRow(i, { price: parseInt(e.target.value) || 0 })
-                                    }
+                                <Input type="number" placeholder="Preis (Cent)" value={row.price}
+                                    onChange={(e) => updateRow(i, { price: parseInt(e.target.value) || 0 })}
                                 />
-                                <Button
-                                    type="button"
-                                    variant="ghost"
-                                    icon={<Trash className="size-3.5" />}
-                                    iconOnly
-                                    size="sm"
-                                    onClick={() => removeRow(i)}
+                                <Button type="button" variant="ghost" icon={<Trash className="size-3.5" />}
+                                    iconOnly size="sm" onClick={() => removeRow(i)}
                                 />
                             </div>
                         ))}
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={addRow}
-                            icon={<Plus className="size-3.5" />}
-                            disabled={contracts.length === 0}
-                        >
+                        <Button type="button" variant="secondary" size="sm" onClick={addRow}
+                            icon={<Plus className="size-3.5" />} disabled={contracts.length === 0}>
                             Konfiguration hinzufügen
                         </Button>
                     </div>
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button type="button" size="sm" variant="secondary" onClick={() => {
-                    reset();
-                    cancelFn();
-                }}>Abbrechen</Button>
-
+                <Button type="button" size="sm" variant="secondary" onClick={onClose}>
+                    Abbrechen
+                </Button>
                 <Button form="pricing-form" type="submit" size="sm"
                     disabled={!canSubmit} loading={submitting || isCreating}>
                     Speichern

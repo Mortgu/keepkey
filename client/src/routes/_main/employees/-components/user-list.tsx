@@ -1,15 +1,13 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
 import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 
-import { useUserHook } from "@/hooks";
+import { useModal, useUserHook } from "@/hooks";
 import type { User } from "@/types";
 import { Button } from "@/components";
 
 export default function UserList() {
-  /* Create New User Modal */
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal();
 
   const { users } = useUserHook();
 
@@ -20,7 +18,7 @@ export default function UserList() {
           Users ({users.length})
         </h1>
 
-        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setOpen(true)} >
+        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => modal.open()}>
           Nutzer hinzufügen
         </Button>
       </div>
@@ -31,7 +29,9 @@ export default function UserList() {
         ))}
       </div>
 
-      <UserModal currentUser={null} open={isOpen} cancelFn={() => setOpen(false)} />
+      {modal.isOpen && (
+        <UserModal key={modal.key} currentUser={null} onClose={modal.close} />
+      )}
     </div>
   );
 }

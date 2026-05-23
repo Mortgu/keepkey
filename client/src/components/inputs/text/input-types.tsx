@@ -18,4 +18,7 @@ export interface InputComponentProps extends InputHTMLAttributes<HTMLInputElemen
 
     /** Interactive button rendered on the right side of the input. Takes precedence over `rightIcon`. */
     rightButton?: InputAdornmentButton;
+
+    /** When true, renders a spinning loader on the right side. Takes precedence over `rightButton` and `rightIcon`. */
+    loading?: boolean;
 }

@@ -5,8 +5,7 @@ import type { SyntheticEvent } from "react";
 import { z } from 'zod';
 
 type Props = {
-    open: boolean;
-    cancelFn: () => void;
+    onClose: () => void;
 };
 
 const formSchema = z.object({
@@ -14,7 +13,7 @@ const formSchema = z.object({
     docxPath: z.string().min(1),
 })
 
-export default function OfferNextCloudSettingsModal({ open, cancelFn }: Props) {
+export default function OfferNextCloudSettingsModal({ onClose }: Props) {
     const { updateSetting } = useSettingsHook();
 
     const settingsForm = useForm({
@@ -27,13 +26,11 @@ export default function OfferNextCloudSettingsModal({ open, cancelFn }: Props) {
             onMount: formSchema,
         },
         onSubmit: async ({ value }) => {
-            Object.entries(value).map(entry => {
+            Object.entries(value).map(async (entry) => {
                 let key = `nextcloud.offers.${entry[0]}`;
                 let value = entry[1];
 
-                updateSetting({
-                    key, value
-                })
+                await updateSetting({ key, value })
             })
         }
     });
@@ -45,15 +42,13 @@ export default function OfferNextCloudSettingsModal({ open, cancelFn }: Props) {
     };
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>NextCloud – Einstellungen</ModalDialog.Header>
             <ModalDialog.Content>
                 <form id="offer-nextcloud-settings" onSubmit={handleSubmit} className="grid gap-4">
                     <settingsForm.Field name="pdfPath">
                         {(field) => (
-                            <Input
-                                label="PDF-Pfad"
-                                placeholder="/Keepit/Angebote/PDF"
+                            <Input label="PDF-Pfad" placeholder="/Keepit/Angebote/PDF"
                                 value={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
@@ -63,9 +58,7 @@ export default function OfferNextCloudSettingsModal({ open, cancelFn }: Props) {
 
                     <settingsForm.Field name="docxPath">
                         {(field) => (
-                            <Input
-                                label="DOCX-Pfad"
-                                placeholder="/Keepit/Angebote/DOCX"
+                            <Input label="DOCX-Pfad" placeholder="/Keepit/Angebote/DOCX"
                                 value={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
@@ -75,7 +68,7 @@ export default function OfferNextCloudSettingsModal({ open, cancelFn }: Props) {
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button variant="secondary" size="sm" type="button" onClick={cancelFn}>
+                <Button variant="secondary" size="sm" type="button" onClick={onClose}>
                     Abbrechen
                 </Button>
                 <settingsForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (

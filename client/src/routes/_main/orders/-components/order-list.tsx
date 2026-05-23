@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OrderModal from "./order-modal";
-import { useCustomerHook, useOrderHook } from "@/hooks";
+import { useCustomerHook, useModal, useOrderHook } from "@/hooks";
 import type { Customer, Order } from "@/types";
 
 import OrderCard from "./order-card";
@@ -15,11 +15,11 @@ const sort_options = [
 ];
 
 export default function OrderList() {
-    const [isOpen, setOpen] = useState<boolean>(false);
+    const modal = useModal();
     const [searchInput, setSearchInput] = useState("");
     const [sort, setSort] = useState(sort_options[0].value);
     const [customerFilter, setCustomerFilter] = useState<string[]>([]);
-    const [contactPersonFilter, setContactPersonFilter] = useState<string[]>([]);
+    const [contactPersonFilter] = useState<string[]>([]);
 
     const { orders } = useOrderHook();
     const { customers } = useCustomerHook();
@@ -41,28 +41,16 @@ export default function OrderList() {
         <>
             <div className='flex justify-between items-center gap-4'>
                 <div className="flex items-center gap-2">
-                    <SortDropdown
-                        value={sort}
-                        onChange={setSort}
-                        options={sort_options}
-                    />
+                    <SortDropdown value={sort} onChange={setSort} options={sort_options} />
 
-                    <MultiDropdown
-                        label="Kunde"
-                        options={customerFilterOptions}
-                        values={customerFilter}
-                        onChange={setCustomerFilter}
-                    />
+                    <MultiDropdown label="Kunde" options={customerFilterOptions}
+                        values={customerFilter} onChange={setCustomerFilter} />
 
-                    <SearchBar
-                        value={searchInput}
-                        onChange={setSearchInput}
-                        onSubmit={handleSearch}
-                        placeholder="AG-Nr. Suchen..."
-                    />
+                    <SearchBar value={searchInput} onChange={setSearchInput}
+                        onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => setOpen(true)} size='sm'>Create <Plus className='size-4' /></Button>
+                    <Button onClick={() => modal.open()} size='sm'>Create <Plus className='size-4' /></Button>
                 </div>
             </div>
 
@@ -72,29 +60,22 @@ export default function OrderList() {
                         const option = customerFilterOptions.find(i => i.value === id);
                         if (!option) return null;
                         return (
-                            <FilterChip
-                                key={`customer-${id}`}
-                                label="Kunde"
-                                value={option.label}
-                                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))}
-                            />
+                            <FilterChip key={`customer-${id}`} label="Kunde" value={option.label}
+                                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))} />
                         );
                     })}
-
-
                 </div>
             )}
 
             <div className='grid gap-2'>
-
-                {orders.map((order: Order, index: number) => (
+                {orders.map((order: Order) => (
                     <OrderCard key={order.id} order={order} />
                 ))}
-
             </div>
 
-            <OrderModal open={isOpen} cancelFn={() => setOpen(false)} />
-
+            {modal.isOpen && (
+                <OrderModal key={modal.key} onClose={modal.close} />
+            )}
         </>
     )
 }

@@ -21,6 +21,11 @@ const env = createEnv({
     NEXTCLOUD_PASSWORD: z.string().min(1),
     NEXTCLOUD_OFFER_PATH: z.string(),
 
+    NEXTCLOUD_OFFER_PDF_PATH: z.string().min(1),
+    NEXTCLOUD_OFFER_ORIGINAL_PATH: z.string().min(1),
+    NEXTCLOUD_ORDER_PDF_PATH: z.string().min(1),
+    NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().min(1),
+
     REDIS_URL: z.string().min(1),
 
     CORS_ORIGIN: z.string(),

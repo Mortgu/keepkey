@@ -1,26 +1,24 @@
 import { Button, Input, ModalDialog } from "@/components";
 import type { ContactPerson } from "@/types";
-import { Pen, Plus, Trash } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import ContactPersonForm from "./contact-person-form";
 import ContactListItem from "./contact-list-item";
 import { useCustomerHook } from "@/hooks";
 
 type ContactPersonModalProps = {
-    open: boolean;
-    cancelFn: () => void;
-
+    onClose: () => void;
     currentCustomerId: string;
     currentContactPersons?: ContactPerson[];
 };
 
-export default function ContactPersonModal({ open, cancelFn, currentCustomerId, currentContactPersons }: ContactPersonModalProps) {
+export default function ContactPersonModal({ onClose, currentCustomerId, currentContactPersons }: ContactPersonModalProps) {
     const [add, setAdd] = useState<boolean>(false);
 
     const { createContact } = useCustomerHook();
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
                 <h1 className="text-lg">Kunden Kontaktpersonen</h1>
             </ModalDialog.Header>
@@ -50,7 +48,7 @@ export default function ContactPersonModal({ open, cancelFn, currentCustomerId, 
                 </div>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button variant="primary" size="sm" onClick={cancelFn}>Schließen</Button>
+                <Button variant="primary" size="sm" onClick={onClose}>Schließen</Button>
             </ModalDialog.Footer>
         </ModalDialog>
     )
