@@ -2,11 +2,9 @@ import { Job, UnrecoverableError, Worker } from "bullmq";
 import { TaskStatus } from "@prisma/client";
 import { connection, uploadQueueKey } from "../lib/queues.js";
 import { prisma } from "../lib/prisma.js";
-import {
-  QuoteIdAlreadyReservedError,
-  reserveQuoteIdInNextCloud,
-} from "../lib/nextcloud.js";
 import logger from "../middlewares/logger.js";
+import { reserveQuoteIdInNextCloud } from "../controllers/nextcloud-controller.js";
+import { NextCloudReservationFailedException } from "../exceptions/exceptions.js";
 
 type UploadJobData =
   | {
@@ -34,15 +32,15 @@ export default function startUploadWorker() {
             data: { status: TaskStatus.COMPLETED, error: null },
           });
           return;
-        } catch (err) {
-          if (err instanceof QuoteIdAlreadyReservedError) {
+        } catch (exception: any) {
+          if (exception instanceof NextCloudReservationFailedException) {
             await prisma.task.update({
               where: { id: taskId },
-              data: { status: TaskStatus.FAILED, error: err.message },
+              data: { status: TaskStatus.FAILED, error: exception.message },
             });
-            throw new UnrecoverableError(err.message);
+            throw new UnrecoverableError(exception.message);
           }
-          throw err;
+          throw exception;
         }
       }
       default:

@@ -71,3 +71,8 @@ export const createReservationAction = (offer_id: string) =>
   api<String>(`/api/offers/${offer_id}/reserve`, {
     method: 'POST',
   });
+
+
+// TODO: 
+export const uploadAction = () =>
+  api<void>('/api/offers/')

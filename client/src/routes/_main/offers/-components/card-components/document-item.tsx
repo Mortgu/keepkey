@@ -5,7 +5,7 @@ import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { useOfferHook } from "@/hooks";
 import type { Document } from "@/types";
-import { Check, File, Loader, Pen, Trash, TriangleAlert } from "lucide-react";
+import { Check, File, Loader, Pen, Trash, TriangleAlert, Upload } from "lucide-react";
 import { tv } from "tailwind-variants";
 
 const MAX_POLLS = 10;
@@ -35,7 +35,14 @@ export function DocumentItem({ document }: Props) {
 
     const [isRenaming, setRenaming] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
-    const { deleteDocument, isDeletingDocument, renameDocument, isRenamingDocument } = useOfferHook();
+    const {
+        deleteDocument,
+        isDeletingDocument,
+        renameDocument,
+        isRenamingDocument,
+        upload,
+        isUploading
+    } = useOfferHook();
 
     const handleRename = async () => {
         if (!newName.trim()) return;
@@ -111,19 +118,23 @@ export function DocumentItem({ document }: Props) {
                 </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-0">
+
                 <a target="_blank" href={`${BASE_URL}/api/offers/${document.offerId}/documents/${document.id}/pdf`}>
-                    <Button variant="secondary" size="sm" disabled={!isGenerated}>PDF</Button>
+                    <Button variant="ghost" size="sm" disabled={!isGenerated}>PDF</Button>
                 </a>
                 <a href={`${BASE_URL}/api/offers/${document.offerId}/documents/${document.id}/docx`}>
-                    <Button variant="secondary" size="sm" disabled={!isGenerated}>DOCX</Button>
+                    <Button variant="ghost" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
 
-                <Button variant="secondary" size="sm" icon={<Pen className="size-3" />}
+                <Button variant="ghost" size="sm" icon={<Upload className="size-3" />} iconOnly
+                    onClick={() => upload()} loading={isUploading} />
+
+                <Button variant="ghost" size="sm" icon={<Pen className="size-3" />}
                     iconOnly onClick={() => { setNewName(document.displayName ?? ""); setRenaming(true); }} />
 
                 <Button
-                    variant="secondary"
+                    variant="ghost"
                     size="sm"
                     icon={<Trash className="size-3" />}
                     iconOnly
@@ -134,6 +145,7 @@ export function DocumentItem({ document }: Props) {
                         deleteDocument({ offerId: document.offerId, documentId: document.id })
                     }
                 />
+
             </div>
         </div>
     )

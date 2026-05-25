@@ -12,9 +12,6 @@ import {
 } from "@prisma/client";
 import { toDate } from "../utils/utils.js";
 import env from "../lib/env.js";
-import { getLatestQuoteId, reserveQuoteIdInNextCloud } from "../lib/nextcloud.js";
-import logger from "../middlewares/logger.js";
-import { NextCloudReservationFailedException } from "../exceptions/exceptions.js";
 
 export const getOffers = async (request: Request, response: Response) => {
   const { search, companyIds, contactPersonIds, sort } = request.query;
@@ -104,7 +101,7 @@ export const getOfferTasks = async (request: Request, response: Response) => {
 
 export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
   try {
-    const quoteId = await getLatestQuoteId();
+    const quoteId = 0; //await getLatestQuoteId();
     return response.status(200).json(quoteId + 1);
   } catch (exception: any) {
     return next(exception);
@@ -115,7 +112,7 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
   const { id } = request.params;
 
 
-  return response.status(200).json({
+  return response.status(500).json({
     file: `${id}.reserved`, message: 'Reservation Failed', cause: ""
   });
 }

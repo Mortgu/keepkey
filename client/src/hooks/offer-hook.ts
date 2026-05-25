@@ -8,6 +8,7 @@ import {
   updateOfferAction,
   renameDocumentAction,
   createReservationAction,
+  uploadAction,
 } from "@/data/offer";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -90,7 +91,9 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     onSuccess: invalidate,
   });
 
-
+  const uploadMutation = useMutation({
+    mutationFn: uploadAction,
+  })
 
   return {
     offers,
@@ -121,5 +124,9 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     createReservation: createReservationMutation.mutate,
     isCreatingReservation: createReservationMutation.isPending,
     errorCreatingReservation: createReservationMutation.error,
+
+    upload: uploadMutation.mutateAsync,
+    isUploading: uploadMutation.isPending,
+    errorUploading: uploadMutation.error,
   };
 };

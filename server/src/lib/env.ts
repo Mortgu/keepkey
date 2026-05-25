@@ -17,14 +17,14 @@ const env = createEnv({
     NODE_ENV: z.string(),
 
     NEXTCLOUD_URL: z.url(),
-    NEXTCLOUD_USER: z.string().min(1),
-    NEXTCLOUD_PASSWORD: z.string().min(1),
+    NEXTCLOUD_USER: z.string(),
+    NEXTCLOUD_PASSWORD: z.string(),
     NEXTCLOUD_OFFER_PATH: z.string(),
 
-    NEXTCLOUD_OFFER_PDF_PATH: z.string().min(1),
-    NEXTCLOUD_OFFER_ORIGINAL_PATH: z.string().min(1),
-    NEXTCLOUD_ORDER_PDF_PATH: z.string().min(1),
-    NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().min(1),
+    NEXTCLOUD_OFFER_PDF_PATH: z.string().default('/'),
+    NEXTCLOUD_OFFER_ORIGINAL_PATH: z.string().default('/'),
+    NEXTCLOUD_ORDER_PDF_PATH: z.string().default('/'),
+    NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().default('/'),
 
     REDIS_URL: z.string().min(1),
 

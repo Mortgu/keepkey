@@ -21,3 +21,9 @@ export class NextCloudReservationFailedException extends AppException {
         super("Reservation failed!", 409, cause)
     }
 }
+
+export class NextCloudException extends AppException {
+    constructor(cause: string) {
+        super("NextCloud failed!", 500, cause);
+    }
+}
