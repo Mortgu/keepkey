@@ -18,7 +18,6 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
-import { getLatestQuoteId } from "./lib/nextcloud.js";
 
 const options = {
   definition: {

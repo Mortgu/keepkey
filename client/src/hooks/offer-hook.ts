@@ -92,7 +92,7 @@ export const useOfferHook = (params?: OfferQueryParams) => {
   });
 
   const uploadMutation = useMutation({
-    mutationFn: uploadAction,
+    mutationFn: ({ id }: { id: string }) => uploadAction(id),
   })
 
   return {

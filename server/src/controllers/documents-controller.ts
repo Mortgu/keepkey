@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { prisma } from "../lib/prisma.js";
+import { uploadQueue, uploadQueueKey } from "../lib/queues.js";
 
 export const renameDocument = async (request: Request, response: Response) => {
     const { id } = request.params;
@@ -20,4 +21,13 @@ export const renameDocument = async (request: Request, response: Response) => {
             message: 'Something went wrong trying to rename doucment!'
         })
     }
+}
+
+export const uploadDocument = async (request: Request, response: Response) => {
+    const { id } = request.params;
+
+    const job = await uploadQueue.add(uploadQueueKey, {
+        taskId: '',
+        type: "UPLOAD"
+    })
 }

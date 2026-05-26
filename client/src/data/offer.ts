@@ -72,7 +72,7 @@ export const createReservationAction = (offer_id: string) =>
     method: 'POST',
   });
 
-
-// TODO: 
-export const uploadAction = () =>
-  api<void>('/api/offers/')
+export const uploadAction = (id: string) =>
+  api<void>(`/api/documents/${id}/upload`, {
+    method: 'POST',
+  })

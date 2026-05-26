@@ -127,16 +127,16 @@ export function DocumentItem({ document }: Props) {
                     <Button variant="ghost" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
 
-                <Button variant="ghost" size="sm" icon={<Upload className="size-3" />} iconOnly
-                    onClick={() => upload()} loading={isUploading} />
+                <Button variant="ghost" size="sm" icon={<Upload className="size-3.5" />} iconOnly
+                    onClick={() => upload({ id: document.id })} loading={isUploading} />
 
-                <Button variant="ghost" size="sm" icon={<Pen className="size-3" />}
+                <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />}
                     iconOnly onClick={() => { setNewName(document.displayName ?? ""); setRenaming(true); }} />
 
                 <Button
                     variant="ghost"
                     size="sm"
-                    icon={<Trash className="size-3" />}
+                    icon={<Trash className="size-3.5" />}
                     iconOnly
                     loading={isDeletingDocument}
                     disabled={!document.offerId || isDeletingDocument}
