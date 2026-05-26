@@ -1,0 +1,32 @@
+node_modules
+.git
+.gitignore
+.idea
+.DS_Store
+
+# Build outputs (will be rebuilt in Docker)
+server/dist
+server/generated
+server/prisma/schema/openapi
+client/dist
+
+# Docker
+dev
+
+# Graphify
+graphify-out
+
+# Environment files (use docker env vars instead)
+*.env
+.env.*
+!.env.example
+!.env.docker
+
+# Misc
+*.md
+*.tikz
+*.tex
+CLAUDE.md
+
+# Logs
+*.log

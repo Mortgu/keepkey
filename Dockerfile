@@ -1,20 +1,37 @@
-FROM node:22-slim
-
-RUN apt-get update && apt-get install -y libreoffice --no-install-recommends \
-    && rm -rf /var/lib/apt/lists/*
-
+FROM node:22-slim AS builder
 WORKDIR /app
 
-COPY client/package*.json ./client/
-RUN cd client && npm ci
-COPY client/ ./client/
-RUN cd client && npm run build
-
 COPY server/package*.json ./server/
-RUN cd server && npm ci
-COPY server/ ./server/
-RUN cd server && npm run build
+COPY server/prisma ./server/prisma/
+RUN cd server && npm ci && npx prisma generate --schema prisma/schema
+
+COPY client/package*.json ./client/
+RUN cd client && npm install
+
+COPY . .
+RUN cd client && npm run generate:types && npx vite build
+RUN cd server && npx tsc --project tsconfig.json && npm prune --production
+
+
+FROM node:22-slim
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libreoffice \
+        libreoffice-writer \
+        default-jre \
+        ghostscript \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app/server
+
+COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/node_modules ./node_modules
+COPY --from=builder /app/server/package.json ./package.json
+COPY --from=builder /app/server/prisma ./prisma
+COPY --from=builder /app/server/assets ./assets
+COPY --from=builder /app/client/dist ../client/dist
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 EXPOSE 3000
-WORKDIR /app/server
-CMD ["node", "dist/server.js"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
