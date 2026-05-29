@@ -1,4 +1,5 @@
 import { Button } from "@/components";
+import type { ComponentSize } from "@/components/size";
 
 interface TabOption {
   value: string;
@@ -10,15 +11,16 @@ interface FilterTabBarProps {
   value: string;
   onChange: (value: string) => void;
   className?: string;
+  size?: ComponentSize;
   children?: React.ReactNode;
 }
 
-export function FilterTabBar({ tabs, value, onChange, className, children }: FilterTabBarProps) {
+export function FilterTabBar({ tabs, value, onChange, className, size = "sm", children }: FilterTabBarProps) {
   return (
     <div className={`flex items-center gap-1.5 flex-wrap ${className ?? ''}`}>
       {tabs.map(tab => (
         <Button
-          size="sm"
+          size={size}
           variant="secondary"
           key={tab.value}
           type="button"

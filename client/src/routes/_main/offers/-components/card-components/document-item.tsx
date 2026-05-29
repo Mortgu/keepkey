@@ -100,7 +100,7 @@ export function DocumentItem({ document }: Props) {
 
                     {isRenaming && (
                         <Input
-                            input_size="xs"
+                            size="xs"
                             placeholder={document.displayName}
                             value={newName}
                             onChange={(e) => setNewName(e.target.value)}

@@ -8,13 +8,14 @@ export function Collapsable({
   children,
   className,
   defaultOpen = false,
+  size = "sm",
 }: CollapsableComponentProps) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
     <React.Fragment>
       <Button
-        size="sm"
+        size={size}
         variant="link"
         onClick={() => setOpen((o) => !o)}
         className={className}

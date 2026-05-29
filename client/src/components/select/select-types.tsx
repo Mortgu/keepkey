@@ -1,4 +1,5 @@
 import type { ReactNode, SelectHTMLAttributes } from "react";
+import type { ComponentSize } from "@/components/size";
 
 export interface SelectOption {
     value: string;
@@ -7,7 +8,7 @@ export interface SelectOption {
 
 export interface SelectComponentProps extends SelectHTMLAttributes<HTMLSelectElement> {
     variant?: "primary";
-    input_size?: "xs" | "sm" | "md";
+    size?: ComponentSize;
     label?: string;
     error?: string;
     options?: SelectOption[];

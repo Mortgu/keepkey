@@ -265,7 +265,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
 
             <offerForm.Field name="paymentTerm" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
+                <Input label="Zahlungsbedingung" size="sm" placeholder="Zahlungsbedingung..."
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value as string}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -277,7 +277,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
           <div className="flex flex-wrap justify-between items-center gap-4">
             <offerForm.Field name="validUntil" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input label="Angebot gültig bis" type="date" input_size="sm" placeholder="Gültig bis..."
+                <Input label="Angebot gültig bis" type="date" size="sm" placeholder="Gültig bis..."
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}
@@ -292,7 +292,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
 
             <offerForm.Field name="requestFrom" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input label="Ihre Anfrage vom" type="date" input_size="sm" placeholder="Ihre Anfrage vom..."
+                <Input label="Ihre Anfrage vom" type="date" size="sm" placeholder="Ihre Anfrage vom..."
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value?.split('T')[0] ?? ''}
                   onBlur={field.handleBlur}

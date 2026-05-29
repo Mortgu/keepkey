@@ -1,9 +1,13 @@
 {
+  "button": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "create": "Erstellen"
+  },
   "catalog": "Katalog",
   "overview": "Übersicht",
   "sales": "Vertrieb",
   "management": "Verwaltung",
-
   "products": "Produkte",
   "pricing": "Preise",
   "flatRates": "Pauschalen",

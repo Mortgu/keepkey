@@ -8,3 +8,4 @@ export * from './navigation/navigation';
 export * from './modal';
 export * from './select/select';
 export * from './integration-status-card';
+export * from './definitions.ts';

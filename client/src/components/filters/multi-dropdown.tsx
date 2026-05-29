@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '../button/button';
+import type { ComponentSize } from "@/components/size";
 
 export interface DropdownOption {
   value: string;
@@ -14,9 +15,10 @@ interface MultiDropdownProps {
   values: string[];
   onChange: (values: string[]) => void;
   className?: string;
+  size?: ComponentSize;
 }
 
-export function MultiDropdown({ label, options, values, onChange, className }: MultiDropdownProps) {
+export function MultiDropdown({ label, options, values, onChange, className, size = "sm" }: MultiDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -38,7 +40,7 @@ export function MultiDropdown({ label, options, values, onChange, className }: M
       <Button
         variant="secondary"
         type="button"
-        size="sm"
+        size={size}
         onClick={() => setOpen(o => !o)}
 
       >

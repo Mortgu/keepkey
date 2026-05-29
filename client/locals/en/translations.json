@@ -1,9 +1,13 @@
 {
+  "button": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
   "catalog": "Catalog",
   "overview": "Overview",
   "sales": "Sales",
   "management": "Management",
-
   "products": "Products",
   "pricing": "Pricing",
   "flatRates": "Flat Rates",
@@ -14,5 +18,4 @@
   "offers": "Offers",
   "orders": "Orders",
   "settings": "Settings"
-
 }

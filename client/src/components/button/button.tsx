@@ -1,7 +1,8 @@
-import { forwardRef } from 'react';
-import { tv } from 'tailwind-variants';
-import { Loader } from 'lucide-react';
-import type { ButtonComponentProps } from './button-types';
+import {forwardRef} from 'react';
+import {tv} from 'tailwind-variants';
+import {Loader} from 'lucide-react';
+import type {ButtonComponentProps} from './button-types';
+import {SIZE_STYLES} from "@/components/size";
 
 const styles = tv({
     base: [
@@ -48,9 +49,9 @@ const styles = tv({
             fit_sm: 'h-fit p-0 w-fit text-sm',
             fit_md: 'h-fit p-0 w-fit text-md',
 
-            xs: 'h-[34px] px-[12px] py-[5px] text-xs',
-            sm: 'h-[38px] px-[16px] py-[7px] text-sm',
-            md: 'h-[42px] px-[22px] py-[10px] text-md',
+            xs: `px-[12px] py-[5px] ${SIZE_STYLES.xs}`,
+            sm: `px-[16px] py-[7px] ${SIZE_STYLES.sm}`,
+            md: `px-[22px] py-[10px] ${SIZE_STYLES.md}`,
         },
         iconOnly: {
             true: 'aspect-square px-0',
@@ -66,13 +67,26 @@ const styles = tv({
     }
 });
 
+
 export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
-    ({ className, variant, size, active, danger, icon, iconPosition = 'left', iconOnly, loading, children, ...rest }, ref) => {
-        const resolvedIcon = loading ? <Loader className="size-4 animate-spin" /> : icon;
+    ({
+         className,
+         variant,
+         size,
+         active,
+         danger,
+         icon,
+         iconPosition = 'left',
+         iconOnly,
+         loading,
+         children,
+         ...rest
+     }, ref) => {
+        const resolvedIcon = loading ? <Loader className="size-4 animate-spin"/> : icon;
         return (
             <button
                 ref={ref}
-                className={styles({ variant, size, active, danger, iconOnly, className })}
+                className={styles({variant, size, active, danger, iconOnly, className})}
                 disabled={loading || rest.disabled}
                 {...rest}
             >
