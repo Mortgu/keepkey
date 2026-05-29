@@ -5,8 +5,8 @@ import { tv } from "tailwind-variants";
 
 const itemStyles = tv({
   base: [
-    "flex items-center rounded-md text-sm font-light text-(--text-inv)",
-    "mx-1.5 px-3.5 py-1.5 gap-2.5",
+    "flex items-center rounded-md text-[15px] text-(--text-inv)",
+    "mx-2 px-3.5 py-2 gap-2.5",
     "transition-colors hover:bg-(--fg-2) hover:text-(--text-inv)",
   ],
   variants: {

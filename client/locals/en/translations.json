@@ -1,0 +1,18 @@
+{
+  "catalog": "Catalog",
+  "overview": "Overview",
+  "sales": "Sales",
+  "management": "Management",
+
+  "products": "Products",
+  "pricing": "Pricing",
+  "flatRates": "Flat Rates",
+  "suppliers": "Suppliers",
+  "contracts": "Contracts",
+  "customers": "Customers",
+  "employees": "Employees",
+  "offers": "Offers",
+  "orders": "Orders",
+  "settings": "Settings"
+
+}

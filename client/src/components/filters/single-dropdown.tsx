@@ -32,14 +32,9 @@ export function SingleDropdown({ label, options, value, onChange, className }: S
 
   return (
     <div ref={ref} className={`relative select-none ${className ?? ''}`}>
-      <Button
-        size="sm"
-        variant="secondary"
-        type="button"
-        onClick={() => setOpen(o => !o)}>
-        <label className='text-(--fg-2) font-normal'>Status:</label>
+      <Button variant="secondary" size="sm" type="button" onClick={() => setOpen(o => !o)}>
         {selected?.dot && (
-          <span className="size-[7px] rounded-full shrink-0" style={{ background: selected.dot }} />
+          <span className="size-1.75 rounded-full shrink-0" style={{ background: selected.dot }} />
         )}
         <span className={`flex-1 text-left ${selected ? 'text-(--text)' : 'text-(--fg-3)'}`}>
           {selected ? selected.label : label}

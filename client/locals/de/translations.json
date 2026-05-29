@@ -1,0 +1,17 @@
+{
+  "catalog": "Katalog",
+  "overview": "Übersicht",
+  "sales": "Vertrieb",
+  "management": "Verwaltung",
+
+  "products": "Produkte",
+  "pricing": "Preise",
+  "flatRates": "Pauschalen",
+  "suppliers": "Lieferanten",
+  "contracts": "Verträge",
+  "customers": "Kunden",
+  "employees": "Angestellte",
+  "offers": "Angebote",
+  "orders": "Bestellungen",
+  "settings": "Einstellungen"
+}

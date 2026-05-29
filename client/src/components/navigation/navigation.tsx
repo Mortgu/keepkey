@@ -9,16 +9,14 @@ import {
   Users,
   UserCircle2,
   Truck,
-  Cuboid,
   DollarSign,
-  Paperclip,
-  ContrastIcon,
 } from "lucide-react";
-
+import { useTranslation } from 'react-i18next';
 import { authClient } from "@/lib/auth-client.ts";
-import { NavGroup, NavLink } from "./nav-link";
+import { NavLink } from "./nav-link";
 import { useMemo, useState, type ReactNode } from "react";
-import { Button } from "../button/button";
+import {Button, type DropdownOption, SingleDropdown} from "@/components";
+import {tv} from "tailwind-variants";
 
 const ICON_SIZE = 14;
 
@@ -31,10 +29,18 @@ type SectionProps = {
 function Section({ title, collapsible = false, children }: SectionProps) {
   const [collapsed, setCollapsed] = useState(false);
 
+  const  sectionStyle = tv({
+    base: [
+        "flex select-none items-center justify-between",
+        "px-3.5 pb-1.5 pt-3 text-[12px] font-semibold",
+        "uppercase tracking-[0.08em] text-(--fg-3)"
+    ],
+  })
+
   return (
     <>
       <button type="button" onClick={() => collapsible && setCollapsed((v) => !v)}
-        className="flex select-none items-center justify-between px-3.5 pb-1 pt-3 text-[12px] font-normal uppercase tracking-[0.08em] text-(--fg-3)"
+        className={sectionStyle()}
         style={{ cursor: collapsible ? "pointer" : "default" }}
       >
         <span>{title}</span>
@@ -50,10 +56,6 @@ function Section({ title, collapsible = false, children }: SectionProps) {
       {!collapsed && <div className="flex flex-col gap-0.5">{children}</div>}
     </>
   );
-}
-
-function SectionDivider() {
-  return <div className="mx-3.5 mt-2 h-px bg-(--fg-2)" />;
 }
 
 function UserFooter() {
@@ -90,65 +92,57 @@ function UserFooter() {
   );
 }
 
-export function Navigation() {
-  return (
-    <aside className="flex h-screen w-65 flex-col overflow-hidden">
-      <div className="flex items-center gap-2 px-4 pb-2.5 pt-4">
+const languageDropdownOptions: DropdownOption[] = [
+    { value: "en", label: "English" },
+    { value: "de", label: "Deutsch" },
+]
 
-        <span className="text-[14px] font-semibold tracking-[-0.01em] text-(--text-inv)">
-          Dignum
-        </span>
+export function Navigation() {
+  const { t, i18n } = useTranslation();
+
+  const changeLanguage = (lng) => {
+    i18n.changeLanguage(lng);
+  };
+
+  return (
+    <aside className="flex h-screen w-74 flex-col overflow-hidden">
+      <div className="flex items-center justify-between gap-2 px-4 pb-2.5 pt-4">
+
+        <h1 className="text-lg font-normal tracking-[-0.01em] text-(--text-inv)">
+          dignum GmbH
+        </h1>
+
+        <SingleDropdown label="Test" options={languageDropdownOptions} value={i18n.language} onChange={(e) => changeLanguage(e as string)} />
+
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
-        <Section title="Übersicht">
+        <Section title={t('overview')}>
           <NavLink to="/" icon={<LayoutGrid size={ICON_SIZE} />} label="Dashboard" />
         </Section>
 
-        <Section title="Katalog" collapsible>
+        <Section title={t('catalog')} collapsible>
 
-          {/*
-          <NavGroup label="Produkte" defaultOpen icon={<Package size={ICON_SIZE} />}>
-          </NavGroup>*/}
+          <NavLink to="/products" label={t('products')} icon={<Package size={ICON_SIZE} />} />
+          <NavLink to="/products/pricing" label={t('pricing')} icon={<DollarSign size={ICON_SIZE} />} />
+          <NavLink to="/products/flatrates" label={t('flatRates')} icon={<DollarSign size={ICON_SIZE} />} />
 
-          <NavLink to="/products" label="Produkte" icon={<Package size={ICON_SIZE} />} />
-          <NavLink to="/products/pricing" label="Preise" icon={<DollarSign size={ICON_SIZE} />} />
-          <NavLink to="/products/flatrates" label="Pauschalen" icon={<DollarSign size={ICON_SIZE} />} />
-
-          <NavLink to="/suppliers" label="Lieferanten" icon={<Truck size={ICON_SIZE} />} />
-          <NavLink to="/contracts" label="Verträge" icon={<Users size={ICON_SIZE} />} />
+          <NavLink to="/suppliers" label={t('suppliers')} icon={<Truck size={ICON_SIZE} />} />
+          <NavLink to="/contracts" label={t('contracts')} icon={<Users size={ICON_SIZE} />} />
 
         </Section>
 
-        <Section title="Vertrieb" collapsible>
-          <NavLink
-            to="/customers"
-            icon={<Users size={ICON_SIZE} />}
-            label="Kunden"
-          />
-          <NavLink
-            to="/offers"
-            icon={<FileText size={ICON_SIZE} />}
-            label="Angebote"
-          />
-          <NavLink
-            to="/orders"
-            icon={<ShoppingCart size={ICON_SIZE} />}
-            label="Bestellungen"
-          />
+        <Section title={t('sales')} collapsible>
+          <NavLink to="/customers" label={t('customers')}  icon={<Users size={ICON_SIZE} />} />
+          <NavLink to="/offers" label={t('offers')}  icon={<FileText size={ICON_SIZE} />} />
+          <NavLink to="/orders" label={t('orders')} icon={<ShoppingCart size={ICON_SIZE} />} />
         </Section>
-        <Section title="Verwaltung" collapsible>
-          <NavLink
-            to="/employees"
-            icon={<UserCircle2 size={ICON_SIZE} />}
-            label="Mitarbeiter"
-          />
-          <NavLink
-            to="/user"
-            icon={<Settings size={ICON_SIZE} />}
-            label="Einstellungen"
-          />
+
+        <Section title={t('management')} collapsible>
+          <NavLink to="/employees" label={t('employees')} icon={<UserCircle2 size={ICON_SIZE} />} />
+          <NavLink to="/user" label={t('settings')} icon={<Settings size={ICON_SIZE} />} />
         </Section>
+
       </nav>
 
       <UserFooter />
