@@ -24,6 +24,10 @@ router.get("/", getOffers);
 router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
+
+/*
+ * /api/offers/:id/reserve
+ */
 router.post('/:id/reserve', reserveQuoteId)
 
 router.get("/:id", getOfferById);

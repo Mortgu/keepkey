@@ -111,10 +111,21 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
 export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
   const { id } = request.params;
 
-
-  return response.status(500).json({
-    file: `${id}.reserved`, message: 'Reservation Failed', cause: ""
+  const task = await prisma.task.create({
+    data: {
+      offerId: id as string,
+      type: TaskType.RESERVATION,
+      status: TaskStatus.PENDING,
+    }
   });
+
+  const job = await uploadQueue.add(uploadQueueKey, {
+    taskId: task.id,
+    type: "QUOTE_RESERVATION",
+    quoteId: id as string,
+  });
+
+  return response.status(200).json(job);
 }
 
 export const getOfferTaskById = async (request: Request, response: Response) => {

@@ -16,7 +16,7 @@ type UploadJobData =
 
 export default function startUploadWorker() {
   const worker = new Worker<UploadJobData>(uploadQueueKey, async (job: Job<UploadJobData>) => {
-    const { type, taskId } = job.data;
+    const { type, taskId, quoteId } = job.data;
 
     await prisma.task.updateMany({
       where: { id: taskId },
@@ -26,7 +26,7 @@ export default function startUploadWorker() {
     switch (type) {
       case "QUOTE_RESERVATION": {
         try {
-          await reserveQuoteIdInNextCloud(job.data.quoteId);
+          await reserveQuoteIdInNextCloud(quoteId);
           await prisma.task.update({
             where: { id: taskId },
             data: { status: TaskStatus.COMPLETED, error: null },

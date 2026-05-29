@@ -1,5 +1,5 @@
 import React from "react";
-import { AlertTriangle, Loader, Pen, Trash } from "lucide-react";
+import {AlertTriangle, Loader, Pen, RotateCcw, Trash} from "lucide-react";
 
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
@@ -20,7 +20,7 @@ type OfferListItemProps = {
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
   const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
-  const { deleteOffer } = useOfferHook();
+  const { deleteOffer, createReservation } = useOfferHook();
 
   const reservationTask = tasks.find((t: Task) => t.type === "RESERVATION");
 
@@ -42,6 +42,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 <a>{offer.quoteId}</a>
                 <span className="text-xs text-(--text-secondary) font-light">v{offer.version}</span>
               </div>
+              <Badge variant="failed">
+                Failed
+              </Badge>
             </div>
 
             <div className="flex flex-wrap items-center gap-4">
@@ -187,11 +190,15 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
         <div className="flex items-center justify-end px-2 border-t border-(--border)">
 
+          <Button size="xs" variant="link" onClick={() => createReservation({offer_id: offer.id})}
+                  icon={<RotateCcw className="size-3" />} iconOnly />
+
           <Button size="xs" variant="link" onClick={() => onEdit(offer)}
             icon={<Pen className="size-3" />} iconOnly />
 
           <Button size="xs" variant="link" onClick={handleDeleteOffer}
             icon={<Trash className="size-3" />} iconOnly />
+
 
         </div>
       </div>

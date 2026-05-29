@@ -1,7 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import type { OfferProductInput } from "./offer-product-form";
-import type { CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput } from "@/types";
-import { useOfferHook } from "@/hooks";
+import type { CreateOfferFlatRatesInput, CreateOfferPositionInput } from "@/types";
 import type { ZodObject, ZodRawShape } from "better-auth";
 import { z } from 'zod';
 
