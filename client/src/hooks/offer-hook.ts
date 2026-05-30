@@ -1,18 +1,3 @@
-import {
-  createOfferAction,
-  createReservationAction,
-  deleteOfferAction,
-  deleteOfferDocumentAction,
-  getContactPersonsAction,
-  getOfferRevisionsAction,
-  getOffersAction,
-  renameDocumentAction,
-  updateOfferAction,
-  uploadAction,
-} from "@/data/offer";
-
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-
 import type {
   CreateOfferFlatRatesInput,
   CreateOfferInput,
@@ -21,6 +6,22 @@ import type {
   UpdateOfferInput,
   UpdateOfferPositionInput,
 } from "@/types";
+
+import {
+  createOfferAction,
+  createReservationAction,
+  deleteOfferAction,
+  deleteOfferDocumentAction,
+  getContactPersonsAction,
+  getOfferRevisionsAction,
+  getOffersAction,
+  getTaskByIdAction,
+  renameDocumentAction,
+  updateOfferAction,
+  uploadAction,
+} from "@/data/offer";
+
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 interface OfferQueryParams {
     search?: string;
@@ -37,6 +38,20 @@ export const useOfferRevisionsHook = (offerId: string) => {
     });
 
     return {revisions};
+};
+
+export const useReservationTask = (taskId?: string) => {
+    const { data: task } = useQuery({
+        queryKey: ["task", taskId],
+        queryFn: () => getTaskByIdAction(taskId!),
+        refetchInterval: (query) =>
+            query.state.data?.status === "COMPLETED" || query.state.data?.status === "FAILED"
+                ? false
+                : 2000,
+        enabled: !!taskId,
+    });
+
+    return { task };
 };
 
 export const useOfferHook = (params?: OfferQueryParams) => {

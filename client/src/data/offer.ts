@@ -11,6 +11,7 @@ import {
   type UpdateOfferFlatRatesInput,
   type UpdateOfferPositionInput,
   type Document,
+  type Task,
 } from '@/types';
 
 interface GetOffersParams {
@@ -76,3 +77,6 @@ export const uploadAction = (id: string) =>
   api<void>(`/api/documents/${id}/upload`, {
     method: 'POST',
   })
+
+export const getTaskByIdAction = (taskId: string) =>
+  api<Task>(`/api/tasks/${taskId}`, { method: 'GET' });
