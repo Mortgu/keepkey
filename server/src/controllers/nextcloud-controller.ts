@@ -1,7 +1,6 @@
-import { Request, Response } from "express";
-import { getNextCloudClient, reserveFile } from "../lib/nextcloud.js";
+import {Request, Response} from "express";
+import {getNextCloudClient} from "../lib/nextcloud.js";
 import env from "../lib/env.js";
-import logger from "../middlewares/logger.js";
 
 export const getNextcloudStatus = async (request: Request, response: Response) => {
     if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
@@ -24,14 +23,10 @@ export const getNextcloudStatus = async (request: Request, response: Response) =
     }
 };
 
-export async function reserveQuoteIdForOffer(quoteId: string): Promise<void> {
-    try {
-        await reserveFile(quoteId, env.NEXTCLOUD_OFFER_PDF_PATH);
-        await reserveFile(quoteId, env.NEXTCLOUD_OFFER_ORIGINAL_PATH);
-        logger.info(`[nextcloud] reservations created for quote ${quoteId}`);
-    } catch (exception: any) {
-        throw new Error(
-            `NextCloud reservation failed for quote ${quoteId}: ${exception.message}`,
-        );
-    }
+
+export async function reserveId(request: Request, response: Response): Promise<void> {
+    /* id from body to reserve (quoteId, offerId, ...) */
+    const {id} = request.body;
+    
+
 }

@@ -1,544 +1,526 @@
 import path from "path";
 import fs from "fs";
-import { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import {NextFunction, Request, Response} from "express";
+import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
-import { documentQueue, documentQueueKey, uploadQueue, uploadQueueKey } from "../lib/queues.js";
-import {
-  OfferFlatRate,
-  OfferPosition,
-  TaskStatus,
-  TaskType,
-} from "@prisma/client";
-import { toDate } from "../utils/utils.js";
+import {documentQueue, documentQueueKey, uploadQueue, uploadQueueKey} from "../lib/queues.js";
+import {OfferFlatRate, OfferPosition, TaskStatus, TaskType,} from "@prisma/client";
+import {toDate} from "../utils/utils.js";
 import env from "../lib/env.js";
 
+import {createHash} from "node:crypto";
+
 export const getOffers = async (request: Request, response: Response) => {
-  const { search, companyIds, contactPersonIds, sort } = request.query;
+    const {search, companyIds, contactPersonIds, sort} = request.query;
 
-  const where: {
-    AND?: any[];
-    quoteId?: { contains: string };
-    customerId?: { in: string[] };
-    contactPersonId?: { in: string[] };
-  } = {};
+    const where: {
+        AND?: any[];
+        quoteId?: { contains: string };
+        customerId?: { in: string[] };
+        contactPersonId?: { in: string[] };
+    } = {};
 
-  if (search && typeof search === "string") {
-    where.quoteId = { contains: search };
-  }
+    if (search && typeof search === "string") {
+        where.quoteId = {contains: search};
+    }
 
-  if (companyIds) {
-    const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
-    where.customerId = { in: ids as string[] };
-  }
+    if (companyIds) {
+        const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
+        where.customerId = {in: ids as string[]};
+    }
 
-  if (contactPersonIds) {
-    const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
-    where.contactPersonId = { in: ids as string[] };
-  }
+    if (contactPersonIds) {
+        const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
+        where.contactPersonId = {in: ids as string[]};
+    }
 
-  const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+    const orderBy = sort === "createdAt:asc" ? {createdAt: "asc" as const} : {createdAt: "desc" as const};
 
-  const offers = await prisma.offer.findMany({
-    where: Object.keys(where).length > 0 ? where : undefined,
-    orderBy,
-    include: {
-      customer: true,
-      supplier: true,
-      customerContactPerson: true,
-      tasks: true,
-      documents: true,
-      offerPositions: {
+    const offers = await prisma.offer.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
+        orderBy,
         include: {
-          product: true,
-          contract: true,
+            customer: true,
+            supplier: true,
+            customerContactPerson: true,
+            tasks: true,
+            documents: true,
+            offerPositions: {
+                include: {
+                    product: true,
+                    contract: true,
+                },
+            },
+            offerFlatRates: {
+                include: {
+                    flatRate: true,
+                },
+            },
         },
-      },
-      offerFlatRates: {
-        include: {
-          flatRate: true,
-        },
-      },
-    },
-  });
+    });
 
-  return response.status(200).json(offers);
+    return response.status(200).json(offers);
 };
 
 export const getOfferById = async (request: Request, response: Response) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  try {
-    const offer = await prisma.offer.findFirstOrThrow({
-      where: { id: id as string },
-      include: {
-        tasks: true,
-        documents: {
-          orderBy: {
-            createdAt: 'desc'
-          }
-        },
-      },
-    });
+    try {
+        const offer = await prisma.offer.findFirstOrThrow({
+            where: {id: id as string},
+            include: {
+                tasks: true,
+                documents: {
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+            },
+        });
 
-    return response.status(200).json(offer);
-  } catch (exception: any) {
-    return response.status(404).json({
-      message: "Offer not found!",
-    });
-  }
+        return response.status(200).json(offer);
+    } catch (exception: any) {
+        return response.status(404).json({
+            message: "Offer not found!",
+        });
+    }
 };
 
 export const getOfferTasks = async (request: Request, response: Response) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  const job = await prisma.task.findFirst({
-    where: { offerId: id as string },
-  });
+    const job = await prisma.task.findFirst({
+        where: {offerId: id as string},
+    });
 
-  return response.status(200).json(job);
+    return response.status(200).json(job);
 };
 
 export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-  try {
-    const quoteId = 0; //await getLatestQuoteId();
-    return response.status(200).json(quoteId + 1);
-  } catch (exception: any) {
-    return next(exception);
-  }
+    try {
+        const quoteId = 0; //await getLatestQuoteId();
+        return response.status(200).json(quoteId + 1);
+    } catch (exception: any) {
+        return next(exception);
+    }
 };
 
 export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  const offer = await prisma.offer.findUniqueOrThrow({
-    where: { id: id as string },
-    select: { quoteId: true },
-  });
+    const offer = await prisma.offer.findUniqueOrThrow({
+        where: {id: id as string},
+        select: {quoteId: true},
+    });
 
-  const task = await prisma.task.create({
-    data: {
-      offerId: id as string,
-      type: TaskType.RESERVATION,
-      status: TaskStatus.PENDING,
-    }
-  });
+    const hash = createHash("sha256").update(`
+        { id: ${id as string}, type: ${TaskType.RESERVATION} }
+    `).digest("hex");
 
-  const job = await uploadQueue.add(uploadQueueKey, {
-    taskId: task.id,
-    type: "QUOTE_RESERVATION",
-    offerId: id as string,
-    quoteId: offer.quoteId,
-  }, { attempts: 5, backoff: { type: "exponential", delay: 2000 } });
+    const task = await prisma.task.upsert({
+        where: {id: hash},
+        update: {
+            status: TaskStatus.PENDING,
+            error: "",
+        },
+        create: {
+            id: hash,
+            offerId: id as string,
+            type: TaskType.RESERVATION,
+            status: TaskStatus.PENDING,
+        }
+    })
 
-  await prisma.task.update({
-    where: { id: task.id },
-    data: { jobId: job.id! },
-  });
+    const job = await uploadQueue.add(uploadQueueKey, {
+        taskId: task.id,
+        taskType: TaskType.RESERVATION
+    })
 
-  return response.status(200).json(job);
+    await prisma.task.update({
+        where: {id: task.id},
+        data: {jobId: job.id!},
+    });
+
+    return response.status(200).json(job);
 }
 
 export const getOfferTaskById = async (request: Request, response: Response) => {
-  const { id, jobId } = request.params;
+    const {id, jobId} = request.params;
 
-  try {
-    const offerTask = await prisma.task.findFirstOrThrow({
-      where: {
-        AND: [
-          { id: jobId as string },
-          { offerId: id as string }
-        ],
-      },
-    });
+    try {
+        const offerTask = await prisma.task.findFirstOrThrow({
+            where: {
+                AND: [
+                    {id: jobId as string},
+                    {offerId: id as string}
+                ],
+            },
+        });
 
-    return response.status(200).json(offerTask);
-  } catch (exception: any) {
-    return response.status(404).json({
-      message: "Job not found!",
-    });
-  }
+        return response.status(200).json(offerTask);
+    } catch (exception: any) {
+        return response.status(404).json({
+            message: "Job not found!",
+        });
+    }
 };
 
 export const createOfferTask = async (request: Request, response: Response) => {
-  const { offer } = request.body;
+    const {offer} = request.body;
 
-  if (!offer) {
-    return response.status(404).json({
-      message: "Failed to create offer task. Missing offer!",
-    });
-  }
+    if (!offer) {
+        return response.status(404).json({
+            message: "Failed to create offer task. Missing offer!",
+        });
+    }
 
-  try {
-    const task = await prisma.task.create({
-      data: {
-        offerId: offer.id,
-        type: TaskType.OFFER,
-        status: TaskStatus.PENDING,
-      },
-    });
+    try {
+        const task = await prisma.task.create({
+            data: {
+                offerId: offer.id,
+                type: TaskType.OFFER,
+                status: TaskStatus.PENDING,
+            },
+        });
 
-    await prisma.$transaction(async (tx) => {
-      await tx.document.updateMany({
-        where: { offerId: offer.id, isCurrent: true },
-        data: { isCurrent: false },
-      });
+        await prisma.$transaction(async (tx) => {
+            await tx.document.updateMany({
+                where: {offerId: offer.id, isCurrent: true},
+                data: {isCurrent: false},
+            });
 
-      const latest = await tx.document.findFirst({
-        where: { offerId: offer.id },
-        orderBy: { version: "desc" },
-        select: { version: true },
-      });
-      const nextVersion = (latest?.version ?? 0) + 1;
+            const latest = await tx.document.findFirst({
+                where: {offerId: offer.id},
+                orderBy: {version: "desc"},
+                select: {version: true},
+            });
+            const nextVersion = (latest?.version ?? 0) + 1;
 
-      await tx.document.create({
-        data: {
-          offerId: offer.id,
-          version: nextVersion,
-          status: "PENDING",
-          isCurrent: true,
-        },
-      });
-    });
+            await tx.document.create({
+                data: {
+                    offerId: offer.id,
+                    version: nextVersion,
+                    status: "PENDING",
+                    isCurrent: true,
+                },
+            });
+        });
 
-    const job = await documentQueue.add(documentQueueKey, {
-      taskId: task.id,
-      taskType: TaskType.OFFER,
-    });
+        const job = await documentQueue.add(documentQueueKey, {
+            taskId: task.id,
+            taskType: TaskType.OFFER,
+        });
 
-    await prisma.task.update({
-      where: { id: task.id },
-      data: { jobId: job.id },
-    });
+        await prisma.task.update({
+            where: {id: task.id},
+            data: {jobId: job.id},
+        });
 
-    return response.status(200).json(offer);
-  } catch (exception: any) {
-    return response.status(500).json({
-      message: `Failed to create task for offer: ${offer.id}`,
-    });
-  }
+        return response.status(200).json(offer);
+    } catch (exception: any) {
+        return response.status(500).json({
+            message: `Failed to create task for offer: ${offer.id}`,
+        });
+    }
 };
 
 export const deleteOfferDocument = async (
-  request: Request,
-  response: Response,
+    request: Request,
+    response: Response,
 ) => {
-  const offerId = request.params.id as string;
-  const documentId = request.params.documentId as string;
+    const offerId = request.params.id as string;
+    const documentId = request.params.documentId as string;
 
-  const document = await prisma.document.findFirst({
-    where: { id: documentId, offerId },
-    select: { id: true },
-  });
+    const document = await prisma.document.findFirst({
+        where: {id: documentId, offerId},
+        select: {id: true},
+    });
 
-  if (!document) {
-    return response.status(404).json({ message: "Document not found" });
-  }
-
-  try {
-    await prisma.document.delete({ where: { id: document.id } });
-
-    for (const ext of ["pdf", "docx"]) {
-      const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${ext}`);
-      await fs.promises.rm(filePath, { force: true });
+    if (!document) {
+        return response.status(404).json({message: "Document not found"});
     }
 
-    return response.status(200).json({ success: true });
-  } catch (exception: any) {
-    return response.status(500).json({
-      message: "Could not delete document: " + exception.message,
-    });
-  }
+    try {
+        await prisma.document.delete({where: {id: document.id}});
+
+        for (const ext of ["pdf", "docx"]) {
+            const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${ext}`);
+            await fs.promises.rm(filePath, {force: true});
+        }
+
+        return response.status(200).json({success: true});
+    } catch (exception: any) {
+        return response.status(500).json({
+            message: "Could not delete document: " + exception.message,
+        });
+    }
 };
 
 export const downloadOfferDocument = async (
-  request: Request,
-  response: Response,
+    request: Request,
+    response: Response,
 ) => {
-  const offerId = request.params.id as string;
-  const documentId = request.params.documentId as string;
-  const format = request.params.format as string;
+    const offerId = request.params.id as string;
+    const documentId = request.params.documentId as string;
+    const format = request.params.format as string;
 
-  if (format !== "pdf" && format !== "docx") {
-    return response.status(400).json({ message: "Invalid format" });
-  }
+    if (format !== "pdf" && format !== "docx") {
+        return response.status(400).json({message: "Invalid format"});
+    }
 
-  const document = await prisma.document.findFirst({
-    where: { id: documentId, offerId },
-    select: {
-      id: true,
-      displayName: true,
-      pdfReady: true,
-      docxReady: true,
-    },
-  });
+    const document = await prisma.document.findFirst({
+        where: {id: documentId, offerId},
+        select: {
+            id: true,
+            displayName: true,
+            pdfReady: true,
+            docxReady: true,
+        },
+    });
 
-  if (!document) {
-    return response.status(404).json({ message: "Document not found" });
-  }
+    if (!document) {
+        return response.status(404).json({message: "Document not found"});
+    }
 
-  const ready = format === "pdf" ? document.pdfReady : document.docxReady;
-  if (!ready) {
-    return response.status(409).json({ message: "Document not yet generated" });
-  }
+    const ready = format === "pdf" ? document.pdfReady : document.docxReady;
+    if (!ready) {
+        return response.status(409).json({message: "Document not yet generated"});
+    }
 
-  const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
-  const downloadName = `${document.displayName ?? document.id}.${format}`;
+    const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
+    const downloadName = `${document.displayName ?? document.id}.${format}`;
 
-  return response.download(filePath, downloadName);
+    return response.download(filePath, downloadName);
 };
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
-  const { body } = request;
+    const {body} = request;
 
-  if (!body) {
-    return response.status(400).json({
-      message: "Bad request",
-    });
-  }
-
-  const { offer, positions, flatRates } = body;
-
-  if (!offer || !positions) {
-    return response.status(400).json({
-      message: "Bad request.",
-    });
-  }
-
-  for (const position of positions) {
-    position["total_cents"] = await calculatePrice({
-      productId: position.productId,
-      contractId: position.contractId,
-      duration: position.duration_months,
-      quantity: position.quantity,
-      customerId: offer.customerId,
-    });
-  }
-
-  try {
-    request.body.offer = await prisma.$transaction(async (tx) => {
-      let net_amount_positions = positions.reduce(
-        (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
-
-      let net_amount_flatrates = flatRates.reduce(
-        (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
-
-      let net_amount = net_amount_positions + net_amount_flatrates;
-
-      const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
-      const offer = await tx.offer.create({
-        data: {
-          ...offerFields,
-          date: toDate(date) ?? new Date(),
-          supplierId: supplierId || null,
-          validUntil: toDate(validUntil),
-          requestFrom: toDate(requestFrom),
-          net_amount: net_amount,
-        },
-      });
-
-      for (const position of positions) {
-        const { productId, contractId, duration_months,
-          quantity, optional, total_cents } = position;
-
-        await tx.offerPosition.create({
-          data: {
-            offerId: offer.id,
-            productId,
-            contractId,
-            duration_months,
-            quantity,
-            total_cents,
-            optional,
-          },
+    if (!body) {
+        return response.status(400).json({
+            message: "Bad request",
         });
-      }
-
-      for (const flatRate of flatRates) {
-        await tx.offerFlatRate.create({
-          data: {
-            offerId: offer.id,
-            flatRateId: flatRate.id,
-            quantity: flatRate.quantity,
-            total_cents: flatRate.total_cents,
-          },
-        });
-      }
-
-      return offer;
-    });
-
-    const createdOffer = request.body.offer;
-    try {
-      const reservationTask = await prisma.task.create({
-        data: {
-          offerId: createdOffer.id,
-          type: TaskType.RESERVATION,
-          status: TaskStatus.PENDING,
-        },
-      });
-      const reservationJob = await uploadQueue.add(
-        uploadQueueKey,
-        {
-          type: "QUOTE_RESERVATION",
-          taskId: reservationTask.id,
-          offerId: createdOffer.id,
-          quoteId: createdOffer.quoteId,
-        },
-        { attempts: 5, backoff: { type: "exponential", delay: 2000 } },
-      );
-      await prisma.task.update({
-        where: { id: reservationTask.id },
-        data: { jobId: reservationJob.id },
-      });
-    } catch (queueErr: any) {
-      // Reservation enqueue failure must not break offer creation;
-      // surface via task status if possible.
-      console.error("Failed to enqueue quoteId reservation:", queueErr?.message);
     }
 
-    next();
-  } catch (exception: any) {
-    return response.status(408).json({
-      message:
-        "Something went wrong trying to create offer: " + exception.message,
-      success: false,
-    });
-  }
+    const {offer, positions, flatRates} = body;
+
+    if (!offer || !positions) {
+        return response.status(400).json({
+            message: "Bad request.",
+        });
+    }
+
+    for (const position of positions) {
+        position["total_cents"] = await calculatePrice({
+            productId: position.productId,
+            contractId: position.contractId,
+            duration: position.duration_months,
+            quantity: position.quantity,
+            customerId: offer.customerId,
+        });
+    }
+
+    try {
+        request.body.offer = await prisma.$transaction(async (tx) => {
+            let net_amount_positions = positions.reduce(
+                (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+
+            let net_amount_flatrates = flatRates.reduce(
+                (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+
+            let net_amount = net_amount_positions + net_amount_flatrates;
+
+            const {supplierId, validUntil, requestFrom, date, ...offerFields} = body.offer;
+            const offer = await tx.offer.create({
+                data: {
+                    ...offerFields,
+                    date: toDate(date) ?? new Date(),
+                    supplierId: supplierId || null,
+                    validUntil: toDate(validUntil),
+                    requestFrom: toDate(requestFrom),
+                    net_amount: net_amount,
+                },
+            });
+
+            for (const position of positions) {
+                const {
+                    productId, contractId, duration_months,
+                    quantity, optional, total_cents
+                } = position;
+
+                await tx.offerPosition.create({
+                    data: {
+                        offerId: offer.id,
+                        productId,
+                        contractId,
+                        duration_months,
+                        quantity,
+                        total_cents,
+                        optional,
+                    },
+                });
+            }
+
+            for (const flatRate of flatRates) {
+                await tx.offerFlatRate.create({
+                    data: {
+                        offerId: offer.id,
+                        flatRateId: flatRate.id,
+                        quantity: flatRate.quantity,
+                        total_cents: flatRate.total_cents,
+                    },
+                });
+            }
+
+            return offer;
+        });
+
+        return response.status(200).json(offer);
+    } catch (exception: any) {
+        return response.status(408).json({
+            message: "Something went wrong trying to create offer: " + exception.message,
+            success: false,
+        });
+    }
 };
 
 export const deleteOffer = async (request: Request, response: Response) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  if (!id) {
-    return response.status(400).json({
-      message: "Bad request",
-      success: false,
-    });
-  }
+    if (!id) {
+        return response.status(400).json({
+            message: "Bad request",
+            success: false,
+        });
+    }
 
-  if (!id) {
-    return response.status(400).json({
-      message: "Bad request. Missing id!",
-      success: false,
-    });
-  }
+    if (!id) {
+        return response.status(400).json({
+            message: "Bad request. Missing id!",
+            success: false,
+        });
+    }
 
-  try {
-    await prisma.offer.deleteMany({
-      where: { id: id as string },
-    });
+    try {
+        await prisma.offer.deleteMany({
+            where: {id: id as string},
+        });
 
-    return response.status(200).json({
-      success: true,
-      message: "Successfully deleted offer!",
-    });
-  } catch (exception: any) {
-    return response.status(500).json({
-      message: "Something went wrong trying to delete offer!",
-      exception,
-      success: false,
-    });
-  }
+        return response.status(200).json({
+            success: true,
+            message: "Successfully deleted offer!",
+        });
+    } catch (exception: any) {
+        return response.status(500).json({
+            message: "Something went wrong trying to delete offer!",
+            exception,
+            success: false,
+        });
+    }
 };
 
 export const getOfferRevisions = async (request: Request, response: Response) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  const revisions = await prisma.offerRevision.findMany({
-    where: { offerId: id as string },
-    orderBy: { version: 'desc' },
-    select: { id: true, version: true, changedBy: true, createdAt: true },
-  });
+    const revisions = await prisma.offerRevision.findMany({
+        where: {offerId: id as string},
+        orderBy: {version: 'desc'},
+        select: {id: true, version: true, changedBy: true, createdAt: true},
+    });
 
-  return response.status(200).json(revisions);
+    return response.status(200).json(revisions);
 };
 
 export const updateOffer = async (request: Request, response: Response, next: NextFunction) => {
-  const oid = request.params.id as string;
-  const data = request.body;
+    const oid = request.params.id as string;
+    const data = request.body;
 
-  if (!data) {
-    return response.status(400).json({
-      message: 'Bad request! Missing body!'
-    });
-  }
-
-  const { positions = [], flatRates = [] } = data;
-  const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
-
-  for (const position of positions) {
-    position["total_cents"] = await calculatePrice({
-      productId: position.productId,
-      contractId: position.contractId,
-      duration: position.duration_months,
-      quantity: position.quantity,
-      customerId: data.offer?.customerId,
-    });
-  }
-
-  try {
-    const offer = await prisma.$transaction(async (tx) => {
-      const net_amount_positions = positions.reduce(
-        (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
-      const net_amount_flatrates = flatRates.reduce(
-        (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
-      const net_amount = net_amount_positions + net_amount_flatrates;
-
-      const current = await tx.offer.findFirstOrThrow({
-        where: { id: oid },
-        include: { offerPositions: true, offerFlatRates: true },
-      });
-
-      await tx.offerRevision.create({
-        data: {
-          offerId: oid,
-          version: current.version,
-          changedBy: data.offer?.userId ?? null,
-          snapshot: current as any,
-        },
-      });
-
-      const offer = await tx.offer.updateManyAndReturn({
-        where: { id: oid as string },
-        data: {
-          ...scalarFields,
-          date: toDate(date) ?? new Date(),
-          supplierId: supplierId || null,
-          validUntil: toDate(validUntil),
-          requestFrom: toDate(requestFrom),
-          net_amount,
-          version: { increment: 1 },
-        },
-      });
-
-      await tx.offerPosition.deleteMany({ where: { offerId: oid } });
-      for (const position of positions) {
-        const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
-        await tx.offerPosition.create({
-          data: { offerId: oid, productId, contractId, duration_months, quantity, total_cents, optional },
+    if (!data) {
+        return response.status(400).json({
+            message: 'Bad request! Missing body!'
         });
-      }
+    }
 
-      await tx.offerFlatRate.deleteMany({ where: { offerId: oid } });
-      for (const flatRate of flatRates) {
-        await tx.offerFlatRate.create({
-          data: { offerId: oid, flatRateId: flatRate.flatRateId, quantity: flatRate.quantity, total_cents: flatRate.total_cents },
+    const {positions = [], flatRates = []} = data;
+    const {id: _, supplierId, validUntil, requestFrom, date, ...scalarFields} = data.offer;
+
+    for (const position of positions) {
+        position["total_cents"] = await calculatePrice({
+            productId: position.productId,
+            contractId: position.contractId,
+            duration: position.duration_months,
+            quantity: position.quantity,
+            customerId: data.offer?.customerId,
         });
-      }
+    }
 
-      return offer[0];
-    });
+    try {
+        const offer = await prisma.$transaction(async (tx) => {
+            const net_amount_positions = positions.reduce(
+                (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+            const net_amount_flatrates = flatRates.reduce(
+                (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+            const net_amount = net_amount_positions + net_amount_flatrates;
 
-    request.body.offer = offer;
-    next();
-    //return response.status(200).json({});
-  } catch (exception: any) {
-    console.error('updateOffer error:', exception.message, JSON.stringify(exception, null, 2));
-    return response.status(500).json({
-      message: 'Something went wrong trying to update offer',
-      detail: exception.message,
-      exception
-    });
-  }
+            const current = await tx.offer.findFirstOrThrow({
+                where: {id: oid},
+                include: {offerPositions: true, offerFlatRates: true},
+            });
+
+            await tx.offerRevision.create({
+                data: {
+                    offerId: oid,
+                    version: current.version,
+                    changedBy: data.offer?.userId ?? null,
+                    snapshot: current as any,
+                },
+            });
+
+            const offer = await tx.offer.updateManyAndReturn({
+                where: {id: oid as string},
+                data: {
+                    ...scalarFields,
+                    date: toDate(date) ?? new Date(),
+                    supplierId: supplierId || null,
+                    validUntil: toDate(validUntil),
+                    requestFrom: toDate(requestFrom),
+                    net_amount,
+                    version: {increment: 1},
+                },
+            });
+
+            await tx.offerPosition.deleteMany({where: {offerId: oid}});
+            for (const position of positions) {
+                const {productId, contractId, duration_months, quantity, optional, total_cents} = position;
+                await tx.offerPosition.create({
+                    data: {offerId: oid, productId, contractId, duration_months, quantity, total_cents, optional},
+                });
+            }
+
+            await tx.offerFlatRate.deleteMany({where: {offerId: oid}});
+            for (const flatRate of flatRates) {
+                await tx.offerFlatRate.create({
+                    data: {
+                        offerId: oid,
+                        flatRateId: flatRate.flatRateId,
+                        quantity: flatRate.quantity,
+                        total_cents: flatRate.total_cents
+                    },
+                });
+            }
+
+            return offer[0];
+        });
+
+        request.body.offer = offer;
+        next();
+        //return response.status(200).json({});
+    } catch (exception: any) {
+        console.error('updateOffer error:', exception.message, JSON.stringify(exception, null, 2));
+        return response.status(500).json({
+            message: 'Something went wrong trying to update offer',
+            detail: exception.message,
+            exception
+        });
+    }
 }

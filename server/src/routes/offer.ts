@@ -1,4 +1,4 @@
-import { Router } from "express";
+import {Router} from "express";
 import {
   createOffer,
   createOfferTask,
@@ -8,14 +8,14 @@ import {
   getNextQuoteId,
   getOfferById,
   getOfferRevisions,
+  getOffers,
   getOfferTaskById,
   getOfferTasks,
-  getOffers,
   reserveQuoteId,
   updateOffer,
 } from "../controllers/offer-controller.js";
-import { validate } from "../middlewares/validate.js";
-import { createOfferSchema } from "../schemas/index.js";
+import {validate} from "../middlewares/validate.js";
+import {createOfferSchema} from "../schemas/index.js";
 
 const router = Router();
 
@@ -25,9 +25,6 @@ router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
 
-/*
- * /api/offers/:id/reserve
- */
 router.post('/:id/reserve', reserveQuoteId)
 
 router.get("/:id", getOfferById);
@@ -44,6 +41,6 @@ router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
 
 router.delete("/:id/documents/:documentId", deleteOfferDocument);
 
-router.post("/", validate(createOfferSchema), createOffer, createOfferTask);
+router.post("/", validate(createOfferSchema), createOffer);
 
 export default router;

@@ -1,125 +1,99 @@
-import { Job, UnrecoverableError, Worker } from "bullmq";
-import { TaskStatus, DocumentStatus } from "@prisma/client";
-import { connection, uploadQueueKey } from "../lib/queues.js";
-import { prisma } from "../lib/prisma.js";
+import {Job, Worker} from "bullmq";
+import {connection, uploadQueueKey} from "../lib/queues.js";
+import {TaskStatus, TaskType} from "@prisma/client";
 import logger from "../middlewares/logger.js";
-import { reserveQuoteIdForOffer } from "../controllers/nextcloud-controller.js";
-import { uploadFile } from "../lib/nextcloud.js";
-import env from "../lib/env.js";
-import path from "path";
-import fs from "fs/promises";
+import {prisma} from "../lib/prisma.js";
 
-type UploadJobData =
-  | {
-      type: "QUOTE_RESERVATION";
-      taskId: string;
-      offerId: string;
-      quoteId: string;
-    }
-  | {
-      type: "DOCUMENT_UPLOAD";
-      taskId: string;
-      documentId: string;
-      offerId: string;
-      displayName: string;
-    };
+interface UploadWorkerInterface {
+    taskId: string;
+    taskType: TaskType;
+}
 
-export default function startUploadWorker() {
-  const worker = new Worker<UploadJobData>(
-    uploadQueueKey,
-    async (job: Job<UploadJobData>) => {
-      const { type, taskId } = job.data;
+export default function registerUploadWorker() {
+    const uploadWorker = new Worker<UploadWorkerInterface>(uploadQueueKey, async (job: Job<UploadWorkerInterface>) => {
+        const {taskId, taskType} = job.data;
 
-      await prisma.task.updateMany({
-        where: { id: taskId },
-        data: { status: TaskStatus.RUNNING },
-      });
-
-      switch (type) {
-        case "QUOTE_RESERVATION": {
-          try {
-            await reserveQuoteIdForOffer(job.data.quoteId);
-            await prisma.task.update({
-              where: { id: taskId },
-              data: { status: TaskStatus.COMPLETED, error: null },
-            });
-            return;
-          } catch (exception: any) {
-            throw exception;
-          }
+        switch (taskType) {
+            case TaskType.RESERVATION:
+                await new Promise((resolve, reject) => setTimeout(resolve, 10000));
+                logger.info(taskId)
+                break;
+            case TaskType.UPLOAD:
+                logger.info("UPLOAD");
+                break;
+            default:
+                break;
         }
-        case "DOCUMENT_UPLOAD": {
-          const { documentId, displayName } = job.data;
 
-          try {
-            const pdfPath = path.join(env.OUTPUT_DIR, `${documentId}.pdf`);
-            const docxPath = path.join(env.OUTPUT_DIR, `${documentId}.docx`);
+    }, {connection, concurrency: 2});
 
-            const [pdfBuffer, docxBuffer] = await Promise.all([
-              fs.readFile(pdfPath),
-              fs.readFile(docxPath),
-            ]);
+    uploadWorker.on("active", async (job: Job<UploadWorkerInterface>) => {
+        const {taskId, taskType} = job.data;
 
-            await Promise.all([
-              uploadFile(
-                `${env.NEXTCLOUD_OFFER_PDF_PATH}/${displayName}.pdf`,
-                pdfBuffer,
-              ),
-              uploadFile(
-                `${env.NEXTCLOUD_OFFER_ORIGINAL_PATH}/${displayName}.docx`,
-                docxBuffer,
-              ),
-            ]);
-
-            await prisma.document.update({
-              where: { id: documentId },
-              data: { status: DocumentStatus.UPLOADED },
-            });
-
-            await prisma.task.update({
-              where: { id: taskId },
-              data: { status: TaskStatus.COMPLETED, error: null },
-            });
-
-            return;
-          } catch (exception: any) {
-            throw exception;
-          }
+        if (!taskId) {
+            throw new Error("Unable to process task with id " + taskId + " in upload worker.");
         }
-        default:
-          throw new UnrecoverableError(
-            `Unknown upload job type: ${(job.data as any).type}`,
-          );
-      }
-    },
-    { connection, concurrency: 2 },
-  );
 
-  worker.on("completed", (job) => {
-    logger.info(
-      `[upload-worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
-    );
-  });
+        try {
+            await prisma.task.update({
+                where: {id: taskId},
+                data: {
+                    status: TaskStatus.RUNNING,
+                }
+            });
 
-  worker.on("failed", async (job, err) => {
-    logger.error(`[upload-worker] job ${job?.id} failed: ${err.message}`);
-    if (!job) return;
+            logger.info("task " + taskId + " updated to status RUNNING!");
+        } catch (error: any) {
+            logger.error("Exception occurred in upload worker trying to update task status!", taskId);
+            throw new Error(`Exception occurred in upload worker trying to update task (${taskId}) status!`);
+        }
+    })
 
-    const exhausted =
-      err instanceof UnrecoverableError ||
-      job.attemptsMade >= (job.opts.attempts ?? 1);
+    uploadWorker.on("completed", async (job) => {
+        const {taskId, taskType} = job.data;
 
-    if (exhausted) {
-      await prisma.task.updateMany({
-        where: { id: job.data.taskId, status: { not: TaskStatus.FAILED } },
-        data: { status: TaskStatus.FAILED, error: err.message },
-      });
-    }
-  });
+        if (!taskId) {
+            throw new Error("Unable to process task with id " + taskId + "in upload worker.");
+        }
 
-  worker.on("stalled", (jobId) => {
-    logger.warn(`[upload-worker] job ${jobId} stalled`);
-  });
+        try {
+            await prisma.task.update({
+                where: {id: taskId},
+                data: {
+                    status: TaskStatus.COMPLETED,
+                }
+            });
 
-  return worker;
+            logger.info("task " + taskId + " completed");
+        } catch (error: any) {
+            logger.error("Exception occurred in upload worker trying to update task status!", taskId);
+            throw new Error(`Exception occurred in upload worker trying to update task (${taskId}) status!`);
+        }
+    });
+
+    uploadWorker.on("failed", async (job, error) => {
+        if (!job) throw new Error("Something went wrong in upload worker.");
+
+        const {taskId, taskType} = job.data;
+
+        logger.error(`task ${taskId} failed with error: ${error}`);
+
+        if (taskId) {
+            try {
+                await prisma.task.update({
+                    where: {id: taskId},
+                    data: {
+                        status: TaskStatus.FAILED,
+                        error: error.message
+                    }
+                })
+            } catch (error: any) {
+                logger.error(`Task failed with error: ${error}`);
+                return;
+            }
+        }
+
+    });
+
+    return uploadWorker;
 }
