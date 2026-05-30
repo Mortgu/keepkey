@@ -921,6 +921,7 @@ components:
         - ORDER
         - RENEWAL
         - RESERVATION
+        - UPLOAD
   responses: {}
   parameters: {}
   examples: {}

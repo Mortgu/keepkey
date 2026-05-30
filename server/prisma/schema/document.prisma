@@ -43,6 +43,7 @@ enum TaskType {
   ORDER
   RENEWAL
   RESERVATION
+  UPLOAD
 }
 
 model Task {

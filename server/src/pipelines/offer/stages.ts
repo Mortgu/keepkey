@@ -10,9 +10,11 @@ import {
   converting,
 } from "./actions.js";
 import { OfferPipelineContext } from "./context.js";
-import { OfferPosition, TaskStatus } from "@prisma/client";
+import { TaskStatus, TaskType } from "@prisma/client";
 import { PipelineStage, PipelineStageError } from "../pipeline.js";
 import logger from "../../middlewares/logger.js";
+import { prisma } from "../../lib/prisma.js";
+import { uploadQueue, uploadQueueKey } from "../../lib/queues.js";
 
 const loadOfferData: PipelineStage<OfferPipelineContext> = {
   name: "fetch",
@@ -94,22 +96,34 @@ const write: PipelineStage<OfferPipelineContext> = {
       fs.writeFile(docxPath, context.docxBuffer!),
       fs.writeFile(pdfPath, context.pdfBuffer!),
     ]);
-
-    /*getNextcloudPaths().then(({ pdfPath, docxPath }) =>
-      Promise.all([
-        uploadToNextCloud(`${pdfPath}/${context.displayName}.pdf`, context.pdfBuffer),
-        uploadToNextCloud(`${docxPath}/${context.displayName}.docx`, context.docxBuffer),
-      ])
-    ).catch((err) => {
-      logger.warn(`[offer-pipeline] Nextcloud upload skipped: ${err?.message ?? err}`);
-    });*/
   },
 };
 
 const upload: PipelineStage<OfferPipelineContext> = {
   name: 'upload',
-  run: async (context) => { }
-}
+  run: async (context) => {
+    const uploadTask = await prisma.task.create({
+      data: {
+        offerId: context.offerId,
+        type: TaskType.UPLOAD,
+        status: TaskStatus.PENDING,
+      },
+    });
+
+    const job = await uploadQueue.add(uploadQueueKey, {
+      type: "DOCUMENT_UPLOAD",
+      taskId: uploadTask.id,
+      documentId: context.documentId,
+      offerId: context.offerId,
+      displayName: context.displayName!,
+    }, { attempts: 5, backoff: { type: "exponential", delay: 2000 } });
+
+    await prisma.task.update({
+      where: { id: uploadTask.id },
+      data: { jobId: job.id! },
+    });
+  },
+};
 
 export const offerStages: PipelineStage<OfferPipelineContext>[] = [
   loadOfferData,
@@ -119,4 +133,5 @@ export const offerStages: PipelineStage<OfferPipelineContext>[] = [
   generate,
   convert,
   write,
+  upload,
 ];

@@ -111,6 +111,11 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
 export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
   const { id } = request.params;
 
+  const offer = await prisma.offer.findUniqueOrThrow({
+    where: { id: id as string },
+    select: { quoteId: true },
+  });
+
   const task = await prisma.task.create({
     data: {
       offerId: id as string,
@@ -122,7 +127,13 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
   const job = await uploadQueue.add(uploadQueueKey, {
     taskId: task.id,
     type: "QUOTE_RESERVATION",
-    quoteId: id as string,
+    offerId: id as string,
+    quoteId: offer.quoteId,
+  }, { attempts: 5, backoff: { type: "exponential", delay: 2000 } });
+
+  await prisma.task.update({
+    where: { id: task.id },
+    data: { jobId: job.id! },
   });
 
   return response.status(200).json(job);
