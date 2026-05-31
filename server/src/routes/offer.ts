@@ -1,7 +1,6 @@
 import {Router} from "express";
 import {
   createOffer,
-  createOfferTask,
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
@@ -29,7 +28,7 @@ router.post('/:id/reserve', reserveQuoteId)
 
 router.get("/:id", getOfferById);
 
-router.put('/:id', updateOffer, createOfferTask);
+router.put('/:id', updateOffer);
 
 router.delete("/:id", deleteOffer);
 

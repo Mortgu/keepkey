@@ -512,9 +512,9 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
             return offer[0];
         });
 
-        request.body.offer = offer;
-        next();
-        //return response.status(200).json({});
+        //request.body.offer = offer;
+        //next();
+        return response.status(200).json(offer);
     } catch (exception: any) {
         console.error('updateOffer error:', exception.message, JSON.stringify(exception, null, 2));
         return response.status(500).json({

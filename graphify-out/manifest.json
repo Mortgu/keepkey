@@ -496,8 +496,8 @@
     "hash": "990312ce27e1df92ce20e2073ed34a9f"
   },
   "/Users/oskar/Programming/keepit/client/src/hooks/offer-hook.ts": {
-    "mtime": 1780140466.8156025,
-    "hash": "07ac6e7961b6769e3da20d391c8b61a5"
+    "mtime": 1780149294.4174507,
+    "hash": "daa535fcc6502fc3685d0e7aa87f748f"
   },
   "/Users/oskar/Programming/keepit/client/src/hooks/product-hook.ts": {
     "mtime": 1779461641.9004834,
@@ -588,8 +588,8 @@
     "hash": "93d1d8bcdedecc733786d7972c5243ce"
   },
   "/Users/oskar/Programming/keepit/client/src/data/offer.ts": {
-    "mtime": 1779799615.54576,
-    "hash": "2fbd018cd751f6f9f86d478b4a6a703d"
+    "mtime": 1780148989.335823,
+    "hash": "425e3607e1009e4aa4f056f5c56eb777"
   },
   "/Users/oskar/Programming/keepit/client/src/data/user.ts": {
     "mtime": 1778491735.6393733,
@@ -648,8 +648,8 @@
     "hash": "fdc7ac8db212dccac671c9df3ed263f6"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-card.tsx": {
-    "mtime": 1780148755.594733,
-    "hash": "fee0789dda960e433d0d304346e5c794"
+    "mtime": 1780149199.9065933,
+    "hash": "005668dd8ddce2605993633d9a723204"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-list.tsx": {
     "mtime": 1779799615.5535116,
@@ -680,8 +680,12 @@
     "hash": "d0681df64db2142b74530ecf673d88e7"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/index.tsx": {
-    "mtime": 1779461641.903745,
-    "hash": "58331297001e41bc08a490dcf1faeb40"
+    "mtime": 1780149106.7692826,
+    "hash": "01f7a55bc39ce4846881439273521aea"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/line-item-row.tsx": {
+    "mtime": 1780149101.8545766,
+    "hash": "0fa919877a6d19474e7f1eb93fd61652"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/task-item.tsx": {
     "mtime": 1779461641.903836,
@@ -690,6 +694,10 @@
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/document-item.tsx": {
     "mtime": 1780129717.1697166,
     "hash": "431db74579880608206094ae48bdaede"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/reservation-badge.tsx": {
+    "mtime": 1780149208.1569486,
+    "hash": "f7a86b85e3192413d2ec9c3e00fa25ce"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/card-components/offer-revision-history.tsx": {
     "mtime": 1779518369.008526,
