@@ -26,7 +26,6 @@ model Order {
   // Fehlt: Summe Netto EUR, MwSt. 19.00%, Summe Brutto EUR
 
   documents Document[]
-  tasks     Task[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime? @default(now())

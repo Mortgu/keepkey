@@ -2,20 +2,25 @@ import { useOrderHook } from "@/hooks";
 import { Pen, Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
 import React, { useState } from "react";
-import type { Order, OrderPosition } from "@/types";
-import { Button } from "@/components";
+import type { Document, Order, OrderPosition } from "@/types";
+import { Button, Collapsable } from "@/components";
+import { DocumentItem } from "@/routes/_main/offers/-components/card-components";
 
 type Props = {
   order: Order
 };
 
 export default function OrderCard({ order }: Props) {
-  const { deleteOrder, errorCreatingOrder, errorDeletingOrder, isDeleting, isCreatingOrder } = useOrderHook();
+  const { deleteOrder, errorDeletingOrder, isDeleting, generateDocument, isGeneratingDocument } = useOrderHook();
 
   const [isOpen, setOpen] = useState<boolean>(false);
 
+  const hasActiveDocTask = order.documents?.some(
+    (d: Document) => d.task?.status === "PENDING" || d.task?.status === "RUNNING"
+  );
+
   return (
-    <React.Fragment >
+    <React.Fragment>
       {errorDeletingOrder && (
         <p className="text-(--destructive) text-md">{errorDeletingOrder.message}</p>
       )}
@@ -35,7 +40,6 @@ export default function OrderCard({ order }: Props) {
               iconOnly
               icon={<Pen className="size-3.5" />}
             />
-
             <Button
               loading={isDeleting}
               onClick={() => deleteOrder(order.id)}
@@ -46,10 +50,10 @@ export default function OrderCard({ order }: Props) {
             />
           </div>
         </div>
-        {/* Products */}
+
         <div className="">
           {order.orderPositions.map((position: OrderPosition) => (
-            <div className="flex items-center justify-between border-b border-(--border) px-3 py-2 ">
+            <div key={position.id} className="flex items-center justify-between border-b border-(--border) px-3 py-2">
               <div className="flex items-center gap-2">
                 <p>{position.product.name}</p>
                 <p className="text-gray-500">
@@ -61,9 +65,23 @@ export default function OrderCard({ order }: Props) {
           ))}
         </div>
 
+        <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
+          <div className="grid gap-2 px-3 py-2">
+            {order.documents?.map((document: Document) => (
+              <DocumentItem key={document.id} document={document} />
+            ))}
+            <Button
+              variant="primary"
+              size="sm"
+              loading={isGeneratingDocument || hasActiveDocTask}
+              disabled={isGeneratingDocument || hasActiveDocTask}
+              onClick={() => generateDocument({ orderId: order.id })}
+            >
+              Dokument generieren
+            </Button>
+          </div>
+        </Collapsable>
       </div>
-
-
     </React.Fragment>
   );
 }

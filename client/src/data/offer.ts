@@ -80,3 +80,6 @@ export const uploadAction = (id: string) =>
 
 export const getTaskByIdAction = (taskId: string) =>
   api<Task>(`/api/tasks/${taskId}`, { method: 'GET' });
+
+export const generateOfferDocumentAction = (offerId: string) =>
+  api<{ taskId: string }>(`/api/offers/${offerId}/document`, { method: 'POST' });

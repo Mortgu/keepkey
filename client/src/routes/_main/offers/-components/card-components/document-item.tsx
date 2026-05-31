@@ -1,14 +1,11 @@
-import { useEffect, useRef, useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Button, Input } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
-import { useOfferHook } from "@/hooks";
+import { useDocumentTask, useOfferHook } from "@/hooks";
 import type { Document } from "@/types";
 import { Check, File, Loader, Pen, Trash, TriangleAlert, Upload } from "lucide-react";
 import { tv } from "tailwind-variants";
-
-const MAX_POLLS = 10;
 
 type Props = {
     document: Document;
@@ -20,29 +17,32 @@ const styles = tv({
     ],
     variants: {
         current: {
-            true: [
-                "border-(--primary-300)"
-            ],
-            false: [
-                "bg-white"
-            ]
+            true: ["border-(--primary-300)"],
+            false: ["bg-white"]
         }
     }
-})
+});
 
 export function DocumentItem({ document }: Props) {
-    const queryClient = useQueryClient();
-
     const [isRenaming, setRenaming] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
+
     const {
         deleteDocument,
         isDeletingDocument,
         renameDocument,
         isRenamingDocument,
         upload,
-        isUploading
+        isUploading,
     } = useOfferHook();
+
+    // Poll the task linked to this document; invalidates offers/orders cache on completion
+    const { task: polledTask } = useDocumentTask(document.task?.id);
+    const activeTask = polledTask ?? document.task;
+
+    const isGenerated = document.status === "GENERATED" && activeTask?.status !== "RUNNING" && activeTask?.status !== "PENDING";
+    const isFailed = activeTask?.status === "FAILED" || document.status === "FAILED";
+    const isProcessing = !isGenerated && !isFailed;
 
     const handleRename = async () => {
         if (!newName.trim()) return;
@@ -51,26 +51,8 @@ export function DocumentItem({ document }: Props) {
         setNewName("");
     };
 
-    const isGenerated = document.status === "GENERATED";
-    const isFailed = document.status === "FAILED";
-    const isPolling = !isGenerated && !isFailed;
-    const pollCount = useRef(0);
-
-    useEffect(() => {
-        if (!isPolling) return;
-
-        const interval = setInterval(() => {
-            pollCount.current += 1;
-            if (pollCount.current > MAX_POLLS) {
-                clearInterval(interval);
-                return;
-            }
-            queryClient.invalidateQueries({ queryKey: ["offers"] });
-        }, 3000);
-
-        return () => clearInterval(interval);
-    }, [isPolling, queryClient]);
-
+    const parentId = document.offerId ?? document.orderId;
+    const parentPath = document.offerId ? "offers" : "orders";
 
     return (
         <div className={styles({ current: document.isCurrent })}>
@@ -88,16 +70,17 @@ export function DocumentItem({ document }: Props) {
                     {!isRenaming && (
                         <>
                             <h1 className="text-md">{document.displayName}</h1>
-
                             <div className="flex font-light text-sm gap-2 text-(--text-secondary)">
                                 <p>{formatDate(document.createdAt)}</p>
-                                {!isGenerated && (
-                                    <p className="capitalize">{document.status.toLowerCase()}</p>
+                                {isProcessing && (
+                                    <p className="capitalize">{(activeTask?.status ?? document.status).toLowerCase()}</p>
+                                )}
+                                {isFailed && activeTask?.error && (
+                                    <p className="text-(--danger-500)">{activeTask.error}</p>
                                 )}
                             </div>
                         </>
                     )}
-
                     {isRenaming && (
                         <Input
                             input_size="xs"
@@ -113,17 +96,14 @@ export function DocumentItem({ document }: Props) {
                             }}
                         />
                     )}
-
-
                 </div>
             </div>
 
             <div className="flex items-center gap-0">
-
-                <a target="_blank" href={`${BASE_URL}/api/offers/${document.offerId}/documents/${document.id}/pdf`}>
+                <a target="_blank" href={`${BASE_URL}/api/${parentPath}/${parentId}/documents/${document.id}/pdf`}>
                     <Button variant="ghost" size="sm" disabled={!isGenerated}>PDF</Button>
                 </a>
-                <a href={`${BASE_URL}/api/offers/${document.offerId}/documents/${document.id}/docx`}>
+                <a href={`${BASE_URL}/api/${parentPath}/${parentId}/documents/${document.id}/docx`}>
                     <Button variant="ghost" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
 
@@ -145,8 +125,7 @@ export function DocumentItem({ document }: Props) {
                         deleteDocument({ offerId: document.offerId, documentId: document.id })
                     }
                 />
-
             </div>
         </div>
-    )
+    );
 }

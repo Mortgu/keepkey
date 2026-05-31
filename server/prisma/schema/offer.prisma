@@ -24,8 +24,10 @@ model Offer {
     offerPositions OfferPosition[]
 
     documents Document[]
-    tasks     Task[]
     orders    Order?
+
+    reservationTaskId String? @unique
+    reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
 
     net_amount Int // Der reine Warenwert (netto) in cent
 

@@ -25,6 +25,9 @@ model Document {
   order   Order?  @relation(fields: [orderId], references: [id])
   orderId String?
 
+  taskId String? @unique
+  task   Task?   @relation("DocumentTask", fields: [taskId], references: [id])
+
   createdAt DateTime @default(now())
 
   @@unique([offerId, version])
@@ -48,21 +51,18 @@ enum TaskType {
 
 model Task {
   id    String  @id @default(cuid())
-  jobId String? // BullMQ job id
+  jobId String?
 
   status TaskStatus @default(PENDING)
   type   TaskType
 
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String?
-
-  order   Order?  @relation(fields: [orderId], references: [id])
-  orderId String?
-
   error String?
 
+  document         Document? @relation("DocumentTask")
+  offerReservation Offer?    @relation("OfferReservationTask")
+
   createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("task")
 }

@@ -4,12 +4,11 @@ import {
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
+  generateOfferDocument,
   getNextQuoteId,
   getOfferById,
   getOfferRevisions,
   getOffers,
-  getOfferTaskById,
-  getOfferTasks,
   reserveQuoteId,
   updateOffer,
 } from "../controllers/offer-controller.js";
@@ -24,21 +23,19 @@ router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
 
-router.post('/:id/reserve', reserveQuoteId)
+router.post('/:id/reserve', reserveQuoteId);
+
+router.post('/:id/document', generateOfferDocument);
+
+router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
+
+router.delete("/:id/documents/:documentId", deleteOfferDocument);
 
 router.get("/:id", getOfferById);
 
 router.put('/:id', updateOffer);
 
 router.delete("/:id", deleteOffer);
-
-router.get("/:id/jobs", getOfferTasks);
-
-router.get("/:id/jobs/:jobId", getOfferTaskById);
-
-router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
-
-router.delete("/:id/documents/:documentId", deleteOfferDocument);
 
 router.post("/", validate(createOfferSchema), createOffer);
 

@@ -1,23 +1,22 @@
 import { Router } from "express";
 import {
   getOrderById,
-  getOrderTasks,
   getAllOrders,
   deleteOrderById,
   createOrder,
   createOrderTask,
+  generateOrderDocument,
 } from "../controllers/order-controller.js";
 import { validate } from "../middlewares/validate.js";
 import { createOrderSchema } from "../schemas/order-schemas.js";
 
 const router = Router();
 
-/* [GET] http://localhost:3000/api/orders */
 router.get("/", getAllOrders);
 
 router.get("/:orderId", getOrderById);
 
-router.get("/:orderId/documents", getOrderTasks);
+router.post('/:orderId/document', generateOrderDocument);
 
 router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
 

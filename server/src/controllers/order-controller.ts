@@ -13,6 +13,10 @@ export const getAllOrders = async (request: Request, response: Response) => {
   const orders = await prisma.order.findMany({
     include: {
       customer: true,
+      documents: {
+        orderBy: { createdAt: 'desc' as const },
+        include: { task: true },
+      },
       orderPositions: {
         include: {
           product: true,
@@ -85,6 +89,49 @@ export const createOrder = async (request: Request, response: Response, next: Ne
   }
 }
 
+const createDocumentForOrder = async (orderId: string) => {
+  const task = await prisma.task.create({
+    data: { type: TaskType.ORDER, status: TaskStatus.PENDING },
+  });
+
+  await prisma.$transaction(async (tx) => {
+    await tx.document.updateMany({
+      where: { orderId, isCurrent: true },
+      data: { isCurrent: false },
+    });
+
+    const latest = await tx.document.findFirst({
+      where: { orderId },
+      orderBy: { version: 'desc' },
+      select: { version: true },
+    });
+
+    await tx.document.create({
+      data: {
+        orderId,
+        taskId: task.id,
+        version: (latest?.version ?? 0) + 1,
+        status: "PENDING",
+        isCurrent: true,
+      },
+    });
+  });
+
+  const job = await documentQueue.add(documentQueueKey, {
+    taskId: task.id,
+    taskType: TaskType.ORDER,
+    orderId,
+  });
+
+  await prisma.task.update({
+    where: { id: task.id },
+    data: { jobId: job.id },
+  });
+
+  return task;
+};
+
+// Middleware — called after createOrder in the route chain
 export const createOrderTask = async (request: Request, response: Response) => {
   const { order } = request.body;
 
@@ -95,55 +142,37 @@ export const createOrderTask = async (request: Request, response: Response) => {
   }
 
   try {
-    const task = await prisma.task.create({
-      data: {
-        orderId: order.id,
-        type: TaskType.ORDER,
-        status: TaskStatus.PENDING,
-      }
-    });
-
-    await prisma.$transaction(async (tx) => {
-      await tx.document.updateMany({
-        where: { orderId: order.id, isCurrent: true },
-        data: { isCurrent: false },
-      });
-
-      const latest = await tx.document.findFirst({
-        where: { orderId: order.id },
-        orderBy: { version: 'desc' },
-        select: { version: true },
-      });
-
-      const nextVersion = (latest?.version ?? 0) + 1;
-
-      await tx.document.create({
-        data: {
-          orderId: order.id,
-          version: nextVersion,
-          status: "PENDING",
-          isCurrent: true,
-        }
-      });
-    });
-
-    const job = await documentQueue.add(documentQueueKey, {
-      taskId: task.id,
-      taskType: TaskType.ORDER,
-    });
-
-    await prisma.task.update({
-      where: { id: task.id },
-      data: { jobId: job.id },
-    });
-
+    await createDocumentForOrder(order.id);
     return response.status(200).json(order);
   } catch (exception: any) {
     return response.status(500).json({
       message: `Failed to create task for order: ${order.id}`,
     });
   }
-}
+};
+
+// Standalone endpoint — manually trigger document generation for an existing order
+export const generateOrderDocument = async (request: Request, response: Response) => {
+  const orderId = request.params.orderId as string;
+
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+    select: { id: true },
+  });
+
+  if (!order) {
+    return response.status(404).json({ message: "Order not found" });
+  }
+
+  try {
+    const task = await createDocumentForOrder(orderId);
+    return response.status(200).json({ taskId: task.id });
+  } catch (exception: any) {
+    return response.status(500).json({
+      message: `Failed to generate document for order: ${orderId}`,
+    });
+  }
+};
 
 /*
  * [GET] http://localhost:3000/api/orders/:orderId
@@ -155,6 +184,10 @@ export const getOrderById = async (request: Request, response: Response) => {
     where: { id: orderId as string },
     include: {
       customer: true,
+      documents: {
+        orderBy: { createdAt: 'desc' as const },
+        include: { task: true },
+      },
       orderPositions: {
         include: {
           product: true,
@@ -165,21 +198,6 @@ export const getOrderById = async (request: Request, response: Response) => {
   });
 
   return response.status(200).json(order);
-};
-
-/*
- * Get document jobs for an order
- * [GET] http://localhost:3000/api/orders/:orderId/documents
- */
-export const getOrderTasks = async (request: Request, response: Response) => {
-  const { orderId } = request.params;
-
-  const jobs = await prisma.task.findMany({
-    where: { orderId: orderId as string },
-    orderBy: { createdAt: "desc" },
-  });
-
-  return response.status(200).json(jobs);
 };
 
 export const deleteOrderById = async (request: Request, response: Response) => {

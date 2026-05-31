@@ -126,6 +126,10 @@ components:
           $ref: "#/components/schemas/Order"
         orderId:
           type: string
+        taskId:
+          type: string
+        task:
+          $ref: "#/components/schemas/Task"
         createdAt:
           type: string
           format: date-time
@@ -148,16 +152,12 @@ components:
           $ref: "#/components/schemas/TaskStatus"
         type:
           $ref: "#/components/schemas/TaskType"
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
-          type: string
-        order:
-          $ref: "#/components/schemas/Order"
-        orderId:
-          type: string
         error:
           type: string
+        document:
+          $ref: "#/components/schemas/Document"
+        offerReservation:
+          $ref: "#/components/schemas/Offer"
         createdAt:
           type: string
           format: date-time
@@ -216,12 +216,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Document"
-        tasks:
-          type: array
-          items:
-            $ref: "#/components/schemas/Task"
         orders:
           $ref: "#/components/schemas/Order"
+        reservationTaskId:
+          type: string
+        reservationTask:
+          $ref: "#/components/schemas/Task"
         net_amount:
           type: integer
           format: int32
@@ -252,7 +252,6 @@ components:
         - offerFlatRates
         - offerPositions
         - documents
-        - tasks
         - net_amount
         - version
         - revisions
@@ -398,10 +397,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Document"
-        tasks:
-          type: array
-          items:
-            $ref: "#/components/schemas/Task"
         createdAt:
           type: string
           format: date-time
@@ -424,7 +419,6 @@ components:
         - employeeId
         - orderPositions
         - documents
-        - tasks
         - createdAt
     OrderPosition:
       type: object

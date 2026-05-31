@@ -8,125 +8,82 @@ import { generateOrderDocument } from "../pipelines/order/pipeline.js";
 interface TaskData {
   taskId: string;
   taskType: TaskType;
+  offerId?: string;
+  orderId?: string;
 }
 
 export default function startDocumentWorker() {
   const worker = new Worker<TaskData>(documentQueueKey, async (job) => {
-    const { taskId, taskType } = job.data;
+    const { taskId, taskType, offerId, orderId } = job.data;
 
-    const task = await prisma.task.findUnique({
-      where: { id: taskId },
+    // Document is linked directly to the task via taskId
+    const document = await prisma.document.findUnique({
+      where: { taskId },
+      select: { id: true, version: true },
     });
 
-    if (!task) {
-      throw new Error(`Task ${taskId} not found! Skip.`);
+    if (!document) {
+      throw new Error(`No document found for task ${taskId}`);
     }
+
+    await prisma.document.update({
+      where: { id: document.id },
+      data: { status: "PROCESSING" },
+    });
 
     switch (taskType) {
-      case TaskType.OFFER:
-        if (!task.offerId) {
-          throw new Error("Document job for offer with undefined offerId");
-        }
-
-        const offerDocument = await prisma.document.findFirst({
-          where: { offerId: task.offerId, isCurrent: true },
-          select: { id: true, version: true },
-        });
-
-        if (!offerDocument) {
-          throw new Error(
-            `No current document row found for offer ${task.offerId}`,
-          );
-        }
-
-        await prisma.document.update({
-          where: { id: offerDocument.id },
-          data: { status: "PROCESSING" },
-        });
+      case TaskType.OFFER: {
+        if (!offerId) throw new Error("Document job for offer missing offerId in job data");
 
         const { displayName } = await generateOfferDocument(
-          task.offerId,
+          offerId,
           taskId,
-          offerDocument.id,
-          offerDocument.version,
+          document.id,
+          document.version,
         );
 
         await prisma.document.update({
-          where: { id: offerDocument.id },
-          data: {
-            displayName,
-            pdfReady: true,
-            docxReady: true,
-            status: "GENERATED",
-          },
+          where: { id: document.id },
+          data: { displayName, pdfReady: true, docxReady: true, status: "GENERATED" },
         });
-
-        await prisma.task.update({
-          where: { id: taskId },
-          data: { status: TaskStatus.COMPLETED },
-        });
-
         break;
-      case TaskType.ORDER:
-        if (!task.orderId) {
-          throw new Error("Document job for order with undefined orderId!");
-        }
+      }
+      case TaskType.ORDER: {
+        if (!orderId) throw new Error("Document job for order missing orderId in job data");
 
-        const orderDocument = await prisma.document.findFirst({
-          where: { orderId: task.orderId, isCurrent: true },
-          select: { id: true, version: true },
-        });
-
-        if (!orderDocument) {
-          throw new Error(`No current document row found for order ${task.orderId}`);
-        }
-
-        await prisma.document.update({
-          where: { id: orderDocument.id },
-          data: { status: "PROCESSING" },
-        });
-
-        const { displayName: orderDisplayName } = await generateOrderDocument(
-          task.orderId,
+        const { displayName } = await generateOrderDocument(
+          orderId,
           taskId,
-          orderDocument.id,
-          orderDocument.version,
+          document.id,
+          document.version,
         );
 
         await prisma.document.update({
-          where: { id: orderDocument.id },
-          data: {
-            displayName: orderDisplayName,
-            pdfReady: true,
-            docxReady: true,
-            status: "GENERATED",
-          },
+          where: { id: document.id },
+          data: { displayName, pdfReady: true, docxReady: true, status: "GENERATED" },
         });
-
-        await prisma.task.update({
-          where: { id: taskId },
-          data: { status: TaskStatus.COMPLETED },
-        });
-
         break;
+      }
       default:
-        throw new Error(`Task ${task.id} with unknown type propertie!`);
+        throw new Error(`Task ${taskId} has unknown type: ${taskType}`);
     }
+
+    await prisma.task.update({
+      where: { id: taskId },
+      data: { status: TaskStatus.COMPLETED },
+    });
   },
     { connection, concurrency: 2 },
   );
 
-  worker.on("completed", async (job) => {
+  worker.on("completed", (job) => {
     if (job) {
-      console.log(
-        `[worker] job ${job.id} completed (taskId: ${job.data.taskId})`,
-      );
+      console.log(`[worker] job ${job.id} completed (taskId: ${job.data.taskId})`);
     }
   });
 
   worker.on("failed", async (job, err) => {
     console.error(`[worker] job ${job?.id} failed:`, err.message);
-
     if (job) {
       await prisma.task.updateMany({
         where: { id: job.data.taskId },

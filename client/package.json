@@ -12,6 +12,7 @@
     "prebuild": "npm run generate:types"
   },
   "dependencies": {
+  "dependencies": {
     "@better-auth/mongo-adapter": "^1.5.5",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-devtools": "^0.10.0",

@@ -12,6 +12,7 @@ import {
   createReservationAction,
   deleteOfferAction,
   deleteOfferDocumentAction,
+  generateOfferDocumentAction,
   getContactPersonsAction,
   getOfferRevisionsAction,
   getOffersAction,
@@ -21,6 +22,7 @@ import {
   uploadAction,
 } from "@/data/offer";
 
+import {useEffect} from "react";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 interface OfferQueryParams {
@@ -40,7 +42,9 @@ export const useOfferRevisionsHook = (offerId: string) => {
     return {revisions};
 };
 
-export const useReservationTask = (taskId?: string) => {
+export const useDocumentTask = (taskId?: string) => {
+    const queryClient = useQueryClient();
+
     const { data: task } = useQuery({
         queryKey: ["task", taskId],
         queryFn: () => getTaskByIdAction(taskId!),
@@ -51,8 +55,17 @@ export const useReservationTask = (taskId?: string) => {
         enabled: !!taskId,
     });
 
+    useEffect(() => {
+        if (task?.status === "COMPLETED") {
+            queryClient.invalidateQueries({ queryKey: ["offers"] });
+            queryClient.invalidateQueries({ queryKey: ["orders"] });
+        }
+    }, [task?.status, queryClient]);
+
     return { task };
 };
+
+export const useReservationTask = (taskId?: string) => useDocumentTask(taskId);
 
 export const useOfferHook = (params?: OfferQueryParams) => {
     const queryClient = useQueryClient();
@@ -111,7 +124,12 @@ export const useOfferHook = (params?: OfferQueryParams) => {
 
     const uploadMutation = useMutation({
         mutationFn: ({id}: { id: string }) => uploadAction(id),
-    })
+    });
+
+    const generateDocumentMutation = useMutation({
+        mutationFn: ({offerId}: { offerId: string }) => generateOfferDocumentAction(offerId),
+        onSuccess: invalidate,
+    });
 
     return {
         offers,
@@ -146,5 +164,8 @@ export const useOfferHook = (params?: OfferQueryParams) => {
         upload: uploadMutation.mutateAsync,
         isUploading: uploadMutation.isPending,
         errorUploading: uploadMutation.error,
+
+        generateDocument: generateDocumentMutation.mutate,
+        isGeneratingDocument: generateDocumentMutation.isPending,
     };
 };

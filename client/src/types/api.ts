@@ -54,6 +54,8 @@ export interface components {
             offerId?: string;
             order?: components["schemas"]["Order"];
             orderId?: string;
+            taskId?: string;
+            task?: components["schemas"]["Task"];
             /** Format: date-time */
             createdAt: string;
         };
@@ -62,11 +64,9 @@ export interface components {
             jobId?: string;
             status: components["schemas"]["TaskStatus"];
             type: components["schemas"]["TaskType"];
-            offer?: components["schemas"]["Offer"];
-            offerId?: string;
-            order?: components["schemas"]["Order"];
-            orderId?: string;
             error?: string;
+            document?: components["schemas"]["Document"];
+            offerReservation?: components["schemas"]["Offer"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -93,8 +93,9 @@ export interface components {
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             offerPositions: components["schemas"]["OfferPosition"][];
             documents: components["schemas"]["Document"][];
-            tasks: components["schemas"]["Task"][];
             orders?: components["schemas"]["Order"];
+            reservationTaskId?: string;
+            reservationTask?: components["schemas"]["Task"];
             /** Format: int32 */
             net_amount: number;
             /** Format: int32 */
@@ -166,7 +167,6 @@ export interface components {
             employeeId: string;
             orderPositions: components["schemas"]["OrderPosition"][];
             documents: components["schemas"]["Document"][];
-            tasks: components["schemas"]["Task"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -366,7 +366,7 @@ export interface components {
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */
-        TaskType: "OFFER" | "ORDER" | "RENEWAL" | "RESERVATION";
+        TaskType: "OFFER" | "ORDER" | "RENEWAL" | "RESERVATION" | "UPLOAD";
     };
     responses: never;
     parameters: never;

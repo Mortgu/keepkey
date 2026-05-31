@@ -1,6 +1,6 @@
 import { api } from "@/lib/api-client";
 
-import type { Order, Task } from "@/types";
+import type { Order } from "@/types";
 
 export const getOrdersAction = () =>
   api<Order[]>("/api/orders", { method: "GET" });
@@ -15,5 +15,5 @@ export const createOrderAction = (offerId: string) =>
 export const deleteOrderAction = (id: string) =>
   api<void>(`/api/orders/${id}`, { method: "DELETE" });
 
-export const getTasksAction = (orderId: string) =>
-  api<Task[]>(`api/orders/${orderId}/documents`, { method: "DELETE" });
+export const generateOrderDocumentAction = (orderId: string) =>
+  api<{ taskId: string }>(`/api/orders/${orderId}/document`, { method: "POST" });
