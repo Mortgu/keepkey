@@ -73,6 +73,7 @@ const write: PipelineStage<OfferPipelineContext> = {
 
         const {quoteId, customer, offerPositions} = offer;
         const {companyName} = customer;
+
         const workloads = offerPositions
             .map((i) => i.product.name.replaceAll(" ", ""))
             .join("+");
@@ -93,7 +94,7 @@ const write: PipelineStage<OfferPipelineContext> = {
 const upload: PipelineStage<OfferPipelineContext> = {
     name: 'upload',
     run: async (context) => {
-        
+
     },
 };
 

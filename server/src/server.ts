@@ -9,8 +9,6 @@ import router from "./routes/router.js";
 import {errorHandler} from "./middlewares/errorHandler.js";
 import config from "./config/config.js";
 
-import startDocumentWorker from "./workers/document-worker.js";
-import registerUploadWorker from "./workers/upload-worker.js";
 import path from "path";
 import env from "./lib/env.js";
 
@@ -18,6 +16,7 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
+import registerTaskWorker from "./workers/task-worker.js";
 
 const options = {
     definition: {
@@ -64,12 +63,10 @@ app.use(express.static(path.join(process.cwd(), "../client/dist")));
 // Global error handler
 app.use(errorHandler);
 
-// Start document generation worker
-const documentWorker = startDocumentWorker();
-const uploadWorker = registerUploadWorker();
+const taskWorker = registerTaskWorker();
 
 const shutdown = async () => {
-    await Promise.all([documentWorker.close(), uploadWorker.close()]);
+    await Promise.all([taskWorker.close()]);
     process.exit(0);
 };
 process.on("SIGTERM", shutdown);

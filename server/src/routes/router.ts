@@ -8,7 +8,7 @@ import userRouter from "./user.js";
 import contractRouter from "./contracts.js";
 import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
-import offerRouter from "./offer.js";
+import offerRouter from "./offer-router";
 import flatratesRoter from "./flatrates.js";
 import taskRouter from "./task-route.js";
 import contactPersonRouter from "./contact-persons.js";

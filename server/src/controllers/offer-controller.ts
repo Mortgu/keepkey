@@ -1,12 +1,12 @@
 import path from "path";
 import fs from "fs";
+import env from "../lib/env.js";
 import {NextFunction, Request, Response} from "express";
 import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
-import {documentQueue, documentQueueKey, uploadQueue, uploadQueueKey} from "../lib/queues.js";
 import {OfferFlatRate, OfferPosition, TaskStatus, TaskTarget, TaskType,} from "@prisma/client";
 import {toDate} from "../utils/utils.js";
-import env from "../lib/env.js";
+import {taskQueue, taskQueueKey} from "../workers/task-worker.js";
 
 export const getOffers = async (request: Request, response: Response) => {
     const {search, companyIds, contactPersonIds, sort} = request.query;
@@ -95,7 +95,7 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
     }
 };
 
-export const reserveQuoteId = async (request: Request, response: Response, next: NextFunction) => {
+export const enqueueQuoteReservationJob = async (request: Request, response: Response, next: NextFunction) => {
     const {id} = request.params;
 
     const offer = await prisma.offer.findUniqueOrThrow({
@@ -121,7 +121,7 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
             }
         });
 
-        const job = await uploadQueue.add(uploadQueueKey, {
+        const job = await taskQueue.add(taskQueueKey, {
             taskId: task.id,
         });
 
@@ -144,9 +144,8 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
         return response.status(200).json(offer.reservationTask);
     }
 
-    const job = await uploadQueue.add(uploadQueueKey, {
-        taskId: offer.reservationTask.id,
-        taskType: TaskType.RESERVATION,
+    const job = await taskQueue.add(taskQueueKey, {
+        taskId: offer.reservationTask.id
     });
 
     await prisma.task.update({
@@ -160,7 +159,7 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
     return response.status(200).json(offer.reservationTask);
 }
 
-export const generateOfferDocument = async (request: Request, response: Response) => {
+export const enqueueDocumentGenerationJob = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUnique({
@@ -205,10 +204,8 @@ export const generateOfferDocument = async (request: Request, response: Response
             });
         });
 
-        const job = await documentQueue.add(documentQueueKey, {
+        const job = await taskQueue.add(taskQueueKey, {
             taskId: task.id,
-            taskTarget: TaskTarget.OFFER,
-            offerId
         });
 
         await prisma.task.update({
@@ -216,7 +213,10 @@ export const generateOfferDocument = async (request: Request, response: Response
             data: {jobId: job.id},
         });
 
-        return response.status(200).json({taskId: task.id});
+        return response.status(200).json({
+            taskId: task.id
+        });
+
     } catch (exception: any) {
         return response.status(500).json({
             message: `Failed to generate document for offer: ${offerId}`,
@@ -224,10 +224,7 @@ export const generateOfferDocument = async (request: Request, response: Response
     }
 };
 
-export const deleteOfferDocument = async (
-    request: Request,
-    response: Response,
-) => {
+export const deleteOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
     const documentId = request.params.documentId as string;
 
@@ -256,10 +253,7 @@ export const deleteOfferDocument = async (
     }
 };
 
-export const downloadOfferDocument = async (
-    request: Request,
-    response: Response,
-) => {
+export const downloadOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
     const documentId = request.params.documentId as string;
     const format = request.params.format as string;

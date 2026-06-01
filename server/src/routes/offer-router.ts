@@ -4,12 +4,12 @@ import {
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
-  generateOfferDocument,
+  enqueueDocumentGenerationJob,
+  enqueueQuoteReservationJob,
   getNextQuoteId,
   getOfferById,
   getOfferRevisions,
   getOffers,
-  reserveQuoteId,
   updateOffer,
 } from "../controllers/offer-controller.js";
 import {validate} from "../middlewares/validate.js";
@@ -23,9 +23,9 @@ router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
 
-router.post('/:id/reserve', reserveQuoteId);
+router.post('/:id/reserve', enqueueQuoteReservationJob);
 
-router.post('/:id/document', generateOfferDocument);
+router.post('/:id/document', enqueueDocumentGenerationJob);
 
 router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
 

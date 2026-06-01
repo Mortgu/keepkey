@@ -1,14 +1,13 @@
-import { Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
-import { uploadQueue, uploadQueueKey } from "../lib/queues.js";
+import {Request, Response} from "express";
+import {prisma} from "../lib/prisma.js";
 
 export const renameDocument = async (request: Request, response: Response) => {
-    const { id } = request.params;
-    const { displayName } = request.body;
+    const {id} = request.params;
+    const {displayName} = request.body;
 
     try {
         const updatedDocument = await prisma.document.update({
-            where: { id: id as string },
+            where: {id: id as string},
             data: {
                 displayName: displayName
             }
@@ -24,10 +23,6 @@ export const renameDocument = async (request: Request, response: Response) => {
 }
 
 export const uploadDocument = async (request: Request, response: Response) => {
-    const { id } = request.params;
+    const {id} = request.params;
 
-    const job = await uploadQueue.add(uploadQueueKey, {
-        taskId: '',
-        type: "UPLOAD"
-    })
 }

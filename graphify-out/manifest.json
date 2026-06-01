@@ -1,7 +1,7 @@
 {
   "/Users/oskar/Programming/keepit/server/src/server.ts": {
-    "mtime": 1780142878.0255475,
-    "hash": "a7fbe898737b8ce4401a2c3e49e24b23"
+    "mtime": 1780305734.1510699,
+    "hash": "7707a8c11c842d9a02e0c7912540b633"
   },
   "/Users/oskar/Programming/keepit/server/src/config/config.ts": {
     "mtime": 1777709493.4633405,
@@ -36,8 +36,8 @@
     "hash": "b1e777803311e6d5c541d6dceb3233af"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/order/pipeline.ts": {
-    "mtime": 1779461641.92088,
-    "hash": "b15fb5c3ecbbd41a877af45c0ec780f2"
+    "mtime": 1780309776.0677333,
+    "hash": "7ef912da38b77cc05bfd2ae732b2f1fe"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/order/context.ts": {
     "mtime": 1779461641.9207006,
@@ -52,20 +52,20 @@
     "hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/offer/pipeline.ts": {
-    "mtime": 1779461641.9201884,
-    "hash": "8993e44ad247a3299a5a1885ae76a505"
+    "mtime": 1780308533.4145215,
+    "hash": "ac5effd4c987b74002a241a23f6ba37b"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/offer/context.ts": {
-    "mtime": 1779461641.9200704,
-    "hash": "7c39a6f8942eb7137a49570638c6d4c0"
+    "mtime": 1780308545.4965014,
+    "hash": "f377c8fbeedd13a0bd626d2fb6dd86ce"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/offer/utils.ts": {
     "mtime": 1779461641.9204226,
     "hash": "0f728b76ca53051447a9518ed4864a3e"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/offer/stages.ts": {
-    "mtime": 1780138177.558432,
-    "hash": "ee1ff328221669330d3f690550d4fac1"
+    "mtime": 1780308483.5432963,
+    "hash": "83cb4b8e996101acf22b0cab74da16ca"
   },
   "/Users/oskar/Programming/keepit/server/src/pipelines/offer/actions.ts": {
     "mtime": 1779461641.9199543,
@@ -163,6 +163,10 @@
     "mtime": 1777709466.6603012,
     "hash": "731e7532885ed7152747bd4007515174"
   },
+  "/Users/oskar/Programming/keepit/server/src/lib/redis.ts": {
+    "mtime": 1780310037.7819073,
+    "hash": "738b273f06c9c0947a41ed2c4e49d361"
+  },
   "/Users/oskar/Programming/keepit/server/src/lib/nextcloud.ts": {
     "mtime": 1780138106.046472,
     "hash": "9044a906320def77111afb87edce8804"
@@ -171,33 +175,73 @@
     "mtime": 1779799615.5592163,
     "hash": "6867973f9d3a379235bd0660e9ded973"
   },
-  "/Users/oskar/Programming/keepit/server/src/lib/queues.ts": {
-    "mtime": 1777709469.7085779,
-    "hash": "ba9af1eb182bc61781843e4a7e48aa0c"
-  },
   "/Users/oskar/Programming/keepit/server/src/lib/auth.ts": {
     "mtime": 1777892565.7243779,
     "hash": "edaa9b0a2610bb79de008815b9a19d81"
   },
-  "/Users/oskar/Programming/keepit/server/src/workers/upload-worker.ts": {
-    "mtime": 1780148646.200598,
-    "hash": "8185aa6e09f4cc57bf3879952407180d"
+  "/Users/oskar/Programming/keepit/server/src/workers/task-worker.ts": {
+    "mtime": 1780310037.7781515,
+    "hash": "68efc0455a36ce41a94ba3f881ec8fb8"
   },
-  "/Users/oskar/Programming/keepit/server/src/workers/document-worker.ts": {
-    "mtime": 1780247419.3071353,
-    "hash": "def0e9023cd56f22bbb860690a9cad41"
+  "/Users/oskar/Programming/keepit/server/src/workers/handler/offer-task-handler.ts": {
+    "mtime": 1780309545.6404939,
+    "hash": "e74ae7593c44b840c23bd78b4cd09d9f"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/handler/index.ts": {
+    "mtime": 1780309275.0310907,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/handler/order-task-handler.ts": {
+    "mtime": 1780309659.7427912,
+    "hash": "daec47136b0bba8cd417a7cbe3cc8fbe"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/index.ts": {
+    "mtime": 1780309610.6807327,
+    "hash": "7547a8d5abe8054b1a9426ac1c2391a0"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/order/order-upload-job.ts": {
+    "mtime": 1780309604.9577394,
+    "hash": "8065190fc0c0b7c755a26409c8c1f998"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/order/order-reservation-job.ts": {
+    "mtime": 1780309604.96186,
+    "hash": "b1a678fbaf177876d3c7dc8fe57ad534"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/order/index.ts": {
+    "mtime": 1780309604.9630415,
+    "hash": "7d1ff86dea8493a8911f8b7bb523315e"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/order/order-generate-job.ts": {
+    "mtime": 1780309843.6076486,
+    "hash": "a9e09f55f418dac4fc2cb18e31ac12bb"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/offer-reservation-job.ts": {
+    "mtime": 1780309526.3486528,
+    "hash": "433940bf9c3e3fe73d912de3fa675824"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/offer-generate-job.ts": {
+    "mtime": 1780309526.3422759,
+    "hash": "d5074d17843664e448306a63aeaf17f4"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/index.ts": {
+    "mtime": 1780309018.2822404,
+    "hash": "fd51ccedfabf66310b12457b10358f2b"
+  },
+  "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/offer-upload-job.ts": {
+    "mtime": 1780309379.1494038,
+    "hash": "42d15f007b8644d06062bfc79385f3f8"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/nextcloud-controller.ts": {
-    "mtime": 1780146035.5852187,
-    "hash": "2012a8f797228a5432751b672ab51e3b"
+    "mtime": 1780298875.995039,
+    "hash": "4fe58b34af1533d931d401818f281516"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/documents-controller.ts": {
-    "mtime": 1779799615.5585592,
-    "hash": "9a653495dbaf449ee819aa0d5d500c66"
+    "mtime": 1780309880.7194405,
+    "hash": "2de63e418a44619dc641c691acf9fc3d"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/offer-controller.ts": {
-    "mtime": 1780249275.185589,
-    "hash": "89513ee95a6479160d14f5bf177a5d37"
+    "mtime": 1780307376.1540945,
+    "hash": "358fb321bc004dfed4e190c8219e076c"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/settings-controller.ts": {
     "mtime": 1780080807.0642383,
@@ -240,8 +284,8 @@
     "hash": "48c11f83df0698a7865e80d16ef40ac5"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/order-controller.ts": {
-    "mtime": 1780247365.0791926,
-    "hash": "26f5b50f4725a731ac48fc3561937914"
+    "mtime": 1780308115.3203905,
+    "hash": "10dfc52645b4e11de3b7d62b719f92c4"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/nextcould-router.ts": {
     "mtime": 1780146035.586354,
@@ -256,8 +300,8 @@
     "hash": "b100cacadb959ff7e189c1c5e3a21ef3"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/router.ts": {
-    "mtime": 1780148403.576082,
-    "hash": "a7463058ced0f0143f47fb20af4c8e2e"
+    "mtime": 1780306426.1862757,
+    "hash": "b6ec6d27496c48374efedd19a47e1aee"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/supplier.ts": {
     "mtime": 1777920102.3276696,
@@ -274,6 +318,10 @@
   "/Users/oskar/Programming/keepit/server/src/routes/admin.ts": {
     "mtime": 1779461641.9212906,
     "hash": "a95dd35e99472b805b031d72eaacc49a"
+  },
+  "/Users/oskar/Programming/keepit/server/src/routes/offer-router.ts": {
+    "mtime": 1780307143.178259,
+    "hash": "6832234a8d0e7275427a97ea509d24a6"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/products.ts": {
     "mtime": 1777657601.1990087,
@@ -298,10 +346,6 @@
   "/Users/oskar/Programming/keepit/server/src/routes/tariff.ts": {
     "mtime": 1779461641.922631,
     "hash": "69fa0b12f716cb1fdd313c2bd3933a2e"
-  },
-  "/Users/oskar/Programming/keepit/server/src/routes/offer.ts": {
-    "mtime": 1780247382.0308266,
-    "hash": "8669b41f1196f23a226a2c787af42313"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/user.ts": {
     "mtime": 1779461641.9228454,
@@ -604,8 +648,8 @@
     "hash": "23fea3e9f62c4e6b2e0c1617c98c7052"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/route.tsx": {
-    "mtime": 1779461641.907211,
-    "hash": "0393ff3f8f9ca18b6e03a51be9c840f7"
+    "mtime": 1780300578.6354642,
+    "hash": "fd084e4ac273e2c39b16a8dafc611084"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/customers/index.tsx": {
     "mtime": 1777538217.7725832,

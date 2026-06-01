@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {prisma} from "../lib/prisma.js";
-import {documentQueue, documentQueueKey} from "../lib/queues.js";
 import {TaskStatus, TaskTarget, TaskType} from "@prisma/client";
+import {taskQueue, taskQueueKey} from "../workers/task-worker.js";
 
 /*
  * Get all orders
@@ -89,7 +89,12 @@ export const createOrder = async (request: Request, response: Response, next: Ne
 
 const createDocumentForOrder = async (orderId: string) => {
     const task = await prisma.task.create({
-        data: {type: TaskType.ORDER, status: TaskStatus.PENDING},
+        data: {
+            target: TaskTarget.ORDER,
+            type: TaskType.GENERATION,
+
+            status: TaskStatus.PENDING,
+        },
     });
 
     await prisma.$transaction(async (tx) => {
@@ -115,9 +120,8 @@ const createDocumentForOrder = async (orderId: string) => {
         });
     });
 
-    const job = await documentQueue.add(documentQueueKey, {
+    const job = await taskQueue.add(taskQueueKey, {
         taskId: task.id,
-        taskTarget: TaskTarget.ORDER,
     });
 
     await prisma.task.update({
