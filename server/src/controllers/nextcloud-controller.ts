@@ -31,7 +31,7 @@ export async function reserveId(id: string): Promise<void> {
         const client = getNextCloudClient();
         await client.putFileContents("dawd", new Buffer(id, "utf8"));
 
-        
+
     } catch (exception: any) {
 
     }

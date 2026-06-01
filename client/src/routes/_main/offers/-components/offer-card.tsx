@@ -1,19 +1,19 @@
-import { Pen, RotateCcw, Trash } from "lucide-react";
+import {Pen, RotateCcw, Trash} from "lucide-react";
 
-import type { Document, Offer } from "@/types";
-import { DocumentItem, LineItemRow, ReservationBadge } from "./card-components";
+import type {Document, Offer} from "@/types";
+import {DocumentItem, LineItemRow, ReservationBadge} from "./card-components";
 import OfferRevisionHistory from "./card-components/offer-revision-history";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
-import { useOfferHook, useReservationTask } from "@/hooks";
-import { Badge, Button, Collapsable } from "@/components";
+import {formatDate} from "@/lib/format";
+import {formatEur} from "@/utils/utils";
+import {useOfferHook, useReservationTask} from "@/hooks";
+import {Badge, Button, Collapsable} from "@/components";
 
 type OfferListItemProps = {
     offer: Offer;
     onEdit: (offer: Offer) => void;
 };
 
-function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
+function OfferPositionRow({op}: { op: Offer["offerPositions"][number] }) {
     return (
         <LineItemRow
             left={
@@ -44,7 +44,7 @@ function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
     );
 }
 
-function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
+function OfferFlatRateRow({fr}: { fr: Offer["offerFlatRates"][number] }) {
     return (
         <LineItemRow
             left={
@@ -68,11 +68,19 @@ function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
     );
 }
 
-export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
-    const { customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer } = offer;
-    const { deleteOffer, createReservation, generateDocument, isGeneratingDocument } = useOfferHook();
+export default function OfferCard({offer, onEdit}: OfferListItemProps) {
+    const {customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer} = offer;
+    const {
+        deleteOffer,
 
-    const { task: polledReservation } = useReservationTask(offer.reservationTask?.id);
+        createReservation,
+        errorCreatingReservation,
+
+        generateDocument,
+        isGeneratingDocument
+    } = useOfferHook();
+
+    const {task: polledReservation} = useReservationTask(offer.reservationTask?.id);
     const effectiveReservation = polledReservation ?? offer.reservationTask;
 
     const canReserve = !effectiveReservation || effectiveReservation.status === "FAILED";
@@ -83,7 +91,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
     const handleDeleteOffer = () => {
         if (confirm("Angebot löschen")) {
-            deleteOffer({ id: offer.id });
+            deleteOffer({id: offer.id});
         }
     };
 
@@ -97,7 +105,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <span>-</span>
                             <span>{quoteId}</span>
                         </div>
-                        {effectiveReservation && <ReservationBadge status={effectiveReservation.status} />}
+                        {effectiveReservation && <ReservationBadge status={effectiveReservation.status}/>}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
@@ -134,10 +142,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <Collapsable label="Produkte" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
                     {offerPositions.map((op, i) => (
-                        <OfferPositionRow key={i} op={op} />
+                        <OfferPositionRow key={i} op={op}/>
                     ))}
                     {offerFlatRates.map((fr, i) => (
-                        <OfferFlatRateRow key={i} fr={fr} />
+                        <OfferFlatRateRow key={i} fr={fr}/>
                     ))}
                     <LineItemRow
                         left={<span className="text-sm text-(--text-secondary) font-light">Gesamtpreis</span>}
@@ -149,14 +157,14 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
                     {offer.documents.map((document: Document) => (
-                        <DocumentItem key={document.id} document={document} />
+                        <DocumentItem key={document.id} document={document}/>
                     ))}
                     <Button
                         variant="primary"
                         size="sm"
                         loading={isGeneratingDocument || hasActiveDocTask}
                         disabled={isGeneratingDocument || hasActiveDocTask}
-                        onClick={() => generateDocument({ offerId: offer.id })}
+                        onClick={() => generateDocument({offerId: offer.id})}
                     >
                         Dokument generieren
                     </Button>
@@ -164,7 +172,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </Collapsable>
 
             <Collapsable label="Versionshistorie" className="w-full bg-(--subtle-50) justify-between rounded-none">
-                <OfferRevisionHistory offerId={offer.id} />
+                <OfferRevisionHistory offerId={offer.id}/>
             </Collapsable>
 
             <div className="flex items-center justify-end px-2 border-t border-(--border)">
@@ -172,14 +180,14 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     size="xs"
                     variant="link"
                     disabled={!canReserve}
-                    onClick={() => createReservation({ offer_id: offer.id })}
-                    icon={<RotateCcw className="size-3" />}
+                    onClick={() => createReservation({offer_id: offer.id})}
+                    icon={<RotateCcw className="size-3"/>}
                     iconOnly
                 />
                 <Button size="xs" variant="link" onClick={() => onEdit(offer)}
-                    icon={<Pen className="size-3" />} iconOnly />
+                        icon={<Pen className="size-3"/>} iconOnly/>
                 <Button size="xs" variant="link" onClick={handleDeleteOffer}
-                    icon={<Trash className="size-3" />} iconOnly />
+                        icon={<Trash className="size-3"/>} iconOnly/>
             </div>
         </div>
     );

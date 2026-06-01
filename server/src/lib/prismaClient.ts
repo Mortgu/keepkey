@@ -13,7 +13,7 @@ const adapter = new PrismaPg({
 export const prisma = globalForPrisma.prisma ?? new PrismaClient({
     adapter,
     log: env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
+        ? ['error', 'warn']
         : ['error']
 });
 

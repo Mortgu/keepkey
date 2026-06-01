@@ -2,6 +2,8 @@ import {Task} from "@prisma/client";
 import logger from "../../../middlewares/logger.js";
 import {enqueueOfferGeneration} from "./offer-generate-job.js";
 import {prisma} from "../../../lib/prismaClient.js";
+import {repository} from "../../../repositories/index.js";
+import env from "../../../lib/env.js";
 
 export async function offerReservationJob(task: Task, chainGenerationOnSuccess?: boolean) {
     const offer = await prisma.offer.findFirst({
@@ -14,8 +16,9 @@ export async function offerReservationJob(task: Task, chainGenerationOnSuccess?:
 
     logger.info(`[reservation] Reserving quoteId "${offer.quoteId}" in NextCloud`);
 
-    // TODO: call NextCloud API to reserve offer.quoteId
-    // throw new Error("quoteId already taken") if NextCloud returns a conflict
+    // TODO: throw new Error("quoteId already taken") if NextCloud returns a conflict
+    await repository.createReservation(env.NEXTCLOUD_OFFER_ORIGINAL_PATH, offer.quoteId);
+    await repository.createReservation(env.NEXTCLOUD_OFFER_PDF_PATH, offer.quoteId);
 
     if (chainGenerationOnSuccess) {
         await enqueueOfferGeneration(offer.id);
