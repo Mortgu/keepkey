@@ -41,12 +41,16 @@ enum TaskStatus {
   FAILED
 }
 
-enum TaskType {
+enum TaskTarget {
   OFFER
   ORDER
   RENEWAL
-  RESERVATION
+}
+
+enum TaskType {
   UPLOAD
+  RESERVATION
+  GENERATION
 }
 
 model Task {
@@ -54,6 +58,7 @@ model Task {
   jobId String?
 
   status TaskStatus @default(PENDING)
+  target TaskTarget
   type   TaskType
 
   error String?

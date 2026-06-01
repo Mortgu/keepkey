@@ -196,8 +196,8 @@
     "hash": "9a653495dbaf449ee819aa0d5d500c66"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/offer-controller.ts": {
-    "mtime": 1780247321.7183323,
-    "hash": "71d8e7124ba2d9baf10dc16494e6e1cd"
+    "mtime": 1780249275.185589,
+    "hash": "89513ee95a6479160d14f5bf177a5d37"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/settings-controller.ts": {
     "mtime": 1780080807.0642383,
@@ -336,7 +336,7 @@
     "hash": "c153d54b277305ad9d2223471e613b19"
   },
   "/Users/oskar/Programming/keepit/client/src/types/api.ts": {
-    "mtime": 1780247615.9045234,
+    "mtime": 1780248285.3505328,
     "hash": "bd2c46c93d3839d412244116e28db0df"
   },
   "/Users/oskar/Programming/keepit/client/src/types/offers.ts": {

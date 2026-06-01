@@ -1,31 +1,17 @@
 import {Job, Worker} from "bullmq";
 import {connection, uploadQueueKey} from "../lib/queues.js";
-import {TaskStatus, TaskType} from "@prisma/client";
+import {TaskStatus} from "@prisma/client";
 import logger from "../middlewares/logger.js";
 import {prisma} from "../lib/prisma.js";
+import {uploadJob, UploadWorkerInterface} from "./upload-job.js";
 
-interface UploadWorkerInterface {
-    taskId: string;
-    taskType: TaskType;
-}
 
 export default function registerUploadWorker() {
-    const uploadWorker = new Worker<UploadWorkerInterface>(uploadQueueKey, async (job: Job<UploadWorkerInterface>) => {
-        const {taskId, taskType} = job.data;
 
-        switch (taskType) {
-            case TaskType.RESERVATION:
-                await new Promise((resolve, reject) => setTimeout(resolve, 10000));
-                logger.info(taskId)
-                break;
-            case TaskType.UPLOAD:
-                logger.info("UPLOAD");
-                break;
-            default:
-                break;
-        }
-
-    }, {connection, concurrency: 2});
+    const uploadWorker = new Worker<UploadWorkerInterface>(uploadQueueKey, uploadJob, {
+        connection,
+        concurrency: 2
+    });
 
     uploadWorker.on("active", async (job: Job<UploadWorkerInterface>) => {
         const {taskId, taskType} = job.data;

@@ -150,6 +150,8 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/TaskStatus"
+        target:
+          $ref: "#/components/schemas/TaskTarget"
         type:
           $ref: "#/components/schemas/TaskType"
         error:
@@ -167,6 +169,7 @@ components:
       required:
         - id
         - status
+        - target
         - type
         - createdAt
         - updatedAt
@@ -908,14 +911,18 @@ components:
         - RUNNING
         - PENDING
         - FAILED
-    TaskType:
+    TaskTarget:
       type: string
       enum:
         - OFFER
         - ORDER
         - RENEWAL
-        - RESERVATION
+    TaskType:
+      type: string
+      enum:
         - UPLOAD
+        - RESERVATION
+        - GENERATION
   responses: {}
   parameters: {}
   examples: {}

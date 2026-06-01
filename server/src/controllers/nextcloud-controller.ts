@@ -1,6 +1,7 @@
 import {Request, Response} from "express";
 import {getNextCloudClient} from "../lib/nextcloud.js";
 import env from "../lib/env.js";
+import logger from "../middlewares/logger.js";
 
 export const getNextcloudStatus = async (request: Request, response: Response) => {
     if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
@@ -23,10 +24,15 @@ export const getNextcloudStatus = async (request: Request, response: Response) =
     }
 };
 
+export async function reserveId(id: string): Promise<void> {
+    logger.info("reservating id " + id + " in cloud!");
 
-export async function reserveId(request: Request, response: Response): Promise<void> {
-    /* id from body to reserve (quoteId, offerId, ...) */
-    const {id} = request.body;
-    
+    try {
+        const client = getNextCloudClient();
+        await client.putFileContents("dawd", new Buffer(id, "utf8"));
 
+        
+    } catch (exception: any) {
+
+    }
 }

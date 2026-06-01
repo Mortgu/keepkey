@@ -4,7 +4,7 @@ import {NextFunction, Request, Response} from "express";
 import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import {documentQueue, documentQueueKey, uploadQueue, uploadQueueKey} from "../lib/queues.js";
-import {OfferFlatRate, OfferPosition, TaskStatus, TaskType,} from "@prisma/client";
+import {OfferFlatRate, OfferPosition, TaskStatus, TaskTarget, TaskType,} from "@prisma/client";
 import {toDate} from "../utils/utils.js";
 import env from "../lib/env.js";
 
@@ -117,12 +117,12 @@ export const reserveQuoteId = async (request: Request, response: Response, next:
             data: {
                 status: TaskStatus.PENDING,
                 type: TaskType.RESERVATION,
+                target: TaskTarget.OFFER
             }
         });
 
         const job = await uploadQueue.add(uploadQueueKey, {
             taskId: task.id,
-            taskType: TaskType.RESERVATION,
         });
 
         await prisma.task.update({
@@ -175,8 +175,9 @@ export const generateOfferDocument = async (request: Request, response: Response
     try {
         const task = await prisma.task.create({
             data: {
-                type: TaskType.OFFER,
                 status: TaskStatus.PENDING,
+                target: TaskTarget.OFFER,
+                type: TaskType.GENERATION,
             },
         });
 
@@ -206,8 +207,8 @@ export const generateOfferDocument = async (request: Request, response: Response
 
         const job = await documentQueue.add(documentQueueKey, {
             taskId: task.id,
-            taskType: TaskType.OFFER,
-            offerId,
+            taskTarget: TaskTarget.OFFER,
+            offerId
         });
 
         await prisma.task.update({
