@@ -1,3 +1,5 @@
+import {prisma} from "../lib/prismaClient.js";
+
 interface PriceCalculatorProps {
     productId: string;
     contractId: string;

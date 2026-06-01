@@ -63,6 +63,7 @@ export interface components {
             id: string;
             jobId?: string;
             status: components["schemas"]["TaskStatus"];
+            target: components["schemas"]["TaskTarget"];
             type: components["schemas"]["TaskType"];
             error?: string;
             document?: components["schemas"]["Document"];
@@ -94,6 +95,7 @@ export interface components {
             offerPositions: components["schemas"]["OfferPosition"][];
             documents: components["schemas"]["Document"][];
             orders?: components["schemas"]["Order"];
+            isReserved: boolean;
             reservationTaskId?: string;
             reservationTask?: components["schemas"]["Task"];
             /** Format: int32 */
@@ -366,7 +368,9 @@ export interface components {
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */
-        TaskType: "OFFER" | "ORDER" | "RENEWAL" | "RESERVATION" | "UPLOAD";
+        TaskTarget: "OFFER" | "ORDER" | "RENEWAL";
+        /** @enum {string} */
+        TaskType: "UPLOAD" | "RESERVATION" | "GENERATION";
     };
     responses: never;
     parameters: never;

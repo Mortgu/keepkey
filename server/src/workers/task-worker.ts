@@ -5,6 +5,7 @@ import logger from "../middlewares/logger.js";
 import offerTaskHandler from "./handler/offer-task-handler.js";
 import orderTaskHandler from "./handler/order-task-handler.js";
 import {TaskJobData, taskQueue, taskQueueKey} from "./task-queue.js";
+import {prisma} from "../lib/prismaClient.js";
 
 export {taskQueue, taskQueueKey};
 

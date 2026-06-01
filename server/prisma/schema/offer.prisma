@@ -26,6 +26,8 @@ model Offer {
     documents Document[]
     orders    Order?
 
+    isReserved Boolean @default(false)
+
     reservationTaskId String? @unique
     reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
 

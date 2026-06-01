@@ -1,12 +1,8 @@
-import {INextCloudRepository, IWebDavRepository} from "./repository.js";
-import {Constructor} from "./base-repository.js";
+import {INextCloudRepository} from "./repository.js";
+import {WebdavRepository} from "./webdav-repository.js";
 
-export function AddNextCloudRepository<TBase extends Constructor<IWebDavRepository>>(Base: TBase) {
-    return class NextCloudRepository extends Base implements INextCloudRepository {
-
-        async createReservation(dir: string, id: string): Promise<void> {
-            await super.uploadFile(dir, `${id}.reserved`, "This is a auto generated reservation file!");
-        }
-
+export class NextcloudRepository extends WebdavRepository implements INextCloudRepository {
+    async createReservation(dir: string, id: string): Promise<void> {
+        await super.uploadFile(dir, `${id}.reserved`, "This is a auto generated reservation file!");
     }
 }

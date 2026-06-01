@@ -8,8 +8,8 @@
     "hash": "3f1f3bd518510b6a8b9a39b9a45e5e8c"
   },
   "/Users/oskar/Programming/keepit/server/src/middlewares/errorHandler.ts": {
-    "mtime": 1779799615.5595381,
-    "hash": "efd08dbb5afe6bd7916a9d600670ec98"
+    "mtime": 1780318368.9774203,
+    "hash": "2d98a396d67e1d0ba88fbf78ae3420dc"
   },
   "/Users/oskar/Programming/keepit/server/src/middlewares/permissions.ts": {
     "mtime": 1777709455.0308495,
@@ -91,13 +91,33 @@
     "mtime": 1779799615.560518,
     "hash": "9ba40649063c8a436f7b13a85ae5da7d"
   },
+  "/Users/oskar/Programming/keepit/server/src/repositories/repository.ts": {
+    "mtime": 1780317350.8344712,
+    "hash": "dd679d16b2aecef901ea077340114291"
+  },
+  "/Users/oskar/Programming/keepit/server/src/repositories/webdav-repository.ts": {
+    "mtime": 1780317858.6015348,
+    "hash": "3fbf35d47b3f19e7f7845045edf190e1"
+  },
+  "/Users/oskar/Programming/keepit/server/src/repositories/index.ts": {
+    "mtime": 1780317092.6584775,
+    "hash": "afd4cde0ccb194613a04f9a890efbb33"
+  },
+  "/Users/oskar/Programming/keepit/server/src/repositories/base-repository.ts": {
+    "mtime": 1780316764.9848878,
+    "hash": "4ce70be27971bb9f79f41bef9855fd23"
+  },
+  "/Users/oskar/Programming/keepit/server/src/repositories/nextcloud-repository.ts": {
+    "mtime": 1780317350.8295445,
+    "hash": "a1202d083629462cbb534b8d3e11f07d"
+  },
   "/Users/oskar/Programming/keepit/server/src/permissions/user.ts": {
     "mtime": 1777709447.4540381,
     "hash": "e1ead3304e20750559f432acad5adf26"
   },
   "/Users/oskar/Programming/keepit/server/src/exceptions/exceptions.ts": {
-    "mtime": 1779799615.559099,
-    "hash": "c953da17297ba4b859e3ce41678ffb90"
+    "mtime": 1780318368.9413092,
+    "hash": "e5a49510c377fa97dc9fbe63b99deb34"
   },
   "/Users/oskar/Programming/keepit/server/src/schemas/checkout-schemas.ts": {
     "mtime": 1777709355.2810628,
@@ -164,8 +184,8 @@
     "hash": "738b273f06c9c0947a41ed2c4e49d361"
   },
   "/Users/oskar/Programming/keepit/server/src/lib/prismaClient.ts": {
-    "mtime": 1780314692.077872,
-    "hash": "afc6253d66bb250fe0b8a71ae341ade8"
+    "mtime": 1780316359.8018715,
+    "hash": "84191298c599ee7581a6d567009852e2"
   },
   "/Users/oskar/Programming/keepit/server/src/lib/nextcloud.ts": {
     "mtime": 1780138106.046472,
@@ -220,8 +240,8 @@
     "hash": "6b8fc6915e8779e26f8360f0ead1ad46"
   },
   "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/offer-reservation-job.ts": {
-    "mtime": 1780314637.0241742,
-    "hash": "323c976051e1fb90a26f3f0729923f3c"
+    "mtime": 1780319891.0586333,
+    "hash": "8b3de8d6b0c99c103d001bfd4f9e000e"
   },
   "/Users/oskar/Programming/keepit/server/src/workers/jobs/offer/offer-generate-job.ts": {
     "mtime": 1780314637.03463,
@@ -236,8 +256,8 @@
     "hash": "42d15f007b8644d06062bfc79385f3f8"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/nextcloud-controller.ts": {
-    "mtime": 1780298875.995039,
-    "hash": "4fe58b34af1533d931d401818f281516"
+    "mtime": 1780314784.2453554,
+    "hash": "ec442fbb14cba15521cc74c5828c1708"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/documents-controller.ts": {
     "mtime": 1780314604.8766062,
@@ -692,8 +712,8 @@
     "hash": "fdc7ac8db212dccac671c9df3ed263f6"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-card.tsx": {
-    "mtime": 1780247620.3106146,
-    "hash": "60ced918145dea43803b61a499bb82e0"
+    "mtime": 1780318927.61127,
+    "hash": "656588ec33078cc381d308019bacaa66"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/offers/-components/offer-list.tsx": {
     "mtime": 1779799615.5535116,

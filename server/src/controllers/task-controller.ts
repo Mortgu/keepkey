@@ -1,4 +1,5 @@
 import {Request, Response} from "express";
+import {prisma} from "../lib/prismaClient.js";
 
 export const getAllTasks = async (request: Request, response: Response) => {
     try {

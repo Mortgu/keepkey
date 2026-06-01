@@ -6,7 +6,7 @@ import calculatePrice from "../utils/products.js";
 import {OfferFlatRate, OfferPosition, TaskStatus, TaskTarget, TaskType,} from "@prisma/client";
 import {toDate} from "../utils/utils.js";
 import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
-import {enqueueOfferGeneration} from "../workers/jobs/offer/offer-generate-job.js";
+import {enqueueOfferGeneration} from "../workers/jobs/index.js";
 import {prisma} from "../lib/prismaClient.js";
 
 export const getOffers = async (request: Request, response: Response) => {
@@ -102,7 +102,7 @@ async function enqueueOfferReservation(offerId: string, opts: { chainGenerationO
         include: {reservationTask: true},
     });
 
-    if (offer.reservationTask?.status === TaskStatus.COMPLETED) {
+    if (offer.isReserved) {
         return offer.reservationTask;
     }
 
@@ -154,9 +154,9 @@ export const enqueueDocumentGenerationJob = async (request: Request, response: R
     }
 
     try {
-        if (!offer.reservationTask || reservationStatus === TaskStatus.FAILED) {
+        if (!offer.isReserved) {
             const task = await enqueueOfferReservation(offerId, {chainGenerationOnSuccess: true});
-            return response.status(200).json({taskId: task.id});
+            return response.status(200).json({taskId: task!.id});
         }
 
         const task = await enqueueOfferGeneration(offerId);

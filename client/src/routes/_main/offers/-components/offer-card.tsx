@@ -74,7 +74,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
         deleteOffer,
 
         createReservation,
-        errorCreatingReservation,
+        //errorCreatingReservation,
 
         generateDocument,
         isGeneratingDocument
@@ -83,7 +83,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
     const {task: polledReservation} = useReservationTask(offer.reservationTask?.id);
     const effectiveReservation = polledReservation ?? offer.reservationTask;
 
-    const canReserve = !effectiveReservation || effectiveReservation.status === "FAILED";
+    const canReserve = !offer.isReserved;
 
     const hasActiveDocTask = offer.documents.some(
         (d: Document) => d.task?.status === "PENDING" || d.task?.status === "RUNNING"

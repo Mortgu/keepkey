@@ -1,4 +1,5 @@
 import {Request, Response} from "express";
+import {prisma} from "../lib/prismaClient.js";
 
 export const updateSettings = async (request: Request, response: Response) => {
     const {key, value} = request.body;

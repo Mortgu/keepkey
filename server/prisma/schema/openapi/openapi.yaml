@@ -221,6 +221,8 @@ components:
             $ref: "#/components/schemas/Document"
         orders:
           $ref: "#/components/schemas/Order"
+        isReserved:
+          type: boolean
         reservationTaskId:
           type: string
         reservationTask:
@@ -255,6 +257,7 @@ components:
         - offerFlatRates
         - offerPositions
         - documents
+        - isReserved
         - net_amount
         - version
         - revisions

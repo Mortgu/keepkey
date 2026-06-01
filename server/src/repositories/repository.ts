@@ -1,4 +1,4 @@
-import {BufferLike, WebDAVClient} from "webdav";
+import {BufferLike} from "webdav";
 
 export interface INextCloudRepository {
     /* Fn to create a reservation file in a directory */
@@ -11,6 +11,4 @@ export interface IWebDavRepository {
 
     /* Function for uploading a file */
     uploadFile(dir: string, fileName: string, content: string | BufferLike): Promise<void>;
-
-    getClient(): WebDAVClient;
 }

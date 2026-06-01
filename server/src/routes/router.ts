@@ -8,14 +8,14 @@ import userRouter from "./user.js";
 import contractRouter from "./contracts.js";
 import orderRouter from "./orders.js";
 import customerRouter from "./customers.js";
-import offerRouter from "./offer-router";
-import flatratesRoter from "./flatrates.js";
+import flatRatesRouter from "./flatrates.js";
 import taskRouter from "./task-route.js";
 import contactPersonRouter from "./contact-persons.js";
 import tariffRouter from './tariff.js';
 import documentRouter from './documents.js';
 import nextCloudRouter from './nextcould-router.js';
 import settingsRouter from './settings-router.js';
+import offerRouter from "./offer-router.js";
 
 const router = Router();
 
@@ -44,7 +44,7 @@ router.use("/orders", requireSession, orderRouter);
 router.use("/customers", requireSession, customerRouter);
 
 /* /api/flatrates */
-router.use("/flatrates", requireSession, flatratesRoter);
+router.use("/flatrates", requireSession, flatRatesRouter);
 
 /* /api/task */
 router.use("/tasks", requireSession, taskRouter);
