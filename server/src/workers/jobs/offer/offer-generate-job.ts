@@ -1,5 +1,5 @@
 import logger from "../../../middlewares/logger.js";
-import {prisma} from "../../../lib/prisma.js";
+import {prisma} from "../../../lib/prismaClient.js";
 import {Task, TaskStatus, TaskTarget, TaskType} from "@prisma/client";
 import runOfferPipeline from "../../../pipelines/offer/pipeline.js";
 import {taskQueue, taskQueueKey} from "../../task-queue.js";

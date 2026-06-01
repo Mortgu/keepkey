@@ -1,6 +1,6 @@
 import {Request, Response} from "express";
-import {prisma} from "../lib/prisma.js";
 import logger from "../middlewares/logger.js";
+import {prisma} from "../lib/prismaClient.js";
 
 export const getAllCustomers = async (request: Request, response: Response) => {
     const customers = await prisma.customer.findMany({

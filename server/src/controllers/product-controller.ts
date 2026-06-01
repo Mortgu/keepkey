@@ -1,27 +1,27 @@
-import { NextFunction, Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import {NextFunction, Request, Response} from "express";
+import {prisma} from "../lib/prismaClient.js";
 
 /*
  * Get Session Products
  * [GET] http://localhost:3000/api/products
  */
 export const getProducts = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
+    request: Request,
+    response: Response,
+    next: NextFunction,
 ) => {
-  const products = await prisma.product.findMany({
-    orderBy: { createdAt: "asc" },
-    include: {
-      tariff: {
+    const products = await prisma.product.findMany({
+        orderBy: {createdAt: "asc"},
         include: {
-          configs: { include: { contract: true } },
+            tariff: {
+                include: {
+                    configs: {include: {contract: true}},
+                },
+            },
         },
-      },
-    },
-  });
+    });
 
-  return response.status(200).json(products);
+    return response.status(200).json(products);
 };
 
 /*
@@ -29,50 +29,50 @@ export const getProducts = async (
  * [GET] http://localhost:3000/api/products/{id}
  */
 export const getProduct = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
+    request: Request,
+    response: Response,
+    next: NextFunction,
 ) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  if (!id) {
-    return response.status(400).json({
-      success: false,
-      message: "Bad request",
+    if (!id) {
+        return response.status(400).json({
+            success: false,
+            message: "Bad request",
+        });
+    }
+
+    const product = await prisma.product.findUnique({
+        where: {id: id as string},
     });
-  }
 
-  const product = await prisma.product.findUnique({
-    where: { id: id as string },
-  });
-
-  return response.status(200).json(product);
+    return response.status(200).json(product);
 };
 
 /* Create Product */
 export const createProduct = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
+    request: Request,
+    response: Response,
+    next: NextFunction,
 ) => {
-  try {
-    const { body } = request;
+    try {
+        const {body} = request;
 
-    if (!body) {
-      return response.status(400).send({
-        success: false,
-        message: "Bad request",
-      });
+        if (!body) {
+            return response.status(400).send({
+                success: false,
+                message: "Bad request",
+            });
+        }
+
+        const newProduct = await prisma.product.create({
+            data: {...body},
+        });
+
+        return response.status(200).json(newProduct);
+    } catch (error) {
+        next(error);
     }
-
-    const newProduct = await prisma.product.create({
-      data: { ...body },
-    });
-
-    return response.status(200).json(newProduct);
-  } catch (error) {
-    next(error);
-  }
 };
 
 /*
@@ -80,24 +80,24 @@ export const createProduct = async (
  * [DELETE] http://localhost:3000/api/products/{id}
  */
 export const deleteProduct = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
+    request: Request,
+    response: Response,
+    next: NextFunction,
 ) => {
-  const { id } = request.params;
+    const {id} = request.params;
 
-  if (!id) {
-    return response.status(400).json({
-      success: false,
-      message: "Bad request",
+    if (!id) {
+        return response.status(400).json({
+            success: false,
+            message: "Bad request",
+        });
+    }
+
+    const result = await prisma.product.deleteMany({
+        where: {id: id as string},
     });
-  }
 
-  const result = await prisma.product.deleteMany({
-    where: { id: id as string },
-  });
-
-  return response.status(200).json(result);
+    return response.status(200).json(result);
 };
 
 /*
@@ -105,24 +105,24 @@ export const deleteProduct = async (
  * [PUT] http://localhost:3000/api/products/{id}
  */
 export const updateProduct = async (
-  request: Request,
-  response: Response,
-  next: NextFunction,
+    request: Request,
+    response: Response,
+    next: NextFunction,
 ) => {
-  const { id } = request.params;
-  const body = request.body;
+    const {id} = request.params;
+    const body = request.body;
 
-  if (!id || !body) {
-    return response.status(400).json({
-      success: false,
-      message: "Bad request",
+    if (!id || !body) {
+        return response.status(400).json({
+            success: false,
+            message: "Bad request",
+        });
+    }
+
+    const result = await prisma.product.updateMany({
+        where: {id: id as string},
+        data: {...body},
     });
-  }
 
-  const result = await prisma.product.updateMany({
-    where: { id: id as string },
-    data: { ...body },
-  });
-
-  return response.status(200).json(result);
+    return response.status(200).json(result);
 };

@@ -1,11 +1,10 @@
-import { Request, Response } from "express";
-import { prisma } from "../lib/prisma.js";
+import {Request, Response} from "express";
 
 export const updateSettings = async (request: Request, response: Response) => {
-    const { key, value } = request.body;
+    const {key, value} = request.body;
 
     const upsertSetting = await prisma.appSetting.upsert({
-        where: { key: key as string },
+        where: {key: key as string},
         update: {
             value: value,
         },

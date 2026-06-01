@@ -1,6 +1,6 @@
-import { TaskStatus } from "@prisma/client";
-import { prisma } from "../lib/prisma.js";
+import {TaskStatus} from "@prisma/client";
 import logger from "../middlewares/logger.js";
+import {prisma} from "../lib/prismaClient.js";
 
 export class PipelineStageError extends Error {
     constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
@@ -33,8 +33,8 @@ export async function runPipeline<T extends PipelineContext>(ctx: T, stages: Pip
     for (const stage of stages) {
         if (stage.status) {
             await prisma.task.update({
-                where: { id: ctx.taskId },
-                data: { status: stage.status }
+                where: {id: ctx.taskId},
+                data: {status: stage.status}
             });
         }
 

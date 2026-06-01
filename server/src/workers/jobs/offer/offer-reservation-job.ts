@@ -1,7 +1,7 @@
 import {Task} from "@prisma/client";
-import {prisma} from "../../../lib/prisma.js";
 import logger from "../../../middlewares/logger.js";
 import {enqueueOfferGeneration} from "./offer-generate-job.js";
+import {prisma} from "../../../lib/prismaClient.js";
 
 export async function offerReservationJob(task: Task, chainGenerationOnSuccess?: boolean) {
     const offer = await prisma.offer.findFirst({

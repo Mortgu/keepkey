@@ -1,5 +1,4 @@
 import logger from "../../../middlewares/logger.js";
-import {prisma} from "../../../lib/prisma.js";
 import {Task} from "@prisma/client";
 import runOrderPipeline from "../../../pipelines/order/pipeline.js";
 

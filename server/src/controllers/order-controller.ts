@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import {prisma} from "../lib/prisma.js";
 import {TaskStatus, TaskTarget, TaskType} from "@prisma/client";
 import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
+import {prisma} from "../lib/prismaClient.js";
 
 /*
  * Get all orders
@@ -97,7 +97,7 @@ const createDocumentForOrder = async (orderId: string) => {
         },
     });
 
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: any) => {
         await tx.document.updateMany({
             where: {orderId, isCurrent: true},
             data: {isCurrent: false},

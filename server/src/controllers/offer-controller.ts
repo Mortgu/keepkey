@@ -2,12 +2,12 @@ import path from "path";
 import fs from "fs";
 import env from "../lib/env.js";
 import {NextFunction, Request, Response} from "express";
-import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import {OfferFlatRate, OfferPosition, TaskStatus, TaskTarget, TaskType,} from "@prisma/client";
 import {toDate} from "../utils/utils.js";
 import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
 import {enqueueOfferGeneration} from "../workers/jobs/offer/offer-generate-job.js";
+import {prisma} from "../lib/prismaClient.js";
 
 export const getOffers = async (request: Request, response: Response) => {
     const {search, companyIds, contactPersonIds, sort} = request.query;
@@ -96,7 +96,7 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
     }
 };
 
-async function enqueueOfferReservation(offerId: string, opts: {chainGenerationOnSuccess?: boolean} = {}) {
+async function enqueueOfferReservation(offerId: string, opts: { chainGenerationOnSuccess?: boolean } = {}) {
     const offer = await prisma.offer.findUniqueOrThrow({
         where: {id: offerId},
         include: {reservationTask: true},

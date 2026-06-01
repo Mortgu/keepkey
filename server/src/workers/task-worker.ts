@@ -1,7 +1,6 @@
 import {Job, Worker} from "bullmq";
 import connection from "../lib/redis.js";
 import {TaskStatus} from "@prisma/client";
-import {prisma} from "../lib/prisma.js";
 import logger from "../middlewares/logger.js";
 import offerTaskHandler from "./handler/offer-task-handler.js";
 import orderTaskHandler from "./handler/order-task-handler.js";
