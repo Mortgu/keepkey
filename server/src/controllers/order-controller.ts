@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {prisma} from "../lib/prisma.js";
 import {TaskStatus, TaskTarget, TaskType} from "@prisma/client";
-import {taskQueue, taskQueueKey} from "../workers/task-worker.js";
+import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
 
 /*
  * Get all orders

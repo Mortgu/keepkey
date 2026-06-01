@@ -6,7 +6,8 @@ import {prisma} from "../lib/prisma.js";
 import calculatePrice from "../utils/products.js";
 import {OfferFlatRate, OfferPosition, TaskStatus, TaskTarget, TaskType,} from "@prisma/client";
 import {toDate} from "../utils/utils.js";
-import {taskQueue, taskQueueKey} from "../workers/task-worker.js";
+import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
+import {enqueueOfferGeneration} from "../workers/jobs/offer/offer-generate-job.js";
 
 export const getOffers = async (request: Request, response: Response) => {
     const {search, companyIds, contactPersonIds, sort} = request.query;
@@ -95,131 +96,74 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
     }
 };
 
+async function enqueueOfferReservation(offerId: string, opts: {chainGenerationOnSuccess?: boolean} = {}) {
+    const offer = await prisma.offer.findUniqueOrThrow({
+        where: {id: offerId},
+        include: {reservationTask: true},
+    });
+
+    if (offer.reservationTask?.status === TaskStatus.COMPLETED) {
+        return offer.reservationTask;
+    }
+
+    if (offer.reservationTask) {
+        const job = await taskQueue.add(taskQueueKey, {taskId: offer.reservationTask.id, ...opts});
+        await prisma.task.update({
+            where: {id: offer.reservationTask.id},
+            data: {status: TaskStatus.PENDING, jobId: job.id},
+        });
+        return offer.reservationTask;
+    }
+
+    const task = await prisma.task.create({
+        data: {status: TaskStatus.PENDING, type: TaskType.RESERVATION, target: TaskTarget.OFFER},
+    });
+    const job = await taskQueue.add(taskQueueKey, {taskId: task.id, ...opts});
+    await prisma.task.update({where: {id: task.id}, data: {jobId: job.id}});
+    await prisma.offer.update({where: {id: offerId}, data: {reservationTaskId: task.id}});
+    return task;
+}
+
 export const enqueueQuoteReservationJob = async (request: Request, response: Response, next: NextFunction) => {
     const {id} = request.params;
 
-    const offer = await prisma.offer.findUniqueOrThrow({
-        where: {id: id as string},
-        select: {
-            quoteId: true,
-            reservationTask: true
-        },
-    });
-
-    if (!offer) {
-        return response.status(404).json({
-            message: "Offer not found!",
-        });
-    }
-
-    if (!offer.reservationTask) {
-        const task = await prisma.task.create({
-            data: {
-                status: TaskStatus.PENDING,
-                type: TaskType.RESERVATION,
-                target: TaskTarget.OFFER
-            }
-        });
-
-        const job = await taskQueue.add(taskQueueKey, {
-            taskId: task.id,
-        });
-
-        await prisma.task.update({
-            where: {id: task.id},
-            data: {jobId: job.id},
-        });
-
-        await prisma.offer.update({
-            where: {id: id as string},
-            data: {
-                reservationTaskId: task.id,
-            }
-        })
-
+    try {
+        const task = await enqueueOfferReservation(id as string);
         return response.status(200).json(task);
+    } catch (exception: any) {
+        return response.status(500).json({message: `Failed to enqueue reservation: ${exception.message}`});
     }
-
-    if (offer.reservationTask.status === TaskStatus.COMPLETED) {
-        return response.status(200).json(offer.reservationTask);
-    }
-
-    const job = await taskQueue.add(taskQueueKey, {
-        taskId: offer.reservationTask.id
-    });
-
-    await prisma.task.update({
-        where: {id: offer.reservationTask.id},
-        data: {
-            status: TaskStatus.PENDING,
-            jobId: job.id,
-        },
-    });
-
-    return response.status(200).json(offer.reservationTask);
-}
+};
 
 export const enqueueDocumentGenerationJob = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUnique({
         where: {id: offerId},
-        select: {id: true},
+        include: {reservationTask: true},
     });
 
     if (!offer) {
         return response.status(404).json({message: "Offer not found"});
     }
 
+    const reservationStatus = offer.reservationTask?.status;
+
+    if (reservationStatus === TaskStatus.PENDING || reservationStatus === TaskStatus.RUNNING) {
+        return response.status(409).json({message: "Reservation is already in progress"});
+    }
+
     try {
-        const task = await prisma.task.create({
-            data: {
-                status: TaskStatus.PENDING,
-                target: TaskTarget.OFFER,
-                type: TaskType.GENERATION,
-            },
-        });
+        if (!offer.reservationTask || reservationStatus === TaskStatus.FAILED) {
+            const task = await enqueueOfferReservation(offerId, {chainGenerationOnSuccess: true});
+            return response.status(200).json({taskId: task.id});
+        }
 
-        await prisma.$transaction(async (tx) => {
-            await tx.document.updateMany({
-                where: {offerId, isCurrent: true},
-                data: {isCurrent: false},
-            });
-
-            const latest = await tx.document.findFirst({
-                where: {offerId},
-                orderBy: {version: "desc"},
-                select: {version: true},
-            });
-            const nextVersion = (latest?.version ?? 0) + 1;
-
-            await tx.document.create({
-                data: {
-                    offerId,
-                    taskId: task.id,
-                    version: nextVersion,
-                    status: "PENDING",
-                    isCurrent: true,
-                },
-            });
-        });
-
-        const job = await taskQueue.add(taskQueueKey, {
-            taskId: task.id,
-        });
-
-        await prisma.task.update({
-            where: {id: task.id},
-            data: {jobId: job.id},
-        });
-
-        return response.status(200).json({
-            taskId: task.id
-        });
-
+        const task = await enqueueOfferGeneration(offerId);
+        return response.status(200).json({taskId: task.id});
     } catch (exception: any) {
         return response.status(500).json({
-            message: `Failed to generate document for offer: ${offerId}`,
+            message: `Failed to start document generation: ${exception.message}`,
         });
     }
 };

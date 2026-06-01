@@ -1,7 +1,8 @@
 import {Task} from "@prisma/client";
 import {offerGenerateJob, offerReservationJob, offerUploadJob} from "../jobs/index.js";
+import {TaskJobData} from "../task-queue.js";
 
-export default async function offerTaskHandler(task: Task) {
+export default async function offerTaskHandler(task: Task, jobData: TaskJobData) {
     const {type: taskType} = task;
 
     switch (taskType) {
@@ -12,7 +13,7 @@ export default async function offerTaskHandler(task: Task) {
             await offerUploadJob(task);
             break;
         case "RESERVATION":
-            await offerReservationJob(task);
+            await offerReservationJob(task, jobData.chainGenerationOnSuccess);
             break;
     }
 }

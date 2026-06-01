@@ -1,7 +1,8 @@
 import {Task} from "@prisma/client";
 import {orderGenerateJob, orderReservationJob, orderUploadJob} from "../jobs/index.js";
+import {TaskJobData} from "../task-queue.js";
 
-export default async function orderTaskHandler(task: Task) {
+export default async function orderTaskHandler(task: Task, jobData: TaskJobData) {
     const {type: taskType} = task;
 
     switch (taskType) {

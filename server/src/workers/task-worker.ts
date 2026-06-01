@@ -1,27 +1,20 @@
-import {Job, Queue, Worker} from "bullmq";
+import {Job, Worker} from "bullmq";
 import connection from "../lib/redis.js";
 import {TaskStatus} from "@prisma/client";
 import {prisma} from "../lib/prisma.js";
 import logger from "../middlewares/logger.js";
 import offerTaskHandler from "./handler/offer-task-handler.js";
 import orderTaskHandler from "./handler/order-task-handler.js";
+import {TaskJobData, taskQueue, taskQueueKey} from "./task-queue.js";
 
-interface jobData {
-    taskId: string;
-}
-
-export const taskQueueKey = "task-queue";
-
-export const taskQueue = new Queue(taskQueueKey, {
-    connection
-});
+export {taskQueue, taskQueueKey};
 
 export default function registerTaskWorker() {
-    const taskWorker = new Worker<jobData>(taskQueueKey, taskHandler, {
+    const taskWorker = new Worker<TaskJobData>(taskQueueKey, taskHandler, {
         connection, concurrency: 2
     });
 
-    taskWorker.on("active", async (job: Job<jobData>) => {
+    taskWorker.on("active", async (job: Job<TaskJobData>) => {
         const {taskId} = job.data;
 
         if (!taskId) {
@@ -42,7 +35,7 @@ export default function registerTaskWorker() {
         }
     });
 
-    taskWorker.on("completed", async (job: Job<jobData>) => {
+    taskWorker.on("completed", async (job: Job<TaskJobData>) => {
         const {taskId} = job.data;
 
         if (!taskId) {
@@ -90,7 +83,7 @@ export default function registerTaskWorker() {
     return taskWorker;
 }
 
-const taskHandler = async (job: Job<jobData>) => {
+const taskHandler = async (job: Job<TaskJobData>) => {
     const {taskId} = job.data;
 
     const task = await prisma.task.findUnique({
@@ -103,10 +96,10 @@ const taskHandler = async (job: Job<jobData>) => {
 
     switch (task.target) {
         case "OFFER":
-            await offerTaskHandler(task);
+            await offerTaskHandler(task, job.data);
             break;
         case "ORDER":
-            await orderTaskHandler(task);
+            await orderTaskHandler(task, job.data);
             break;
         case "RENEWAL":
             break;
