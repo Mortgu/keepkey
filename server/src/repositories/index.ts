@@ -1,5 +1,5 @@
-import {NextcloudRepository} from "./nextcloud-repository.js";
-import {WebdavRepository} from "./webdav-repository.js";
+import { NextCloudRepository } from "./nextcloud-repository.js";
+import { WebdavRepository } from "./webdav-repository.js";
 
-export const WebDavRepository = new WebdavRepository();
-export const NextCloudRepository = new NextcloudRepository();
+export const nextCloudRepository = new NextCloudRepository();
+export const webDavRepository = new WebdavRepository();

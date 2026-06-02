@@ -1,14 +1,14 @@
-import {BufferLike} from "webdav";
+import { BufferLike } from "webdav";
 
 export interface INextCloudRepository {
-    /* Fn to create a reservation file in a directory */
-    createReservation(dir: string, id: string): Promise<string | null>;
+  checkConnection(): Promise<boolean>;
+  fileExists(path: string): Promise<boolean>;
+  reserveFile(quoteId: string, directoryPath: string): Promise<string>;
+  uploadFile(path: string, buffer: Buffer): Promise<void>;
+  listFiles(dir: string): Promise<string[]>;
 }
 
 export interface IWebDavRepository {
-    /* List all the files in a given folder. */
-    listFiles(dir: string): Promise<string[]>;
-
-    /* Function for uploading a file */
-    uploadFile(dir: string, fileName: string, content: string | BufferLike): Promise<boolean>;
+  listFiles(dir: string): Promise<string[]>;
+  uploadFile(dir: string, fileName: string, content: string | BufferLike): Promise<boolean>;
 }

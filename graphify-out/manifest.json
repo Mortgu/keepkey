@@ -1,19 +1,19 @@
 {
   "/Users/oskar/Programming/keepit/server/src/server.ts": {
-    "mtime": 1780305734.1510699,
-    "hash": "7707a8c11c842d9a02e0c7912540b633"
+    "mtime": 1780392467.7459307,
+    "hash": "62f3c3f97e5e55dcb9a960e729a621b7"
   },
   "/Users/oskar/Programming/keepit/server/src/config/config.ts": {
     "mtime": 1777709493.4633405,
     "hash": "3f1f3bd518510b6a8b9a39b9a45e5e8c"
   },
-  "/Users/oskar/Programming/keepit/server/src/middlewares/errorHandler.ts": {
-    "mtime": 1780318368.9774203,
-    "hash": "2d98a396d67e1d0ba88fbf78ae3420dc"
-  },
   "/Users/oskar/Programming/keepit/server/src/middlewares/permissions.ts": {
     "mtime": 1777709455.0308495,
     "hash": "1964af413e9d722fbc01fb9d360593e4"
+  },
+  "/Users/oskar/Programming/keepit/server/src/middlewares/exception-handler.ts": {
+    "mtime": 1780392467.7484353,
+    "hash": "d3c04ae659875a23eb4e8b1ef6a5daa3"
   },
   "/Users/oskar/Programming/keepit/server/src/middlewares/validate.ts": {
     "mtime": 1779461641.9198215,

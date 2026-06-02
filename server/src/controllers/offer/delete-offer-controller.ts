@@ -40,20 +40,23 @@ export const deleteOffer = async (request: Request, response: Response) => {
 
     if (!id) {
         return response.status(400).json({
-            message: "Bad request",
-            success: false,
-        });
-    }
-
-    if (!id) {
-        return response.status(400).json({
             message: "Bad request. Missing id!",
             success: false,
         });
     }
 
     try {
-        await prisma.offer.deleteMany({
+        const offer = await prisma.offer.findUniqueOrThrow({
+            where: {id: id as string}
+        });
+
+        const reservationFiles: string[] = offer.reservationFile;
+
+        for (const reservationFile of reservationFiles) {
+
+        }
+
+        await prisma.offer.delete({
             where: {id: id as string},
         });
 

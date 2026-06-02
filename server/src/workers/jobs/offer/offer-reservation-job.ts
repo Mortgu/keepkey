@@ -3,7 +3,7 @@ import logger from "../../../middlewares/logger.js";
 import {enqueueOfferGeneration} from "./offer-generate-job.js";
 import {prisma} from "../../../lib/prismaClient.js";
 import env from "../../../lib/env.js";
-import {NextCloudRepository} from "../../../repositories/index.js";
+import {nextCloudRepository} from "../../../repositories/index.js";
 
 export async function offerReservationJob(task: Task, chainGenerationOnSuccess?: boolean) {
     const offer = await prisma.offer.findFirst({
@@ -17,12 +17,8 @@ export async function offerReservationJob(task: Task, chainGenerationOnSuccess?:
     logger.info(`[reservation] Reserving quoteId "${offer.quoteId}" in NextCloud`);
 
     // TODO: throw new Error("quoteId already taken") if NextCloud returns a conflict
-    const docxFilePath = await NextCloudRepository.createReservation(env.NEXTCLOUD_OFFER_ORIGINAL_PATH, offer.quoteId);
-    const pdfFilePath = await NextCloudRepository.createReservation(env.NEXTCLOUD_OFFER_PDF_PATH, offer.quoteId);
-
-    if (!docxFilePath || !pdfFilePath) {
-        throw new Error("Something went wrong while reserving quoteId! Files were not uploaded correctly.");
-    }
+    const docxFilePath = await nextCloudRepository.reserveFile(offer.quoteId, env.NEXTCLOUD_OFFER_ORIGINAL_PATH);
+    const pdfFilePath = await nextCloudRepository.reserveFile(offer.quoteId, env.NEXTCLOUD_OFFER_PDF_PATH);
 
     await prisma.offer.update({
         where: {id: offer.id},
