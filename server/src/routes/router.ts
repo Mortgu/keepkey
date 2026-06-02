@@ -1,26 +1,21 @@
 import {Router} from "express";
 import {requireSession} from "../middlewares/auth.js";
 
-import adminRouter from "./admin.js";
-import productRouter from "./products.js";
-import supplierRouter from "./supplier.js";
-import userRouter from "./user.js";
-import contractRouter from "./contracts.js";
-import orderRouter from "./order-router";
-import customerRouter from "./customers.js";
-import flatRatesRouter from "./flatrates.js";
-import taskRouter from "./task-route.js";
-import contactPersonRouter from "./contact-persons.js";
-import tariffRouter from './tariff.js';
-import documentRouter from './document-router';
+import productRouter from "./product-router.js";
+import supplierRouter from "./supplier-router.js";
+import userRouter from "./user-router.js";
+import contractRouter from "./contract-router.js";
+import orderRouter from "./order-router.js";
+import customerRouter from "./customer-router.js";
+import flatRatesRouter from "./flat-rate-router.js";
+import taskRouter from "./task-router.js";
+import contactPersonRouter from "./contact-person-router.js";
+import tariffRouter from './tariff-router.js';
+import documentRouter from './document-router.js';
 import nextCloudRouter from './nextcould-router.js';
-import settingsRouter from './settings-router.js';
 import offerRouter from "./offer-router.js";
 
 const router = Router();
-
-/* /api/admin */
-router.use("/admin", requireSession, adminRouter);
 
 /* /api/products */
 router.use("/products", requireSession, productRouter);
@@ -60,8 +55,5 @@ router.use('/documents', documentRouter);
 
 /* /api/nextcloud */
 router.use('/nextcloud', nextCloudRouter);
-
-/* /api/settings */
-router.use('/settings', settingsRouter);
 
 export default router;

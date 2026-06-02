@@ -1,16 +1,16 @@
-import { Router } from "express";
+import {Router} from "express";
 import {
-  getAllCustomers,
-  getCustomerById,
+  createContact,
   createCustomer,
-  updateCustomerById,
+  deleteContactById,
   deleteCustomer,
   getAllCustomerContacts,
+  getAllCustomers,
+  getCustomerById,
   updateContact,
-  deleteContactById,
-  createContact,
-} from "../controllers/customer-controller.js";
-import { validate } from "../middlewares/validate.js";
+  updateCustomerById,
+} from "../controllers/index.js";
+import {validate} from "../middlewares/validate.js";
 import {
   createContactSchema,
   createCustomerSchema,

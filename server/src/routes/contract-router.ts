@@ -1,18 +1,10 @@
-import { Router } from "express";
+import {Router} from "express";
 
-import {
-  createContract,
-  deleteContract,
-  getAllContracts,
-  updateContract,
-} from "../controllers/contract-controller.js";
+import {createContract, deleteContract, getAllContracts, updateContract,} from "../controllers/index.js";
 
-import { validate } from "../middlewares/validate.js";
+import {validate} from "../middlewares/validate.js";
 
-import {
-  createContractSchema,
-  updateContractSchema,
-} from "../schemas/index.js";
+import {createContractSchema, updateContractSchema,} from "../schemas/index.js";
 
 const router = Router();
 

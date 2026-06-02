@@ -1,13 +1,7 @@
-import { Router } from "express";
-import {
-  createProduct,
-  getProduct,
-  getProducts,
-  deleteProduct,
-  updateProduct,
-} from "../controllers/product-controller.js";
-import { validate } from "../middlewares/validate.js";
-import { createProductSchema, updateProductSchema } from "../schemas/index.js";
+import {Router} from "express";
+import {createProduct, deleteProduct, getProduct, getProducts, updateProduct,} from "../controllers/index.js";
+import {validate} from "../middlewares/validate.js";
+import {createProductSchema, updateProductSchema} from "../schemas/index.js";
 
 const router = Router();
 
