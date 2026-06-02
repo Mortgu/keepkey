@@ -26,3 +26,21 @@ export const uploadDocument = async (request: Request, response: Response) => {
     const {id} = request.params;
 
 }
+
+export const deleteDocument = async (request: Request, response: Response) => {
+    const {id} = request.params;
+
+    try {
+        await prisma.document.delete({
+            where: {id: id as string},
+        });
+
+        return response.status(200).json({
+            message: 'Document deleted!'
+        })
+    } catch (exception: any) {
+        return response.status(500).json({
+            message: "Something went wrong trying to delete document!", exception: exception.message
+        })
+    }
+}

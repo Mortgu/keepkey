@@ -1,7 +1,7 @@
 import logger from "../../../middlewares/logger.js";
 import {Task} from "@prisma/client";
-import runOrderPipeline from "../../../pipelines/order/pipeline.js";
 import {prisma} from "../../../lib/prismaClient.js";
+import runOrderPipeline from "../../../pipelines/order/pipeline.js";
 
 export async function orderGenerateJob(task: Task) {
     logger.info("Task for generating a order document")

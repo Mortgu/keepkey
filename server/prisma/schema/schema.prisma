@@ -94,8 +94,8 @@ model Supplier {
   supplierId String
   name       String
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   offers Offer[]
   orders Order[]
@@ -110,16 +110,9 @@ model FlatRate {
   total_cents Int
 
   offerFlatRates OfferFlatRate[]
+  orderFlatRates OrderFlatRate[]
 
   @@map("flat_rate")
-}
-
-model AppSetting {
-  key       String   @id
-  value     String
-  updatedAt DateTime @updatedAt
-
-  @@map("app_setting")
 }
 
 model Contract {

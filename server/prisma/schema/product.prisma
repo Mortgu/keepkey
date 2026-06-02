@@ -11,10 +11,10 @@ model Product {
   tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
   tariffId String?
 
-  tariffCustomers TariffCustomer[]
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime?
+  tariffCustomers TariffCustomer[]
 
   @@index([name])
   @@index([tariffId])
@@ -28,8 +28,8 @@ model Tariff {
   configs   TariffConfig[]
   customers TariffCustomer[]
 
-  createdAt DateTime? @default(now())
-  updatedAt DateTime? @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@map("tariff")
 }

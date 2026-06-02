@@ -10,9 +10,9 @@ export class WebdavRepository extends BaseRepository implements IWebDavRepositor
         return files.map((file) => file.filename);
     }
 
-    async uploadFile(dir: string, fileName: string, content: string | BufferLike): Promise<void> {
+    async uploadFile(dir: string, fileName: string, content: string | BufferLike): Promise<boolean> {
         try {
-            await this.client.putFileContents(`${dir}/${fileName}`, content);
+            return await this.client.putFileContents(`${dir}/${fileName}`, content);
         } catch (exception) {
             throw new Error(`Error while uploading a webdav client: ${exception}`);
         }

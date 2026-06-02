@@ -1,4 +1,5 @@
 import {Router} from "express";
+
 import {
   createOffer,
   deleteOffer,
@@ -10,10 +11,12 @@ import {
   getOfferById,
   getOfferRevisions,
   getOffers,
-  updateOffer,
-} from "../controllers/offer-controller.js";
+  updateOffer
+} from "../controllers/index.js";
+
 import {validate} from "../middlewares/validate.js";
 import {createOfferSchema} from "../schemas/index.js";
+
 
 const router = Router();
 

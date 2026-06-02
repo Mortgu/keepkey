@@ -55,6 +55,8 @@ components:
         - id
         - customerId
         - companyName
+        - createdAt
+        - updatedAt
         - contactPersons
         - offers
         - orders
@@ -98,6 +100,8 @@ components:
         - salutation
         - firstName
         - lastName
+        - createdAt
+        - updatedAt
         - offers
         - orders
     Document:
@@ -223,6 +227,10 @@ components:
           $ref: "#/components/schemas/Order"
         isReserved:
           type: boolean
+        reservationFile:
+          type: array
+          items:
+            type: string
         reservationTaskId:
           type: string
         reservationTask:
@@ -258,6 +266,7 @@ components:
         - offerPositions
         - documents
         - isReserved
+        - reservationFile
         - net_amount
         - version
         - revisions
@@ -334,6 +343,8 @@ components:
         - duration_months
         - quantity
         - total_cents
+        - createdAt
+        - updatedAt
     OfferFlatRate:
       type: object
       properties:
@@ -366,26 +377,13 @@ components:
       properties:
         id:
           type: string
-        orderId:
-          type: string
-        date:
-          type: string
-          format: date-time
-        paymentTerm:
-          type: string
-        projectId:
-          type: string
-        customer:
-          $ref: "#/components/schemas/Customer"
-        customerId:
-          type: string
         supplier:
           $ref: "#/components/schemas/Supplier"
         supplierId:
           type: string
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
+        customer:
+          $ref: "#/components/schemas/Customer"
+        customerId:
           type: string
         customerContactPerson:
           $ref: "#/components/schemas/ContactPerson"
@@ -395,10 +393,31 @@ components:
           $ref: "#/components/schemas/User"
         employeeId:
           type: string
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
+        orderId:
+          type: string
+        paymentTerm:
+          type: string
+        date:
+          type: string
+          format: date-time
+        validUntil:
+          type: string
+          format: date-time
+        requestFrom:
+          type: string
+          format: date-time
         orderPositions:
           type: array
           items:
             $ref: "#/components/schemas/OrderPosition"
+        flatRates:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderFlatRate"
         documents:
           type: array
           items:
@@ -411,21 +430,22 @@ components:
           format: date-time
       required:
         - id
-        - orderId
-        - date
-        - paymentTerm
-        - projectId
         - customer
         - customerId
-        - offer
-        - offerId
         - customerContactPerson
         - contactPersonId
         - employee
         - employeeId
+        - offer
+        - offerId
+        - orderId
+        - paymentTerm
+        - date
         - orderPositions
+        - flatRates
         - documents
         - createdAt
+        - updatedAt
     OrderPosition:
       type: object
       properties:
@@ -449,13 +469,9 @@ components:
         quantity:
           type: integer
           format: int32
-        unit_price:
-          type: integer
-          format: int32
-        discount:
-          type: integer
-          format: int32
-        total:
+        optional:
+          type: boolean
+        total_cents:
           type: integer
           format: int32
         createdAt:
@@ -471,10 +487,35 @@ components:
         - contractId
         - duration_months
         - quantity
-        - unit_price
-        - discount
-        - total
+        - total_cents
         - createdAt
+    OrderFlatRate:
+      type: object
+      properties:
+        id:
+          type: string
+        flatRate:
+          $ref: "#/components/schemas/FlatRate"
+        flatRateId:
+          type: string
+        order:
+          $ref: "#/components/schemas/Order"
+        orderId:
+          type: string
+        quantity:
+          type: integer
+          format: int32
+        total_cents:
+          type: integer
+          format: int32
+      required:
+        - id
+        - flatRate
+        - flatRateId
+        - order
+        - orderId
+        - quantity
+        - total_cents
     Product:
       type: object
       properties:
@@ -498,21 +539,23 @@ components:
           $ref: "#/components/schemas/Tariff"
         tariffId:
           type: string
-        tariffCustomers:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffCustomer"
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
+        tariffCustomers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
       required:
         - id
         - name
         - orderPositions
         - offerPositions
+        - createdAt
+        - updatedAt
         - tariffCustomers
     Tariff:
       type: object
@@ -542,6 +585,8 @@ components:
         - products
         - configs
         - customers
+        - createdAt
+        - updatedAt
     TariffConfig:
       type: object
       properties:
@@ -819,6 +864,8 @@ components:
         - id
         - supplierId
         - name
+        - createdAt
+        - updatedAt
         - offers
         - orders
     FlatRate:
@@ -837,26 +884,17 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferFlatRate"
+        orderFlatRates:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderFlatRate"
       required:
         - id
         - name
         - table
         - total_cents
         - offerFlatRates
-    AppSetting:
-      type: object
-      properties:
-        key:
-          type: string
-        value:
-          type: string
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - key
-        - value
-        - updatedAt
+        - orderFlatRates
     Contract:
       type: object
       properties:

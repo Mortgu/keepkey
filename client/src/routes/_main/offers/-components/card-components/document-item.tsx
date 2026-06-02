@@ -1,11 +1,11 @@
-import { useState } from "react";
-import { Button, Input } from "@/components";
-import { BASE_URL } from "@/lib/api-client";
-import { formatDate } from "@/lib/format";
-import { useDocumentTask, useOfferHook } from "@/hooks";
-import type { Document } from "@/types";
-import { Check, File, Loader, Pen, Trash, TriangleAlert, Upload } from "lucide-react";
-import { tv } from "tailwind-variants";
+import {useState} from "react";
+import {Button, Input} from "@/components";
+import {BASE_URL} from "@/lib/api-client";
+import {formatDate} from "@/lib/format";
+import {useDocumentTask, useOfferHook} from "@/hooks";
+import type {Document} from "@/types";
+import {Check, File, Loader, Pen, Trash, TriangleAlert, Upload} from "lucide-react";
+import {tv} from "tailwind-variants";
 
 type Props = {
     document: Document;
@@ -23,7 +23,7 @@ const styles = tv({
     }
 });
 
-export function DocumentItem({ document }: Props) {
+export function DocumentItem({document}: Props) {
     const [isRenaming, setRenaming] = useState<boolean>(false);
     const [newName, setNewName] = useState<string>("");
 
@@ -37,7 +37,7 @@ export function DocumentItem({ document }: Props) {
     } = useOfferHook();
 
     // Poll the task linked to this document; invalidates offers/orders cache on completion
-    const { task: polledTask } = useDocumentTask(document.task?.id);
+    const {task: polledTask} = useDocumentTask(document.task?.id);
     const activeTask = polledTask ?? document.task;
 
     const isGenerated = document.status === "GENERATED" && activeTask?.status !== "RUNNING" && activeTask?.status !== "PENDING";
@@ -46,7 +46,7 @@ export function DocumentItem({ document }: Props) {
 
     const handleRename = async () => {
         if (!newName.trim()) return;
-        await renameDocument({ document_id: document.id, displayName: newName.trim() });
+        await renameDocument({document_id: document.id, displayName: newName.trim()});
         setRenaming(false);
         setNewName("");
     };
@@ -55,15 +55,15 @@ export function DocumentItem({ document }: Props) {
     const parentPath = document.offerId ? "offers" : "orders";
 
     return (
-        <div className={styles({ current: document.isCurrent })}>
+        <div className={styles({current: document.isCurrent})}>
             <div className="flex items-center gap-3">
                 <div className="p-3 bg-(--subtle-50) rounded-full">
                     {isGenerated ? (
-                        <File className="size-4" />
+                        <File className="size-4"/>
                     ) : isFailed ? (
-                        <TriangleAlert className="size-4 text-(--danger-500)" />
+                        <TriangleAlert className="size-4 text-(--danger-500)"/>
                     ) : (
-                        <Loader className="size-4 animate-spin text-(--text-secondary)" />
+                        <Loader className="size-4 animate-spin text-(--text-secondary)"/>
                     )}
                 </div>
                 <div className="flex flex-col justify-between">
@@ -89,7 +89,8 @@ export function DocumentItem({ document }: Props) {
                             onChange={(e) => setNewName(e.target.value)}
                             onKeyDown={(e) => e.key === "Enter" && handleRename()}
                             rightButton={{
-                                icon: isRenamingDocument ? <Loader className="size-4 animate-spin" /> : <Check className="size-4" />,
+                                icon: isRenamingDocument ? <Loader className="size-4 animate-spin"/> :
+                                    <Check className="size-4"/>,
                                 variant: "secondary",
                                 onClick: handleRename,
                                 disabled: isRenamingDocument || !newName.trim(),
@@ -107,23 +108,23 @@ export function DocumentItem({ document }: Props) {
                     <Button variant="ghost" size="sm" disabled={!isGenerated}>DOCX</Button>
                 </a>
 
-                <Button variant="ghost" size="sm" icon={<Upload className="size-3.5" />} iconOnly
-                    onClick={() => upload({ id: document.id })} loading={isUploading} />
+                <Button variant="ghost" size="sm" icon={<Upload className="size-3.5"/>} iconOnly
+                        onClick={() => upload({id: document.id})} loading={isUploading}/>
 
-                <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />}
-                    iconOnly onClick={() => { setNewName(document.displayName ?? ""); setRenaming(true); }} />
+                <Button variant="ghost" size="sm" icon={<Pen className="size-3.5"/>}
+                        iconOnly onClick={() => {
+                    setNewName(document.displayName ?? "");
+                    setRenaming(true);
+                }}/>
 
                 <Button
                     variant="ghost"
                     size="sm"
-                    icon={<Trash className="size-3.5" />}
+                    icon={<Trash className="size-3.5"/>}
                     iconOnly
                     loading={isDeletingDocument}
-                    disabled={!document.offerId || isDeletingDocument}
-                    onClick={() =>
-                        document.offerId &&
-                        deleteDocument({ offerId: document.offerId, documentId: document.id })
-                    }
+                    disabled={isDeletingDocument}
+                    onClick={() => deleteDocument({documentId: document.id})}
                 />
             </div>
         </div>

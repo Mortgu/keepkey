@@ -1,97 +1,98 @@
 model Offer {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
-    supplierId String?
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  supplierId String?
 
-    customer   Customer @relation(fields: [customerId], references: [id])
-    customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String
 
-    customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
-    contactPersonId       String
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  contactPersonId       String
 
-    user   User   @relation(fields: [userId], references: [id])
-    userId String
+  user   User   @relation(fields: [userId], references: [id])
+  userId String
 
-    quoteId     String // quoteId / voucherId
-    paymentTerm String
+  quoteId     String // quoteId / voucherId
+  paymentTerm String
 
-    date        DateTime  @default(now())
-    validUntil  DateTime?
-    requestFrom DateTime?
+  date        DateTime  @default(now())
+  validUntil  DateTime?
+  requestFrom DateTime?
 
-    offerFlatRates OfferFlatRate[]
-    offerPositions OfferPosition[]
+  offerFlatRates OfferFlatRate[]
+  offerPositions OfferPosition[]
 
-    documents Document[]
-    orders    Order?
+  documents Document[]
+  orders    Order?
 
-    isReserved Boolean @default(false)
+  isReserved      Boolean  @default(false)
+  reservationFile String[]
 
-    reservationTaskId String? @unique
-    reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
+  reservationTaskId String? @unique
+  reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
 
-    net_amount Int // Der reine Warenwert (netto) in cent
+  net_amount Int // Der reine Warenwert (netto) in cent
 
-    version   Int             @default(1)
-    revisions OfferRevision[]
+  version   Int             @default(1)
+  revisions OfferRevision[]
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-    @@map("offer")
+  @@map("offer")
 }
 
 model OfferRevision {
-    id      String @id @default(uuid())
-    offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-    offerId String
+  id      String @id @default(uuid())
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String
 
-    version   Int
-    snapshot  Json
-    changedBy String?
+  version   Int
+  snapshot  Json
+  changedBy String?
 
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
 
-    @@map("offer_revision")
+  @@map("offer_revision")
 }
 
 model OfferPosition {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-    offerId String
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String
 
-    product   Product @relation(fields: [productId], references: [id])
-    productId String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 
-    contract   Contract @relation(fields: [contractId], references: [id])
-    contractId String
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
 
-    duration_months Int
-    quantity        Int
+  duration_months Int
+  quantity        Int
 
-    optional Boolean? @default(false)
+  optional Boolean? @default(false)
 
-    total_cents Int
+  total_cents Int
 
-    createdAt DateTime? @default(now())
-    updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-    @@map("offer_position")
+  @@map("offer_position")
 }
 
 model OfferFlatRate {
-    id String @id @default(uuid())
+  id String @id @default(uuid())
 
-    flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
-    flatRateId String
+  flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
+  flatRateId String
 
-    offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-    offerId String
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String
 
-    quantity    Int
-    total_cents Int
+  quantity    Int
+  total_cents Int
 
-    @@map("offer_flat_rate")
+  @@map("offer_flat_rate")
 }

@@ -1,25 +1,25 @@
 import type {
-  CreateOfferFlatRatesInput,
-  CreateOfferInput,
-  CreateOfferPositionInput,
-  UpdateOfferFlatRatesInput,
-  UpdateOfferInput,
-  UpdateOfferPositionInput,
+    CreateOfferFlatRatesInput,
+    CreateOfferInput,
+    CreateOfferPositionInput,
+    UpdateOfferFlatRatesInput,
+    UpdateOfferInput,
+    UpdateOfferPositionInput,
 } from "@/types";
 
 import {
-  createOfferAction,
-  createReservationAction,
-  deleteOfferAction,
-  deleteOfferDocumentAction,
-  generateOfferDocumentAction,
-  getContactPersonsAction,
-  getOfferRevisionsAction,
-  getOffersAction,
-  getTaskByIdAction,
-  renameDocumentAction,
-  updateOfferAction,
-  uploadAction,
+    createOfferAction,
+    createReservationAction,
+    deleteOfferAction,
+    deleteOfferDocumentAction,
+    generateOfferDocumentAction,
+    getContactPersonsAction,
+    getOfferRevisionsAction,
+    getOffersAction,
+    getTaskByIdAction,
+    renameDocumentAction,
+    updateOfferAction,
+    uploadAction,
 } from "@/data/offer";
 
 import {useEffect} from "react";
@@ -45,7 +45,7 @@ export const useOfferRevisionsHook = (offerId: string) => {
 export const useDocumentTask = (taskId?: string) => {
     const queryClient = useQueryClient();
 
-    const { data: task } = useQuery({
+    const {data: task} = useQuery({
         queryKey: ["task", taskId],
         queryFn: () => getTaskByIdAction(taskId!),
         refetchInterval: (query) =>
@@ -57,12 +57,12 @@ export const useDocumentTask = (taskId?: string) => {
 
     useEffect(() => {
         if (task?.status === "COMPLETED") {
-            queryClient.invalidateQueries({ queryKey: ["offers"] });
-            queryClient.invalidateQueries({ queryKey: ["orders"] });
+            queryClient.invalidateQueries({queryKey: ["offers"]});
+            queryClient.invalidateQueries({queryKey: ["orders"]});
         }
     }, [task?.status, queryClient]);
 
-    return { task };
+    return {task};
 };
 
 export const useReservationTask = (taskId?: string) => useDocumentTask(taskId);
@@ -106,8 +106,8 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     });
 
     const deleteDocumentMutation = useMutation({
-        mutationFn: ({offerId, documentId}: { offerId: string; documentId: string }) =>
-            deleteOfferDocumentAction(offerId, documentId),
+        mutationFn: ({documentId}: { documentId: string }) =>
+            deleteOfferDocumentAction(documentId),
         onSuccess: invalidate,
     });
 

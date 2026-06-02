@@ -1,31 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import {TaskStatus, TaskTarget, TaskType} from "@prisma/client";
-import {taskQueue, taskQueueKey} from "../workers/task-queue.js";
-import {prisma} from "../lib/prismaClient.js";
+import {prisma, TaskStatus, TaskTarget, TaskType} from "../../lib/prismaClient.js";
+import {taskQueue, taskQueueKey} from "../../workers/task-queue.js";
 
-/*
- * Get all orders
- * [GET] http://localhost:3000/api/admin/orders
- */
-export const getAllOrders = async (request: Request, response: Response) => {
-    const orders = await prisma.order.findMany({
-        include: {
-            customer: true,
-            documents: {
-                orderBy: {createdAt: 'desc' as const},
-                include: {task: true},
-            },
-            orderPositions: {
-                include: {
-                    product: true,
-                    contract: true,
-                },
-            },
-        },
-    });
-
-    return response.status(200).json(orders);
-};
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
     const {id} = request.body;
@@ -45,19 +21,21 @@ export const createOrder = async (request: Request, response: Response, next: Ne
     }
 
     try {
-        const order = await prisma.$transaction(async (tx) => {
+        request.body.order = await prisma.$transaction(async (tx) => {
             const order = await prisma.order.create({
                 data: {
-                    orderId: existingOffer.quoteId,
-                    date: new Date(),
-                    paymentTerm: existingOffer.paymentTerm,
-                    projectId: '/', // TODO:
-
-                    customerId: existingOffer.customerId,
                     supplierId: existingOffer.supplierId,
-                    offerId: existingOffer.id,
+                    customerId: existingOffer.customerId,
                     contactPersonId: existingOffer.contactPersonId,
                     employeeId: existingOffer.userId,
+                    offerId: existingOffer.id,
+
+                    orderId: existingOffer.quoteId, // TODO: REMOVE THIS PLACEHOLDER
+                    paymentTerm: existingOffer.paymentTerm,
+
+                    date: new Date(),
+                    validUntil: existingOffer.validUntil,
+                    requestFrom: existingOffer.requestFrom,
                 }
             });
 
@@ -68,17 +46,23 @@ export const createOrder = async (request: Request, response: Response, next: Ne
                     contractId: offerPosition.contractId,
                     duration_months: offerPosition.duration_months,
                     quantity: offerPosition.quantity,
+                    optional: offerPosition.optional,
 
-                    unit_price: 0,
-                    discount: 0,
-                    total: offerPosition.total_cents,
+                    total_cents: offerPosition.total_cents,
                 }))
             });
 
+            await prisma.orderFlatRate.createMany({
+                data: existingOffer.offerFlatRates.map((offerFlatRate) => ({
+                    flatRateId: offerFlatRate.flatRateId,
+                    orderId: order.id,
+                    quantity: offerFlatRate.quantity,
+                    total_cents: offerFlatRate.total_cents,
+                }))
+            })
+
             return order;
         });
-
-        request.body.order = order;
         next();
     } catch (exception: any) {
         return response.status(500).json({
@@ -173,43 +157,4 @@ export const generateOrderDocument = async (request: Request, response: Response
             message: `Failed to generate document for order: ${orderId}`,
         });
     }
-};
-
-/*
- * [GET] http://localhost:3000/api/orders/:orderId
- */
-export const getOrderById = async (request: Request, response: Response) => {
-    const {orderId} = request.params;
-
-    const order = await prisma.order.findUnique({
-        where: {id: orderId as string},
-        include: {
-            customer: true,
-            documents: {
-                orderBy: {createdAt: 'desc' as const},
-                include: {task: true},
-            },
-            orderPositions: {
-                include: {
-                    product: true,
-                    contract: true,
-                },
-            },
-        },
-    });
-
-    return response.status(200).json(order);
-};
-
-export const deleteOrderById = async (request: Request, response: Response) => {
-    const {id} = request.params;
-
-    await prisma.order.delete({
-        where: {id: id as string},
-    });
-
-    return response.status(200).send({
-        message: "Deletion successfully",
-        success: true,
-    });
 };

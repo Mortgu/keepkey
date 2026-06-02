@@ -66,8 +66,8 @@ model Task {
   document         Document? @relation("DocumentTask")
   offerReservation Offer?    @relation("OfferReservationTask")
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@map("task")
 }

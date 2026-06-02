@@ -1,14 +1,14 @@
-import { Router } from "express";
+import {Router} from "express";
 import {
-  getOrderById,
-  getAllOrders,
-  deleteOrderById,
   createOrder,
   createOrderTask,
+  deleteOrderById,
   generateOrderDocument,
-} from "../controllers/order-controller.js";
-import { validate } from "../middlewares/validate.js";
-import { createOrderSchema } from "../schemas/order-schemas.js";
+  getAllOrders,
+  getOrderById,
+} from "../controllers/index.js";
+import {validate} from "../middlewares/validate.js";
+import {createOrderSchema} from "../schemas/index.js";
 
 const router = Router();
 
