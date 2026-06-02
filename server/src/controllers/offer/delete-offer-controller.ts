@@ -45,30 +45,22 @@ export const deleteOffer = async (request: Request, response: Response) => {
         });
     }
 
-    try {
-        const offer = await prisma.offer.findUniqueOrThrow({
-            where: {id: id as string}
-        });
+    const offer = await prisma.offer.findUniqueOrThrow({
+        where: {id: id as string}
+    });
 
-        const reservationFiles: string[] = offer.reservationFile;
+    const reservationFiles: string[] = offer.reservationFile;
 
-        for (const reservationFile of reservationFiles) {
+    for (const reservationFile of reservationFiles) {
 
-        }
-
-        await prisma.offer.delete({
-            where: {id: id as string},
-        });
-
-        return response.status(200).json({
-            success: true,
-            message: "Successfully deleted offer!",
-        });
-    } catch (exception: any) {
-        return response.status(500).json({
-            message: "Something went wrong trying to delete offer!",
-            exception,
-            success: false,
-        });
     }
+
+    await prisma.offer.delete({
+        where: {id: id as string},
+    });
+
+    return response.status(200).json({
+        success: true,
+        message: "Successfully deleted offer!",
+    });
 };

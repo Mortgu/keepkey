@@ -7,6 +7,8 @@ import {formatDate} from "@/lib/format";
 import {formatEur} from "@/utils/utils";
 import {useOfferHook, useReservationTask} from "@/hooks";
 import {Badge, Button, Collapsable} from "@/components";
+import {useEffect} from "react";
+import {toast} from "react-toastify";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -72,6 +74,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
     const {customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer} = offer;
     const {
         deleteOffer,
+        errorDeletingOffer,
 
         createReservation,
         //errorCreatingReservation,
@@ -94,6 +97,12 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
             deleteOffer({id: offer.id});
         }
     };
+
+    useEffect(() => {
+        if (errorDeletingOffer) {
+            toast.error(`${errorDeletingOffer}`);
+        }
+    }, [errorDeletingOffer]);
 
     return (
         <div className="border border-(--border) rounded-md">
