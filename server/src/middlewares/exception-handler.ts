@@ -23,7 +23,7 @@ const webDavErrorMap: Record<string, errorMapProps> = {
     507: {status: 507, message: "Der Cloud-Speicher/Server ist voll."}
 }
 
-export const errorHandler = (err: AppException, req: Request, res: Response, next: NextFunction) => {
+export const exceptionHandler = (err: AppException, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode ?? 500;
     const isOperational = err.isOperational ?? false;
 

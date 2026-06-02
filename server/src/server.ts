@@ -6,7 +6,7 @@ import {auth} from "./lib/auth.js";
 import cors from "cors";
 
 import router from "./routes/router.js";
-import {errorHandler} from "./middlewares/errorHandler.js";
+import {exceptionHandler} from "./middlewares/exception-handler";
 import config from "./config/config.js";
 
 import path from "path";
@@ -61,7 +61,7 @@ app.use("/api", router);
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
 
 // Global error handler
-app.use(errorHandler);
+app.use(exceptionHandler);
 
 const taskWorker = registerTaskWorker();
 
