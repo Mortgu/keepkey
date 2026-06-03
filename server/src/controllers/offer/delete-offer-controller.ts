@@ -1,33 +1,30 @@
 import fs from 'fs';
-import path from "path";
 
-import {Request, Response} from 'express';
+import { Request, Response } from 'express';
 
-import {prisma} from "../../lib/prismaClient.js";
-import env from '../../lib/env.js';
+import { prisma } from "../../lib/prismaClient.js";
 
 export const deleteOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
     const documentId = request.params.documentId as string;
 
-    const document = await prisma.document.findFirst({
-        where: {id: documentId, offerId},
-        select: {id: true},
+    const offerDoc = await prisma.offerDocument.findFirst({
+        where: { offerId, documentId },
+        include: { document: true },
     });
 
-    if (!document) {
-        return response.status(404).json({message: "Document not found"});
+    if (!offerDoc) {
+        return response.status(404).json({ message: "Document not found" });
     }
 
     try {
-        await prisma.document.delete({where: {id: document.id}});
+        await prisma.document.delete({ where: { id: offerDoc.documentId } });
 
-        for (const ext of ["pdf", "docx"]) {
-            const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${ext}`);
-            await fs.promises.rm(filePath, {force: true});
+        if (offerDoc.document.path) {
+            await fs.promises.rm(offerDoc.document.path, { force: true });
         }
 
-        return response.status(200).json({success: true});
+        return response.status(200).json({ success: true });
     } catch (exception: any) {
         return response.status(500).json({
             message: "Could not delete document: " + exception.message,
@@ -36,7 +33,7 @@ export const deleteOfferDocument = async (request: Request, response: Response) 
 };
 
 export const deleteOffer = async (request: Request, response: Response) => {
-    const {id} = request.params;
+    const id = request.params.id as string;
 
     if (!id) {
         return response.status(400).json({
@@ -45,19 +42,8 @@ export const deleteOffer = async (request: Request, response: Response) => {
         });
     }
 
-    const offer = await prisma.offer.findUniqueOrThrow({
-        where: {id: id as string}
-    });
-
-    const reservationFiles: string[] = offer.reservationFile;
-
-    for (const reservationFile of reservationFiles) {
-
-    }
-
-    await prisma.offer.delete({
-        where: {id: id as string},
-    });
+    await prisma.offer.findUniqueOrThrow({ where: { id } });
+    await prisma.offer.delete({ where: { id } });
 
     return response.status(200).json({
         success: true,

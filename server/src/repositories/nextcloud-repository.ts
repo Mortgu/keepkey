@@ -17,8 +17,8 @@ export class NextCloudRepository implements INextCloudRepository {
     }
 
     async reserveFile(quoteId: string, directoryPath: string): Promise<string> {
-        await reserveFile(quoteId, directoryPath);
-        return `${directoryPath}/${quoteId}.reserved`;
+        const {filename} = await reserveFile(quoteId, directoryPath);
+        return filename;
     }
 
     async uploadFile(path: string, buffer: Buffer): Promise<void> {

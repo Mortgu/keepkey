@@ -1,73 +1,33 @@
 enum DocumentStatus {
-  UPLOADED
-  UPLOADING
-  GENERATED
-  PROCESSING
   PENDING
+  PROCESSING
+  GENERATED
+  UPLOADING
+  UPLOADED
   FAILED
+}
+
+enum DocumentFormat {
+  PDF
+  DOCX
+  RESERVED
 }
 
 model Document {
   id String @id @default(cuid())
 
-  version     Int
   displayName String?
-
-  pdfReady  Boolean @default(false)
-  docxReady Boolean @default(false)
-
-  status    DocumentStatus @default(PENDING)
-  isCurrent Boolean
-
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String?
-
-  order   Order?  @relation(fields: [orderId], references: [id])
-  orderId String?
+  format      DocumentFormat
+  status      DocumentStatus @default(PENDING)
+  path        String?
 
   taskId String? @unique
   task   Task?   @relation("DocumentTask", fields: [taskId], references: [id])
 
+  offerDocument OfferDocument?
+  orderDocument OrderDocument?
+
   createdAt DateTime @default(now())
 
-  @@unique([offerId, version])
   @@map("document")
-}
-
-enum TaskStatus {
-  COMPLETED
-  RUNNING
-  PENDING
-  FAILED
-}
-
-enum TaskTarget {
-  OFFER
-  ORDER
-  RENEWAL
-}
-
-enum TaskType {
-  UPLOAD
-  RESERVATION
-  GENERATION
-}
-
-model Task {
-  id    String  @id @default(cuid())
-  jobId String?
-
-  status TaskStatus @default(PENDING)
-  target TaskTarget
-  type   TaskType
-
-  error String?
-
-  document         Document? @relation("DocumentTask")
-  offerReservation Offer?    @relation("OfferReservationTask")
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@map("task")
 }

@@ -1,9 +1,9 @@
-import {NextFunction, Request, Response} from 'express';
-import {prisma, TaskStatus} from "../../lib/prismaClient.js";
-import {taskQueue, taskQueueKey} from "../../workers/task-worker.js";
-import {OfferFlatRate, OfferPosition, TaskTarget, TaskType} from "@prisma/client";
-import {enqueueOfferGeneration} from "../../workers/jobs/index.js";
-import {toDate} from '../../utils/utils.js';
+import { NextFunction, Request, Response } from 'express';
+import { prisma, TaskStatus } from "../../lib/prismaClient.js";
+import { taskQueue, taskQueueKey } from "../../workers/task-worker.js";
+import { OfferFlatRate, OfferPosition, TaskTarget, TaskType } from "@prisma/client";
+import { enqueueOfferGeneration } from "../../workers/jobs/index.js";
+import { toDate } from '../../utils/utils.js';
 import calculatePrice from "../../utils/products.js";
 
 /*
@@ -12,13 +12,13 @@ import calculatePrice from "../../utils/products.js";
  */
 
 export const enqueueQuoteReservationJob = async (request: Request, response: Response, next: NextFunction) => {
-    const {id} = request.params;
+    const { id } = request.params;
 
     try {
         const task = await enqueueOfferReservation(id as string);
         return response.status(200).json(task);
     } catch (exception: any) {
-        return response.status(500).json({message: `Failed to enqueue reservation: ${exception.message}`});
+        return response.status(500).json({ message: `Failed to enqueue reservation: ${exception.message}` });
     }
 };
 
@@ -26,28 +26,31 @@ export const enqueueDocumentGenerationJob = async (request: Request, response: R
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUnique({
-        where: {id: offerId},
-        include: {reservationTask: true},
+        where: { id: offerId },
+        include: { reservationTask: true },
     });
 
     if (!offer) {
-        return response.status(404).json({message: "Offer not found"});
+        return response.status(404).json({ message: "Offer not found" });
     }
 
     const reservationStatus = offer.reservationTask?.status;
 
     if (reservationStatus === TaskStatus.PENDING || reservationStatus === TaskStatus.RUNNING) {
-        return response.status(409).json({message: "Reservation is already in progress"});
+        return response.status(409).json({ message: "Reservation is already in progress" });
     }
 
+    // "Reserved" means at least one OfferDocument exists (reservation or generation has happened)
+    const isReserved = (await prisma.offerDocument.count({ where: { offerId } })) > 0;
+
     try {
-        if (!offer.isReserved) {
-            const task = await enqueueOfferReservation(offerId, {chainGenerationOnSuccess: true});
-            return response.status(200).json({taskId: task!.id});
+        if (!isReserved) {
+            const task = await enqueueOfferReservation(offerId, { chainGenerationOnSuccess: true });
+            return response.status(200).json({ taskId: task!.id });
         }
 
         const task = await enqueueOfferGeneration(offerId);
-        return response.status(200).json({taskId: task.id});
+        return response.status(200).json({ taskId: task.id });
     } catch (exception: any) {
         return response.status(500).json({
             message: `Failed to start document generation: ${exception.message}`,
@@ -57,47 +60,45 @@ export const enqueueDocumentGenerationJob = async (request: Request, response: R
 
 async function enqueueOfferReservation(offerId: string, opts: { chainGenerationOnSuccess?: boolean } = {}) {
     const offer = await prisma.offer.findUniqueOrThrow({
-        where: {id: offerId},
-        include: {reservationTask: true},
+        where: { id: offerId },
+        include: { reservationTask: true },
     });
 
-    if (offer.isReserved) {
+    const isReserved = (await prisma.offerDocument.count({ where: { offerId } })) > 0;
+
+    if (isReserved) {
         return offer.reservationTask;
     }
 
     if (offer.reservationTask) {
-        const job = await taskQueue.add(taskQueueKey, {taskId: offer.reservationTask.id, ...opts});
+        const job = await taskQueue.add(taskQueueKey, { taskId: offer.reservationTask.id, ...opts });
         await prisma.task.update({
-            where: {id: offer.reservationTask.id},
-            data: {status: TaskStatus.PENDING, jobId: job.id},
+            where: { id: offer.reservationTask.id },
+            data: { status: TaskStatus.PENDING, jobId: job.id },
         });
         return offer.reservationTask;
     }
 
     const task = await prisma.task.create({
-        data: {status: TaskStatus.PENDING, type: TaskType.RESERVATION, target: TaskTarget.OFFER},
+        data: { status: TaskStatus.PENDING, type: TaskType.RESERVATION, target: TaskTarget.OFFER },
     });
-    const job = await taskQueue.add(taskQueueKey, {taskId: task.id, ...opts});
-    await prisma.task.update({where: {id: task.id}, data: {jobId: job.id}});
-    await prisma.offer.update({where: {id: offerId}, data: {reservationTaskId: task.id}});
+    const job = await taskQueue.add(taskQueueKey, { taskId: task.id, ...opts });
+    await prisma.task.update({ where: { id: task.id }, data: { jobId: job.id } });
+    await prisma.offer.update({ where: { id: offerId }, data: { reservationTaskId: task.id } });
     return task;
 }
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
-    const {body} = request;
+    const { body } = request;
 
     if (!body) {
-        return response.status(400).json({
-            message: "Bad request",
-        });
+        return response.status(400).json({ message: "Bad request" });
     }
 
-    const {offer, positions, flatRates} = body;
+    const { offer, positions, flatRates } = body;
 
     if (!offer || !positions) {
-        return response.status(400).json({
-            message: "Bad request.",
-        });
+        return response.status(400).json({ message: "Bad request." });
     }
 
     for (const position of positions) {
@@ -120,7 +121,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
             let net_amount = net_amount_positions + net_amount_flatrates;
 
-            const {supplierId, validUntil, requestFrom, date, ...offerFields} = body.offer;
+            const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
             const offer = await tx.offer.create({
                 data: {
                     ...offerFields,
@@ -133,32 +134,15 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             });
 
             for (const position of positions) {
-                const {
-                    productId, contractId, duration_months,
-                    quantity, optional, total_cents
-                } = position;
-
+                const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
                 await tx.offerPosition.create({
-                    data: {
-                        offerId: offer.id,
-                        productId,
-                        contractId,
-                        duration_months,
-                        quantity,
-                        total_cents,
-                        optional,
-                    },
+                    data: { offerId: offer.id, productId, contractId, duration_months, quantity, total_cents, optional },
                 });
             }
 
             for (const flatRate of flatRates) {
                 await tx.offerFlatRate.create({
-                    data: {
-                        offerId: offer.id,
-                        flatRateId: flatRate.id,
-                        quantity: flatRate.quantity,
-                        total_cents: flatRate.total_cents,
-                    },
+                    data: { offerId: offer.id, flatRateId: flatRate.id, quantity: flatRate.quantity, total_cents: flatRate.total_cents },
                 });
             }
 

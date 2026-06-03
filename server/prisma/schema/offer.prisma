@@ -22,13 +22,11 @@ model Offer {
 
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
+  offerDocuments OfferDocument[]
 
-  documents Document[]
-  orders    Order?
+  orders Order?
 
-  isReserved      Boolean  @default(false)
-  reservationFile String[]
-
+  isReserved        Boolean @default(false)
   reservationTaskId String? @unique
   reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
 
@@ -95,4 +93,20 @@ model OfferFlatRate {
   total_cents Int
 
   @@map("offer_flat_rate")
+}
+
+model OfferDocument {
+  id String @id @default(uuid())
+
+  version   Int
+  isCurrent Boolean @default(false)
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String   @unique
+
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String
+
+  @@unique([offerId, version, documentId])
+  @@map("offer_documents")
 }

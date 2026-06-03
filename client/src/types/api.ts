@@ -17,9 +17,9 @@ export interface components {
             plz?: string;
             phone?: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
             contactPersons: components["schemas"]["ContactPerson"][];
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
@@ -35,43 +35,24 @@ export interface components {
             lastName: string;
             email?: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
         };
         Document: {
             id: string;
-            /** Format: int32 */
-            version: number;
             displayName?: string;
-            pdfReady: boolean;
-            docxReady: boolean;
+            format: components["schemas"]["DocumentFormat"];
             status: components["schemas"]["DocumentStatus"];
-            isCurrent: boolean;
-            offer?: components["schemas"]["Offer"];
-            offerId?: string;
-            order?: components["schemas"]["Order"];
-            orderId?: string;
+            path?: string;
             taskId?: string;
             task?: components["schemas"]["Task"];
+            offerDocument?: components["schemas"]["OfferDocument"];
+            orderDocument?: components["schemas"]["OrderDocument"];
             /** Format: date-time */
             createdAt: string;
-        };
-        Task: {
-            id: string;
-            jobId?: string;
-            status: components["schemas"]["TaskStatus"];
-            target: components["schemas"]["TaskTarget"];
-            type: components["schemas"]["TaskType"];
-            error?: string;
-            document?: components["schemas"]["Document"];
-            offerReservation?: components["schemas"]["Offer"];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
         };
         Offer: {
             id: string;
@@ -93,7 +74,7 @@ export interface components {
             requestFrom?: string;
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             offerPositions: components["schemas"]["OfferPosition"][];
-            documents: components["schemas"]["Document"][];
+            offerDocuments: components["schemas"]["OfferDocument"][];
             orders?: components["schemas"]["Order"];
             isReserved: boolean;
             reservationTaskId?: string;
@@ -135,9 +116,9 @@ export interface components {
             /** Format: int32 */
             total_cents: number;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         OfferFlatRate: {
             id: string;
@@ -150,29 +131,43 @@ export interface components {
             /** Format: int32 */
             total_cents: number;
         };
-        Order: {
+        OfferDocument: {
             id: string;
-            orderId: string;
-            /** Format: date-time */
-            date: string;
-            paymentTerm: string;
-            projectId: string;
-            customer: components["schemas"]["Customer"];
-            customerId: string;
-            supplier?: components["schemas"]["Supplier"];
-            supplierId?: string;
+            /** Format: int32 */
+            version: number;
+            isCurrent: boolean;
+            document: components["schemas"]["Document"];
+            documentId: string;
             offer: components["schemas"]["Offer"];
             offerId: string;
+        };
+        Order: {
+            id: string;
+            supplier?: components["schemas"]["Supplier"];
+            supplierId?: string;
+            customer: components["schemas"]["Customer"];
+            customerId: string;
             customerContactPerson: components["schemas"]["ContactPerson"];
             contactPersonId: string;
             employee: components["schemas"]["User"];
             employeeId: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            orderId: string;
+            paymentTerm: string;
+            /** Format: date-time */
+            date: string;
+            /** Format: date-time */
+            validUntil?: string;
+            /** Format: date-time */
+            requestFrom?: string;
             orderPositions: components["schemas"]["OrderPosition"][];
-            documents: components["schemas"]["Document"][];
+            flatRates: components["schemas"]["OrderFlatRate"][];
+            orderDocuments: components["schemas"]["OrderDocument"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         OrderPosition: {
             id: string;
@@ -186,14 +181,32 @@ export interface components {
             duration_months: number;
             /** Format: int32 */
             quantity: number;
+            optional?: boolean;
             /** Format: int32 */
-            unit_price: number;
-            /** Format: int32 */
-            discount: number;
-            /** Format: int32 */
-            total: number;
+            total_cents: number;
             /** Format: date-time */
             createdAt: string;
+        };
+        OrderFlatRate: {
+            id: string;
+            flatRate: components["schemas"]["FlatRate"];
+            flatRateId: string;
+            order: components["schemas"]["Order"];
+            orderId: string;
+            /** Format: int32 */
+            quantity: number;
+            /** Format: int32 */
+            total_cents: number;
+        };
+        OrderDocument: {
+            id: string;
+            /** Format: int32 */
+            version: number;
+            isCurrent: boolean;
+            document: components["schemas"]["Document"];
+            documentId: string;
+            order: components["schemas"]["Order"];
+            orderId: string;
         };
         Product: {
             id: string;
@@ -204,11 +217,11 @@ export interface components {
             offerPositions: components["schemas"]["OfferPosition"][];
             tariff?: components["schemas"]["Tariff"];
             tariffId?: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
             tariffCustomers: components["schemas"]["TariffCustomer"][];
-            /** Format: date-time */
-            createdAt?: string;
-            /** Format: date-time */
-            updatedAt?: string;
         };
         Tariff: {
             id: string;
@@ -216,9 +229,9 @@ export interface components {
             configs: components["schemas"]["TariffConfig"][];
             customers: components["schemas"]["TariffCustomer"][];
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
         };
         TariffConfig: {
             id: string;
@@ -331,9 +344,9 @@ export interface components {
             supplierId: string;
             name: string;
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
             /** Format: date-time */
-            updatedAt?: string;
+            updatedAt: string;
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
         };
@@ -344,12 +357,7 @@ export interface components {
             /** Format: int32 */
             total_cents: number;
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
-        };
-        AppSetting: {
-            key: string;
-            value: string;
-            /** Format: date-time */
-            updatedAt: string;
+            orderFlatRates: components["schemas"]["OrderFlatRate"][];
         };
         Contract: {
             id: string;
@@ -363,8 +371,24 @@ export interface components {
             /** Format: date-time */
             createdAt?: string;
         };
+        Task: {
+            id: string;
+            jobId?: string;
+            status: components["schemas"]["TaskStatus"];
+            target: components["schemas"]["TaskTarget"];
+            type: components["schemas"]["TaskType"];
+            error?: string;
+            document?: components["schemas"]["Document"];
+            offerReservation?: components["schemas"]["Offer"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
         /** @enum {string} */
-        DocumentStatus: "UPLOADED" | "UPLOADING" | "GENERATED" | "PROCESSING" | "PENDING" | "FAILED";
+        DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "RESERVED" | "UPLOADING" | "UPLOADED" | "FAILED";
+        /** @enum {string} */
+        DocumentFormat: "PDF" | "DOCX";
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */

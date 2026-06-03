@@ -1,7 +1,7 @@
 import {Pen, RotateCcw, Trash} from "lucide-react";
 
-import type {Document, Offer} from "@/types";
-import {DocumentItem, LineItemRow, ReservationBadge} from "./card-components";
+import type {Offer, OfferDocument} from "@/types";
+import {Document, LineItemRow, ReservationBadge} from "./card-components";
 import OfferRevisionHistory from "./card-components/offer-revision-history";
 import {formatDate} from "@/lib/format";
 import {formatEur} from "@/utils/utils";
@@ -88,15 +88,14 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
 
     const canReserve = !offer.isReserved;
 
-    const hasActiveDocTask = offer.documents.some(
-        (d: Document) => d.task?.status === "PENDING" || d.task?.status === "RUNNING"
-    );
 
     const handleDeleteOffer = () => {
         if (confirm("Angebot löschen")) {
             deleteOffer({id: offer.id});
         }
     };
+
+    console.log(offer);
 
     useEffect(() => {
         if (errorDeletingOffer) {
@@ -165,14 +164,15 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
 
             <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
-                    {offer.documents.map((document: Document) => (
-                        <DocumentItem key={document.id} document={document}/>
+                    {offer.offerDocuments.map((document: OfferDocument) => (
+                        <Document key={document.id} document={document.document}/>
                     ))}
+
                     <Button
                         variant="primary"
                         size="sm"
-                        loading={isGeneratingDocument || hasActiveDocTask}
-                        disabled={isGeneratingDocument || hasActiveDocTask}
+                        loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument}
                         onClick={() => generateDocument({offerId: offer.id})}
                     >
                         Dokument generieren

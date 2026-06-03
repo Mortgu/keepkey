@@ -1,8 +1,14 @@
-import path from "path";
 import fs from "fs/promises";
 
 import env from "../../lib/env.js";
-import {converting, fetchOfferData, formatFetchedData, generating, postprocessing,} from "./actions.js";
+import {
+    converting,
+    fetchOfferData,
+    formatFetchedData,
+    generating,
+    postprocessing,
+    writeGeneratedDocuments,
+} from "./actions.js";
 import {OfferPipelineContext} from "./context.js";
 import {TaskStatus} from "@prisma/client";
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
@@ -65,29 +71,7 @@ const convert: PipelineStage<OfferPipelineContext> = {
 const write: PipelineStage<OfferPipelineContext> = {
     name: "write",
     run: async (context) => {
-        const offer = context?.fetchedData?.offer;
-
-        if (!offer) {
-            throw new Error("Offer is null!");
-        }
-
-        const {quoteId, customer, offerPositions} = offer;
-        const {companyName} = customer;
-
-        const workloads = offerPositions
-            .map((i) => i.product.name.replaceAll(" ", ""))
-            .join("+");
-
-        const baseName = `${quoteId}_AG_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
-        context.displayName = `${baseName}_v${context.version}`;
-
-        const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);
-        const pdfPath = path.join(env.OUTPUT_DIR, `${context.documentId}.pdf`);
-
-        await Promise.all([
-            fs.writeFile(docxPath, context.docxBuffer!),
-            fs.writeFile(pdfPath, context.pdfBuffer!),
-        ]);
+        await writeGeneratedDocuments(context.fetchedData, context.docxBuffer, context.pdfBuffer)
     },
 };
 
@@ -104,7 +88,6 @@ export const offerStages: PipelineStage<OfferPipelineContext>[] = [
     postprocess,
     prepare,
     generate,
-    convert,
     write,
     upload,
 ];

@@ -10,4 +10,5 @@ export type OfferPipelineContext = PipelineContext & {
     fetchedData?: OfferFetchData;
     formatedData?: OfferFormatedData;
 
+    displayName?: string;
 }

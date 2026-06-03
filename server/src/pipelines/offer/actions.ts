@@ -10,6 +10,7 @@ import Docxtemplater from "docxtemplater";
 
 import {convert as libconvert} from "libreoffice-convert";
 import {prisma} from "../../lib/prismaClient.js";
+import {PipelineStageError} from "../pipeline.js";
 
 export async function fetchOfferData(offerId: string) {
     const [offer, contracts] = await Promise.all([
@@ -184,4 +185,32 @@ export async function converting(docxBuffer: Buffer): Promise<Buffer> {
             else resolve(result);
         });
     });
+}
+
+export async function writeGeneratedDocuments(fetchedData?: OfferFetchData, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<String[]> {
+    if (!fetchedData || !docxBuffer || !pdfBuffer) {
+        throw new Error("Failed to write generated! Missing Data");
+    }
+
+    const {quoteId, customer, offerPositions} = fetchedData.offer;
+
+    const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
+    const formatedWorkloads = offerPositions.map((op) => op.product.name.replaceAll(" ", "").trim()).join("+");
+
+    const name = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}`;
+
+    const docxPath = path.join(env.OUTPUT_DIR, `${name}.docx`);
+    const pdfPath = path.join(env.OUTPUT_DIR, `${name}.pdf`);
+
+    try {
+        await Promise.all([
+            fs.writeFile(docxPath, docxBuffer!),
+            fs.writeFile(pdfPath, pdfBuffer!),
+        ]);
+    } catch (exception: any) {
+        throw new PipelineStageError("Something went wrong, trying to write generated documents to file system!",
+            500, "writeGeneratedDocuments");
+    }
+
+    return [docxPath, pdfPath];
 }

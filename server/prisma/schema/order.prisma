@@ -22,11 +22,10 @@ model Order {
   date        DateTime  @default(now()) // Datum
   validUntil  DateTime?
   requestFrom DateTime?
-  // projectId   String // Projekt-Nr.
 
   orderPositions OrderPosition[]
   flatRates      OrderFlatRate[]
-  documents      Document[]
+  orderDocuments OrderDocument[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -71,4 +70,20 @@ model OrderFlatRate {
   total_cents Int
 
   @@map("order_flat_rate")
+}
+
+model OrderDocument {
+  id String @id @default(uuid())
+
+  version   Int
+  isCurrent Boolean @default(false)
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String   @unique
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  @@unique([orderId, version, documentId])
+  @@map("order_documents")
 }

@@ -109,74 +109,30 @@ components:
       properties:
         id:
           type: string
-        version:
-          type: integer
-          format: int32
         displayName:
           type: string
-        pdfReady:
-          type: boolean
-        docxReady:
-          type: boolean
+        format:
+          $ref: "#/components/schemas/DocumentFormat"
         status:
           $ref: "#/components/schemas/DocumentStatus"
-        isCurrent:
-          type: boolean
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
-          type: string
-        order:
-          $ref: "#/components/schemas/Order"
-        orderId:
+        path:
           type: string
         taskId:
           type: string
         task:
           $ref: "#/components/schemas/Task"
+        offerDocument:
+          $ref: "#/components/schemas/OfferDocument"
+        orderDocument:
+          $ref: "#/components/schemas/OrderDocument"
         createdAt:
           type: string
           format: date-time
       required:
         - id
-        - version
-        - pdfReady
-        - docxReady
+        - format
         - status
-        - isCurrent
         - createdAt
-    Task:
-      type: object
-      properties:
-        id:
-          type: string
-        jobId:
-          type: string
-        status:
-          $ref: "#/components/schemas/TaskStatus"
-        target:
-          $ref: "#/components/schemas/TaskTarget"
-        type:
-          $ref: "#/components/schemas/TaskType"
-        error:
-          type: string
-        document:
-          $ref: "#/components/schemas/Document"
-        offerReservation:
-          $ref: "#/components/schemas/Offer"
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - status
-        - target
-        - type
-        - createdAt
-        - updatedAt
     Offer:
       type: object
       properties:
@@ -219,18 +175,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferPosition"
-        documents:
+        offerDocuments:
           type: array
           items:
-            $ref: "#/components/schemas/Document"
+            $ref: "#/components/schemas/OfferDocument"
         orders:
           $ref: "#/components/schemas/Order"
         isReserved:
           type: boolean
-        reservationFile:
-          type: array
-          items:
-            type: string
         reservationTaskId:
           type: string
         reservationTask:
@@ -264,9 +216,8 @@ components:
         - date
         - offerFlatRates
         - offerPositions
-        - documents
+        - offerDocuments
         - isReserved
-        - reservationFile
         - net_amount
         - version
         - revisions
@@ -372,6 +323,32 @@ components:
         - offerId
         - quantity
         - total_cents
+    OfferDocument:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        isCurrent:
+          type: boolean
+        document:
+          $ref: "#/components/schemas/Document"
+        documentId:
+          type: string
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
+      required:
+        - id
+        - version
+        - isCurrent
+        - document
+        - documentId
+        - offer
+        - offerId
     Order:
       type: object
       properties:
@@ -418,10 +395,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OrderFlatRate"
-        documents:
+        orderDocuments:
           type: array
           items:
-            $ref: "#/components/schemas/Document"
+            $ref: "#/components/schemas/OrderDocument"
         createdAt:
           type: string
           format: date-time
@@ -443,7 +420,7 @@ components:
         - date
         - orderPositions
         - flatRates
-        - documents
+        - orderDocuments
         - createdAt
         - updatedAt
     OrderPosition:
@@ -516,6 +493,32 @@ components:
         - orderId
         - quantity
         - total_cents
+    OrderDocument:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        isCurrent:
+          type: boolean
+        document:
+          $ref: "#/components/schemas/Document"
+        documentId:
+          type: string
+        order:
+          $ref: "#/components/schemas/Order"
+        orderId:
+          type: string
+      required:
+        - id
+        - version
+        - isCurrent
+        - document
+        - documentId
+        - order
+        - orderId
     Product:
       type: object
       properties:
@@ -936,15 +939,53 @@ components:
         - offerPositions
         - tariffConfigs
         - tariffCustomers
+    Task:
+      type: object
+      properties:
+        id:
+          type: string
+        jobId:
+          type: string
+        status:
+          $ref: "#/components/schemas/TaskStatus"
+        target:
+          $ref: "#/components/schemas/TaskTarget"
+        type:
+          $ref: "#/components/schemas/TaskType"
+        error:
+          type: string
+        document:
+          $ref: "#/components/schemas/Document"
+        offerReservation:
+          $ref: "#/components/schemas/Offer"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - status
+        - target
+        - type
+        - createdAt
+        - updatedAt
     DocumentStatus:
       type: string
       enum:
-        - UPLOADED
-        - UPLOADING
-        - GENERATED
-        - PROCESSING
         - PENDING
+        - PROCESSING
+        - GENERATED
+        - UPLOADING
+        - UPLOADED
         - FAILED
+    DocumentFormat:
+      type: string
+      enum:
+        - PDF
+        - DOCX
+        - RESERVED
     TaskStatus:
       type: string
       enum:

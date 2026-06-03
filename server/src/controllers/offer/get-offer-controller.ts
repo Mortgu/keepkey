@@ -1,7 +1,5 @@
 import {NextFunction, Request, Response} from "express";
 import {prisma} from "../../lib/prismaClient.js";
-import path from "path";
-import env from '../../lib/env.js';
 
 export const getOffers = async (request: Request, response: Response) => {
     const {search, companyIds, contactPersonIds, sort} = request.query;
@@ -37,9 +35,11 @@ export const getOffers = async (request: Request, response: Response) => {
             supplier: true,
             customerContactPerson: true,
             reservationTask: true,
-            documents: {
-                orderBy: {createdAt: 'desc' as const},
-                include: {task: true},
+            offerDocuments: {
+                orderBy: {version: "desc" as const},
+                include: {
+                    document: true,
+                },
             },
             offerPositions: {
                 include: {
@@ -66,9 +66,9 @@ export const getOfferById = async (request: Request, response: Response) => {
             where: {id: id as string},
             include: {
                 reservationTask: true,
-                documents: {
-                    orderBy: {createdAt: 'desc'},
-                    include: {task: true},
+                offerDocuments: {
+                    orderBy: {version: "desc" as const},
+                    include: {document: true},
                 },
             },
         });
@@ -86,7 +86,7 @@ export const getOfferRevisions = async (request: Request, response: Response) =>
 
     const revisions = await prisma.offerRevision.findMany({
         where: {offerId: id as string},
-        orderBy: {version: 'desc'},
+        orderBy: {version: "desc"},
         select: {id: true, version: true, changedBy: true, createdAt: true},
     });
 
@@ -102,38 +102,25 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
     }
 };
 
-
 export const downloadOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
     const documentId = request.params.documentId as string;
-    const format = request.params.format as string;
 
-    if (format !== "pdf" && format !== "docx") {
-        return response.status(400).json({message: "Invalid format"});
-    }
-
-    const document = await prisma.document.findFirst({
-        where: {id: documentId, offerId},
-        select: {
-            id: true,
-            displayName: true,
-            pdfReady: true,
-            docxReady: true,
-        },
+    const offerDoc = await prisma.offerDocument.findFirst({
+        where: {offerId, documentId},
+        include: {document: true},
     });
 
-    if (!document) {
+    if (!offerDoc) {
         return response.status(404).json({message: "Document not found"});
     }
 
-    const ready = format === "pdf" ? document.pdfReady : document.docxReady;
-    if (!ready) {
+    const {document} = offerDoc;
+
+    if (document.status !== "GENERATED" || !document.path) {
         return response.status(409).json({message: "Document not yet generated"});
     }
 
-    const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
-    const downloadName = `${document.displayName ?? document.id}.${format}`;
-
-    return response.download(filePath, downloadName);
+    const downloadName = `${document.displayName ?? document.id}.${document.format.toLowerCase()}`;
+    return response.download(document.path, downloadName);
 };
-
