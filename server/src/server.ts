@@ -6,7 +6,7 @@ import {auth} from "./lib/auth.js";
 import cors from "cors";
 
 import router from "./routes/router.js";
-import {exceptionHandler} from "./middlewares/exception-handler";
+import {exceptionHandler} from "./middlewares/exception-handler.js";
 import config from "./config/config.js";
 
 import path from "path";

@@ -1,6 +1,6 @@
-import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
-import {OfferFetchData, OfferFormatedData} from "./context.js";
-import {customParser, deepIterate} from "./utils.js";
+import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { OfferFetchData, OfferFormatedData } from "./context.js";
+import { customParser, deepIterate } from "./utils.js";
 import env from "../../lib/env.js";
 
 import path from "path";
@@ -8,14 +8,14 @@ import fs from "fs/promises";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
-import {convert as libconvert} from "libreoffice-convert";
-import {prisma} from "../../lib/prismaClient.js";
-import {PipelineStageError} from "../pipeline.js";
+import { convert as libconvert } from "libreoffice-convert";
+import { prisma } from "../../lib/prismaClient.js";
+import { PipelineStageError } from "../pipeline.js";
 
 export async function fetchOfferData(offerId: string) {
     const [offer, contracts] = await Promise.all([
         await prisma.offer.findUniqueOrThrow({
-            where: {id: offerId},
+            where: { id: offerId },
             include: {
                 customer: true,
                 customerContactPerson: true,
@@ -37,7 +37,7 @@ export async function fetchOfferData(offerId: string) {
         await prisma.contract.findMany(),
     ]);
 
-    return {offer, contracts};
+    return { offer, contracts };
 }
 
 export async function formatFetchedData(fetchedData?: OfferFetchData) {
@@ -187,12 +187,8 @@ export async function converting(docxBuffer: Buffer): Promise<Buffer> {
     });
 }
 
-export async function writeGeneratedDocuments(fetchedData?: OfferFetchData, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<String[]> {
-    if (!fetchedData || !docxBuffer || !pdfBuffer) {
-        throw new Error("Failed to write generated! Missing Data");
-    }
-
-    const {quoteId, customer, offerPositions} = fetchedData.offer;
+export async function writeGeneratedDocuments(fetchedData: OfferFetchData, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<string> {
+    const { quoteId, customer, offerPositions } = fetchedData.offer;
 
     const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
     const formatedWorkloads = offerPositions.map((op) => op.product.name.replaceAll(" ", "").trim()).join("+");
@@ -202,15 +198,10 @@ export async function writeGeneratedDocuments(fetchedData?: OfferFetchData, docx
     const docxPath = path.join(env.OUTPUT_DIR, `${name}.docx`);
     const pdfPath = path.join(env.OUTPUT_DIR, `${name}.pdf`);
 
-    try {
-        await Promise.all([
-            fs.writeFile(docxPath, docxBuffer!),
-            fs.writeFile(pdfPath, pdfBuffer!),
-        ]);
-    } catch (exception: any) {
-        throw new PipelineStageError("Something went wrong, trying to write generated documents to file system!",
-            500, "writeGeneratedDocuments");
-    }
+    await Promise.all([
+        fs.writeFile(docxPath, docxBuffer!),
+        fs.writeFile(pdfPath, pdfBuffer!),
+    ]);
 
-    return [docxPath, pdfPath];
+    return name;
 }

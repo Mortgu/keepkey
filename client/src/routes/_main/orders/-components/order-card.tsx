@@ -1,19 +1,17 @@
-import {useOrderHook} from "@/hooks";
-import {Trash} from "lucide-react";
-import {formatDate} from "@/lib/format.ts";
+import { useOrderHook } from "@/hooks";
+import { Trash } from "lucide-react";
+import { formatDate } from "@/lib/format.ts";
 import React from "react";
-import type {Document, Order, OrderPosition} from "@/types";
-import {Button, Collapsable} from "@/components";
-import {DocumentItem} from "@/routes/_main/offers/-components/card-components";
+import type { Document, Order, OrderPosition } from "@/types";
+import { Button, Collapsable } from "@/components";
+import { DocumentItem } from "@/routes/_main/offers/-components/card-components";
 
 type Props = {
     order: Order
 };
 
-export default function OrderCard({order}: Props) {
-    const {deleteOrder, errorDeletingOrder, isDeleting} = useOrderHook();
-
-    console.log(order);
+export default function OrderCard({ order }: Props) {
+    const { deleteOrder, errorDeletingOrder, isDeleting } = useOrderHook();
 
     return (
         <React.Fragment>
@@ -35,7 +33,7 @@ export default function OrderCard({order}: Props) {
                             size="sm"
                             variant="secondary"
                             iconOnly
-                            icon={<Trash className="size-3.5"/>}
+                            icon={<Trash className="size-3.5" />}
                         />
                     </div>
                 </div>
@@ -43,7 +41,7 @@ export default function OrderCard({order}: Props) {
                 <div className="">
                     {order.orderPositions.map((position: OrderPosition) => (
                         <div key={position.id}
-                             className="flex items-center justify-between border-b border-(--border) px-3 py-2">
+                            className="flex items-center justify-between border-b border-(--border) px-3 py-2">
                             <div className="flex items-center gap-2">
                                 <p>{position.product.name}</p>
                                 <p className="text-gray-500">
@@ -58,7 +56,7 @@ export default function OrderCard({order}: Props) {
                 <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
                     <div className="grid gap-2 px-3 py-2">
                         {order.documents?.map((document: Document) => (
-                            <DocumentItem key={document.id} document={document}/>
+                            <DocumentItem key={document.id} document={document} />
                         ))}
                     </div>
                 </Collapsable>

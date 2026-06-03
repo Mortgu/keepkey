@@ -1,17 +1,11 @@
-import fs from "fs/promises";
+import path from 'path';
+import fs from 'fs/promises';
 
-import env from "../../lib/env.js";
-import {
-    converting,
-    fetchOfferData,
-    formatFetchedData,
-    generating,
-    postprocessing,
-    writeGeneratedDocuments,
-} from "./actions.js";
-import {OfferPipelineContext} from "./context.js";
-import {TaskStatus} from "@prisma/client";
-import {PipelineStage, PipelineStageError} from "../pipeline.js";
+import { OfferPipelineContext } from "./context.js";
+import { TaskStatus } from "@prisma/client";
+import { PipelineStage, PipelineStageError } from "../pipeline.js";
+import { converting, fetchOfferData, formatFetchedData, generating, postprocessing, writeGeneratedDocuments } from "./actions.js";
+import env from '../../lib/env.js';
 
 const loadOfferData: PipelineStage<OfferPipelineContext> = {
     name: "fetch",
@@ -49,8 +43,8 @@ const postprocess: PipelineStage<OfferPipelineContext> = {
 
 const prepare: PipelineStage<OfferPipelineContext> = {
     name: "prepare",
-    run: async () => {
-        await fs.mkdir(env.OUTPUT_DIR, {recursive: true});
+    run: async (context) => {
+        await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
     },
 };
 
@@ -71,7 +65,18 @@ const convert: PipelineStage<OfferPipelineContext> = {
 const write: PipelineStage<OfferPipelineContext> = {
     name: "write",
     run: async (context) => {
-        await writeGeneratedDocuments(context.fetchedData, context.docxBuffer, context.pdfBuffer)
+        const { fetchedData, docxBuffer, pdfBuffer } = context;
+
+        if (!docxBuffer || !pdfBuffer || !fetchedData) {
+            console.log("Something went wrong! File buffers null!");
+            throw new PipelineStageError("Something went wrong! File buffers null!");
+        }
+
+        try {
+            context.displayName = await writeGeneratedDocuments(fetchedData, docxBuffer, pdfBuffer)
+        } catch (exception: any) {
+            throw new PipelineStageError("Writing step in pipeline failed", 500, exception.message);
+        }
     },
 };
 
@@ -88,6 +93,6 @@ export const offerStages: PipelineStage<OfferPipelineContext>[] = [
     postprocess,
     prepare,
     generate,
+    convert,
     write,
-    upload,
 ];

@@ -1,21 +1,20 @@
-import {Pen, RotateCcw, Trash} from "lucide-react";
-
-import type {Offer, OfferDocument} from "@/types";
-import {Document, LineItemRow, ReservationBadge} from "./card-components";
+import type { Offer, OfferDocument } from "@/types";
+import { Document, LineItemRow } from "./card-components";
 import OfferRevisionHistory from "./card-components/offer-revision-history";
-import {formatDate} from "@/lib/format";
-import {formatEur} from "@/utils/utils";
-import {useOfferHook, useReservationTask} from "@/hooks";
-import {Badge, Button, Collapsable} from "@/components";
-import {useEffect} from "react";
-import {toast} from "react-toastify";
+import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
+import { useOfferHook } from "@/hooks";
+import { Badge, Button, Collapsable } from "@/components";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { Pen, Trash } from "lucide-react";
 
 type OfferListItemProps = {
     offer: Offer;
     onEdit: (offer: Offer) => void;
 };
 
-function OfferPositionRow({op}: { op: Offer["offerPositions"][number] }) {
+function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
     return (
         <LineItemRow
             left={
@@ -46,7 +45,7 @@ function OfferPositionRow({op}: { op: Offer["offerPositions"][number] }) {
     );
 }
 
-function OfferFlatRateRow({fr}: { fr: Offer["offerFlatRates"][number] }) {
+function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
     return (
         <LineItemRow
             left={
@@ -70,32 +69,21 @@ function OfferFlatRateRow({fr}: { fr: Offer["offerFlatRates"][number] }) {
     );
 }
 
-export default function OfferCard({offer, onEdit}: OfferListItemProps) {
-    const {customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer} = offer;
+export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const { customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer } = offer;
     const {
         deleteOffer,
         errorDeletingOffer,
-
-        createReservation,
-        //errorCreatingReservation,
 
         generateDocument,
         isGeneratingDocument
     } = useOfferHook();
 
-    const {task: polledReservation} = useReservationTask(offer.reservationTask?.id);
-    const effectiveReservation = polledReservation ?? offer.reservationTask;
-
-    const canReserve = !offer.isReserved;
-
-
     const handleDeleteOffer = () => {
         if (confirm("Angebot löschen")) {
-            deleteOffer({id: offer.id});
+            deleteOffer({ id: offer.id });
         }
     };
-
-    console.log(offer);
 
     useEffect(() => {
         if (errorDeletingOffer) {
@@ -113,7 +101,6 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
                             <span>-</span>
                             <span>{quoteId}</span>
                         </div>
-                        {effectiveReservation && <ReservationBadge status={effectiveReservation.status}/>}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-4">
@@ -150,10 +137,10 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
             <Collapsable label="Produkte" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
                     {offerPositions.map((op, i) => (
-                        <OfferPositionRow key={i} op={op}/>
+                        <OfferPositionRow key={i} op={op} />
                     ))}
                     {offerFlatRates.map((fr, i) => (
-                        <OfferFlatRateRow key={i} fr={fr}/>
+                        <OfferFlatRateRow key={i} fr={fr} />
                     ))}
                     <LineItemRow
                         left={<span className="text-sm text-(--text-secondary) font-light">Gesamtpreis</span>}
@@ -165,38 +152,29 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
             <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <Document key={document.id} document={document.document}/>
+                        <Document key={document.id} document={document.document} />
                     ))}
 
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({offerId: offer.id})}
-                    >
+                    <Button className="min-w-fit" variant="primary" size="sm" loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument} onClick={() => generateDocument({ offerId: offer.id })}>
                         Dokument generieren
                     </Button>
                 </div>
             </Collapsable>
 
             <Collapsable label="Versionshistorie" className="w-full bg-(--subtle-50) justify-between rounded-none">
-                <OfferRevisionHistory offerId={offer.id}/>
+                <OfferRevisionHistory offerId={offer.id} />
             </Collapsable>
 
-            <div className="flex items-center justify-end px-2 border-t border-(--border)">
-                <Button
-                    size="xs"
-                    variant="link"
-                    disabled={!canReserve}
-                    onClick={() => createReservation({offer_id: offer.id})}
-                    icon={<RotateCcw className="size-3"/>}
-                    iconOnly
-                />
-                <Button size="xs" variant="link" onClick={() => onEdit(offer)}
-                        icon={<Pen className="size-3"/>} iconOnly/>
-                <Button size="xs" variant="link" onClick={handleDeleteOffer}
-                        icon={<Trash className="size-3"/>} iconOnly/>
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+                <div className="flex items-center gap-2"></div>
+                <div className="flex items-center gap-2">
+                    <Button size="xs" variant="secondary" onClick={() => onEdit(offer)}
+                        icon={<Pen className="size-3" />} iconOnly />
+
+                    <Button size="xs" variant="secondary" onClick={handleDeleteOffer}
+                        icon={<Trash className="size-3" />} iconOnly />
+                </div>
             </div>
         </div>
     );

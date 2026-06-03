@@ -2,11 +2,11 @@ import {Router} from "express";
 
 import {
   createOffer,
+  createReservation,
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
-  enqueueDocumentGenerationJob,
-  enqueueQuoteReservationJob,
+  enqueueGeneration,
   getNextQuoteId,
   getOfferById,
   getOfferRevisions,
@@ -26,9 +26,9 @@ router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
 
-router.post('/:id/reserve', enqueueQuoteReservationJob);
+router.post('/:id/reserve', createReservation);
 
-router.post('/:id/document', enqueueDocumentGenerationJob);
+router.post('/:id/document', enqueueGeneration);
 
 router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
 

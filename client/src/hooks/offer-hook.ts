@@ -22,8 +22,8 @@ import {
     uploadAction,
 } from "@/data/offer";
 
-import {useEffect} from "react";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface OfferQueryParams {
     search?: string;
@@ -33,36 +33,44 @@ interface OfferQueryParams {
 }
 
 export const useOfferRevisionsHook = (offerId: string) => {
-    const {data: revisions = []} = useQuery({
+    const { data: revisions = [] } = useQuery({
         queryKey: ["offers", offerId, "revisions"],
         queryFn: () => getOfferRevisionsAction(offerId),
         enabled: !!offerId,
     });
 
-    return {revisions};
+    return { revisions };
 };
 
 export const useDocumentTask = (taskId?: string) => {
     const queryClient = useQueryClient();
 
-    const {data: task} = useQuery({
+    const { data: task } = useQuery({
         queryKey: ["task", taskId],
         queryFn: () => getTaskByIdAction(taskId!),
-        refetchInterval: (query) =>
-            query.state.data?.status === "COMPLETED" || query.state.data?.status === "FAILED"
-                ? false
-                : 2000,
+        refetchInterval: (query) => {
+            if (query.state.data?.status === "COMPLETED") {
+                return false;
+            }
+
+            if (query.state.data?.status === "FAILED") {
+                return false;
+            }
+
+            return 2000;
+        },
+
         enabled: !!taskId,
     });
 
     useEffect(() => {
         if (task?.status === "COMPLETED") {
-            queryClient.invalidateQueries({queryKey: ["offers"]});
-            queryClient.invalidateQueries({queryKey: ["orders"]});
+            queryClient.invalidateQueries({ queryKey: ["offers"] });
+            queryClient.invalidateQueries({ queryKey: ["orders"] });
         }
     }, [task?.status, queryClient]);
 
-    return {task};
+    return { task };
 };
 
 export const useReservationTask = (taskId?: string) => useDocumentTask(taskId);
@@ -71,27 +79,27 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     const queryClient = useQueryClient();
 
     const invalidate = () =>
-        queryClient.invalidateQueries({queryKey: ["offers"]});
+        queryClient.invalidateQueries({ queryKey: ["offers"] });
 
-    const {data: offers = [], isPending, error} = useQuery({
+    const { data: offers = [], isPending, error } = useQuery({
         queryKey: ["offers", params],
         queryFn: () => getOffersAction(params),
     });
 
-    const {data: contactPersons = []} = useQuery({
+    const { data: contactPersons = [] } = useQuery({
         queryKey: ["contact-persons"],
         queryFn: getContactPersonsAction,
     });
 
     const createMutation = useMutation({
-        mutationFn: ({offer, positions, flatRates}: {
+        mutationFn: ({ offer, positions, flatRates }: {
             offer: CreateOfferInput; positions: CreateOfferPositionInput[]; flatRates: CreateOfferFlatRatesInput[];
         }) => createOfferAction(offer, positions, flatRates),
         onSuccess: invalidate,
     });
 
     const updateMutation = useMutation({
-        mutationFn: ({id, offer, positions, flatRates}: {
+        mutationFn: ({ id, offer, positions, flatRates }: {
             id: string,
             offer: UpdateOfferInput;
             positions: UpdateOfferPositionInput[];
@@ -101,33 +109,33 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     });
 
     const deleteMutation = useMutation({
-        mutationFn: ({id}: { id: string }) => deleteOfferAction(id),
+        mutationFn: ({ id }: { id: string }) => deleteOfferAction(id),
         onSuccess: invalidate,
     });
 
     const deleteDocumentMutation = useMutation({
-        mutationFn: ({documentId}: { documentId: string }) =>
+        mutationFn: ({ documentId }: { documentId: string }) =>
             deleteOfferDocumentAction(documentId),
         onSuccess: invalidate,
     });
 
     const renameDocumentMutation = useMutation({
-        mutationFn: ({document_id, displayName}: { document_id: string, displayName: string }) =>
+        mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
             renameDocumentAction(document_id, displayName),
         onSuccess: invalidate,
     });
 
     const createReservationMutation = useMutation({
-        mutationFn: ({offer_id}: { offer_id: string }) => createReservationAction(offer_id),
+        mutationFn: ({ offer_id }: { offer_id: string }) => createReservationAction(offer_id),
         onSuccess: invalidate,
     });
 
     const uploadMutation = useMutation({
-        mutationFn: ({id}: { id: string }) => uploadAction(id),
+        mutationFn: ({ id }: { id: string }) => uploadAction(id),
     });
 
     const generateDocumentMutation = useMutation({
-        mutationFn: ({offerId}: { offerId: string }) => generateOfferDocumentAction(offerId),
+        mutationFn: ({ offerId }: { offerId: string }) => generateOfferDocumentAction(offerId),
         onSuccess: invalidate,
     });
 

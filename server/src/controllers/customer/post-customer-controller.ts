@@ -1,8 +1,8 @@
-import {Request, Response} from "express";
-import {prisma} from "../../lib/prismaClient.js";
+import { Request, Response } from "express";
+import { prisma } from "../../lib/prismaClient.js";
 
 export const createCustomer = async (request: Request, response: Response) => {
-    const {body} = request;
+    const { body } = request;
 
     if (!body) {
         return response.status(400).json({
@@ -11,14 +11,12 @@ export const createCustomer = async (request: Request, response: Response) => {
         });
     }
 
-    const {contactPersons, ...customerFields} = body;
-
-    console.log(body);
+    const { contactPersons, ...customerFields } = body;
 
     try {
         const createdCustomer = await prisma.$transaction(async (tx) => {
             const customer = await tx.customer.create({
-                data: {...body},
+                data: { ...body },
             });
 
             if (contactPersons?.length > 0) {
@@ -47,7 +45,7 @@ export const createContact = async (request: Request, response: Response) => {
     const body = request.body;
 
     const createdContact = await prisma.contactPerson.create({
-        data: {...body}
+        data: { ...body }
     });
 
     return response.status(200).json(createdContact);
