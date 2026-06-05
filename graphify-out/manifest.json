@@ -112,8 +112,8 @@
     "hash": "4ce70be27971bb9f79f41bef9855fd23"
   },
   "/Users/oskar/Programming/keepit/server/src/repositories/nextcloud-repository.ts": {
-    "mtime": 1780647429.9812226,
-    "hash": "689fbdef9016b0bc2379cf165ca3cef7"
+    "mtime": 1780679540.6615474,
+    "hash": "3912b8b68e5773143b6d20722ff44854"
   },
   "/Users/oskar/Programming/keepit/server/src/permissions/user.ts": {
     "mtime": 1777709447.4540381,
@@ -183,6 +183,10 @@
     "mtime": 1777709466.6603012,
     "hash": "731e7532885ed7152747bd4007515174"
   },
+  "/Users/oskar/Programming/keepit/server/src/lib/document.ts": {
+    "mtime": 1780679695.1378155,
+    "hash": "be30625796b73d1f53517d1b9d282ba4"
+  },
   "/Users/oskar/Programming/keepit/server/src/lib/redis.ts": {
     "mtime": 1780647429.9783635,
     "hash": "738b273f06c9c0947a41ed2c4e49d361"
@@ -211,33 +215,13 @@
     "mtime": 1780647429.9849224,
     "hash": "984e534be8e1a2fa13264f1f801b8b70"
   },
-  "/Users/oskar/Programming/keepit/server/src/service/document/id-registry.ts": {
-    "mtime": 1780647429.9840693,
-    "hash": "d5e38534ae0bd0de32345eb7892d22d2"
-  },
-  "/Users/oskar/Programming/keepit/server/src/service/document/types.ts": {
-    "mtime": 1780647429.984377,
-    "hash": "6cbbcbe389e298db2a7348c4f270ca90"
-  },
-  "/Users/oskar/Programming/keepit/server/src/service/document/nextcloud-location.ts": {
-    "mtime": 1780647429.9841707,
-    "hash": "65eeedfbcd27ab1ab1acd6904924d407"
-  },
-  "/Users/oskar/Programming/keepit/server/src/service/document/document-service.ts": {
-    "mtime": 1780647429.9839618,
-    "hash": "d58b3c1920a8206b6065734fc4582297"
-  },
-  "/Users/oskar/Programming/keepit/server/src/service/document/nextcloud-search.ts": {
-    "mtime": 1780647429.9842737,
-    "hash": "73a055581a323a3922b8a00caec5f8d3"
-  },
   "/Users/oskar/Programming/keepit/server/src/controllers/nextcloud-controller.ts": {
     "mtime": 1780647429.974002,
     "hash": "c31aad49b35335f30a1781eab8f783bb"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/documents-controller.ts": {
-    "mtime": 1780647429.9735157,
-    "hash": "fbfa04c6c25d3495ab78ac3732da135b"
+    "mtime": 1780679868.4070477,
+    "hash": "0b325c719087b665131cb50f033800cc"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/flatrate-controller.ts": {
     "mtime": 1780653417.7014642,
@@ -284,8 +268,8 @@
     "hash": "7ae2aa0a0a0d0b917886a63d2d677601"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/offer/post-offer-controller.ts": {
-    "mtime": 1780647429.9747436,
-    "hash": "f9e3e92f5d50ec0bb9b6cdf853ac7048"
+    "mtime": 1780679829.5172808,
+    "hash": "5f1f7311a881347f66fd3a37e4e30091"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/offer/patch-offer-controller.ts": {
     "mtime": 1780647429.9745374,
