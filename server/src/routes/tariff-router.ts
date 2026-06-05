@@ -26,13 +26,19 @@ import {
 const router = Router();
 
 router.get("/", getAllTariffs);
+
 router.get("/price", getTariffPrice);
+
 router.get("/:id", getTariffById);
+
 router.post("/", validate(createTariffSchema), createTariff);
+
 router.put("/:id", validate(updateTariffSchema), updateTariff);
+
 router.delete("/:id", deleteTariff);
 
 router.post("/:id/configs", validate(createTariffConfigSchema), addTariffConfig);
+
 router.put(
     "/:id/configs/:configId",
     validate(updateTariffConfigSchema),

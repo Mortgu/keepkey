@@ -20,7 +20,7 @@ export default function ProductItem({ product }: { product: Product }) {
   return (
     <>
       <div className="bg-white border border-(--border) rounded-md overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
+        <div className="flex items-center justify-between px-4 py-3">
           <div>
             <p className="text-md text-gray-900">{name}</p>
             <p className="text-sm font-light text-gray-400 mt-0.5">
@@ -36,7 +36,8 @@ export default function ProductItem({ product }: { product: Product }) {
           </div>
         </div>
 
-        {configs.length > 0 && (
+        {/*
+       {configs.length > 0 && (
           <>
             <div className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center px-4 py-1.5 border-b border-(--border) bg-(--page-bg)">
               <span className="text-caption text-gray-400">Vertrag</span>
@@ -62,6 +63,7 @@ export default function ProductItem({ product }: { product: Product }) {
             ))}
           </>
         )}
+      */}
       </div>
 
       {modal.isOpen && (

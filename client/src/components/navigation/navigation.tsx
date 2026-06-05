@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { authClient } from "@/lib/auth-client.ts";
 import { NavLink } from "./nav-link";
 import { useMemo, useState, type ReactNode } from "react";
-import { Button, DEFAULT_LANGUAGE_OPTIONS, type DropdownOption, SegmentedLanguageToggle, SingleDropdown } from "@/components";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle } from "@/components";
 import { tv } from "tailwind-variants";
 
 const ICON_SIZE = 14;
@@ -92,17 +92,8 @@ function UserFooter() {
   );
 }
 
-const languageDropdownOptions: DropdownOption[] = [
-  { value: "en", label: "English" },
-  { value: "de", label: "Deutsch" },
-]
-
 export function Navigation() {
   const { t, i18n } = useTranslation();
-
-  const changeLanguage = (lng: string) => {
-    i18n.changeLanguage(lng);
-  };
 
   return (
     <aside className="flex h-screen w-74 flex-col overflow-hidden">
@@ -113,11 +104,9 @@ export function Navigation() {
         </h1>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
-          value={i18n.language}
+          value={i18n.language.toUpperCase()}
           onChange={(lng) => i18n.changeLanguage(lng)}
         />
-
-
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
@@ -128,7 +117,7 @@ export function Navigation() {
         <Section title={t('catalog')} collapsible>
 
           <NavLink to="/products" label={t('products')} icon={<Package size={ICON_SIZE} />} />
-          <NavLink to="/products/pricing" label={t('pricing')} icon={<DollarSign size={ICON_SIZE} />} />
+          <NavLink to="/pricing" label={t('pricing')} icon={<DollarSign size={ICON_SIZE} />} />
           <NavLink to="/products/flatrates" label={t('flatRates')} icon={<DollarSign size={ICON_SIZE} />} />
 
           <NavLink to="/suppliers" label={t('suppliers')} icon={<Truck size={ICON_SIZE} />} />

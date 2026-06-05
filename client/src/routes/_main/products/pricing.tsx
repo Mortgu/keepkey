@@ -39,7 +39,14 @@ function RouteComponent() {
     const configModal = useModal<string>();
     const locale = useLocale();
 
-    const { tariffs, deleteTariff, deleteConfig, deleteCustomerOverride, isDeletingCustomerOverride } = useTariffHook();
+    const {
+        tariffs,
+        deleteTariff,
+        deleteConfig,
+        deleteCustomerOverride
+    } = useTariffHook();
+
+    console.log(tariffs);
 
     return (
         <Fragment>
