@@ -1,6 +1,7 @@
 import { Button, Input, ModalDialog, Select } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { useContractHook, useProductHook, useTariffHook } from "@/hooks";
+import { useContractHook, useLocale, useProductHook, useTariffHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { Plus, Trash } from "lucide-react";
 import { useMemo, useState, type SyntheticEvent } from "react";
 
@@ -28,14 +29,15 @@ export default function PricingModal({ onClose }: PricingModalProps) {
     const { products } = useProductHook();
     const { contracts } = useContractHook();
     const { createTariff, addConfig, isCreating } = useTariffHook();
+    const locale = useLocale();
 
     const [productIds, setProductIds] = useState<string[]>([]);
     const [rows, setRows] = useState<ConfigRow[]>([]);
     const [submitting, setSubmitting] = useState(false);
 
     const productOptions = useMemo(
-        () => products.map((p) => ({ value: p.id, label: p.name })),
-        [products],
+        () => products.map((p) => ({ value: p.id, label: localized(p.translations, locale, "name") })),
+        [products, locale],
     );
 
     const addRow = () =>
@@ -107,7 +109,7 @@ export default function PricingModal({ onClose }: PricingModalProps) {
                                 <Select value={row.contractId} onChange={(e) => updateRow(i, { contractId: e.target.value })}>
                                     {contracts.map((c) => (
                                         <option key={c.id} value={c.id}>
-                                            {c.name}
+                                            {localized(c.translations, locale, "name")}
                                         </option>
                                     ))}
                                 </Select>

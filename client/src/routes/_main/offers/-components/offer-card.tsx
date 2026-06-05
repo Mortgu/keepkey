@@ -3,7 +3,8 @@ import { Document, LineItemRow } from "./card-components";
 import OfferRevisionHistory from "./card-components/offer-revision-history";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { useOfferHook } from "@/hooks";
+import { useLocale, useOfferHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { Badge, Button, Collapsable } from "@/components";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -15,13 +16,14 @@ type OfferListItemProps = {
 };
 
 function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
+    const locale = useLocale();
     return (
         <LineItemRow
             left={
                 <div className="grid">
                     <div className="flex gap-2">
-                        <p className="text-sm">{op.product.name}</p>
-                        <Badge variant="draft">{op.contract.name}</Badge>
+                        <p className="text-sm">{localized(op.product.translations, locale, "name")}</p>
+                        <Badge variant="draft">{localized(op.contract.translations, locale, "name")}</Badge>
                     </div>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1 text-sm font-light">
@@ -46,11 +48,12 @@ function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
 }
 
 function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
+    const locale = useLocale();
     return (
         <LineItemRow
             left={
                 <div className="grid">
-                    <p className="text-sm">{fr.flatRate.name}</p>
+                    <p className="text-sm">{localized(fr.flatRate.translations, locale, "name")}</p>
                     <div className="flex items-center gap-2">
                         <div className="flex gap-1 text-sm font-light">
                             <span className="text-(--text-secondary)">Anzahl:</span>

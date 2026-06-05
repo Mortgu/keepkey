@@ -2,6 +2,8 @@ import { useState } from "react";
 
 import type { CreateOfferFlatRatesInput, FlatRate } from "@/types";
 import { Button, Input, Select } from "@/components";
+import { useLocale } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 
 interface Props {
   flatRates: FlatRate[];
@@ -11,6 +13,7 @@ interface Props {
 
 export default function OfferFlatRateForm(props: Props) {
   const { flatRates, saveFn, cancelFn } = props;
+  const locale = useLocale();
 
   const [flatRateIndex, setFlatRateIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
@@ -34,7 +37,7 @@ export default function OfferFlatRateForm(props: Props) {
           <Select label="Pauschale" value={flatRates[0].id} onChange={(e) => setFlatRateIndex(parseInt(e.target.value))} className="bg-white">
             {flatRates.map((fr, index) => (
               <option key={index} value={index}>
-                {fr.name}
+                {localized(fr.translations, locale, "name")}
               </option>
             ))}
           </Select>

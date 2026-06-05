@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import type { CreateProductInput, Language, UpdateProductInput } from "@/types";
-import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, SingleDropdown } from "@/components";
+import type { CreateProductInput, Language, ProductTranslationInput, UpdateProductInput } from "@/types";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 import { useState } from "react";
 
 interface ProductModalProps {
@@ -10,31 +10,44 @@ interface ProductModalProps {
     currentItem?: UpdateProductInput | null;
 }
 
-const productScheme = z.object({
+const langFields = z.object({
     name: z.string().min(1, "Mindestens 1 Zeichen"),
     description: z.string(),
     table: z.string(),
 });
 
-const emptyData: CreateProductInput = {
-    name: "",
-    description: "",
-    table: "",
-};
+const productScheme = z.object({
+    key: z.string().min(1, "Schlüssel erforderlich"),
+    DE: langFields,
+    EN: langFields,
+});
+
+function seedLang(translations: UpdateProductInput["translations"], lang: Language) {
+    const t = translations?.find((x) => x.language === lang);
+    return { name: t?.name ?? "", description: t?.description ?? "", table: t?.table ?? "" };
+}
 
 export default function ProductModal({ onClose, submitFn, currentItem = null }: ProductModalProps) {
-    const isEdit = currentItem !== null;
+    const isEdit = currentItem != null;
 
     const [language, setLanguage] = useState<Language>("DE");
 
     const productForm = useForm({
-        defaultValues: currentItem || emptyData,
+        defaultValues: {
+            key: currentItem?.key ?? "",
+            DE: seedLang(currentItem?.translations, "DE"),
+            EN: seedLang(currentItem?.translations, "EN"),
+        },
         validators: {
             onChange: productScheme,
             onMount: productScheme,
         },
         onSubmit: ({ value }) => {
-            submitFn(value as CreateProductInput);
+            const translations: ProductTranslationInput[] = [
+                { language: "DE", ...value.DE },
+                { language: "EN", ...value.EN },
+            ];
+            submitFn({ key: value.key, translations });
             onClose();
         },
     });
@@ -61,10 +74,22 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
 
             <ModalDialog.Content>
                 <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
-                    <productForm.Field name="name" children={(field) => (
+                    <productForm.Field name="key" children={(field) => (
                         <div className="grid gap-1">
                             <Input id={field.name} name={field.name} value={field.state.value}
-                                label="Produkt Name"
+                                label="Schlüssel (sprachunabhängig)"
+                                disabled={isEdit}
+                                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                                placeholder="z.B. managed-server"
+                                onChange={(e) => field.handleChange(e.target.value)}
+                            />
+                        </div>
+                    )} />
+
+                    <productForm.Field name={`${language}.name`} children={(field) => (
+                        <div className="grid gap-1">
+                            <Input id={field.name} name={field.name} value={field.state.value}
+                                label={`Produkt Name (${language})`}
                                 error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                                 placeholder="Produkt Name"
                                 onChange={(e) => field.handleChange(e.target.value)}
@@ -72,10 +97,10 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
                         </div>
                     )} />
 
-                    <productForm.Field name="description" children={(field) => (
+                    <productForm.Field name={`${language}.description`} children={(field) => (
                         <div className="grid gap-1">
                             <label htmlFor={field.name} className="text-sm text-gray-500">
-                                Produkt Beschreibung
+                                Produkt Beschreibung ({language})
                             </label>
                             <textarea rows={5} id={field.name} name={field.name}
                                 className="flex-1 outline-none border border-(--border) p-2 rounded-md"
@@ -85,10 +110,10 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
                         </div>
                     )} />
 
-                    <productForm.Field name="table" children={(field) => (
+                    <productForm.Field name={`${language}.table`} children={(field) => (
                         <div className="grid gap-1">
                             <label htmlFor={field.name} className="text-sm text-gray-500">
-                                Tabelle Beschreibung
+                                Tabelle Beschreibung ({language})
                             </label>
                             <textarea rows={5} id={field.name} name={field.name}
                                 className="flex-1 outline-none border border-(--border) p-2 rounded-md"

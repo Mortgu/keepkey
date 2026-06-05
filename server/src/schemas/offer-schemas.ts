@@ -20,6 +20,7 @@ export const createOfferSchema = z.object({
     contactPersonId: z.string().min(1),
     userId: z.string().min(1),
     quoteId: z.string().min(1),
+    language: z.enum(["DE", "EN"]).default("DE"),
 
     supplierId: z.string().nullable(),
     paymentTerm: z.string().nullable(),

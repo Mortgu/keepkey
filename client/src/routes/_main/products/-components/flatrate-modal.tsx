@@ -1,8 +1,9 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 
-import type { CreateFlatRateInput, UpdateFlatRateInput } from "@/types";
-import { Button, Input, ModalDialog } from "@/components";
+import type { CreateFlatRateInput, FlatRateTranslationInput, Language, UpdateFlatRateInput } from "@/types";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 
 interface FlatRateModalProps {
   onClose: () => void;
@@ -10,29 +11,45 @@ interface FlatRateModalProps {
   currentItem?: UpdateFlatRateInput | null;
 }
 
-const flatRateSchema = z.object({
+const langFields = z.object({
   name: z.string().min(1, "Mindestens 1 Zeichen"),
   table: z.string().min(1, "Mindestens 1 Zeichen"),
-  total_cents: z.number().int().nonnegative(),
 });
 
-const emptyData: CreateFlatRateInput = {
-  name: "",
-  table: "",
-  total_cents: 0,
-};
+const flatRateSchema = z.object({
+  key: z.string().min(1, "Schlüssel erforderlich"),
+  total_cents: z.number().int().nonnegative(),
+  DE: langFields,
+  EN: langFields,
+});
+
+function seedLang(translations: UpdateFlatRateInput["translations"], lang: Language) {
+  const t = translations?.find((x) => x.language === lang);
+  return { name: t?.name ?? "", table: t?.table ?? "" };
+}
 
 export default function FlatRateModal({ onClose, submitFn, currentItem = null }: FlatRateModalProps) {
-  const isEdit = currentItem !== null;
+  const isEdit = currentItem != null;
+
+  const [language, setLanguage] = useState<Language>("DE");
 
   const form = useForm({
-    defaultValues: currentItem || emptyData,
+    defaultValues: {
+      key: currentItem?.key ?? "",
+      total_cents: currentItem?.total_cents ?? 0,
+      DE: seedLang(currentItem?.translations, "DE"),
+      EN: seedLang(currentItem?.translations, "EN"),
+    },
     validators: {
       onChange: flatRateSchema,
       onMount: flatRateSchema,
     },
     onSubmit: ({ value }) => {
-      submitFn(value as CreateFlatRateInput);
+      const translations: FlatRateTranslationInput[] = [
+        { language: "DE", ...value.DE },
+        { language: "EN", ...value.EN },
+      ];
+      submitFn({ key: value.key, total_cents: value.total_cents, translations });
       onClose();
     },
   });
@@ -46,18 +63,39 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
   return (
     <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
-        <h1 className="text-lg">
-          {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
-        </h1>
+        <div className="flex items-center justify-between w-full mr-2">
+          <h1 className="text-lg">
+            {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
+          </h1>
+          <SegmentedLanguageToggle
+            options={DEFAULT_LANGUAGE_OPTIONS}
+            value={language}
+            onChange={(lng) => setLanguage(lng)}
+          />
+        </div>
       </ModalDialog.Header>
 
       <ModalDialog.Content>
         <form id="flatrate-form" onSubmit={handleSubmit} className="grid gap-4">
-          <form.Field name="name">
+          <form.Field name="key">
             {(field) => (
               <div className="grid gap-1">
                 <Input id={field.name} name={field.name} value={field.state.value}
-                  label="Name"
+                  label="Schlüssel (sprachunabhängig)"
+                  disabled={isEdit}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                  placeholder="z.B. setup-fee"
+                  onChange={(e) => field.handleChange(e.target.value)}
+                />
+              </div>
+            )}
+          </form.Field>
+
+          <form.Field name={`${language}.name`}>
+            {(field) => (
+              <div className="grid gap-1">
+                <Input id={field.name} name={field.name} value={field.state.value}
+                  label={`Name (${language})`}
                   error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   placeholder="Flatrate Name"
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -66,19 +104,12 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
             )}
           </form.Field>
 
-          <form.Field name="table">
+          <form.Field name={`${language}.table`}>
             {(field) => (
               <div className="grid gap-1">
-                <div className="flex items-center justify-between">
-                  <label htmlFor={field.name} className="text-sm text-gray-500">
-                    Tabelle
-                  </label>
-                  {field.state.meta.errors.map((error, i) => (
-                    <p key={i} className="text-sm text-red-500">
-                      {(error as unknown as { message?: string })?.message}
-                    </p>
-                  ))}
-                </div>
+                <label htmlFor={field.name} className="text-sm text-gray-500">
+                  Tabelle ({language})
+                </label>
                 <textarea rows={4} id={field.name} name={field.name}
                   value={field.state.value} placeholder="Tabellenbeschreibung"
                   onChange={(e) => field.handleChange(e.target.value)}

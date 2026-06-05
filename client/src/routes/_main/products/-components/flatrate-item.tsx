@@ -1,21 +1,23 @@
-import { useFlatRateHook, useModal } from "@/hooks";
+import { useFlatRateHook, useLocale, useModal } from "@/hooks";
 import { Button } from "@/components";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
+import { localized } from "@/lib/i18n-content";
 import { Pen, Trash } from "lucide-react";
 import FlatRateModal from "./flatrate-modal";
 
-export default function FlatRateItem(item: FlatRate) {
+export default function FlatRateItem({ item }: { item: FlatRate }) {
   const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRateHook();
   const modal = useModal<FlatRate>();
+  const locale = useLocale();
 
   return (
     <>
       <div className="bg-white border border-(--border) rounded-md overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-md text-gray-900">{item.name}</p>
+            <p className="text-md text-gray-900">{localized(item.translations, locale, "name")}</p>
             <p className="text-sm font-light text-gray-400 mt-0.5">
-              {item.table}
+              {localized(item.translations, locale, "table")}
             </p>
           </div>
           <div className="flex items-center gap-4">
@@ -43,7 +45,7 @@ export default function FlatRateItem(item: FlatRate) {
           key={modal.key}
           onClose={modal.close}
           submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatrate: value })}
-          currentItem={{ name: item.name, table: item.table, total_cents: item.total_cents }}
+          currentItem={{ key: item.key, total_cents: item.total_cents, translations: item.translations }}
         />
       )}
     </>

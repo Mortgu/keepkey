@@ -1,5 +1,6 @@
 import { Button, Input, ModalDialog, Select } from "@/components";
-import { useContractHook, useTariffHook } from "@/hooks";
+import { useContractHook, useLocale, useTariffHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { useState, type SyntheticEvent } from "react";
 
 interface TariffConfigModalProps {
@@ -10,6 +11,7 @@ interface TariffConfigModalProps {
 export default function TariffConfigModal({ onClose, tariffId }: TariffConfigModalProps) {
     const { contracts } = useContractHook();
     const { addConfig, isAddingConfig } = useTariffHook();
+    const locale = useLocale();
 
     const [contractId, setContractId] = useState<string>(contracts[0]?.id ?? "");
     const [duration, setDuration] = useState<number>(12);
@@ -46,7 +48,7 @@ export default function TariffConfigModal({ onClose, tariffId }: TariffConfigMod
                         <Select value={contractId} onChange={(e) => setContractId(e.target.value)}>
                             {contracts.map((c) => (
                                 <option key={c.id} value={c.id}>
-                                    {c.name}
+                                    {localized(c.translations, locale, "name")}
                                 </option>
                             ))}
                         </Select>

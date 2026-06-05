@@ -1,9 +1,8 @@
 model Product {
-  id   String @id @default(uuid())
-  name String @unique
+  id  String @id @default(uuid())
+  key String @unique // sprachunabhängiger Identifier (ersetzt das bisherige @unique auf name)
 
-  description String?
-  table       String?
+  translations ProductTranslation[]
 
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
@@ -16,9 +15,23 @@ model Product {
 
   tariffCustomers TariffCustomer[]
 
-  @@index([name])
   @@index([tariffId])
   @@map("product")
+}
+
+model ProductTranslation {
+  productId String
+  language  Language
+
+  name        String
+  description String?
+  table       String?
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, language])
+  @@index([language, name])
+  @@map("product_translation")
 }
 
 model Tariff {

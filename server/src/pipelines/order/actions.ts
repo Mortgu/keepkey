@@ -1,6 +1,7 @@
 import {prisma} from "../../lib/prismaClient.js";
 import {OrderFetchedData, OrderFormattedData} from "./context.js";
 import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
+import {pickTranslation} from "../../utils/i18n.js";
 import {customParser, deepIterate} from "../offer/utils.js";
 import fs from "fs/promises";
 import path from "path";
@@ -21,14 +22,14 @@ export async function fetchOrderData(orderId: string) {
 
                 orderPositions: {
                     include: {
-                        product: true,
-                        contract: true,
+                        product: {include: {translations: true}},
+                        contract: {include: {translations: true}},
                     }
                 },
 
                 flatRates: {
                     include: {
-                        flatRate: true
+                        flatRate: {include: {translations: true}}
                     }
                 }
             }
@@ -44,8 +45,24 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     }
 
     const order = fetchedData.order;
-    const {customer, customerContactPerson: ccp, employee, orderPositions, flatRates} = order;
+    const lang = "DE"; // Orders carry no language yet — default to German.
+    const {customer, customerContactPerson: ccp, employee} = order;
 
+    // Resolve the language variant once and flatten it onto each entity so the
+    // docx template can keep referencing name/description/table/features directly.
+    const orderPositions = order.orderPositions.map((position) => {
+        const pt = pickTranslation(position.product.translations, lang);
+        const ct = pickTranslation(position.contract.translations, lang);
+        return {
+            ...position,
+            product: {...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? ""},
+            contract: {...position.contract, name: ct?.name ?? "", features: ct?.features ?? [], table: ct?.table ?? ""},
+        };
+    });
+    const flatRates = order.flatRates.map((fr) => {
+        const ft = pickTranslation(fr.flatRate.translations, lang);
+        return {...fr, flatRate: {...fr.flatRate, name: ft?.name ?? "", table: ft?.table ?? ""}};
+    });
 
     const products = orderPositions.map((position) => ({
         contract: position.contract,

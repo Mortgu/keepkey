@@ -105,9 +105,10 @@ model Supplier {
 
 model FlatRate {
   id          String @id @default(uuid())
-  name        String
-  table       String
+  key         String @unique // sprachunabhängiger Identifier
   total_cents Int
+
+  translations FlatRateTranslation[]
 
   offerFlatRates OfferFlatRate[]
   orderFlatRates OrderFlatRate[]
@@ -115,13 +116,24 @@ model FlatRate {
   @@map("flat_rate")
 }
 
+model FlatRateTranslation {
+  flatRateId String
+  language   Language
+
+  name  String
+  table String
+
+  flatRate FlatRate @relation(fields: [flatRateId], references: [id], onDelete: Cascade)
+
+  @@id([flatRateId, language])
+  @@map("flat_rate_translation")
+}
+
 model Contract {
-  id String @id @default(uuid())
+  id  String @id @default(uuid())
+  key String @unique // sprachunabhängiger Identifier
 
-  name     String
-  features String[]
-
-  table String @default("")
+  translations ContractTranslation[]
 
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
@@ -132,6 +144,20 @@ model Contract {
   createdAt DateTime? @default(now())
 
   @@map("contract")
+}
+
+model ContractTranslation {
+  contractId String
+  language   Language
+
+  name     String
+  features String[]
+  table    String @default("")
+
+  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+
+  @@id([contractId, language])
+  @@map("contract_translation")
 }
 
 enum Language {

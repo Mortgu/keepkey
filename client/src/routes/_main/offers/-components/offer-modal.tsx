@@ -7,8 +7,8 @@ import { Loader, Plus, Trash, X } from "lucide-react";
 import { type OfferProductInput } from "./modal-components/offer-product-form";
 import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
-import { useCustomerHook, useFlatRateHook, useOfferHook, useSupplierHook, useUserHook } from "@/hooks";
-import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, Select, type LanguageOption } from "@/components";
+import { useCustomerHook, useFlatRateHook, useLocale, useOfferHook, useSupplierHook, useUserHook } from "@/hooks";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, Select } from "@/components";
 
 import type {
     ContactPerson,
@@ -25,9 +25,9 @@ import type {
 } from "@/types";
 
 import { formatEur } from "@/utils/utils";
+import { localized } from "@/lib/i18n-content";
 import ProductModalSection from "./modal-components/product-section";
 import { useAuth } from "@/context/auth";
-import { useTranslation } from "react-i18next";
 
 interface OfferModalProps {
     onClose: () => void;
@@ -39,6 +39,7 @@ export const offerSchema = z.object({
     contactPersonId: z.string().min(1, "Required!"),
     userId: z.string().min(1, "Required!"),
     quoteId: z.string().min(1, "Required!"),
+    language: z.enum(["DE", "EN"]),
 
     supplierId: z.string().nullable(),
     paymentTerm: z.string(),
@@ -54,6 +55,7 @@ const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.i
             contactPersonId: currentOffer.contactPersonId,
             userId: currentOffer.userId,
             quoteId: currentOffer.quoteId,
+            language: currentOffer.language ?? "DE",
             supplierId: currentOffer.supplierId ?? null,
             paymentTerm: currentOffer.paymentTerm,
             validUntil: currentOffer.validUntil ?? null,
@@ -66,6 +68,7 @@ const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.i
         contactPersonId: defaults?.contactPersonId ?? "",
         userId: defaults?.userId ?? "",
         quoteId: defaults?.quoteId ?? "",
+        language: defaults?.language ?? "DE",
         supplierId: defaults?.supplierId ?? null,
         paymentTerm: defaults?.paymentTerm ?? "30 Tage",
         validUntil: defaults?.validUntil ?? null,
@@ -83,7 +86,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
     const { users } = useUserHook();
     const { flatRates } = useFlatRateHook();
 
-    const [language, setLanguage] = useState<string>("de");
+    const locale = useLocale();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
         currentOffer?.offerPositions.map((pos) => ({
@@ -158,11 +161,13 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                 <div className="flex items-center justify-between w-full mr-2">
                     <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
 
-                    <SegmentedLanguageToggle
-                        options={DEFAULT_LANGUAGE_OPTIONS}
-                        value={language}
-                        onChange={(lng) => setLanguage(lng)}
-                    />
+                    <offerForm.Field name="language" children={(field) => (
+                        <SegmentedLanguageToggle
+                            options={DEFAULT_LANGUAGE_OPTIONS}
+                            value={field.state.value}
+                            onChange={(lng) => field.handleChange(lng)}
+                        />
+                    )} />
                 </div>
             </ModalDialog.Header>
             <ModalDialog.Content>
@@ -327,7 +332,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                                     className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
                                     <div className="grid">
                                         <p className="flex items-center gap-1 text-sm">{flatRate.quantity} <X
-                                            className="size-3" /> {flatRate.flatRate.name}</p>
+                                            className="size-3" /> {localized(flatRate.flatRate.translations, locale, "name")}</p>
                                         <p className="text-xs text-(--text-secondary)">{formatEur(flatRate.total_cents)}</p>
                                     </div>
                                     <div>

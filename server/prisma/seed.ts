@@ -20,45 +20,115 @@ const SUPPLIERS = [
 ];
 
 const CONTRACTS = [
-    {name: "Basic", features: ["E-Mail-Support", "8×5 Verfügbarkeit", "Standard-SLA"], table: "contract_basic"},
     {
-        name: "Professional",
-        features: ["Telefon- & E-Mail-Support", "24×7 Verfügbarkeit", "Premium-SLA", "Priorisierte Bearbeitung"],
-        table: "contract_pro"
+        key: "basic",
+        translations: {
+            DE: {name: "Basic", features: ["E-Mail-Support", "8×5 Verfügbarkeit", "Standard-SLA"], table: "contract_basic"},
+            EN: {name: "Basic", features: ["Email support", "8×5 availability", "Standard SLA"], table: "contract_basic"},
+        },
     },
     {
-        name: "Enterprise",
-        features: ["Dedizierter Account Manager", "24×7 Verfügbarkeit", "Enterprise-SLA", "On-Site Support", "Custom Development"],
-        table: "contract_enterprise"
+        key: "professional",
+        translations: {
+            DE: {
+                name: "Professional",
+                features: ["Telefon- & E-Mail-Support", "24×7 Verfügbarkeit", "Premium-SLA", "Priorisierte Bearbeitung"],
+                table: "contract_pro",
+            },
+            EN: {
+                name: "Professional",
+                features: ["Phone & email support", "24×7 availability", "Premium SLA", "Prioritized handling"],
+                table: "contract_pro",
+            },
+        },
+    },
+    {
+        key: "enterprise",
+        translations: {
+            DE: {
+                name: "Enterprise",
+                features: ["Dedizierter Account Manager", "24×7 Verfügbarkeit", "Enterprise-SLA", "On-Site Support", "Custom Development"],
+                table: "contract_enterprise",
+            },
+            EN: {
+                name: "Enterprise",
+                features: ["Dedicated account manager", "24×7 availability", "Enterprise SLA", "On-site support", "Custom development"],
+                table: "contract_enterprise",
+            },
+        },
     },
 ];
 
 const PRODUCTS = [
-    {name: "Managed Server", description: "Vollständig verwalteter Server inkl. Backup & Monitoring", table: "server"},
-    {name: "Cloud Storage", description: "Skalierbarer Objektspeicher mit S3-kompatibler API", table: "storage"},
-    {name: "E-Mail Hosting", description: "Business-E-Mail mit Exchange- und IMAP-Unterstützung", table: "email"},
-    {name: "Webhosting", description: "Shared-Hosting mit PHP, MySQL und SSL-Zertifikat", table: "webhosting"},
-    {name: "DDoS Protection", description: "Edge-Schutz gegen DDoS-Angriffe", table: "security"},
+    {
+        key: "managed-server",
+        translations: {
+            DE: {name: "Managed Server", description: "Vollständig verwalteter Server inkl. Backup & Monitoring", table: "server"},
+            EN: {name: "Managed Server", description: "Fully managed server incl. backup & monitoring", table: "server"},
+        },
+    },
+    {
+        key: "cloud-storage",
+        translations: {
+            DE: {name: "Cloud Storage", description: "Skalierbarer Objektspeicher mit S3-kompatibler API", table: "storage"},
+            EN: {name: "Cloud Storage", description: "Scalable object storage with S3-compatible API", table: "storage"},
+        },
+    },
+    {
+        key: "email-hosting",
+        translations: {
+            DE: {name: "E-Mail Hosting", description: "Business-E-Mail mit Exchange- und IMAP-Unterstützung", table: "email"},
+            EN: {name: "Email Hosting", description: "Business email with Exchange and IMAP support", table: "email"},
+        },
+    },
+    {
+        key: "webhosting",
+        translations: {
+            DE: {name: "Webhosting", description: "Shared-Hosting mit PHP, MySQL und SSL-Zertifikat", table: "webhosting"},
+            EN: {name: "Web Hosting", description: "Shared hosting with PHP, MySQL and SSL certificate", table: "webhosting"},
+        },
+    },
+    {
+        key: "ddos-protection",
+        translations: {
+            DE: {name: "DDoS Protection", description: "Edge-Schutz gegen DDoS-Angriffe", table: "security"},
+            EN: {name: "DDoS Protection", description: "Edge protection against DDoS attacks", table: "security"},
+        },
+    },
 ];
 
 /** Price in cents (Euro) */
 const TARIFF_CONFIGS = [
     // Basic
-    {contractName: "Basic", duration: 12, min_quantity: 1, max_quantity: 5, price: 4_900},
-    {contractName: "Basic", duration: 12, min_quantity: 6, max_quantity: 25, price: 3_900},
-    {contractName: "Basic", duration: 24, min_quantity: 1, max_quantity: 5, price: 4_400},
+    {contractKey: "basic", duration: 12, min_quantity: 1, max_quantity: 5, price: 4_900},
+    {contractKey: "basic", duration: 12, min_quantity: 6, max_quantity: 25, price: 3_900},
+    {contractKey: "basic", duration: 24, min_quantity: 1, max_quantity: 5, price: 4_400},
     // Professional
-    {contractName: "Professional", duration: 12, min_quantity: 1, max_quantity: 10, price: 9_900},
-    {contractName: "Professional", duration: 12, min_quantity: 11, max_quantity: 50, price: 8_400},
-    {contractName: "Professional", duration: 24, min_quantity: 1, max_quantity: 10, price: 8_900},
+    {contractKey: "professional", duration: 12, min_quantity: 1, max_quantity: 10, price: 9_900},
+    {contractKey: "professional", duration: 12, min_quantity: 11, max_quantity: 50, price: 8_400},
+    {contractKey: "professional", duration: 24, min_quantity: 1, max_quantity: 10, price: 8_900},
     // Enterprise
-    {contractName: "Enterprise", duration: 12, min_quantity: 1, max_quantity: null, price: 19_900},
-    {contractName: "Enterprise", duration: 24, min_quantity: 1, max_quantity: null, price: 17_900},
+    {contractKey: "enterprise", duration: 12, min_quantity: 1, max_quantity: null, price: 19_900},
+    {contractKey: "enterprise", duration: 24, min_quantity: 1, max_quantity: null, price: 17_900},
 ];
 
 const FLAT_RATES = [
-    {name: "Einrichtungsgebühr", table: "setup_fee", total_cents: 299_00},
-    {name: "Migrationsservice", table: "migration", total_cents: 499_00},
+    {
+        key: "setup-fee",
+        total_cents: 299_00,
+        translations: {
+            DE: {name: "Einrichtungsgebühr", table: "setup_fee"},
+            EN: {name: "Setup fee", table: "setup_fee"},
+        },
+    },
+    {
+        key: "migration-service",
+        total_cents: 499_00,
+        translations: {
+            DE: {name: "Migrationsservice", table: "migration"},
+            EN: {name: "Migration service", table: "migration"},
+        },
+    },
 ];
 
 const CUSTOMERS = [
@@ -143,15 +213,25 @@ async function seedSuppliers() {
 async function seedContracts() {
     const results = [];
     for (const data of CONTRACTS) {
-        let contract = await prisma.contract.findFirst({
-            where: {name: data.name},
+        let contract = await prisma.contract.findUnique({
+            where: {key: data.key},
         });
 
         if (!contract) {
-            contract = await prisma.contract.create({data});
-            console.log(`Contract created: ${contract.name}`);
+            contract = await prisma.contract.create({
+                data: {
+                    key: data.key,
+                    translations: {
+                        create: [
+                            {language: "DE", ...data.translations.DE},
+                            {language: "EN", ...data.translations.EN},
+                        ],
+                    },
+                },
+            });
+            console.log(`Contract created: ${data.key}`);
         } else {
-            console.log(`Contract exists: ${contract.name}`);
+            console.log(`Contract exists: ${data.key}`);
         }
         results.push(contract);
     }
@@ -174,16 +254,25 @@ async function seedProductsAndTariff() {
     const products = [];
     for (const data of PRODUCTS) {
         let product = await prisma.product.findUnique({
-            where: {name: data.name},
+            where: {key: data.key},
         });
 
         if (!product) {
             product = await prisma.product.create({
-                data: {...data, tariffId: existingTariff.id},
+                data: {
+                    key: data.key,
+                    tariffId: existingTariff.id,
+                    translations: {
+                        create: [
+                            {language: "DE", ...data.translations.DE},
+                            {language: "EN", ...data.translations.EN},
+                        ],
+                    },
+                },
             });
-            console.log(`Product created: ${product.name}`);
+            console.log(`Product created: ${data.key}`);
         } else {
-            console.log(`Product exists: ${product.name}`);
+            console.log(`Product exists: ${data.key}`);
         }
         products.push(product);
     }
@@ -191,11 +280,11 @@ async function seedProductsAndTariff() {
     return {tariff: existingTariff, products};
 }
 
-async function seedTariffConfigs(tariffId: string, contracts: { id: string; name: string }[]) {
-    const contractMap = new Map(contracts.map((c) => [c.name, c.id]));
+async function seedTariffConfigs(tariffId: string, contracts: { id: string; key: string }[]) {
+    const contractMap = new Map(contracts.map((c) => [c.key, c.id]));
 
     for (const cfg of TARIFF_CONFIGS) {
-        const contractId = contractMap.get(cfg.contractName);
+        const contractId = contractMap.get(cfg.contractKey);
         if (!contractId) continue;
 
         const existing = await prisma.tariffConfig.findUnique({
@@ -233,15 +322,26 @@ async function seedTariffConfigs(tariffId: string, contracts: { id: string; name
 
 async function seedFlatRates() {
     for (const data of FLAT_RATES) {
-        let flatRate = await prisma.flatRate.findFirst({
-            where: {name: data.name},
+        let flatRate = await prisma.flatRate.findUnique({
+            where: {key: data.key},
         });
 
         if (!flatRate) {
-            flatRate = await prisma.flatRate.create({data});
-            console.log(`FlatRate created: ${flatRate.name}`);
+            flatRate = await prisma.flatRate.create({
+                data: {
+                    key: data.key,
+                    total_cents: data.total_cents,
+                    translations: {
+                        create: [
+                            {language: "DE", ...data.translations.DE},
+                            {language: "EN", ...data.translations.EN},
+                        ],
+                    },
+                },
+            });
+            console.log(`FlatRate created: ${data.key}`);
         } else {
-            console.log(`FlatRate exists: ${flatRate.name}`);
+            console.log(`FlatRate exists: ${data.key}`);
         }
     }
 }

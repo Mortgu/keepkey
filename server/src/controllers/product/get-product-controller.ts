@@ -5,9 +5,10 @@ export const getProducts = async (request: Request, response: Response, next: Ne
     const products = await prisma.product.findMany({
         orderBy: {createdAt: "asc"},
         include: {
+            translations: true,
             tariff: {
                 include: {
-                    configs: {include: {contract: true}},
+                    configs: {include: {contract: {include: {translations: true}}}},
                 },
             },
         },
@@ -33,6 +34,7 @@ export const getProduct = async (request: Request, response: Response, next: Nex
 
     const product = await prisma.product.findUnique({
         where: {id: id as string},
+        include: {translations: true},
     });
 
     return response.status(200).json(product);

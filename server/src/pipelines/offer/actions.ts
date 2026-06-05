@@ -1,4 +1,5 @@
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { pickTranslation } from "../../utils/i18n.js";
 import { OfferFetchData, OfferFormatedData } from "./context.js";
 import { customParser, deepIterate } from "./utils.js";
 import env from "../../lib/env.js";
@@ -22,13 +23,13 @@ export async function fetchOfferData(offerId: string) {
                 user: true,
                 offerPositions: {
                     include: {
-                        product: true,
-                        contract: true,
+                        product: { include: { translations: true } },
+                        contract: { include: { translations: true } },
                     },
                 },
                 offerFlatRates: {
                     include: {
-                        flatRate: true,
+                        flatRate: { include: { translations: true } },
                     },
                 },
             },
@@ -46,13 +47,28 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
     }
 
     const offer = fetchedData.offer;
+    const lang = offer.language;
     const {
         customer,
         customerContactPerson: ccp,
         user: employee,
-        offerPositions,
-        offerFlatRates,
     } = offer;
+
+    // Resolve the language variant once and flatten it onto each entity so the
+    // docx template can keep referencing name/description/table/features directly.
+    const offerPositions = offer.offerPositions.map((position) => {
+        const pt = pickTranslation(position.product.translations, lang);
+        const ct = pickTranslation(position.contract.translations, lang);
+        return {
+            ...position,
+            product: { ...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? "" },
+            contract: { ...position.contract, name: ct?.name ?? "", features: ct?.features ?? [], table: ct?.table ?? "" },
+        };
+    });
+    const offerFlatRates = offer.offerFlatRates.map((fr) => {
+        const ft = pickTranslation(fr.flatRate.translations, lang);
+        return { ...fr, flatRate: { ...fr.flatRate, name: ft?.name ?? "", table: ft?.table ?? "" } };
+    });
 
     const products = offerPositions.map((position) => ({
         contract: position.contract,
@@ -188,10 +204,12 @@ export async function converting(docxBuffer: Buffer): Promise<Buffer> {
 }
 
 export async function writeGeneratedDocuments(fetchedData: OfferFetchData, documentId: string, version: number, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<string> {
-    const { quoteId, customer, offerPositions } = fetchedData.offer;
+    const { quoteId, customer, offerPositions, language } = fetchedData.offer;
 
     const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
-    const formatedWorkloads = offerPositions.map((op) => op.product.name.replaceAll(" ", "").trim()).join("+");
+    const formatedWorkloads = offerPositions
+        .map((op) => (pickTranslation(op.product.translations, language)?.name ?? "").replaceAll(" ", "").trim())
+        .join("+");
 
     const name = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
 

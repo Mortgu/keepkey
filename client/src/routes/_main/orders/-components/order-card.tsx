@@ -1,4 +1,5 @@
-import { useOrderHook } from "@/hooks";
+import { useLocale, useOrderHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { Trash } from "lucide-react";
 import { formatDate } from "@/lib/format.ts";
 import React from "react";
@@ -12,6 +13,7 @@ type Props = {
 
 export default function OrderCard({ order }: Props) {
     const { deleteOrder, errorDeletingOrder, isDeleting } = useOrderHook();
+    const locale = useLocale();
 
     return (
         <React.Fragment>
@@ -43,9 +45,9 @@ export default function OrderCard({ order }: Props) {
                         <div key={position.id}
                             className="flex items-center justify-between border-b border-(--border) px-3 py-2">
                             <div className="flex items-center gap-2">
-                                <p>{position.product.name}</p>
+                                <p>{localized(position.product.translations, locale, "name")}</p>
                                 <p className="text-gray-500">
-                                    ({position.contract.name} / {position.duration_months} Monate)
+                                    ({localized(position.contract.translations, locale, "name")} / {position.duration_months} Monate)
                                 </p>
                             </div>
                             <p>0 €</p>

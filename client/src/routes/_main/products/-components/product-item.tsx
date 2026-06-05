@@ -2,15 +2,19 @@ import { Pen, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
 import { Badge, Button } from "@/components";
-import { useModal, useProductHook } from "@/hooks";
+import { useLocale, useModal, useProductHook } from "@/hooks";
 import type { Product } from "@/types";
+import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
-export default function ProductItem(product: Product) {
+export default function ProductItem({ product }: { product: Product }) {
   const { deleteProduct, updateProduct, isDeletingProduct } = useProductHook();
   const modal = useModal<Product>();
+  const locale = useLocale();
 
-  const { name, description, table, tariff } = product;
+  const name = localized(product.translations, locale, "name");
+  const description = localized(product.translations, locale, "description");
+  const { tariff } = product;
   const configs = tariff?.configs ?? [];
 
   return (
@@ -18,9 +22,9 @@ export default function ProductItem(product: Product) {
       <div className="bg-white border border-(--border) rounded-md overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
           <div>
-            <p className="text-md text-gray-900">{product.name}</p>
+            <p className="text-md text-gray-900">{name}</p>
             <p className="text-sm font-light text-gray-400 mt-0.5">
-              {product.description}
+              {description}
             </p>
           </div>
           <div className="flex items-center gap-1">
@@ -43,7 +47,7 @@ export default function ProductItem(product: Product) {
             {configs.map((config) => (
               <div key={config.id} className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
                 <p className="text-sm text-gray-700 truncate">
-                  <Badge variant="generated">{config.contract?.name}</Badge>
+                  <Badge variant="generated">{localized(config.contract?.translations, locale, "name")}</Badge>
                 </p>
                 <p className="text-sm text-gray-600 text-center">
                   {config.min_quantity}–{config.max_quantity ?? "∞"}
@@ -63,7 +67,7 @@ export default function ProductItem(product: Product) {
       {modal.isOpen && (
         <ProductModal key={modal.key} onClose={modal.close}
           submitFn={(value) => updateProduct({ id: product.id, product: value })}
-          currentItem={{ name, description, table }}
+          currentItem={{ key: product.key, translations: product.translations }}
         />
       )}
     </>
