@@ -1,67 +1,33 @@
 enum DocumentStatus {
-  UPLOADED
-  UPLOADING
-  GENERATED
-  PROCESSING
   PENDING
+  PROCESSING
+  GENERATED
+  UPLOADING
+  UPLOADED
   FAILED
+}
+
+enum DocumentFormat {
+  PDF
+  DOCX
+  RESERVED
 }
 
 model Document {
   id String @id @default(cuid())
 
-  version     Int
   displayName String?
+  format      DocumentFormat
+  status      DocumentStatus @default(PENDING)
+  path        String?
 
-  pdfReady  Boolean @default(false)
-  docxReady Boolean @default(false)
+  taskId String? @unique
+  task   Task?   @relation("DocumentTask", fields: [taskId], references: [id])
 
-  status    DocumentStatus @default(PENDING)
-  isCurrent Boolean
-
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String?
-
-  order   Order?  @relation(fields: [orderId], references: [id])
-  orderId String?
+  offerDocument OfferDocument?
+  orderDocument OrderDocument?
 
   createdAt DateTime @default(now())
 
-  @@unique([offerId, version])
   @@map("document")
-}
-
-enum TaskStatus {
-  COMPLETED
-  RUNNING
-  PENDING
-  FAILED
-}
-
-enum TaskType {
-  OFFER
-  ORDER
-  RENEWAL
-  RESERVATION
-}
-
-model Task {
-  id    String  @id @default(cuid())
-  jobId String? // BullMQ job id
-
-  status TaskStatus @default(PENDING)
-  type   TaskType
-
-  offer   Offer?  @relation(fields: [offerId], references: [id])
-  offerId String?
-
-  order   Order?  @relation(fields: [orderId], references: [id])
-  orderId String?
-
-  error String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now())
-
-  @@map("task")
 }

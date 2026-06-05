@@ -1,6 +1,5 @@
-import { z } from "zod";
+import {z} from "zod";
 
-export const updateNextcloudPathsSchema = z.object({
-  pdfPath: z.string().min(1),
-  docxPath: z.string().min(1),
+export const reserveSchema = z.object({
+    id: z.string().min(1),
 });

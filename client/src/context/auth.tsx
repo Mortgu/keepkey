@@ -31,8 +31,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     retry: false,
   });
 
-  console.log(user);
-
   const logout = async () => {
     await authClient.signOut();
     await navigate({ to: "/login" });

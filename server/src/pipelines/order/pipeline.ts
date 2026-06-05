@@ -1,14 +1,7 @@
-import { runPipeline } from "../pipeline.js";
-import { OrderPipelineContext } from "./context.js";
-import { orderStages } from "./stages.js";
+import {runPipeline} from "../pipeline.js";
+import {orderStages} from "./stages.js";
+import {OrderPipelineContext} from "./context.js";
 
-type Result = {
-    displayName: string;
-}
-
-export async function generateOrderDocument(orderId: string, taskId: string, documentId: string, version: number): Promise<Result> {
-    const ctx: OrderPipelineContext = { orderId, taskId, documentId, version };
-    const result = await runPipeline(ctx, orderStages);
-
-    return { displayName: result.displayName! };
+export default async function runOrderPipeline(context: OrderPipelineContext) {
+    return await runPipeline(context, orderStages);
 }

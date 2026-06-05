@@ -1,207 +1,181 @@
-import React from "react";
-import {AlertTriangle, Loader, Pen, RotateCcw, Trash} from "lucide-react";
-
+import type { Offer, OfferDocument } from "@/types";
+import { Document, LineItemRow } from "./card-components";
+import OfferRevisionHistory from "./card-components/offer-revision-history";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { DocumentItem } from "./card-components";
-import OfferRevisionHistory from "./card-components/offer-revision-history";
-
-
 import { useOfferHook } from "@/hooks";
-import { Button, Badge, Collapsable } from "@/components";
-import type { Document, Offer, OfferFlatRate, OfferPosition } from "@/types";
-
-type Task = Offer["tasks"][number];
+import { Badge, Button, Collapsable } from "@/components";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { Pen, Trash } from "lucide-react";
 
 type OfferListItemProps = {
-  offer: Offer;
-  onEdit: (offer: Offer) => void;
+    offer: Offer;
+    onEdit: (offer: Offer) => void;
 };
 
-export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
-  const { customerContactPerson: ccp, offerPositions, offerFlatRates, tasks } = offer;
-  const { deleteOffer, createReservation } = useOfferHook();
-
-  const reservationTask = tasks.find((t: Task) => t.type === "RESERVATION");
-
-  const handleDeleteOffer = () => {
-    if (confirm("Angebot löschen")) {
-      deleteOffer({ id: offer.id });
-    }
-  };
-
-  return (
-    <React.Fragment>
-      <div className="border border-(--border) rounded-md">
-        <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
-          <div className="grid gap-1">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-2 text-md">
-                <a className="text-(--text) hover:cursor-pointer hover:underline">{offer.customer.companyName}</a>
-                -
-                <a>{offer.quoteId}</a>
-                <span className="text-xs text-(--text-secondary) font-light">v{offer.version}</span>
-              </div>
-              <Badge variant="failed">
-                Failed
-              </Badge>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-4">
-
-              {/* Contact person */}
-              <div className="flex items-center gap-1 text-sm font-light">
-                <label className="text-(--text-secondary)">Kontakt:</label>
-                <p className="text-(--text) hover:cursor-pointer hover:underline">
-                  {ccp.salutation} {ccp.firstName} {ccp.lastName}
-                </p>
-              </div>
-
-              {/* Offer-Id. */}
-              <div className="flex items-center gap-1 text-sm font-light">
-                <label className="text-(--text-secondary)">Angebots-Nr.</label>
-                <p className="text-(--text)">{offer.quoteId}</p>
-                {reservationTask && (reservationTask.status === "PENDING" || reservationTask.status === "RUNNING") && (
-                  <span className="flex items-center gap-1 text-(--text-secondary) text-xs ml-1" title="Reservierung in NextCloud läuft…">
-                    <Loader className="size-3 animate-spin" />
-                    Reservierung…
-                  </span>
-                )}
-                {reservationTask?.status === "FAILED" && (
-                  <span className="flex items-center gap-1 text-(--destructive) text-xs ml-1"
-                    title={reservationTask.error ?? "Unbekannter Fehler"}>
-                    <AlertTriangle className="size-3" />
-                    Reservierung fehlgeschlagen
-                  </span>
-                )}
-              </div>
-
-              {/* Created at */}
-              <div className="flex items-center gap-1 text-sm font-light">
-                <label className="text-(--text-secondary)">Erstellt:</label>
-                <p className="text-(--text)">
-                  {formatDate(offer.createdAt ?? "")}
-                </p>
-              </div>
-
-              {/* Valid until */}
-              <div className="flex items-center gap-1 text-sm font-light">
-                <label className="text-(--text-secondary)">Gültig bis:</label>
-                <p className="text-(--text)">
-                  {offer.validUntil ? formatDate(offer.validUntil) : "-"}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Total display */}
-          <div className="flex flex-col items-end">
-            <p className="text-md font-semibold">
-              {formatEur(offer.net_amount)}
-            </p>
-            <p className="text-(--text-secondary) font-light text-sm">
-              Gesamtpreis
-            </p>
-          </div>
-
-        </div>
-
-        {/* Products */}
-        <Collapsable label="Produkte" className="w-full bg-(--subtle-50) justify-between rounded-none">
-          <div className="grid gap-2 px-4 py-3">
-
-            {/* Product */}
-            {offerPositions.map((op: OfferPosition, i: number) => (
-              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
+function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
+    return (
+        <LineItemRow
+            left={
                 <div className="grid">
-                  <div className="flex gap-2">
-                    <p className="text-sm">{op.product.name}</p>
-                    <Badge variant="draft">{op.contract.name}</Badge>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1 text-sm font-light">
-                      <span className="text-(--text-secondary)">Seats:</span>
-                      <p>{op.quantity}</p>
+                    <div className="flex gap-2">
+                        <p className="text-sm">{op.product.name}</p>
+                        <Badge variant="draft">{op.contract.name}</Badge>
                     </div>
-                    <div className="flex gap-1 text-sm font-light">
-                      <span className="text-(--text-secondary)">Laufzeit:</span>
-                      <p>{op.duration_months} Monate</p>
+                    <div className="flex items-center gap-2">
+                        <div className="flex gap-1 text-sm font-light">
+                            <span className="text-(--text-secondary)">Seats:</span>
+                            <p>{op.quantity}</p>
+                        </div>
+                        <div className="flex gap-1 text-sm font-light">
+                            <span className="text-(--text-secondary)">Laufzeit:</span>
+                            <p>{op.duration_months} Monate</p>
+                        </div>
                     </div>
-                  </div>
                 </div>
-                <div className="flex flex-col items-end">
-                  <p className="text-sm font-semibold">
-                    {formatEur(op.total_cents)}
-                  </p>
-                  <p className="text-(--text-secondary) font-light text-sm">
-                    Gesamtpreis (netto)
-                  </p>
-                </div>
-              </div>
-            ))}
+            }
+            right={
+                <>
+                    <p className="text-sm font-semibold">{formatEur(op.total_cents)}</p>
+                    <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis (netto)</p>
+                </>
+            }
+        />
+    );
+}
 
-            {offerFlatRates.map((fr: OfferFlatRate, i: number) => (
-              <div key={i} className="flex items-center justify-between gap-2 border border-(--border) py-2 px-3 rounded-md">
+function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
+    return (
+        <LineItemRow
+            left={
                 <div className="grid">
-                  <div className="flex gap-2">
                     <p className="text-sm">{fr.flatRate.name}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1 text-sm font-light">
-                      <span className="text-(--text-secondary)">Anzahl:</span>
-                      <p>{fr.quantity}</p>
+                    <div className="flex items-center gap-2">
+                        <div className="flex gap-1 text-sm font-light">
+                            <span className="text-(--text-secondary)">Anzahl:</span>
+                            <p>{fr.quantity}</p>
+                        </div>
                     </div>
-                  </div>
                 </div>
+            }
+            right={
+                <>
+                    <p className="text-sm font-semibold">{formatEur(fr.total_cents)}</p>
+                    <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis (netto)</p>
+                </>
+            }
+        />
+    );
+}
+
+export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const { customerContactPerson: ccp, quoteId, offerPositions, offerFlatRates, customer } = offer;
+    const {
+        deleteOffer,
+        errorDeletingOffer,
+
+        generateDocument,
+        isGeneratingDocument
+    } = useOfferHook();
+
+    const handleDeleteOffer = () => {
+        if (confirm("Angebot löschen")) {
+            deleteOffer({ id: offer.id });
+        }
+    };
+
+    useEffect(() => {
+        if (errorDeletingOffer) {
+            toast.error(`${errorDeletingOffer}`);
+        }
+    }, [errorDeletingOffer]);
+
+    return (
+        <div className="border border-(--border) rounded-md">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
+                <div className="grid gap-1">
+                    <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2 text-md">
+                            <span className="text-(--text)">{customer.companyName}</span>
+                            <span>-</span>
+                            <span>{quoteId}</span>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex items-center gap-1 text-sm font-light">
+                            <label className="text-(--text-secondary)">Kontakt:</label>
+                            <p className="text-(--text)">
+                                {ccp.salutation} {ccp.firstName} {ccp.lastName}
+                            </p>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-sm font-light">
+                            <label className="text-(--text-secondary)">Angebots-Nr.</label>
+                            <p className="text-(--text)">{quoteId}</p>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-sm font-light">
+                            <label className="text-(--text-secondary)">Erstellt:</label>
+                            <p className="text-(--text)">{formatDate(offer.createdAt)}</p>
+                        </div>
+
+                        <div className="flex items-center gap-1 text-sm font-light">
+                            <label className="text-(--text-secondary)">Gültig bis:</label>
+                            <p className="text-(--text)">{offer.validUntil ? formatDate(offer.validUntil) : "-"}</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="flex flex-col items-end">
-                  <p className="text-sm font-semibold">
-                    {formatEur(fr.total_cents)}
-                  </p>
-                  <p className="text-(--text-secondary) font-light text-sm">
-                    Gesamtpreis (netto)
-                  </p>
+                    <p className="text-md font-semibold">{formatEur(offer.net_amount)}</p>
+                    <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis</p>
                 </div>
-              </div>
-            ))}
-
-            {/* Total price */}
-            <div className="flex items-center gap-2 border border-(--border) py-2 px-3 justify-end rounded-md">
-              <span className="text-sm text-(--text-secondary) font-light">
-                Gesamtpreis
-              </span>{" "}
-              <p>{formatEur(offer.net_amount)}</p>
             </div>
-          </div>
-        </Collapsable>
 
-        {/* Documents */}
-        <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
-          <div className="grid gap-2 px-4 py-3">
-            {offer.documents.map((document: Document) => (
-              <DocumentItem key={document.id} document={document} />
-            ))}
-          </div>
-        </Collapsable>
+            <Collapsable label="Produkte" className="w-full bg-(--subtle-50) justify-between rounded-none">
+                <div className="grid gap-2 px-4 py-3">
+                    {offerPositions.map((op, i) => (
+                        <OfferPositionRow key={i} op={op} />
+                    ))}
+                    {offerFlatRates.map((fr, i) => (
+                        <OfferFlatRateRow key={i} fr={fr} />
+                    ))}
+                    <LineItemRow
+                        left={<span className="text-sm text-(--text-secondary) font-light">Gesamtpreis</span>}
+                        right={<p>{formatEur(offer.net_amount)}</p>}
+                    />
+                </div>
+            </Collapsable>
 
-        {/* Revision history */}
-        <Collapsable label="Versionshistorie" className="w-full bg-(--subtle-50) justify-between rounded-none">
-          <OfferRevisionHistory offerId={offer.id} />
-        </Collapsable>
+            <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
+                <div className="grid gap-2 px-4 py-3">
+                    {offer.offerDocuments.map((document: OfferDocument) => (
+                        <Document key={document.id} offer={offer} document={document.document} />
+                    ))}
 
-        <div className="flex items-center justify-end px-2 border-t border-(--border)">
+                    <Button className="min-w-fit" variant="primary" size="sm" loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument} onClick={() => generateDocument({ offerId: offer.id })}>
+                        Dokument generieren
+                    </Button>
+                </div>
+            </Collapsable>
 
-          <Button size="xs" variant="link" onClick={() => createReservation({offer_id: offer.id})}
-                  icon={<RotateCcw className="size-3" />} iconOnly />
+            <Collapsable label="Versionshistorie" className="w-full bg-(--subtle-50) justify-between rounded-none">
+                <OfferRevisionHistory offerId={offer.id} />
+            </Collapsable>
 
-          <Button size="xs" variant="link" onClick={() => onEdit(offer)}
-            icon={<Pen className="size-3" />} iconOnly />
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+                <div className="flex items-center gap-2"></div>
+                <div className="flex items-center gap-2">
+                    <Button size="xs" variant="secondary" onClick={() => onEdit(offer)}
+                        icon={<Pen className="size-3" />} iconOnly />
 
-          <Button size="xs" variant="link" onClick={handleDeleteOffer}
-            icon={<Trash className="size-3" />} iconOnly />
-
-
+                    <Button size="xs" variant="secondary" onClick={handleDeleteOffer}
+                        icon={<Trash className="size-3" />} iconOnly />
+                </div>
+            </div>
         </div>
-      </div>
-    </React.Fragment>
-  );
+    );
 }
