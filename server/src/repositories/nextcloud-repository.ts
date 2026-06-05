@@ -1,8 +1,8 @@
-import {FileStat} from "webdav";
-import {fileExists, getNextCloudClient, reserveFile, uploadFile} from "../lib/nextcloud.js";
-import {INextCloudRepository} from "./repository.js";
+import { FileStat } from "webdav";
+import { fileExists, getNextCloudClient, reserveFile, uploadFile } from "../lib/nextcloud.js";
+import { INextCloudRepository } from "./repository.js";
 import * as Buffer from "node:buffer";
-import {AppException} from "../exceptions/exceptions.js";
+import { AppException } from "../exceptions/exceptions.js";
 
 export class NextCloudRepository implements INextCloudRepository {
     async checkConnection(): Promise<boolean> {
@@ -39,7 +39,7 @@ export class NextCloudRepository implements INextCloudRepository {
                 409, "reserveFile");
         }
 
-        const {filename} = await reserveFile(id, directoryPath);
+        const { filename } = await reserveFile(id, directoryPath);
         return filename;
     }
 

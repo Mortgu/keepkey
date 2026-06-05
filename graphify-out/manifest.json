@@ -252,8 +252,8 @@
     "hash": "c914c45d7c580a789eea764342b75687"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/tariff-controller.ts": {
-    "mtime": 1780647429.9766846,
-    "hash": "f648261684b16a6e7f9a103b4ea89031"
+    "mtime": 1780657289.8454027,
+    "hash": "f2e1f621c2f24b514e6e6c03a50ac3a7"
   },
   "/Users/oskar/Programming/keepit/server/src/controllers/index.ts": {
     "mtime": 1780647429.9738808,
@@ -392,8 +392,8 @@
     "hash": "16e18075c3acc5879c24bc2a9f369c97"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/router.ts": {
-    "mtime": 1780647429.9827187,
-    "hash": "ef1179d7d0974a8475aa4b61c07caa8b"
+    "mtime": 1780657254.0488799,
+    "hash": "ad13eb665f03cc246d49ad1588cf828a"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/supplier-router.ts": {
     "mtime": 1780647429.9828227,
@@ -436,20 +436,20 @@
     "hash": "87b124ac8bd81e094e41b60cfc5462e7"
   },
   "/Users/oskar/Programming/keepit/server/src/routes/tariff-router.ts": {
-    "mtime": 1780647429.982933,
-    "hash": "69fa0b12f716cb1fdd313c2bd3933a2e"
+    "mtime": 1780657268.5922184,
+    "hash": "280dc844f839a4a6b17111e0fbdb196a"
   },
   "/Users/oskar/Programming/keepit/client/src/main.tsx": {
     "mtime": 1774348757.573655,
     "hash": "7ae8c25f71d0355f34120e5a218a86b4"
   },
   "/Users/oskar/Programming/keepit/client/src/i18n.ts": {
-    "mtime": 1780647371.655604,
-    "hash": "91d2902bfa879b40f28d45fac73510ed"
+    "mtime": 1780658686.6629105,
+    "hash": "7cc6728057393c1206b354599827fd3c"
   },
   "/Users/oskar/Programming/keepit/client/src/routeTree.gen.ts": {
-    "mtime": 1779461641.9017358,
-    "hash": "af94f8407649c22f5bf7248e90f55a1d"
+    "mtime": 1780655200.8570695,
+    "hash": "d6d85a24741e9e451e2e4f07bc6e4e48"
   },
   "/Users/oskar/Programming/keepit/client/src/types/supplier.ts": {
     "mtime": 1777917652.451891,
@@ -468,7 +468,7 @@
     "hash": "c153d54b277305ad9d2223471e613b19"
   },
   "/Users/oskar/Programming/keepit/client/src/types/api.ts": {
-    "mtime": 1780653550.233244,
+    "mtime": 1780658182.975274,
     "hash": "c8082af5d334433d2c807ca78219cbbc"
   },
   "/Users/oskar/Programming/keepit/client/src/types/offers.ts": {
@@ -584,8 +584,8 @@
     "hash": "e59e5dd5a6d5c5a0586e792d32ada75f"
   },
   "/Users/oskar/Programming/keepit/client/src/components/navigation/navigation.tsx": {
-    "mtime": 1780648124.8095336,
-    "hash": "3b5668a91eebe0dacdecd8715721dc6f"
+    "mtime": 1780658723.5767179,
+    "hash": "c34e4381b65a1d6db01ec9f54134cc4d"
   },
   "/Users/oskar/Programming/keepit/client/src/components/button/button-types.tsx": {
     "mtime": 1780647371.6318576,
@@ -864,8 +864,8 @@
     "hash": "0c03d1feedf65de3499386a1fc807cfc"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/products/pricing.tsx": {
-    "mtime": 1780654515.2516072,
-    "hash": "0a53687e2d541789645a21fbc2ff825f"
+    "mtime": 1780655358.0064573,
+    "hash": "4c614b20e7cecee939f0f29c67a2ac27"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/products/flatrates.tsx": {
     "mtime": 1779461641.9067583,
@@ -904,8 +904,8 @@
     "hash": "b006b2a76cba799b84c94ba27b094209"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/products/-components/product-item.tsx": {
-    "mtime": 1780653931.4832559,
-    "hash": "5352fc157473da24111f270b3a3d2aeb"
+    "mtime": 1780655085.24733,
+    "hash": "b788f710fade83c964c682cebfe8052a"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/products/-components/tariff-products-modal.tsx": {
     "mtime": 1780654551.6124601,
@@ -966,6 +966,18 @@
   "/Users/oskar/Programming/keepit/client/src/routes/_main/orders/-components/order-modal.tsx": {
     "mtime": 1779799615.554136,
     "hash": "f727d285f1f8129114da5c4fdc59798f"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/pricing/index.tsx": {
+    "mtime": 1780658232.49348,
+    "hash": "c66a66a25908330461c0621ae5edb838"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/pricing/-components/pricing-list-item.tsx": {
+    "mtime": 1780657597.1732438,
+    "hash": "1cd69229bda3a3e38a9a8775e14018bc"
+  },
+  "/Users/oskar/Programming/keepit/client/src/routes/_main/pricing/-components/pricing-list.tsx": {
+    "mtime": 1780655250.8715007,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
   },
   "/Users/oskar/Programming/keepit/client/src/routes/_main/employees/index.tsx": {
     "mtime": 1777148690.852774,
