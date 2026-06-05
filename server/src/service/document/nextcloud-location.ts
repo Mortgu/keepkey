@@ -1,27 +1,24 @@
-import {AuthType, createClient, WebDAVClient} from "webdav";
+import { AuthType, createClient, WebDAVClient } from "webdav";
 
 export interface LocationConfig {
     name: string;
-    baseUrl: string;
-    username: string;
-    password: string;
 }
 
 export default class NextCloudLocation {
-    public readonly name: string;
-    private client: WebDAVClient;
+    public name: string;
+    public path: string;
 
-    constructor(config: LocationConfig) {
-        this.name = config.name;
-        this.client = createClient(config.baseUrl, {
-            authType: AuthType.Password,
-            username: config.username,
-            password: config.password,
-        });
+    constructor(
+        private readonly client: WebDAVClient,
+        name: string,
+        path: string,
+    ) {
+        this.name = name;
+        this.path = path;
     }
 
     buildPath(docId: string, filename: string): string {
-        return `/documents/${docId}/${filename}`;
+        return `${this.path}/${filename}`;
     }
 
     async fileExists(path: string): Promise<boolean> {
@@ -34,14 +31,14 @@ export default class NextCloudLocation {
     }
 
     async ensureDirectory(docId: string): Promise<void> {
-        const dir = `/documents/${docId}`;
+        const dir = this.path;
         const exists = await this.fileExists(dir);
         if (!exists) {
-            await this.client.createDirectory(dir, {recursive: true});
+            await this.client.createDirectory(dir, { recursive: true });
         }
     }
 
     async put(path: string, content: Buffer): Promise<void> {
-        await this.client.putFileContents(path, content, {overwrite: false});
+        await this.client.putFileContents(path, content, { overwrite: false });
     }
 }

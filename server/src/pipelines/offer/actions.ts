@@ -187,16 +187,16 @@ export async function converting(docxBuffer: Buffer): Promise<Buffer> {
     });
 }
 
-export async function writeGeneratedDocuments(fetchedData: OfferFetchData, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<string> {
+export async function writeGeneratedDocuments(fetchedData: OfferFetchData, documentId: string, version: number, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<string> {
     const { quoteId, customer, offerPositions } = fetchedData.offer;
 
     const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
     const formatedWorkloads = offerPositions.map((op) => op.product.name.replaceAll(" ", "").trim()).join("+");
 
-    const name = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}`;
+    const name = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
 
-    const docxPath = path.join(env.OUTPUT_DIR, `${name}.docx`);
-    const pdfPath = path.join(env.OUTPUT_DIR, `${name}.pdf`);
+    const docxPath = path.join(env.OUTPUT_DIR, `${documentId}.docx`);
+    const pdfPath = path.join(env.OUTPUT_DIR, `${documentId}.pdf`);
 
     await Promise.all([
         fs.writeFile(docxPath, docxBuffer!),

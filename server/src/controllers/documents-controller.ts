@@ -1,20 +1,21 @@
-import {Request, Response} from "express";
-import {prisma} from "../lib/prismaClient.js";
+import fs from 'fs';
+
+import { Request, Response } from "express";
+import { DocumentStatus, prisma } from "../lib/prismaClient.js";
 import env from "../lib/env.js";
-import {NextCloudSearch} from "../service/document/nextcloud-search.js";
+import { NextCloudSearch } from "../service/document/nextcloud-search.js";
 import IDRegistry from "../service/document/id-registry.js";
-import UploadOrchestrator from "../service/document/upload-orchestrator.js";
-import NextCloudLocation from "../service/document/nextcloud-location.js";
 import DocumentService from "../service/document/document-service.js";
-import {createClient} from "webdav";
+import { createClient } from "webdav";
+import path from 'path';
 
 export const renameDocument = async (request: Request, response: Response) => {
-    const {id} = request.params;
-    const {displayName} = request.body;
+    const { id } = request.params;
+    const { displayName } = request.body;
 
     try {
         const updatedDocument = await prisma.document.update({
-            where: {id: id as string},
+            where: { id: id as string },
             data: {
                 displayName: displayName
             }
@@ -29,17 +30,12 @@ export const renameDocument = async (request: Request, response: Response) => {
     }
 }
 
-export const uploadDocument = async (request: Request, response: Response) => {
-    const {id} = request.params;
-
-}
-
 export const deleteDocument = async (request: Request, response: Response) => {
-    const {id} = request.params;
+    const { id } = request.params;
 
     try {
         await prisma.document.delete({
-            where: {id: id as string},
+            where: { id: id as string },
         });
 
         return response.status(200).json({
@@ -64,14 +60,9 @@ const buildContainer = () => {
     const search = new NextCloudSearch(webDAVClient);
     const registry = new IDRegistry(search, webDAVClient);
 
-    const orchestrator = new UploadOrchestrator([
-        new NextCloudLocation({name: "primary", baseUrl, username, password}),
-        new NextCloudLocation({name: "secondary", baseUrl, username, password}),
-    ]);
+    const documentService = new DocumentService(search, webDAVClient, prisma);
 
-    const documentService = new DocumentService(search, orchestrator, prisma);
-
-    return {search, registry, orchestrator, documentService} as const;
+    return { search, registry, documentService } as const;
 }
 
 export const container = buildContainer();

@@ -1,14 +1,13 @@
-import UploadOrchestrator from "./upload-orchestrator.js";
-import { DocumentRequest } from "./types.js";
 import { TaskStatus, TaskTarget, TaskType } from "../../lib/prismaClient.js";
 import { taskQueue, taskQueueKey } from "../../workers/task-queue.js";
 import { Document, PrismaClient, Task } from "@prisma/client";
 import { NextCloudSearch } from "./nextcloud-search.js";
+import { WebDAVClient } from "webdav";
 
 export default class DocumentService {
     constructor(
         private readonly search: NextCloudSearch,
-        private readonly orchestrator: UploadOrchestrator,
+        private readonly client: WebDAVClient,
         private readonly prisma: PrismaClient,
     ) {
     }
@@ -39,21 +38,13 @@ export default class DocumentService {
         return task;
     }
 
-    async uploadDocument(request: DocumentRequest) {
-        const { id, filename, content } = request;
-
-        // 1. ID reservieren — wirft DuplicateDocumentError bei Kollision
-        //await this.registry.reserve(id);
-        const exists = this.search.findById(id, "/");
-
-        // 2. Parallel hochladen
-        const result = await this.orchestrator.upload(id, filename, content);
-
-        // 3. Registry aktualisieren
-        const successful = result.results.filter((r) => r.status !== "failed").map((r) => r.locationName);
-
-        //await this.registry.markComplete(id, successful);
-
-        return result;
+    async uploadDocument(filename: string, upload_dir: string, content: Buffer) {
+        try {
+            this.client.putFileContents(`${upload_dir}/${filename}`, content, { overwrite: false });
+            return `${upload_dir}/${filename}`;
+        } catch (exception: any) {
+            console.error(exception);
+            throw new Error("Upload Failed!")
+        }
     }
 }

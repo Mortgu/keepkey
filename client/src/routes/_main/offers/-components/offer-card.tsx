@@ -152,7 +152,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
                 <div className="grid gap-2 px-4 py-3">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <Document key={document.id} document={document.document} />
+                        <Document key={document.id} offer={offer} document={document.document} />
                     ))}
 
                     <Button className="min-w-fit" variant="primary" size="sm" loading={isGeneratingDocument}

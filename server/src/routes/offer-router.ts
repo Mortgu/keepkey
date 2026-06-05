@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 
 import {
   createOffer,
@@ -11,11 +11,12 @@ import {
   getOfferById,
   getOfferRevisions,
   getOffers,
-  updateOffer
+  updateOffer,
+  uploadOfferDocument
 } from "../controllers/index.js";
 
-import {validate} from "../middlewares/validate.js";
-import {createOfferSchema} from "../schemas/index.js";
+import { validate } from "../middlewares/validate.js";
+import { createOfferSchema } from "../schemas/index.js";
 
 
 const router = Router();
@@ -26,7 +27,9 @@ router.get('/next', getNextQuoteId);
 
 router.get("/:id/revisions", getOfferRevisions);
 
-router.post('/:id/reserve', createReservation);
+router.post('/:id/upload/:documentId', uploadOfferDocument);
+
+//router.post('/:id/reserve', createReservation);
 
 router.post('/:id/document', enqueueGeneration);
 

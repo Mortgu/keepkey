@@ -131,7 +131,8 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     });
 
     const uploadMutation = useMutation({
-        mutationFn: ({ id }: { id: string }) => uploadAction(id),
+        mutationFn: ({ offerId, documentId }: { offerId: string, documentId: string }) => uploadAction(offerId, documentId),
+        onSuccess: invalidate
     });
 
     const generateDocumentMutation = useMutation({

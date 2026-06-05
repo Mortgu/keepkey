@@ -4,6 +4,10 @@ import { OfferFlatRate, OfferPosition, Task } from "@prisma/client";
 import { toDate } from '../../utils/utils.js';
 import calculatePrice from "../../utils/products.js";
 import { container } from "../documents-controller.js";
+import env from '../../lib/env.js';
+
+import fs from 'fs';
+import path from 'path';
 
 /*
  * Function to enqueue a new reservation job for an offer.
@@ -38,11 +42,17 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
         }
     });
 
+    const currentVersion = await prisma.offerDocument.findFirst({
+        where: { offerId: offerId },
+        select: { version: true },
+        orderBy: { version: "desc" }
+    });
+
     const offerDocument = await prisma.offerDocument.create({
         data: {
             offerId: offerId,
             documentId: document.id,
-            version: 0,
+            version: (currentVersion?.version ?? -1) + 1,
         }
     })
 
@@ -130,3 +140,45 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 };
+
+export const uploadOfferDocument = async (request: Request, response: Response) => {
+    const { id, documentId } = request.params;
+
+    const PDF_PATH = env.NEXTCLOUD_OFFER_PDF_PATH;
+    const DOCX_PATH = env.NEXTCLOUD_OFFER_ORIGINAL_PATH;
+
+    const document = await prisma.document.findUniqueOrThrow({
+        where: { id: documentId as string },
+    });
+
+    if (!document || !document.displayName) {
+        return response.status(404).json({
+            message: 'Something went wrong! Document not found!'
+        });
+    }
+
+    const [pdfContent, docxContent] = await Promise.all([
+        fs.readFileSync(path.join(env.OUTPUT_DIR, document.id + ".pdf")),
+        fs.readFileSync(path.join(env.OUTPUT_DIR, document.id + ".docx")),
+    ]);
+
+    const [pdfUploadResponse, docxUploadResponse] = await Promise.all([
+        await container.documentService.uploadDocument(
+            document.displayName + ".pdf", PDF_PATH, pdfContent),
+        await container.documentService.uploadDocument(
+            document.displayName + ".docx", DOCX_PATH, docxContent),
+    ]);
+
+    if (!pdfUploadResponse || !docxUploadResponse) {
+        throw new Error("Something went wrong while trying to upload docx and pdf! Please try again.");
+    }
+
+    await prisma.document.update({
+        where: { id: documentId as string },
+        data: { status: "UPLOADED" }
+    });
+
+    return response.status(200).json({
+        docx: docxUploadResponse, pdf: pdfUploadResponse,
+    });
+}

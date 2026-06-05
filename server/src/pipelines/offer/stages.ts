@@ -65,7 +65,7 @@ const convert: PipelineStage<OfferPipelineContext> = {
 const write: PipelineStage<OfferPipelineContext> = {
     name: "write",
     run: async (context) => {
-        const { fetchedData, docxBuffer, pdfBuffer } = context;
+        const { fetchedData, docxBuffer, pdfBuffer, documentId, version } = context;
 
         if (!docxBuffer || !pdfBuffer || !fetchedData) {
             console.log("Something went wrong! File buffers null!");
@@ -73,7 +73,7 @@ const write: PipelineStage<OfferPipelineContext> = {
         }
 
         try {
-            context.displayName = await writeGeneratedDocuments(fetchedData, docxBuffer, pdfBuffer)
+            context.displayName = await writeGeneratedDocuments(fetchedData, documentId, version, docxBuffer, pdfBuffer);
         } catch (exception: any) {
             throw new PipelineStageError("Writing step in pipeline failed", 500, exception.message);
         }
