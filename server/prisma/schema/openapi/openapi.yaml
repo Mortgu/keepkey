@@ -154,6 +154,8 @@ components:
           $ref: "#/components/schemas/User"
         userId:
           type: string
+        language:
+          $ref: "#/components/schemas/Language"
         quoteId:
           type: string
         paymentTerm:
@@ -211,6 +213,7 @@ components:
         - contactPersonId
         - user
         - userId
+        - language
         - quoteId
         - paymentTerm
         - date
@@ -986,6 +989,11 @@ components:
         - PDF
         - DOCX
         - RESERVED
+    Language:
+      type: string
+      enum:
+        - DE
+        - EN
     TaskStatus:
       type: string
       enum:

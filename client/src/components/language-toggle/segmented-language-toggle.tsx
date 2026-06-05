@@ -1,17 +1,11 @@
-import {cn} from '@/lib/utils';
-import type {LanguageToggleProps} from './language-toggle-types';
+import { cn } from '@/lib/utils';
+import type { LanguageToggleProps } from './language-toggle-types';
 
 /**
  * Segmented control with a sliding white thumb behind the active option.
  * Scales to any number of options.
  */
-export const SegmentedLanguageToggle = ({
-                                            options,
-                                            value,
-                                            onChange,
-                                            className,
-                                            'aria-label': ariaLabel = 'Language',
-                                        }: LanguageToggleProps) => {
+export const SegmentedLanguageToggle = ({ options, value, onChange, className, 'aria-label': ariaLabel = 'Language', }: LanguageToggleProps) => {
     const activeIndex = Math.max(0, options.findIndex((o) => o.code === value));
 
     return (

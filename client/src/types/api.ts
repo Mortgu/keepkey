@@ -64,6 +64,7 @@ export interface components {
             contactPersonId: string;
             user: components["schemas"]["User"];
             userId: string;
+            language: components["schemas"]["Language"];
             quoteId: string;
             paymentTerm: string;
             /** Format: date-time */
@@ -386,9 +387,11 @@ export interface components {
             updatedAt: string;
         };
         /** @enum {string} */
-        DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "RESERVED" | "UPLOADING" | "UPLOADED" | "FAILED";
+        DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "UPLOADING" | "UPLOADED" | "FAILED";
         /** @enum {string} */
-        DocumentFormat: "PDF" | "DOCX";
+        DocumentFormat: "PDF" | "DOCX" | "RESERVED";
+        /** @enum {string} */
+        Language: "DE" | "EN";
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */

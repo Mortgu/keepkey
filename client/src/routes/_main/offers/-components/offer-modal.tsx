@@ -131,7 +131,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                         flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
                     });
                 } else {
-                    const offer = await createOffer({
+                    await createOffer({
                         offer: value as CreateOfferInput,
                         positions: offerProducts as CreateOfferPositionInput[],
                         flatRates: offerFlatRates as CreateOfferFlatRatesInput[],

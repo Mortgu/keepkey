@@ -133,3 +133,8 @@ model Contract {
 
   @@map("contract")
 }
+
+enum Language {
+  DE
+  EN
+}
