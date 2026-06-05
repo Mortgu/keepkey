@@ -1,14 +1,14 @@
-import {z} from "zod";
-import {useState} from "react";
-import {useForm} from "@tanstack/react-form";
+import { z } from "zod";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
 
-import {Loader, Plus, Trash, X} from "lucide-react";
+import { Loader, Plus, Trash, X } from "lucide-react";
 
-import {type OfferProductInput} from "./modal-components/offer-product-form";
+import { type OfferProductInput } from "./modal-components/offer-product-form";
 import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
-import {useCustomerHook, useFlatRateHook, useOfferHook, useSupplierHook, useUserHook} from "@/hooks";
-import {Button, Input, ModalDialog, Select} from "@/components";
+import { useCustomerHook, useFlatRateHook, useOfferHook, useSupplierHook, useUserHook } from "@/hooks";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, Select, type LanguageOption } from "@/components";
 
 import type {
     ContactPerson,
@@ -24,9 +24,10 @@ import type {
     User,
 } from "@/types";
 
-import {formatEur} from "@/utils/utils";
+import { formatEur } from "@/utils/utils";
 import ProductModalSection from "./modal-components/product-section";
-import {useAuth} from "@/context/auth";
+import { useAuth } from "@/context/auth";
+import { useTranslation } from "react-i18next";
 
 interface OfferModalProps {
     onClose: () => void;
@@ -72,15 +73,17 @@ const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.i
     }
 }
 
-export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
+export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
     const isEdit = currentOffer !== undefined;
 
-    const {user} = useAuth();
+    const { user } = useAuth();
 
-    const {customers} = useCustomerHook();
-    const {suppliers} = useSupplierHook();
-    const {users} = useUserHook();
-    const {flatRates} = useFlatRateHook();
+    const { customers } = useCustomerHook();
+    const { suppliers } = useSupplierHook();
+    const { users } = useUserHook();
+    const { flatRates } = useFlatRateHook();
+
+    const [language, setLanguage] = useState<string>("de");
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
         currentOffer?.offerPositions.map((pos) => ({
@@ -94,7 +97,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
     );
 
     const [offerFlatRates, setOfferFlatRates] = useState<CreateOfferFlatRatesInput[]>(
-        currentOffer?.offerFlatRates.map(({id: _id, offer: _offer, ...fr}) => fr) ?? []
+        currentOffer?.offerFlatRates.map(({ id: _id, offer: _offer, ...fr }) => fr) ?? []
     );
 
     const [showFlatRateForm, setShowFlatRateForm] = useState(false);
@@ -118,12 +121,12 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
             onChange: offerSchema,
             onMount: offerSchema,
         },
-        onSubmit: async ({value}) => {
+        onSubmit: async ({ value }) => {
             try {
                 if (isEdit) {
                     await updateOffer({
                         id: currentOffer.id,
-                        offer: {...value, id: currentOffer!.id} as UpdateOfferInput,
+                        offer: { ...value, id: currentOffer!.id } as UpdateOfferInput,
                         positions: offerProducts as UpdateOfferPositionInput[],
                         flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
                     });
@@ -152,7 +155,15 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
     return (
         <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
-                <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
+                <div className="flex items-center justify-between w-full mr-2">
+                    <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
+
+                    <SegmentedLanguageToggle
+                        options={DEFAULT_LANGUAGE_OPTIONS}
+                        value={language}
+                        onChange={(lng) => setLanguage(lng)}
+                    />
+                </div>
             </ModalDialog.Header>
             <ModalDialog.Content>
                 <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
@@ -160,12 +171,12 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="customerId" children={(field) => (
                             <div className="flex-1">
                                 <Select label="Kunde" error={field.state.meta.errors[0]?.message}
-                                        value={field.state.value as string} onChange={(e) => {
-                                    const newCustomerId = e.target.value;
-                                    field.handleChange(newCustomerId);
-                                    const newCustomer = customers.find((c: Customer) => c.id === newCustomerId);
-                                    offerForm.setFieldValue('contactPersonId', newCustomer?.contactPersons[0]?.id ?? '');
-                                }}>
+                                    value={field.state.value as string} onChange={(e) => {
+                                        const newCustomerId = e.target.value;
+                                        field.handleChange(newCustomerId);
+                                        const newCustomer = customers.find((c: Customer) => c.id === newCustomerId);
+                                        offerForm.setFieldValue('contactPersonId', newCustomer?.contactPersons[0]?.id ?? '');
+                                    }}>
                                     {customers?.map((customer: Customer) => (
                                         <option key={customer.id} value={customer.id}>
                                             {customer.companyName}
@@ -174,39 +185,39 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                     {customers.length <= 0 && <option value="">None</option>}
                                 </Select>
                             </div>
-                        )}/>
+                        )} />
 
                         <offerForm.Field name="contactPersonId" children={(field) => (
                             <div className="flex-1">
                                 <offerForm.Subscribe selector={(state) => state.values.customerId}
-                                                     children={(customerId) => {
-                                                         const selectedCustomer = customers?.find((c: Customer) => c.id === customerId);
-                                                         const contactPersons = selectedCustomer?.contactPersons ?? [];
+                                    children={(customerId) => {
+                                        const selectedCustomer = customers?.find((c: Customer) => c.id === customerId);
+                                        const contactPersons = selectedCustomer?.contactPersons ?? [];
 
-                                                         return (
-                                                             <Select label="Ansprechpartner Kunde"
-                                                                     value={field.state.value as string}
-                                                                     error={field.state.meta.errors[0]?.message}
-                                                                     onChange={(e) => field.handleChange(e.target.value)}
-                                                                     disabled={!customerId}>
-                                                                 {contactPersons.map((cp: ContactPerson) => (
-                                                                     <option key={cp.id} value={cp.id}>
-                                                                         {cp.firstName} {cp.lastName}
-                                                                     </option>
-                                                                 ))}
-                                                                 {contactPersons.length <= 0 &&
-                                                                     <option value="">None</option>}
-                                                             </Select>
-                                                         );
-                                                     }}/>
+                                        return (
+                                            <Select label="Ansprechpartner Kunde"
+                                                value={field.state.value as string}
+                                                error={field.state.meta.errors[0]?.message}
+                                                onChange={(e) => field.handleChange(e.target.value)}
+                                                disabled={!customerId}>
+                                                {contactPersons.map((cp: ContactPerson) => (
+                                                    <option key={cp.id} value={cp.id}>
+                                                        {cp.firstName} {cp.lastName}
+                                                    </option>
+                                                ))}
+                                                {contactPersons.length <= 0 &&
+                                                    <option value="">None</option>}
+                                            </Select>
+                                        );
+                                    }} />
                             </div>
-                        )}/>
+                        )} />
 
                         <offerForm.Field name="userId" children={(field) => (
                             <div className="flex-1">
                                 <Select label="Unser Ansprechpartner" value={field.state.value as string}
-                                        error={field.state.meta.errors[0]?.message}
-                                        onChange={(e) => field.handleChange(e.target.value)}>
+                                    error={field.state.meta.errors[0]?.message}
+                                    onChange={(e) => field.handleChange(e.target.value)}>
                                     {users.map((user: User) => (
                                         <option key={user.id} value={user.id}>
                                             {user.firstName} {user.lastName}
@@ -215,27 +226,27 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                     {users.length <= 0 && <option value="">None</option>}
                                 </Select>
                             </div>
-                        )}/>
+                        )} />
                     </div>
 
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <offerForm.Field name="quoteId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
                                 <Input label="AG-Nr." value={field.state.value as string}
-                                       warning={field.state.meta.errors[0]?.message || errorCreatingReservation?.message}
-                                       warningTooltip={String(JSON.stringify(errorCreatingReservation))}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       loading={isCreatingReservation}
-                                       disabled={isCreatingReservation}
+                                    warning={field.state.meta.errors[0]?.message || errorCreatingReservation?.message}
+                                    warningTooltip={String(JSON.stringify(errorCreatingReservation))}
+                                    onChange={(e) => field.handleChange(e.target.value)}
+                                    loading={isCreatingReservation}
+                                    disabled={isCreatingReservation}
                                 />
                             </div>
-                        )}/>
+                        )} />
 
                         <offerForm.Field name="supplierId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
                                 <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
-                                        error={field.state.meta.errors[0]?.message}
-                                        onChange={(e) => field.handleChange(e.target.value || null)}>
+                                    error={field.state.meta.errors[0]?.message}
+                                    onChange={(e) => field.handleChange(e.target.value || null)}>
                                     <option value="">None</option>
                                     {suppliers?.map((supplier: Supplier) => (
                                         <option key={supplier.id} value={supplier.id}>
@@ -244,68 +255,68 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                     ))}
                                 </Select>
                             </div>
-                        )}/>
+                        )} />
 
                         <offerForm.Field name="paymentTerm" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
-                                       error={field.state.meta.errors[0]?.message}
-                                       value={field.state.value as string}
-                                       onChange={(e) => field.handleChange(e.target.value)}
+                                <Input label="Zahlungsbedingung" size="sm" placeholder="Zahlungsbedingung..."
+                                    error={field.state.meta.errors[0]?.message}
+                                    value={field.state.value as string}
+                                    onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
-                        )}/>
+                        )} />
                     </div>
 
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <offerForm.Field name="validUntil" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Angebot gültig bis" type="date" input_size="sm"
-                                       placeholder="Gültig bis..."
-                                       error={field.state.meta.errors[0]?.message}
-                                       value={field.state.value?.split('T')[0] ?? ''}
-                                       onBlur={field.handleBlur}
-                                       onChange={(e) => {
-                                           const val = e.target.value;
-                                           if (!val) {
-                                               field.handleChange(null);
-                                               return;
-                                           }
-                                           field.handleChange(`${val}T00:00:00.000Z`);
-                                       }}
+                                <Input label="Angebot gültig bis" type="date" size="sm"
+                                    placeholder="Gültig bis..."
+                                    error={field.state.meta.errors[0]?.message}
+                                    value={field.state.value?.split('T')[0] ?? ''}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (!val) {
+                                            field.handleChange(null);
+                                            return;
+                                        }
+                                        field.handleChange(`${val}T00:00:00.000Z`);
+                                    }}
                                 />
                             </div>
-                        )}/>
+                        )} />
 
                         <offerForm.Field name="requestFrom" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Ihre Anfrage vom" type="date" input_size="sm"
-                                       placeholder="Ihre Anfrage vom..."
-                                       error={field.state.meta.errors[0]?.message}
-                                       value={field.state.value?.split('T')[0] ?? ''}
-                                       onBlur={field.handleBlur}
-                                       onChange={(e) => {
-                                           const val = e.target.value;
-                                           if (!val) {
-                                               field.handleChange(null);
-                                               return;
-                                           }
-                                           field.handleChange(`${val}T00:00:00.000Z`);
-                                       }}
+                                <Input label="Ihre Anfrage vom" type="date" size="sm"
+                                    placeholder="Ihre Anfrage vom..."
+                                    error={field.state.meta.errors[0]?.message}
+                                    value={field.state.value?.split('T')[0] ?? ''}
+                                    onBlur={field.handleBlur}
+                                    onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (!val) {
+                                            field.handleChange(null);
+                                            return;
+                                        }
+                                        field.handleChange(`${val}T00:00:00.000Z`);
+                                    }}
                                 />
                             </div>
-                        )}/>
+                        )} />
                     </div>
 
-                    <ProductModalSection offerProducts={offerProducts} setOfferProducts={setOfferProducts}/>
+                    <ProductModalSection offerProducts={offerProducts} setOfferProducts={setOfferProducts} />
 
-                    <hr className="text-gray-200"/>
+                    <hr className="text-gray-200" />
 
                     <div className="grid gap-4">
                         <div className="flex items-center justify-between w-full">
                             <span className="text-sm font-medium text-gray-700">Pauschalen</span>
                             <Button variant="link" size="fit_sm" disabled={showFlatRateForm}
-                                    icon={<Plus className="size-4"/>} onClick={() => setShowFlatRateForm(true)}>
+                                icon={<Plus className="size-4" />} onClick={() => setShowFlatRateForm(true)}>
                                 Pauschale hinzufügen
                             </Button>
                         </div>
@@ -313,16 +324,16 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <div className="flex flex-col gap-2">
                             {offerFlatRates.map((flatRate, index) => (
                                 <div key={index}
-                                     className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
+                                    className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
                                     <div className="grid">
                                         <p className="flex items-center gap-1 text-sm">{flatRate.quantity} <X
-                                            className="size-3"/> {flatRate.flatRate.name}</p>
+                                            className="size-3" /> {flatRate.flatRate.name}</p>
                                         <p className="text-xs text-(--text-secondary)">{formatEur(flatRate.total_cents)}</p>
                                     </div>
                                     <div>
                                         <Button type="button" size="xs" variant="secondary"
-                                                icon={<Trash className="size-3"/>} iconOnly
-                                                onClick={() => setOfferFlatRates((prev) => prev.filter((_, i) => i !== index))}/>
+                                            icon={<Trash className="size-3" />} iconOnly
+                                            onClick={() => setOfferFlatRates((prev) => prev.filter((_, i) => i !== index))} />
                                     </div>
                                 </div>
                             ))}
@@ -331,7 +342,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                 <OfferFlatRateForm flatRates={flatRates} saveFn={(data) => {
                                     setOfferFlatRates((prev) => [...prev, data]);
                                     setShowFlatRateForm(false);
-                                }} cancelFn={() => setShowFlatRateForm(false)}/>
+                                }} cancelFn={() => setShowFlatRateForm(false)} />
                             )}
                         </div>
                     </div>
@@ -347,13 +358,13 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                             Abbrechen
                         </Button>
                         <offerForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
-                                             children={([canSubmit, isSubmitting]) => (
-                                                 <Button form="offer-form" disabled={!canSubmit} type="submit"
-                                                         size="sm">
-                                                     {isSubmitting && <Loader className="size-4 animate-spin"/>}
-                                                     Speichern
-                                                 </Button>
-                                             )}/>
+                            children={([canSubmit, isSubmitting]) => (
+                                <Button form="offer-form" disabled={!canSubmit} type="submit"
+                                    size="sm">
+                                    {isSubmitting && <Loader className="size-4 animate-spin" />}
+                                    Speichern
+                                </Button>
+                            )} />
                     </div>
                 </div>
             </ModalDialog.Footer>

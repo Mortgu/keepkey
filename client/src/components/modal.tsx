@@ -1,6 +1,6 @@
-import {X} from "lucide-react";
-import {useEffect} from "react";
-import {Button} from "@/components";
+import { X } from "lucide-react";
+import { useEffect } from "react";
+import { Button } from "@/components";
 
 interface ModalProps {
     onClose: () => void;
@@ -8,19 +8,19 @@ interface ModalProps {
     className?: string;
 }
 
-function Header({children}: { children: React.ReactNode }) {
+function Header({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
-function Content({children}: { children: React.ReactNode }) {
+function Content({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
-function Footer({children}: { children: React.ReactNode }) {
+function Footer({ children }: { children: React.ReactNode }) {
     return <>{children}</>;
 }
 
-function ModalDialog({onClose, children}: ModalProps) {
+function ModalDialog({ onClose, children }: ModalProps) {
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
@@ -41,13 +41,15 @@ function ModalDialog({onClose, children}: ModalProps) {
                 className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between pt-5 px-5">
                     {header}
-                    <Button
+
+                    <Button className="w-9.5 h-9.5"
                         onClick={onClose}
                         variant="secondary"
                         size="xs"
-                        icon={<X className="size-4"/>}
+                        icon={<X className="size-4" />}
                         iconOnly
                     />
+
                 </div>
 
                 <div className="scrollbar-none py-5 px-5">{content}</div>
@@ -74,4 +76,4 @@ ModalDialog.Header = Header;
 ModalDialog.Content = Content;
 ModalDialog.Footer = Footer;
 
-export {ModalDialog};
+export { ModalDialog };

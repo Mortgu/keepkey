@@ -15,8 +15,8 @@ import { useTranslation } from 'react-i18next';
 import { authClient } from "@/lib/auth-client.ts";
 import { NavLink } from "./nav-link";
 import { useMemo, useState, type ReactNode } from "react";
-import {Button, type DropdownOption, SingleDropdown} from "@/components";
-import {tv} from "tailwind-variants";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, type DropdownOption, SegmentedLanguageToggle, SingleDropdown } from "@/components";
+import { tv } from "tailwind-variants";
 
 const ICON_SIZE = 14;
 
@@ -29,11 +29,11 @@ type SectionProps = {
 function Section({ title, collapsible = false, children }: SectionProps) {
   const [collapsed, setCollapsed] = useState(false);
 
-  const  sectionStyle = tv({
+  const sectionStyle = tv({
     base: [
-        "flex select-none items-center justify-between",
-        "px-3.5 pb-1.5 pt-3 text-[12px] font-semibold",
-        "uppercase tracking-[0.08em] text-(--fg-3)"
+      "flex select-none items-center justify-between",
+      "px-3.5 pb-1.5 pt-3 text-[12px] font-semibold",
+      "uppercase tracking-[0.08em] text-(--fg-3)"
     ],
   })
 
@@ -93,8 +93,8 @@ function UserFooter() {
 }
 
 const languageDropdownOptions: DropdownOption[] = [
-    { value: "en", label: "English" },
-    { value: "de", label: "Deutsch" },
+  { value: "en", label: "English" },
+  { value: "de", label: "Deutsch" },
 ]
 
 export function Navigation() {
@@ -106,13 +106,17 @@ export function Navigation() {
 
   return (
     <aside className="flex h-screen w-74 flex-col overflow-hidden">
-      <div className="flex items-center justify-between gap-2 px-4 pb-2.5 pt-4">
+      <div className="grid items-center justify-between gap-2 px-4 pb-2.5 pt-4">
 
         <h1 className="text-lg font-normal tracking-[-0.01em] text-(--text-inv)">
           dignum GmbH
         </h1>
+        <SegmentedLanguageToggle
+          options={DEFAULT_LANGUAGE_OPTIONS}
+          value={i18n.language}
+          onChange={(lng) => i18n.changeLanguage(lng)}
+        />
 
-        <SingleDropdown label="Test" options={languageDropdownOptions} value={i18n.language} onChange={(e) => changeLanguage(e as string)} />
 
       </div>
 
@@ -133,8 +137,8 @@ export function Navigation() {
         </Section>
 
         <Section title={t('sales')} collapsible>
-          <NavLink to="/customers" label={t('customers')}  icon={<Users size={ICON_SIZE} />} />
-          <NavLink to="/offers" label={t('offers')}  icon={<FileText size={ICON_SIZE} />} />
+          <NavLink to="/customers" label={t('customers')} icon={<Users size={ICON_SIZE} />} />
+          <NavLink to="/offers" label={t('offers')} icon={<FileText size={ICON_SIZE} />} />
           <NavLink to="/orders" label={t('orders')} icon={<ShoppingCart size={ICON_SIZE} />} />
         </Section>
 
