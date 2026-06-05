@@ -1,10 +1,11 @@
 import { formatDate } from "@/lib/format";
 import { Pen, Trash } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import ContractModal from "./contract-modal";
 
 import type { Contract } from "@/types";
 import { Button } from "@/components";
+import { useModal } from "@/hooks";
 
 interface ContractListItemProps {
   contract: Contract;
@@ -12,12 +13,11 @@ interface ContractListItemProps {
 }
 
 export default function ContractListItem({ contract, deleteContract }: ContractListItemProps) {
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal<Contract>();
 
   return (
     <Fragment>
       <div className="bg-white border border-(--border) rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-        {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
           <div>
             <p className="text-md text-(--text)">{contract.name}</p>
@@ -27,14 +27,13 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
           </div>
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />} iconOnly
-              onClick={() => setOpen(true)} />
+              onClick={() => modal.open(contract)} />
 
             <Button variant="ghost" size="sm" icon={<Trash className="size-3.5" />} iconOnly
               onClick={() => deleteContract(contract.id)} />
           </div>
         </div>
 
-        {/* Body */}
         <div className="px-4 py-3.5">
           <ul className="flex flex-col gap-1.5">
             {contract.features.map((feature) => (
@@ -47,7 +46,9 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
         </div>
       </div>
 
-      <ContractModal open={isOpen} cancelFn={() => setOpen(false)} currentContract={contract} />
+      {modal.isOpen && (
+        <ContractModal key={modal.key} onClose={modal.close} currentContract={modal.data} />
+      )}
     </Fragment>
   );
 }

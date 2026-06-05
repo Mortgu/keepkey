@@ -1,19 +1,11 @@
 model Order {
   id String @id @default(uuid())
 
-  orderId     String // Beleg-Nr.
-  date        DateTime @default(now()) // Datum
-  paymentTerm String   @default("") // Zahlungsbedingung
-  projectId   String // Projekt-Nr.
-
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String // Kunden-Nr.
-
   supplier   Supplier? @relation(fields: [supplierId], references: [id])
   supplierId String? // Lieferanten-Nr.
 
-  offer   Offer  @relation(fields: [offerId], references: [id])
-  offerId String @unique // One-to-one relation
+  customer   Customer @relation(fields: [customerId], references: [id])
+  customerId String // Kunden-Nr.
 
   customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
   contactPersonId       String // Ihr Ansprechpartner
@@ -21,15 +13,22 @@ model Order {
   employee   User   @relation(fields: [employeeId], references: [id])
   employeeId String // Unser Ansprechpartner
 
+  offer   Offer  @relation(fields: [offerId], references: [id])
+  offerId String @unique // One-to-one relation
+
+  orderId     String // Beleg-Nr.
+  paymentTerm String @default("") // Zahlungsbedingung
+
+  date        DateTime  @default(now()) // Datum
+  validUntil  DateTime?
+  requestFrom DateTime?
+
   orderPositions OrderPosition[]
+  flatRates      OrderFlatRate[]
+  orderDocuments OrderDocument[]
 
-  // Fehlt: Summe Netto EUR, MwSt. 19.00%, Summe Brutto EUR
-
-  documents Document[]
-  tasks     Task[]
-
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@map("order")
 }
@@ -49,11 +48,42 @@ model OrderPosition {
   duration_months Int
   quantity        Int
 
-  unit_price Int
-  discount   Int
-  total      Int
+  optional Boolean? @default(false)
+
+  total_cents Int
 
   createdAt DateTime @default(now())
 
   @@map("order_position")
+}
+
+model OrderFlatRate {
+  id String @id @default(uuid())
+
+  flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
+  flatRateId String
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  quantity    Int
+  total_cents Int
+
+  @@map("order_flat_rate")
+}
+
+model OrderDocument {
+  id String @id @default(uuid())
+
+  version   Int
+  isCurrent Boolean @default(false)
+
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String   @unique
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  @@unique([orderId, version, documentId])
+  @@map("order_documents")
 }

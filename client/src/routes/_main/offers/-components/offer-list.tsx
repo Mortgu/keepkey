@@ -1,7 +1,7 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
-import { useCustomerHook, useOfferHook } from "@/hooks";
+import { useCustomerHook, useModal, useOfferHook } from "@/hooks";
 import OfferCard from "./offer-card";
 
 import type { ContactPerson, Customer, Offer } from "@/types";
@@ -15,7 +15,7 @@ const sort_options = [
 ];
 
 export default function OfferList() {
-  const [editing, setEditing] = useState<Offer | null | undefined>(undefined);
+  const modal = useModal<Offer>();
 
   const [searchInput, setSearchInput] = useState("");
   const [sort, setSort] = useState(sort_options[0].value);
@@ -55,38 +55,21 @@ export default function OfferList() {
   return (
     <>
       <div className="flex justify-between items-center gap-4">
-        {/* Filters */}
         <div className="w-full flex items-center gap-4">
-          <SortDropdown
-            value={sort}
-            onChange={setSort}
-            options={sort_options}
-          />
+          <SortDropdown value={sort} onChange={setSort} options={sort_options} />
 
-          <MultiDropdown
-            label="Kunde"
-            options={customerFilterOptions}
-            values={customerFilter}
-            onChange={setCustomerFilter}
-          />
+          <MultiDropdown label="Kunde" options={customerFilterOptions}
+            values={customerFilter} onChange={setCustomerFilter} />
 
-          <MultiDropdown
-            label="Kontakt"
-            options={contactPersonFilterOptions}
-            values={contactPersonFilter}
-            onChange={setContactPersonFilter}
-          />
+          <MultiDropdown label="Kontakt" options={contactPersonFilterOptions}
+            values={contactPersonFilter} onChange={setContactPersonFilter} />
 
-          <SearchBar
-            value={searchInput}
-            onChange={setSearchInput}
-            onSubmit={handleSearch}
-            placeholder="AG-Nr. Suchen..."
-          />
+          <SearchBar value={searchInput} onChange={setSearchInput}
+            onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
         </div>
 
         <div className="flex items-center gap-2">
-          <Button onClick={() => setEditing(null)} size="sm">
+          <Button onClick={() => modal.open()} size="sm">
             Erstellen <Plus className="size-4" />
           </Button>
         </div>
@@ -98,12 +81,8 @@ export default function OfferList() {
             const option = customerFilterOptions.find(i => i.value === id);
             if (!option) return null;
             return (
-              <FilterChip
-                key={`customer-${id}`}
-                label="Kunde"
-                value={option.label}
-                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))}
-              />
+              <FilterChip key={`customer-${id}`} label="Kunde" value={option.label}
+                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))} />
             );
           })}
 
@@ -111,12 +90,8 @@ export default function OfferList() {
             const option = contactPersonFilterOptions.find(i => i.value === id);
             if (!option) return null;
             return (
-              <FilterChip
-                key={`contact-${id}`}
-                label="Kontakt"
-                value={option.label}
-                onRemove={() => setContactPersonFilter(contactPersonFilter.filter(i => i !== id))}
-              />
+              <FilterChip key={`contact-${id}`} label="Kontakt" value={option.label}
+                onRemove={() => setContactPersonFilter(contactPersonFilter.filter(i => i !== id))} />
             );
           })}
         </div>
@@ -124,16 +99,15 @@ export default function OfferList() {
 
       <div className="grid gap-2">
         {offers.map((offer) => (
-          <OfferCard key={offer.id} offer={offer} onEdit={setEditing} />
+          <OfferCard key={offer.id} offer={offer} onEdit={(offer) => modal.open(offer)} />
         ))}
       </div>
 
-      {editing !== undefined && (
+      {modal.isOpen && (
         <OfferModal
-          key={editing?.id ?? 'create'}
-          open={true}
-          cancelFn={() => setEditing(undefined)}
-          currentOffer={editing ?? undefined}
+          key={modal.key}
+          onClose={modal.close}
+          currentOffer={modal.data ?? undefined}
         />
       )}
     </>

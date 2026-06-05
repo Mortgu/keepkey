@@ -6,12 +6,11 @@ import type {
 } from "@/types";
 import { useContractHook } from "@/hooks";
 import { useForm } from "@tanstack/react-form";
-import { Loader, Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { z } from "zod";
 
 interface ContractModalProps {
-  open: boolean;
-  cancelFn: () => void;
+  onClose: () => void;
   currentContract?: Contract | null;
 }
 
@@ -27,7 +26,7 @@ const emptyContract: CreateContractInput = {
   table: "",
 };
 
-export default function ContractModal({ open, cancelFn, currentContract = null }: ContractModalProps) {
+export default function ContractModal({ onClose, currentContract = null }: ContractModalProps) {
   const isEdit = currentContract !== null;
 
   const { updateContract, createContract } = useContractHook();
@@ -46,7 +45,7 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
       } else {
         createContract(value as CreateContractInput);
       }
-      cancelFn();
+      onClose();
     },
   });
 
@@ -57,11 +56,10 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
   };
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
         <h1 className="text-lg">
-          {isEdit && "Vertrag bearbeiten"}
-          {!isEdit && "Neuen Vertrag anlegen"}
+          {isEdit ? "Vertrag bearbeiten" : "Neuen Vertrag anlegen"}
         </h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
@@ -97,8 +95,7 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
                 Feature hinzufügen
               </Button>
             </div>
-          )}
-          />
+          )} />
 
           <contractForm.Field name="table" children={(field) => (
             <div className="grid gap-1">
@@ -112,11 +109,10 @@ export default function ContractModal({ open, cancelFn, currentContract = null }
               />
             </div>
           )} />
-
         </form>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button onClick={cancelFn} type="button" size="xs" variant="secondary">
+        <Button onClick={onClose} type="button" size="xs" variant="secondary">
           Abbrechen
         </Button>
         <contractForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}

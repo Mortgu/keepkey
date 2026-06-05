@@ -1,13 +1,12 @@
-import { useFlatRateHook } from "@/hooks";
+import { useFlatRateHook, useModal } from "@/hooks";
 import { Button } from "@/components";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
 import { Pen, Trash } from "lucide-react";
-import { useState } from "react";
 import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateItem(item: FlatRate) {
   const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRateHook();
-  const [isEditing, setEditing] = useState(false);
+  const modal = useModal<FlatRate>();
 
   return (
     <>
@@ -29,38 +28,24 @@ export default function FlatRateItem(item: FlatRate) {
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <Button
-                variant="ghost"
-                size="sm"
-                icon={<Pen className="size-3.5" />}
-                iconOnly
-                onClick={() => setEditing(true)}
-              />
-              <Button
-                variant="ghost"
-                size="sm"
-                loading={isDeletingFlatRate}
-                icon={<Trash className="size-3.5" />}
-                iconOnly
-                onClick={() => deleteFlatRate(item.id)}
-              />
+              <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />}
+                iconOnly onClick={() => modal.open(item)} />
+              <Button variant="ghost" size="sm" loading={isDeletingFlatRate}
+                icon={<Trash className="size-3.5" />} iconOnly
+                onClick={() => deleteFlatRate(item.id)} />
             </div>
           </div>
         </div>
       </div>
 
-      <FlatRateModal
-        open={isEditing}
-        cancelFn={() => setEditing(false)}
-        submitFn={(value: UpdateFlatRateInput) =>
-          updateFlatRate({ id: item.id, flatrate: value })
-        }
-        currentItem={{
-          name: item.name,
-          table: item.table,
-          total_cents: item.total_cents,
-        }}
-      />
+      {modal.isOpen && (
+        <FlatRateModal
+          key={modal.key}
+          onClose={modal.close}
+          submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatrate: value })}
+          currentItem={{ name: item.name, table: item.table, total_cents: item.total_cents }}
+        />
+      )}
     </>
   );
 }

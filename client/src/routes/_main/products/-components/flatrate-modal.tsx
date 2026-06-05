@@ -5,8 +5,7 @@ import type { CreateFlatRateInput, UpdateFlatRateInput } from "@/types";
 import { Button, Input, ModalDialog } from "@/components";
 
 interface FlatRateModalProps {
-  open: boolean;
-  cancelFn: () => void;
+  onClose: () => void;
   submitFn: (value: CreateFlatRateInput) => void;
   currentItem?: UpdateFlatRateInput | null;
 }
@@ -23,12 +22,7 @@ const emptyData: CreateFlatRateInput = {
   total_cents: 0,
 };
 
-export default function FlatRateModal({
-  open,
-  cancelFn,
-  submitFn,
-  currentItem = null,
-}: FlatRateModalProps) {
+export default function FlatRateModal({ onClose, submitFn, currentItem = null }: FlatRateModalProps) {
   const isEdit = currentItem !== null;
 
   const form = useForm({
@@ -39,7 +33,7 @@ export default function FlatRateModal({
     },
     onSubmit: ({ value }) => {
       submitFn(value as CreateFlatRateInput);
-      cancelFn();
+      onClose();
     },
   });
 
@@ -50,7 +44,7 @@ export default function FlatRateModal({
   };
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
         <h1 className="text-lg">
           {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
@@ -62,14 +56,9 @@ export default function FlatRateModal({
           <form.Field name="name">
             {(field) => (
               <div className="grid gap-1">
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
+                <Input id={field.name} name={field.name} value={field.state.value}
                   label="Name"
-                  error={field.state.meta.errors
-                    .map((e) => e?.message)
-                    .join(" & ")}
+                  error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
                   placeholder="Flatrate Name"
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -90,13 +79,8 @@ export default function FlatRateModal({
                     </p>
                   ))}
                 </div>
-
-                <textarea
-                  rows={4}
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  placeholder="Tabellenbeschreibung"
+                <textarea rows={4} id={field.name} name={field.name}
+                  value={field.state.value} placeholder="Tabellenbeschreibung"
                   onChange={(e) => field.handleChange(e.target.value)}
                   className="flex-1 outline-none border border-(--border) p-2 rounded-md"
                 />
@@ -110,11 +94,7 @@ export default function FlatRateModal({
                 <label htmlFor={field.name} className="text-sm text-gray-500">
                   Preis (in Cent)
                 </label>
-                <input
-                  id={field.name}
-                  name={field.name}
-                  type="number"
-                  min={0}
+                <input id={field.name} name={field.name} type="number" min={0}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(parseInt(e.target.value))}
                   className="flex-1 outline-none border border-(--border) p-2 rounded-md"
@@ -126,20 +106,12 @@ export default function FlatRateModal({
       </ModalDialog.Content>
 
       <ModalDialog.Footer>
-        <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+        <Button onClick={onClose} type="button" size="sm" variant="secondary">
           Abbrechen
         </Button>
-        <form.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-        >
+        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
           {([canSubmit, isSubmitting]) => (
-            <Button
-              form="flatrate-form"
-              disabled={!canSubmit}
-              type="submit"
-              size="sm"
-              loading={isSubmitting}
-            >
+            <Button form="flatrate-form" disabled={!canSubmit} type="submit" size="sm" loading={isSubmitting}>
               Speichern
             </Button>
           )}

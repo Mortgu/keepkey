@@ -1,8 +1,8 @@
 import { Badge, Button } from "@/components";
-import { useSupplierHook } from "@/hooks";
+import { useModal, useSupplierHook } from "@/hooks";
 import type { Supplier } from "@/types";
 import { Pen, Trash } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import SupplierModal from "./supplier-modal";
 
 type Props = {
@@ -10,7 +10,7 @@ type Props = {
 };
 
 export default function SupplierListItem({ supplier }: Props) {
-    const [isEdit, setEdit] = useState<boolean>(false);
+    const modal = useModal<Supplier>();
 
     const { deleteSupplier } = useSupplierHook();
 
@@ -36,14 +36,16 @@ export default function SupplierListItem({ supplier }: Props) {
 
                 <div className="flex items-center gap-2">
                     <Button variant="secondary" icon={<Pen className="size-3.5" />} iconOnly
-                        onClick={() => setEdit(true)} />
+                        onClick={() => modal.open(supplier)} />
 
                     <Button variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
                         onClick={handleDeleteSupplier} />
                 </div>
             </div>
 
-            <SupplierModal open={isEdit} cancelFn={() => setEdit(false)} currentSupplier={supplier} />
+            {modal.isOpen && (
+                <SupplierModal key={modal.key} currentSupplier={modal.data ?? undefined} onClose={modal.close} />
+            )}
         </Fragment>
     )
 }

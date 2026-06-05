@@ -16,8 +16,8 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType>({
   user: null,
   isLoading: false,
-  refetch: () => {},
-  logout: () => {},
+  refetch: () => { },
+  logout: () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -25,12 +25,7 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
-  const {
-    data: user = null,
-    isLoading,
-    refetch,
-    error,
-  } = useQuery({
+  const { data: user = null, isLoading, refetch, error } = useQuery({
     queryKey: ["session"],
     queryFn: getSessionUser,
     retry: false,
@@ -56,14 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider
-      value={{
-        user: user ? user[0] : null,
-        logout,
-        isLoading,
-        refetch,
-      }}
-    >
+    <AuthContext.Provider value={{ user: user ? user : null, logout, isLoading, refetch }}>
       {children}
     </AuthContext.Provider>
   );

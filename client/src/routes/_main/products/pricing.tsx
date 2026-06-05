@@ -1,8 +1,8 @@
 import { Badge, Button } from "@/components";
-import { useTariffHook } from "@/hooks";
+import { useModal, useTariffHook } from "@/hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import { Pen, Plus, Trash, UserPlus } from "lucide-react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { formatEur } from "@/utils/utils";
 import PricingModal from "./-components/pricing-modal";
 import TariffConfigModal from "./-components/tariff-config-modal";
@@ -31,10 +31,10 @@ function tariffTitle(tariff: Tariff): string {
 }
 
 function RouteComponent() {
-    const [open, setOpen] = useState<boolean>(false);
-    const [overrideFor, setOverrideFor] = useState<OverrideTarget | null>(null);
-    const [editingProducts, setEditingProducts] = useState<Tariff | null>(null);
-    const [addConfigFor, setAddConfigFor] = useState<string | null>(null);
+    const createModal = useModal();
+    const overrideModal = useModal<OverrideTarget>();
+    const productsModal = useModal<Tariff>();
+    const configModal = useModal<string>();
 
     const { tariffs, deleteTariff, deleteConfig, deleteCustomerOverride, isDeletingCustomerOverride } = useTariffHook();
 
@@ -43,7 +43,7 @@ function RouteComponent() {
             <div className="grid gap-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-medium">Preise</h1>
-                    <Button size="sm" onClick={() => setOpen(true)}>
+                    <Button size="sm" onClick={() => createModal.open()}>
                         Erstellen <Plus className="size-4" />
                     </Button>
                 </div>
@@ -62,18 +62,16 @@ function RouteComponent() {
                                     {tariffTitle(tariff)}
                                 </p>
                                 <div className="flex items-center gap-1">
-
                                     <Button variant="secondary" size="sm" icon={<Plus className="size-3.5" />}
-                                        onClick={() => setAddConfigFor(tariff.id)}>
+                                        onClick={() => configModal.open(tariff.id)}>
                                         Konfiguration
                                     </Button>
 
                                     <Button variant="ghost" size="sm" icon={<Pen className="size-3.5" />}
-                                        iconOnly onClick={() => setEditingProducts(tariff)} />
+                                        iconOnly onClick={() => productsModal.open(tariff)} />
 
                                     <Button variant="ghost" size="sm" icon={<Trash className="size-3.5" />}
                                         iconOnly onClick={() => deleteTariff({ id: tariff.id })} />
-
                                 </div>
                             </div>
 
@@ -106,12 +104,9 @@ function RouteComponent() {
                                     <div className="flex items-center justify-end">
                                         <Button variant="link" size="sm" icon={<UserPlus className="size-3.5" />}
                                             iconOnly disabled={tariff.products.length === 0} onClick={() =>
-                                                setOverrideFor({
+                                                overrideModal.open({
                                                     tariffId: tariff.id,
-                                                    productOptions: tariff.products.map((p) => ({
-                                                        id: p.id,
-                                                        name: p.name,
-                                                    })),
+                                                    productOptions: tariff.products.map((p) => ({ id: p.id, name: p.name })),
                                                     contractId: config.contractId,
                                                     contractName: config.contract?.name ?? "",
                                                     duration: config.duration,
@@ -123,12 +118,7 @@ function RouteComponent() {
                                         />
 
                                         <Button variant="link" size="sm" icon={<Trash className="size-3.5" />}
-                                            iconOnly onClick={() =>
-                                                deleteConfig({
-                                                    tariffId: tariff.id,
-                                                    configId: config.id,
-                                                })
-                                            }
+                                            iconOnly onClick={() => deleteConfig({ tariffId: tariff.id, configId: config.id })}
                                         />
                                     </div>
                                 </div>
@@ -163,14 +153,10 @@ function RouteComponent() {
                                     <div className="flex items-center justify-end">
                                         <Button variant="link" size="sm" icon={<Trash className="size-3.5" />}
                                             iconOnly onClick={async () =>
-                                                deleteCustomerOverride({
-                                                    tariffId: tariff.id,
-                                                    tariffCustomerId: c.id,
-                                                })
+                                                deleteCustomerOverride({ tariffId: tariff.id, tariffCustomerId: c.id })
                                             }
                                         />
                                     </div>
-
                                 </div>
                             ))}
                         </div>
@@ -178,36 +164,38 @@ function RouteComponent() {
                 </div>
             </div>
 
-            <PricingModal open={open} cancelFn={() => setOpen(false)} />
+            {createModal.isOpen && (
+                <PricingModal key={createModal.key} onClose={createModal.close} />
+            )}
 
-            {overrideFor && (
+            {overrideModal.isOpen && overrideModal.data && (
                 <TariffCustomerModal
-                    open
-                    cancelFn={() => setOverrideFor(null)}
-                    tariffId={overrideFor.tariffId}
-                    productOptions={overrideFor.productOptions}
-                    contractId={overrideFor.contractId}
-                    contractName={overrideFor.contractName}
-                    duration={overrideFor.duration}
-                    min_quantity={overrideFor.min_quantity}
-                    max_quantity={overrideFor.max_quantity}
-                    listPrice={overrideFor.price}
+                    key={overrideModal.key}
+                    onClose={overrideModal.close}
+                    tariffId={overrideModal.data.tariffId}
+                    productOptions={overrideModal.data.productOptions}
+                    contractId={overrideModal.data.contractId}
+                    contractName={overrideModal.data.contractName}
+                    duration={overrideModal.data.duration}
+                    min_quantity={overrideModal.data.min_quantity}
+                    max_quantity={overrideModal.data.max_quantity}
+                    listPrice={overrideModal.data.price}
                 />
             )}
 
-            {editingProducts && (
+            {productsModal.isOpen && productsModal.data && (
                 <TariffProductsModal
-                    open
-                    cancelFn={() => setEditingProducts(null)}
-                    tariff={editingProducts}
+                    key={productsModal.key}
+                    onClose={productsModal.close}
+                    tariff={productsModal.data}
                 />
             )}
 
-            {addConfigFor && (
+            {configModal.isOpen && configModal.data && (
                 <TariffConfigModal
-                    open
-                    cancelFn={() => setAddConfigFor(null)}
-                    tariffId={addConfigFor}
+                    key={configModal.key}
+                    onClose={configModal.close}
+                    tariffId={configModal.data}
                 />
             )}
         </Fragment>

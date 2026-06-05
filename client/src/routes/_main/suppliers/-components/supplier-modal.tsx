@@ -6,8 +6,7 @@ import type { SyntheticEvent } from "react";
 import { z } from 'zod';
 
 interface SupplierModalProps {
-    open: boolean;
-    cancelFn: () => void;
+    onClose: () => void;
     currentSupplier?: Supplier;
 }
 
@@ -16,13 +15,12 @@ const supplierSchema = z.object({
     supplierId: z.string(),
 })
 
-export default function SupplierModal({ open, cancelFn, currentSupplier }: SupplierModalProps) {
+export default function SupplierModal({ onClose, currentSupplier }: SupplierModalProps) {
     const isEdit = !!currentSupplier;
 
     const {
         createSupplier,
         errorCreatingSupplier,
-
         updateSupplier,
         errorUpdateingSupplier,
     } = useSupplierHook();
@@ -41,7 +39,7 @@ export default function SupplierModal({ open, cancelFn, currentSupplier }: Suppl
             else createSupplier(value);
 
             if (!errorCreatingSupplier && !errorUpdateingSupplier) {
-                cancelFn();
+                onClose();
             }
         }
     });
@@ -53,11 +51,10 @@ export default function SupplierModal({ open, cancelFn, currentSupplier }: Suppl
     }
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
                 <h1 className="text-lg">
-                    {isEdit && "Zulieferer bearbeiten"}
-                    {!isEdit && "Neuen Zulieferer anlegen"}
+                    {isEdit ? "Zulieferer bearbeiten" : "Neuen Zulieferer anlegen"}
                 </h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
@@ -85,7 +82,7 @@ export default function SupplierModal({ open, cancelFn, currentSupplier }: Suppl
                         )}
                     </p>
                     <div className="flex items-center gap-2">
-                        <Button type="button" variant="secondary" size="sm">Abbrechen</Button>
+                        <Button type="button" variant="secondary" size="sm" onClick={onClose}>Abbrechen</Button>
                         <supplierForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
                             <Button form="supplier-form" size="sm" type="submit" disabled={!canSubmit} loading={isSubmitting}>
                                 Speichern

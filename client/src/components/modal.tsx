@@ -1,81 +1,77 @@
-import { X } from "lucide-react";
-import { useEffect } from "react";
-import { Button } from "@/components";
+import {X} from "lucide-react";
+import {useEffect} from "react";
+import {Button} from "@/components";
 
 interface ModalProps {
-  open: boolean;
-  cancelFn?: () => void;
-  primaryFn?: () => void;
-  children?: React.ReactNode;
-  className?: string;
+    onClose: () => void;
+    children?: React.ReactNode;
+    className?: string;
 }
 
-function Header({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+function Header({children}: { children: React.ReactNode }) {
+    return <>{children}</>;
 }
 
-function Content({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+function Content({children}: { children: React.ReactNode }) {
+    return <>{children}</>;
 }
 
-function Footer({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+function Footer({children}: { children: React.ReactNode }) {
+    return <>{children}</>;
 }
 
-function ModalDialog({ open, cancelFn, primaryFn, children }: ModalProps) {
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && open) {
-        if (cancelFn) cancelFn();
-      }
-    };
+function ModalDialog({onClose, children}: ModalProps) {
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") onClose();
+        };
 
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [open, cancelFn]);
+        document.addEventListener("keydown", handleKeyDown);
+        return () => document.removeEventListener("keydown", handleKeyDown);
+    }, [onClose]);
 
-  if (!open) return null;
+    const childArray = Array.isArray(children) ? children : [children];
+    const header = childArray.find((c: any) => c?.type === Header);
+    const content = childArray.find((c: any) => c?.type === Content);
+    const footer = childArray.find((c: any) => c?.type === Footer);
 
-  const childArray = Array.isArray(children) ? children : [children];
-  const header = childArray.find((c: any) => c?.type === Header);
-  const content = childArray.find((c: any) => c?.type === Content);
-  const footer = childArray.find((c: any) => c?.type === Footer);
+    return (
+        <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
+            <div
+                className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between pt-5 px-5">
+                    {header}
+                    <Button
+                        onClick={onClose}
+                        variant="secondary"
+                        size="xs"
+                        icon={<X className="size-4"/>}
+                        iconOnly
+                    />
+                </div>
 
-  return (
-    <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
-      <div className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-        <div className="flex items-center justify-between pt-5 px-5">
-          {header}
-          <Button
-            onClick={cancelFn}
-            variant="secondary"
-            size="xs"
-            icon={<X className="size-4" />}
-            iconOnly
-          />
+                <div className="scrollbar-none py-5 px-5">{content}</div>
+
+                <div
+                    className="flex items-center justify-end gap-2 py-3.5 px-5 border-t border-(--border) bg-(--subtle-50)">
+                    {footer ?? (
+                        <>
+                            <Button onClick={onClose} variant="secondary" size="sm">
+                                Abbrechen
+                            </Button>
+                            <Button variant="primary" size="sm">
+                                Speichern
+                            </Button>
+                        </>
+                    )}
+                </div>
+            </div>
         </div>
-
-        <div className="scrollbar-none py-5 px-5">{content}</div>
-
-        <div className="flex items-center justify-end gap-2 py-3.5 px-5 border-t border-(--border) bg-(--subtle-50)">
-          {footer ?? (
-            <>
-              <Button onClick={cancelFn} variant="secondary" size="sm">
-                Abbrechen
-              </Button>
-              <Button onClick={primaryFn} variant="primary" size="sm">
-                Speichern
-              </Button>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+    );
 }
 
 ModalDialog.Header = Header;
 ModalDialog.Content = Content;
 ModalDialog.Footer = Footer;
 
-export { ModalDialog };
+export {ModalDialog};

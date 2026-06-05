@@ -5,16 +5,11 @@ import type { Tariff } from "@/types";
 import { useMemo, useState, type SyntheticEvent } from "react";
 
 interface TariffProductsModalProps {
-    open: boolean;
-    cancelFn: () => void;
+    onClose: () => void;
     tariff: Tariff;
 }
 
-export default function TariffProductsModal({
-    open,
-    cancelFn,
-    tariff,
-}: TariffProductsModalProps) {
+export default function TariffProductsModal({ onClose, tariff }: TariffProductsModalProps) {
     const { products } = useProductHook();
     const { updateTariff, isUpdating } = useTariffHook();
 
@@ -23,10 +18,9 @@ export default function TariffProductsModal({
     );
 
     const productOptions = useMemo(
-        () =>
-            products
-                .filter((p) => !p.tariffId || p.tariffId === tariff.id)
-                .map((p) => ({ value: p.id, label: p.name })),
+        () => products
+            .filter((p) => !p.tariffId || p.tariffId === tariff.id)
+            .map((p) => ({ value: p.id, label: p.name })),
         [products, tariff.id],
     );
 
@@ -35,20 +29,16 @@ export default function TariffProductsModal({
         e.stopPropagation();
         if (productIds.length === 0) return;
         await updateTariff({ id: tariff.id, body: { productIds } });
-        cancelFn();
+        onClose();
     };
 
     return (
-        <ModalDialog open={open} cancelFn={cancelFn}>
+        <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
                 <h1 className="text-lg">Produkte der Preistabelle</h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
-                <form
-                    id="tariff-products-form"
-                    onSubmit={handleSubmit}
-                    className="grid gap-2"
-                >
+                <form id="tariff-products-form" onSubmit={handleSubmit} className="grid gap-2">
                     <p className="text-sm text-gray-500">
                         Produkte hinzufügen oder entfernen. Konfigurationen gelten danach
                         für alle ausgewählten Produkte.
@@ -62,16 +52,11 @@ export default function TariffProductsModal({
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+                <Button onClick={onClose} type="button" size="sm" variant="secondary">
                     Abbrechen
                 </Button>
-                <Button
-                    form="tariff-products-form"
-                    type="submit"
-                    size="sm"
-                    disabled={productIds.length === 0 || isUpdating}
-                    loading={isUpdating}
-                >
+                <Button form="tariff-products-form" type="submit" size="sm"
+                    disabled={productIds.length === 0 || isUpdating} loading={isUpdating}>
                     Speichern
                 </Button>
             </ModalDialog.Footer>

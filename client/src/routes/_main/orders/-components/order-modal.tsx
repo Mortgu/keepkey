@@ -6,28 +6,25 @@ import { Button, Input, ModalDialog } from "@/components";
 import { Search } from "lucide-react";
 
 interface OrderModalProps {
-  open: boolean;
-  cancelFn: () => void;
-  currentOrder?: any | null;
+  onClose: () => void;
 }
 
-export default function OrderModal({ open, cancelFn, currentOrder }: OrderModalProps) {
+export default function OrderModal({ onClose }: OrderModalProps) {
   const { offers } = useOfferHook();
-  const { createOrder, errorCreatingOrder } = useOrderHook();
+  const { createOrder } = useOrderHook();
 
   const handleCreateOrder = (offer: Offer) => {
     createOrder({ offerId: offer.id });
-    cancelFn();
+    onClose();
   }
 
   return (
-    <ModalDialog open={open} cancelFn={cancelFn}>
+    <ModalDialog onClose={onClose}>
       <ModalDialog.Header>
         <h1 className="text-lg">Neue Bestellung erstellen</h1>
       </ModalDialog.Header>
       <ModalDialog.Content>
         <div className="grid gap-2">
-
           <Input placeholder="Suchen..." rightButton={{
             icon: <Search className="size-4" />,
             variant: "ghost",
@@ -35,7 +32,7 @@ export default function OrderModal({ open, cancelFn, currentOrder }: OrderModalP
           }} />
 
           {offers.map((offer: Offer) => (
-            <div className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
+            <div key={offer.id} className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
               onClick={() => handleCreateOrder(offer)}>
               <div className="grid">
                 <div className="flex items-center gap-2">
@@ -57,11 +54,8 @@ export default function OrderModal({ open, cancelFn, currentOrder }: OrderModalP
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button onClick={cancelFn} type="button" size="sm" variant="secondary">
+        <Button onClick={onClose} type="button" size="sm" variant="secondary">
           Abbrechen
-        </Button>
-        <Button form="order-form" type="submit" size="sm">
-          Speichern
         </Button>
       </ModalDialog.Footer>
     </ModalDialog>

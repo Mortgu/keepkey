@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Cloud } from "lucide-react";
 import { IntegrationStatusCard, type IntegrationStatus } from "@/components";
-import { Fragment, useState } from "react";
-import NextCloudSettingsModal from "./-components/nextcloud-settings-modal";
+import { Fragment } from "react";
 import { useNextcloudStatus } from "@/hooks/nextcloud-hook";
 
 export const Route = createFileRoute("/_main/")({
@@ -10,7 +9,6 @@ export const Route = createFileRoute("/_main/")({
 });
 
 function RouteComponent() {
-    const [nextCloudSettingsOpen, setNextCloudSettingsOpen] = useState<boolean>(false);
     const { status, detail, isPending, refetch } = useNextcloudStatus();
 
     return (
@@ -25,13 +23,11 @@ function RouteComponent() {
                             status={(isPending ? "checking" : status ?? "not_configured") as IntegrationStatus}
                             detail={detail}
                             onRetry={() => refetch()}
-                            onSettings={() => setNextCloudSettingsOpen(true)}
                         />
                     </div>
                 </div>
             </div>
 
-            <NextCloudSettingsModal open={nextCloudSettingsOpen} cancelFn={() => setNextCloudSettingsOpen(false)} />
         </Fragment>
     );
 }

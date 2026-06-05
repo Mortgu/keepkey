@@ -10,12 +10,24 @@ export interface InputComponentProps extends InputHTMLAttributes<HTMLInputElemen
     /** Optional label text that will be rendered above the input element. */
     label?: string;
 
-    /** Optional error message. When supplied, the input border will turn red and the message will be shown below the input. */
+    /** Short error label shown as a badge next to the field label. Turns the input border red. */
     error?: string;
+
+    /** Longer explanation shown in a tooltip when the error badge is hovered. */
+    errorTooltip?: string;
+
+    /** Short warning label shown as a badge next to the field label. Turns the input border amber. */
+    warning?: string;
+
+    /** Longer explanation shown in a tooltip when the warning badge is hovered. */
+    warningTooltip?: string;
 
     /** Decorative icon rendered on the right side of the input (non-interactive). */
     rightIcon?: ReactNode;
 
     /** Interactive button rendered on the right side of the input. Takes precedence over `rightIcon`. */
     rightButton?: InputAdornmentButton;
+
+    /** When true, renders a spinning loader on the right side. Takes precedence over `rightButton` and `rightIcon`. */
+    loading?: boolean;
 }

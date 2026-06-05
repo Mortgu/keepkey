@@ -1,6 +1,5 @@
 import { Loader, Plus } from "lucide-react";
-import { useState } from "react";
-import { useContractHook } from "@/hooks";
+import { useContractHook, useModal } from "@/hooks";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
@@ -10,7 +9,7 @@ import { Button } from "@/components";
 export default function ContractList() {
   const { contracts, isPending, error, deleteContract } = useContractHook();
 
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal();
 
   if (isPending) {
     return <Loader className="animate-spin" />;
@@ -31,7 +30,7 @@ export default function ContractList() {
         <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
           Verträge ({contracts.length})
         </h1>
-        <Button onClick={() => setOpen(true)} size="sm">
+        <Button onClick={() => modal.open()} size="sm">
           Create <Plus className="size-4" />
         </Button>
       </div>
@@ -41,7 +40,9 @@ export default function ContractList() {
         ))}
       </div>
 
-      <ContractModal open={isOpen} cancelFn={() => setOpen(false)} />
+      {modal.isOpen && (
+        <ContractModal key={modal.key} onClose={modal.close} />
+      )}
     </div>
   );
 }

@@ -1,16 +1,14 @@
-import { useState } from "react";
-
 import { Pen, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
 import { Badge, Button } from "@/components";
-import { useProductHook } from "@/hooks";
+import { useModal, useProductHook } from "@/hooks";
 import type { Product } from "@/types";
 import { formatEur } from "@/utils/utils";
 
 export default function ProductItem(product: Product) {
   const { deleteProduct, updateProduct, isDeletingProduct } = useProductHook();
-  const [isEditing, setEdit] = useState<boolean>(false);
+  const modal = useModal<Product>();
 
   const { name, description, table, tariff } = product;
   const configs = tariff?.configs ?? [];
@@ -26,21 +24,11 @@ export default function ProductItem(product: Product) {
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <Button
-              variant="ghost"
-              icon={<Pen className="size-3.5" />}
-              iconOnly
-              onClick={() => setEdit(true)}
-              size="sm"
-            />
-            <Button
-              variant="ghost"
-              loading={isDeletingProduct}
-              icon={<Trash className="size-3.5" />}
-              iconOnly
-              onClick={() => deleteProduct(product.id)}
-              size="sm"
-            />
+            <Button variant="ghost" icon={<Pen className="size-3.5" />}
+              iconOnly onClick={() => modal.open(product)} size="sm" />
+            <Button variant="ghost" loading={isDeletingProduct}
+              icon={<Trash className="size-3.5" />} iconOnly
+              onClick={() => deleteProduct(product.id)} size="sm" />
           </div>
         </div>
 
@@ -53,10 +41,7 @@ export default function ProductItem(product: Product) {
               <span className="text-caption text-gray-400 text-right">Preis</span>
             </div>
             {configs.map((config) => (
-              <div
-                key={config.id}
-                className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)"
-              >
+              <div key={config.id} className="grid grid-cols-[1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
                 <p className="text-sm text-gray-700 truncate">
                   <Badge variant="generated">{config.contract?.name}</Badge>
                 </p>
@@ -75,12 +60,12 @@ export default function ProductItem(product: Product) {
         )}
       </div>
 
-      <ProductModal
-        open={isEditing}
-        cancelFn={() => setEdit(false)}
-        submitFn={(value) => updateProduct({ id: product.id, product: value })}
-        currentItem={{ name, description, table }}
-      />
+      {modal.isOpen && (
+        <ProductModal key={modal.key} onClose={modal.close}
+          submitFn={(value) => updateProduct({ id: product.id, product: value })}
+          currentItem={{ name, description, table }}
+        />
+      )}
     </>
   );
 }

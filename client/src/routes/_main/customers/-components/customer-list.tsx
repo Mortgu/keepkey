@@ -1,15 +1,14 @@
-import { useState } from "react";
 import { Plus } from "lucide-react";
 
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
-import { useCustomerHook } from "@/hooks";
+import { useCustomerHook, useModal } from "@/hooks";
 import type { Customer } from "@/types";
 import { Button } from "@/components";
 
 export default function CustomerList() {
-  const [isOpen, setOpen] = useState<boolean>(false);
+  const modal = useModal();
 
   const { customers } = useCustomerHook();
 
@@ -20,7 +19,7 @@ export default function CustomerList() {
           Kunden ({customers.length})
         </h1>
 
-        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => setOpen(true)}>
+        <Button size="sm" icon={<Plus className="size-4" />} onClick={() => modal.open()}>
           Kunde hinzufügen
         </Button>
       </div>
@@ -31,7 +30,9 @@ export default function CustomerList() {
         ))}
       </div>
 
-      <CustomerModal open={isOpen} cancelFn={() => setOpen(false)} />
+      {modal.isOpen && (
+        <CustomerModal key={modal.key} onClose={modal.close} />
+      )}
     </div>
   );
 }

@@ -1,13 +1,12 @@
 import { Button } from "@/components";
 import type { FlatRate } from "@/types";
-import { useFlatRateHook } from "@/hooks";
+import { useFlatRateHook, useModal } from "@/hooks";
 import { Loader, Plus } from "lucide-react";
-import { useState } from "react";
 import FlatRateItem from "./flatrate-item";
 import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateList() {
-  const [isOpen, setOpen] = useState(false);
+  const modal = useModal();
   const { flatRates, isPending, error, createFlatRate } = useFlatRateHook();
 
   if (isPending) {
@@ -29,7 +28,7 @@ export default function FlatRateList() {
         <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
           Flatrates
         </h1>
-        <Button onClick={() => setOpen(true)} size="sm">
+        <Button onClick={() => modal.open()} size="sm">
           Erstellen <Plus className="size-4" />
         </Button>
       </div>
@@ -40,11 +39,10 @@ export default function FlatRateList() {
         ))}
       </div>
 
-      <FlatRateModal
-        open={isOpen}
-        cancelFn={() => setOpen(false)}
-        submitFn={(value) => createFlatRate({ ...value })}
-      />
+      {modal.isOpen && (
+        <FlatRateModal key={modal.key} onClose={modal.close}
+          submitFn={(value) => createFlatRate({ ...value })} />
+      )}
     </div>
   );
 }
