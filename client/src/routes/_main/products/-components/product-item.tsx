@@ -1,11 +1,12 @@
 import { Pen, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
-import { Badge, Button } from "@/components";
+import { Badge, Button, NavLink } from "@/components";
 import { useLocale, useModal, useProductHook } from "@/hooks";
 import type { Product } from "@/types";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
+import { Link } from "@tanstack/react-router";
 
 export default function ProductItem({ product }: { product: Product }) {
   const { deleteProduct, updateProduct, isDeletingProduct } = useProductHook();
@@ -22,17 +23,33 @@ export default function ProductItem({ product }: { product: Product }) {
       <div className="bg-white border border-(--border) rounded-md overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <p className="text-md text-gray-900">{name}</p>
+            <Link
+              to="/products/$id"
+              params={{ id: product.id }}
+              className="text-md text-gray-900"
+            >
+              {name}
+            </Link>
             <p className="text-sm font-light text-gray-400 mt-0.5">
               {description}
             </p>
           </div>
           <div className="flex items-center gap-1">
-            <Button variant="ghost" icon={<Pen className="size-3.5" />}
-              iconOnly onClick={() => modal.open(product)} size="sm" />
-            <Button variant="ghost" loading={isDeletingProduct}
-              icon={<Trash className="size-3.5" />} iconOnly
-              onClick={() => deleteProduct(product.id)} size="sm" />
+            <Button
+              variant="ghost"
+              icon={<Pen className="size-3.5" />}
+              iconOnly
+              onClick={() => modal.open(product)}
+              size="sm"
+            />
+            <Button
+              variant="ghost"
+              loading={isDeletingProduct}
+              icon={<Trash className="size-3.5" />}
+              iconOnly
+              onClick={() => deleteProduct(product.id)}
+              size="sm"
+            />
           </div>
         </div>
 
@@ -67,8 +84,12 @@ export default function ProductItem({ product }: { product: Product }) {
       </div>
 
       {modal.isOpen && (
-        <ProductModal key={modal.key} onClose={modal.close}
-          submitFn={(value) => updateProduct({ id: product.id, product: value })}
+        <ProductModal
+          key={modal.key}
+          onClose={modal.close}
+          submitFn={(value) =>
+            updateProduct({ id: product.id, product: value })
+          }
           currentItem={{ key: product.key, translations: product.translations }}
         />
       )}

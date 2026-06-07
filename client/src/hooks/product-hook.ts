@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { UpdateProductInput } from "@/types";
 import {
   createProductAction,
   deleteProductAction,
   getProductsAction,
   updateProductAction,
 } from "@/data/products.ts";
-import type { UpdateProductInput } from "@/types";
 
 export const useProductHook = () => {
   const queryClient = useQueryClient();

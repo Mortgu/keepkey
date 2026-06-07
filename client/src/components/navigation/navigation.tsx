@@ -1,12 +1,10 @@
-import { type ReactNode, useMemo, useState } from "react";
+import { useState } from "react";
 import {
   ChevronDown,
   DollarSign,
   FileText,
   Languages,
-  LanguagesIcon,
   LayoutGrid,
-  LogOut,
   Package,
   Settings,
   ShoppingCart,
@@ -17,12 +15,12 @@ import {
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { NavLink } from "./nav-link.js";
+import type { ReactNode } from "react";
 import {
-  Button,
   DEFAULT_LANGUAGE_OPTIONS,
   SegmentedLanguageToggle,
 } from "@/components";
-import { authClient } from "@/lib/auth-client.ts";
+import { useAuth } from "@/context/auth";
 
 const ICON_SIZE = 14;
 
@@ -68,23 +66,16 @@ function Section({ title, collapsible = false, children }: SectionProps) {
 }
 
 function UserFooter() {
-  const { t, i18n } = useTranslation();
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
+  const { i18n } = useTranslation();
+  const { user } = useAuth();
 
-  if (!user) {
-    throw new Error("Failed to load user from session!");
-  }
-
-  const { salutation, firstName, lastName, email } = user;
-
-  const displayName = `${firstName} ${lastName}`;
+  const displayName = user ? `${user.firstName} ${user.lastName}` : null;
 
   return (
     <div>
       {/* Language toggle */}
       <div className="flex items-center justify-between mx-3.5 py-3.5 border-t border-(--fg-2)">
-        <Languages className="size-5 text-white" />
+        <Languages className="size-5 text-(--text-inv)" />
         <SegmentedLanguageToggle
           className="bg-(--fg-2) text-white border-none"
           options={DEFAULT_LANGUAGE_OPTIONS}
@@ -93,16 +84,17 @@ function UserFooter() {
         />
       </div>
 
-      {/* User */}
-      <div className="flex items-center gap-2.5 border-t border-(--fg-2) mx-3.5 py-3.5">
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary-100)">
-          <UserCircle2 className="size-4" />
+      {user && (
+        <div className="flex items-center gap-2.5 border-t border-(--fg-2) mx-3.5 py-3.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary-100)">
+            <UserCircle2 className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1 text-white">
+            <p className="text-[13px] font-semibold">{displayName}</p>
+            <p className="text-[11px] text-(--fg-3)">{user.email}</p>
+          </div>
         </div>
-        <div className="min-w-0 flex-1 text-white">
-          <p className="text-[13px] font-semibold">{displayName}</p>
-          <p className="text-[11px] text-(--fg-3)">{email}</p>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
