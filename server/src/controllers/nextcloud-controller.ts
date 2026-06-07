@@ -1,26 +1,32 @@
 import { Request, Response } from "express";
-import env from "../lib/env.js";
-import { getNextCloudClient } from "../lib/nextcloud.js";
-import logger from "../middlewares/logger.js";
+import {
+    isNextcloudConfigured,
+    isNextcloudAvailable,
+    getNextcloudInitError,
+} from "../lib/nextcloud.js";
 
 export const getNextcloudStatus = async (request: Request, response: Response) => {
-  if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
-    return response.status(404).json({
-      message: "NextCloud not configured!",
-    });
-  }
+    const configured = isNextcloudConfigured();
 
-  const client = getNextCloudClient();
+    if (!configured) {
+        return response.status(200).json({
+            configured: false,
+            available: false,
+            message: "Nextcloud is not configured. Set NEXTCLOUD_URL, NEXTCLOUD_USER, and NEXTCLOUD_PASSWORD.",
+        });
+    }
 
-  try {
-    await client.getDirectoryContents("/");
+    if (!isNextcloudAvailable) {
+        return response.status(200).json({
+            configured: true,
+            available: false,
+            message: getNextcloudInitError(),
+        });
+    }
+
     return response.status(200).json({
-      message: "ok"
+        configured: true,
+        available: true,
+        message: "ok",
     });
-  } catch (exception: any) {
-    logger.error(exception);
-    return response.status(500).json({
-      message: "NextCloud connection could not be established!"
-    });
-  }
 };

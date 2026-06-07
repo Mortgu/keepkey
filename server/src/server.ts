@@ -17,6 +17,7 @@ import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
+import {initNextcloud, getNextcloudInitError} from "./lib/nextcloud.js";
 
 const options = {
     definition: {
@@ -71,6 +72,11 @@ const shutdown = async () => {
 };
 process.on("SIGTERM", shutdown);
 process.on("SIGINT", shutdown);
+
+const nextcloudInitialized = await initNextcloud();
+if (!nextcloudInitialized) {
+    logger.warn(`[nextcloud] ${getNextcloudInitError()}. Upload functionality is disabled.`);
+}
 
 app.listen(config.port, () => {
     logger.info(`Server is listening on port ${config.port}`);
