@@ -22,6 +22,8 @@ export const useProductHook = () => {
     queryFn: getProductsAction,
   });
 
+
+
   const createMutation = useMutation({
     mutationFn: createProductAction,
     onSuccess: invalidate,

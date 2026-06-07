@@ -1,13 +1,13 @@
-import { api } from "@/lib/api-client";
-
 import type {
-  Product,
   CreateProductInput,
+  Product,
   UpdateProductInput,
 } from "@/types";
 
+import { api } from "@/lib/api-client";
+
 export const getProductsAction = () =>
-  api<Product[]>("/api/products", { method: "GET" });
+  api<Array<Product>>("/api/products", { method: "GET" });
 
 export const getProductAction = (id: string) =>
   api<Product>(`/api/products/${id}`, { method: "GET" });
