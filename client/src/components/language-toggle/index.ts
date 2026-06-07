@@ -2,8 +2,8 @@ import type { LanguageOption } from './language-toggle-types';
 
 /** Default DE / EN options matching the app's i18n setup. */
 export const DEFAULT_LANGUAGE_OPTIONS: LanguageOption[] = [
-    { code: "DE", label: 'Deutsch' },
-    { code: "EN", label: 'English' },
+  { code: "DE", label: 'DE' },
+  { code: "EN", label: 'EN' },
 ];
 
 export type { LanguageOption, LanguageToggleProps } from './language-toggle-types';
