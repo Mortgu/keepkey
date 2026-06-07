@@ -3,6 +3,7 @@ import type { UpdateProductInput } from "@/types";
 import {
   createProductAction,
   deleteProductAction,
+  getProductAction,
   getProductsAction,
   updateProductAction,
 } from "@/data/products.ts";
@@ -21,8 +22,6 @@ export const useProductHook = () => {
     queryKey: ["products"],
     queryFn: getProductsAction,
   });
-
-
 
   const createMutation = useMutation({
     mutationFn: createProductAction,

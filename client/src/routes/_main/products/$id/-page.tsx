@@ -1,14 +1,24 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "@tanstack/react-router";
 import { Server } from "lucide-react";
+import { useEffect, useState } from "react";
 import type { Product, Tariff } from "@/types";
 import { useLocale } from "@/hooks";
 import { api } from "@/lib/api-client";
 import { localized } from "@/lib/i18n-content";
+import { Collapsable, SegmentedToggle, Select } from "@/components";
+
+type PricingMode = "customer" | "default";
+
+const DEFAULT_MODE_OPTIONS: Array<{ value: PricingMode; label: string }> = [
+  { value: "default", label: "Standardpreise" },
+  { value: "customer", label: "Kundenpreise" },
+];
 
 export function ProductDetailPage() {
   const params = useParams({ from: "/_main/products/$id/" });
   const locale = useLocale();
+  const [pricingMode, setPricingMode] = useState<PricingMode>("customer");
 
   const { data: product } = useQuery({
     queryKey: ["product", params.id],
@@ -20,8 +30,9 @@ export function ProductDetailPage() {
     queryKey: ["tariff", product?.tariffId],
     queryFn: () => api<Tariff>(`/api/tariffs/${product?.tariffId}`),
   });
-
   console.log(tariff);
+
+  useEffect(() => {}, []);
 
   return (
     <div className="grid gap-5">
@@ -40,7 +51,7 @@ export function ProductDetailPage() {
         </div>
       </header>
 
-      <section className="grid gap-4 rounded-md border border-(--border) bg-white p-4 shadow-sm">
+      <section className="grid gap-4 rounded-md border border-(--border) bg-white p-4 shadow-xs">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-medium text-(--text)">
@@ -51,6 +62,19 @@ export function ProductDetailPage() {
             </p>
           </div>
         </div>
+      </section>
+
+      <section className="flex items-center justify-between rounded-md gap-4">
+        <SegmentedToggle
+          aria-label="Preismodus"
+          options={DEFAULT_MODE_OPTIONS}
+          value={pricingMode}
+          onChange={setPricingMode}
+        />
+
+        <Select>
+          <option value="Adwa">test</option>
+        </Select>
       </section>
 
       {/* Products */}
