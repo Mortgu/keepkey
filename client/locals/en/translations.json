@@ -2,20 +2,35 @@
   "button": {
     "save": "Save",
     "cancel": "Cancel",
-    "create": "Create"
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
   },
-  "catalog": "Catalog",
-  "overview": "Overview",
-  "sales": "Sales",
-  "management": "Management",
-  "products": "Products",
-  "pricing": "Pricing",
-  "flatRates": "Flat Rates",
-  "suppliers": "Suppliers",
-  "contracts": "Contracts",
-  "customers": "Customers",
-  "employees": "Employees",
-  "offers": "Offers",
-  "orders": "Orders",
-  "settings": "Settings"
+  "nav": {
+    "catalog": "Catalog",
+    "overview": "Overview",
+    "sales": "Sales",
+    "management": "Management",
+    "settings": "Settings"
+  },
+  "section": {
+    "products": "Products",
+    "pricing": "Pricing",
+    "flatRates": "Flat Rates",
+    "suppliers": "Suppliers",
+    "contracts": "Contracts",
+    "customers": "Customers",
+    "employees": "Employees",
+    "offers": "Offers",
+    "orders": "Orders"
+  },
+  "common": {
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "loading": "Loading...",
+    "noResults": "No results"
+  }
 }
