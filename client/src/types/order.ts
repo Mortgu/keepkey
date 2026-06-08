@@ -1,7 +1,8 @@
-import type { components } from "./api";
+import type {components} from "./api";
 
 export type Order = components["schemas"]["Order"];
 export type OrderPosition = components["schemas"]["OrderPosition"];
+export type OrderDocument = components["schemas"]["OrderDocument"];
 
 export type CreateOrderInput = Omit<
     Order,
