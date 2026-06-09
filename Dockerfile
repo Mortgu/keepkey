@@ -29,9 +29,10 @@ COPY --from=builder /app/server/node_modules ./node_modules
 COPY --from=builder /app/server/package.json ./package.json
 COPY --from=builder /app/server/prisma ./prisma
 COPY --from=builder /app/server/assets ./assets
+COPY --from=builder /app/server/prisma.config.js ./prisma.config.js
 COPY --from=builder /app/client/dist ../client/dist
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
-RUN chmod +x /app/docker-entrypoint.sh
 
+RUN chmod +x /app/docker-entrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
