@@ -1,5 +1,5 @@
-import {auth} from "../src/lib/auth";
-import {prisma} from "../src/lib/prismaClient";
+import {auth} from "../src/lib/auth.js";
+import {prisma} from "../src/lib/prismaClient.js";
 
 const OWNER = {
     email: "admin@dignum.de",

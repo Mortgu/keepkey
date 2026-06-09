@@ -10,7 +10,7 @@ RUN cd client && npm install
 
 COPY . .
 RUN cd client && npm run generate:types && VITE_API_BASE_URL="" npx vite build
-RUN cd server && npx tsc --project tsconfig.json && npm prune --production
+RUN cd server && npx tsc --project tsconfig.json && npx tsc --project tsconfig.seed.json && npm prune --production
 
 
 FROM node:22-slim
@@ -25,6 +25,7 @@ RUN apt-get update \
 WORKDIR /app/server
 
 COPY --from=builder /app/server/dist ./dist
+COPY --from=builder /app/server/dist-seed ./dist-seed
 COPY --from=builder /app/server/node_modules ./node_modules
 COPY --from=builder /app/server/package.json ./package.json
 COPY --from=builder /app/server/prisma ./prisma
