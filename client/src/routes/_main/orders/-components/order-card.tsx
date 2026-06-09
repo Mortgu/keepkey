@@ -66,8 +66,8 @@ export default function OrderCard({order}: Props) {
                     className="w-full bg-(--subtle-50) justify-between rounded-none"
                 >
                     <div className="grid gap-2 px-3 py-2">
-                        {order.orderDocuments?.map((document: OrderDocument) => (
-                            <></>
+                        {order.orderDocuments?.map((_document: OrderDocument) => (
+                            <>Not implemented</>
                         ))}
                     </div>
                 </Collapsable>

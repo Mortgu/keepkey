@@ -1,7 +1,6 @@
-import { useLocale, useTariffHook } from "@/hooks";
+import { useTariffHook } from "@/hooks";
 import { createFileRoute } from "@tanstack/react-router";
 import PricingListItem from "./-components/pricing-list-item";
-import { t } from "i18next";
 import { useTranslation } from "react-i18next";
 
 export const Route = createFileRoute("/_main/pricing/")({

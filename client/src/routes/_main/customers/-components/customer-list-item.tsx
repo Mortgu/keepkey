@@ -8,7 +8,7 @@ import type { Customer } from "@/types";
 import { useCustomerHook, useModal } from "@/hooks";
 import { Button } from "@/components";
 import ContactPersonModal from "./contact-person-modal";
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 interface CustomerListItemProps {
   customer: Customer;

@@ -14,19 +14,15 @@ type Props = {
 
 export default function ProductModalSection({ offerProducts, setOfferProducts }: Props) {
     const [showForm, setShowForm] = useState<boolean>(false);
-    const [totalPrice, setTotalPrice] = useState(0);
 
     const { products } = useProductHook();
     const { contracts } = useContractHook();
 
-    const { isPending, mutateAsync } = useMutation({
+    const { mutateAsync } = useMutation({
         mutationKey: ['price'],
         mutationFn: ({ productId, contractId, quantity, duration }: {
             productId: string, contractId: string, quantity: number, duration: number,
         }) => getPrice(productId, contractId, duration, quantity),
-        onSuccess: (value) => {
-            setTotalPrice((prev) => prev + value);
-        }
     });
 
     return (
@@ -59,8 +55,8 @@ export default function ProductModalSection({ offerProducts, setOfferProducts }:
                         const op = Object.assign(offerProduct, product);
 
                         return <ProductSectionItem key={offerProduct.productId} offerProduct={op} offerContract={contract} setOfferProducts={setOfferProducts}
-                            index={index} onUpdate={async (data) => {
-                                setOfferProducts(offerProducts.filter((p, i) => i !== index))
+                            index={index}                             onUpdate={async (data) => {
+                                setOfferProducts(offerProducts.filter((_p, i) => i !== index))
 
                                 data.total_cents = await mutateAsync({
                                     productId: data.productId,

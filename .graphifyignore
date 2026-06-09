@@ -2,8 +2,9 @@
 node_modules/
 dist/
 *.generated.py
-
-# only index src/, ignore everything else
-*
-!src/
-!src/**
+.git/
+graphify-out/
+.idea/
+.opencode/
+.claude/
+dev/

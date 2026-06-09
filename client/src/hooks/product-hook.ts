@@ -3,7 +3,6 @@ import type { UpdateProductInput } from "@/types";
 import {
   createProductAction,
   deleteProductAction,
-  getProductAction,
   getProductsAction,
   updateProductAction,
 } from "@/data/products.ts";

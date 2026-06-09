@@ -52,7 +52,7 @@ export default function UserListItem({ user }: UserListItemProps) {
       {modal.isOpen && (
         <UserModal
           key={modal.key}
-          currentUser={modal.data}
+          currentUser={modal.data ?? null}
           onClose={modal.close}
         />
       )}

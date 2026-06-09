@@ -13,7 +13,7 @@ export const Route = createFileRoute('/_main/products/')({
 
 function RouteComponent() {
     const {t} = useTranslation()
-    const {products, isPending, error, createProduct} = useProductHook();
+    const {products, createProduct} = useProductHook();
 
     const modal = useModal();
 
@@ -23,7 +23,7 @@ function RouteComponent() {
         <div className="grid gap-4">
             {/* Page header */}
             <div className="flex items-center justify-between">
-                <h1 className="text-2xl font-medium">{t('products')}</h1>
+                <h1 className="text-2xl font-medium">{t('section.products')}</h1>
             </div>
 
             {/* Page header actions */}

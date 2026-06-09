@@ -6,7 +6,7 @@ export interface SelectOption {
     label: string;
 }
 
-export interface SelectComponentProps extends SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> {
     variant?: "primary";
     size?: ComponentSize;
     label?: string;

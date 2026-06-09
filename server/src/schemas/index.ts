@@ -6,5 +6,4 @@ export * from "./product-schemas.js";
 export * from "./supplier-schemas.js";
 export * from "./user-schemas.js";
 export * from "./tariffs-schemas.js";
-export * from "./checkout-schemas.js";
 export * from "./flatrate-schemas.js";

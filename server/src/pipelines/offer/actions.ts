@@ -10,7 +10,7 @@ import logger from "../../middlewares/logger.js";
 import {PipelineStageError} from "../pipeline.js";
 import {pickTranslation} from "../../utils/i18n.js";
 import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
-import {customParser, deepIterate} from "./utils.js";
+import {customParser, deepIterate, resolveTemplateName} from "./utils.js";
 import {convert as libconvert} from "libreoffice-convert";
 import env from "../../lib/env.js";
 
@@ -219,7 +219,13 @@ export const prepareAction = async (context: OfferPipelineContext) => {
 export async function generateAction(context: OfferPipelineContext) {
     const {formatedData} = context;
 
-    const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+    // TODO:
+    //const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+
+    const content = await fs.readFile(
+        resolveTemplateName("offer", context.fetchedData!.offer.language),
+        "binary"
+    );
 
     const zip = new PizZip(content);
 
@@ -234,7 +240,7 @@ export async function generateAction(context: OfferPipelineContext) {
     context.docxBuffer = doc.toBuffer();
 }
 
-export async function converteAction(context: OfferPipelineContext) {
+export async function convertAction(context: OfferPipelineContext) {
     const {docxBuffer} = context;
 
     if (!docxBuffer) {

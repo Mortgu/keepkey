@@ -1,7 +1,6 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { CheckboxComponentProps } from "./checkbox-types";
-import { SIZE_STYLES } from "@/components/size";
 
 const checkboxSizes = {
   xs: "w-3 h-3",

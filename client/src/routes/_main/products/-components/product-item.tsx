@@ -1,11 +1,10 @@
 import { Pen, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
-import { Badge, Button, NavLink } from "@/components";
+import { Button } from "@/components";
 import { useLocale, useModal, useProductHook } from "@/hooks";
 import type { Product } from "@/types";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
 import { Link } from "@tanstack/react-router";
 
 export default function ProductItem({ product }: { product: Product }) {
@@ -15,8 +14,6 @@ export default function ProductItem({ product }: { product: Product }) {
 
   const name = localized(product.translations, locale, "name");
   const description = localized(product.translations, locale, "description");
-  const { tariff } = product;
-  const configs = tariff?.configs ?? [];
 
   return (
     <>

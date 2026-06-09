@@ -92,7 +92,7 @@ const BasicLinkComponent = React.forwardRef<HTMLAnchorElement, BasicLinkProps>(
 
 const CreatedLinkComponent = createLink(BasicLinkComponent);
 
-export const NavLink: LinkComponent<typeof BasicLinkComponent> = (props) => {
+export const NavLink = ((props: any) => {
     return (
         <CreatedLinkComponent
             activeOptions={{exact: true}}
@@ -102,7 +102,7 @@ export const NavLink: LinkComponent<typeof BasicLinkComponent> = (props) => {
             }}
         />
     );
-};
+}) as LinkComponent<typeof BasicLinkComponent>;
 
 type NavButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
     NavItemContentProps & { indent?: boolean };

@@ -1,0 +1,54 @@
+model Tariff {
+  id String @id @default(cuid())
+
+  products  Product[]
+  configs   TariffConfig[]
+  customers TariffCustomer[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff")
+}
+
+model TariffConfig {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  duration     Int  @default(12)
+  min_quantity Int
+  max_quantity Int?
+  price        Int
+
+  @@unique([tariffId, contractId, duration, min_quantity])
+  @@map("tariff_config")
+}
+
+model TariffCustomer {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
+
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+
+  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  contractId String
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String
+
+  duration     Int  @default(12)
+  min_quantity Int
+  max_quantity Int?
+  price        Int
+
+  @@unique([tariffId, productId, customerId, contractId, duration, min_quantity])
+  @@map("tariff_customer")
+}

@@ -1,11 +1,11 @@
 import type { Contract, Product } from "@/types";
 import type { OfferProductInput } from "./offer-product-form";
-import { DollarSign, Loader, Pen, Trash, X } from "lucide-react";
+import { Pen, Trash, X } from "lucide-react";
 import { formatEur } from "@/utils/utils";
 import { Button } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import OfferProductForm from "./offer-product-form";
 import { tv } from "tailwind-variants";
 

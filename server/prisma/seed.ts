@@ -23,8 +23,16 @@ const CONTRACTS = [
     {
         key: "basic",
         translations: {
-            DE: {name: "Basic", features: ["E-Mail-Support", "8×5 Verfügbarkeit", "Standard-SLA"], table: "contract_basic"},
-            EN: {name: "Basic", features: ["Email support", "8×5 availability", "Standard SLA"], table: "contract_basic"},
+            DE: {
+                name: "Basic",
+                features: ["E-Mail-Support", "8×5 Verfügbarkeit", "Standard-SLA"],
+                table: "contract_basic"
+            },
+            EN: {
+                name: "Basic",
+                features: ["Email support", "8×5 availability", "Standard SLA"],
+                table: "contract_basic"
+            },
         },
     },
     {
@@ -63,29 +71,57 @@ const PRODUCTS = [
     {
         key: "managed-server",
         translations: {
-            DE: {name: "Managed Server", description: "Vollständig verwalteter Server inkl. Backup & Monitoring", table: "server"},
-            EN: {name: "Managed Server", description: "Fully managed server incl. backup & monitoring", table: "server"},
+            DE: {
+                name: "Managed Server",
+                description: "Vollständig verwalteter Server inkl. Backup & Monitoring",
+                table: "server"
+            },
+            EN: {
+                name: "Managed Server",
+                description: "Fully managed server incl. backup & monitoring",
+                table: "server"
+            },
         },
     },
     {
         key: "cloud-storage",
         translations: {
-            DE: {name: "Cloud Storage", description: "Skalierbarer Objektspeicher mit S3-kompatibler API", table: "storage"},
-            EN: {name: "Cloud Storage", description: "Scalable object storage with S3-compatible API", table: "storage"},
+            DE: {
+                name: "Cloud Storage",
+                description: "Skalierbarer Objektspeicher mit S3-kompatibler API",
+                table: "storage"
+            },
+            EN: {
+                name: "Cloud Storage",
+                description: "Scalable object storage with S3-compatible API",
+                table: "storage"
+            },
         },
     },
     {
         key: "email-hosting",
         translations: {
-            DE: {name: "E-Mail Hosting", description: "Business-E-Mail mit Exchange- und IMAP-Unterstützung", table: "email"},
+            DE: {
+                name: "E-Mail Hosting",
+                description: "Business-E-Mail mit Exchange- und IMAP-Unterstützung",
+                table: "email"
+            },
             EN: {name: "Email Hosting", description: "Business email with Exchange and IMAP support", table: "email"},
         },
     },
     {
         key: "webhosting",
         translations: {
-            DE: {name: "Webhosting", description: "Shared-Hosting mit PHP, MySQL und SSL-Zertifikat", table: "webhosting"},
-            EN: {name: "Web Hosting", description: "Shared hosting with PHP, MySQL and SSL certificate", table: "webhosting"},
+            DE: {
+                name: "Webhosting",
+                description: "Shared-Hosting mit PHP, MySQL und SSL-Zertifikat",
+                table: "webhosting"
+            },
+            EN: {
+                name: "Web Hosting",
+                description: "Shared hosting with PHP, MySQL and SSL certificate",
+                table: "webhosting"
+            },
         },
     },
     {
@@ -310,11 +346,11 @@ async function seedTariffConfigs(tariffId: string, contracts: { id: string; key:
                 },
             });
             console.log(
-                `TariffConfig created: ${cfg.contractName} / ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
+                `TariffConfig created: ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
             );
         } else {
             console.log(
-                `TariffConfig exists: ${cfg.contractName} / ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
+                `TariffConfig exists: ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
             );
         }
     }

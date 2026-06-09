@@ -4,7 +4,7 @@ import type { ComponentSize } from "@/components/size";
 
 export type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 
-export interface InputComponentProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
     variant?: "primary" | "secondary";
     size?: ComponentSize;
 
