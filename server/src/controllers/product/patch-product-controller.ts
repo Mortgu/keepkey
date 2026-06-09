@@ -16,9 +16,25 @@ export const updateProduct = async (request: Request, response: Response, next: 
         });
     }
 
-    const result = await prisma.product.updateMany({
+    const {key, translations} = body;
+
+    const result = await prisma.product.update({
         where: {id: id as string},
-        data: {...body},
+        data: {
+            ...(key !== undefined ? {key} : {}),
+            ...(Array.isArray(translations)
+                ? {
+                      translations: {
+                          upsert: translations.map((t: {language: "DE" | "EN"; name: string; description?: string; table?: string}) => ({
+                              where: {productId_language: {productId: id as string, language: t.language}},
+                              create: {language: t.language, name: t.name, description: t.description, table: t.table},
+                              update: {name: t.name, description: t.description, table: t.table},
+                          })),
+                      },
+                  }
+                : {}),
+        },
+        include: {translations: true},
     });
 
     return response.status(200).json(result);

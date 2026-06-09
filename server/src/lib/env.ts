@@ -16,9 +16,9 @@ const env = createEnv({
     PORT: z.string(),
     NODE_ENV: z.string(),
 
-    NEXTCLOUD_URL: z.url(),
-    NEXTCLOUD_USER: z.string(),
-    NEXTCLOUD_PASSWORD: z.string(),
+    NEXTCLOUD_URL: z.string().url().optional(),
+    NEXTCLOUD_USER: z.string().optional(),
+    NEXTCLOUD_PASSWORD: z.string().optional(),
     NEXTCLOUD_OFFER_PATH: z.string(),
 
     NEXTCLOUD_OFFER_PDF_PATH: z.string().default('/'),

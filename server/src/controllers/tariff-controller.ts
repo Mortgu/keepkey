@@ -1,38 +1,62 @@
-import {Request, Response} from "express";
+import { Request, Response } from "express";
 import calculatePrice from "../utils/products.js";
-import {prisma} from "../lib/prismaClient.js";
+import { Prisma, prisma } from "../lib/prismaClient.js";
 
 const tariffInclude = {
-    products: true,
-    configs: {include: {contract: true}},
-    customers: {include: {product: true, contract: true, customer: true}},
-} as const;
+    products: {
+        include: {
+            translations: true,
+        },
+    },
+    configs: {
+        include: {
+            contract: {
+                include: {
+                    translations: true,
+                },
+            },
+        },
+    },
+    customers: {
+        include: {
+            product: true,
+            contract: {
+                include: {
+                    translations: true,
+                },
+            },
+            customer: true,
+        },
+    },
+}
 
 export const getAllTariffs = async (_request: Request, response: Response) => {
-    const tariffs = await prisma.tariff.findMany({include: tariffInclude});
+    const tariffs = await prisma.tariff.findMany({
+        include: tariffInclude
+    });
     return response.status(200).json(tariffs);
 };
 
 export const getTariffById = async (request: Request, response: Response) => {
     const id = request.params.id as string;
     const tariff = await prisma.tariff.findUnique({
-        where: {id},
+        where: { id },
         include: tariffInclude,
     });
     if (!tariff) {
-        return response.status(404).json({message: "Tariff not found"});
+        return response.status(404).json({ message: "Tariff not found" });
     }
     return response.status(200).json(tariff);
 };
 
 export const createTariff = async (request: Request, response: Response) => {
-    const {productIds = []} = request.body ?? {};
+    const { productIds = [] } = request.body ?? {};
 
     try {
         const tariff = await prisma.$transaction(async (tx) => {
             const conflicting = await tx.product.findMany({
-                where: {id: {in: productIds}, tariffId: {not: null}},
-                select: {id: true, name: true, tariffId: true},
+                where: { id: { in: productIds }, tariffId: { not: null } },
+                select: { id: true, name: true, tariffId: true },
             });
             if (conflicting.length > 0) {
                 throw new Error(
@@ -44,7 +68,7 @@ export const createTariff = async (request: Request, response: Response) => {
 
             const created = await tx.tariff.create({
                 data: {
-                    products: {connect: productIds.map((id: string) => ({id}))},
+                    products: { connect: productIds.map((id: string) => ({ id })) },
                 },
                 include: tariffInclude,
             });
@@ -61,16 +85,16 @@ export const createTariff = async (request: Request, response: Response) => {
 
 export const updateTariff = async (request: Request, response: Response) => {
     const id = request.params.id as string;
-    const {productIds = []} = request.body ?? {};
+    const { productIds = [] } = request.body ?? {};
 
     try {
         const tariff = await prisma.$transaction(async (tx) => {
             const conflicting = await tx.product.findMany({
                 where: {
-                    id: {in: productIds},
-                    tariffId: {not: null, notIn: [id]},
+                    id: { in: productIds },
+                    tariffId: { not: null, notIn: [id] },
                 },
-                select: {id: true, name: true},
+                select: { id: true, name: true },
             });
             if (conflicting.length > 0) {
                 throw new Error(
@@ -81,15 +105,15 @@ export const updateTariff = async (request: Request, response: Response) => {
             }
 
             await tx.product.updateMany({
-                where: {tariffId: id, id: {notIn: productIds}},
-                data: {tariffId: null},
+                where: { tariffId: id, id: { notIn: productIds } },
+                data: { tariffId: null },
             });
             await tx.product.updateMany({
-                where: {id: {in: productIds}},
-                data: {tariffId: id},
+                where: { id: { in: productIds } },
+                data: { tariffId: id },
             });
 
-            return tx.tariff.findUnique({where: {id}, include: tariffInclude});
+            return tx.tariff.findUnique({ where: { id }, include: tariffInclude });
         });
 
         return response.status(200).json(tariff);
@@ -103,8 +127,8 @@ export const updateTariff = async (request: Request, response: Response) => {
 export const deleteTariff = async (request: Request, response: Response) => {
     const id = request.params.id as string;
     try {
-        await prisma.tariff.delete({where: {id}});
-        return response.status(200).json({success: true});
+        await prisma.tariff.delete({ where: { id } });
+        return response.status(200).json({ success: true });
     } catch (exception: any) {
         return response.status(500).json({
             message: "Could not delete tariff: " + exception.message,
@@ -114,7 +138,7 @@ export const deleteTariff = async (request: Request, response: Response) => {
 
 export const addTariffConfig = async (request: Request, response: Response) => {
     const tariffId = request.params.id as string;
-    const {contractId, duration, min_quantity, max_quantity, price} = request.body;
+    const { contractId, duration, min_quantity, max_quantity, price } = request.body;
 
     try {
         const entry = await prisma.tariffConfig.create({
@@ -139,7 +163,7 @@ export const updateTariffConfig = async (request: Request, response: Response) =
     const configId = request.params.configId as string;
     try {
         const entry = await prisma.tariffConfig.update({
-            where: {id: configId},
+            where: { id: configId },
             data: request.body,
         });
         return response.status(200).json(entry);
@@ -153,8 +177,8 @@ export const updateTariffConfig = async (request: Request, response: Response) =
 export const deleteTariffConfig = async (request: Request, response: Response) => {
     const configId = request.params.configId as string;
     try {
-        await prisma.tariffConfig.delete({where: {id: configId}});
-        return response.status(200).json({success: true});
+        await prisma.tariffConfig.delete({ where: { id: configId } });
+        return response.status(200).json({ success: true });
     } catch (exception: any) {
         return response.status(400).json({
             message: "Could not delete tariff config: " + exception.message,
@@ -199,7 +223,7 @@ export const updateTariffCustomer = async (request: Request, response: Response)
     const tariffCustomerId = request.params.tariffCustomerId as string;
     try {
         const entry = await prisma.tariffCustomer.update({
-            where: {id: tariffCustomerId},
+            where: { id: tariffCustomerId },
             data: request.body,
         });
         return response.status(200).json(entry);
@@ -213,8 +237,8 @@ export const updateTariffCustomer = async (request: Request, response: Response)
 export const deleteTariffCustomer = async (request: Request, response: Response) => {
     const tariffCustomerId = request.params.tariffCustomerId as string;
     try {
-        await prisma.tariffCustomer.delete({where: {id: tariffCustomerId}});
-        return response.status(200).json({success: true});
+        await prisma.tariffCustomer.delete({ where: { id: tariffCustomerId } });
+        return response.status(200).json({ success: true });
     } catch (exception: any) {
         return response.status(400).json({
             message: "Could not delete customer override: " + exception.message,
@@ -223,7 +247,7 @@ export const deleteTariffCustomer = async (request: Request, response: Response)
 };
 
 export const getTariffPrice = async (request: Request, response: Response) => {
-    const {productId, contractId, duration, quantity, customerId} = request.query;
+    const { productId, contractId, duration, quantity, customerId } = request.query;
 
     if (!productId || !contractId || !duration || !quantity) {
         return response.status(400).json({

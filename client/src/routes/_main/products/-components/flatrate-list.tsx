@@ -35,7 +35,7 @@ export default function FlatRateList() {
 
       <div className="grid gap-2">
         {flatRates?.map((item: FlatRate) => (
-          <FlatRateItem key={item.id} {...item} />
+          <FlatRateItem key={item.id} item={item} />
         ))}
       </div>
 

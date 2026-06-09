@@ -10,7 +10,7 @@ type Props = {
 }
 
 export function Document({ offer, document }: Props) {
-    const { deleteDocument, isDeletingDocument, errorDeletingDocument, upload, isUploading, errorUploading } = useOfferHook();
+    const { deleteDocument, isDeletingDocument, errorDeletingDocument, upload, isUploading } = useOfferHook();
     const { task: polledTask } = useDocumentTask(document.taskId);
 
     const [status, setStatus] = useState<DocumentStatus>(document.status);

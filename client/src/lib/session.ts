@@ -1,14 +1,19 @@
-import {redirect} from "@tanstack/react-router";
+import { redirect } from "@tanstack/react-router";
+import type { authClient } from "@/lib/auth-client";
 
-export async function requireSession(context: any) {
-    const { data: session } = await context.auth.getSession();
+export type RouterContext = {
+  auth: typeof authClient;
+};
 
-    if (!session) {
-        throw redirect({
-            to: '/login',
-            search: { redirect: window.location.href }
-        })
-    }
+export async function requireSession(context: RouterContext) {
+  const { data: session } = await context.auth.getSession();
 
-    return session;
+  if (!session) {
+    throw redirect({
+      to: "/login",
+      search: { redirect: window.location.href },
+    });
+  }
+
+  return session;
 }

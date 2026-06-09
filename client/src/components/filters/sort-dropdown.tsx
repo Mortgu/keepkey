@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
 import { Button } from "@/components";
+import type { ComponentSize } from "@/components/size";
 
 export interface SortOption {
   value: string;
@@ -12,6 +13,7 @@ interface SortDropdownProps {
   onChange: (value: string) => void;
   options: SortOption[];
   className?: string;
+  size?: ComponentSize;
 }
 
 export const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => (
@@ -37,7 +39,7 @@ export const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => (
   </svg>
 );
 
-export function SortDropdown({ value, onChange, options, className }: SortDropdownProps) {
+export function SortDropdown({ value, onChange, options, className, size = "sm" }: SortDropdownProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -56,7 +58,7 @@ export function SortDropdown({ value, onChange, options, className }: SortDropdo
     <div ref={ref} className={`relative select-none ${className ?? ''}`}>
       <Button
         type="button"
-        size="sm"
+        size={size}
         onClick={() => setOpen(o => !o)}
         className={[
           'flex items-center gap-1.5 py-[6px] pl-3 pr-2.5 bg-white border rounded-md cursor-pointer text-sm whitespace-nowrap transition-[border-color,box-shadow] duration-[120ms]',

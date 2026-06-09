@@ -2,7 +2,8 @@ import { useState } from "react";
 
 import { Input, Button, Checkbox, Select } from "@/components";
 import type { CreateOfferPositionInput } from "@/types";
-import { useContractHook, useProductHook } from "@/hooks";
+import { useContractHook, useLocale, useProductHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 
 export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
 
@@ -21,6 +22,7 @@ interface Props {
 export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
   const { products } = useProductHook();
   const { contracts } = useContractHook();
+  const locale = useLocale();
 
   const [productId, setProductId] = useState(currentProduct?.productId ?? products[0]?.id ?? "");
   const [contractId, setContractId] = useState(currentProduct?.contractId ?? contracts[0]?.id ?? "");
@@ -55,7 +57,7 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
           <Select label="Produkt" value={productId} onChange={(e) => setProductId(e.target.value)} className="bg-white">
             {products.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name}
+                {localized(p.translations, locale, "name")}
               </option>
             ))}
           </Select>
@@ -65,7 +67,7 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
           <Select label="Vertrag" value={contractId} onChange={(e) => setContractId(e.target.value)} className="bg-white">
             {contracts.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name}
+                {localized(c.translations, locale, "name")}
               </option>
             ))}
           </Select>

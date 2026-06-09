@@ -1,10 +1,13 @@
-import { createRequire } from "module";
+import {createRequire} from "module";
+import type {DXT} from "docxtemplater";
+import {Language} from "@prisma/client";
+import path from "path";
+import env from "../../lib/env.js";
+import fs from "fs";
 
 // Require-Workaround für den Expression-Parser
 const require = createRequire(import.meta.url);
 const expressionParser = require("docxtemplater/expressions.js");
-
-import type { DXT } from "docxtemplater";
 
 export function interpolate(template: string, ctx: Record<string, unknown>): string {
     return template.replace(/\{([\w.]+)\}/g, (_, key: string) => {
@@ -15,7 +18,7 @@ export function interpolate(template: string, ctx: Record<string, unknown>): str
 }
 
 export const deepIterate = (obj: Record<string, unknown>, root: Record<string, unknown>, local: Record<string, unknown> = {}): Record<string, unknown> => {
-    const ctx = { ...root, ...local };
+    const ctx = {...root, ...local};
 
     for (const key in obj) {
         const value = obj[key];
@@ -58,3 +61,16 @@ export const customParser = function (tag: string): ParserResult {
         },
     };
 };
+
+export function resolveTemplateName(baseName: string, language: Language): string {
+    const langSuffix = language === "DE" ? "" : `.${language.toLowerCase()}`;
+    const templatePath = path.join(env.TEMPLATES_DIR, `${baseName}${langSuffix}.docx`);
+
+    // Prüfe ob sprachspezifisches Template existiert, sonst Fallback
+    try {
+        fs.accessSync(templatePath);
+        return templatePath;
+    } catch {
+        return path.join(env.TEMPLATES_DIR, `${baseName}.docx`);
+    }
+}

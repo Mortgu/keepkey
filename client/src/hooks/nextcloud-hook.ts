@@ -9,8 +9,12 @@ export const useNextcloudStatus = () => {
         refetchOnWindowFocus: false,
     });
 
+    const connected = data?.message === "ok";
+
     return {
-        connected: data?.message === "ok",
+        connected,
+        status: connected ? "connected" : "not_configured" as const,
+        detail: !connected && !isPending ? data?.message : undefined,
         isPending,
         refetch,
     };

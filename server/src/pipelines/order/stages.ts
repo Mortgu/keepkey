@@ -2,6 +2,7 @@ import {TaskStatus} from "@prisma/client";
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
 import {converting, fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {pickTranslation} from "../../utils/i18n.js";
 import fs from "fs/promises";
 import env from "../../lib/env.js";
 import path from "path";
@@ -73,7 +74,7 @@ const write: PipelineStage<OrderPipelineContext> = {
         const {companyName} = customer;
 
         const workloads = orderPositions
-            .map((i) => i.product.name.replaceAll(" ", ""))
+            .map((i) => (pickTranslation(i.product.translations, "DE")?.name ?? "").replaceAll(" ", ""))
             .join("+");
 
         const baseName = `${orderId}_BE_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;

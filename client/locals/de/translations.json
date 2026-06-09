@@ -1,0 +1,36 @@
+{
+  "button": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen"
+  },
+  "nav": {
+    "catalog": "Katalog",
+    "overview": "Übersicht",
+    "sales": "Vertrieb",
+    "management": "Verwaltung",
+    "settings": "Einstellungen"
+  },
+  "section": {
+    "products": "Produkte",
+    "pricing": "Preise",
+    "flatRates": "Pauschalen",
+    "suppliers": "Lieferanten",
+    "contracts": "Verträge",
+    "customers": "Kunden",
+    "employees": "Angestellte",
+    "offers": "Angebote",
+    "orders": "Bestellungen"
+  },
+  "common": {
+    "search": "Suchen",
+    "filter": "Filtern",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "loading": "Laden...",
+    "noResults": "Keine Ergebnisse"
+  }
+}

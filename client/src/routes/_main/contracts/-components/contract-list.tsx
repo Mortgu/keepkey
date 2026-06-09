@@ -1,48 +1,50 @@
-import { Loader, Plus } from "lucide-react";
-import { useContractHook, useModal } from "@/hooks";
+import {Loader, Plus} from "lucide-react";
+import {useContractHook, useModal} from "@/hooks";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
-import type { Contract } from "@/types";
-import { Button } from "@/components";
+import type {Contract} from "@/types";
+import {Button} from "@/components";
+import {useTranslation} from "react-i18next";
 
 export default function ContractList() {
-  const { contracts, isPending, error, deleteContract } = useContractHook();
+    const {t} = useTranslation();
+    const {contracts, isPending, error, deleteContract} = useContractHook();
 
-  const modal = useModal();
+    const modal = useModal();
 
-  if (isPending) {
-    return <Loader className="animate-spin" />;
-  }
+    if (isPending) {
+        return <Loader className="animate-spin"/>;
+    }
 
-  if (error) {
+    if (error) {
+        return (
+            <div className="p-2 bg-red-200 border border-red-400 rounded-lg">
+                <p className="text-lg">Error</p>
+                <p>{error.message}</p>
+            </div>
+        );
+    }
+
     return (
-      <div className="p-2 bg-red-200 border border-red-400 rounded-lg">
-        <p className="text-lg">Error</p>
-        <p>{error.message}</p>
-      </div>
+        <div>
+            <div className="mb-4 flex items-center justify-between">
+                <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
+                    {t("section.contracts")} ({contracts.length})
+                </h1>
+                <Button onClick={() => modal.open()} size="sm">
+                    Create <Plus className="size-4"/>
+                </Button>
+            </div>
+            <div className="grid gap-2">
+                {contracts.map((contract: Contract, index) => (
+                    <ContractListItem key={index} contract={contract} deleteContract={deleteContract}/>
+                ))}
+            </div>
+
+            {modal.isOpen && (
+                <ContractModal key={modal.key} onClose={modal.close}/>
+            )}
+        </div>
     );
-  }
-
-  return (
-    <div>
-      <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-          Verträge ({contracts.length})
-        </h1>
-        <Button onClick={() => modal.open()} size="sm">
-          Create <Plus className="size-4" />
-        </Button>
-      </div>
-      <div className="grid gap-2">
-        {contracts.map((contract: Contract, index) => (
-          <ContractListItem key={index} contract={contract} deleteContract={deleteContract} />
-        ))}
-      </div>
-
-      {modal.isOpen && (
-        <ContractModal key={modal.key} onClose={modal.close} />
-      )}
-    </div>
-  );
 }

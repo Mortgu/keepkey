@@ -91,7 +91,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
         {
             className,
             variant: _variant,
-            input_size,
+            size,
             label,
             error,
             errorTooltip,
@@ -127,7 +127,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                 <div className="relative">
                     <input
                         ref={ref}
-                        className={styles({input_size, state, adornment, className})}
+                        className={styles({input_size: size, state, adornment, className})}
                         {...rest}
                     />
 

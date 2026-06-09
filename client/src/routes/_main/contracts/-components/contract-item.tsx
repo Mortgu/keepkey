@@ -5,7 +5,8 @@ import ContractModal from "./contract-modal";
 
 import type { Contract } from "@/types";
 import { Button } from "@/components";
-import { useModal } from "@/hooks";
+import { useLocale, useModal } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 
 interface ContractListItemProps {
   contract: Contract;
@@ -14,13 +15,17 @@ interface ContractListItemProps {
 
 export default function ContractListItem({ contract, deleteContract }: ContractListItemProps) {
   const modal = useModal<Contract>();
+  const locale = useLocale();
+
+  const name = localized(contract.translations, locale, "name");
+  const features = localized(contract.translations, locale, "features") || [];
 
   return (
     <Fragment>
       <div className="bg-white border border-(--border) rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
           <div>
-            <p className="text-md text-(--text)">{contract.name}</p>
+            <p className="text-md text-(--text)">{name}</p>
             <p className="text-xs text-gray-400 mt-0.5">
               {formatDate(contract.createdAt || "")}
             </p>
@@ -36,7 +41,7 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
 
         <div className="px-4 py-3.5">
           <ul className="flex flex-col gap-1.5">
-            {contract.features.map((feature) => (
+            {features.map((feature) => (
               <li key={feature} className="flex items-start gap-2 text-sm text-(--text) leading-snug">
                 <span className="w-1.25 h-1.25 rounded-full bg-(--text) shrink-0 mt-1.5" />
                 {feature}

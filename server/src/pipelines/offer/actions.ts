@@ -1,58 +1,99 @@
-import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
-import { OfferFetchData, OfferFormatedData } from "./context.js";
-import { customParser, deepIterate } from "./utils.js";
-import env from "../../lib/env.js";
-
-import path from "path";
 import fs from "fs/promises";
+import path from "path";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 
-import { convert as libconvert } from "libreoffice-convert";
-import { prisma } from "../../lib/prismaClient.js";
-import { PipelineStageError } from "../pipeline.js";
+import {PrismaClientKnownRequestError} from "@prisma/client/runtime/client";
+import {prisma} from "../../lib/prismaClient.js";
+import {OfferFetchData, OfferFormatedData, OfferPipelineContext} from "./context.js";
+import logger from "../../middlewares/logger.js";
+import {PipelineStageError} from "../pipeline.js";
+import {pickTranslation} from "../../utils/i18n.js";
+import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
+import {customParser, deepIterate, resolveTemplateName} from "./utils.js";
+import {convert as libconvert} from "libreoffice-convert";
+import env from "../../lib/env.js";
 
-export async function fetchOfferData(offerId: string) {
+/* Helper function */
+export const fetchOfferData = async (offerId: string) => {
     const [offer, contracts] = await Promise.all([
         await prisma.offer.findUniqueOrThrow({
-            where: { id: offerId },
+            where: {id: offerId},
             include: {
                 customer: true,
                 customerContactPerson: true,
                 user: true,
                 offerPositions: {
                     include: {
-                        product: true,
-                        contract: true,
+                        product: {include: {translations: true}},
+                        contract: {include: {translations: true}},
                     },
                 },
                 offerFlatRates: {
                     include: {
-                        flatRate: true,
+                        flatRate: {include: {translations: true}},
                     },
                 },
-            },
+            }
         }),
 
         await prisma.contract.findMany(),
     ]);
 
-    return { offer, contracts };
+    return {offer, contracts};
 }
 
-export async function formatFetchedData(fetchedData?: OfferFetchData) {
-    if (!fetchedData) {
-        throw new Error("Failed to format! No input fetched data!");
-    }
+/* Stage function */
+export const fetchOfferAction = async (context: OfferPipelineContext) => {
+    try {
+        context.fetchedData = await fetchOfferData(context.offerId);
+    } catch (exception: any) {
+        if (exception instanceof PrismaClientKnownRequestError) {
+            logger.error("[pipline]: Prisma error: Something failed while trying to fetch data!")
+        }
 
-    const offer = fetchedData.offer;
-    const {
-        customer,
-        customerContactPerson: ccp,
-        user: employee,
-        offerPositions,
-        offerFlatRates,
-    } = offer;
+        logger.error(exception);
+        throw new PipelineStageError("An error occurred! Please try again later.");
+    }
+}
+
+/* Helper function */
+export const formatOfferData = async (fetchedData: OfferFetchData) => {
+    const {offer, contracts} = fetchedData;
+    const {customer, customerContactPerson: ccp, user: employee, language} = offer;
+
+    const offerPositions = offer.offerPositions.map((position) => {
+        const product = pickTranslation(position.product.translations, language);
+        const contract = pickTranslation(position.contract.translations, language);
+
+        return {
+            ...position,
+            product: {
+                ...position.product,
+                name: product?.name ?? "",
+                description: product?.description ?? "",
+                table: product?.table ?? "",
+            },
+            contract: {
+                ...position.contract,
+                name: contract?.name ?? "",
+                features: contract?.features ?? [],
+                table: contract?.table ?? "",
+            }
+        };
+    });
+
+    const offerFlatRates = offer.offerFlatRates.map((fr) => {
+        const ft = pickTranslation(fr.flatRate.translations, language);
+        return {
+            ...fr,
+            flatRate: {
+                ...fr.flatRate,
+                name: ft?.name ?? "",
+                table: ft?.table ?? ""
+            }
+        };
+    });
 
     const products = offerPositions.map((position) => ({
         contract: position.contract,
@@ -62,21 +103,14 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
         duration: formatDuration(position.duration_months),
     }));
 
-    const groups = Object.groupBy(
-        offerPositions,
-        (p) => `${p.contract.id}_${p.duration_months}`,
-    );
+    const groups = Object.groupBy(offerPositions, (p) =>
+        `${p.contract.id}_${p.duration_months}`);
+
     const grouped = Object.values(groups).map((group) => {
         const first = group![0];
 
-        const flatrate_total = offerFlatRates?.reduce(
-            (sum, p) => sum + p.total_cents,
-            0,
-        );
-        const group_total = group?.reduce(
-            (sum, p) => sum + p.total_cents,
-            flatrate_total,
-        );
+        const flatrate_total = offerFlatRates?.reduce((sum, p) => sum + p.total_cents, 0);
+        const group_total = group?.reduce((sum, p) => sum + p.total_cents, flatrate_total);
 
         return {
             names: group?.map((p) => p.product.name).join(" & "),
@@ -151,19 +185,47 @@ export async function formatFetchedData(fetchedData?: OfferFetchData) {
     };
 }
 
-export async function postprocessing(formatedData?: OfferFormatedData): Promise<OfferFormatedData> {
+/* Stage function */
+export const formatFetchedDataAction = async (context: OfferPipelineContext) => {
+    if (!context.fetchedData || !context.fetchedData.offer || !context.fetchedData.contracts) {
+        throw new PipelineStageError("Fetched data is empty!");
+    }
+
+    try {
+        context.formatedData = await formatOfferData(context.fetchedData);
+    } catch (exception: any) {
+        logger.error(exception);
+        throw new PipelineStageError("An error occurred! Please try again later.");
+    }
+}
+
+export const postProcessingAction = async (context: OfferPipelineContext) => {
+    const {formatedData} = context;
+
     if (!formatedData) {
         throw new Error("Failed to postprocess! No formatted data!");
     }
 
-    return deepIterate(
+    context.formatedData = deepIterate(
         formatedData as Record<string, unknown>,
         formatedData as Record<string, unknown>,
     ) as unknown as OfferFormatedData;
 }
 
-export async function generating(formatedData?: OfferFormatedData): Promise<Buffer> {
-    const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+export const prepareAction = async (context: OfferPipelineContext) => {
+    await fs.mkdir(env.OUTPUT_DIR, {recursive: true});
+}
+
+export async function generateAction(context: OfferPipelineContext) {
+    const {formatedData} = context;
+
+    // TODO:
+    //const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+
+    const content = await fs.readFile(
+        resolveTemplateName("offer", context.fetchedData!.offer.language),
+        "binary"
+    );
 
     const zip = new PizZip(content);
 
@@ -175,11 +237,17 @@ export async function generating(formatedData?: OfferFormatedData): Promise<Buff
 
     doc.render(formatedData);
 
-    return doc.toBuffer();
+    context.docxBuffer = doc.toBuffer();
 }
 
-export async function converting(docxBuffer: Buffer): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
+export async function convertAction(context: OfferPipelineContext) {
+    const {docxBuffer} = context;
+
+    if (!docxBuffer) {
+        throw new PipelineStageError("Something went wrong! Empty docx buffer.");
+    }
+
+    context.pdfBuffer = await new Promise((resolve, reject) => {
         libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
             if (err) reject(err);
             else resolve(result);
@@ -187,13 +255,21 @@ export async function converting(docxBuffer: Buffer): Promise<Buffer> {
     });
 }
 
-export async function writeGeneratedDocuments(fetchedData: OfferFetchData, documentId: string, version: number, docxBuffer?: Buffer, pdfBuffer?: Buffer): Promise<string> {
-    const { quoteId, customer, offerPositions } = fetchedData.offer;
+export async function writeAction(context: OfferPipelineContext) {
+    const {fetchedData, documentId, version, docxBuffer, pdfBuffer} = context;
+
+    if (!fetchedData || !documentId || !version || !docxBuffer || !pdfBuffer) {
+        throw new PipelineStageError("Something went wrong! Failed to write to disk!");
+    }
+
+    const {quoteId, customer, offerPositions, language} = fetchedData.offer;
 
     const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
-    const formatedWorkloads = offerPositions.map((op) => op.product.name.replaceAll(" ", "").trim()).join("+");
+    const formatedWorkloads = offerPositions
+        .map((op) => (pickTranslation(op.product.translations, language)?.name ?? "").replaceAll(" ", "").trim())
+        .join("+");
 
-    const name = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
+    context.displayName = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
 
     const docxPath = path.join(env.OUTPUT_DIR, `${documentId}.docx`);
     const pdfPath = path.join(env.OUTPUT_DIR, `${documentId}.pdf`);
@@ -202,6 +278,4 @@ export async function writeGeneratedDocuments(fetchedData: OfferFetchData, docum
         fs.writeFile(docxPath, docxBuffer!),
         fs.writeFile(pdfPath, pdfBuffer!),
     ]);
-
-    return name;
 }

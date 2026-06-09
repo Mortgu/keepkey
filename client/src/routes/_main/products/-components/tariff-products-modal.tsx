@@ -1,6 +1,7 @@
 import { Button, ModalDialog } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { useProductHook, useTariffHook } from "@/hooks";
+import { useLocale, useProductHook, useTariffHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import type { Tariff } from "@/types";
 import { useMemo, useState, type SyntheticEvent } from "react";
 
@@ -12,6 +13,7 @@ interface TariffProductsModalProps {
 export default function TariffProductsModal({ onClose, tariff }: TariffProductsModalProps) {
     const { products } = useProductHook();
     const { updateTariff, isUpdating } = useTariffHook();
+    const locale = useLocale();
 
     const [productIds, setProductIds] = useState<string[]>(
         tariff.products.map((p) => p.id),
@@ -20,8 +22,8 @@ export default function TariffProductsModal({ onClose, tariff }: TariffProductsM
     const productOptions = useMemo(
         () => products
             .filter((p) => !p.tariffId || p.tariffId === tariff.id)
-            .map((p) => ({ value: p.id, label: p.name })),
-        [products, tariff.id],
+            .map((p) => ({ value: p.id, label: localized(p.translations, locale, "name") })),
+        [products, tariff.id, locale],
     );
 
     const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {

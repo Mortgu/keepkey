@@ -1,3 +1,14 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+
+import type {
+  CreateTariffConfigInput,
+  CreateTariffCustomerInput,
+  CreateTariffInput,
+  UpdateTariffConfigInput,
+  UpdateTariffCustomerInput,
+  UpdateTariffInput,
+} from "@/types";
+
 import {
   addTariffConfigAction,
   addTariffCustomerAction,
@@ -10,15 +21,6 @@ import {
   updateTariffConfigAction,
   updateTariffCustomerAction,
 } from "@/data/tariffs";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type {
-  CreateTariffConfigInput,
-  CreateTariffCustomerInput,
-  CreateTariffInput,
-  UpdateTariffConfigInput,
-  UpdateTariffCustomerInput,
-  UpdateTariffInput,
-} from "@/types";
 
 export const useTariffHook = () => {
   const queryClient = useQueryClient();

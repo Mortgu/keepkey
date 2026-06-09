@@ -154,6 +154,8 @@ components:
           $ref: "#/components/schemas/User"
         userId:
           type: string
+        language:
+          $ref: "#/components/schemas/Language"
         quoteId:
           type: string
         paymentTerm:
@@ -211,6 +213,7 @@ components:
         - contactPersonId
         - user
         - userId
+        - language
         - quoteId
         - paymentTerm
         - date
@@ -524,12 +527,12 @@ components:
       properties:
         id:
           type: string
-        name:
+        key:
           type: string
-        description:
-          type: string
-        table:
-          type: string
+        translations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductTranslation"
         orderPositions:
           type: array
           items:
@@ -554,12 +557,33 @@ components:
             $ref: "#/components/schemas/TariffCustomer"
       required:
         - id
-        - name
+        - key
+        - translations
         - orderPositions
         - offerPositions
         - createdAt
         - updatedAt
         - tariffCustomers
+    ProductTranslation:
+      type: object
+      properties:
+        productId:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        name:
+          type: string
+        description:
+          type: string
+        table:
+          type: string
+        product:
+          $ref: "#/components/schemas/Product"
+      required:
+        - productId
+        - language
+        - name
+        - product
     Tariff:
       type: object
       properties:
@@ -876,13 +900,15 @@ components:
       properties:
         id:
           type: string
-        name:
-          type: string
-        table:
+        key:
           type: string
         total_cents:
           type: integer
           format: int32
+        translations:
+          type: array
+          items:
+            $ref: "#/components/schemas/FlatRateTranslation"
         offerFlatRates:
           type: array
           items:
@@ -893,24 +919,41 @@ components:
             $ref: "#/components/schemas/OrderFlatRate"
       required:
         - id
-        - name
-        - table
+        - key
         - total_cents
+        - translations
         - offerFlatRates
         - orderFlatRates
+    FlatRateTranslation:
+      type: object
+      properties:
+        flatRateId:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        name:
+          type: string
+        table:
+          type: string
+        flatRate:
+          $ref: "#/components/schemas/FlatRate"
+      required:
+        - flatRateId
+        - language
+        - name
+        - table
+        - flatRate
     Contract:
       type: object
       properties:
         id:
           type: string
-        name:
+        key:
           type: string
-        features:
+        translations:
           type: array
           items:
-            type: string
-        table:
-          type: string
+            $ref: "#/components/schemas/ContractTranslation"
         orderPositions:
           type: array
           items:
@@ -932,13 +975,36 @@ components:
           format: date-time
       required:
         - id
-        - name
-        - features
-        - table
+        - key
+        - translations
         - orderPositions
         - offerPositions
         - tariffConfigs
         - tariffCustomers
+    ContractTranslation:
+      type: object
+      properties:
+        contractId:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        name:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        table:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+      required:
+        - contractId
+        - language
+        - name
+        - features
+        - table
+        - contract
     Task:
       type: object
       properties:
@@ -986,6 +1052,11 @@ components:
         - PDF
         - DOCX
         - RESERVED
+    Language:
+      type: string
+      enum:
+        - DE
+        - EN
     TaskStatus:
       type: string
       enum:

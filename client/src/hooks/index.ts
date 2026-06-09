@@ -1,4 +1,5 @@
 export * from './use-modal';
+export * from './use-locale';
 export * from './contract-hook';
 export * from './customer-hook';
 export * from './flatrate-hook';

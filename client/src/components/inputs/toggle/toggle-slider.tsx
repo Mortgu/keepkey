@@ -2,11 +2,26 @@ import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { ToggleSliderComponentProps } from "./toggle-slider-types";
 
+const sizeClasses = {
+  xs: {
+    wrapper: "w-9 h-5",
+    thumb: "w-3 h-3 top-0.5 left-0.5 peer-checked:translate-x-4",
+  },
+  sm: {
+    wrapper: "w-12 h-6",
+    thumb: "w-4 h-4 top-1 left-1 peer-checked:translate-x-6",
+  },
+  md: {
+    wrapper: "w-14 h-7",
+    thumb: "w-5 h-5 top-1 left-1 peer-checked:translate-x-7",
+  },
+} as const;
+
 const styles = tv({
   slots: {
     container: "flex items-center gap-3",
     wrapper: [
-      "relative inline-flex w-12 h-6 rounded-full transition-colors duration-200",
+      "relative inline-flex rounded-full transition-colors duration-200",
       "cursor-pointer focus-within:ring-2 focus-within:ring-[var(--primary-25)] focus-within:ring-offset-1",
       "disabled:cursor-not-allowed disabled:opacity-50",
     ],
@@ -16,9 +31,8 @@ const styles = tv({
       "peer-disabled:bg-gray-200",
     ],
     thumb: [
-      "absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-md",
+      "absolute bg-white rounded-full shadow-md",
       "transition-transform duration-200",
-      "peer-checked:translate-x-6",
       "peer-disabled:shadow-none",
     ],
     input: "peer sr-only",
@@ -28,10 +42,11 @@ const styles = tv({
 const { container, wrapper, track, thumb, input } = styles();
 
 export const ToggleSlider = forwardRef<HTMLInputElement, ToggleSliderComponentProps>(
-  ({ className, label, disabled, ...rest }, ref) => {
+  ({ className, label, disabled, size = "sm", ...rest }, ref) => {
+    const s = sizeClasses[size];
     return (
       <div className={container()}>
-        <label className={wrapper()}>
+        <label className={`${wrapper()} ${s.wrapper}`}>
           <input
             ref={ref}
             type="checkbox"
@@ -40,7 +55,7 @@ export const ToggleSlider = forwardRef<HTMLInputElement, ToggleSliderComponentPr
             {...rest}
           />
           <span className={track()} />
-          <span className={thumb()} />
+          <span className={`${thumb()} ${s.thumb}`} />
         </label>
         {label && (
           <label

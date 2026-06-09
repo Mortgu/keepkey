@@ -1,9 +1,11 @@
 import { Badge, Button } from "@/components";
-import { useModal, useTariffHook } from "@/hooks";
+import { useLocale, useModal, useTariffHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { createFileRoute } from "@tanstack/react-router";
 import { Pen, Plus, Trash, UserPlus } from "lucide-react";
 import { Fragment } from "react";
 import { formatEur } from "@/utils/utils";
+import type { Language } from "@/types";
 import PricingModal from "./-components/pricing-modal";
 import TariffConfigModal from "./-components/tariff-config-modal";
 import TariffCustomerModal from "./-components/tariff-customer-modal";
@@ -25,9 +27,9 @@ interface OverrideTarget {
     price: number;
 }
 
-function tariffTitle(tariff: Tariff): string {
+function tariffTitle(tariff: Tariff, locale: Language): string {
     if (tariff.products.length === 0) return "(keine Produkte)";
-    return tariff.products.map((p) => p.name).join(" & ");
+    return tariff.products.map((p) => localized(p.translations, locale, "name")).join(" & ");
 }
 
 function RouteComponent() {
@@ -35,8 +37,16 @@ function RouteComponent() {
     const overrideModal = useModal<OverrideTarget>();
     const productsModal = useModal<Tariff>();
     const configModal = useModal<string>();
+    const locale = useLocale();
 
-    const { tariffs, deleteTariff, deleteConfig, deleteCustomerOverride, isDeletingCustomerOverride } = useTariffHook();
+    const {
+        tariffs,
+        deleteTariff,
+        deleteConfig,
+        deleteCustomerOverride
+    } = useTariffHook();
+
+    console.log(tariffs);
 
     return (
         <Fragment>
@@ -59,7 +69,7 @@ function RouteComponent() {
                         <div key={tariff.id} className="bg-white border border-(--border) rounded-md overflow-hidden">
                             <div className="flex items-center justify-between px-4 py-3 border-b border-(--border)">
                                 <p className="text-md text-gray-900">
-                                    {tariffTitle(tariff)}
+                                    {tariffTitle(tariff, locale)}
                                 </p>
                                 <div className="flex items-center gap-1">
                                     <Button variant="secondary" size="sm" icon={<Plus className="size-3.5" />}
@@ -87,7 +97,7 @@ function RouteComponent() {
 
                             {tariff.configs.map((config) => (
                                 <div key={config.id} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
-                                    <Badge variant="generated">{config.contract?.name}</Badge>
+                                    <Badge variant="generated">{localized(config.contract?.translations, locale, "name")}</Badge>
 
                                     <p className="text-sm text-gray-600 text-center">
                                         {config.min_quantity}–{config.max_quantity ?? "∞"}
@@ -106,9 +116,9 @@ function RouteComponent() {
                                             iconOnly disabled={tariff.products.length === 0} onClick={() =>
                                                 overrideModal.open({
                                                     tariffId: tariff.id,
-                                                    productOptions: tariff.products.map((p) => ({ id: p.id, name: p.name })),
+                                                    productOptions: tariff.products.map((p) => ({ id: p.id, name: localized(p.translations, locale, "name") })),
                                                     contractId: config.contractId,
-                                                    contractName: config.contract?.name ?? "",
+                                                    contractName: localized(config.contract?.translations, locale, "name"),
                                                     duration: config.duration,
                                                     min_quantity: config.min_quantity,
                                                     max_quantity: config.max_quantity ?? null,
@@ -136,7 +146,7 @@ function RouteComponent() {
                             {tariff.customers.map((c) => (
                                 <div key={c.id} className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr] items-center px-4 py-1 border-b border-(--border)">
                                     <div className="flex gap-1">
-                                        <Badge variant="generated">{c.contract?.name}</Badge>
+                                        <Badge variant="generated">{localized(c.contract?.translations, locale, "name")}</Badge>
                                         <Badge variant="draft">{c.customer?.companyName}</Badge>
                                     </div>
 

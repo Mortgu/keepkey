@@ -76,7 +76,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
           <div className="flex items-center gap-4">
             <customerForm.Field name="customerId" children={(field) => (
               <div className="flex gap-2">
-                <Input id={field.name} label="Kunden-Nr." input_size="sm"
+                <Input id={field.name} label="Kunden-Nr." size="sm"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -85,7 +85,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
 
             <customerForm.Field name="companyName" children={(field) => (
               <div className="flex-3 grid gap-2">
-                <Input id={field.name} label="Firmenname" input_size="sm"
+                <Input id={field.name} label="Firmenname" size="sm"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -96,7 +96,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
           <div className="flex items-center gap-4">
             <customerForm.Field name="email" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <Input id={field.name} label="E-Mail" input_size="sm"
+                <Input id={field.name} label="E-Mail" size="sm"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -105,7 +105,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
 
             <customerForm.Field name="phone" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <Input id={field.name} label="Telefonnummer" input_size="sm"
+                <Input id={field.name} label="Telefonnummer" size="sm"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -116,7 +116,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
           <div className="flex items-center gap-4">
             <customerForm.Field name="street" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <Input id={field.name} input_size="sm" label="Straße"
+                <Input id={field.name} size="sm" label="Straße"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -125,7 +125,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
 
             <customerForm.Field name="city" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <Input id={field.name} input_size="sm" label="Stadt"
+                <Input id={field.name} size="sm" label="Stadt"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />
@@ -134,7 +134,7 @@ export default function CustomerModal({ onClose, currentCustomer = null }: Custo
 
             <customerForm.Field name="plz" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} input_size="sm" label="Postleitzahl"
+                <Input id={field.name} size="sm" label="Postleitzahl"
                   value={field.state.value} error={field.state.meta.errors[0]?.message}
                   onChange={(e) => field.handleChange(e.target.value)}
                 />

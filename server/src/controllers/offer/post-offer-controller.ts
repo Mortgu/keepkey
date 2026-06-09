@@ -3,11 +3,11 @@ import { prisma } from "../../lib/prismaClient.js";
 import { OfferFlatRate, OfferPosition, Task } from "@prisma/client";
 import { toDate } from '../../utils/utils.js';
 import calculatePrice from "../../utils/products.js";
-import { container } from "../documents-controller.js";
 import env from '../../lib/env.js';
 
 import fs from 'fs';
 import path from 'path';
+import { generateDocument, uploadDocument } from '../../lib/document.js';
 
 /*
  * Function to enqueue a new reservation job for an offer.
@@ -54,10 +54,9 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
             documentId: document.id,
             version: (currentVersion?.version ?? -1) + 1,
         }
-    })
+    });
 
-    const task: Task = await container.documentService.generateDocument(document);
-
+    const task: Task = await generateDocument(document);
 
     return response.status(200).json(task);
 };
@@ -163,10 +162,8 @@ export const uploadOfferDocument = async (request: Request, response: Response) 
     ]);
 
     const [pdfUploadResponse, docxUploadResponse] = await Promise.all([
-        await container.documentService.uploadDocument(
-            document.displayName + ".pdf", PDF_PATH, pdfContent),
-        await container.documentService.uploadDocument(
-            document.displayName + ".docx", DOCX_PATH, docxContent),
+        await uploadDocument(document.displayName + ".pdf", PDF_PATH, pdfContent),
+        await uploadDocument(document.displayName + ".docx", DOCX_PATH, docxContent),
     ]);
 
     if (!pdfUploadResponse || !docxUploadResponse) {

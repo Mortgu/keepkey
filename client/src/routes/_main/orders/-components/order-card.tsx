@@ -1,29 +1,32 @@
-import { useOrderHook } from "@/hooks";
-import { Trash } from "lucide-react";
-import { formatDate } from "@/lib/format.ts";
 import React from "react";
-import type { Document, Order, OrderPosition } from "@/types";
-import { Button, Collapsable } from "@/components";
-import { DocumentItem } from "@/routes/_main/offers/-components/card-components";
+import {Trash} from "lucide-react";
+import type {Order, OrderDocument, OrderPosition} from "@/types";
+import {useLocale, useOrderHook} from "@/hooks";
+import {localized} from "@/lib/i18n-content";
+import {formatDate} from "@/lib/format.ts";
+import {Button, Collapsable} from "@/components";
 
 type Props = {
-    order: Order
+    order: Order;
 };
 
-export default function OrderCard({ order }: Props) {
-    const { deleteOrder, errorDeletingOrder, isDeleting } = useOrderHook();
+export default function OrderCard({order}: Props) {
+    const {deleteOrder, errorDeletingOrder, isDeleting} = useOrderHook();
+    const locale = useLocale();
 
     return (
         <React.Fragment>
             {errorDeletingOrder && (
-                <p className="text-(--destructive) text-md">{errorDeletingOrder.message}</p>
+                <p className="text-(--destructive) text-md">
+                    {errorDeletingOrder.message}
+                </p>
             )}
             <div className="grid border border-(--border) rounded-md">
                 <div className="flex items-center justify-between border-b border-(--border) px-3 py-2">
                     <div className="flex-1">
                         <p className="text-md">BE{order.orderId}</p>
                         <p className="text-sm font-light text-(--text-secondary)">
-                            {formatDate(order?.createdAt || '')}
+                            {formatDate(order?.createdAt || "")}
                         </p>
                     </div>
                     <div className="flex gap-2 items-center">
@@ -33,19 +36,24 @@ export default function OrderCard({ order }: Props) {
                             size="sm"
                             variant="secondary"
                             iconOnly
-                            icon={<Trash className="size-3.5" />}
+                            icon={<Trash className="size-3.5"/>}
                         />
                     </div>
                 </div>
 
                 <div className="">
                     {order.orderPositions.map((position: OrderPosition) => (
-                        <div key={position.id}
-                            className="flex items-center justify-between border-b border-(--border) px-3 py-2">
+                        <div
+                            key={position.id}
+                            className="flex items-center justify-between border-b border-(--border) px-3 py-2"
+                        >
                             <div className="flex items-center gap-2">
-                                <p>{position.product.name}</p>
+                                <p>
+                                    {localized(position.product.translations, locale, "name")}
+                                </p>
                                 <p className="text-gray-500">
-                                    ({position.contract.name} / {position.duration_months} Monate)
+                                    ({localized(position.contract.translations, locale, "name")} /{" "}
+                                    {position.duration_months} Monate)
                                 </p>
                             </div>
                             <p>0 €</p>
@@ -53,10 +61,13 @@ export default function OrderCard({ order }: Props) {
                     ))}
                 </div>
 
-                <Collapsable label="Dokumente" className="w-full bg-(--subtle-50) justify-between rounded-none">
+                <Collapsable
+                    label="Dokumente"
+                    className="w-full bg-(--subtle-50) justify-between rounded-none"
+                >
                     <div className="grid gap-2 px-3 py-2">
-                        {order.documents?.map((document: Document) => (
-                            <DocumentItem key={document.id} document={document} />
+                        {order.orderDocuments?.map((_document: OrderDocument) => (
+                            <>Not implemented</>
                         ))}
                     </div>
                 </Collapsable>

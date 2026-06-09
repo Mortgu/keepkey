@@ -27,7 +27,6 @@ function RouteComponent() {
                     </div>
                 </div>
             </div>
-
         </Fragment>
     );
 }

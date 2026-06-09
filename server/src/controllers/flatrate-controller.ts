@@ -3,7 +3,8 @@ import {prisma} from "../lib/prismaClient.js";
 
 export const getFlatRates = async (request: Request, response: Response) => {
     const flatrates = await prisma.flatRate.findMany({
-        orderBy: {name: "asc"},
+        orderBy: {key: "asc"},
+        include: {translations: true},
     });
     return response.status(200).json(flatrates);
 };
@@ -13,6 +14,7 @@ export const getFlatRate = async (request: Request, response: Response) => {
 
     const flatrate = await prisma.flatRate.findUnique({
         where: {id},
+        include: {translations: true},
     });
 
     if (!flatrate) {
@@ -30,10 +32,15 @@ export const createFlatRate = async (
     next: NextFunction,
 ) => {
     try {
-        const {body} = request;
+        const {key, total_cents, translations} = request.body;
 
         const flatrate = await prisma.flatRate.create({
-            data: {...body},
+            data: {
+                key,
+                total_cents,
+                translations: {create: translations},
+            },
+            include: {translations: true},
         });
 
         return response.status(201).json(flatrate);
@@ -49,11 +56,26 @@ export const updateFlatRate = async (
 ) => {
     try {
         const id = request.params.id as string;
-        const {body} = request;
+        const {key, total_cents, translations} = request.body;
 
         const flatrate = await prisma.flatRate.update({
             where: {id},
-            data: {...body},
+            data: {
+                ...(key !== undefined ? {key} : {}),
+                ...(total_cents !== undefined ? {total_cents} : {}),
+                ...(Array.isArray(translations)
+                    ? {
+                          translations: {
+                              upsert: translations.map((t: {language: "DE" | "EN"; name: string; table: string}) => ({
+                                  where: {flatRateId_language: {flatRateId: id, language: t.language}},
+                                  create: {language: t.language, name: t.name, table: t.table},
+                                  update: {name: t.name, table: t.table},
+                              })),
+                          },
+                      }
+                    : {}),
+            },
+            include: {translations: true},
         });
 
         return response.status(200).json(flatrate);

@@ -1,11 +1,12 @@
 import type { InputHTMLAttributes, ReactNode } from "react";
 import type { ButtonComponentProps } from "@/components/button/button-types";
+import type { ComponentSize } from "@/components/size";
 
 export type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 
-export interface InputComponentProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
     variant?: "primary" | "secondary";
-    input_size?: "xs" | "sm" | "md";
+    size?: ComponentSize;
 
     /** Optional label text that will be rendered above the input element. */
     label?: string;

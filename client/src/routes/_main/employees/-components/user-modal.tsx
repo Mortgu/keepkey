@@ -78,7 +78,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
           <div className="flex items-center gap-4">
             <userForm.Field name="salutation" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} label="Anrede" input_size="sm"
+                <Input id={field.name} label="Anrede" size="sm"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -89,7 +89,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
 
             <userForm.Field name="firstName" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} input_size="sm" label="Vorname"
+                <Input id={field.name} size="sm" label="Vorname"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -100,7 +100,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
 
             <userForm.Field name="lastName" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} input_size="sm" label="Nachname"
+                <Input id={field.name} size="sm" label="Nachname"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -113,7 +113,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
           <div className="flex items-center gap-4">
             <userForm.Field name="email" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} label="E-Mail" input_size="sm"
+                <Input id={field.name} label="E-Mail" size="sm"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}
@@ -124,7 +124,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
 
             <userForm.Field name="password" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <Input id={field.name} type="password" input_size="sm" label="Passwort"
+                <Input id={field.name} type="password" size="sm" label="Passwort"
                   error={field.state.meta.errors[0]?.message}
                   value={field.state.value}
                   onChange={(e) => field.handleChange(e.target.value)}

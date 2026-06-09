@@ -1,17 +1,32 @@
 import { Request, Response } from "express";
-import env from "../lib/env.js";
-import { nextCloudRepository } from "../repositories/index.js";
+import {
+    isNextcloudConfigured,
+    isNextcloudAvailable,
+    getNextcloudInitError,
+} from "../lib/nextcloud.js";
 
 export const getNextcloudStatus = async (request: Request, response: Response) => {
-  if (!env.NEXTCLOUD_URL || !env.NEXTCLOUD_USER || !env.NEXTCLOUD_PASSWORD) {
-    return response.status(404).json({
-      message: "NextCloud not configured!",
-    });
-  }
+    const configured = isNextcloudConfigured();
 
-  const connected = await nextCloudRepository.checkConnection();
-  if (connected) {
-    return response.status(200).json({ message: "ok" });
-  }
-  return response.status(500).json({ message: "NextCloud connection could not be established!" });
+    if (!configured) {
+        return response.status(200).json({
+            configured: false,
+            available: false,
+            message: "Nextcloud is not configured. Set NEXTCLOUD_URL, NEXTCLOUD_USER, and NEXTCLOUD_PASSWORD.",
+        });
+    }
+
+    if (!isNextcloudAvailable) {
+        return response.status(200).json({
+            configured: true,
+            available: false,
+            message: getNextcloudInitError(),
+        });
+    }
+
+    return response.status(200).json({
+        configured: true,
+        available: true,
+        message: "ok",
+    });
 };

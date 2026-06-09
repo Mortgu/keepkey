@@ -64,6 +64,7 @@ export interface components {
             contactPersonId: string;
             user: components["schemas"]["User"];
             userId: string;
+            language: components["schemas"]["Language"];
             quoteId: string;
             paymentTerm: string;
             /** Format: date-time */
@@ -210,9 +211,8 @@ export interface components {
         };
         Product: {
             id: string;
-            name: string;
-            description?: string;
-            table?: string;
+            key: string;
+            translations: components["schemas"]["ProductTranslation"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
             tariff?: components["schemas"]["Tariff"];
@@ -222,6 +222,14 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             tariffCustomers: components["schemas"]["TariffCustomer"][];
+        };
+        ProductTranslation: {
+            productId: string;
+            language: components["schemas"]["Language"];
+            name: string;
+            description?: string;
+            table?: string;
+            product: components["schemas"]["Product"];
         };
         Tariff: {
             id: string;
@@ -352,24 +360,38 @@ export interface components {
         };
         FlatRate: {
             id: string;
-            name: string;
-            table: string;
+            key: string;
             /** Format: int32 */
             total_cents: number;
+            translations: components["schemas"]["FlatRateTranslation"][];
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             orderFlatRates: components["schemas"]["OrderFlatRate"][];
         };
+        FlatRateTranslation: {
+            flatRateId: string;
+            language: components["schemas"]["Language"];
+            name: string;
+            table: string;
+            flatRate: components["schemas"]["FlatRate"];
+        };
         Contract: {
             id: string;
-            name: string;
-            features: string[];
-            table: string;
+            key: string;
+            translations: components["schemas"]["ContractTranslation"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
             tariffConfigs: components["schemas"]["TariffConfig"][];
             tariffCustomers: components["schemas"]["TariffCustomer"][];
             /** Format: date-time */
             createdAt?: string;
+        };
+        ContractTranslation: {
+            contractId: string;
+            language: components["schemas"]["Language"];
+            name: string;
+            features: string[];
+            table: string;
+            contract: components["schemas"]["Contract"];
         };
         Task: {
             id: string;
@@ -386,9 +408,11 @@ export interface components {
             updatedAt: string;
         };
         /** @enum {string} */
-        DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "RESERVED" | "UPLOADING" | "UPLOADED" | "FAILED";
+        DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "UPLOADING" | "UPLOADED" | "FAILED";
         /** @enum {string} */
-        DocumentFormat: "PDF" | "DOCX";
+        DocumentFormat: "PDF" | "DOCX" | "RESERVED";
+        /** @enum {string} */
+        Language: "DE" | "EN";
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */

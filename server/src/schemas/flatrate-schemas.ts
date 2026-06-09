@@ -1,9 +1,15 @@
 import { z } from "zod";
 
-export const flatRateSchema = z.object({
+const flatRateTranslationSchema = z.object({
+  language: z.enum(["DE", "EN"]),
   name: z.string().min(1),
   table: z.string().min(1),
+});
+
+export const flatRateSchema = z.object({
+  key: z.string().min(1),
   total_cents: z.number().int().nonnegative(),
+  translations: z.array(flatRateTranslationSchema).min(1),
 });
 
 export const createFlatRateSchema = flatRateSchema;

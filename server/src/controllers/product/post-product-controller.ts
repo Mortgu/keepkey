@@ -14,8 +14,14 @@ export const createProduct = async (request: Request, response: Response, next: 
             });
         }
 
+        const {key, translations} = body;
+
         const newProduct = await prisma.product.create({
-            data: {...body},
+            data: {
+                key,
+                translations: {create: translations},
+            },
+            include: {translations: true},
         });
 
         return response.status(200).json(newProduct);

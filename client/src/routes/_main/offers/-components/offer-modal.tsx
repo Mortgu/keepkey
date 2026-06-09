@@ -7,8 +7,8 @@ import {Loader, Plus, Trash, X} from "lucide-react";
 import {type OfferProductInput} from "./modal-components/offer-product-form";
 import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
-import {useCustomerHook, useFlatRateHook, useOfferHook, useSupplierHook, useUserHook} from "@/hooks";
-import {Button, Input, ModalDialog, Select} from "@/components";
+import {useCustomerHook, useFlatRateHook, useLocale, useOfferHook, useSupplierHook, useUserHook} from "@/hooks";
+import {Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, Select} from "@/components";
 
 import type {
     ContactPerson,
@@ -25,6 +25,7 @@ import type {
 } from "@/types";
 
 import {formatEur} from "@/utils/utils";
+import {localized} from "@/lib/i18n-content";
 import ProductModalSection from "./modal-components/product-section";
 import {useAuth} from "@/context/auth";
 
@@ -38,6 +39,7 @@ export const offerSchema = z.object({
     contactPersonId: z.string().min(1, "Required!"),
     userId: z.string().min(1, "Required!"),
     quoteId: z.string().min(1, "Required!"),
+    language: z.enum(["EN", "DE"]),
 
     supplierId: z.string().nullable(),
     paymentTerm: z.string(),
@@ -53,6 +55,7 @@ const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.i
             contactPersonId: currentOffer.contactPersonId,
             userId: currentOffer.userId,
             quoteId: currentOffer.quoteId,
+            language: currentOffer.language ?? "DE",
             supplierId: currentOffer.supplierId ?? null,
             paymentTerm: currentOffer.paymentTerm,
             validUntil: currentOffer.validUntil ?? null,
@@ -65,6 +68,7 @@ const getFormDefaults = (currentOffer: Offer | undefined, defaults?: Partial<z.i
         contactPersonId: defaults?.contactPersonId ?? "",
         userId: defaults?.userId ?? "",
         quoteId: defaults?.quoteId ?? "",
+        language: defaults?.language ?? "DE",
         supplierId: defaults?.supplierId ?? null,
         paymentTerm: defaults?.paymentTerm ?? "30 Tage",
         validUntil: defaults?.validUntil ?? null,
@@ -81,6 +85,8 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
     const {suppliers} = useSupplierHook();
     const {users} = useUserHook();
     const {flatRates} = useFlatRateHook();
+
+    const locale = useLocale();
 
     const [offerProducts, setOfferProducts] = useState<OfferProductInput[]>(
         currentOffer?.offerPositions.map((pos) => ({
@@ -113,6 +119,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
             contactPersonId: customers[0]?.contactPersons[0]?.id,
             userId: user?.id,
             supplierId: suppliers[0]?.id,
+            language: locale,
         }),
         validators: {
             onChange: offerSchema,
@@ -128,7 +135,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
                     });
                 } else {
-                    const offer = await createOffer({
+                    await createOffer({
                         offer: value as CreateOfferInput,
                         positions: offerProducts as CreateOfferPositionInput[],
                         flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
@@ -152,7 +159,17 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
     return (
         <ModalDialog onClose={onClose}>
             <ModalDialog.Header>
-                <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
+                <div className="flex items-center justify-between w-full mr-2">
+                    <h1 className="text-lg">{isEdit ? "Angebot bearbeiten" : "Angebot erstellen"}</h1>
+
+                    <offerForm.Field name="language" children={(field) => (
+                        <SegmentedLanguageToggle
+                            options={DEFAULT_LANGUAGE_OPTIONS}
+                            value={field.state.value}
+                            onChange={(lng) => field.handleChange(lng)}
+                        />
+                    )}/>
+                </div>
             </ModalDialog.Header>
             <ModalDialog.Content>
                 <form id="offer-form" onSubmit={handleFormSubmit} className="grid gap-4">
@@ -223,7 +240,6 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                             <div className="flex-1 grid gap-2 items-center">
                                 <Input label="AG-Nr." value={field.state.value as string}
                                        warning={field.state.meta.errors[0]?.message || errorCreatingReservation?.message}
-                                       warningTooltip={String(JSON.stringify(errorCreatingReservation))}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        loading={isCreatingReservation}
                                        disabled={isCreatingReservation}
@@ -248,7 +264,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
 
                         <offerForm.Field name="paymentTerm" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Zahlungsbedingung" input_size="sm" placeholder="Zahlungsbedingung..."
+                                <Input label="Zahlungsbedingung" size="sm" placeholder="Zahlungsbedingung..."
                                        error={field.state.meta.errors[0]?.message}
                                        value={field.state.value as string}
                                        onChange={(e) => field.handleChange(e.target.value)}
@@ -260,7 +276,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <offerForm.Field name="validUntil" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Angebot gültig bis" type="date" input_size="sm"
+                                <Input label="Angebot gültig bis" type="date" size="sm"
                                        placeholder="Gültig bis..."
                                        error={field.state.meta.errors[0]?.message}
                                        value={field.state.value?.split('T')[0] ?? ''}
@@ -279,7 +295,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
 
                         <offerForm.Field name="requestFrom" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <Input label="Ihre Anfrage vom" type="date" input_size="sm"
+                                <Input label="Ihre Anfrage vom" type="date" size="sm"
                                        placeholder="Ihre Anfrage vom..."
                                        error={field.state.meta.errors[0]?.message}
                                        value={field.state.value?.split('T')[0] ?? ''}
@@ -316,7 +332,8 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                      className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
                                     <div className="grid">
                                         <p className="flex items-center gap-1 text-sm">{flatRate.quantity} <X
-                                            className="size-3"/> {flatRate.flatRate.name}</p>
+                                            className="size-3"/> {localized(flatRate.flatRate.translations, locale, "name")}
+                                        </p>
                                         <p className="text-xs text-(--text-secondary)">{formatEur(flatRate.total_cents)}</p>
                                     </div>
                                     <div>

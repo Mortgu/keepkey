@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { SelectComponentProps } from "./select-types";
+import { SIZE_STYLES } from "@/components/size";
 
 const styles = tv({
     base: [
@@ -11,10 +12,10 @@ const styles = tv({
         "disabled:opacity-50 disabled:cursor-not-allowed",
     ],
     variants: {
-        input_size: {
-            xs: "h-[34px] px-3 text-xs font-light",
-            sm: "h-[38px] px-3 text-sm font-normal",
-            md: "h-[42px] px-3 text-md font-semibold",
+        size: {
+            xs: `px-3 font-light ${SIZE_STYLES.xs}`,
+            sm: `px-3 font-normal ${SIZE_STYLES.sm}`,
+            md: `px-3 font-semibold ${SIZE_STYLES.md}`,
         },
         error: {
             true: "border-red-500",
@@ -22,13 +23,13 @@ const styles = tv({
         },
     },
     defaultVariants: {
-        input_size: "sm",
+        size: "sm",
         error: false,
     },
 });
 
 export const Select = forwardRef<HTMLSelectElement, SelectComponentProps>(
-    ({ className, variant, input_size, label, error, options, placeholder, children, ...rest }, ref) => (
+    ({ className, variant, size, label, error, options, placeholder, children, ...rest }, ref) => (
         <div className="w-full">
             <div className="flex items-center justify-between">
                 {label && (
@@ -44,7 +45,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectComponentProps>(
             </div>
             <select
                 ref={ref}
-                className={styles({ input_size, error: !!error, className })}
+                className={styles({ size, error: !!error, className })}
                 {...rest}
             >
                 {placeholder && <option value="">{placeholder}</option>}

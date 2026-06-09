@@ -1,9 +1,11 @@
 import type { Contract, Product } from "@/types";
 import type { OfferProductInput } from "./offer-product-form";
-import { DollarSign, Loader, Pen, Trash, X } from "lucide-react";
+import { Pen, Trash, X } from "lucide-react";
 import { formatEur } from "@/utils/utils";
 import { Button } from "@/components";
-import { Fragment, useState } from "react";
+import { useLocale } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
+import { useState } from "react";
 import OfferProductForm from "./offer-product-form";
 import { tv } from "tailwind-variants";
 
@@ -32,14 +34,15 @@ const styles = tv({
 
 export default function ProductSectionItem({ offerProduct, offerContract, setOfferProducts, onUpdate, index }: Props) {
     const [edit, setEdit] = useState<boolean>(false);
+    const locale = useLocale();
 
     return (
         <div className={styles({ edit: edit })}>
             <div className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
                 <div className="grid">
-                    <p className="flex items-center gap-1 text-sm">{offerProduct.quantity} <X className="size-3" /> {offerProduct.name}</p>
+                    <p className="flex items-center gap-1 text-sm">{offerProduct.quantity} <X className="size-3" /> {localized(offerProduct.translations, locale, "name")}</p>
                     <div className="flex items-center">
-                        <p className="text-xs text-(--text-secondary)">{offerContract.name} | {offerProduct.duration_months} Monate</p>
+                        <p className="text-xs text-(--text-secondary)">{localized(offerContract.translations, locale, "name")} | {offerProduct.duration_months} Monate</p>
                     </div>
                 </div>
 

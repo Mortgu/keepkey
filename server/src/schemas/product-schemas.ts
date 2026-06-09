@@ -1,13 +1,18 @@
 import { z } from "zod";
 
-export const createProductSchema = z.object({
+const productTranslationSchema = z.object({
+  language: z.enum(["DE", "EN"]),
   name: z.string().min(1),
-  description: z.string(),
-  type: z.string().optional(),
+  description: z.string().optional(),
+  table: z.string().optional(),
+});
+
+export const createProductSchema = z.object({
+  key: z.string().min(1),
+  translations: z.array(productTranslationSchema).min(1),
 });
 
 export const updateProductSchema = z.object({
-  name: z.string().optional(),
-  description: z.string().optional(),
-  type: z.string().optional(),
+  key: z.string().min(1).optional(),
+  translations: z.array(productTranslationSchema).optional(),
 });

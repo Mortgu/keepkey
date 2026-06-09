@@ -1,24 +1,26 @@
+import { useState } from "react";
 import {
   ChevronDown,
+  DollarSign,
   FileText,
+  Languages,
   LayoutGrid,
-  LogOut,
   Package,
   Settings,
   ShoppingCart,
-  Users,
-  UserCircle2,
   Truck,
-  Cuboid,
-  DollarSign,
-  Paperclip,
-  ContrastIcon,
+  UserCircle2,
+  Users,
 } from "lucide-react";
-
-import { authClient } from "@/lib/auth-client.ts";
-import { NavGroup, NavLink } from "./nav-link";
-import { useMemo, useState, type ReactNode } from "react";
-import { Button } from "../button/button";
+import { useTranslation } from "react-i18next";
+import { tv } from "tailwind-variants";
+import { NavLink } from "./nav-link.js";
+import type { ReactNode } from "react";
+import {
+  DEFAULT_LANGUAGE_OPTIONS,
+  SegmentedLanguageToggle,
+} from "@/components";
+import { useAuth } from "@/context/auth";
 
 const ICON_SIZE = 14;
 
@@ -31,10 +33,20 @@ type SectionProps = {
 function Section({ title, collapsible = false, children }: SectionProps) {
   const [collapsed, setCollapsed] = useState(false);
 
+  const sectionStyle = tv({
+    base: [
+      "flex select-none items-center justify-between",
+      "px-3.5 pb-1.5 pt-3 text-[12px] font-semibold",
+      "uppercase tracking-[0.08em] text-(--fg-3)",
+    ],
+  });
+
   return (
     <>
-      <button type="button" onClick={() => collapsible && setCollapsed((v) => !v)}
-        className="flex select-none items-center justify-between px-3.5 pb-1 pt-3 text-[12px] font-normal uppercase tracking-[0.08em] text-(--fg-3)"
+      <button
+        type="button"
+        onClick={() => collapsible && setCollapsed((v) => !v)}
+        className={sectionStyle()}
         style={{ cursor: collapsible ? "pointer" : "default" }}
       >
         <span>{title}</span>
@@ -42,8 +54,9 @@ function Section({ title, collapsible = false, children }: SectionProps) {
           <ChevronDown
             size={11}
             strokeWidth={2.4}
-            className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""
-              }`}
+            className={`transition-transform duration-150 ${
+              collapsed ? "-rotate-90" : ""
+            }`}
           />
         )}
       </button>
@@ -52,101 +65,117 @@ function Section({ title, collapsible = false, children }: SectionProps) {
   );
 }
 
-function SectionDivider() {
-  return <div className="mx-3.5 mt-2 h-px bg-(--fg-2)" />;
-}
-
 function UserFooter() {
-  const { data: session } = authClient.useSession();
-  const user = session?.user;
+  const { i18n } = useTranslation();
+  const { user } = useAuth();
 
-  const initials = useMemo(() => {
-    if (!user) return "";
-    const first = user.firstName?.[0] ?? user.name?.[0] ?? "";
-    const last = user.lastName?.[0] ?? "";
-    return (first + last).toUpperCase();
-  }, [user]);
-
-  const displayName =
-    user && (user.firstName || user.lastName)
-      ? `${user.firstName ?? ""} ${user.lastName ?? ""}`.trim()
-      : user?.name ?? "—";
+  const displayName = user ? `${user.firstName} ${user.lastName}` : null;
 
   return (
-    <div className="flex items-center gap-2.5 border-t border-(--fg-3) px-3.5 py-2.5">
-      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary) text-[11px] font-semibold text-white">
-        {initials || <UserCircle2 size={16} />}
+    <div>
+      {/* Language toggle */}
+      <div className="flex items-center justify-between mx-3.5 py-3.5 border-t border-(--fg-2)">
+        <Languages className="size-5 text-(--text-inv)" />
+        <SegmentedLanguageToggle
+          className="bg-(--fg-2) text-white border-none"
+          options={DEFAULT_LANGUAGE_OPTIONS}
+          value={i18n.language.toUpperCase()}
+          onChange={(lng) => i18n.changeLanguage(lng)}
+        />
       </div>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-[13px] font-medium text-(--text-inv)">
-          {displayName}
+
+      {user && (
+        <div className="flex items-center gap-2.5 border-t border-(--fg-2) mx-3.5 py-3.5">
+          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary-100)">
+            <UserCircle2 className="size-4" />
+          </div>
+          <div className="min-w-0 flex-1 text-white">
+            <p className="text-[13px] font-semibold">{displayName}</p>
+            <p className="text-[11px] text-(--fg-3)">{user.email}</p>
+          </div>
         </div>
-        <div className="truncate text-[11px] text-(--fg-3)">
-          {user?.email ?? ""}
-        </div>
-      </div>
-      <Button variant="primary" size="sm" onClick={() => authClient.signOut()} icon={<LogOut size={ICON_SIZE} />} iconOnly className="text-white" />
+      )}
     </div>
   );
 }
 
 export function Navigation() {
-  return (
-    <aside className="flex h-screen w-65 flex-col overflow-hidden">
-      <div className="flex items-center gap-2 px-4 pb-2.5 pt-4">
+  const { t } = useTranslation();
 
-        <span className="text-[14px] font-semibold tracking-[-0.01em] text-(--text-inv)">
-          Dignum
-        </span>
+  return (
+    <aside className="flex h-screen w-74 flex-col overflow-hidden">
+      <div className="grid items-center justify-between gap-2 px-4 pb-2.5 pt-4">
+        <h1 className="text-lg font-semibold tracking-[-0.01em] text-(--text-inv)">
+          dignum
+        </h1>
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
-        <Section title="Übersicht">
-          <NavLink to="/" icon={<LayoutGrid size={ICON_SIZE} />} label="Dashboard" />
+        <Section title={t("overview")}>
+          <NavLink
+            to="/"
+            icon={<LayoutGrid size={ICON_SIZE} />}
+            label="Dashboard"
+          />
         </Section>
 
-        <Section title="Katalog" collapsible>
+        <Section title={t("catalog")} collapsible>
+          <NavLink
+            to="/products"
+            label={t("section.products")}
+            icon={<Package size={ICON_SIZE} />}
+          />
+          <NavLink
+            to="/pricing"
+            label={t("section.pricing")}
+            icon={<DollarSign size={ICON_SIZE} />}
+          />
+          <NavLink
+            to="/products/flatrates"
+            label={t("section.flatRates")}
+            icon={<DollarSign size={ICON_SIZE} />}
+          />
 
-          {/*
-          <NavGroup label="Produkte" defaultOpen icon={<Package size={ICON_SIZE} />}>
-          </NavGroup>*/}
-
-          <NavLink to="/products" label="Produkte" icon={<Package size={ICON_SIZE} />} />
-          <NavLink to="/products/pricing" label="Preise" icon={<DollarSign size={ICON_SIZE} />} />
-          <NavLink to="/products/flatrates" label="Pauschalen" icon={<DollarSign size={ICON_SIZE} />} />
-
-          <NavLink to="/suppliers" label="Lieferanten" icon={<Truck size={ICON_SIZE} />} />
-          <NavLink to="/contracts" label="Verträge" icon={<Users size={ICON_SIZE} />} />
-
+          <NavLink
+            to="/suppliers"
+            label={t("section.suppliers")}
+            icon={<Truck size={ICON_SIZE} />}
+          />
+          <NavLink
+            to="/contracts"
+            label={t("section.contracts")}
+            icon={<Users size={ICON_SIZE} />}
+          />
         </Section>
 
-        <Section title="Vertrieb" collapsible>
+        <Section title={t("sales")} collapsible>
           <NavLink
             to="/customers"
+            label={t("section.customers")}
             icon={<Users size={ICON_SIZE} />}
-            label="Kunden"
           />
           <NavLink
             to="/offers"
+            label={t("section.offers")}
             icon={<FileText size={ICON_SIZE} />}
-            label="Angebote"
           />
           <NavLink
             to="/orders"
+            label={t("section.orders")}
             icon={<ShoppingCart size={ICON_SIZE} />}
-            label="Bestellungen"
           />
         </Section>
-        <Section title="Verwaltung" collapsible>
+
+        <Section title={t("management")} collapsible>
           <NavLink
             to="/employees"
+            label={t("section.employees")}
             icon={<UserCircle2 size={ICON_SIZE} />}
-            label="Mitarbeiter"
           />
           <NavLink
             to="/user"
+            label={t("nav.settings")}
             icon={<Settings size={ICON_SIZE} />}
-            label="Einstellungen"
           />
         </Section>
       </nav>

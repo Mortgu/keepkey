@@ -1,17 +1,17 @@
 import { PipelineContext } from "../pipeline.js";
-import { fetchOfferData, formatFetchedData } from "./actions.js";
+import { fetchOfferData, formatOfferData } from "./actions.js";
 
 export type OfferFetchData = Awaited<ReturnType<typeof fetchOfferData>>;
-export type OfferFormatedData = Awaited<ReturnType<typeof formatFetchedData>>;
+export type OfferFormatedData = Awaited<ReturnType<typeof formatOfferData>>;
 
 export type OfferPipelineContext = PipelineContext & {
-    offerId: string;
+  offerId: string;
 
-    fetchedData?: OfferFetchData;
-    formatedData?: OfferFormatedData;
+  fetchedData?: OfferFetchData;
+  formatedData?: OfferFormatedData;
 
-    docxBuffer: Buffer | null;
-    pdfBuffer: Buffer | null;
+  docxBuffer: Buffer | null;
+  pdfBuffer: Buffer | null;
 
-    displayName?: string;
+  displayName?: string;
 }

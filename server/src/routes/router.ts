@@ -1,5 +1,5 @@
-import {Router} from "express";
-import {requireSession} from "../middlewares/auth.js";
+import { Router } from "express";
+import { requireSession } from "../middlewares/auth.js";
 
 import productRouter from "./product-router.js";
 import supplierRouter from "./supplier-router.js";
