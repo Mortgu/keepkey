@@ -1,18 +1,12 @@
-# Graph Report - keepit  (2026-06-09)
+# Graph Report - /Users/oskar/Programming/keepit  (2026-06-08)
 
 ## Corpus Check
-- 284 files · ~49,442 words
-- Verdict: corpus is large enough that graph structure adds value.
+- Corpus is ~49,401 words - fits in a single context window. You may not need a graph.
 
 ## Summary
-- 1240 nodes · 1792 edges · 117 communities (94 shown, 23 thin omitted)
+- 1229 nodes · 1781 edges · 117 communities (95 shown, 22 thin omitted)
 - Extraction: 91% EXTRACTED · 9% INFERRED · 0% AMBIGUOUS · INFERRED: 156 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
-
-## Graph Freshness
-- Built from commit: `3985dd36`
-- Run `git rev-parse HEAD` and compare to check if the graph is stale.
-- Run `graphify update .` after code changes (no API cost).
 
 ## Community Hubs (Navigation)
 - [[_COMMUNITY_Offer Actions Pipeline|Offer Actions Pipeline]]
@@ -154,19 +148,19 @@
 - **Async Document Generation Pipeline** —  [INFERRED 0.85]
 - **Tariff-Based Pricing Structure** —  [INFERRED 0.85]
 
-## Communities (117 total, 23 thin omitted)
+## Communities (117 total, 22 thin omitted)
 
 ### Community 0 - "Offer Actions Pipeline"
-Cohesion: 0.05
-Nodes (57): env, connection, logger, convertAction(), fetchOfferAction(), fetchOfferData(), formatFetchedDataAction(), formatOfferData() (+49 more)
+Cohesion: 0.06
+Nodes (52): converteAction(), fetchOfferAction(), fetchOfferData(), formatFetchedDataAction(), formatOfferData(), generateAction(), postProcessingAction(), prepareAction() (+44 more)
 
 ### Community 1 - "Auth & Task Controllers"
-Cohesion: 0.18
-Nodes (12): PermissionOptions, requirePermission(), canCreateUsers, canDeleteUsers, canUpdateUsers, canViewUsers, router, contactPersonSchema (+4 more)
+Cohesion: 0.05
+Nodes (40): getAllTasks(), getTaskById(), auth, Request, requireSession(), PermissionOptions, requirePermission(), canCreateUsers (+32 more)
 
 ### Community 2 - "UI Core Components"
 Cohesion: 0.05
-Nodes (29): Badge(), badgeSizeStyles, countSizeStyles, countStyles, formatSizeStyles, formatStyles, styles, BadgeComponentProps (+21 more)
+Nodes (31): Button, styles, ButtonComponentProps, CollapsableComponentProps, card, dot, IntegrationStatus, IntegrationStatusCard() (+23 more)
 
 ### Community 3 - "Input & Filter Components"
 Cohesion: 0.05
@@ -185,8 +179,8 @@ Cohesion: 0.08
 Nodes (26): dependencies, better-auth, @better-auth/mongo-adapter, clsx, i18next, i18next-browser-languagedetector, i18next-http-backend, lucide-react (+18 more)
 
 ### Community 7 - "Customer Controllers"
-Cohesion: 0.15
-Nodes (14): deleteContactById(), deleteCustomer(), getAllCustomerContacts(), getAllCustomers(), getCustomerById(), updateContact(), updateCustomerById(), createContact() (+6 more)
+Cohesion: 0.12
+Nodes (16): deleteContactById(), deleteCustomer(), getAllCustomerContacts(), getAllCustomers(), getCustomerById(), updateContact(), updateCustomerById(), createContact() (+8 more)
 
 ### Community 8 - "Auth Context & Navigation"
 Cohesion: 0.09
@@ -217,32 +211,32 @@ Cohesion: 0.10
 Nodes (19): compilerOptions, allowImportingTsExtensions, erasableSyntaxOnly, lib, module, moduleDetection, moduleResolution, noEmit (+11 more)
 
 ### Community 15 - "Server Config & Middleware"
-Cohesion: 0.10
-Nodes (21): Config, getNextcloudStatus(), AppException, fileExists(), getNextCloudClient(), getNextcloudInitError(), initNextcloud(), isNextcloudConfigured() (+13 more)
+Cohesion: 0.13
+Nodes (13): Config, env, initNextcloud(), errorMapProps, exceptionHandler(), prismaErrorMap, webDavErrorMap, logger (+5 more)
 
 ### Community 16 - "Offer Modal Components"
 Cohesion: 0.15
 Nodes (14): getFormDefaults(), OfferModal(), OfferModalProps, offerSchema, OfferFlatRateForm(), Props, DURATIONS, OfferProductInput (+6 more)
 
 ### Community 17 - "Offer Card Components"
-Cohesion: 0.12
-Nodes (15): Document(), Props, LineItemRow(), LineItemRowProps, OfferCard(), OfferFlatRateRow(), OfferListItemProps, OfferPositionRow() (+7 more)
+Cohesion: 0.15
+Nodes (12): Document(), Props, LineItemRow(), LineItemRowProps, OfferCard(), OfferFlatRateRow(), OfferListItemProps, OfferPositionRow() (+4 more)
 
 ### Community 18 - "Order Controllers"
-Cohesion: 0.15
-Nodes (11): validate(), deleteOrderById(), getAllOrders(), getOrderById(), createDocumentForOrder(), createOrder(), createOrderTask(), generateOrderDocument() (+3 more)
+Cohesion: 0.17
+Nodes (10): deleteOrderById(), getAllOrders(), getOrderById(), createDocumentForOrder(), createOrder(), createOrderTask(), generateOrderDocument(), router (+2 more)
 
 ### Community 19 - "Tariff Modal Components"
 Cohesion: 0.15
 Nodes (10): TariffConfigModal(), TariffConfigModalProps, TariffCustomerModal(), TariffCustomerModalProps, TariffProductsModal(), TariffProductsModalProps, useTariffHook(), OverrideTarget (+2 more)
 
 ### Community 20 - "Product Controllers"
-Cohesion: 0.15
-Nodes (11): adapter, globalForPrisma, deleteProduct(), getProduct(), getProducts(), updateProduct(), createProduct(), router (+3 more)
+Cohesion: 0.17
+Nodes (9): deleteProduct(), getProduct(), getProducts(), updateProduct(), createProduct(), router, createProductSchema, productTranslationSchema (+1 more)
 
 ### Community 21 - "Nextcloud & Exceptions"
-Cohesion: 0.24
-Nodes (11): CompactLanguageToggle(), DEFAULT_LANGUAGE_OPTIONS, LanguageOption, LanguageToggleProps, PillLanguageToggle(), SegmentedLanguageToggle(), SegmentedToggle(), SegmentedToggleOption (+3 more)
+Cohesion: 0.25
+Nodes (10): getNextcloudStatus(), AppException, fileExists(), getNextCloudClient(), getNextcloudInitError(), isNextcloudConfigured(), reserveFile(), ReserveFileResult (+2 more)
 
 ### Community 22 - "Offer Data Access"
 Cohesion: 0.24
@@ -253,7 +247,7 @@ Cohesion: 0.13
 Nodes (14): compilerOptions, declaration, declarationMap, esModuleInterop, module, moduleResolution, outDir, rootDir (+6 more)
 
 ### Community 24 - "Pricing Modal"
-Cohesion: 0.16
+Cohesion: 0.18
 Nodes (7): ConfigRow, PricingModal(), PricingModalProps, useContractHook(), useProductHook(), OfferProductForm(), ProductModalSection()
 
 ### Community 25 - "Supplier List Components"
@@ -262,11 +256,11 @@ Nodes (8): Props, SupplierListItem(), SupplierList(), SupplierModal(), SupplierM
 
 ### Community 26 - "Employee List Components"
 Cohesion: 0.19
-Nodes (10): UserList(), UserListItem(), UserListItemProps, createUserSchema, editUserSchema, emptyUser, UserModal(), UserModalProps (+2 more)
+Nodes (9): UserList(), UserListItem(), UserListItemProps, createUserSchema, editUserSchema, emptyUser, UserModal(), UserModalProps (+1 more)
 
 ### Community 27 - "Offer Delete & Download"
-Cohesion: 0.09
-Nodes (23): generateDocument(), uploadDocument(), deleteOffer(), deleteOfferDocument(), downloadOfferDocument(), getNextQuoteId(), getOfferById(), getOfferRevisions() (+15 more)
+Cohesion: 0.23
+Nodes (9): deleteOffer(), deleteOfferDocument(), downloadOfferDocument(), getNextQuoteId(), getOfferById(), getOfferRevisions(), getOffers(), createReservation() (+1 more)
 
 ### Community 28 - "Offer Type Definitions"
 Cohesion: 0.15
@@ -277,24 +271,24 @@ Cohesion: 0.17
 Nodes (8): Route, RouteComponent(), Route, RouteComponent(), Route, FileRoutesById, FileRoutesByPath, Route
 
 ### Community 30 - "Customer List Components"
-Cohesion: 0.21
-Nodes (8): CustomerList(), CustomerListItem(), CustomerListItemProps, CustomerModal(), CustomerModalProps, customerSchema, Route, useCustomerHook()
+Cohesion: 0.20
+Nodes (8): CustomerList(), CustomerListItem(), CustomerListItemProps, CustomerModal(), CustomerModalProps, customerSchema, Route, useModal()
 
 ### Community 31 - "Flatrate Components"
 Cohesion: 0.21
 Nodes (8): FlatRateItem(), FlatRateList(), FlatRateModal(), FlatRateModalProps, flatRateSchema, langFields, seedLang(), useFlatRateHook()
 
 ### Community 32 - "Contract Controllers"
-Cohesion: 0.13
-Nodes (10): deleteContract(), getAllContracts(), updateContract(), createContract(), router, contractTranslationSchema, createContractSchema, updateContractSchema (+2 more)
+Cohesion: 0.21
+Nodes (6): deleteContract(), getAllContracts(), updateContract(), createContract(), adapter, globalForPrisma
 
 ### Community 33 - "Document Type Definitions"
 Cohesion: 0.20
 Nodes (9): CreateDocumentInput, CreateTaskInput, Document, DocumentStatus, UpdateDocumentInput, UpdateTaskInput, Task, TaskStatus (+1 more)
 
 ### Community 34 - "Badge Component"
-Cohesion: 0.18
-Nodes (15): CONTRACTS, CUSTOMERS, FLAT_RATES, main(), OWNER, PRODUCTS, seedContracts(), seedCustomers() (+7 more)
+Cohesion: 0.27
+Nodes (9): Badge(), badgeSizeStyles, countSizeStyles, countStyles, formatSizeStyles, formatStyles, styles, BadgeComponentProps (+1 more)
 
 ### Community 35 - "Order Card Components"
 Cohesion: 0.22
@@ -329,8 +323,8 @@ Cohesion: 0.20
 Nodes (10): section, contracts, customers, employees, flatRates, offers, orders, pricing (+2 more)
 
 ### Community 43 - "Community 43"
-Cohesion: 0.27
-Nodes (6): auth, Request, requireSession(), router, createContactPersons(), createUser()
+Cohesion: 0.24
+Nodes (6): updateOffer(), createOffer(), calculatePrice(), findMatchingTier(), PriceCalculatorProps, Tier
 
 ### Community 44 - "Community 44"
 Cohesion: 0.22
@@ -353,16 +347,16 @@ Cohesion: 0.29
 Nodes (6): OfferRevisionHistory(), Props, OfferQueryParams, useDocumentTask(), useOfferRevisionsHook(), useReservationTask()
 
 ### Community 49 - "Community 49"
-Cohesion: 0.33
-Nodes (4): ContactListItem(), Props, ContactPersonModal(), ContactPersonModalProps
+Cohesion: 0.29
+Nodes (5): ContactListItem(), Props, ContactPersonModal(), ContactPersonModalProps, useCustomerHook()
 
 ### Community 50 - "Community 50"
-Cohesion: 0.20
-Nodes (4): deleteUser(), getAllUsers(), getSessionUser(), updateUserById()
+Cohesion: 0.36
+Nodes (3): connection, TaskJobData, taskQueue
 
 ### Community 51 - "Community 51"
-Cohesion: 0.60
-Nodes (3): getAllTasks(), getTaskById(), router
+Cohesion: 0.32
+Nodes (5): validate(), router, contractTranslationSchema, createContractSchema, updateContractSchema
 
 ### Community 52 - "Community 52"
 Cohesion: 0.25
@@ -401,8 +395,8 @@ Cohesion: 0.29
 Nodes (7): common, export, filter, import, loading, noResults, search
 
 ### Community 61 - "Community 61"
-Cohesion: 0.50
-Nodes (3): Commands, graphify, Prisma and migrations
+Cohesion: 0.48
+Nodes (4): generateDocument(), uploadDocument(), enqueueGeneration(), uploadOfferDocument()
 
 ### Community 62 - "Community 62"
 Cohesion: 0.29
@@ -477,8 +471,12 @@ Cohesion: 0.40
 Nodes (4): ac, admin, employee, statement
 
 ### Community 83 - "Community 83"
+Cohesion: 0.67
+Nodes (3): PricingListItem(), Props, tariffTitle()
+
+### Community 90 - "Community 90"
 Cohesion: 0.50
-Nodes (3): Expanding the ESLint configuration, React Compiler, React + TypeScript + Vite
+Nodes (3): createOfferSchema, offerFlatRateSchema, offerPositionSchema
 
 ### Community 91 - "Community 91"
 Cohesion: 0.50
@@ -489,24 +487,24 @@ Cohesion: 0.67
 Nodes (3): client/index.html, client/public/favicon.svg, client/public/icons.svg
 
 ## Knowledge Gaps
-- **503 isolated node(s):** `save`, `cancel`, `create`, `delete`, `edit` (+498 more)
+- **498 isolated node(s):** `save`, `cancel`, `create`, `delete`, `edit` (+493 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **22 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `useAuth()` connect `Auth Context & Navigation` to `Offer Modal Components`?**
-  _High betweenness centrality (0.063) - this node is a cross-community bridge._
-- **Why does `OfferModal()` connect `Offer Modal Components` to `Auth Context & Navigation`, `Offer Card Components`, `Supplier List Components`, `Employee List Components`, `Customer List Components`, `Flatrate Components`?**
-  _High betweenness centrality (0.062) - this node is a cross-community bridge._
+  _High betweenness centrality (0.067) - this node is a cross-community bridge._
+- **Why does `OfferModal()` connect `Offer Modal Components` to `Auth Context & Navigation`, `Community 49`, `Offer Card Components`, `Supplier List Components`, `Employee List Components`, `Flatrate Components`?**
+  _High betweenness centrality (0.065) - this node is a cross-community bridge._
 - **Are the 58 inferred relationships involving `api()` (e.g. with `createContractAction()` and `deleteContractAction()`) actually correct?**
   _`api()` has 58 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `save`, `cancel`, `create` to the rest of the system?**
-  _503 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _498 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Offer Actions Pipeline` be split into smaller, more focused modules?**
-  _Cohesion score 0.05063291139240506 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05920745920745921 - nodes in this community are weakly interconnected._
+- **Should `Auth & Task Controllers` be split into smaller, more focused modules?**
+  _Cohesion score 0.05263157894736842 - nodes in this community are weakly interconnected._
 - **Should `UI Core Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.05272108843537415 - nodes in this community are weakly interconnected._
-- **Should `Input & Filter Components` be split into smaller, more focused modules?**
-  _Cohesion score 0.049682875264270614 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.05454545454545454 - nodes in this community are weakly interconnected._

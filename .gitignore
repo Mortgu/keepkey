@@ -10,3 +10,4 @@ graphify-out/.graphify_python
 graphify-out/.graphify_root
 graphify-out/cache/
 *.tex
+graphify-out/2026-06-09/graph.json
