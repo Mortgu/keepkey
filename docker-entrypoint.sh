@@ -24,5 +24,8 @@ echo "Redis is ready."
 echo "Running database migrations..."
 npx prisma migrate deploy --schema prisma/schema
 
+echo "Seeding database..."
+npm run seed
+
 echo "Starting application..."
 exec node dist/server.js
