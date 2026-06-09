@@ -2,7 +2,7 @@
 set -e
 
 echo "Waiting for PostgreSQL..."
-until node -e "
+until node --input-type=commonjs -e "
   const { Client } = require('pg');
   const client = new Client({ connectionString: process.env.DATABASE_URL });
   client.connect().then(() => { client.end(); process.exit(0); }).catch(() => process.exit(1));
@@ -12,7 +12,7 @@ done
 echo "PostgreSQL is ready."
 
 echo "Waiting for Redis..."
-until node -e "
+until node --input-type=commonjs -e "
   const { createClient } = require('redis');
   const client = createClient({ url: process.env.REDIS_URL });
   client.connect().then(() => { client.quit(); process.exit(0); }).catch(() => process.exit(1));

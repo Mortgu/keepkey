@@ -9,7 +9,7 @@ COPY client/package*.json ./client/
 RUN cd client && npm install
 
 COPY . .
-RUN cd client && npm run generate:types && npx vite build
+RUN cd client && npm run generate:types && VITE_API_BASE_URL="" npx vite build
 RUN cd server && npx tsc --project tsconfig.json && npm prune --production
 
 
