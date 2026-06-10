@@ -17,7 +17,7 @@ import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
-import {initNextcloud, getNextcloudInitError} from "./lib/nextcloud.js";
+import {getNextcloudInitError, initNextcloud} from "./lib/nextcloud.js";
 
 const options = {
     definition: {
@@ -60,6 +60,10 @@ app.use(express.json());
 app.use("/api", router);
 
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
+
+app.get("{*path}", (req, res) => {
+    res.sendFile(path.join(process.cwd(), "../client/dist/index.html"));
+});
 
 // Global error handler
 app.use(exceptionHandler);
