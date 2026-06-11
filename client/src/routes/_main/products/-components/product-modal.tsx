@@ -3,6 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import type { CreateProductInput, Language, ProductTranslationInput, UpdateProductInput } from "@/types";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 import { useState } from "react";
+import { getFormErrors } from "@/lib/utils";
 
 interface ProductModalProps {
     onClose: () => void;
@@ -79,7 +80,7 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
                             <Input id={field.name} name={field.name} value={field.state.value}
                                 label="Schlüssel (sprachunabhängig)"
                                 disabled={isEdit}
-                                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                                error={getFormErrors(field.state.meta.errors)}
                                 placeholder="z.B. managed-server"
                                 onChange={(e) => field.handleChange(e.target.value)}
                             />
@@ -90,7 +91,7 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
                         <div className="grid gap-1">
                             <Input id={field.name} name={field.name} value={field.state.value}
                                 label={`Produkt Name (${language})`}
-                                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                                error={getFormErrors(field.state.meta.errors)}
                                 placeholder="Produkt Name"
                                 onChange={(e) => field.handleChange(e.target.value)}
                             />

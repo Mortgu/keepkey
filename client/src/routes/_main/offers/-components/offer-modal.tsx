@@ -8,6 +8,7 @@ import {type OfferProductInput} from "./modal-components/offer-product-form";
 import OfferFlatRateForm from "./modal-components/offer-flat-rate-form";
 
 import {useCustomerHook, useFlatRateHook, useLocale, useOfferHook, useSupplierHook, useUserHook} from "@/hooks";
+import {getFormError} from "@/lib/utils";
 import {Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle, Select} from "@/components";
 
 import type {
@@ -176,7 +177,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         <offerForm.Field name="customerId" children={(field) => (
                             <div className="flex-1">
-                                <Select label="Kunde" error={field.state.meta.errors[0]?.message}
+                                <Select label="Kunde" error={getFormError(field.state.meta.errors)}
                                         value={field.state.value as string} onChange={(e) => {
                                     const newCustomerId = e.target.value;
                                     field.handleChange(newCustomerId);
@@ -203,7 +204,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                                                          return (
                                                              <Select label="Ansprechpartner Kunde"
                                                                      value={field.state.value as string}
-                                                                     error={field.state.meta.errors[0]?.message}
+                                                                     error={getFormError(field.state.meta.errors)}
                                                                      onChange={(e) => field.handleChange(e.target.value)}
                                                                      disabled={!customerId}>
                                                                  {contactPersons.map((cp: ContactPerson) => (
@@ -222,7 +223,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="userId" children={(field) => (
                             <div className="flex-1">
                                 <Select label="Unser Ansprechpartner" value={field.state.value as string}
-                                        error={field.state.meta.errors[0]?.message}
+                                        error={getFormError(field.state.meta.errors)}
                                         onChange={(e) => field.handleChange(e.target.value)}>
                                     {users.map((user: User) => (
                                         <option key={user.id} value={user.id}>
@@ -239,7 +240,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="quoteId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
                                 <Input label="AG-Nr." value={field.state.value as string}
-                                       warning={field.state.meta.errors[0]?.message || errorCreatingReservation?.message}
+                                       warning={getFormError(field.state.meta.errors) || errorCreatingReservation?.message}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        loading={isCreatingReservation}
                                        disabled={isCreatingReservation}
@@ -250,7 +251,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="supplierId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
                                 <Select label="Lieferant" value={(field.state.value as string | null) ?? ''}
-                                        error={field.state.meta.errors[0]?.message}
+                                        error={getFormError(field.state.meta.errors)}
                                         onChange={(e) => field.handleChange(e.target.value || null)}>
                                     <option value="">None</option>
                                     {suppliers?.map((supplier: Supplier) => (
@@ -265,7 +266,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="paymentTerm" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input label="Zahlungsbedingung" size="sm" placeholder="Zahlungsbedingung..."
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value as string}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
@@ -278,7 +279,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                             <div className="flex-1 grid gap-2">
                                 <Input label="Angebot gültig bis" type="date" size="sm"
                                        placeholder="Gültig bis..."
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value?.split('T')[0] ?? ''}
                                        onBlur={field.handleBlur}
                                        onChange={(e) => {
@@ -297,7 +298,7 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                             <div className="flex-1 grid gap-2">
                                 <Input label="Ihre Anfrage vom" type="date" size="sm"
                                        placeholder="Ihre Anfrage vom..."
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value?.split('T')[0] ?? ''}
                                        onBlur={field.handleBlur}
                                        onChange={(e) => {

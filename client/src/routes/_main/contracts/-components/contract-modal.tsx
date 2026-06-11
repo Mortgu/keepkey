@@ -11,6 +11,7 @@ import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import { getFormErrors } from "@/lib/utils";
 
 interface ContractModalProps {
   onClose: () => void;
@@ -93,7 +94,7 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
             <div className="grid gap-2">
               <Input id={field.name} value={field.state.value} label="Schlüssel (sprachunabhängig)"
                 disabled={isEdit}
-                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                error={getFormErrors(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />
@@ -103,7 +104,7 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
           <contractForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-2">
               <Input id={field.name} value={field.state.value} label={`Name (${language})`}
-                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                error={getFormErrors(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />

@@ -3,6 +3,7 @@ import {z} from "zod";
 import {useCustomerHook} from "@/hooks";
 import {Button, Input, ModalDialog} from "@/components";
 import type {Customer} from "@/types";
+import {getFormError} from "@/lib/utils";
 
 interface CustomerModalProps {
     onClose: () => void;
@@ -10,10 +11,10 @@ interface CustomerModalProps {
 }
 
 const customerSchema = z.object({
-    customerId: z.string().optional(),
+    customerId: z.union([z.string(), z.undefined()]).transform(val => val === undefined ? null : val),
     companyName: z.string().min(1, "min. 1 Zeichen!"),
-    email: z.string().email(),
-    invoiceEmail: z.string().email().optional(),
+    email: z.email(),
+    invoiceEmail: z.union([z.email(), z.undefined()]).transform(val => val === undefined ? null : val),
     street: z.string(),
     city: z.string(),
     plz: z.string(),
@@ -48,7 +49,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                 }
             } else {
                 try {
-                    createCustomer(value);
+                    createCustomer({body: value});
                     onClose();
                 } catch (exception: any) {
                 }
@@ -81,7 +82,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="customerId" children={(field) => (
                             <div className="flex gap-2">
                                 <Input id={field.name} label="Kunden-Nr." size="sm"
-                                       value={field.state.value ?? ""} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value ?? ""} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -90,7 +91,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="companyName" children={(field) => (
                             <div className="flex-3 grid gap-2">
                                 <Input id={field.name} label="Firmenname" size="sm"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -99,7 +100,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="phone" children={(field) => (
                             <div className="flex-2 grid gap-2">
                                 <Input id={field.name} label="Telefonnummer" size="sm"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -110,7 +111,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="email" children={(field) => (
                             <div className="flex-2 grid gap-2">
                                 <Input id={field.name} label="E-Mail" size="sm"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -119,7 +120,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="invoiceEmail" children={(field) => (
                             <div className="flex-2 grid gap-2">
                                 <Input id={field.name} label="Rechnungs E-Mail" size="sm"
-                                       value={field.state.value ?? ""} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value ?? ""} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -132,7 +133,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="street" children={(field) => (
                             <div className="flex-2 grid gap-2">
                                 <Input id={field.name} size="sm" label="Straße"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -141,7 +142,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="city" children={(field) => (
                             <div className="flex-2 grid gap-2">
                                 <Input id={field.name} size="sm" label="Stadt"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>
@@ -150,7 +151,7 @@ export default function CustomerModal({onClose, currentCustomer = null}: Custome
                         <customerForm.Field name="plz" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} size="sm" label="Postleitzahl"
-                                       value={field.state.value} error={field.state.meta.errors[0]?.message}
+                                       value={field.state.value} error={getFormError(field.state.meta.errors)}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                 />
                             </div>

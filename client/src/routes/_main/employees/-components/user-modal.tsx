@@ -5,6 +5,7 @@ import {useForm} from "@tanstack/react-form";
 import {useUserHook} from "@/hooks";
 import {type User} from "@/types";
 import {Button, Input, ModalDialog} from "@/components";
+import {getFormError} from "@/lib/utils";
 
 interface UserModalProps {
     onClose: () => void;
@@ -82,7 +83,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="salutation" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} label="Anrede" size="sm"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}
@@ -93,7 +94,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="firstName" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} size="sm" label="Vorname"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}
@@ -104,7 +105,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="lastName" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} size="sm" label="Nachname"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}
@@ -117,7 +118,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="email" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} label="E-Mail" size="sm"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}
@@ -128,7 +129,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="phone" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} label="Telefonnummer" size="sm"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}
@@ -139,7 +140,7 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
                         <userForm.Field name="password" children={(field) => (
                             <div className="flex-1 grid gap-2">
                                 <Input id={field.name} type="password" size="sm" label="Passwort"
-                                       error={field.state.meta.errors[0]?.message}
+                                       error={getFormError(field.state.meta.errors)}
                                        value={field.state.value}
                                        onChange={(e) => field.handleChange(e.target.value)}
                                        onBlur={field.handleBlur}

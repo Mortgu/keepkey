@@ -4,6 +4,7 @@ import { z } from "zod";
 import { Button, Input } from "@/components";
 import type { ContactPerson, CreateContactPersonInput } from "@/types";
 import { useForm } from "@tanstack/react-form";
+import { getFormError } from "@/lib/utils";
 
 const contactPersonSchema = z.object({
   salutation: z.string().min(1, "Anrede fehlt"),
@@ -55,14 +56,14 @@ export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId,
         <div className="flex items-center gap-2">
           <contactForm.Field name="salutation" children={(field) => (
             <Input value={field.state.value} label="Anrede" className="bg-white"
-              error={field.state.meta.errors[0]?.message}
+              error={getFormError(field.state.meta.errors)}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur} />
           )} />
 
           <contactForm.Field name="firstName" children={(field) => (
             <Input value={field.state.value} label="Vorname" className="bg-white"
-              error={field.state.meta.errors[0]?.message}
+              error={getFormError(field.state.meta.errors)}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -70,7 +71,7 @@ export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId,
 
           <contactForm.Field name="lastName" children={(field) => (
             <Input value={field.state.value} label="Nachname" className="bg-white"
-              error={field.state.meta.errors[0]?.message}
+              error={getFormError(field.state.meta.errors)}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />
@@ -80,7 +81,7 @@ export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId,
         <div className="flex gap-2">
           <contactForm.Field name="email" children={(field) => (
             <Input value={field?.state?.value || ''} label="E-Mail" className="bg-white"
-              error={field.state.meta.errors[0]?.message}
+              error={getFormError(field.state.meta.errors)}
               onChange={(e) => field.handleChange(e.target.value)}
               onBlur={field.handleBlur}
             />

@@ -1,17 +1,17 @@
 import type {ReactNode} from "react";
 import {useState} from "react";
 import {
-  ChevronDown,
-  DollarSign,
-  FileText,
-  Languages,
-  LayoutGrid,
-  Package,
-  Settings,
-  ShoppingCart,
-  Truck,
-  UserCircle2,
-  Users,
+    ChevronDown,
+    DollarSign,
+    FileText,
+    Languages,
+    LayoutGrid,
+    Package,
+    Settings,
+    ShoppingCart,
+    Truck,
+    UserCircle2,
+    Users,
 } from "lucide-react";
 import {useTranslation} from "react-i18next";
 import {tv} from "tailwind-variants";
@@ -108,7 +108,7 @@ export function Navigation() {
             </div>
 
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
-                <Section title={t("overview")}>
+                <Section title={t("nav.overview")}>
                     <NavLink
                         to="/"
                         icon={<LayoutGrid size={ICON_SIZE}/>}
@@ -116,7 +116,7 @@ export function Navigation() {
                     />
                 </Section>
 
-                <Section title={t("catalog")} collapsible>
+                <Section title={t("nav.catalog")} collapsible>
                     <NavLink
                         to="/products"
                         label={t("section.products")}
@@ -145,7 +145,7 @@ export function Navigation() {
                     />
                 </Section>
 
-                <Section title={t("sales")} collapsible>
+                <Section title={t("nav.sales")} collapsible>
                     <NavLink
                         to="/customers"
                         label={t("section.customers")}
@@ -163,7 +163,7 @@ export function Navigation() {
                     />
                 </Section>
 
-                <Section title={t("management")} collapsible>
+                <Section title={t("nav.management")} collapsible>
                     <NavLink
                         to="/employees"
                         label={t("section.employees")}

@@ -6,6 +6,7 @@ import { Route } from "../";
 
 import { Button, Input } from "@/components";
 import { authClient } from "@/lib/auth-client.js";
+import { getFormError } from "@/lib/utils";
 
 export function LoginFormComponent() {
   const [error, setError] = useState<string | undefined>(undefined);
@@ -137,8 +138,7 @@ export function LoginFormComponent() {
                   />
                   {field.state.meta.isTouched && field.state.meta.errors[0] && (
                     <span className="text-xs text-red-500">
-                      {(field.state.meta.errors[0] as { message?: string })
-                        ?.message ?? String(field.state.meta.errors[0])}
+                      {getFormError(field.state.meta.errors)}
                     </span>
                   )}
                 </div>
@@ -176,8 +176,7 @@ export function LoginFormComponent() {
                   </div>
                   {field.state.meta.isTouched && field.state.meta.errors[0] && (
                     <span className="text-xs text-red-500">
-                      {(field.state.meta.errors[0] as { message?: string })
-                        ?.message ?? String(field.state.meta.errors[0])}
+                      {getFormError(field.state.meta.errors)}
                     </span>
                   )}
                 </div>
