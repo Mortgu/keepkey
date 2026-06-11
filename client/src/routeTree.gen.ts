@@ -12,8 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainUserIndexRouteImport } from './routes/_main/user/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
+import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
 import { Route as MainPricingIndexRouteImport } from './routes/_main/pricing/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
@@ -39,14 +39,14 @@ const MainIndexRoute = MainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainUserIndexRoute = MainUserIndexRouteImport.update({
-  id: '/user/',
-  path: '/user/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
   id: '/suppliers/',
   path: '/suppliers/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
@@ -112,8 +112,8 @@ export interface FileRoutesByFullPath {
   '/orders/': typeof MainOrdersIndexRoute
   '/pricing/': typeof MainPricingIndexRoute
   '/products/': typeof MainProductsIndexRoute
+  '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
-  '/user/': typeof MainUserIndexRoute
   '/products/$id/': typeof MainProductsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -128,8 +128,8 @@ export interface FileRoutesByTo {
   '/orders': typeof MainOrdersIndexRoute
   '/pricing': typeof MainPricingIndexRoute
   '/products': typeof MainProductsIndexRoute
+  '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
-  '/user': typeof MainUserIndexRoute
   '/products/$id': typeof MainProductsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -146,8 +146,8 @@ export interface FileRoutesById {
   '/_main/orders/': typeof MainOrdersIndexRoute
   '/_main/pricing/': typeof MainPricingIndexRoute
   '/_main/products/': typeof MainProductsIndexRoute
+  '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
-  '/_main/user/': typeof MainUserIndexRoute
   '/_main/products/$id/': typeof MainProductsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -164,8 +164,8 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/pricing/'
     | '/products/'
+    | '/settings/'
     | '/suppliers/'
-    | '/user/'
     | '/products/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -180,8 +180,8 @@ export interface FileRouteTypes {
     | '/orders'
     | '/pricing'
     | '/products'
+    | '/settings'
     | '/suppliers'
-    | '/user'
     | '/products/$id'
   id:
     | '__root__'
@@ -197,8 +197,8 @@ export interface FileRouteTypes {
     | '/_main/orders/'
     | '/_main/pricing/'
     | '/_main/products/'
+    | '/_main/settings/'
     | '/_main/suppliers/'
-    | '/_main/user/'
     | '/_main/products/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -230,18 +230,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/user/': {
-      id: '/_main/user/'
-      path: '/user'
-      fullPath: '/user/'
-      preLoaderRoute: typeof MainUserIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/suppliers/': {
       id: '/_main/suppliers/'
       path: '/suppliers'
       fullPath: '/suppliers/'
       preLoaderRoute: typeof MainSuppliersIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/settings/': {
+      id: '/_main/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof MainSettingsIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/products/': {
@@ -328,8 +328,8 @@ interface MainRouteRouteChildren {
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
   MainPricingIndexRoute: typeof MainPricingIndexRoute
   MainProductsIndexRoute: typeof MainProductsIndexRoute
+  MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
-  MainUserIndexRoute: typeof MainUserIndexRoute
   MainProductsIdIndexRoute: typeof MainProductsIdIndexRoute
 }
 
@@ -344,8 +344,8 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainOrdersIndexRoute: MainOrdersIndexRoute,
   MainPricingIndexRoute: MainPricingIndexRoute,
   MainProductsIndexRoute: MainProductsIndexRoute,
+  MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
-  MainUserIndexRoute: MainUserIndexRoute,
   MainProductsIdIndexRoute: MainProductsIdIndexRoute,
 }
 

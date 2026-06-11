@@ -43,8 +43,16 @@ export const getOffers = async (request: Request, response: Response) => {
             },
             offerPositions: {
                 include: {
-                    product: true,
-                    contract: true,
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    },
+                    contract: {
+                        include: {
+                            translations: true
+                        }
+                    },
                 },
             },
             offerFlatRates: {

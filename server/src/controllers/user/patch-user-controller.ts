@@ -46,7 +46,7 @@ export const updateUserById = async (request: Request, response: Response) => {
 
         return response.status(200).json({
             success: true,
-            message: "Successfully updated user!",
+            message: "Successfully updated settings!",
         });
     } catch (exception: any) {
         return response.status(500).json({

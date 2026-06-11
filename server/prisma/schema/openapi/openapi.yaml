@@ -17,6 +17,8 @@ components:
           type: string
         email:
           type: string
+        invoiceEmail:
+          type: string
         street:
           type: string
         city:
@@ -53,7 +55,6 @@ components:
             $ref: "#/components/schemas/TariffCustomer"
       required:
         - id
-        - customerId
         - companyName
         - createdAt
         - updatedAt
@@ -584,116 +585,6 @@ components:
         - language
         - name
         - product
-    Tariff:
-      type: object
-      properties:
-        id:
-          type: string
-        products:
-          type: array
-          items:
-            $ref: "#/components/schemas/Product"
-        configs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffConfig"
-        customers:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffCustomer"
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - products
-        - configs
-        - customers
-        - createdAt
-        - updatedAt
-    TariffConfig:
-      type: object
-      properties:
-        id:
-          type: string
-        tariff:
-          $ref: "#/components/schemas/Tariff"
-        tariffId:
-          type: string
-        contract:
-          $ref: "#/components/schemas/Contract"
-        contractId:
-          type: string
-        duration:
-          type: integer
-          format: int32
-        min_quantity:
-          type: integer
-          format: int32
-        max_quantity:
-          type: integer
-          format: int32
-        price:
-          type: integer
-          format: int32
-      required:
-        - id
-        - tariff
-        - tariffId
-        - contract
-        - contractId
-        - duration
-        - min_quantity
-        - price
-    TariffCustomer:
-      type: object
-      properties:
-        id:
-          type: string
-        tariff:
-          $ref: "#/components/schemas/Tariff"
-        tariffId:
-          type: string
-        product:
-          $ref: "#/components/schemas/Product"
-        productId:
-          type: string
-        contract:
-          $ref: "#/components/schemas/Contract"
-        contractId:
-          type: string
-        customer:
-          $ref: "#/components/schemas/Customer"
-        customerId:
-          type: string
-        duration:
-          type: integer
-          format: int32
-        min_quantity:
-          type: integer
-          format: int32
-        max_quantity:
-          type: integer
-          format: int32
-        price:
-          type: integer
-          format: int32
-      required:
-        - id
-        - tariff
-        - tariffId
-        - product
-        - productId
-        - contract
-        - contractId
-        - customer
-        - customerId
-        - duration
-        - min_quantity
-        - price
     User:
       type: object
       properties:
@@ -1005,6 +896,116 @@ components:
         - features
         - table
         - contract
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+        configs:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffConfig"
+        customers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCustomer"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - products
+        - configs
+        - customers
+        - createdAt
+        - updatedAt
+    TariffConfig:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+        contractId:
+          type: string
+        duration:
+          type: integer
+          format: int32
+        min_quantity:
+          type: integer
+          format: int32
+        max_quantity:
+          type: integer
+          format: int32
+        price:
+          type: integer
+          format: int32
+      required:
+        - id
+        - tariff
+        - tariffId
+        - contract
+        - contractId
+        - duration
+        - min_quantity
+        - price
+    TariffCustomer:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        product:
+          $ref: "#/components/schemas/Product"
+        productId:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+        contractId:
+          type: string
+        customer:
+          $ref: "#/components/schemas/Customer"
+        customerId:
+          type: string
+        duration:
+          type: integer
+          format: int32
+        min_quantity:
+          type: integer
+          format: int32
+        max_quantity:
+          type: integer
+          format: int32
+        price:
+          type: integer
+          format: int32
+      required:
+        - id
+        - tariff
+        - tariffId
+        - product
+        - productId
+        - contract
+        - contractId
+        - customer
+        - customerId
+        - duration
+        - min_quantity
+        - price
     Task:
       type: object
       properties:

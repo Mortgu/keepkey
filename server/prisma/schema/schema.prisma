@@ -152,7 +152,7 @@ model ContractTranslation {
 
   name     String
   features String[]
-  table    String @default("")
+  table    String   @default("")
 
   contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
 

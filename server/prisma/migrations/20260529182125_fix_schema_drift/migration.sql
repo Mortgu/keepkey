@@ -9,9 +9,9 @@
   - Added the required column `firstName` to the `contact_person` table without a default value. This is not possible if the table is not empty.
   - Added the required column `lastName` to the `contact_person` table without a default value. This is not possible if the table is not empty.
   - Added the required column `salutation` to the `contact_person` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `firstName` to the `user` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `lastName` to the `user` table without a default value. This is not possible if the table is not empty.
-  - Added the required column `salutation` to the `user` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `firstName` to the `settings` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `lastName` to the `settings` table without a default value. This is not possible if the table is not empty.
+  - Added the required column `salutation` to the `settings` table without a default value. This is not possible if the table is not empty.
 
 */
 -- CreateEnum

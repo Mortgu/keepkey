@@ -28,14 +28,14 @@ export const createUser = async (request: Request, response: Response) => {
     } catch (exception: any) {
         return response.status(500).json({
             success: false,
-            message: "Something went wrong trying to create user!",
+            message: "Something went wrong trying to create settings!",
             exception: exception.message,
         });
     }
 
     return response.status(200).json({
         success: true,
-        message: "Successfully created user!",
+        message: "Successfully created settings!",
     });
 };
 

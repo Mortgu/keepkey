@@ -1,9 +1,11 @@
 model Customer {
   id String @id @default(uuid())
 
-  customerId  String  @unique
+  customerId  String? @unique
   companyName String
-  email       String? @unique
+
+  email        String? @unique
+  invoiceEmail String?
 
   street String?
   city   String?

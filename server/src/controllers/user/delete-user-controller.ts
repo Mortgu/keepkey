@@ -7,7 +7,7 @@ export const deleteUser = async (request: Request, response: Response) => {
     if (!id) {
         return response.status(404).json({
             success: false,
-            message: "Missing user Id!",
+            message: "Missing settings Id!",
         });
     }
 
@@ -18,14 +18,14 @@ export const deleteUser = async (request: Request, response: Response) => {
     } catch (exception: any) {
         return response.status(500).json({
             success: false,
-            message: "Something went wrong trying to delete user!",
+            message: "Something went wrong trying to delete settings!",
             exception: exception.message,
         });
     }
 
     return response.status(200).json({
         success: true,
-        message: "Successfully deleted user!",
+        message: "Successfully deleted settings!",
     });
 };
 
