@@ -29,6 +29,7 @@ import {formatEur} from "@/utils/utils";
 import {localized} from "@/lib/i18n-content";
 import ProductModalSection from "./modal-components/product-section";
 import {useAuth} from "@/context/auth";
+import {findOfferFilesByIdAction} from "@/data/nextcloud";
 
 interface OfferModalProps {
     onClose: () => void;
@@ -110,9 +111,27 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
         createOffer,
         errorCreatingOffer,
         updateOffer,
-        isCreatingReservation,
-        errorCreatingReservation,
     } = useOfferHook();
+
+    const [quoteIdWarning, setQuoteIdWarning] = useState<string | undefined>(undefined);
+    const [checkingQuoteId, setCheckingQuoteId] = useState(false);
+
+    const checkQuoteId = async (id: string) => {
+        if (!id) {
+            setQuoteIdWarning(undefined);
+            return;
+        }
+
+        setCheckingQuoteId(true);
+        try {
+            const result = await findOfferFilesByIdAction(id);
+            setQuoteIdWarning(result.found ? "Datei existiert bereits" : undefined);
+        } catch {
+            setQuoteIdWarning(undefined);
+        } finally {
+            setCheckingQuoteId(false);
+        }
+    }
 
     const offerForm = useForm({
         defaultValues: getFormDefaults(currentOffer, {
@@ -240,10 +259,13 @@ export default function OfferModal({onClose, currentOffer}: OfferModalProps) {
                         <offerForm.Field name="quoteId" children={(field) => (
                             <div className="flex-1 grid gap-2 items-center">
                                 <Input label="AG-Nr." value={field.state.value as string}
-                                       warning={getFormError(field.state.meta.errors) || errorCreatingReservation?.message}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       loading={isCreatingReservation}
-                                       disabled={isCreatingReservation}
+                                       warning={quoteIdWarning ?? getFormError(field.state.meta.errors)}
+                                       warningTooltip={checkingQuoteId ? "Prüfe..." : undefined}
+                                       onChange={(e) => {
+                                           field.handleChange(e.target.value);
+                                           setQuoteIdWarning(undefined);
+                                       }}
+                                       onBlur={() => checkQuoteId(field.state.value as string)}
                                 />
                             </div>
                         )}/>
