@@ -6,9 +6,10 @@ type Props = {
     term: number;
     index: number;
     removeTerm: (index: number) => void;
+    updateTerm: (index: number, duration: number) => void;
 }
 
-export default function TariffTermsComponent({term, index, removeTerm}: Props) {
+export default function TariffTermsComponent({term, index, removeTerm, updateTerm}: Props) {
     const [edit, setEdit] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(term);
 
@@ -30,6 +31,7 @@ export default function TariffTermsComponent({term, index, removeTerm}: Props) {
                            }
 
                            setDuration(value);
+                           updateTerm(index, value);
                        }}/>
             )}
 

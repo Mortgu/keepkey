@@ -18,6 +18,13 @@ export const addTermAction = (tariffId: string, duration: number) =>
         body: JSON.stringify({duration}),
     });
 
+export const updateTermAction = (tariffId: string, termIndex: number, duration: number) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/terms`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({termIndex, duration}),
+    })
+
 export const removeTermAction = (tariffId: string, termIndex: number) =>
     api<Tariff>(`/api/tariffs/${tariffId}/terms`, {
         method: "PUT",

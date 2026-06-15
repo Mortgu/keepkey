@@ -8,6 +8,8 @@ import TariffTermsComponent from "@/routes/_main/products/$id/-components/tariff
 
 type AddTermVars = { tariffId: string; duration: number };
 type RemoveTermVars = { tariffId: string; termIndex: number };
+type UpdateTermVars = { tariffId: string; termIndex: number, duration: number };
+
 type AddBandVars = { tariffId: string; min_quantity: number; max_quantity: number; prices: number[] };
 type RemoveBandVars = string;
 type UpdateCellVars = { cellId: string; price: number };
@@ -16,6 +18,7 @@ type Props = {
     tariff: Tariff;
     onAddTerm: (vars: AddTermVars) => void;
     onRemoveTerm: (vars: RemoveTermVars) => void;
+    onUpdateTerm: (vars: UpdateTermVars) => void;
     onAddBand: (vars: AddBandVars) => void;
     onRemoveBand: (vars: RemoveBandVars) => void;
     onUpdateCell: (vars: UpdateCellVars) => void;
@@ -26,10 +29,14 @@ export default function TariffComponent(props: Props) {
         tariff,
         onAddTerm,
         onRemoveTerm,
+        onUpdateTerm,
+
         onAddBand,
         onRemoveBand,
-        onUpdateCell
+        onUpdateCell,
     } = props;
+
+    console.log(tariff)
 
     const locale = useLocale();
 
@@ -40,6 +47,10 @@ export default function TariffComponent(props: Props) {
     const removeTerm = (termIndex: number) => {
         onRemoveTerm({tariffId: tariff.id, termIndex});
     };
+
+    const updateTerm = (termIndex: number, duration: number) => {
+        onUpdateTerm({tariffId: tariff.id, termIndex, duration});
+    }
 
     const addBand = () => {
         const lastRow = tariff.rows[tariff.rows.length - 1];
@@ -70,7 +81,8 @@ export default function TariffComponent(props: Props) {
                         <div className="flex gap-2">
                             <p className="flex-1 min-w-50"></p>
                             {tariff.terms.map((term: number, index: number) => (
-                                <TariffTermsComponent key={index} term={term} index={index} removeTerm={removeTerm}/>
+                                <TariffTermsComponent key={index} term={term} index={index} removeTerm={removeTerm}
+                                                      updateTerm={updateTerm}/>
                             ))}
                         </div>
 

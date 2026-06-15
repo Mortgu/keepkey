@@ -67,7 +67,10 @@ export async function addTerm(request: Request, response: Response, next: NextFu
             });
 
             for (const row of tariff.rows) {
-                const cellCount = await tx.tariffCell.count({where: {rowId: row.id}});
+                const cellCount = await tx.tariffCell.count({
+                    where: {rowId: row.id}
+                });
+                
                 await tx.tariffCell.create({
                     data: {rowId: row.id, price: 0, order: cellCount},
                 });
@@ -112,6 +115,39 @@ export async function removeTerm(request: Request, response: Response, next: Nex
                     });
                 }
             }
+        });
+
+        const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});
+        return response.status(200).json(updated);
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateTerm(request: Request, response: Response, next: NextFunction) {
+    try {
+        const tariffId = request.params.tariffId as string;
+        const {termIndex, duration} = request.body as { termIndex: number; duration: number };
+
+        const tariff = await prisma.tariff.findUnique({where: {id: tariffId}});
+        if (!tariff) {
+            return response.status(404).json({success: false, message: "Tariff not found."});
+        }
+
+        if (termIndex < 0 || termIndex >= tariff.terms.length) {
+            return response.status(400).json({success: false, message: "Invalid term index."});
+        }
+
+        if (tariff.terms.includes(duration) && tariff.terms[termIndex] !== duration) {
+            return response.status(409).json({success: false, message: "Term already exists."});
+        }
+
+        const newTerms = [...tariff.terms];
+        newTerms[termIndex] = duration;
+
+        await prisma.tariff.update({
+            where: {id: tariffId},
+            data: {terms: {set: newTerms}},
         });
 
         const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});

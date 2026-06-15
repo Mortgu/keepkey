@@ -123,11 +123,6 @@ export function Navigation() {
                         icon={<Package size={ICON_SIZE}/>}
                     />
                     <NavLink
-                        to="/pricing"
-                        label={t("section.pricing")}
-                        icon={<DollarSign size={ICON_SIZE}/>}
-                    />
-                    <NavLink
                         to="/products/flatrates"
                         label={t("section.flatRates")}
                         icon={<DollarSign size={ICON_SIZE}/>}

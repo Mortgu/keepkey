@@ -8,6 +8,7 @@ import {
     removeBandAction,
     removeTermAction,
     updateCellAction,
+    updateTermAction,
 } from "@/data/tariffs";
 
 export const useTariffHook = (productId?: string) => {
@@ -24,16 +25,22 @@ export const useTariffHook = (productId?: string) => {
     });
 
     const addTermMutation = useMutation({
-        mutationFn: ({tariffId, duration}: {tariffId: string; duration: number}) =>
+        mutationFn: ({tariffId, duration}: { tariffId: string; duration: number }) =>
             addTermAction(tariffId, duration),
         onSuccess: invalidate,
     });
 
     const removeTermMutation = useMutation({
-        mutationFn: ({tariffId, termIndex}: {tariffId: string; termIndex: number}) =>
+        mutationFn: ({tariffId, termIndex}: { tariffId: string; termIndex: number }) =>
             removeTermAction(tariffId, termIndex),
         onSuccess: invalidate,
     });
+
+    const updateTermMutation = useMutation({
+        mutationFn: ({tariffId, termIndex, duration}: { tariffId: string; termIndex: number, duration: number }) =>
+            updateTermAction(tariffId, termIndex, duration),
+        onSuccess: invalidate,
+    })
 
     const addBandMutation = useMutation({
         mutationFn: ({tariffId, min_quantity, max_quantity, prices}: {
@@ -51,7 +58,7 @@ export const useTariffHook = (productId?: string) => {
     });
 
     const updateCellMutation = useMutation({
-        mutationFn: ({cellId, price}: {cellId: string; price: number}) =>
+        mutationFn: ({cellId, price}: { cellId: string; price: number }) =>
             updateCellAction(cellId, price),
         onSuccess: invalidate,
     });
@@ -68,6 +75,10 @@ export const useTariffHook = (productId?: string) => {
         removeTerm: removeTermMutation.mutate,
         removeTermPending: removeTermMutation.isPending,
         removeTermError: removeTermMutation.error,
+
+        updateTerm: updateTermMutation.mutate,
+        updateTermPending: updateTermMutation.isPending,
+        updateTermError: updateTermMutation.error,
 
         addBand: addBandMutation.mutate,
         addBandPending: addBandMutation.isPending,

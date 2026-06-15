@@ -8,7 +8,8 @@ import {
     getTariffPrice,
     removeBand,
     removeTerm,
-    updateCell
+    updateCell,
+    updateTerm
 } from "../controllers/tariff-controller.js";
 
 const router = Router();
@@ -29,6 +30,9 @@ router.post('/:tariffId/terms', addTerm);
 
 /* [PUT]  /api/tariffs/:tariffId/terms   */
 router.put('/:tariffId/terms', removeTerm);
+
+/* [PUT]  /api/tariffs/:tariffId/terms   */
+router.patch('/:tariffId/terms', updateTerm);
 
 /* [POST] /api/tariffs/:tariffId/bands   */
 router.post('/:tariffId/bands', addBand);

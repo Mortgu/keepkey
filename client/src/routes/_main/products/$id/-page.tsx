@@ -43,7 +43,7 @@ export function ProductDetailPage({customers, product}: ProductDetailPageProps) 
     const [pricingMode, setPricingMode] = useState<PricingMode>("default");
     const [selectedCustomer, setSelectedCustomer] = useState<string>("");
 
-    const {tariffs, addTerm, removeTerm, addBand, removeBand, updateCell} = useTariffHook(product.id);
+    const {tariffs, addTerm, updateTerm, removeTerm, addBand, removeBand, updateCell} = useTariffHook(product.id);
 
     return (
         <div className="grid gap-5">
@@ -85,6 +85,7 @@ export function ProductDetailPage({customers, product}: ProductDetailPageProps) 
                         tariff={tariff}
                         onAddTerm={addTerm}
                         onRemoveTerm={removeTerm}
+                        onUpdateTerm={updateTerm}
                         onAddBand={addBand}
                         onRemoveBand={removeBand}
                         onUpdateCell={updateCell}
