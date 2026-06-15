@@ -41,7 +41,7 @@ export default function TariffComponent(props: Props) {
     const locale = useLocale();
 
     const addTerm = (duration: number) => {
-        onAddTerm({tariffId: tariff.id, duration: tariff.terms.reduce((partialSum, a) => partialSum + a, 0)});
+        onAddTerm({tariffId: tariff.id, duration: tariff.terms.reduce((partialSum, a) => partialSum + a, 1)});
     };
 
     const removeTerm = (termIndex: number) => {

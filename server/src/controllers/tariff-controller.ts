@@ -51,7 +51,15 @@ export async function addTerm(request: Request, response: Response, next: NextFu
         const tariffId = request.params.tariffId as string;
         const {duration} = request.body as { duration: number };
 
-        const tariff = await prisma.tariff.findUnique({where: {id: tariffId}, include: {rows: true}});
+        const tariff = await prisma.tariff.findUnique({
+            where: {
+                id: tariffId
+            },
+            include: {
+                rows: true
+            }
+        });
+
         if (!tariff) {
             return response.status(404).json({success: false, message: "Tariff not found."});
         }
@@ -70,7 +78,7 @@ export async function addTerm(request: Request, response: Response, next: NextFu
                 const cellCount = await tx.tariffCell.count({
                     where: {rowId: row.id}
                 });
-                
+
                 await tx.tariffCell.create({
                     data: {rowId: row.id, price: 0, order: cellCount},
                 });
