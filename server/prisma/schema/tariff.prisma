@@ -1,54 +1,57 @@
 model Tariff {
   id String @id @default(cuid())
 
-  products  Product[]
-  configs   TariffConfig[]
-  customers TariffCustomer[]
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
 
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  terms Int[]       @default([12, 24, 36])
+  rows  TariffRow[]
 
   @@map("tariff")
 }
 
-model TariffConfig {
+model TariffRow {
   id String @id @default(cuid())
 
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
-
-  duration     Int  @default(12)
   min_quantity Int
-  max_quantity Int?
-  price        Int
+  max_quantity Int
+  order        Int @default(0)
 
-  @@unique([tariffId, contractId, duration, min_quantity])
-  @@map("tariff_config")
+  cells TariffCell[]
+
+  @@map("tariff_row")
 }
 
-model TariffCustomer {
+model TariffCell {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
+  row   TariffRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
+  rowId String
 
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
+  price Int
+  order Int @default(0)
 
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
+  customerPrices TariffCellCustomerPrice[]
 
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  @@map("tariff_cell")
+}
+
+model TariffCellCustomerPrice {
+  id String @id @default(cuid())
+
+  cell   TariffCell @relation(fields: [cellId], references: [id])
+  cellId String
+
+  customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
 
-  duration     Int  @default(12)
-  min_quantity Int
-  max_quantity Int?
-  price        Int
+  price Int
 
-  @@unique([tariffId, productId, customerId, contractId, duration, min_quantity])
-  @@map("tariff_customer")
+  @@map("tariff_cell_customer_price")
 }

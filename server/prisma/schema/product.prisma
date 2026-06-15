@@ -7,15 +7,11 @@ model Product {
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
 
-  tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
-  tariffId String?
-
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  tariffCustomers TariffCustomer[]
+  tariffs Tariff[]
 
-  @@index([tariffId])
   @@map("product")
 }
 

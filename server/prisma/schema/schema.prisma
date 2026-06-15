@@ -133,13 +133,10 @@ model Contract {
   id  String @id @default(uuid())
   key String @unique // sprachunabhängiger Identifier
 
-  translations ContractTranslation[]
-
+  translations   ContractTranslation[]
   orderPositions OrderPosition[]
   offerPositions OfferPosition[]
-
-  tariffConfigs   TariffConfig[]
-  tariffCustomers TariffCustomer[]
+  tariffs        Tariff[]
 
   createdAt DateTime? @default(now())
 

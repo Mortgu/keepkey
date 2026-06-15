@@ -1,61 +1,42 @@
-import { Router } from "express";
+import {Router} from "express";
 import {
-    addTariffConfig,
-    addTariffCustomer,
-    createTariff,
-    deleteTariff,
-    deleteTariffConfig,
-    deleteTariffCustomer,
+    addBand,
+    addTerm,
     getAllTariffs,
-    getTariffById,
+    getProductTariffs,
+    getTariff,
     getTariffPrice,
-    updateTariff,
-    updateTariffConfig,
-    updateTariffCustomer,
+    removeBand,
+    removeTerm,
+    updateCell
 } from "../controllers/tariff-controller.js";
-import { validate } from "../middlewares/validate.js";
-import {
-    createTariffConfigSchema,
-    createTariffCustomerSchema,
-    createTariffSchema,
-    updateTariffConfigSchema,
-    updateTariffCustomerSchema,
-    updateTariffSchema,
-} from "../schemas/tariffs-schemas.js";
 
 const router = Router();
 
-router.get("/", getAllTariffs);
+/* [GET]    /api/tariffs                    */
+router.get('/', getAllTariffs);
 
 router.get("/price", getTariffPrice);
 
-router.get("/:id", getTariffById);
+/* [GET]    /api/tariffs/tariff/:tariffId   */
+router.get('/tariff/:tariffId', getTariff);
 
-router.post("/", validate(createTariffSchema), createTariff);
+/* [GET]    /api/tariffs/:productId         */
+router.get('/:productId', getProductTariffs);
 
-router.put("/:id", validate(updateTariffSchema), updateTariff);
+/* [POST] /api/tariffs/:tariffId/terms   */
+router.post('/:tariffId/terms', addTerm);
 
-router.delete("/:id", deleteTariff);
+/* [PUT]  /api/tariffs/:tariffId/terms   */
+router.put('/:tariffId/terms', removeTerm);
 
-router.post("/:id/configs", validate(createTariffConfigSchema), addTariffConfig);
+/* [POST] /api/tariffs/:tariffId/bands   */
+router.post('/:tariffId/bands', addBand);
 
-router.put(
-    "/:id/configs/:configId",
-    validate(updateTariffConfigSchema),
-    updateTariffConfig,
-);
-router.delete("/:id/configs/:configId", deleteTariffConfig);
+/* [DELETE] /api/tariffs/bands/:rowId    */
+router.delete('/bands/:rowId', removeBand);
 
-router.post(
-    "/:id/customers",
-    validate(createTariffCustomerSchema),
-    addTariffCustomer,
-);
-router.put(
-    "/:id/customers/:tariffCustomerId",
-    validate(updateTariffCustomerSchema),
-    updateTariffCustomer,
-);
-router.delete("/:id/customers/:tariffCustomerId", deleteTariffCustomer);
+/* [PUT]  /api/tariffs/cells/:cellId     */
+router.put('/cells/:cellId', updateCell);
 
 export default router;

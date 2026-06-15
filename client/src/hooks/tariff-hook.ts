@@ -1,141 +1,84 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import type {
-  CreateTariffConfigInput,
-  CreateTariffCustomerInput,
-  CreateTariffInput,
-  UpdateTariffConfigInput,
-  UpdateTariffCustomerInput,
-  UpdateTariffInput,
-} from "@/types";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 import {
-  addTariffConfigAction,
-  addTariffCustomerAction,
-  createTariffAction,
-  deleteTariffAction,
-  deleteTariffConfigAction,
-  deleteTariffCustomerAction,
-  getAllTariffsAction,
-  updateTariffAction,
-  updateTariffConfigAction,
-  updateTariffCustomerAction,
+    addBandAction,
+    addTermAction,
+    getAllTariffsAction,
+    getProductTariffsAction,
+    removeBandAction,
+    removeTermAction,
+    updateCellAction,
 } from "@/data/tariffs";
 
-export const useTariffHook = () => {
-  const queryClient = useQueryClient();
+export const useTariffHook = (productId?: string) => {
+    const queryClient = useQueryClient();
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["tariffs"] });
+    const queryKey = productId ? ["tariffs", productId] : ["tariffs"];
 
-  const { data: tariffs = [], isPending, error } = useQuery({
-    queryKey: ["tariffs"],
-    queryFn: getAllTariffsAction,
-  });
+    const invalidate = () =>
+        queryClient.invalidateQueries({queryKey: ["tariffs"]});
 
-  const createMutation = useMutation({
-    mutationFn: (body: CreateTariffInput) => createTariffAction(body),
-    onSuccess: invalidate,
-  });
+    const {data: tariffs = [], isPending, error} = useQuery({
+        queryKey,
+        queryFn: productId ? () => getProductTariffsAction(productId) : getAllTariffsAction,
+    });
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: UpdateTariffInput }) =>
-      updateTariffAction(id, body),
-    onSuccess: invalidate,
-  });
+    const addTermMutation = useMutation({
+        mutationFn: ({tariffId, duration}: {tariffId: string; duration: number}) =>
+            addTermAction(tariffId, duration),
+        onSuccess: invalidate,
+    });
 
-  const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: string }) => deleteTariffAction(id),
-    onSuccess: invalidate,
-  });
+    const removeTermMutation = useMutation({
+        mutationFn: ({tariffId, termIndex}: {tariffId: string; termIndex: number}) =>
+            removeTermAction(tariffId, termIndex),
+        onSuccess: invalidate,
+    });
 
-  const addConfigMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      body,
-    }: {
-      tariffId: string;
-      body: CreateTariffConfigInput;
-    }) => addTariffConfigAction(tariffId, body),
-    onSuccess: invalidate,
-  });
+    const addBandMutation = useMutation({
+        mutationFn: ({tariffId, min_quantity, max_quantity, prices}: {
+            tariffId: string;
+            min_quantity: number;
+            max_quantity: number;
+            prices: number[];
+        }) => addBandAction(tariffId, {min_quantity, max_quantity, prices}),
+        onSuccess: invalidate,
+    });
 
-  const updateConfigMutation = useMutation({
-    mutationFn: ({ tariffId, configId, body }: {
-      tariffId: string; configId: string; body: UpdateTariffConfigInput;
-    }) => updateTariffConfigAction(tariffId, configId, body),
-    onSuccess: invalidate,
-  });
+    const removeBandMutation = useMutation({
+        mutationFn: (rowId: string) => removeBandAction(rowId),
+        onSuccess: invalidate,
+    });
 
-  const deleteConfigMutation = useMutation({
-    mutationFn: ({ tariffId, configId }: {
-      tariffId: string; configId: string;
-    }) => deleteTariffConfigAction(tariffId, configId),
-    onSuccess: invalidate,
-  });
+    const updateCellMutation = useMutation({
+        mutationFn: ({cellId, price}: {cellId: string; price: number}) =>
+            updateCellAction(cellId, price),
+        onSuccess: invalidate,
+    });
 
-  const addCustomerMutation = useMutation({
-    mutationFn: ({ tariffId, body }: {
-      tariffId: string; body: CreateTariffCustomerInput;
-    }) => addTariffCustomerAction(tariffId, body),
-    onSuccess: invalidate,
-  });
+    return {
+        tariffs,
+        isPending,
+        error,
 
-  const updateCustomerMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      tariffCustomerId,
-      body,
-    }: {
-      tariffId: string;
-      tariffCustomerId: string;
-      body: UpdateTariffCustomerInput;
-    }) => updateTariffCustomerAction(tariffId, tariffCustomerId, body),
-    onSuccess: invalidate,
-  });
+        addTerm: addTermMutation.mutate,
+        addTermPending: addTermMutation.isPending,
+        addTermError: addTermMutation.error,
 
-  const deleteCustomerMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      tariffCustomerId,
-    }: {
-      tariffId: string;
-      tariffCustomerId: string;
-    }) => deleteTariffCustomerAction(tariffId, tariffCustomerId),
-    onSuccess: invalidate,
-  });
+        removeTerm: removeTermMutation.mutate,
+        removeTermPending: removeTermMutation.isPending,
+        removeTermError: removeTermMutation.error,
 
-  return {
-    tariffs,
-    isPending,
-    error,
+        addBand: addBandMutation.mutate,
+        addBandPending: addBandMutation.isPending,
+        addBandError: addBandMutation.error,
 
-    createTariff: createMutation.mutateAsync,
-    isCreating: createMutation.isPending,
-    errorCreatingTariff: createMutation.error,
+        removeBand: removeBandMutation.mutate,
+        removeBandPending: removeBandMutation.isPending,
+        removeBandError: removeBandMutation.error,
 
-    updateTariff: updateMutation.mutateAsync,
-    isUpdating: updateMutation.isPending,
-
-    deleteTariff: deleteMutation.mutate,
-    isDeleting: deleteMutation.isPending,
-
-    addConfig: addConfigMutation.mutateAsync,
-    isAddingConfig: addConfigMutation.isPending,
-
-    updateConfig: updateConfigMutation.mutateAsync,
-    isUpdatingConfig: updateConfigMutation.isPending,
-
-    deleteConfig: deleteConfigMutation.mutate,
-    isDeletingConfig: deleteConfigMutation.isPending,
-
-    addCustomerOverride: addCustomerMutation.mutateAsync,
-    isAddingCustomerOverride: addCustomerMutation.isPending,
-
-    updateCustomerOverride: updateCustomerMutation.mutateAsync,
-    isUpdatingCustomerOverride: updateCustomerMutation.isPending,
-
-    deleteCustomerOverride: deleteCustomerMutation.mutate,
-    isDeletingCustomerOverride: deleteCustomerMutation.isPending,
-  };
+        updateCell: updateCellMutation.mutate,
+        updateCellPending: updateCellMutation.isPending,
+        updateCellError: updateCellMutation.error,
+    };
 };

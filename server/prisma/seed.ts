@@ -133,19 +133,109 @@ const PRODUCTS = [
     },
 ];
 
-/** Price in cents (Euro) */
-const TARIFF_CONFIGS = [
-    // Basic
-    {contractKey: "basic", duration: 12, min_quantity: 1, max_quantity: 5, price: 4_900},
-    {contractKey: "basic", duration: 12, min_quantity: 6, max_quantity: 25, price: 3_900},
-    {contractKey: "basic", duration: 24, min_quantity: 1, max_quantity: 5, price: 4_400},
-    // Professional
-    {contractKey: "professional", duration: 12, min_quantity: 1, max_quantity: 10, price: 9_900},
-    {contractKey: "professional", duration: 12, min_quantity: 11, max_quantity: 50, price: 8_400},
-    {contractKey: "professional", duration: 24, min_quantity: 1, max_quantity: 10, price: 8_900},
-    // Enterprise
-    {contractKey: "enterprise", duration: 12, min_quantity: 1, max_quantity: null, price: 19_900},
-    {contractKey: "enterprise", duration: 24, min_quantity: 1, max_quantity: null, price: 17_900},
+/** Price in cents (Euro) — matrix: product × contract × terms × quantity tiers */
+const TARIFF_DATA = [
+    {
+        productKey: "managed-server",
+        contractKey: "basic",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 5, prices: [4_900, 4_400]},
+            {min_quantity: 6, max_quantity: 25, prices: [3_900, 3_500]},
+        ],
+    },
+    {
+        productKey: "managed-server",
+        contractKey: "professional",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 10, prices: [9_900, 8_900]},
+            {min_quantity: 11, max_quantity: 50, prices: [8_400, 7_600]},
+        ],
+    },
+    {
+        productKey: "managed-server",
+        contractKey: "enterprise",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 999_999, prices: [19_900, 17_900]},
+        ],
+    },
+    {
+        productKey: "cloud-storage",
+        contractKey: "basic",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 10, prices: [2_900, 2_400]},
+            {min_quantity: 11, max_quantity: 100, prices: [2_200, 1_800]},
+        ],
+    },
+    {
+        productKey: "cloud-storage",
+        contractKey: "professional",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 10, prices: [5_900, 5_400]},
+            {min_quantity: 11, max_quantity: 100, prices: [4_900, 4_400]},
+        ],
+    },
+    {
+        productKey: "cloud-storage",
+        contractKey: "enterprise",
+        terms: [12, 24, 36],
+        rows: [
+            {min_quantity: 1, max_quantity: 999_999, prices: [14_900, 13_400, 11_900]},
+        ],
+    },
+    {
+        productKey: "email-hosting",
+        contractKey: "basic",
+        terms: [12],
+        rows: [
+            {min_quantity: 1, max_quantity: 50, prices: [1_900]},
+        ],
+    },
+    {
+        productKey: "email-hosting",
+        contractKey: "professional",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 50, prices: [3_900, 3_400]},
+        ],
+    },
+    {
+        productKey: "webhosting",
+        contractKey: "basic",
+        terms: [12],
+        rows: [
+            {min_quantity: 1, max_quantity: 5, prices: [1_500]},
+        ],
+    },
+    {
+        productKey: "webhosting",
+        contractKey: "professional",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 5, prices: [3_200, 2_900]},
+            {min_quantity: 6, max_quantity: 25, prices: [2_700, 2_400]},
+        ],
+    },
+    {
+        productKey: "ddos-protection",
+        contractKey: "professional",
+        terms: [12, 24],
+        rows: [
+            {min_quantity: 1, max_quantity: 999_999, prices: [7_900, 7_200]},
+        ],
+    },
+    {
+        productKey: "ddos-protection",
+        contractKey: "enterprise",
+        terms: [12, 24, 36],
+        rows: [
+            {min_quantity: 1, max_quantity: 999_999, prices: [15_900, 14_400, 12_900]},
+        ],
+    },
 ];
 
 const FLAT_RATES = [
@@ -274,19 +364,7 @@ async function seedContracts() {
     return results;
 }
 
-async function seedProductsAndTariff() {
-    const tariff = await prisma.tariff.findFirst({
-        where: {id: "seed-main-tariff"},
-    });
-
-    let existingTariff = tariff;
-    if (!existingTariff) {
-        existingTariff = await prisma.tariff.create({data: {id: "seed-main-tariff"}});
-        console.log(`Tariff created: ${existingTariff.id}`);
-    } else {
-        console.log(`Tariff exists: ${existingTariff.id}`);
-    }
-
+async function seedProducts() {
     const products = [];
     for (const data of PRODUCTS) {
         let product = await prisma.product.findUnique({
@@ -297,7 +375,6 @@ async function seedProductsAndTariff() {
             product = await prisma.product.create({
                 data: {
                     key: data.key,
-                    tariffId: existingTariff.id,
                     translations: {
                         create: [
                             {language: "DE", ...data.translations.DE},
@@ -313,45 +390,85 @@ async function seedProductsAndTariff() {
         products.push(product);
     }
 
-    return {tariff: existingTariff, products};
+    return products;
 }
 
-async function seedTariffConfigs(tariffId: string, contracts: { id: string; key: string }[]) {
+async function seedTariffs(
+    products: {id: string; key: string}[],
+    contracts: {id: string; key: string}[],
+    customers: {id: string; customerId: string | null; companyName: string}[]
+) {
+    const productMap = new Map(products.map((p) => [p.key, p.id]));
     const contractMap = new Map(contracts.map((c) => [c.key, c.id]));
 
-    for (const cfg of TARIFF_CONFIGS) {
-        const contractId = contractMap.get(cfg.contractKey);
-        if (!contractId) continue;
+    for (const data of TARIFF_DATA) {
+        const productId = productMap.get(data.productKey);
+        const contractId = contractMap.get(data.contractKey);
+        if (!productId || !contractId) continue;
 
-        const existing = await prisma.tariffConfig.findUnique({
-            where: {
-                tariffId_contractId_duration_min_quantity: {
-                    tariffId,
-                    contractId,
-                    duration: cfg.duration,
-                    min_quantity: cfg.min_quantity,
-                },
-            },
+        const existing = await prisma.tariff.findFirst({
+            where: {productId, contractId},
         });
 
-        if (!existing) {
-            await prisma.tariffConfig.create({
+        if (existing) {
+            console.log(`Tariff exists: ${data.productKey} × ${data.contractKey}`);
+            continue;
+        }
+
+        const tariff = await prisma.tariff.create({
+            data: {productId, contractId, terms: data.terms},
+        });
+
+        for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
+            const row = data.rows[rowIndex];
+            const tariffRow = await prisma.tariffRow.create({
                 data: {
-                    tariffId,
-                    contractId,
-                    duration: cfg.duration,
-                    min_quantity: cfg.min_quantity,
-                    max_quantity: cfg.max_quantity,
-                    price: cfg.price,
+                    tariffId: tariff.id,
+                    min_quantity: row.min_quantity,
+                    max_quantity: row.max_quantity,
+                    order: rowIndex,
                 },
             });
-            console.log(
-                `TariffConfig created: ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
-            );
-        } else {
-            console.log(
-                `TariffConfig exists: ${cfg.duration}M / qty ${cfg.min_quantity}${cfg.max_quantity ? `-${cfg.max_quantity}` : "+"} = ${cfg.price} ct`
-            );
+
+            for (let i = 0; i < row.prices.length; i++) {
+                await prisma.tariffCell.create({
+                    data: {
+                        rowId: tariffRow.id,
+                        price: row.prices[i],
+                        order: i,
+                    },
+                });
+            }
+        }
+
+        console.log(
+            `Tariff created: ${data.productKey} × ${data.contractKey} (${data.rows.length} rows × ${data.terms.length} terms)`
+        );
+    }
+
+    // Seed a sample customer-specific price override
+    const enterpriseTariff = await prisma.tariff.findFirst({
+        where: {productId: productMap.get("managed-server")!, contractId: contractMap.get("enterprise")!},
+        include: {rows: {include: {cells: true}}},
+    });
+
+    const musterfirma = customers.find((c) => c.companyName === "Musterfirma GmbH");
+    if (enterpriseTariff && musterfirma && enterpriseTariff.rows.length > 0) {
+        const firstCell = enterpriseTariff.rows[0].cells[0];
+        if (firstCell) {
+            const existingOverride = await prisma.tariffCellCustomerPrice.findFirst({
+                where: {cellId: firstCell.id, customerId: musterfirma.id},
+            });
+            if (!existingOverride) {
+                await prisma.tariffCellCustomerPrice.create({
+                    data: {
+                        cellId: firstCell.id,
+                        customerId: musterfirma.id,
+                        price: 15_900,
+                    },
+                });
+                console.log(`Customer price override created: Musterfirma GmbH → Managed Server Enterprise 12M = 15900 ct`);
+            }
         }
     }
 }
@@ -383,11 +500,12 @@ async function seedFlatRates() {
 }
 
 async function seedCustomers() {
+    const results = [];
     for (const data of CUSTOMERS) {
         const {contactPersons, ...customerData} = data;
 
         let customer = await prisma.customer.findUnique({
-            where: {customerId: customerData.customerId},
+            where: {email: customerData.email},
         });
 
         if (!customer) {
@@ -411,7 +529,9 @@ async function seedCustomers() {
                 console.log(`  ContactPerson exists: ${cp.firstName} ${cp.lastName}`);
             }
         }
+        results.push(customer);
     }
+    return results;
 }
 
 /* ───────────────────────────────
@@ -423,10 +543,10 @@ async function main() {
 
     const suppliers = await seedSuppliers();
     const contracts = await seedContracts();
-    const {tariff, products} = await seedProductsAndTariff();
-    await seedTariffConfigs(tariff.id, contracts);
+    const products = await seedProducts();
+    const customers = await seedCustomers();
+    await seedTariffs(products, contracts, customers);
     await seedFlatRates();
-    await seedCustomers();
 
     console.log("\nSeed finished successfully.");
 }

@@ -49,10 +49,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
-        tariffCustomers:
+        tariffCellCustomerPrice:
           type: array
           items:
-            $ref: "#/components/schemas/TariffCustomer"
+            $ref: "#/components/schemas/TariffCellCustomerPrice"
       required:
         - id
         - companyName
@@ -62,7 +62,7 @@ components:
         - offers
         - orders
         - users
-        - tariffCustomers
+        - tariffCellCustomerPrice
     ContactPerson:
       type: object
       properties:
@@ -542,20 +542,16 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferPosition"
-        tariff:
-          $ref: "#/components/schemas/Tariff"
-        tariffId:
-          type: string
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
-        tariffCustomers:
+        tariffs:
           type: array
           items:
-            $ref: "#/components/schemas/TariffCustomer"
+            $ref: "#/components/schemas/Tariff"
       required:
         - id
         - key
@@ -564,7 +560,7 @@ components:
         - offerPositions
         - createdAt
         - updatedAt
-        - tariffCustomers
+        - tariffs
     ProductTranslation:
       type: object
       properties:
@@ -853,14 +849,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferPosition"
-        tariffConfigs:
+        tariffs:
           type: array
           items:
-            $ref: "#/components/schemas/TariffConfig"
-        tariffCustomers:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffCustomer"
+            $ref: "#/components/schemas/Tariff"
         createdAt:
           type: string
           format: date-time
@@ -870,8 +862,7 @@ components:
         - translations
         - orderPositions
         - offerPositions
-        - tariffConfigs
-        - tariffCustomers
+        - tariffs
     ContractTranslation:
       type: object
       properties:
@@ -901,74 +892,6 @@ components:
       properties:
         id:
           type: string
-        products:
-          type: array
-          items:
-            $ref: "#/components/schemas/Product"
-        configs:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffConfig"
-        customers:
-          type: array
-          items:
-            $ref: "#/components/schemas/TariffCustomer"
-        createdAt:
-          type: string
-          format: date-time
-        updatedAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - products
-        - configs
-        - customers
-        - createdAt
-        - updatedAt
-    TariffConfig:
-      type: object
-      properties:
-        id:
-          type: string
-        tariff:
-          $ref: "#/components/schemas/Tariff"
-        tariffId:
-          type: string
-        contract:
-          $ref: "#/components/schemas/Contract"
-        contractId:
-          type: string
-        duration:
-          type: integer
-          format: int32
-        min_quantity:
-          type: integer
-          format: int32
-        max_quantity:
-          type: integer
-          format: int32
-        price:
-          type: integer
-          format: int32
-      required:
-        - id
-        - tariff
-        - tariffId
-        - contract
-        - contractId
-        - duration
-        - min_quantity
-        - price
-    TariffCustomer:
-      type: object
-      properties:
-        id:
-          type: string
-        tariff:
-          $ref: "#/components/schemas/Tariff"
-        tariffId:
-          type: string
         product:
           $ref: "#/components/schemas/Product"
         productId:
@@ -977,34 +900,101 @@ components:
           $ref: "#/components/schemas/Contract"
         contractId:
           type: string
-        customer:
-          $ref: "#/components/schemas/Customer"
-        customerId:
+        terms:
+          type: array
+          items:
+            type: integer
+            format: int32
+        rows:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffRow"
+      required:
+        - id
+        - product
+        - productId
+        - contract
+        - contractId
+        - terms
+        - rows
+    TariffRow:
+      type: object
+      properties:
+        id:
           type: string
-        duration:
-          type: integer
-          format: int32
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
         min_quantity:
           type: integer
           format: int32
         max_quantity:
           type: integer
           format: int32
+        order:
+          type: integer
+          format: int32
+        cells:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCell"
+      required:
+        - id
+        - tariff
+        - tariffId
+        - min_quantity
+        - max_quantity
+        - order
+        - cells
+    TariffCell:
+      type: object
+      properties:
+        id:
+          type: string
+        row:
+          $ref: "#/components/schemas/TariffRow"
+        rowId:
+          type: string
+        price:
+          type: integer
+          format: int32
+        order:
+          type: integer
+          format: int32
+        customerPrices:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCellCustomerPrice"
+      required:
+        - id
+        - row
+        - rowId
+        - price
+        - order
+        - customerPrices
+    TariffCellCustomerPrice:
+      type: object
+      properties:
+        id:
+          type: string
+        cell:
+          $ref: "#/components/schemas/TariffCell"
+        cellId:
+          type: string
+        customer:
+          $ref: "#/components/schemas/Customer"
+        customerId:
+          type: string
         price:
           type: integer
           format: int32
       required:
         - id
-        - tariff
-        - tariffId
-        - product
-        - productId
-        - contract
-        - contractId
+        - cell
+        - cellId
         - customer
         - customerId
-        - duration
-        - min_quantity
         - price
     Task:
       type: object

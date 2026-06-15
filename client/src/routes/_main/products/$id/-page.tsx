@@ -1,13 +1,10 @@
-import {useQuery} from "@tanstack/react-query";
-import {useParams} from "@tanstack/react-router";
-import {Server} from "lucide-react";
-import {useEffect, useState} from "react";
-import type {Product, Tariff} from "@/types";
-import {useContractHook, useCustomerHook, useLocale} from "@/hooks";
-import {api} from "@/lib/api-client";
+import {useState} from "react";
+import type {Customer, Product} from "@/types";
+import {useCustomerHook, useLocale, useProductHook, useTariffHook} from "@/hooks";
 import {localized} from "@/lib/i18n-content";
 import {SegmentedToggle, Select} from "@/components";
-import Collapsable from "@/routes/_main/products/$id/-components/collapsable.tsx";
+import {useParams} from "@tanstack/react-router";
+import TariffComponent from "./-components/tariff-component.tsx";
 
 type PricingMode = "customer" | "default";
 
@@ -16,53 +13,41 @@ const DEFAULT_MODE_OPTIONS: Array<{ value: PricingMode; label: string }> = [
     {value: "customer", label: "Kundenpreise"},
 ];
 
-export function ProductDetailPage() {
+export function ProductDetailContainer() {
     const params = useParams({from: "/_main/products/$id/"});
-    const locale = useLocale();
-    const [pricingMode, setPricingMode] = useState<PricingMode>("customer");
 
     const {customers} = useCustomerHook();
-    const {contracts} = useContractHook();
+    const {getProduct} = useProductHook();
 
-    const {data: product} = useQuery({
-        queryKey: ["product", params.id],
-        queryFn: () => api<Product>(`/api/products/${params.id}`),
-    });
-    console.log(product);
+    const {data: product, isPending: isPendingProduct, error: isErrorProduct} = getProduct(params.id);
 
-    const {data: tariff} = useQuery({
-        queryKey: ["tariff", product?.tariffId],
-        queryFn: () => api<Tariff>(`/api/tariffs/${product?.tariffId}`),
-    });
-    console.log(tariff);
+    if (isErrorProduct) {
+        return <div>Error: Something went wrong trying to fetch product!</div>;
+    }
 
-    useEffect(() => {
-    }, []);
+    if (isPendingProduct || !product) {
+        return <div>isPending</div>;
+    }
 
-    const groups = Object.groupBy(tariff ? tariff.configs : [], (p) =>
-        `${p.contractId}`);
+    return <ProductDetailPage key={product.id} product={product} customers={customers}/>;
+}
 
-    console.log(groups);
+interface ProductDetailPageProps {
+    customers: Array<Customer>;
+    product: Product;
+}
+
+export function ProductDetailPage({customers, product}: ProductDetailPageProps) {
+    const locale = useLocale();
+
+    const [pricingMode, setPricingMode] = useState<PricingMode>("default");
+    const [selectedCustomer, setSelectedCustomer] = useState<string>("");
+
+    const {tariffs, addTerm, removeTerm, addBand, removeBand, updateCell} = useTariffHook(product.id);
 
     return (
         <div className="grid gap-5">
-            <header className="grid gap-2">
-                <div className="flex flex-wrap items-start justify-between gap-4">
-                    <div className="grid gap-1">
-                        <h1 className="text-2xl font-medium">Preiskonfiguration</h1>
-                        <p className="text-md text-(--text-600)">
-                            Preise je Tarif, Laufzeit und Mengenstaffel pflegen.
-                        </p>
-                    </div>
-                    <div
-                        className="flex items-center gap-2 rounded-full border border-(--border) bg-white px-3 py-1.5 text-sm text-(--text-600)">
-                        <Server className="size-4 text-(--primary)"/>
-                        Mock-Daten
-                    </div>
-                </div>
-            </header>
-
-            <section className="grid gap-4 rounded-md border border-(--border) bg-white p-4 shadow-xs">
+            <div className="grid gap-4 ">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
                         <h2 className="text-xl font-medium text-(--text)">
@@ -73,27 +58,37 @@ export function ProductDetailPage() {
                         </p>
                     </div>
                 </div>
-            </section>
+            </div>
 
             <section className="flex items-center justify-between rounded-md gap-4">
                 <SegmentedToggle
                     aria-label="Preismodus"
                     options={DEFAULT_MODE_OPTIONS}
                     value={pricingMode}
-                    onChange={setPricingMode}
+                    onChange={(val) => setPricingMode(val as PricingMode)}
                 />
 
-                <Select>
-                    {customers.map((customer) => (
-                        <option>{customer.companyName}</option>
-                    ))}
-                </Select>
+                {pricingMode === "customer" && (
+                    <Select onChange={(e) => setSelectedCustomer(e.target.value as string)}>
+                        <option>Select customer...</option>
+                        {customers.map((customer) => (
+                            <option key={customer.id} value={customer.id}>{customer.companyName}</option>
+                        ))}
+                    </Select>
+                )}
             </section>
 
-            {/* Products */}
             <div className="grid gap-4">
-                {contracts.map((contract) => (
-                    <Collapsable contract={contract}/>
+                {tariffs.map((tariff) => (
+                    <TariffComponent
+                        key={tariff.id}
+                        tariff={tariff}
+                        onAddTerm={addTerm}
+                        onRemoveTerm={removeTerm}
+                        onAddBand={addBand}
+                        onRemoveBand={removeBand}
+                        onUpdateCell={updateCell}
+                    />
                 ))}
             </div>
         </div>
