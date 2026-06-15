@@ -11,7 +11,7 @@ import {
   useTariffHook,
 } from "@/hooks";
 
-type PricingMode = "customer" | "default";
+export type PricingMode = "customer" | "default";
 
 const DEFAULT_MODE_OPTIONS: Array<{ value: PricingMode; label: string }> = [
   { value: "default", label: "Standardpreise" },
@@ -71,6 +71,8 @@ export function ProductDetailPage({
     updateCell,
   } = useTariffHook(product.id);
 
+  console.log(tariffs);
+
   return (
     <div className="grid gap-5">
       <div className="grid gap-4 ">
@@ -110,6 +112,8 @@ export function ProductDetailPage({
         {tariffs.map((tariff) => (
           <TariffComponent
             key={tariff.id}
+            selectedCustomer={selectedCustomer}
+            mode={pricingMode}
             tariff={tariff}
             onAddTerm={addTerm}
             onRemoveTerm={removeTerm}

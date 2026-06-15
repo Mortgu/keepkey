@@ -5,6 +5,7 @@ import { useLocale } from "@/hooks";
 import { Button } from "@/components";
 import TariffRowComponent from "@/routes/_main/products/$id/-components/tariff-row-component.tsx";
 import TariffTermsComponent from "@/routes/_main/products/$id/-components/tariff-terms-component.tsx";
+import type { PricingMode } from "../-page";
 
 type AddTermVars = { tariffId: string; duration: number };
 type RemoveTermVars = { tariffId: string; termIndex: number };
@@ -21,6 +22,8 @@ type UpdateCellVars = { cellId: string; price: number };
 
 type Props = {
   tariff: Tariff;
+  mode: PricingMode;
+  selectedCustomer: string;
   onAddTerm: (vars: AddTermVars) => void;
   onRemoveTerm: (vars: RemoveTermVars) => void;
   onUpdateTerm: (vars: UpdateTermVars) => void;
@@ -32,6 +35,8 @@ type Props = {
 export default function TariffComponent(props: Props) {
   const {
     tariff,
+    mode,
+    selectedCustomer,
     onAddTerm,
     onRemoveTerm,
     onUpdateTerm,
@@ -112,6 +117,7 @@ export default function TariffComponent(props: Props) {
               <TariffRowComponent
                 key={row.id}
                 row={row}
+                mode={mode}
                 cells={row.cells}
                 onRemove={() => onRemoveBand(row.id)}
                 onUpdateCell={(cellId, price) =>
