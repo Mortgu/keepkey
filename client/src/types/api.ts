@@ -7,6 +7,24 @@ export type paths = Record<string, never>;
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Contract: {
+            id: string;
+            key: string;
+            translations: components["schemas"]["ContractTranslation"][];
+            orderPositions: components["schemas"]["OrderPosition"][];
+            offerPositions: components["schemas"]["OfferPosition"][];
+            tariffs: components["schemas"]["Tariff"][];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        ContractTranslation: {
+            contractId: string;
+            language: components["schemas"]["Language"];
+            name: string;
+            features: string[];
+            table: string;
+            contract: components["schemas"]["Contract"];
+        };
         Customer: {
             id: string;
             customerId?: string;
@@ -329,24 +347,6 @@ export interface components {
             table: string;
             flatRate: components["schemas"]["FlatRate"];
         };
-        Contract: {
-            id: string;
-            key: string;
-            translations: components["schemas"]["ContractTranslation"][];
-            orderPositions: components["schemas"]["OrderPosition"][];
-            offerPositions: components["schemas"]["OfferPosition"][];
-            tariffs: components["schemas"]["Tariff"][];
-            /** Format: date-time */
-            createdAt?: string;
-        };
-        ContractTranslation: {
-            contractId: string;
-            language: components["schemas"]["Language"];
-            name: string;
-            features: string[];
-            table: string;
-            contract: components["schemas"]["Contract"];
-        };
         Tariff: {
             id: string;
             product: components["schemas"]["Product"];
@@ -355,6 +355,10 @@ export interface components {
             contractId: string;
             terms: number[];
             rows: components["schemas"]["TariffRow"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         TariffRow: {
             id: string;
@@ -367,6 +371,10 @@ export interface components {
             /** Format: int32 */
             order: number;
             cells: components["schemas"]["TariffCell"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         TariffCell: {
             id: string;
@@ -377,6 +385,10 @@ export interface components {
             /** Format: int32 */
             order: number;
             customerPrices: components["schemas"]["TariffCellCustomerPrice"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         TariffCellCustomerPrice: {
             id: string;
@@ -386,6 +398,10 @@ export interface components {
             customerId: string;
             /** Format: int32 */
             price: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Task: {
             id: string;

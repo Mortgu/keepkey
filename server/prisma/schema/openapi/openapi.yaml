@@ -6,6 +6,63 @@ info:
 paths: {}
 components:
   schemas:
+    Contract:
+      type: object
+      properties:
+        id:
+          type: string
+        key:
+          type: string
+        translations:
+          type: array
+          items:
+            $ref: "#/components/schemas/ContractTranslation"
+        orderPositions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderPosition"
+        offerPositions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferPosition"
+        tariffs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tariff"
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - key
+        - translations
+        - orderPositions
+        - offerPositions
+        - tariffs
+    ContractTranslation:
+      type: object
+      properties:
+        contractId:
+          type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        name:
+          type: string
+        features:
+          type: array
+          items:
+            type: string
+        table:
+          type: string
+        contract:
+          $ref: "#/components/schemas/Contract"
+      required:
+        - contractId
+        - language
+        - name
+        - features
+        - table
+        - contract
     Customer:
       type: object
       properties:
@@ -830,63 +887,6 @@ components:
         - name
         - table
         - flatRate
-    Contract:
-      type: object
-      properties:
-        id:
-          type: string
-        key:
-          type: string
-        translations:
-          type: array
-          items:
-            $ref: "#/components/schemas/ContractTranslation"
-        orderPositions:
-          type: array
-          items:
-            $ref: "#/components/schemas/OrderPosition"
-        offerPositions:
-          type: array
-          items:
-            $ref: "#/components/schemas/OfferPosition"
-        tariffs:
-          type: array
-          items:
-            $ref: "#/components/schemas/Tariff"
-        createdAt:
-          type: string
-          format: date-time
-      required:
-        - id
-        - key
-        - translations
-        - orderPositions
-        - offerPositions
-        - tariffs
-    ContractTranslation:
-      type: object
-      properties:
-        contractId:
-          type: string
-        language:
-          $ref: "#/components/schemas/Language"
-        name:
-          type: string
-        features:
-          type: array
-          items:
-            type: string
-        table:
-          type: string
-        contract:
-          $ref: "#/components/schemas/Contract"
-      required:
-        - contractId
-        - language
-        - name
-        - features
-        - table
-        - contract
     Tariff:
       type: object
       properties:
@@ -909,6 +909,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffRow"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - product
@@ -917,6 +923,8 @@ components:
         - contractId
         - terms
         - rows
+        - createdAt
+        - updatedAt
     TariffRow:
       type: object
       properties:
@@ -939,6 +947,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffCell"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - tariff
@@ -947,6 +961,8 @@ components:
         - max_quantity
         - order
         - cells
+        - createdAt
+        - updatedAt
     TariffCell:
       type: object
       properties:
@@ -966,6 +982,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffCellCustomerPrice"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - row
@@ -973,6 +995,8 @@ components:
         - price
         - order
         - customerPrices
+        - createdAt
+        - updatedAt
     TariffCellCustomerPrice:
       type: object
       properties:
@@ -989,6 +1013,12 @@ components:
         price:
           type: integer
           format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - cell
@@ -996,6 +1026,8 @@ components:
         - customer
         - customerId
         - price
+        - createdAt
+        - updatedAt
     Task:
       type: object
       properties:

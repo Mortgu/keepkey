@@ -37,7 +37,7 @@ export const getProduct = async (request: Request, response: Response, next: Nex
                     contract: {
                         include: {
                             translations: true
-                        }
+                        },
                     },
                     rows: {
                         include: {
