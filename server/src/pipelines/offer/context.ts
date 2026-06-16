@@ -10,6 +10,8 @@ export type OfferPipelineContext = PipelineContext & {
   fetchedData?: OfferFetchData;
   formatedData?: OfferFormatedData;
 
+  version: number;
+
   docxBuffer: Buffer | null;
   pdfBuffer: Buffer | null;
 

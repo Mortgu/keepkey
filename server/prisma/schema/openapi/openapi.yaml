@@ -84,6 +84,12 @@ components:
           type: string
         phone:
           type: string
+        language:
+          $ref: "#/components/schemas/Language"
+        country:
+          type: string
+        currency:
+          $ref: "#/components/schemas/Currency"
         createdAt:
           type: string
           format: date-time
@@ -1087,6 +1093,13 @@ components:
       enum:
         - DE
         - EN
+    Currency:
+      type: string
+      enum:
+        - EUR
+        - RAND
+        - DOLLAR
+        - CHF
     TaskStatus:
       type: string
       enum:

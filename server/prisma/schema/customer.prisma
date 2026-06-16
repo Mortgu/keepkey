@@ -12,6 +12,10 @@ model Customer {
   plz    String?
   phone  String?
 
+  language Language? @default(DE)
+  country  String?   @default("Deutschland")
+  currency Currency? @default(EUR)
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 

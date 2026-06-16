@@ -35,6 +35,9 @@ export interface components {
             city?: string;
             plz?: string;
             phone?: string;
+            language?: components["schemas"]["Language"];
+            country?: string;
+            currency?: components["schemas"]["Currency"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -427,6 +430,8 @@ export interface components {
         DocumentFormat: "PDF" | "DOCX" | "RESERVED";
         /** @enum {string} */
         Language: "DE" | "EN";
+        /** @enum {string} */
+        Currency: "EUR" | "RAND" | "DOLLAR" | "CHF";
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */

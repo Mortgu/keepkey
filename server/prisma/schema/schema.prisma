@@ -133,3 +133,10 @@ enum Language {
   DE
   EN
 }
+
+enum Currency {
+  EUR
+  RAND
+  DOLLAR
+  CHF
+}

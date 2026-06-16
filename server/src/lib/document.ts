@@ -13,16 +13,16 @@ export async function generateDocument(document: Document): Promise<Task> {
     }
   });
 
+  await prisma.document.update({
+    where: { id: document.id },
+    data: { taskId: task.id },
+  });
+
   const job = await taskQueue.add(taskQueueKey, { taskId: task.id });
 
   await prisma.task.update({
     where: { id: task.id },
     data: { jobId: job.id },
-  });
-
-  await prisma.document.update({
-    where: { id: document.id },
-    data: { taskId: task.id },
   });
 
   return task;
