@@ -3,11 +3,14 @@ import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {
     addBandAction,
     addTermAction,
+    createTariffAction,
+    deleteTariffAction,
     getAllTariffsAction,
     getProductTariffsAction,
     removeBandAction,
     removeTermAction,
     updateCellAction,
+    updateCustomerPriceAction,
     updateTermAction,
 } from "@/data/tariffs";
 
@@ -23,6 +26,18 @@ export const useTariffHook = (productId?: string) => {
         queryKey,
         queryFn: productId ? () => getProductTariffsAction(productId) : getAllTariffsAction,
     });
+
+    const createTariffMutation = useMutation({
+        mutationFn: ({productId, contractId}: { productId: string, contractId: string }) =>
+            createTariffAction(productId, contractId),
+        onSuccess: invalidate,
+    });
+
+    const deleteTariffMutation = useMutation({
+        mutationFn: ({tariffId}: { tariffId: string }) =>
+            deleteTariffAction(tariffId),
+        onSuccess: invalidate,
+    })
 
     const addTermMutation = useMutation({
         mutationFn: ({tariffId, duration}: { tariffId: string; duration: number }) =>
@@ -63,10 +78,24 @@ export const useTariffHook = (productId?: string) => {
         onSuccess: invalidate,
     });
 
+    const updateCustomerPriceMutation = useMutation({
+        mutationFn: ({cellId, customerId, price}: { cellId: string; customerId: string; price: number }) =>
+            updateCustomerPriceAction(cellId, customerId, price),
+        onSuccess: invalidate,
+    });
+
     return {
         tariffs,
         isPending,
         error,
+
+        createTariff: createTariffMutation.mutate,
+        createTariffPending: createTariffMutation.isPending,
+        createTariffError: createTariffMutation.error,
+
+        deleteTariff: deleteTariffMutation.mutateAsync,
+        deleteTariffPending: deleteTariffMutation.isPending,
+        deleteTariffError: deleteTariffMutation.error,
 
         addTerm: addTermMutation.mutate,
         addTermPending: addTermMutation.isPending,
@@ -91,5 +120,9 @@ export const useTariffHook = (productId?: string) => {
         updateCell: updateCellMutation.mutate,
         updateCellPending: updateCellMutation.isPending,
         updateCellError: updateCellMutation.error,
+
+        updateCustomerPrice: updateCustomerPriceMutation.mutate,
+        updateCustomerPricePending: updateCustomerPriceMutation.isPending,
+        updateCustomerPriceError: updateCustomerPriceMutation.error,
     };
 };

@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Drawer" subtitle="Right-side slide-in panel — details, edit form, filters" viewport="900x680" -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #F7F8F7; color: #111A14; -webkit-font-smoothing: antialiased; min-height: 100vh; }
+
+  .page { padding: 28px; }
+  .page h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .page p.lead { font-size: 13px; color: #4B5C52; margin: 0 0 20px; }
+  .trigger-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* Buttons */
+  button { font-family: 'DM Sans', sans-serif; font-weight: 500; border: none; border-radius: 6px; cursor: pointer; display: inline-flex; align-items: center; gap: 7px; transition: background 150ms, border-color 150ms, color 150ms; }
+  .btn-primary    { background: #00683F; color: white; padding: 8px 16px; font-size: 13px; }
+  .btn-primary:hover { background: #005432; }
+  .btn-secondary  { background: white; color: #111A14; border: 1px solid #E0E4E1; padding: 8px 16px; font-size: 13px; }
+  .btn-secondary:hover { background: #F7F8F7; border-color: #C4CFC8; }
+  .btn-destructive{ background: #C0392B; color: white; padding: 8px 16px; font-size: 13px; }
+  .btn-destructive:hover { background: #A93226; }
+  .btn-ghost { background: transparent; color: #00683F; padding: 8px 14px; font-size: 13px; }
+  .btn-ghost:hover { background: #E6F2EC; }
+  svg { display: block; }
+
+  /* ── Overlay + drawer ─────────────────────────────────────────── */
+  .scrim {
+    position: fixed; inset: 0; background: rgba(17, 26, 20, 0.38);
+    opacity: 0; pointer-events: none; transition: opacity 240ms ease;
+    z-index: 40;
+  }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+
+  .drawer {
+    position: fixed; top: 0; right: 0; bottom: 0;
+    width: 420px; max-width: 92vw;
+    background: white; box-shadow: -8px 0 24px rgba(0,0,0,0.12);
+    display: flex; flex-direction: column;
+    transform: translateX(100%);
+    transition: transform 280ms cubic-bezier(0.32, 0.72, 0, 1);
+    z-index: 50;
+    will-change: transform;
+  }
+  .drawer.wide { width: 540px; }
+  .drawer.open { transform: translateX(0); }
+
+  .drawer-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+    padding: 18px 22px; border-bottom: 1px solid #E0E4E1; flex-shrink: 0;
+  }
+  .drawer-eyebrow { font-size: 11px; font-weight: 600; color: #00683F; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+  .drawer-title { font-size: 17px; font-weight: 600; color: #111A14; letter-spacing: -0.01em; line-height: 1.25; }
+  .drawer-subtitle { font-size: 13px; color: #8A9E93; margin-top: 3px; }
+  .drawer-close { background: none; border: none; cursor: pointer; color: #8A9E93; padding: 5px; border-radius: 5px; display: flex; flex-shrink: 0; margin: -3px -5px 0 0; }
+  .drawer-close:hover { background: #F0F4F1; color: #111A14; }
+
+  .drawer-body { padding: 20px 22px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+  .drawer-footer {
+    padding: 14px 22px; border-top: 1px solid #E0E4E1; background: #F7F8F7;
+    display: flex; gap: 8px; align-items: center; flex-shrink: 0;
+  }
+
+  /* content bits */
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  label { font-size: 13px; font-weight: 500; color: #111A14; }
+  input, select, textarea { font-family: 'DM Sans', sans-serif; font-size: 14px; color: #111A14; background: white; border: 1px solid #E0E4E1; border-radius: 6px; padding: 8px 10px; outline: none; width: 100%; transition: border-color 150ms, box-shadow 150ms; }
+  input:focus, select:focus, textarea:focus { border-color: #00683F; box-shadow: 0 0 0 3px rgba(0,104,63,0.15); }
+  textarea { resize: vertical; min-height: 70px; line-height: 1.5; }
+
+  .meta-grid { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; align-items: baseline; }
+  .meta-grid dt { font-size: 12px; color: #8A9E93; }
+  .meta-grid dd { font-size: 13px; color: #111A14; font-weight: 500; text-align: right; }
+  .mono { font-family: 'DM Mono', monospace; }
+
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 9999px; font-size: 11px; font-weight: 500; }
+  .badge-green { background: #E6F2EC; color: #00683F; }
+  .badge-gray  { background: #F0F4F1; color: #4B5C52; }
+
+  .group-label { font-size: 10px; font-weight: 600; color: #8A9E93; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+  .divider { height: 1px; background: #E0E4E1; margin: 2px 0; }
+
+  .activity { display: flex; flex-direction: column; gap: 0; }
+  .activity-item { display: flex; gap: 12px; padding: 8px 0; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; background: #00683F; margin-top: 5px; flex-shrink: 0; position: relative; }
+  .activity-item:not(:last-child) .activity-dot::after { content: ''; position: absolute; top: 12px; left: 3px; width: 2px; height: calc(100% + 8px); background: #E0E4E1; }
+  .activity-text { font-size: 13px; color: #111A14; line-height: 1.4; }
+  .activity-time { font-size: 11px; color: #8A9E93; margin-top: 1px; }
+
+  /* filter pills */
+  .pill-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { font-size: 13px; padding: 6px 12px; border: 1px solid #E0E4E1; border-radius: 9999px; background: white; cursor: pointer; color: #4B5C52; transition: all 130ms; }
+  .pill:hover { border-color: #C4CFC8; }
+  .pill.active { background: #E6F2EC; border-color: #00683F; color: #00683F; font-weight: 500; }
+  .check-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; cursor: pointer; }
+  .check-box { width: 18px; height: 18px; border: 1.5px solid #C4CFC8; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 130ms; }
+  .check-row.on .check-box { background: #00683F; border-color: #00683F; }
+  .check-row .check-label { font-size: 14px; color: #111A14; }
+
+  .hint { font-size: 12px; color: #8A9E93; }
+  .footer-spacer { margin-left: auto; }
+</style>
+</head>
+<body>
+  <div class="page">
+    <h1>Drawer</h1>
+    <p class="lead">A panel that slides in from the right for details, editing, and filtering — without leaving the current page. Click a trigger to open.</p>
+    <div class="trigger-row">
+      <button class="btn-primary" data-open="details">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Template details
+      </button>
+      <button class="btn-secondary" data-open="edit">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        Edit panel
+      </button>
+      <button class="btn-secondary" data-open="filter">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- scrim -->
+  <div class="scrim" id="scrim"></div>
+
+  <!-- ── Drawer 1: details (read) ─────────────────────────────────── -->
+  <aside class="drawer" id="drawer-details" role="dialog" aria-modal="true" aria-labelledby="d1-title">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-eyebrow">Template</div>
+        <div class="drawer-title" id="d1-title">Service Agreement</div>
+        <div class="drawer-subtitle">Standard commercial services contract</div>
+      </div>
+      <button class="drawer-close" data-close aria-label="Close">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div style="display:flex;gap:8px">
+        <span class="badge badge-green"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>Active</span>
+        <span class="badge badge-gray">PDF</span>
+        <span class="badge badge-gray">6 fields</span>
+      </div>
+
+      <dl class="meta-grid">
+        <dt>Template ID</dt><dd class="mono">tpl_8f3a2b</dd>
+        <dt>Created</dt><dd>12 Mar 2026</dd>
+        <dt>Last generated</dt><dd>2 hours ago</dd>
+        <dt>Times used</dt><dd>184</dd>
+        <dt>Owner</dt><dd>j.morel</dd>
+        <dt>Default language</dt><dd>English</dd>
+      </dl>
+
+      <div class="divider"></div>
+
+      <div>
+        <div class="group-label" style="margin-bottom:8px">Recent activity</div>
+        <div class="activity">
+          <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Generated <strong>service_agreement_acme.pdf</strong></div><div class="activity-time">2 hours ago · j.morel</div></div></div>
+          <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Field "fee structure" edited</div><div class="activity-time">Yesterday · a.weber</div></div></div>
+          <div class="activity-item"><div class="activity-dot"></div><div><div class="activity-text">Template duplicated from NDA — Standard</div><div class="activity-time">12 Mar 2026 · j.morel</div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-ghost" data-close>Close</button>
+      <button class="btn-primary footer-spacer">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><polyline points="22 2 11 13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Generate
+      </button>
+    </div>
+  </aside>
+
+  <!-- ── Drawer 2: edit form ──────────────────────────────────────── -->
+  <aside class="drawer" id="drawer-edit" role="dialog" aria-modal="true" aria-labelledby="d2-title">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-eyebrow">Edit template</div>
+        <div class="drawer-title" id="d2-title">Service Agreement</div>
+      </div>
+      <button class="drawer-close" data-close aria-label="Close">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div class="field"><label>Template name</label><input value="Service Agreement"></div>
+      <div class="field"><label>Description</label><textarea>Standard commercial services contract with configurable party names, term dates, and fee structure.</textarea></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label>Output format</label><select><option>PDF</option><option>DOCX</option><option>HTML</option></select></div>
+        <div class="field"><label>Default language</label><select><option>English</option><option>Deutsch</option><option>Français</option></select></div>
+      </div>
+      <div class="field"><label>Owner</label><select><option>j.morel</option><option>a.weber</option><option>s.klein</option></select></div>
+      <div class="hint">Changes apply to new documents only. Existing files are unaffected.</div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-secondary" data-close>Cancel</button>
+      <button class="btn-primary footer-spacer">Save changes</button>
+    </div>
+  </aside>
+
+  <!-- ── Drawer 3: filter panel ───────────────────────────────────── -->
+  <aside class="drawer wide" id="drawer-filter" role="dialog" aria-modal="true" aria-labelledby="d3-title">
+    <div class="drawer-header">
+      <div>
+        <div class="drawer-title" id="d3-title">Filters</div>
+        <div class="drawer-subtitle">Refine the template list</div>
+      </div>
+      <button class="drawer-close" data-close aria-label="Close">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+      <div>
+        <div class="group-label" style="margin-bottom:8px">Status</div>
+        <div class="pill-wrap">
+          <span class="pill active" data-pill>Active</span>
+          <span class="pill" data-pill>Draft</span>
+          <span class="pill" data-pill>Archived</span>
+        </div>
+      </div>
+      <div>
+        <div class="group-label" style="margin-bottom:8px">Output format</div>
+        <div class="pill-wrap">
+          <span class="pill active" data-pill>PDF</span>
+          <span class="pill" data-pill>DOCX</span>
+          <span class="pill" data-pill>HTML</span>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="group-label" style="margin-bottom:4px">Language</div>
+        <div class="check-row on" data-check><span class="check-box"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span><span class="check-label">English</span></div>
+        <div class="check-row" data-check><span class="check-box"></span><span class="check-label">Deutsch</span></div>
+        <div class="check-row" data-check><span class="check-box"></span><span class="check-label">Français</span></div>
+        <div class="check-row" data-check><span class="check-box"></span><span class="check-label">Español</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="field"><label>Owner</label><select><option>Anyone</option><option>j.morel</option><option>a.weber</option></select></div>
+    </div>
+    <div class="drawer-footer">
+      <button class="btn-ghost" data-close>Reset</button>
+      <button class="btn-primary footer-spacer">Apply filters</button>
+    </div>
+  </aside>
+
+<script>
+  var scrim = document.getElementById('scrim');
+  var drawers = { details:'drawer-details', edit:'drawer-edit', filter:'drawer-filter' };
+  var current = null;
+
+  function open(name) {
+    var el = document.getElementById(drawers[name]);
+    if (!el) return;
+    current = el;
+    scrim.classList.add('open');
+    el.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function close() {
+    scrim.classList.remove('open');
+    if (current) current.classList.remove('open');
+    current = null;
+    document.body.style.overflow = '';
+  }
+
+  document.querySelectorAll('[data-open]').forEach(function (b) {
+    b.addEventListener('click', function () { open(b.getAttribute('data-open')); });
+  });
+  document.querySelectorAll('[data-close]').forEach(function (b) {
+    b.addEventListener('click', close);
+  });
+  scrim.addEventListener('click', close);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+
+  // filter interactivity
+  document.querySelectorAll('[data-pill]').forEach(function (p) {
+    p.addEventListener('click', function () { p.classList.toggle('active'); });
+  });
+  document.querySelectorAll('[data-check]').forEach(function (row) {
+    row.addEventListener('click', function () {
+      row.classList.toggle('on');
+      var box = row.querySelector('.check-box');
+      box.innerHTML = row.classList.contains('on')
+        ? '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>'
+        : '';
+    });
+  });
+</script>
+</body>
+</html>

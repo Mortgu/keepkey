@@ -1,6 +1,6 @@
 import {Button, Input} from "@/components";
 import {X} from "lucide-react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 type Props = {
     term: number;
@@ -13,6 +13,10 @@ export default function TariffTermsComponent({term, index, removeTerm, updateTer
     const [edit, setEdit] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(term);
 
+    useEffect(() => {
+        setDuration(term);
+    }, [term]);
+
     return (
         <div key={index} className="flex-1 flex items-center justify-between gap-2 min-w-50">
             {!edit && (
@@ -22,17 +26,19 @@ export default function TariffTermsComponent({term, index, removeTerm, updateTer
             )}
 
             {edit && (
-                <Input autoFocus size="xs" onBlur={() => setEdit(false)} value={duration}
-                       onChange={(e) => {
-                           const value: number = Number(e.target.value);
+                <div className="w-full">
+                    <Input autoFocus size="xs" onBlur={() => setEdit(false)} value={duration}
+                           onChange={(e) => {
+                               const value: number = Number(e.target.value);
 
-                           if (isNaN(value)) {
-                               return;
-                           }
+                               if (isNaN(value)) {
+                                   return;
+                               }
 
-                           setDuration(value);
-                           updateTerm(index, value);
-                       }}/>
+                               setDuration(value);
+                               updateTerm(index, value);
+                           }}/>
+                </div>
             )}
 
             <Button size="xs" variant="secondary" icon={<X className="size-3.5"/>} iconOnly

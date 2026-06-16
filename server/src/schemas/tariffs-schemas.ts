@@ -1,7 +1,8 @@
-import { z } from "zod";
+import {z} from "zod";
 
 export const createTariffSchema = z.object({
-    productIds: z.array(z.string()).min(1),
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
 });
 
 export const updateTariffSchema = z.object({

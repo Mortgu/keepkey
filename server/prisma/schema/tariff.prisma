@@ -10,6 +10,9 @@ model Tariff {
   terms Int[]       @default([12, 24, 36])
   rows  TariffRow[]
 
+  validFrom DateTime  @default(now()) @db.Timestamptz(6)
+  validTo   DateTime?
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -65,5 +68,6 @@ model TariffCellCustomerPrice {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([cellId, customerId])
   @@map("tariff_cell_customer_price")
 }

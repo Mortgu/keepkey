@@ -28,6 +28,7 @@ export default async function calculatePrice(props: PriceCalculatorProps): Promi
 
     const tariff = await prisma.tariff.findFirst({
         where: {productId, contractId},
+        orderBy: {createdAt: "desc"},
         include: {
             rows: {
                 orderBy: {order: "asc"},

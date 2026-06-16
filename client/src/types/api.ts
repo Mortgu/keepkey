@@ -356,6 +356,10 @@ export interface components {
             terms: number[];
             rows: components["schemas"]["TariffRow"][];
             /** Format: date-time */
+            validFrom: string;
+            /** Format: date-time */
+            validTo?: string;
+            /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;

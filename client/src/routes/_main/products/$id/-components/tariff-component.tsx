@@ -1,12 +1,11 @@
-import {ChevronRight, Plus, UndoDot} from "lucide-react";
-import type {Tariff} from "@/types";
-import {localized} from "@/lib/i18n-content.ts";
-import {useLocale} from "@/hooks";
+import {ChevronRight, Plus, Trash} from "lucide-react";
+import type {Customer, Tariff} from "@/types";
+import {useTariffHook} from "@/hooks";
 import {Button} from "@/components";
 import TariffRowComponent from "@/routes/_main/products/$id/-components/tariff-row-component.tsx";
 import TariffTermsComponent from "@/routes/_main/products/$id/-components/tariff-terms-component.tsx";
-import type {PricingMode} from "../-page";
 import {useState} from "react";
+import {formatDate} from "@/lib/format.ts";
 
 type AddTermVars = { tariffId: string; duration: number };
 type RemoveTermVars = { tariffId: string; termIndex: number };
@@ -20,23 +19,23 @@ type AddBandVars = {
 };
 type RemoveBandVars = string;
 type UpdateCellVars = { cellId: string; price: number };
+type UpdateCustomerPriceVars = { cellId: string; customerId: string; price: number };
 
 type Props = {
     tariff: Tariff;
-    mode: PricingMode;
-    selectedCustomer: string;
+    selectedCustomer: Customer | null;
     onAddTerm: (vars: AddTermVars) => void;
     onRemoveTerm: (vars: RemoveTermVars) => void;
     onUpdateTerm: (vars: UpdateTermVars) => void;
     onAddBand: (vars: AddBandVars) => void;
     onRemoveBand: (vars: RemoveBandVars) => void;
     onUpdateCell: (vars: UpdateCellVars) => void;
+    onUpdateCustomerPrice: (vars: UpdateCustomerPriceVars) => void;
 };
 
 export default function TariffComponent(props: Props) {
     const {
         tariff,
-        mode,
         selectedCustomer,
         onAddTerm,
         onRemoveTerm,
@@ -45,16 +44,19 @@ export default function TariffComponent(props: Props) {
         onAddBand,
         onRemoveBand,
         onUpdateCell,
+        onUpdateCustomerPrice,
     } = props;
 
-    const locale = useLocale();
+    const {deleteTariff, deleteTariffPending} = useTariffHook();
 
     const [open, setOpen] = useState<boolean>(false);
 
     const addTerm = () => {
+        const nextDuration = tariff.terms[tariff.terms.length - 1] ? tariff.terms[tariff.terms.length - 1] + 12 : 12;
+
         onAddTerm({
             tariffId: tariff.id,
-            duration: tariff.terms.reduce((partialSum, a) => partialSum + a, 1),
+            duration: nextDuration,
         });
     };
 
@@ -83,34 +85,34 @@ export default function TariffComponent(props: Props) {
         <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
             <div className="flex items-center justify-between border-b border-(--border)">
                 <div onClick={() => setOpen(!open)}
-                     className="w-full flex items-center gap-2 py-4 px-5 hover:bg-(--page-bg) hover:cursor-pointer
-                    border-r border-(--border)">
-                    <ChevronRight className="size-4"/>
-                    <h1>{localized(tariff.contract.translations, locale, "name")}</h1>
+                     className="w-full flex items-center gap-2 py-2 px-5 hover:bg-(--page-bg) hover:cursor-pointer border-r border-(--border)">
+                    <ChevronRight className={open ? "size-4 rotate-90 transition-all" : "transition-all size-4"}/>
+                    <div>
+                        <h1>{tariff.id}</h1>
+                        <p className="text-sm">{formatDate(tariff.validFrom)} {tariff.validTo && (`- ${formatDate(tariff.validTo)}`)}</p>
+                    </div>
                 </div>
 
                 <div className="flex items-center gap-2 px-2">
-                    <Button
-                        icon={<UndoDot className="size-4"/>}
-                        iconOnly
-                        variant="secondary"
-                        size="sm"
+                    <Button onClick={() => deleteTariff({tariffId: tariff.id})}
+                            loading={deleteTariffPending}
+                            icon={<Trash className="size-4"/>}
+                            iconOnly
+                            variant="secondary"
+                            size="sm"
                     />
-                    <Button variant="secondary" size="sm">
-                        Neu
-                    </Button>
                 </div>
             </div>
 
             {open && (
                 <div className="w-full grid gap-2 p-4">
-                    <div className="w-full flex gap-2 overflow-x-scroll">
+                    <div className="w-full flex gap-2 overflow-x-scroll py-1">
                         <div className="grid gap-2">
                             <div className="flex gap-2">
                                 <p className="flex-1 min-w-50"></p>
                                 {tariff.terms.map((term: number, index: number) => (
                                     <TariffTermsComponent
-                                        key={index}
+                                        key={term}
                                         term={term}
                                         index={index}
                                         removeTerm={removeTerm}
@@ -123,13 +125,16 @@ export default function TariffComponent(props: Props) {
                                 <TariffRowComponent
                                     key={row.id}
                                     row={row}
-                                    mode={mode}
                                     selectedCustomer={selectedCustomer}
                                     cells={row.cells}
                                     onRemove={() => onRemoveBand(row.id)}
-                                    onUpdateCell={(cellId, price) =>
-                                        onUpdateCell({cellId, price})
-                                    }
+                                    onUpdateCell={(cellId, price) => {
+                                        if (selectedCustomer) {
+                                            onUpdateCustomerPrice({cellId, customerId: selectedCustomer.id, price});
+                                        } else {
+                                            onUpdateCell({cellId, price});
+                                        }
+                                    }}
                                 />
                             ))}
                         </div>

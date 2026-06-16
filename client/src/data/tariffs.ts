@@ -5,6 +5,20 @@ import type {Tariff, TariffCell} from "@/types";
 export const getAllTariffsAction = () =>
     api<Tariff[]>("/api/tariffs", {method: "GET"});
 
+export const createTariffAction = (productId: string, contractId: string) =>
+    api<Tariff>(`/api/tariffs/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({productId, contractId}),
+    });
+
+export const deleteTariffAction = (tariffId: string) =>
+    api<void>(`/api/tariffs/${tariffId}`, {
+        method: "DELETE"
+    });
+
 export const getProductTariffsAction = (productId: string) =>
     api<Tariff[]>(`/api/tariffs/${productId}`, {method: "GET"});
 
@@ -51,6 +65,13 @@ export const updateCellAction = (cellId: string, price: number) =>
         method: "PUT",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({price}),
+    });
+
+export const updateCustomerPriceAction = (cellId: string, customerId: string, price: number) =>
+    api<Tariff>(`/api/tariffs/cells/${cellId}/customer-price`, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({customerId, price}),
     });
 
 export const getTariffPrice = (

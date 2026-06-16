@@ -909,6 +909,12 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffRow"
+        validFrom:
+          type: string
+          format: date-time
+        validTo:
+          type: string
+          format: date-time
         createdAt:
           type: string
           format: date-time
@@ -923,6 +929,7 @@ components:
         - contractId
         - terms
         - rows
+        - validFrom
         - createdAt
         - updatedAt
     TariffRow:

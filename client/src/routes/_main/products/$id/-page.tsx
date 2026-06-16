@@ -3,8 +3,8 @@ import {useParams} from "@tanstack/react-router";
 import type {Customer, Product} from "@/types";
 import {localized} from "@/lib/i18n-content";
 import {SegmentedToggle, Select} from "@/components";
-import {useCustomerHook, useLocale, useProductHook, useTariffHook,} from "@/hooks";
-import TariffComponent from "@/routes/_main/products/$id/-components/tariff-component.tsx";
+import {useContractHook, useCustomerHook, useLocale, useProductHook,} from "@/hooks";
+import ContractCollapsable from "@/routes/_main/products/$id/-components/contract-collapsable.tsx";
 
 export type PricingMode = "customer" | "default";
 
@@ -47,27 +47,14 @@ interface ProductDetailPageProps {
     product: Product;
 }
 
-export function ProductDetailPage({
-                                      customers,
-                                      product,
-                                  }: ProductDetailPageProps) {
+export function ProductDetailPage({customers, product}: ProductDetailPageProps) {
     const locale = useLocale();
 
     const [pricingMode, setPricingMode] = useState<PricingMode>("default");
-    const [selectedCustomer, setSelectedCustomer] = useState<string>("");
-
-    const {
-        tariffs,
-        addTerm,
-        updateTerm,
-        removeTerm,
-        addBand,
-        removeBand,
-        updateCell,
-    } = useTariffHook(product.id);
+    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
 
 
-    console.log(tariffs);
+    const {contracts} = useContractHook();
 
 
     return (
@@ -90,11 +77,14 @@ export function ProductDetailPage({
                     aria-label="Preismodus"
                     options={DEFAULT_MODE_OPTIONS}
                     value={pricingMode}
-                    onChange={(val) => setPricingMode(val)}
+                    onChange={(val) => {
+                        setPricingMode(val)
+                        setSelectedCustomer(null)
+                    }}
                 />
 
                 {pricingMode === "customer" && (
-                    <Select onChange={(e) => setSelectedCustomer(e.target.value)}>
+                    <Select onChange={(e) => setSelectedCustomer(customers.find(c => c.id === e.target.value) ?? null)}>
                         <option value="">Select customer...</option>
                         {customers.map((customer) => (
                             <option key={customer.id} value={customer.id}>
@@ -106,18 +96,12 @@ export function ProductDetailPage({
             </section>
 
             <div className="grid gap-4">
-                {tariffs.map((tariff) => (
-                    <TariffComponent
-                        key={tariff.id}
-                        selectedCustomer={selectedCustomer}
-                        mode={pricingMode}
-                        tariff={tariff}
-                        onAddTerm={addTerm}
-                        onRemoveTerm={removeTerm}
-                        onUpdateTerm={updateTerm}
-                        onAddBand={addBand}
-                        onRemoveBand={removeBand}
-                        onUpdateCell={updateCell}
+                {contracts.map((contract) => (
+                    <ContractCollapsable
+                        key={contract.id}
+                        product={product}
+                        contract={contract}
+                        customer={selectedCustomer}
                     />
                 ))}
             </div>
