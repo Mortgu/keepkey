@@ -1,13 +1,13 @@
 import type { Document, DocumentStatus, Offer } from "@/types";
 import { useDocumentTask, useOfferHook } from "@/hooks";
 import { useEffect, useState } from "react";
-import { File, Loader, Trash, UploadCloud } from "lucide-react";
+import { Download, File, Loader, Trash, UploadCloud } from "lucide-react";
 import { Button, Input } from "@/components";
 
 type Props = {
-  document: Document;
-  offer: Offer;
-};
+    document: Document;
+    offer: Offer;
+}
 
 export function Document({ offer, document }: Props) {
   const {
@@ -62,27 +62,22 @@ export function Document({ offer, document }: Props) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2">
-        <Button
-          variant="secondary"
-          size="sm"
-          icon={<UploadCloud className="size-3.5" />}
-          iconOnly
-          onClick={() => upload({ offerId: offer.id, documentId: document.id })}
-          loading={isUploading}
-          disabled={document.status === "UPLOADED"}
-        />
+            <div className="flex items-center gap-2">
+                {status === "GENERATED" && (
+                    <a
+                        href={`/api/offers/${offer.id}/documents/${document.id}/${document.format.toLowerCase()}`}
+                        download
+                    >
+                        <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly />
+                    </a>
+                )}
 
-        <Button
-          variant="secondary"
-          size="sm"
-          icon={<Trash className="size-3.5" />}
-          iconOnly
-          onClick={() => deleteDocument({ documentId: document.id })}
-          loading={isDeletingDocument || !!errorDeletingDocument}
-          disabled={isDeletingDocument || !!errorDeletingDocument}
-        />
-      </div>
-    </div>
-  );
+                <Button variant="secondary" size="sm" icon={<UploadCloud className="size-3.5" />} iconOnly
+                    onClick={() => upload({ offerId: offer.id, documentId: document.id })} loading={isUploading} disabled={document.status === "UPLOADED"} />
+
+                <Button variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
+                    onClick={() => deleteDocument({ documentId: document.id })} loading={isDeletingDocument || !!errorDeletingDocument} disabled={isDeletingDocument || !!errorDeletingDocument} />
+            </div>
+        </div>
+    )
 }

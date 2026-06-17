@@ -38,6 +38,7 @@ export interface components {
             language?: components["schemas"]["Language"];
             country?: string;
             currency?: components["schemas"]["Currency"];
+            salutation?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

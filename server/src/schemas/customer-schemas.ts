@@ -31,6 +31,7 @@ export const updateCustomerSchema = z.object({
     city: z.string().optional(),
     plz: z.string().optional(),
     phone: z.string().optional(),
+    salutation: z.string().optional(),
     contactPersons: z.array(contactPersonSchema).optional(),
 });
 
