@@ -48,7 +48,7 @@ router.use("/tasks", requireSession, taskRouter);
 router.use("/contact-persons", requireSession, contactPersonRouter);
 
 /* /api/tariffs */
-router.use("/tariffs", requireSession, tariffRouter);
+router.use("/tariffs", tariffRouter);
 
 /* /api/documents */
 router.use('/documents', documentRouter);

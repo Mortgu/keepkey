@@ -26,8 +26,8 @@ model Customer {
   offers Offer[]
   orders Order[]
 
-  users                   User[]
-  tariffCellCustomerPrice TariffCellCustomerPrice[]
+  users       User[]
+  tariffCells TariffCellCustomer[]
 
   @@map("customer")
 }

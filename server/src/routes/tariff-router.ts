@@ -1,60 +1,64 @@
 import {Router} from "express";
 import {
-    addBand,
-    addTerm,
     createTariff,
-    deleteTariff,
-    getAllTariffs,
+    createTariffColumn,
+    createTariffRow,
+    deleteTariffColumn,
+    deleteTariffRow,
     getProductTariffs,
-    getTariff,
+    getTariffById,
     getTariffPrice,
-    removeBand,
-    removeTerm,
-    updateCell,
-    updateCustomerPrice,
-    updateTerm
+    getTariffs,
+    updateTariffCell,
+    updateTariffColumn,
+    updateTariffRow,
 } from "../controllers/tariff-controller.js";
-import {createTariffSchema} from "../schemas/index.js";
+import {
+    createTariffColumnSchema,
+    createTariffRowSchema,
+    createTariffSchema,
+    updateTariffCellSchema,
+    updateTariffColumnSchema,
+    updateTariffRowSchema
+} from "../schemas/index.js";
 import {validate} from "../middlewares/validate.js";
 
 const router = Router();
 
-/* [GET]    /api/tariffs                    */
-router.get('/', getAllTariffs);
+/* [GET] /api/tariffs */
+router.get('/', getTariffs);
+
+/* [GET] /api/tariffs/tariff/:tariffId */
+router.get('/tariff/:tariffId', getTariffById);
+
+/* [GET] /api/tariffs/:productId */
+router.get('/:productId', getProductTariffs);
+
+/* [GET] /api/tariffs?productId=...&contractId=...&... */
+router.get("/price", getTariffPrice);
 
 /* [POST] /api/tariffs */
 router.post('/', validate(createTariffSchema), createTariff);
 
-router.get("/price", getTariffPrice);
+/* [POST] /api/tariffs/:tariffId/column   */
+router.post('/:tariffId/column', validate(createTariffColumnSchema), createTariffColumn);
 
-/* [GET]    /api/tariffs/tariff/:tariffId   */
-router.get('/tariff/:tariffId', getTariff);
+/* [DELETE] /api/tariffs/:tariffId/column/:columnId   */
+router.delete('/:tariffId/column/:columnId', deleteTariffColumn);
 
-/* [GET]    /api/tariffs/:productId         */
-router.get('/:productId', getProductTariffs);
+/* [PATCH] /api/tariffs/:tariffId/column/:columnId */
+router.patch('/:tariffId/column/:columnId', validate(updateTariffColumnSchema), updateTariffColumn)
 
-/* [POST] /api/tariffs/:tariffId/terms   */
-router.post('/:tariffId/terms', addTerm);
+/* [POST] /api/tariffs/:tariffId/row */
+router.post('/:tariffId/row', validate(createTariffRowSchema), createTariffRow);
 
-/* [PUT]  /api/tariffs/:tariffId/terms   */
-router.put('/:tariffId/terms', removeTerm);
+/* [DELETE] /api/tariffs/:tariffId/row/:rowId */
+router.delete('/:tariffId/row/:rowId', deleteTariffRow);
 
-/* [PUT]  /api/tariffs/:tariffId/terms   */
-router.patch('/:tariffId/terms', updateTerm);
+/* [PATCH] /api/tariffs/:tariffId/row */
+router.patch('/:tariffId/row/:rowId', validate(updateTariffRowSchema), updateTariffRow);
 
-/* [POST] /api/tariffs/:tariffId/bands   */
-router.post('/:tariffId/bands', addBand);
-
-/* [DELETE] /api/tariffs/:tariffId */
-router.delete('/:tariffId', deleteTariff);
-
-/* [DELETE] /api/tariffs/bands/:rowId    */
-router.delete('/bands/:rowId', removeBand);
-
-/* [PUT]  /api/tariffs/cells/:cellId     */
-router.put('/cells/:cellId', updateCell);
-
-/* [PUT]  /api/tariffs/cells/:cellId/customer-price */
-router.put('/cells/:cellId/customer-price', updateCustomerPrice);
+/* [PATCH] /api/tariffs/:tariffId/cell/:cellId */
+router.patch('/:tariffId/cell/:cellId', validate(updateTariffCellSchema), updateTariffCell);
 
 export default router;

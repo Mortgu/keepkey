@@ -5,40 +5,25 @@ export const createTariffSchema = z.object({
     contractId: z.string().min(1),
 });
 
-export const updateTariffSchema = z.object({
-    productIds: z.array(z.string()).min(1),
+export const createTariffColumnSchema = z.object({
+    duration: z.number().int(),
 });
 
-const configBase = {
-    contractId: z.string().min(1),
-    duration: z.number().int().positive(),
-    min_quantity: z.number().int().nonnegative(),
-    max_quantity: z.number().int().nonnegative().nullable().optional(),
-    price: z.number().int().nonnegative(),
-};
-
-export const createTariffConfigSchema = z.object(configBase);
-
-export const updateTariffConfigSchema = z.object({
-    contractId: configBase.contractId.optional(),
-    duration: configBase.duration.optional(),
-    min_quantity: configBase.min_quantity.optional(),
-    max_quantity: configBase.max_quantity,
-    price: configBase.price.optional(),
+export const updateTariffColumnSchema = z.object({
+    duration: z.number().int().optional(),
 });
 
-export const createTariffCustomerSchema = z.object({
-    ...configBase,
-    customerId: z.string().min(1),
-    productId: z.string().min(1),
+export const createTariffRowSchema = z.object({
+    min_quantity: z.number().int(),
+    max_quantity: z.number().int(),
 });
 
-export const updateTariffCustomerSchema = z.object({
-    contractId: configBase.contractId.optional(),
-    duration: configBase.duration.optional(),
-    min_quantity: configBase.min_quantity.optional(),
-    max_quantity: configBase.max_quantity,
-    price: configBase.price.optional(),
-    customerId: z.string().min(1).optional(),
-    productId: z.string().min(1).optional(),
+export const updateTariffRowSchema = z.object({
+    min_qty: z.number().int().optional(),
+    max_qty: z.number().int().optional(),
+});
+
+export const updateTariffCellSchema = z.object({
+    default_price: z.number().int().optional(),
+    customer_price: z.number().int().optional(),
 });

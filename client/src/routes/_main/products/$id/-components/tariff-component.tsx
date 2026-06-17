@@ -1,11 +1,11 @@
 import {ChevronRight, Plus, Trash} from "lucide-react";
-import type {Customer, Tariff} from "@/types";
+import type {Customer, Tariff, TariffColumn, TariffRow} from "@/types";
 import {useTariffHook} from "@/hooks";
 import {Button} from "@/components";
-import TariffRowComponent from "@/routes/_main/products/$id/-components/tariff-row-component.tsx";
-import TariffTermsComponent from "@/routes/_main/products/$id/-components/tariff-terms-component.tsx";
 import {useState} from "react";
 import {formatDate} from "@/lib/format.ts";
+import TariffColumnComponent from "@/routes/_main/products/$id/-components/tariff-column-component.tsx";
+import TariffRowComponent from "@/routes/_main/products/$id/-components/tariff-row-component.tsx";
 
 type AddTermVars = { tariffId: string; duration: number };
 type RemoveTermVars = { tariffId: string; termIndex: number };
@@ -47,17 +47,23 @@ export default function TariffComponent(props: Props) {
         onUpdateCustomerPrice,
     } = props;
 
-    const {deleteTariff, deleteTariffPending} = useTariffHook();
+    const {
+        deleteTariff,
+        deleteTariffPending,
+
+        createColumn,
+        createRow,
+    } = useTariffHook();
 
     const [open, setOpen] = useState<boolean>(false);
 
     const addTerm = () => {
-        const nextDuration = tariff.terms[tariff.terms.length - 1] ? tariff.terms[tariff.terms.length - 1] + 12 : 12;
+        /*const nextDuration = tariff.terms[tariff.terms.length - 1] ? tariff.terms[tariff.terms.length - 1] + 12 : 12;
 
         onAddTerm({
             tariffId: tariff.id,
             duration: nextDuration,
-        });
+        });*/
     };
 
     const removeTerm = (termIndex: number) => {
@@ -69,7 +75,7 @@ export default function TariffComponent(props: Props) {
     };
 
     const addBand = () => {
-        const lastRow = tariff.rows[tariff.rows.length - 1];
+        /*const lastRow = tariff.rows[tariff.rows.length - 1];
         const minQty = lastRow ? lastRow.max_quantity + 1 : 1;
         const maxQty = minQty + 99;
 
@@ -78,8 +84,9 @@ export default function TariffComponent(props: Props) {
             min_quantity: minQty,
             max_quantity: maxQty,
             prices: tariff.terms.map(() => 0),
-        });
+        });*/
     };
+
 
     return (
         <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
@@ -89,7 +96,7 @@ export default function TariffComponent(props: Props) {
                     <ChevronRight className={open ? "size-4 rotate-90 transition-all" : "transition-all size-4"}/>
                     <div>
                         <h1>{tariff.id}</h1>
-                        <p className="text-sm">{formatDate(tariff.validFrom)} {tariff.validTo && (`- ${formatDate(tariff.validTo)}`)}</p>
+                        <p className="text-sm">{formatDate(tariff.createdAt)} {formatDate(tariff.updatedAt)}</p>
                     </div>
                 </div>
 
@@ -105,56 +112,40 @@ export default function TariffComponent(props: Props) {
             </div>
 
             {open && (
-                <div className="w-full grid gap-2 p-4">
-                    <div className="w-full flex gap-2 overflow-x-scroll py-1">
-                        <div className="grid gap-2">
-                            <div className="flex gap-2">
-                                <p className="flex-1 min-w-50"></p>
-                                {tariff.terms.map((term: number, index: number) => (
-                                    <TariffTermsComponent
-                                        key={term}
-                                        term={term}
-                                        index={index}
-                                        removeTerm={removeTerm}
-                                        updateTerm={updateTerm}
-                                    />
+                <div className="grid p-4 gap-2">
+                    <div className="flex gap-2">
+                        <div className="flex gap-2 w-full text-left">
+                            {/* Rows */}
+                            <div className="flex-1 grid">
+                                <div/>
+                                {tariff.rows.map((row: TariffRow) => (
+                                    <TariffRowComponent key={row.id} tariffId={tariff.id} row={row}/>
                                 ))}
                             </div>
 
-                            {tariff.rows.map((row) => (
-                                <TariffRowComponent
-                                    key={row.id}
-                                    row={row}
-                                    selectedCustomer={selectedCustomer}
-                                    cells={row.cells}
-                                    onRemove={() => onRemoveBand(row.id)}
-                                    onUpdateCell={(cellId, price) => {
-                                        if (selectedCustomer) {
-                                            onUpdateCustomerPrice({cellId, customerId: selectedCustomer.id, price});
-                                        } else {
-                                            onUpdateCell({cellId, price});
-                                        }
-                                    }}
-                                />
-                            ))}
+                            {/* Columns */}
+                            <div className="flex-3 flex flex-wrap items-center gap-2">
+                                {tariff.columns.map((column: TariffColumn) => (
+                                    <TariffColumnComponent
+                                        key={column.id}
+                                        tariffId={tariff.id}
+                                        column={column}
+                                    />
+                                ))}
+                            </div>
                         </div>
 
-                        <Button
-                            className="h-full border-dashed"
-                            icon={<Plus className="size-4"/>}
-                            size="sm"
-                            variant="secondary"
-                            onClick={() => addTerm()}
+                        <Button className="border-dashed h-full" variant="secondary" size="xs"
+                                onClick={() => createColumn({tariffId: tariff.id, duration: 1})}
+                                icon={<Plus className="size-4"/>}
                         />
                     </div>
 
-                    <Button
-                        variant="secondary"
-                        className="w-full border-dashed"
-                        onClick={addBand}
-                    >
-                        Zeile hinzufügen
-                    </Button>
+                    <Button className="border-dashed h-full w-full" variant="secondary" size="sm"
+                            onClick={() => createRow({
+                                tariffId: tariff.id,
+                                min_qty: 1, max_qty: 100
+                            })}>Create Row</Button>
                 </div>
             )}
         </div>

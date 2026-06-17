@@ -8,21 +8,6 @@ interface PriceCalculatorProps {
     customerId?: string;
 }
 
-interface Tier {
-    min_quantity: number;
-    max_quantity: number | null;
-    price: number;
-}
-
-function findMatchingTier<T extends Tier>(tiers: T[], quantity: number): T | undefined {
-    return tiers.find((tier) => {
-        const withinMin = quantity >= tier.min_quantity;
-        const noUpperLimit = tier.max_quantity === null || tier.max_quantity === 0;
-        const withinMax = noUpperLimit || quantity <= tier.max_quantity!;
-        return withinMin && withinMax;
-    });
-}
-
 export default async function calculatePrice(props: PriceCalculatorProps): Promise<number> {
     const {productId, contractId, duration, quantity, customerId} = props;
 
@@ -30,13 +15,12 @@ export default async function calculatePrice(props: PriceCalculatorProps): Promi
         where: {productId, contractId},
         orderBy: {createdAt: "desc"},
         include: {
-            rows: {
-                orderBy: {order: "asc"},
+            rows: true,
+            columns: true,
+            cells: {
                 include: {
-                    cells: {
-                        orderBy: {order: "asc"},
-                        include: {customerPrices: true},
-                    },
+                    default_cells: true,
+                    customer_cells: true,
                 },
             },
         },
@@ -44,21 +28,27 @@ export default async function calculatePrice(props: PriceCalculatorProps): Promi
 
     if (!tariff) return 0;
 
-    // Term-Index finden
-    const termIndex = tariff.terms.indexOf(duration);
-    if (termIndex === -1) return 0;
+    const column = tariff.columns.find(c => c.duration === duration);
+    if (!column) return 0;
 
-    // Passende Zeile (Mengenstaffel) finden
-    const row = tariff.rows.find(r => quantity >= r.min_quantity && quantity <= r.max_quantity);
+    const row = tariff.rows.find(r => {
+        const withinMin = quantity >= r.min_quantity;
+        const noUpperLimit = r.max_quantity === null;
+        const withinMax = noUpperLimit || quantity <= r.max_quantity!;
+        return withinMin && withinMax;
+    });
     if (!row) return 0;
 
-    const cell = row.cells[termIndex];
+    const cell = tariff.cells.find(c => c.rowId === row.id && c.columnId === column.id);
     if (!cell) return 0;
 
-    // Customer-Override prüfen
-    let price = cell.price;
+    const defaultCell = cell.default_cells[0];
+    if (!defaultCell) return 0;
+
+    let price = defaultCell.price;
+
     if (customerId) {
-        const override = cell.customerPrices.find(cp => cp.customerId === customerId);
+        const override = cell.customer_cells.find(cc => cc.customerId === customerId);
         if (override) price = override.price;
     }
 

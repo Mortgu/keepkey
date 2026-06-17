@@ -114,10 +114,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/User"
-        tariffCellCustomerPrice:
+        tariffCells:
           type: array
           items:
-            $ref: "#/components/schemas/TariffCellCustomerPrice"
+            $ref: "#/components/schemas/TariffCellCustomer"
       required:
         - id
         - companyName
@@ -127,7 +127,7 @@ components:
         - offers
         - orders
         - users
-        - tariffCellCustomerPrice
+        - tariffCells
     ContactPerson:
       type: object
       properties:
@@ -908,21 +908,18 @@ components:
           $ref: "#/components/schemas/Contract"
         contractId:
           type: string
-        terms:
-          type: array
-          items:
-            type: integer
-            format: int32
         rows:
           type: array
           items:
             $ref: "#/components/schemas/TariffRow"
-        validFrom:
-          type: string
-          format: date-time
-        validTo:
-          type: string
-          format: date-time
+        columns:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffColumn"
+        cells:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCell"
         createdAt:
           type: string
           format: date-time
@@ -935,9 +932,9 @@ components:
         - productId
         - contract
         - contractId
-        - terms
         - rows
-        - validFrom
+        - columns
+        - cells
         - createdAt
         - updatedAt
     TariffRow:
@@ -955,7 +952,34 @@ components:
         max_quantity:
           type: integer
           format: int32
-        order:
+        cells:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCell"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - tariff
+        - tariffId
+        - min_quantity
+        - cells
+        - createdAt
+        - updatedAt
+    TariffColumn:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        duration:
           type: integer
           format: int32
         cells:
@@ -972,9 +996,7 @@ components:
         - id
         - tariff
         - tariffId
-        - min_quantity
-        - max_quantity
-        - order
+        - duration
         - cells
         - createdAt
         - updatedAt
@@ -983,20 +1005,26 @@ components:
       properties:
         id:
           type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
         row:
           $ref: "#/components/schemas/TariffRow"
         rowId:
           type: string
-        price:
-          type: integer
-          format: int32
-        order:
-          type: integer
-          format: int32
-        customerPrices:
+        column:
+          $ref: "#/components/schemas/TariffColumn"
+        columnId:
+          type: string
+        default_cells:
           type: array
           items:
-            $ref: "#/components/schemas/TariffCellCustomerPrice"
+            $ref: "#/components/schemas/TariffCellDefault"
+        customer_cells:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCellCustomer"
         createdAt:
           type: string
           format: date-time
@@ -1005,14 +1033,42 @@ components:
           format: date-time
       required:
         - id
+        - tariff
+        - tariffId
         - row
         - rowId
-        - price
-        - order
-        - customerPrices
+        - column
+        - columnId
+        - default_cells
+        - customer_cells
         - createdAt
         - updatedAt
-    TariffCellCustomerPrice:
+    TariffCellDefault:
+      type: object
+      properties:
+        id:
+          type: string
+        cell:
+          $ref: "#/components/schemas/TariffCell"
+        cellId:
+          type: string
+        price:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - cell
+        - cellId
+        - price
+        - createdAt
+        - updatedAt
+    TariffCellCustomer:
       type: object
       properties:
         id:

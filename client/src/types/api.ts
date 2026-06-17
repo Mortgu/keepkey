@@ -47,7 +47,7 @@ export interface components {
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
             users: components["schemas"]["User"][];
-            tariffCellCustomerPrice: components["schemas"]["TariffCellCustomerPrice"][];
+            tariffCells: components["schemas"]["TariffCellCustomer"][];
         };
         ContactPerson: {
             id: string;
@@ -357,12 +357,9 @@ export interface components {
             productId: string;
             contract: components["schemas"]["Contract"];
             contractId: string;
-            terms: number[];
             rows: components["schemas"]["TariffRow"][];
-            /** Format: date-time */
-            validFrom: string;
-            /** Format: date-time */
-            validTo?: string;
+            columns: components["schemas"]["TariffColumn"][];
+            cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -375,9 +372,19 @@ export interface components {
             /** Format: int32 */
             min_quantity: number;
             /** Format: int32 */
-            max_quantity: number;
+            max_quantity?: number;
+            cells: components["schemas"]["TariffCell"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffColumn: {
+            id: string;
+            tariff: components["schemas"]["Tariff"];
+            tariffId: string;
             /** Format: int32 */
-            order: number;
+            duration: number;
             cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;
@@ -386,19 +393,31 @@ export interface components {
         };
         TariffCell: {
             id: string;
+            tariff: components["schemas"]["Tariff"];
+            tariffId: string;
             row: components["schemas"]["TariffRow"];
             rowId: string;
-            /** Format: int32 */
-            price: number;
-            /** Format: int32 */
-            order: number;
-            customerPrices: components["schemas"]["TariffCellCustomerPrice"][];
+            column: components["schemas"]["TariffColumn"];
+            columnId: string;
+            default_cells: components["schemas"]["TariffCellDefault"][];
+            customer_cells: components["schemas"]["TariffCellCustomer"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
         };
-        TariffCellCustomerPrice: {
+        TariffCellDefault: {
+            id: string;
+            cell: components["schemas"]["TariffCell"];
+            cellId: string;
+            /** Format: int32 */
+            price: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffCellCustomer: {
             id: string;
             cell: components["schemas"]["TariffCell"];
             cellId: string;

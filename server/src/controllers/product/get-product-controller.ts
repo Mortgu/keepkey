@@ -32,24 +32,7 @@ export const getProduct = async (request: Request, response: Response, next: Nex
         where: {id},
         include: {
             translations: true,
-            tariffs: {
-                include: {
-                    contract: {
-                        include: {
-                            translations: true
-                        },
-                    },
-                    rows: {
-                        include: {
-                            cells: {
-                                include: {
-                                    customerPrices: true
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            tariffs: true
         },
     });
 

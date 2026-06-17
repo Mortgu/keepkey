@@ -1,6 +1,6 @@
 import {api} from "@/lib/api-client";
 
-import type {Tariff, TariffCell} from "@/types";
+import type {Tariff, TariffCell, TariffRow} from "@/types";
 
 export const getAllTariffsAction = () =>
     api<Tariff[]>("/api/tariffs", {method: "GET"});
@@ -25,53 +25,49 @@ export const getProductTariffsAction = (productId: string) =>
 export const getTariffAction = (tariffId: string) =>
     api<Tariff>(`/api/tariffs/tariff/${tariffId}`, {method: "GET"});
 
-export const addTermAction = (tariffId: string, duration: number) =>
-    api<Tariff>(`/api/tariffs/${tariffId}/terms`, {
+export const createTariffColumnAction = (tariffId: string, duration: number) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({duration}),
     });
 
-export const updateTermAction = (tariffId: string, termIndex: number, duration: number) =>
-    api<Tariff>(`/api/tariffs/${tariffId}/terms`, {
+export const deleteTariffColumnAction = (tariffId: string, columnId: string) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column/${columnId}`, {
+        method: "DELETE",
+    });
+
+export const updateTariffColumnAction = (tariffId: string, columnId: string, duration: number) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column/${columnId}`, {
         method: "PATCH",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({termIndex, duration}),
-    })
-
-export const removeTermAction = (tariffId: string, termIndex: number) =>
-    api<Tariff>(`/api/tariffs/${tariffId}/terms`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({termIndex}),
+        body: JSON.stringify({duration}),
     });
 
-export const addBandAction = (tariffId: string, data: {
-    min_quantity: number;
-    max_quantity: number;
-    prices: number[]
-}) =>
-    api<Tariff>(`/api/tariffs/${tariffId}/bands`, {
+export const createTariffRowAction = (tariffId: string, min_quantity: number, max_quantity) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row`, {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify(data),
+        body: JSON.stringify({min_quantity, max_quantity}),
     });
 
-export const removeBandAction = (rowId: string) =>
-    api<Tariff>(`/api/tariffs/bands/${rowId}`, {method: "DELETE"});
-
-export const updateCellAction = (cellId: string, price: number) =>
-    api<TariffCell>(`/api/tariffs/cells/${cellId}`, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({price}),
+export const deleteTariffRowAction = (tariffId: string, rowId: string) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row/${rowId}`, {
+        method: "DELETE",
     });
 
-export const updateCustomerPriceAction = (cellId: string, customerId: string, price: number) =>
-    api<Tariff>(`/api/tariffs/cells/${cellId}/customer-price`, {
-        method: "PUT",
+export const updateTariffRowAction = (tariffId: string, rowId: string, min_qty: number, max_qty: number) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row/${rowId}`, {
+        method: "PATCH",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({customerId, price}),
+        body: JSON.stringify({min_qty, max_qty}),
+    });
+
+export const updateTariffCellAction = (tariffId: string, cellId: string, default_price?: number, customer_price?: number) =>
+    api<TariffCell>(`/api/tariffs/${tariffId}/cell/${cellId}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({default_price, customer_price}),
     });
 
 export const getTariffPrice = (

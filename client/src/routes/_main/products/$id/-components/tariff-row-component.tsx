@@ -1,97 +1,99 @@
-import type {Customer, NewTariffCell, NewTariffRow} from "@/types";
+import type {TariffRow} from "@/types";
+import {type ChangeEvent, useState} from "react";
 import {Button, Input} from "@/components";
-import {X} from "lucide-react";
-import TariffCellComponent from "@/routes/_main/products/$id/-components/tariff-cell-component.tsx";
-import {useEffect, useState} from "react";
+import {Trash} from "lucide-react";
+import {useTariffHook} from "@/hooks";
 
 type Props = {
-    row: NewTariffRow;
-    cells: Array<NewTariffCell>;
-    selectedCustomer: Customer | null;
-    onRemove: () => void;
-    onUpdateCell: (cellId: string, price: number) => void;
-};
+    tariffId: string;
+    row: TariffRow;
+}
 
 export default function TariffRowComponent(props: Props) {
-    const {
-        row,
-        cells,
-        selectedCustomer,
-        onRemove,
-        onUpdateCell,
-    } = props;
+    const {row, tariffId} = props;
 
+    const [min_qty, setMinQty] = useState<number>(row.min_quantity);
     const [editMin, setEditMin] = useState<boolean>(false);
-    const [minQuantity, setMinQuantity] = useState<number>(row.min_quantity);
 
+    const [max_qty, setMaxQty] = useState<number>(row.max_quantity);
     const [editMax, setEditMax] = useState<boolean>(false);
-    const [maxQuantity, setMaxQuantity] = useState<number>(row.max_quantity);
 
-    useEffect(() => {
-        setMinQuantity(row.min_quantity);
-    }, [row.min_quantity]);
+    const {deleteRow, updateRow} = useTariffHook();
 
-    useEffect(() => {
-        setMaxQuantity(row.max_quantity);
-    }, [row.max_quantity]);
-    
+    const handleMinBlur = async () => {
+        await updateRow({
+            tariffId: tariffId,
+            rowId: row.id,
+            min_qty: min_qty,
+            max_qty: max_qty,
+        });
+
+        setEditMin(false);
+    }
+
+    const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = Number(e.target.value);
+        if (isNaN(value)) return;
+        setMinQty(value);
+    }
+
+    const handleMaxBlur = async () => {
+        await updateRow({
+            tariffId: tariffId,
+            rowId: row.id,
+            min_qty: min_qty,
+            max_qty: max_qty,
+        });
+
+        setEditMax(false);
+    }
+
+    const handleMaxChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const value = Number(e.target.value);
+        if (isNaN(value)) return;
+        setMaxQty(value);
+    }
 
     return (
-        <div className="flex gap-2">
-            <div className="w-full max-w-50 flex items-center justify-between gap-2">
-                <div className="flex-1 flex items-center justify-start gap-2">
-                    {!editMin && (<p onClick={() => setEditMin(true)}>{minQuantity}</p>)}
-                    {editMin && (
-                        <div className="w-15">
-                            <Input autoFocus size="xs" onBlur={() => setEditMin(false)} value={minQuantity}
-                                   onChange={(e) => {
-                                       const value = Number(e.target.value);
+        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center gap-2">
+            <div className="flex-1 flex gap-1 items-center">
+                {!editMin && (
+                    <p onClick={() => setEditMin(true)}>{min_qty}</p>
+                )}
 
-                                       if (isNaN(value)) {
-                                           return
-                                       }
+                {editMin && (
+                    <div>
+                        <Input
+                            autoFocus
+                            size="xs"
+                            onBlur={handleMinBlur}
+                            value={min_qty}
+                            onChange={handleMinChange}
+                        />
+                    </div>
+                )}
 
-                                       setMinQuantity(value);
-                                   }}
-                            />
-                        </div>
-                    )}
-                    -
-                    {!editMax && (<p onClick={() => setEditMax(true)}>{maxQuantity}</p>)}
-                    {editMax && (
-                        <div className="w-15">
-                            <Input autoFocus size="xs" onBlur={() => setEditMax(false)} value={maxQuantity}
-                                   onChange={(e) => {
-                                       const value = Number(e.target.value);
+                -
+                {!editMax && (
+                    <p onClick={() => setEditMax(true)}>{max_qty}</p>
+                )}
 
-                                       if (isNaN(value)) {
-                                           return
-                                       }
-
-                                       setMaxQuantity(value);
-                                   }}
-                            />
-                        </div>
-                    )}
-                </div>
-                <Button
-                    size="xs"
-                    variant="ghost"
-                    icon={<X className="size-3.5"/>}
-                    iconOnly
-                    onClick={onRemove}
-                />
+                {editMax && (
+                    <div>
+                        <Input
+                            autoFocus
+                            size="xs"
+                            onBlur={handleMaxBlur}
+                            value={max_qty}
+                            onChange={handleMaxChange}
+                        />
+                    </div>
+                )}
             </div>
-            {cells.map((cell) => {
-                return (
-                    <TariffCellComponent
-                        key={cell.id}
-                        selectedCustomer={selectedCustomer}
-                        cell={cell}
-                        onPriceChange={(price) => onUpdateCell(cell.id, price)}
-                    />
-                );
-            })}
+            <Button variant="link" size="xs" icon={<Trash className="size-3"/>} iconOnly
+                    onClick={() => deleteRow({tariffId: tariffId, rowId: row.id})}/>
+
+
         </div>
-    );
+    )
 }

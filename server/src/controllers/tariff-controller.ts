@@ -1,6 +1,7 @@
 import {NextFunction, Request, Response} from "express";
 import {prisma} from "../lib/prismaClient.js";
 import calculatePrice from "../utils/products.js";
+import logger from "../middlewares/logger.js";
 
 const TARIFF_INCLUDE = {
     contract: {
@@ -8,28 +9,85 @@ const TARIFF_INCLUDE = {
             translations: true
         }
     },
+    product: {
+        include: {
+            translations: true
+        }
+    },
     rows: {
-        orderBy: {
-            order: "asc" as const
-        },
+        orderBy: {createdAt: 'desc'},
         include: {
             cells: {
-                orderBy: {
-                    order: "asc" as const
-                },
+                orderBy: {createdAt: 'asc'},
                 include: {
-                    customerPrices: true,
+                    column: true,
+                    row: true,
+                    default_cells: true,
+                    customer_cells: true,
                 }
             }
-        },
+        }
     },
+    columns: {
+        orderBy: {createdAt: 'desc'},
+        include: {
+            cells: {
+                orderBy: {createdAt: 'asc'},
+                include: {
+                    column: true,
+                    row: true,
+                    default_cells: true,
+                    customer_cells: true,
+                }
+            }
+        }
+    },
+    cells: {
+        orderBy: {createdAt: 'asc'},
+        include: {
+            column: true,
+            row: true,
+            default_cells: true,
+            customer_cells: true,
+        }
+    }
 } as const;
 
-export async function getAllTariffs(request: Request, response: Response) {
+export async function getTariffs(request: Request, response: Response) {
     const tariffs = await prisma.tariff.findMany({
         include: TARIFF_INCLUDE,
     });
+
     return response.status(200).json(tariffs);
+}
+
+export async function getTariffById(request: Request, response: Response) {
+    const id = request.params.tariffId as string;
+
+    const tariff = await prisma.tariff.findUnique({
+        where: {id},
+        include: TARIFF_INCLUDE,
+    });
+
+    if (!tariff) {
+        return response.status(404).json({success: false, message: "Tariff not found."});
+    }
+
+    return response.status(200).json(tariff);
+}
+
+export async function getProductTariffs(request: Request, response: Response) {
+    const productId = request.params.productId as string;
+
+    const tariff = await prisma.tariff.findMany({
+        where: {productId},
+        include: TARIFF_INCLUDE,
+        orderBy: {
+            createdAt: "desc",
+        },
+    });
+
+    return response.status(200).json(tariff);
 }
 
 export async function createTariff(request: Request, response: Response) {
@@ -56,187 +114,6 @@ export async function createTariff(request: Request, response: Response) {
     return response.status(201).json(tariff);
 }
 
-export async function getProductTariffs(request: Request, response: Response) {
-    const productId = request.params.productId as string;
-
-    const tariff = await prisma.tariff.findMany({
-        where: {productId},
-        include: TARIFF_INCLUDE,
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
-
-    return response.status(200).json(tariff);
-}
-
-export async function getTariff(request: Request, response: Response) {
-    const id = request.params.tariffId as string;
-
-    const tariff = await prisma.tariff.findUnique({
-        where: {id},
-        include: TARIFF_INCLUDE,
-    });
-
-    if (!tariff) {
-        return response.status(404).json({success: false, message: "Tariff not found."});
-    }
-
-    return response.status(200).json(tariff);
-}
-
-export async function addTerm(request: Request, response: Response, next: NextFunction) {
-    try {
-        const tariffId = request.params.tariffId as string;
-        const {duration} = request.body as { duration: number };
-
-        const tariff = await prisma.tariff.findUnique({
-            where: {
-                id: tariffId
-            },
-            include: {
-                rows: true
-            }
-        });
-
-        if (!tariff) {
-            return response.status(404).json({success: false, message: "Tariff not found."});
-        }
-
-        if (tariff.terms.includes(duration)) {
-            return response.status(409).json({success: false, message: "Term already exists."});
-        }
-
-        await prisma.$transaction(async (tx) => {
-            await tx.tariff.update({
-                where: {id: tariffId},
-                data: {terms: {push: duration}},
-            });
-
-            for (const row of tariff.rows) {
-                const cellCount = await tx.tariffCell.count({
-                    where: {rowId: row.id}
-                });
-
-                await tx.tariffCell.create({
-                    data: {rowId: row.id, price: 0, order: cellCount},
-                });
-            }
-        });
-
-        const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});
-        return response.status(200).json(updated);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function removeTerm(request: Request, response: Response, next: NextFunction) {
-    try {
-        const tariffId = request.params.tariffId as string;
-        const {termIndex} = request.body as { termIndex: number };
-
-        const tariff = await prisma.tariff.findUnique({
-            where: {id: tariffId},
-            include: {rows: {orderBy: {order: "asc"}, include: {cells: {orderBy: {order: "asc"}}}}}
-        });
-        if (!tariff) {
-            return response.status(404).json({success: false, message: "Tariff not found."});
-        }
-
-        if (termIndex < 0 || termIndex >= tariff.terms.length) {
-            return response.status(400).json({success: false, message: "Invalid term index."});
-        }
-
-        await prisma.$transaction(async (tx) => {
-            const newTerms = tariff.terms.filter((_, i) => i !== termIndex);
-            await tx.tariff.update({where: {id: tariffId}, data: {terms: {set: newTerms}}});
-
-            for (const row of tariff.rows) {
-                const cellToRemove = row.cells[termIndex];
-                if (cellToRemove) {
-                    await tx.tariffCell.delete({where: {id: cellToRemove.id}});
-                    await tx.tariffCell.updateMany({
-                        where: {rowId: row.id, order: {gt: cellToRemove.order}},
-                        data: {order: {decrement: 1}},
-                    });
-                }
-            }
-        });
-
-        const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});
-        return response.status(200).json(updated);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function updateTerm(request: Request, response: Response, next: NextFunction) {
-    try {
-        const tariffId = request.params.tariffId as string;
-        const {termIndex, duration} = request.body as { termIndex: number; duration: number };
-
-        const tariff = await prisma.tariff.findUnique({where: {id: tariffId}});
-        if (!tariff) {
-            return response.status(404).json({success: false, message: "Tariff not found."});
-        }
-
-        if (termIndex < 0 || termIndex >= tariff.terms.length) {
-            return response.status(400).json({success: false, message: "Invalid term index."});
-        }
-
-        if (tariff.terms.includes(duration) && tariff.terms[termIndex] !== duration) {
-            return response.status(409).json({success: false, message: "Term already exists."});
-        }
-
-        const newTerms = [...tariff.terms];
-        newTerms[termIndex] = duration;
-
-        await prisma.tariff.update({
-            where: {id: tariffId},
-            data: {terms: {set: newTerms}},
-        });
-
-        const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});
-        return response.status(200).json(updated);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function addBand(request: Request, response: Response, next: NextFunction) {
-    try {
-        const tariffId = request.params.tariffId as string;
-        const {min_quantity, max_quantity, prices} = request.body as {
-            min_quantity: number;
-            max_quantity: number;
-            prices: number[];
-        };
-
-        const tariff = await prisma.tariff.findUnique({where: {id: tariffId}});
-        if (!tariff) {
-            return response.status(404).json({success: false, message: "Tariff not found."});
-        }
-
-        await prisma.$transaction(async (tx) => {
-            const rowCount = await tx.tariffRow.count({where: {tariffId}});
-            const row = await tx.tariffRow.create({
-                data: {tariffId, min_quantity, max_quantity, order: rowCount},
-            });
-
-            for (let i = 0; i < prices.length; i++) {
-                await tx.tariffCell.create({
-                    data: {rowId: row.id, price: prices[i], order: i},
-                });
-            }
-        });
-
-        const updated = await prisma.tariff.findUnique({where: {id: tariffId}, include: TARIFF_INCLUDE});
-        return response.status(200).json(updated);
-    } catch (error) {
-        next(error);
-    }
-}
 
 export async function deleteTariff(request: Request, response: Response, next: NextFunction) {
     const tariffId = request.params.tariffId as string;
@@ -251,80 +128,6 @@ export async function deleteTariff(request: Request, response: Response, next: N
         return response.status(200).json({
             success: true, message: "Tariff deleted."
         });
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function removeBand(request: Request, response: Response, next: NextFunction) {
-    try {
-        const rowId = request.params.rowId as string;
-
-        const row = await prisma.tariffRow.findUnique({where: {id: rowId}});
-        if (!row) {
-            return response.status(404).json({success: false, message: "Row not found."});
-        }
-
-        await prisma.$transaction(async (tx) => {
-            await tx.tariffRow.delete({where: {id: rowId}});
-            await tx.tariffRow.updateMany({
-                where: {tariffId: row.tariffId, order: {gt: row.order}},
-                data: {order: {decrement: 1}},
-            });
-        });
-
-        const updated = await prisma.tariff.findUnique({where: {id: row.tariffId}, include: TARIFF_INCLUDE});
-        return response.status(200).json(updated);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function updateCell(request: Request, response: Response, next: NextFunction) {
-    try {
-        const cellId = request.params.cellId as string;
-        const {price} = request.body as { price: number };
-
-        const cell = await prisma.tariffCell.update({
-            where: {id: cellId},
-            data: {price},
-            include: {customerPrices: true},
-        });
-
-        return response.status(200).json(cell);
-    } catch (error) {
-        next(error);
-    }
-}
-
-export async function updateCustomerPrice(request: Request, response: Response, next: NextFunction) {
-    try {
-        const cellId = request.params.cellId as string;
-        const {customerId, price} = request.body as { customerId: string; price: number };
-
-        const cell = await prisma.tariffCell.findUnique({
-            where: {id: cellId},
-            include: {row: {include: {tariff: true}}},
-        });
-
-        if (!cell) {
-            return response.status(404).json({success: false, message: "Cell not found."});
-        }
-
-        await prisma.tariffCellCustomerPrice.upsert({
-            where: {
-                cellId_customerId: {cellId, customerId},
-            },
-            update: {price},
-            create: {cellId, customerId, price},
-        });
-
-        const updated = await prisma.tariff.findUnique({
-            where: {id: cell.row.tariffId},
-            include: TARIFF_INCLUDE,
-        });
-
-        return response.status(200).json(updated);
     } catch (error) {
         next(error);
     }
@@ -356,3 +159,226 @@ export const getTariffPrice = async (request: Request, response: Response) => {
     });
     return response.status(200).json(price);
 };
+
+
+export async function createTariffColumn(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+
+    const duration = request.body.duration;
+
+    try {
+        const tariff = await prisma.tariff.findUniqueOrThrow({
+            where: {id: tariffId},
+            include: {rows: true}
+        });
+
+        const column = await prisma.$transaction(async (tx) => {
+            const col = await tx.tariffColumn.create({
+                data: {tariffId, duration},
+            });
+
+            for (const row of tariff.rows) {
+                const cell = await tx.tariffCell.create({
+                    data: {
+                        tariffId,
+                        rowId: row.id,
+                        columnId: col.id
+                    },
+                });
+
+                await tx.tariffCellDefault.create({
+                    data: {cellId: cell.id, price: 1}
+                })
+            }
+
+            return col;
+        });
+
+        const updated = await prisma.tariff.findUniqueOrThrow({
+            where: {id: tariffId},
+            include: TARIFF_INCLUDE,
+        });
+
+        return response.status(201).json(updated);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export async function deleteTariffColumn(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+    const columnId = request.params.columnId as string;
+
+    try {
+        const deletedColumn = await prisma.tariffColumn.delete({
+            where: {id: columnId}
+        });
+
+        return response.status(200).json({
+            message: 'Column deleted successfully!', column: deletedColumn,
+        });
+    } catch (error) {
+        next(error);
+    }
+}
+
+export async function updateTariffColumn(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+    const columnId = request.params.columnId as string;
+
+    const duration = request.body.duration;
+
+    try {
+        const updated = await prisma.tariffColumn.updateManyAndReturn({
+            where: {id: columnId},
+            data: {
+                duration
+            }
+        });
+
+        return response.status(200).json({
+            message: 'Column updated successfully!', updated
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+
+export async function createTariffRow(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+
+    const {min_quantity, max_quantity} = request.body;
+
+    console.log("createTariffRow")
+
+    try {
+        const tariff = await prisma.tariff.findUniqueOrThrow({
+            where: {id: tariffId},
+            include: {columns: true}
+        });
+
+        const row = await prisma.$transaction(async (tx) => {
+            const r = await tx.tariffRow.create({
+                data: {tariffId, min_quantity, max_quantity},
+            });
+
+            for (const column of tariff.columns) {
+                const cell = await tx.tariffCell.create({
+                    data: {
+                        tariffId,
+                        rowId: r.id,
+                        columnId: column.id
+                    },
+                });
+
+                await tx.tariffCellDefault.create({
+                    data: {cellId: cell.id, price: 1}
+                })
+            }
+
+            return r;
+        });
+
+        console.log(row)
+
+        const updated = await prisma.tariff.findUniqueOrThrow({
+            where: {id: tariffId},
+            include: TARIFF_INCLUDE,
+        });
+
+        return response.status(201).json(updated);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export async function deleteTariffRow(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+    const rowId = request.params.rowId as string;
+
+    try {
+        const deletedRow = await prisma.tariffRow.delete({
+            where: {id: rowId},
+        });
+
+        return response.status(201).json({
+            message: "Successfully deleted row!", row: deletedRow,
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export async function updateTariffRow(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+    const rowId = request.params.rowId as string;
+
+    const {min_qty, max_qty} = request.body;
+
+    try {
+        const updated = await prisma.tariffRow.updateManyAndReturn({
+            where: {id: rowId},
+            data: {
+                min_quantity: min_qty,
+                max_quantity: max_qty
+            }
+        });
+
+        return response.status(200).json({
+            message: 'Row updated successfully!', updated
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export async function updateTariffCell(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
+    const cellId = request.params.cellId as string;
+
+    const {default_price, customer_price} = request.body;
+
+    if (default_price === undefined && customer_price === undefined) {
+        logger.error("default_price or customer_price is required");
+        return response.status(400).json({
+            message: "Bad request!"
+        });
+    }
+
+    try {
+        if (default_price !== undefined) {
+            const updated = await prisma.tariffCellDefault.updateManyAndReturn({
+                where: {cellId: cellId},
+                data: {
+                    price: default_price,
+                }
+            });
+
+            return response.status(200).json({
+                message: 'Cell updated successfully!', updated
+            });
+        }
+
+        if (customer_price !== undefined) {
+            const updated = await prisma.tariffCellCustomer.updateManyAndReturn({
+                where: {cellId: cellId},
+                data: {
+                    price: customer_price,
+                }
+            });
+
+            return response.status(200).json({
+                message: 'Cell updated successfully!', updated
+            });
+        }
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}

@@ -1,30 +1,36 @@
-import {type ChangeEvent, useEffect, useState} from "react";
-
-import type {Customer, NewTariffCell} from "@/types";
-import {formatEur} from "@/utils/utils.ts";
+import type {TariffCellDefault} from "@/types";
 import {Input} from "@/components";
+import {type ChangeEvent, useState} from "react";
+import {useTariffHook} from "@/hooks";
+import {formatEur} from "@/utils/utils.ts";
 
 type Props = {
-    cell: NewTariffCell;
-    onPriceChange: (price: number) => void;
-    selectedCustomer: Customer | null;
-};
+    tariffId: string;
+    cell: TariffCellDefault;
+}
 
-export default function TariffCellComponent({cell, onPriceChange, selectedCustomer}: Props) {
+export default function TariffCellComponent(props: Props) {
+    const {tariffId, cell} = props;
+
     const [edit, setEdit] = useState<boolean>(false);
     const [price, setPrice] = useState<number>(cell.price);
 
-    useEffect(() => {
-        setPrice(cell.price);
-    }, [cell.price]);
+    const {updateCell} = useTariffHook();
 
-    const handleBlur = () => {
+    console.log(cell)
+
+    // TEst
+    const [customerMode, setCustomerMode] = useState<boolean>(false);
+
+    const handleBlur = async () => {
+        await updateCell({
+            tariffId: tariffId,
+            cellId: cell.cellId,
+            default_price: price,
+        });
+
         setEdit(false);
-
-        if (price !== cell.price) {
-            onPriceChange(price);
-        }
-    };
+    }
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const value = Number(e.target.value);
@@ -32,19 +38,13 @@ export default function TariffCellComponent({cell, onPriceChange, selectedCustom
         if (isNaN(value)) return;
 
         setPrice(value);
-    };
-
-    const customer = cell.customerPrices.find(
-        (c) => c.customerId === selectedCustomer?.id,
-    );
+    }
 
     return (
-        <div
-            onClick={() => setEdit(true)}
-            className="flex-1 border border-(--border) rounded-md hover:bg-(--page-bg) min-w-50"
-        >
-            {edit ? (
-                <div className="w-full h-full py-2 px-3 flex items-center justify-center">
+        <div onClick={() => setEdit(true)}
+             className="w-auto h-15 border border-(--border) rounded-sm flex items-center justify-end p-2 hover:bg-(--page-bg)">
+            {edit && (
+                <div className="">
                     <Input
                         autoFocus
                         size="xs"
@@ -53,16 +53,15 @@ export default function TariffCellComponent({cell, onPriceChange, selectedCustom
                         onChange={handleChange}
                     />
                 </div>
-            ) : (
-                <div className="text-right py-2 px-3 pointer-events-none">
-                    {customer ? (
-                        <p>{formatEur(customer.price)}</p>
-                    ) : (
-                        <p>{formatEur(cell.price)}</p>
-                    )}
-                    <p className="text-sm text-(--text-secondary)">/Nutzer</p>
+            )}
+
+            {!edit && (
+                <div className="">
+                    <p className="text-md font-semibold">{formatEur(price || 0)}</p>
+                    <p className="text-(--fg-3) text-sm font-light">/Nutzer</p>
                 </div>
             )}
+
         </div>
-    );
+    )
 }

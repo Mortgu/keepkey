@@ -1,9 +1,13 @@
 import type {components} from "./api";
 
 export type Tariff = components["schemas"]["Tariff"];
+
 export type TariffRow = components["schemas"]["TariffRow"];
+export type TariffColumn = components["schemas"]["TariffColumn"];
+
 export type TariffCell = components["schemas"]["TariffCell"];
-export type TariffCellCustomerPrice = components["schemas"]["TariffCellCustomerPrice"];
+export type TariffCellDefault = components["schemas"]["TariffCellDefault"];
+export type TariffCellCustomer = components["schemas"]["TariffCellCustomer"];
 
 export type CreateTariffInput = Omit<Tariff, "id">;
 export type UpdateTariffInput = Partial<CreateTariffInput>;
