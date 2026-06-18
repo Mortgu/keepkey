@@ -32,5 +32,22 @@
     "import": "Import",
     "loading": "Loading...",
     "noResults": "No results"
+  },
+  "dashboard": {
+    "recentOffers": "Recent offers",
+    "recentOrders": "Recent orders",
+    "integrations": "Integrations",
+    "viewAll": "View all",
+    "noActivity": "No activity yet.",
+    "stats": {
+      "offerVolume": "Open offer volume",
+      "openOffers": "Open offers",
+      "orders": "Orders",
+      "conversion": "Conversion rate"
+    },
+    "badge": {
+      "reserved": "Reserved",
+      "converted": "Ordered"
+    }
   }
 }

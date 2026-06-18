@@ -32,5 +32,22 @@
     "import": "Importieren",
     "loading": "Laden...",
     "noResults": "Keine Ergebnisse"
+  },
+  "dashboard": {
+    "recentOffers": "Letzte Angebote",
+    "recentOrders": "Letzte Bestellungen",
+    "integrations": "Integrationen",
+    "viewAll": "Alle ansehen",
+    "noActivity": "Noch keine Aktivität.",
+    "stats": {
+      "offerVolume": "Offenes Angebotsvolumen",
+      "openOffers": "Offene Angebote",
+      "orders": "Bestellungen",
+      "conversion": "Conversion-Rate"
+    },
+    "badge": {
+      "reserved": "Reserviert",
+      "converted": "Bestellt"
+    }
   }
 }
