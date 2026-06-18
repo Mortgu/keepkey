@@ -1,14 +1,14 @@
 import { PipelineContext } from "../pipeline.js";
 import { fetchOfferData, formatOfferData } from "./actions.js";
+import type { OfferContext } from "../../templates/offer-template-schema.js";
 
 export type OfferFetchData = Awaited<ReturnType<typeof fetchOfferData>>;
-export type OfferFormatedData = Awaited<ReturnType<typeof formatOfferData>>;
 
 export type OfferPipelineContext = PipelineContext & {
   offerId: string;
 
   fetchedData?: OfferFetchData;
-  formatedData?: OfferFormatedData;
+  formatedData?: OfferContext;
 
   version: number;
 

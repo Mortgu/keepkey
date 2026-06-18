@@ -73,6 +73,7 @@ const productsSchema = z.object({
 
 const flatRateSchema = z.object({
   id: z.string(),
+  quantity: z.number(),
   total_cents: z.number(),
   flatRate: z.object({
     id: z.string(),
