@@ -28,6 +28,9 @@ export const getTariffAction = (tariffId: string) =>
 export const getTariffHistoryAction = (productId: string, contractId: string) =>
     api<TariffHistory[]>(`/api/tariffs/history/${productId}/${contractId}`, {method: "GET"});
 
+export const getTariffDurationsAction = (productId: string, contractId: string) =>
+    api<number[]>(`/api/tariffs/durations/${productId}/${contractId}`, {method: "GET"});
+
 export const createTariffColumnAction = (tariffId: string, duration: number) =>
     api<Tariff>(`/api/tariffs/${tariffId}/column`, {
         method: "POST",

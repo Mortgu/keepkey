@@ -146,8 +146,8 @@ export default function TariffComponent(props: Props) {
     const cellMap = useMemo(() => buildCellMap(tariff.cells), [tariff.cells]);
 
     return (
-        <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
-            <div className="grid p-4 gap-2">
+        <div className="grid ">
+            <div className="grid gap-2">
                 <table className="w-full">
                     <thead>
                     <tr>

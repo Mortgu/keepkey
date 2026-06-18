@@ -375,3 +375,21 @@ export async function getTariffHistory(request: Request, response: Response, nex
         next(exception);
     }
 }
+
+export async function getTariffDurations(request: Request, response: Response, next: NextFunction) {
+    const productId = request.params.productId as string;
+    const contractId = request.params.contractId as string;
+
+    try {
+        const tariff = await prisma.tariff.findUnique({
+            where: {productId_contractId: {productId, contractId}},
+            select: {columns: {select: {duration: true}, orderBy: {createdAt: 'asc'}}},
+        });
+
+        if (!tariff) return response.status(200).json([]);
+        return response.status(200).json(tariff.columns.map(c => c.duration));
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}

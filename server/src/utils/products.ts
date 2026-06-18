@@ -49,9 +49,8 @@ export async function snapshotTariff(productId: string, contractId: string) {
 export default async function calculatePrice(props: PriceCalculatorProps): Promise<number> {
     const {productId, contractId, duration, quantity, customerId} = props;
 
-    const tariff = await prisma.tariff.findFirst({
-        where: {productId, contractId},
-        orderBy: {createdAt: "desc"},
+    const tariff = await prisma.tariff.findUnique({
+        where: {productId_contractId: {productId, contractId}},
         include: {
             rows: true,
             columns: true,

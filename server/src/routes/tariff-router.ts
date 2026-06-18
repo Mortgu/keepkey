@@ -7,6 +7,7 @@ import {
     deleteTariffRow,
     getProductTariffs,
     getTariffById,
+    getTariffDurations,
     getTariffHistory,
     getTariffPrice,
     getTariffs,
@@ -34,6 +35,9 @@ router.get('/tariff/:tariffId', getTariffById);
 
 /* [GET] /api/tariffs/history/:productId/:contractId */
 router.get('/history/:productId/:contractId', getTariffHistory);
+
+/* [GET] /api/tariffs/durations/:productId/:contractId */
+router.get('/durations/:productId/:contractId', getTariffDurations);
 
 /* [GET] /api/tariffs/:productId */
 router.get('/:productId', getProductTariffs);

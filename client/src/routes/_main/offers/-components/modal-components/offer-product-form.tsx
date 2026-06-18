@@ -1,17 +1,11 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Input, Button, Checkbox, Select } from "@/components";
 import type { CreateOfferPositionInput } from "@/types";
-import { useContractHook, useLocale, useProductHook } from "@/hooks";
+import { useContractHook, useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
-
-const DURATIONS: { value: 12 | 24 | 36; label: string }[] = [
-  { value: 12, label: "12 Monate" },
-  { value: 24, label: "24 Monate" },
-  { value: 36, label: "36 Monate" },
-];
 
 interface Props {
   onSave: (data: OfferProductInput) => void;
@@ -27,12 +21,23 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
   const [productId, setProductId] = useState(currentProduct?.productId ?? products[0]?.id ?? "");
   const [contractId, setContractId] = useState(currentProduct?.contractId ?? contracts[0]?.id ?? "");
 
-  const [duration_months, setDurationMonths] = useState<number>(currentProduct?.duration_months ?? 12);
+  const [duration_months, setDurationMonths] = useState<number>(currentProduct?.duration_months ?? 0);
   const [quantity, setQuantity] = useState<number>(currentProduct?.quantity ?? 1);
 
   const [optional, setOptional] = useState<boolean>(currentProduct?.optional ?? false);
 
   const [error, setError] = useState("");
+
+  const { durations } = useTariffDurationsHook(productId, contractId);
+
+  useEffect(() => {
+    if (durations.length > 0 && !durations.includes(duration_months)) {
+      setDurationMonths(durations[0]);
+    }
+    if (durations.length === 0) {
+      setDurationMonths(0);
+    }
+  }, [durations]);
 
   const handleSave = () => {
     if (!productId) {
@@ -41,6 +46,10 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
     }
     if (!contractId) {
       setError("Bitte einen Vertrag auswählen.");
+      return;
+    }
+    if (durations.length === 0) {
+      setError("Kein Tariff für dieses Produkt und diesen Vertrag konfiguriert.");
       return;
     }
     if (quantity < 1) {
@@ -75,10 +84,13 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
 
         <div className="flex-1 grid gap-1">
           <Select label="Laufzeit" value={duration_months} onChange={(e) =>
-            setDurationMonths(Number(e.target.value) as OfferProductInput["duration_months"])} className="bg-white">
-            {DURATIONS.map((d) => (
-              <option key={d.value} value={d.value}>
-                {d.label}
+            setDurationMonths(Number(e.target.value))} className="bg-white" disabled={durations.length === 0}>
+            {durations.length === 0 && (
+              <option value={0}>Kein Tariff konfiguriert</option>
+            )}
+            {durations.map((d) => (
+              <option key={d} value={d}>
+                {d} Monate
               </option>
             ))}
           </Select>

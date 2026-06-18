@@ -9,6 +9,7 @@ import {
     deleteTariffRowAction,
     getAllTariffsAction,
     getProductTariffsAction,
+    getTariffDurationsAction,
     getTariffHistoryAction,
     updateTariffCellAction,
     updateTariffColumnAction,
@@ -144,4 +145,14 @@ export const useTariffHistoryHook = (productId: string, contractId: string) => {
     });
 
     return {history, isPending, error};
+};
+
+export const useTariffDurationsHook = (productId: string, contractId: string) => {
+    const {data: durations = [], isPending, error} = useQuery({
+        queryKey: ["tariff-durations", productId, contractId],
+        queryFn: () => getTariffDurationsAction(productId, contractId),
+        enabled: !!productId && !!contractId,
+    });
+
+    return {durations, isPending, error};
 };
