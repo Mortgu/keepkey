@@ -17,11 +17,6 @@ export default function TariffCellComponent(props: Props) {
 
     const {updateCell} = useTariffHook();
 
-    console.log(cell)
-
-    // TEst
-    const [customerMode, setCustomerMode] = useState<boolean>(false);
-
     const handleBlur = async () => {
         await updateCell({
             tariffId: tariffId,

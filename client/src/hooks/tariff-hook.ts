@@ -20,6 +20,10 @@ export const useTariffHook = (productId?: string) => {
 
     const queryKey = productId ? ["tariffs", productId] : ["tariffs"];
 
+    const invalidateTariffs = () => {
+        queryClient.invalidateQueries({queryKey: ["tariffs"]});
+    };
+
     const invalidateAll = () => {
         queryClient.invalidateQueries({queryKey: ["tariffs"]});
         queryClient.invalidateQueries({queryKey: ["tariff-history"]});
@@ -45,40 +49,40 @@ export const useTariffHook = (productId?: string) => {
     const createTariffColumnMutation = useMutation({
         mutationFn: ({tariffId, duration}: { tariffId: string, duration: number }) =>
             createTariffColumnAction(tariffId, duration),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     })
 
     const deleteTariffColumnMutation = useMutation({
         mutationFn: ({tariffId, columnId}: { tariffId: string, columnId: string }) =>
             deleteTariffColumnAction(tariffId, columnId),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     });
 
     const updateTariffColumnMutation = useMutation({
         mutationFn: ({tariffId, columnId, duration}: { tariffId: string, columnId: string, duration: number }) =>
             updateTariffColumnAction(tariffId, columnId, duration),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     });
 
     const createTariffRowMutation = useMutation({
         mutationFn: ({tariffId, min_qty, max_qty}: {
             tariffId: string, min_qty: number, max_qty: number
         }) => createTariffRowAction(tariffId, min_qty, max_qty),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     });
 
     const deleteTariffRowMutation = useMutation({
         mutationFn: ({tariffId, rowId}: {
             tariffId: string, rowId: string
         }) => deleteTariffRowAction(tariffId, rowId),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     });
 
     const updateTariffRowMutation = useMutation({
         mutationFn: ({tariffId, rowId, min_qty, max_qty}: {
             tariffId: string, rowId: string, min_qty: number, max_qty: number
         }) => updateTariffRowAction(tariffId, rowId, min_qty, max_qty),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     });
 
     const updateTariffCellMutation = useMutation({
@@ -86,7 +90,7 @@ export const useTariffHook = (productId?: string) => {
             tariffId: string, cellId: string, default_price?: number, customer_price?: number
         }) =>
             updateTariffCellAction(tariffId, cellId, default_price, customer_price),
-        onSuccess: invalidateAll,
+        onSuccess: invalidateTariffs,
     })
 
     return {
@@ -132,11 +136,11 @@ export const useTariffHook = (productId?: string) => {
     };
 };
 
-export const useTariffHistoryHook = (tariffId: string) => {
+export const useTariffHistoryHook = (productId: string, contractId: string) => {
     const {data: history = [], isPending, error} = useQuery({
-        queryKey: ["tariff-history", tariffId],
-        queryFn: () => getTariffHistoryAction(tariffId),
-        enabled: !!tariffId,
+        queryKey: ["tariff-history", productId, contractId],
+        queryFn: () => getTariffHistoryAction(productId, contractId),
+        enabled: !!productId && !!contractId,
     });
 
     return {history, isPending, error};

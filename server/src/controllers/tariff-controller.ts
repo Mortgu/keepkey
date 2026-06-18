@@ -66,37 +66,41 @@ export async function getProductTariffs(request: Request, response: Response) {
     return response.status(200).json(tariff);
 }
 
-export async function createTariff(request: Request, response: Response) {
+export async function createTariff(request: Request, response: Response, next: NextFunction) {
     const {productId, contractId} = request.body;
 
-    await prisma.tariff.updateMany({
-        where: {
-            productId,
-            contractId
-        },
-        data: {
-            validTo: new Date()
-        }
-    });
+    try {
+        const existing = await prisma.tariff.findFirst({
+            where: {productId, contractId},
+        });
 
-    const tariff = await prisma.tariff.create({
-        data: {
-            productId,
-            contractId,
-            terms: [12, 24, 36],
+        if (existing) {
+            await snapshotTariff(productId, contractId);
+            await prisma.tariff.delete({where: {id: existing.id}});
         }
-    });
 
-    return response.status(201).json(tariff);
+        const tariff = await prisma.tariff.create({
+            data: {
+                productId,
+                contractId,
+            },
+        });
+
+        const result = await prisma.tariff.findUniqueOrThrow({
+            where: {id: tariff.id},
+            include: TARIFF_INCLUDE,
+        });
+
+        return response.status(201).json(result);
+    } catch (error) {
+        next(error);
+    }
 }
-
 
 export async function deleteTariff(request: Request, response: Response, next: NextFunction) {
     const tariffId = request.params.tariffId as string;
 
     try {
-
-
         await prisma.tariff.delete({
             where: {id: tariffId}
         });
@@ -175,8 +179,6 @@ export async function createTariffColumn(request: Request, response: Response, n
             include: TARIFF_INCLUDE,
         });
 
-        await snapshotTariff(tariffId);
-
         return response.status(201).json(updated);
     } catch (exception: any) {
         logger.error(exception);
@@ -192,8 +194,6 @@ export async function deleteTariffColumn(request: Request, response: Response, n
         const deletedColumn = await prisma.tariffColumn.delete({
             where: {id: columnId}
         });
-
-        await snapshotTariff(tariffId);
 
         return response.status(200).json({
             message: 'Column deleted successfully!', column: deletedColumn,
@@ -217,8 +217,6 @@ export async function updateTariffColumn(request: Request, response: Response, n
             }
         });
 
-        await snapshotTariff(tariffId);
-
         return response.status(200).json({
             message: 'Column updated successfully!', updated
         });
@@ -233,8 +231,6 @@ export async function createTariffRow(request: Request, response: Response, next
     const tariffId = request.params.tariffId as string;
 
     const {min_quantity, max_quantity} = request.body;
-
-    console.log("createTariffRow")
 
     try {
         const tariff = await prisma.tariff.findUniqueOrThrow({
@@ -264,14 +260,10 @@ export async function createTariffRow(request: Request, response: Response, next
             return r;
         });
 
-        console.log(row)
-
         const updated = await prisma.tariff.findUniqueOrThrow({
             where: {id: tariffId},
             include: TARIFF_INCLUDE,
         });
-
-        await snapshotTariff(tariffId);
 
         return response.status(201).json(updated);
     } catch (exception: any) {
@@ -288,8 +280,6 @@ export async function deleteTariffRow(request: Request, response: Response, next
         const deletedRow = await prisma.tariffRow.delete({
             where: {id: rowId},
         });
-
-        await snapshotTariff(tariffId);
 
         return response.status(201).json({
             message: "Successfully deleted row!", row: deletedRow,
@@ -314,8 +304,6 @@ export async function updateTariffRow(request: Request, response: Response, next
                 max_quantity: max_qty
             }
         });
-
-        await snapshotTariff(tariffId);
 
         return response.status(200).json({
             message: 'Row updated successfully!', updated
@@ -348,8 +336,6 @@ export async function updateTariffCell(request: Request, response: Response, nex
                 }
             });
 
-            await snapshotTariff(tariffId);
-
             return response.status(200).json({
                 message: 'Cell updated successfully!', updated
             });
@@ -363,8 +349,6 @@ export async function updateTariffCell(request: Request, response: Response, nex
                 }
             });
 
-            await snapshotTariff(tariffId);
-
             return response.status(200).json({
                 message: 'Cell updated successfully!', updated
             });
@@ -376,11 +360,12 @@ export async function updateTariffCell(request: Request, response: Response, nex
 }
 
 export async function getTariffHistory(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
+    const productId = request.params.productId as string;
+    const contractId = request.params.contractId as string;
 
     try {
         const history = await prisma.tariffHistory.findMany({
-            where: {tariffId},
+            where: {productId, contractId},
             orderBy: {version: 'desc'},
         });
 

@@ -360,7 +360,6 @@ export interface components {
             rows: components["schemas"]["TariffRow"][];
             columns: components["schemas"]["TariffColumn"][];
             cells: components["schemas"]["TariffCell"][];
-            history: components["schemas"]["TariffHistory"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -433,8 +432,8 @@ export interface components {
         };
         TariffHistory: {
             id: string;
-            tariff: components["schemas"]["Tariff"];
-            tariffId: string;
+            productId: string;
+            contractId: string;
             /** Format: int32 */
             version: number;
             snapshot: Record<string, never>;

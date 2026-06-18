@@ -1,9 +1,8 @@
-import {ChevronRight, Plus, Trash} from "lucide-react";
+import {Plus, Trash} from "lucide-react";
 import type {Tariff, TariffCell} from "@/types";
 import {useTariffHook} from "@/hooks";
 import {Button, Input} from "@/components";
 import {type ChangeEvent, useMemo, useState} from "react";
-import {formatDate} from "@/lib/format.ts";
 import {formatEur} from "@/utils/utils.ts";
 
 type Props = {
@@ -148,70 +147,50 @@ export default function TariffComponent(props: Props) {
 
     return (
         <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
-            <div className="flex items-center justify-between border-b border-(--border)">
-                <div onClick={() => setOpen(!open)}
-                     className="w-full flex items-center gap-2 py-2 px-5 hover:bg-(--page-bg) hover:cursor-pointer border-r border-(--border)">
-                    <ChevronRight className={open ? "size-4 rotate-90 transition-all" : "transition-all size-4"}/>
-                    <div>
-                        <h1>{tariff.id}</h1>
-                        <p className="text-sm">{formatDate(tariff.createdAt)} {formatDate(tariff.updatedAt)}</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 px-2">
-                    <Button onClick={() => deleteTariff({tariffId: tariff.id})}
-                            loading={deleteTariffPending}
-                            icon={<Trash className="size-4"/>}
-                            iconOnly variant="secondary" size="sm"/>
-                </div>
-            </div>
-
-            {open && (
-                <div className="grid p-4 gap-2">
-                    <table className="w-full border-collapse">
-                        <thead>
-                        <tr>
-                            <th className="text-left p-2"/>
-                            {tariff.columns.map(column => (
-                                <th key={column.id} className="p-2">
-                                    <ColumnHeader tariffId={tariff.id} columnId={column.id}
-                                                  duration={column.duration}/>
-                                </th>
-                            ))}
-                            <th className="p-1">
-                                <Button className="border-dashed" variant="secondary" size="xs"
-                                        onClick={() => createColumn({tariffId: tariff.id, duration: 1})}
-                                        icon={<Plus className="size-4"/>}/>
+            <div className="grid p-4 gap-2">
+                <table className="w-full">
+                    <thead>
+                    <tr>
+                        <th className="text-left p-2"/>
+                        {tariff.columns.map(column => (
+                            <th key={column.id} className="p-2">
+                                <ColumnHeader tariffId={tariff.id} columnId={column.id}
+                                              duration={column.duration}/>
                             </th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {tariff.rows.map(row => (
-                            <tr key={row.id}>
-                                <td className="p-2">
-                                    <RowLabel tariffId={tariff.id} rowId={row.id}
-                                              minQty={row.min_quantity} maxQty={row.max_quantity}/>
-                                </td>
-                                {tariff.columns.map(column => {
-                                    const cell = cellMap.get(`${row.id}:${column.id}`);
-                                    return (
-                                        <td key={column.id} className="p-2">
-                                            {cell && <CellInput tariffId={tariff.id} cell={cell}/>}
-                                        </td>
-                                    );
-                                })}
-                                <td/>
-                            </tr>
                         ))}
-                        </tbody>
-                    </table>
+                        <th className="p-1">
+                            <Button className="border-dashed" variant="secondary" size="xs"
+                                    onClick={() => createColumn({tariffId: tariff.id, duration: 1})}
+                                    icon={<Plus className="size-4"/>}/>
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {tariff.rows.map(row => (
+                        <tr key={row.id}>
+                            <td className="p-2">
+                                <RowLabel tariffId={tariff.id} rowId={row.id}
+                                          minQty={row.min_quantity} maxQty={row.max_quantity}/>
+                            </td>
+                            {tariff.columns.map(column => {
+                                const cell = cellMap.get(`${row.id}:${column.id}`);
+                                return (
+                                    <td key={column.id} className="p-2">
+                                        {cell && <CellInput tariffId={tariff.id} cell={cell}/>}
+                                    </td>
+                                );
+                            })}
+                            <td/>
+                        </tr>
+                    ))}
+                    </tbody>
+                </table>
 
-                    <Button className="border-dashed h-full w-full" variant="secondary" size="sm"
-                            onClick={() => createRow({tariffId: tariff.id, min_qty: 1, max_qty: 100})}>
-                        Create Row
-                    </Button>
-                </div>
-            )}
+                <Button className="border-dashed h-full w-full" variant="secondary" size="sm"
+                        onClick={() => createRow({tariffId: tariff.id, min_qty: 1, max_qty: 100})}>
+                    Create Row
+                </Button>
+            </div>
         </div>
     );
 }

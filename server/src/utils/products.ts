@@ -2,16 +2,14 @@ import {prisma} from "../lib/prismaClient.js";
 
 const TARIFF_SNAPSHOT_INCLUDE = {
     rows: {
-        orderBy: {createdAt: 'desc'},
+        orderBy: {createdAt: 'asc'},
     },
     columns: {
-        orderBy: {createdAt: 'desc'},
+        orderBy: {createdAt: 'asc'},
     },
     cells: {
         orderBy: {createdAt: 'asc'},
         include: {
-            column: true,
-            row: true,
             default_cells: true,
             customer_cells: true,
         },
@@ -26,19 +24,22 @@ interface PriceCalculatorProps {
     customerId?: string;
 }
 
-export async function snapshotTariff(tariffId: string) {
-    const tariff = await prisma.tariff.findUniqueOrThrow({
-        where: {id: tariffId},
+export async function snapshotTariff(productId: string, contractId: string) {
+    const tariff = await prisma.tariff.findFirst({
+        where: {productId, contractId},
         include: TARIFF_SNAPSHOT_INCLUDE,
     });
 
+    if (!tariff) return;
+
     const versionCount = await prisma.tariffHistory.count({
-        where: {tariffId},
+        where: {productId, contractId},
     });
 
     await prisma.tariffHistory.create({
         data: {
-            tariffId,
+            productId,
+            contractId,
             version: versionCount + 1,
             snapshot: tariff as any,
         },

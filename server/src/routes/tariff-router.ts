@@ -32,8 +32,8 @@ router.get('/', getTariffs);
 /* [GET] /api/tariffs/tariff/:tariffId */
 router.get('/tariff/:tariffId', getTariffById);
 
-/* [GET] /api/tariffs/tariff/:tariffId/history */
-router.get('/tariff/:tariffId/history', getTariffHistory);
+/* [GET] /api/tariffs/history/:productId/:contractId */
+router.get('/history/:productId/:contractId', getTariffHistory);
 
 /* [GET] /api/tariffs/:productId */
 router.get('/:productId', getProductTariffs);

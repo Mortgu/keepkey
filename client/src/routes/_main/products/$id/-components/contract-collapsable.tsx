@@ -12,8 +12,8 @@ type Props = {
     contract: Contract;
 }
 
-function TariffHistoryList({tariffId}: { tariffId: string }) {
-    const {history, isPending} = useTariffHistoryHook(tariffId);
+function TariffHistoryList({productId, contractId}: { productId: string; contractId: string }) {
+    const {history, isPending} = useTariffHistoryHook(productId, contractId);
     const [expandedVersion, setExpandedVersion] = useState<number | null>(null);
 
     if (isPending) return <p className="text-sm text-gray-500">Laden...</p>;
@@ -37,40 +37,33 @@ function TariffHistoryList({tariffId}: { tariffId: string }) {
 
                     {expandedVersion === entry.version && entry.snapshot && (
                         <div className="border-t border-(--border) p-3">
-                            <div className="grid gap-2">
-                                <div className="flex gap-2 text-left">
-                                    <div className="flex-1 grid">
-                                        <div/>
-                                        {entry.snapshot.rows?.map((row) => (
-                                            <div key={row.id}
-                                                 className="py-1 text-sm">{row.min_quantity} - {row.max_quantity ?? "∞"}</div>
-                                        ))}
-                                    </div>
-
-                                    <div className="flex-3 flex flex-wrap items-center gap-2">
-                                        {entry.snapshot.columns?.map((column) => (
-                                            <div key={column.id} className="flex-1 grid gap-2">
-                                                <div className="text-center text-sm font-medium rounded-md px-3">
-                                                    {column.duration} Monate
-                                                </div>
-                                                {entry.snapshot.cells
-                                                    ?.filter(cell => cell.columnId === column.id)
-                                                    .sort((a, b) => {
-                                                        const rowA = entry.snapshot.rows?.find(r => r.id === a.rowId);
-                                                        const rowB = entry.snapshot.rows?.find(r => r.id === b.rowId);
-                                                        return (rowA?.min_quantity ?? 0) - (rowB?.min_quantity ?? 0);
-                                                    })
-                                                    .map(cell => (
-                                                        <div key={cell.id}
-                                                             className="text-center text-sm rounded-md px-3 py-1 bg-(--page-bg)">
-                                                            {cell.default_cells?.[0]?.price ?? "-"}
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
+                            <table className="w-full border-collapse text-sm">
+                                <thead>
+                                <tr>
+                                    <th className="text-left p-1"/>
+                                    {entry.snapshot.columns?.map(column => (
+                                        <th key={column.id} className="p-1 text-center">{column.duration} Monate</th>
+                                    ))}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {entry.snapshot.rows?.map(row => (
+                                    <tr key={row.id}>
+                                        <td className="p-1">{row.min_quantity} - {row.max_quantity ?? "∞"}</td>
+                                        {entry.snapshot.columns?.map(column => {
+                                            const cell = entry.snapshot.cells?.find(
+                                                c => c.rowId === row.id && c.columnId === column.id
+                                            );
+                                            return (
+                                                <td key={column.id} className="p-1 text-center bg-(--page-bg) rounded">
+                                                    {cell?.default_cells?.[0]?.price ?? "-"}
+                                                </td>
+                                            );
+                                        })}
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
                 </div>
@@ -81,7 +74,6 @@ function TariffHistoryList({tariffId}: { tariffId: string }) {
 
 export default function ContractCollapsable(props: Props) {
     const locale = useLocale();
-
     const {product, contract} = props;
 
     const [modalOpen, setModalOpen] = useState<boolean>(false);
@@ -89,7 +81,7 @@ export default function ContractCollapsable(props: Props) {
 
     const {tariffs, createTariff} = useTariffHook(product.id);
 
-    const matches = tariffs.filter(tariff => tariff.contractId === contract.id);
+    const tariff = tariffs.find(t => t.contractId === contract.id);
 
     return (
         <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
@@ -109,14 +101,9 @@ export default function ContractCollapsable(props: Props) {
                 </div>
             </div>
 
-            {modalOpen && (
+            {modalOpen && tariff && (
                 <div className="w-full grid gap-2 p-4">
-                    {matches.map((tariff) => (
-                        <TariffComponent
-                            key={tariff.id}
-                            tariff={tariff}
-                        />
-                    ))}
+                    <TariffComponent key={tariff.id} tariff={tariff}/>
                 </div>
             )}
 
@@ -124,14 +111,7 @@ export default function ContractCollapsable(props: Props) {
                 <Drawer.Header eyebrow="" title="History"
                                subtitle="Vergangene Preistabellen"/>
                 <Drawer.Body>
-                    <div className="grid gap-4">
-                        {matches.map((tariff) => (
-                            <div key={tariff.id}>
-                                <h2 className="font-medium mb-2">Tariff {formatDate(tariff.createdAt)}</h2>
-                                <TariffHistoryList tariffId={tariff.id}/>
-                            </div>
-                        ))}
-                    </div>
+                    <TariffHistoryList productId={product.id} contractId={contract.id}/>
                 </Drawer.Body>
             </Drawer>
         </div>

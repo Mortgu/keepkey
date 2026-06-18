@@ -10,7 +10,6 @@ model Tariff {
   rows    TariffRow[]
   columns TariffColumn[]
   cells   TariffCell[]
-  history TariffHistory[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -21,7 +20,7 @@ model Tariff {
 model TariffRow {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id])
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
   min_quantity Int
@@ -38,7 +37,7 @@ model TariffRow {
 model TariffColumn {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id])
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
   duration Int
@@ -107,14 +106,14 @@ model TariffCellCustomer {
 model TariffHistory {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
+  productId String
+  contractId String
 
   version  Int
   snapshot Json
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  @@unique([tariffId, version])
+  @@unique([productId, contractId, version])
   @@map("tariff_history")
 }
