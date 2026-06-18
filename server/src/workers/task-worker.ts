@@ -49,6 +49,7 @@ export default function registerTaskWorker() {
                     data: {
                         displayName: pipeline.displayName,
                         status: "GENERATED",
+                        path: pipeline.path,
                     }
                 })
 

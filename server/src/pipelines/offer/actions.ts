@@ -289,4 +289,8 @@ export async function writeAction(context: OfferPipelineContext) {
     fs.writeFile(docxPath, docxBuffer!),
     fs.writeFile(pdfPath, pdfBuffer!),
   ]);
+
+  // Expose the canonical document path (docx matches the document's format)
+  // so the worker can persist it for downloads.
+  context.path = docxPath;
 }

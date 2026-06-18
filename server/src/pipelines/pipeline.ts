@@ -21,6 +21,9 @@ export interface PipelineContext {
   pdfBuffer?: Buffer | null;
 
   displayName?: string;
+
+  /** Filesystem path of the generated document that should be persisted/served. */
+  path?: string;
 }
 
 export type PipelineStage<T extends PipelineContext = PipelineContext> = {

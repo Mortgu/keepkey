@@ -3,6 +3,7 @@ import { useDocumentTask, useOfferHook } from "@/hooks";
 import { useEffect, useState } from "react";
 import { Download, File, Loader, Trash, UploadCloud } from "lucide-react";
 import { Button, Input } from "@/components";
+import { BASE_URL } from "@/lib/api-client";
 
 type Props = {
     document: Document;
@@ -65,7 +66,7 @@ export function Document({ offer, document }: Props) {
             <div className="flex items-center gap-2">
                 {status === "GENERATED" && (
                     <a
-                        href={`/api/offers/${offer.id}/documents/${document.id}/${document.format.toLowerCase()}`}
+                        href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/${document.format.toLowerCase()}`}
                         download
                     >
                         <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly />

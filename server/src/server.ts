@@ -17,7 +17,7 @@ import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
-import {initNextcloud, getNextcloudInitError} from "./lib/nextcloud.js";
+import {getNextcloudInitError, initNextcloud} from "./lib/nextcloud.js";
 
 const options = {
     definition: {
