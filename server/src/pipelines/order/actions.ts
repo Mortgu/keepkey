@@ -101,7 +101,9 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
                 price: {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(
-                        item.total_cents / item.quantity / item.duration_months / 100,
+                        item.quantity && item.duration_months
+                            ? item.total_cents / item.quantity / item.duration_months / 100
+                            : 0,
                     ),
                 },
             })),
