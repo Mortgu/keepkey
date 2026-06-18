@@ -5,8 +5,8 @@ import {
     getNextcloudInitError,
     isNextcloudAvailable,
     isNextcloudConfigured,
-} from "../lib/nextcloud.js";
-import env from "../lib/env.js";
+} from "../../lib/nextcloud.js";
+import env from "../../lib/env.js";
 
 const ALL_DIRECTORIES = [
     { path: env.NEXTCLOUD_OFFER_PDF_PATH, label: "offer_pdf" },

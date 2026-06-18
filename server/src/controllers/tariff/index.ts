@@ -1,7 +1,7 @@
 import {NextFunction, Request, Response} from "express";
-import {prisma} from "../lib/prismaClient.js";
-import calculatePrice, {snapshotTariff} from "../utils/products.js";
-import logger from "../middlewares/logger.js";
+import {prisma} from "../../lib/prismaClient.js";
+import calculatePrice, {snapshotTariff} from "../../utils/products.js";
+import logger from "../../middlewares/logger.js";
 
 const TARIFF_INCLUDE = {
     contract: {

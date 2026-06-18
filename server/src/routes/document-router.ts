@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { deleteDocument, renameDocument } from "../controllers/documents-controller.js";
+import { deleteDocument, renameDocument } from "../controllers/index.js";
 import { validate } from "../middlewares/validate.js";
 import { renameDocumentSchema } from "../schemas/document-schemas.js";
 

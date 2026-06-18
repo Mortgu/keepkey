@@ -4,7 +4,7 @@ import {
   deleteSupplier,
   getSuppliers,
   updateSupplier,
-} from "../controllers/supplier-controller.js";
+} from "../controllers/index.js";
 import { validate } from "../middlewares/validate.js";
 import {
   createSupplierSchema,

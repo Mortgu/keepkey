@@ -5,7 +5,7 @@ import {
   getFlatRate,
   getFlatRates,
   updateFlatRate,
-} from "../controllers/flatrate-controller.js";
+} from "../controllers/index.js";
 import { validate } from "../middlewares/validate.js";
 import {
   createFlatRateSchema,

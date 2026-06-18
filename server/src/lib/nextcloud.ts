@@ -1,7 +1,7 @@
 import {createClient, FileStat, type WebDAVClient} from "webdav";
 import env from "./env.js";
 import logger from "../middlewares/logger.js";
-import {AppException} from "../exceptions/exceptions.js";
+import {AppException} from "./exceptions.js";
 
 let client: WebDAVClient | null = null;
 export let isNextcloudAvailable = false;

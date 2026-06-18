@@ -14,7 +14,7 @@ import {
     updateTariffCell,
     updateTariffColumn,
     updateTariffRow,
-} from "../controllers/tariff-controller.js";
+} from "../controllers/index.js";
 import {
     createTariffColumnSchema,
     createTariffRowSchema,

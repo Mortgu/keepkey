@@ -8,7 +8,7 @@ import {PrismaClientKnownRequestError} from "@prisma/client/runtime/client";
 import {z} from "zod";
 import {prisma} from "../../lib/prismaClient.js";
 import {OfferFetchData, OfferPipelineContext} from "./context.js";
-import {type OfferContext, offerSchema} from "../../templates/offer-template-schema.js";
+import {type OfferContext, offerSchema} from "../../schemas/offer-template-schema.js";
 import logger from "../../middlewares/logger.js";
 import {PipelineStageError} from "../pipeline.js";
 import {pickTranslation} from "../../utils/i18n.js";
@@ -267,10 +267,11 @@ const flattenTags = (tags: Record<string, unknown>, prefix = ""): string[] => {
     return out;
 };
 
-const flattenSchema = (schema: z.ZodTypeAny, prefix = ""): string[] => {
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const flattenSchema = (schema: any, prefix = ""): string[] => {
     if (schema instanceof z.ZodObject) {
-        return Object.entries(schema.shape).flatMap(([k, v]) =>
-            flattenSchema(v as z.ZodTypeAny, prefix ? `${prefix}.${k}` : k)
+        return Object.entries(schema.shape).flatMap(([k, v]: [string, any]) =>
+            flattenSchema(v, prefix ? `${prefix}.${k}` : k)
         );
     }
     if (schema instanceof z.ZodArray) {
@@ -284,6 +285,7 @@ const flattenSchema = (schema: z.ZodTypeAny, prefix = ""): string[] => {
 
 export async function generateAction(context: OfferPipelineContext) {
     const {formatedData} = context;
+    // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
     const iModule = InspectModule();
 
     const content = await fs.readFile(

@@ -1,5 +1,5 @@
 import {NextFunction, Request, Response} from "express";
-import {prisma} from "../lib/prismaClient.js";
+import {prisma} from "../../lib/prismaClient.js";
 
 export const getFlatRates = async (request: Request, response: Response) => {
     const flatrates = await prisma.flatRate.findMany({

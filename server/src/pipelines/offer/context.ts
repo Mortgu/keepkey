@@ -1,6 +1,6 @@
 import { PipelineContext } from "../pipeline.js";
 import { fetchOfferData, formatOfferData } from "./actions.js";
-import type { OfferContext } from "../../templates/offer-template-schema.js";
+import type { OfferContext } from "../../schemas/offer-template-schema.js";
 
 export type OfferFetchData = Awaited<ReturnType<typeof fetchOfferData>>;
 

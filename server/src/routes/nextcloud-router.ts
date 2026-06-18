@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {getCloudStatus, getFilesById, getOfferFileById, getOfferFiles, getOrderFileById} from "../controllers/nextcloud-controller.js";
+import {getCloudStatus, getFilesById, getOfferFileById, getOfferFiles, getOrderFileById} from "../controllers/index.js";
 
 const router = Router();
 
