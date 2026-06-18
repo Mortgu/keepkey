@@ -10,6 +10,7 @@ model Tariff {
   rows    TariffRow[]
   columns TariffColumn[]
   cells   TariffCell[]
+  history TariffHistory[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -101,4 +102,19 @@ model TariffCellCustomer {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@map("tariff_cell_customer")
+}
+
+model TariffHistory {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
+
+  version  Int
+  snapshot Json
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([tariffId, version])
+  @@map("tariff_history")
 }

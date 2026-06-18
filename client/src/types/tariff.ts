@@ -9,6 +9,9 @@ export type TariffCell = components["schemas"]["TariffCell"];
 export type TariffCellDefault = components["schemas"]["TariffCellDefault"];
 export type TariffCellCustomer = components["schemas"]["TariffCellCustomer"];
 
+export type TariffHistoryBase = components["schemas"]["TariffHistory"];
+export type TariffHistory = Omit<TariffHistoryBase, "snapshot"> & { snapshot: Tariff };
+
 export type CreateTariffInput = Omit<Tariff, "id">;
 export type UpdateTariffInput = Partial<CreateTariffInput>;
 

@@ -920,6 +920,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffCell"
+        history:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffHistory"
         createdAt:
           type: string
           format: date-time
@@ -935,6 +939,7 @@ components:
         - rows
         - columns
         - cells
+        - history
         - createdAt
         - updatedAt
     TariffRow:
@@ -1099,6 +1104,30 @@ components:
         - price
         - createdAt
         - updatedAt
+    TariffHistory:
+      type: object
+      properties:
+        id:
+          type: string
+        tariff:
+          $ref: "#/components/schemas/Tariff"
+        tariffId:
+          type: string
+        version:
+          type: integer
+          format: int32
+        snapshot:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - tariff
+        - tariffId
+        - version
+        - snapshot
+        - createdAt
     Task:
       type: object
       properties:

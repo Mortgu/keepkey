@@ -1,11 +1,48 @@
 import {prisma} from "../lib/prismaClient.js";
 
+const TARIFF_SNAPSHOT_INCLUDE = {
+    rows: {
+        orderBy: {createdAt: 'desc'},
+    },
+    columns: {
+        orderBy: {createdAt: 'desc'},
+    },
+    cells: {
+        orderBy: {createdAt: 'asc'},
+        include: {
+            column: true,
+            row: true,
+            default_cells: true,
+            customer_cells: true,
+        },
+    },
+} as const;
+
 interface PriceCalculatorProps {
     productId: string;
     contractId: string;
     duration: number;
     quantity: number;
     customerId?: string;
+}
+
+export async function snapshotTariff(tariffId: string) {
+    const tariff = await prisma.tariff.findUniqueOrThrow({
+        where: {id: tariffId},
+        include: TARIFF_SNAPSHOT_INCLUDE,
+    });
+
+    const versionCount = await prisma.tariffHistory.count({
+        where: {tariffId},
+    });
+
+    await prisma.tariffHistory.create({
+        data: {
+            tariffId,
+            version: versionCount + 1,
+            snapshot: tariff as any,
+        },
+    });
 }
 
 export default async function calculatePrice(props: PriceCalculatorProps): Promise<number> {

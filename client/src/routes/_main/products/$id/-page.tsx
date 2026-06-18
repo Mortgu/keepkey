@@ -1,22 +1,12 @@
-import {useState} from "react";
 import {useParams} from "@tanstack/react-router";
-import type {Customer, Product} from "@/types";
+import type {Product} from "@/types";
 import {localized} from "@/lib/i18n-content";
-import {SegmentedToggle, Select} from "@/components";
-import {useContractHook, useCustomerHook, useLocale, useProductHook,} from "@/hooks";
+import {useContractHook, useLocale, useProductHook,} from "@/hooks";
 import ContractCollapsable from "@/routes/_main/products/$id/-components/contract-collapsable.tsx";
-
-export type PricingMode = "customer" | "default";
-
-const DEFAULT_MODE_OPTIONS: Array<{ value: PricingMode; label: string }> = [
-    {value: "default", label: "Standardpreise"},
-    {value: "customer", label: "Kundenpreise"},
-];
 
 export function ProductDetailContainer() {
     const params = useParams({from: "/_main/products/$id/"});
 
-    const {customers} = useCustomerHook();
     const {getProduct} = useProductHook();
 
     const {
@@ -34,28 +24,18 @@ export function ProductDetailContainer() {
     }
 
     return (
-        <ProductDetailPage
-            key={product.id}
-            product={product}
-            customers={customers}
-        />
+        <ProductDetailPage key={product.id} product={product}/>
     );
 }
 
 interface ProductDetailPageProps {
-    customers: Array<Customer>;
     product: Product;
 }
 
-export function ProductDetailPage({customers, product}: ProductDetailPageProps) {
+export function ProductDetailPage({product}: ProductDetailPageProps) {
     const locale = useLocale();
 
-    const [pricingMode, setPricingMode] = useState<PricingMode>("default");
-    const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-
-
     const {contracts} = useContractHook();
-
 
     return (
         <div className="grid gap-5">
@@ -72,36 +52,12 @@ export function ProductDetailPage({customers, product}: ProductDetailPageProps) 
                 </div>
             </div>
 
-            <section className="flex items-center justify-between rounded-md gap-4">
-                <SegmentedToggle
-                    aria-label="Preismodus"
-                    options={DEFAULT_MODE_OPTIONS}
-                    value={pricingMode}
-                    onChange={(val) => {
-                        setPricingMode(val)
-                        setSelectedCustomer(null)
-                    }}
-                />
-
-                {pricingMode === "customer" && (
-                    <Select onChange={(e) => setSelectedCustomer(customers.find(c => c.id === e.target.value) ?? null)}>
-                        <option value="">Select customer...</option>
-                        {customers.map((customer) => (
-                            <option key={customer.id} value={customer.id}>
-                                {customer.companyName}
-                            </option>
-                        ))}
-                    </Select>
-                )}
-            </section>
-
             <div className="grid gap-4">
                 {contracts.map((contract) => (
                     <ContractCollapsable
                         key={contract.id}
                         product={product}
                         contract={contract}
-                        customer={selectedCustomer}
                     />
                 ))}
             </div>
