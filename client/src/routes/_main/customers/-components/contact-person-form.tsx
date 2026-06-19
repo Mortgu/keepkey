@@ -1,9 +1,9 @@
-import { type SyntheticEvent } from "react";
 import { z } from "zod";
-
-import { Button, Input } from "@/components";
-import type { ContactPerson, CreateContactPersonInput } from "@/types";
 import { useForm } from "@tanstack/react-form";
+import type {SyntheticEvent} from "react";
+
+import type { ContactPerson, CreateContactPersonInput } from "@/types";
+import { Button, Input } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 const contactPersonSchema = z.object({

@@ -1,7 +1,7 @@
-import type { Document, DocumentStatus, Offer } from "@/types";
-import { useDocumentTask, useOfferHook } from "@/hooks";
 import { useEffect, useState } from "react";
 import { Download, File, Loader, Trash, UploadCloud } from "lucide-react";
+import type { Document, DocumentStatus, Offer } from "@/types";
+import { useDocumentTask, useOfferHook } from "@/hooks";
 import { Button, Input } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 

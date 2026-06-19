@@ -1,9 +1,9 @@
+import type {Tariff, TariffCell, TariffHistory, TariffRow} from "@/types";
 import {api} from "@/lib/api-client";
 
-import type {Tariff, TariffCell, TariffHistory, TariffRow} from "@/types";
 
 export const getAllTariffsAction = () =>
-    api<Tariff[]>("/api/tariffs", {method: "GET"});
+    api<Array<Tariff>>("/api/tariffs", {method: "GET"});
 
 export const createTariffAction = (productId: string, contractId: string) =>
     api<Tariff>(`/api/tariffs/`, {
@@ -20,16 +20,16 @@ export const deleteTariffAction = (tariffId: string) =>
     });
 
 export const getProductTariffsAction = (productId: string) =>
-    api<Tariff[]>(`/api/tariffs/${productId}`, {method: "GET"});
+    api<Array<Tariff>>(`/api/tariffs/${productId}`, {method: "GET"});
 
 export const getTariffAction = (tariffId: string) =>
     api<Tariff>(`/api/tariffs/tariff/${tariffId}`, {method: "GET"});
 
 export const getTariffHistoryAction = (productId: string, contractId: string) =>
-    api<TariffHistory[]>(`/api/tariffs/history/${productId}/${contractId}`, {method: "GET"});
+    api<Array<TariffHistory>>(`/api/tariffs/history/${productId}/${contractId}`, {method: "GET"});
 
 export const getTariffDurationsAction = (productId: string, contractId: string) =>
-    api<number[]>(`/api/tariffs/durations/${productId}/${contractId}`, {method: "GET"});
+    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, {method: "GET"});
 
 export const createTariffColumnAction = (tariffId: string, duration: number) =>
     api<Tariff>(`/api/tariffs/${tariffId}/column`, {

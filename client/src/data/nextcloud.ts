@@ -15,7 +15,7 @@ export type NextcloudFileMetadata = {
 export type FindFilesByIdResult = {
     id: string;
     found: boolean;
-    files: Record<string, NextcloudFileMetadata[]>;
+    files: Record<string, Array<NextcloudFileMetadata>>;
 };
 
 export const getNextcloudStatusAction = () =>

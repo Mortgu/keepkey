@@ -1,15 +1,16 @@
 import {Plus, Trash} from "lucide-react";
+import { useMemo, useState} from "react";
+import type {ChangeEvent} from "react";
 import type {Tariff, TariffCell} from "@/types";
 import {useTariffHook} from "@/hooks";
 import {Button, Input} from "@/components";
-import {type ChangeEvent, useMemo, useState} from "react";
 import {formatEur} from "@/utils/utils.ts";
 
 type Props = {
     tariff: Tariff;
 };
 
-function buildCellMap(cells: TariffCell[]): Map<string, TariffCell> {
+function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
     const map = new Map<string, TariffCell>();
     for (const cell of cells) {
         map.set(`${cell.rowId}:${cell.columnId}`, cell);

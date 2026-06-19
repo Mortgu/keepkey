@@ -1,8 +1,8 @@
-import { useEffect, useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import { XIcon } from "lucide-react";
 import { tv } from "tailwind-variants";
+import type { DrawerBodyProps, DrawerFooterProps, DrawerHeaderProps, DrawerProps } from "./drawer-types";
 import { Button } from "@/components";
-import type { DrawerProps, DrawerHeaderProps, DrawerBodyProps, DrawerFooterProps } from "./drawer-types";
 
 const scrimStyles = tv({
     base: [

@@ -1,6 +1,6 @@
+import {LogOut} from 'lucide-react';
 import {Button} from '@/components'
 import {useAuth} from '@/context/auth';
-import {LogOut} from 'lucide-react';
 
 export default function SettingsPage() {
     const {logout} = useAuth();

@@ -1,6 +1,7 @@
+import { useState} from "react";
+import type {ChangeEvent} from "react";
 import type {TariffCellDefault} from "@/types";
 import {Input} from "@/components";
-import {type ChangeEvent, useState} from "react";
 import {useTariffHook} from "@/hooks";
 import {formatEur} from "@/utils/utils.ts";
 

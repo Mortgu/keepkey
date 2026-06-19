@@ -1,14 +1,14 @@
 import {useForm} from "@tanstack/react-form";
+import type {z} from 'zod';
 import type {CreateOfferFlatRatesInput, CreateOfferPositionInput} from "@/types";
 import type {ZodObject, ZodRawShape} from "better-auth";
-import {z} from 'zod';
 
 type Props<T extends ZodRawShape> = {
     schema: ZodObject<T>;
     defaultValues: z.output<ZodObject<T>>,
 
-    offerPositions: CreateOfferPositionInput[];
-    offerFlatRates: CreateOfferFlatRatesInput[];
+    offerPositions: Array<CreateOfferPositionInput>;
+    offerFlatRates: Array<CreateOfferFlatRatesInput>;
 };
 
 export default function useOfferCreateForm<T extends ZodRawShape>({
@@ -17,7 +17,7 @@ export default function useOfferCreateForm<T extends ZodRawShape>({
                                                                       offerPositions,
                                                                       offerFlatRates
                                                                   }: Props<T>) {
-    //const { createOffer, isCreatingOffer, errorCreatingOffer } = useOfferHook();
+    // const { createOffer, isCreatingOffer, errorCreatingOffer } = useOfferHook();
 
     return useForm({
         defaultValues: defaultValues,
@@ -27,7 +27,7 @@ export default function useOfferCreateForm<T extends ZodRawShape>({
         },
         onSubmit: async ({value}) => {
             console.log({offer: value, positions: offerPositions, flatRates: offerFlatRates});
-            /*await createOffer({
+            /* await createOffer({
                 offer: value as CreateOfferInput,
                 positions: offerPositions,
                 flatRates: offerFlatRates,

@@ -1,7 +1,7 @@
 import {useState} from "react";
 import {ChevronRight, Plus, UndoDot} from "lucide-react";
-import {Button, Drawer} from "@/components";
 import type {Contract, Product, TariffHistory} from "@/types";
+import {Button, Drawer} from "@/components";
 import {localized} from "@/lib/i18n-content.ts";
 import {useLocale, useTariffHistoryHook, useTariffHook} from "@/hooks";
 import TariffComponent from "@/routes/_main/products/$id/-components/tariff-component.tsx";

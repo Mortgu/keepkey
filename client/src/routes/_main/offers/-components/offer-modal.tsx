@@ -157,15 +157,15 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
         if (isEdit) {
           await updateOffer({
             id: currentOffer.id,
-            offer: { ...value, id: currentOffer!.id } as UpdateOfferInput,
-            positions: offerProducts as UpdateOfferPositionInput[],
-            flatRates: offerFlatRates as UpdateOfferFlatRatesInput[],
+            offer: { ...value, id: currentOffer.id } as UpdateOfferInput,
+            positions: offerProducts,
+            flatRates: offerFlatRates,
           });
         } else {
           await createOffer({
             offer: value as CreateOfferInput,
-            positions: offerProducts as CreateOfferPositionInput[],
-            flatRates: offerFlatRates as CreateOfferFlatRatesInput[],
+            positions: offerProducts as Array<CreateOfferPositionInput>,
+            flatRates: offerFlatRates,
           });
         }
         onClose();
@@ -174,8 +174,8 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
   });
 
   const handleFormSubmit = (e: {
-    preventDefault(): void;
-    stopPropagation(): void;
+    preventDefault: () => void;
+    stopPropagation: () => void;
   }) => {
     e.preventDefault();
     e.stopPropagation();
@@ -216,7 +216,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                   <Select
                     label="Kunde"
                     error={getFormError(field.state.meta.errors)}
-                    value={field.state.value as string}
+                    value={field.state.value}
                     onChange={(e) => {
                       const newCustomerId = e.target.value;
                       field.handleChange(newCustomerId);
@@ -256,7 +256,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                       return (
                         <Select
                           label="Ansprechpartner Kunde"
-                          value={field.state.value as string}
+                          value={field.state.value}
                           error={getFormError(field.state.meta.errors)}
                           onChange={(e) => field.handleChange(e.target.value)}
                           disabled={!customerId}
@@ -283,7 +283,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                 <div className="flex-1">
                   <Select
                     label="Unser Ansprechpartner"
-                    value={field.state.value as string}
+                    value={field.state.value}
                     error={getFormError(field.state.meta.errors)}
                     onChange={(e) => field.handleChange(e.target.value)}
                   >
@@ -306,7 +306,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                 <div className="flex-1 grid gap-2 items-center">
                   <Input
                     label="AG-Nr."
-                    value={field.state.value as string}
+                    value={field.state.value}
                     warning={
                       quoteIdWarning ?? getFormError(field.state.meta.errors)
                     }
@@ -315,7 +315,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                       field.handleChange(e.target.value);
                       setQuoteIdWarning(undefined);
                     }}
-                    onBlur={() => checkQuoteId(field.state.value as string)}
+                    onBlur={() => checkQuoteId(field.state.value)}
                   />
                 </div>
               )}
@@ -351,7 +351,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                     size="sm"
                     placeholder="Zahlungsbedingung..."
                     error={getFormError(field.state.meta.errors)}
-                    value={field.state.value as string}
+                    value={field.state.value}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
                 </div>

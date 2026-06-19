@@ -1,4 +1,3 @@
-import type {ReactNode} from "react";
 import {useState} from "react";
 import {
     ChevronDown,
@@ -16,6 +15,7 @@ import {
 import {useTranslation} from "react-i18next";
 import {tv} from "tailwind-variants";
 import {NavLink} from "./nav-link.js";
+import type {ReactNode} from "react";
 import {DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle,} from "@/components";
 import {useAuth} from "@/context/auth";
 

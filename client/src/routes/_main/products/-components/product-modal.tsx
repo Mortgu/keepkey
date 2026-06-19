@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
+import { useState } from "react";
 import type {
   CreateProductInput,
   Language,
@@ -13,7 +14,6 @@ import {
   ModalDialog,
   SegmentedLanguageToggle,
 } from "@/components";
-import { useState } from "react";
 import { getFormError } from "@/lib/utils";
 
 interface ProductModalProps {
@@ -66,7 +66,7 @@ export default function ProductModal({
       onMount: productScheme,
     },
     onSubmit: ({ value }) => {
-      const translations: ProductTranslationInput[] = [
+      const translations: Array<ProductTranslationInput> = [
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];

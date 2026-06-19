@@ -1,13 +1,13 @@
-import { api } from "@/lib/api-client.ts";
-
 import type {
   Contract,
   CreateContractInput,
   UpdateContractInput,
 } from "@/types";
+import { api } from "@/lib/api-client.ts";
+
 
 export const getContractsAction = () =>
-  api<Contract[]>("/api/contracts", { method: "GET" });
+  api<Array<Contract>>("/api/contracts", { method: "GET" });
 
 export const createContractAction = (data: CreateContractInput) =>
   api<Contract>("/api/contracts", {

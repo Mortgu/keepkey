@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { Button } from "@/components";
 import type { CollapsableComponentProps } from "./collapsable-types";
+import { Button } from "@/components";
 
 export function Collapsable({
   label,

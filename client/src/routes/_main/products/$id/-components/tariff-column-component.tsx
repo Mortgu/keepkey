@@ -1,7 +1,8 @@
-import {Button, Input} from "@/components";
-import {type ChangeEvent, useState} from "react";
-import type {TariffColumn} from "@/types";
+import { useState} from "react";
 import {Trash} from "lucide-react";
+import type {ChangeEvent} from "react";
+import type {TariffColumn} from "@/types";
+import {Button, Input} from "@/components";
 import {useTariffHook} from "@/hooks";
 import TariffCellComponent from "@/routes/_main/products/$id/-components/tariff-cell-component.tsx";
 

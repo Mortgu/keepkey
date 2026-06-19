@@ -1,16 +1,9 @@
+import type {ContactPerson, CreateContactPersonInput, CreateCustomerInput, Customer, UpdateContactPersonInput, UpdateCustomerInput} from "@/types";
 import { api } from "@/lib/api-client";
 
-import {
-  type Customer,
-  type CreateCustomerInput,
-  type UpdateCustomerInput,
-  type UpdateContactPersonInput,
-  type ContactPerson,
-  type CreateContactPersonInput,
-} from "@/types";
 
 export const getAllCustomersAction = () =>
-  api<Customer[]>("/api/customers", { method: "GET" });
+  api<Array<Customer>>("/api/customers", { method: "GET" });
 
 export const getCustomerByIdAction = (id: string) =>
   api<Customer>(`/api/customers/${id}`, { method: "GET" });

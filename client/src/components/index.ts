@@ -1,5 +1,6 @@
 export * from './inputs';
 export * from './button/button';
+export * from './button-group/button-group';
 export * from './badge/badge';
 export * from './filters';
 export * from './collapsable/collapsable';

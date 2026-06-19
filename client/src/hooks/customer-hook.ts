@@ -1,3 +1,10 @@
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import type {
+  CreateContactPersonInput,
+  CreateCustomerInput,
+  UpdateContactPersonInput,
+  UpdateCustomerInput
+} from "@/types";
 import {
   createContactAction,
   createCustomerAction,
@@ -7,13 +14,6 @@ import {
   updateContactAction,
   updateCustomerByIdAction,
 } from "@/data/customers";
-import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import type {
-  CreateContactPersonInput,
-  CreateCustomerInput,
-  UpdateContactPersonInput,
-  UpdateCustomerInput
-} from "@/types";
 
 export const useCustomerHook = () => {
     const queryClient = useQueryClient();

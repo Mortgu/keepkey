@@ -1,15 +1,16 @@
-import React, {type SyntheticEvent, useEffect, useState} from "react";
+import React, { useEffect, useState} from "react";
 import {Pen, Settings, Trash, Users} from "lucide-react";
-import CustomerModal from "./customer-modal";
-
-import {formatDate} from "@/lib/format";
-
-import type {Customer} from "@/types";
-import {useCustomerHook, useModal} from "@/hooks";
-import {Button, Drawer, Textarea} from "@/components";
-import ContactPersonModal from "./contact-person-modal";
 import {toast} from 'react-toastify';
 import {useForm} from "@tanstack/react-form";
+import CustomerModal from "./customer-modal";
+import ContactPersonModal from "./contact-person-modal";
+import type {SyntheticEvent} from "react";
+
+import type {Customer} from "@/types";
+import {formatDate} from "@/lib/format";
+
+import {useCustomerHook, useModal} from "@/hooks";
+import {Button, Drawer, Textarea} from "@/components";
 import {api} from "@/lib/api-client.ts";
 
 interface CustomerListItemProps {

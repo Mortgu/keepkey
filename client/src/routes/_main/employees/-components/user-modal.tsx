@@ -1,9 +1,9 @@
-import type React from "react";
 import {z} from "zod";
 import {useForm} from "@tanstack/react-form";
+import type React from "react";
 
+import type {User} from "@/types";
 import {useUserHook} from "@/hooks";
-import {type User} from "@/types";
 import {Button, Input, ModalDialog} from "@/components";
 import {getFormError} from "@/lib/utils";
 

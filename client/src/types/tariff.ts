@@ -16,4 +16,4 @@ export type CreateTariffInput = Omit<Tariff, "id">;
 export type UpdateTariffInput = Partial<CreateTariffInput>;
 
 export type NewTariffCell = Omit<TariffCell, "row">;
-export type NewTariffRow = Omit<TariffRow, "tariff" | "cells"> & { cells: NewTariffCell[] };
+export type NewTariffRow = Omit<TariffRow, "tariff" | "cells"> & { cells: Array<NewTariffCell> };

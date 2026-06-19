@@ -1,7 +1,8 @@
-import type {TariffRow} from "@/types";
-import {type ChangeEvent, useState} from "react";
-import {Button, Input} from "@/components";
+import type {ChangeEvent} from "react";
+import {useState} from "react";
 import {Trash} from "lucide-react";
+import type {TariffRow} from "@/types";
+import {Button, Input} from "@/components";
 import {useTariffHook} from "@/hooks";
 
 type Props = {
@@ -15,7 +16,7 @@ export default function TariffRowComponent(props: Props) {
     const [min_qty, setMinQty] = useState<number>(row.min_quantity);
     const [editMin, setEditMin] = useState<boolean>(false);
 
-    const [max_qty, setMaxQty] = useState<number>(row.max_quantity);
+    const [max_qty, setMaxQty] = useState<number>(row.max_quantity ? row.max_quantity : 0);
     const [editMax, setEditMax] = useState<boolean>(false);
 
     const {deleteRow, updateRow} = useTariffHook();

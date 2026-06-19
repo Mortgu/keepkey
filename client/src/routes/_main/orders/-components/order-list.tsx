@@ -1,10 +1,10 @@
 import {Plus} from "lucide-react";
 import {useMemo, useState} from "react";
 import OrderModal from "./order-modal";
-import {useCustomerHook, useModal, useOrderHook} from "@/hooks";
-import type {Customer, Order} from "@/types";
-
 import OrderCard from "./order-card";
+import type {Customer, Order} from "@/types";
+import {useCustomerHook, useModal, useOrderHook} from "@/hooks";
+
 import {Button, FilterChip, SearchBar} from "@/components";
 import {MultiDropdown} from "@/components/filters/multi-dropdown";
 import {SortDropdown} from "@/components/filters/sort-dropdown";
@@ -18,8 +18,8 @@ export default function OrderList() {
     const modal = useModal();
     const [searchInput, setSearchInput] = useState("");
     const [sort, setSort] = useState(sort_options[0].value);
-    const [customerFilter, setCustomerFilter] = useState<string[]>([]);
-    const [contactPersonFilter] = useState<string[]>([]);
+    const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
+    const [contactPersonFilter] = useState<Array<string>>([]);
 
     const {orders} = useOrderHook();
     const {customers} = useCustomerHook();

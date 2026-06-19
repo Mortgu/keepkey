@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
     CreateOfferFlatRatesInput,
     CreateOfferInput,
@@ -22,13 +24,11 @@ import {
     uploadAction,
 } from "@/data/offer";
 
-import { useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface OfferQueryParams {
     search?: string;
-    companyIds?: string[];
-    contactPersonIds?: string[];
+    companyIds?: Array<string>;
+    contactPersonIds?: Array<string>;
     sort?: string;
 }
 
@@ -93,7 +93,7 @@ export const useOfferHook = (params?: OfferQueryParams) => {
 
     const createMutation = useMutation({
         mutationFn: ({ offer, positions, flatRates }: {
-            offer: CreateOfferInput; positions: CreateOfferPositionInput[]; flatRates: CreateOfferFlatRatesInput[];
+            offer: CreateOfferInput; positions: Array<CreateOfferPositionInput>; flatRates: Array<CreateOfferFlatRatesInput>;
         }) => createOfferAction(offer, positions, flatRates),
         onSuccess: invalidate,
     });
@@ -102,8 +102,8 @@ export const useOfferHook = (params?: OfferQueryParams) => {
         mutationFn: ({ id, offer, positions, flatRates }: {
             id: string,
             offer: UpdateOfferInput;
-            positions: UpdateOfferPositionInput[];
-            flatRates: UpdateOfferFlatRatesInput[];
+            positions: Array<UpdateOfferPositionInput>;
+            flatRates: Array<UpdateOfferFlatRatesInput>;
         }) => updateOfferAction(id, offer, positions, flatRates),
         onSuccess: invalidate,
     });

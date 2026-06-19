@@ -11,7 +11,7 @@ export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSele
     size?: ComponentSize;
     label?: string;
     error?: string;
-    options?: SelectOption[];
+    options?: Array<SelectOption>;
     placeholder?: string;
     children?: ReactNode;
 }

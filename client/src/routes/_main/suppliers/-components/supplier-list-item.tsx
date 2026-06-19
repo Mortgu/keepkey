@@ -1,9 +1,9 @@
-import { Badge, Button } from "@/components";
-import { useModal, useSupplierHook } from "@/hooks";
-import type { Supplier } from "@/types";
 import { Pen, Trash } from "lucide-react";
 import { Fragment } from "react";
 import SupplierModal from "./supplier-modal";
+import type { Supplier } from "@/types";
+import { useModal, useSupplierHook } from "@/hooks";
+import { Badge, Button } from "@/components";
 
 type Props = {
     supplier: Supplier;

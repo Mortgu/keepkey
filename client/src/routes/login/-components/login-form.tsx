@@ -227,10 +227,10 @@ export function LoginFormComponent() {
                                 <Button
                                     type="submit"
                                     disabled={!canSubmit}
-                                    loading={isSubmitting as boolean}
+                                    loading={isSubmitting}
                                     className="w-full mt-1"
                                 >
-                                    {!(isSubmitting as boolean) && "Anmelden"}
+                                    {!(isSubmitting) && "Anmelden"}
                                 </Button>
                             )}
                         </form.Subscribe>

@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from 'react';
 import {Check} from 'lucide-react';
-import {Button} from "@/components";
 import type { ComponentSize } from "@/components/size";
+import {Button} from "@/components";
 
 export interface DropdownOption {
     value: string;
@@ -11,7 +11,7 @@ export interface DropdownOption {
 
 interface SingleDropdownProps {
     label: string;
-    options: DropdownOption[];
+    options: Array<DropdownOption>;
     value: string;
     onChange: (value: string) => void;
     className?: string;

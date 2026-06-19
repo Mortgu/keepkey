@@ -1,13 +1,13 @@
-import { api } from "@/lib/api-client.ts";
-
 import type {
-  FlatRate,
   CreateFlatRateInput,
+  FlatRate,
   UpdateFlatRateInput,
 } from '@/types';
+import { api } from "@/lib/api-client.ts";
+
 
 export const getFlatRatesAction = () =>
-  api<FlatRate[]>("/api/flatrates", { method: "GET" });
+  api<Array<FlatRate>>("/api/flatrates", { method: "GET" });
 
 export const createFlatRateAction = (flatRate: CreateFlatRateInput) =>
   api<FlatRate>("/api/flatrates", {

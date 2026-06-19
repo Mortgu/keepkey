@@ -1,4 +1,7 @@
-import { Input, Button, ModalDialog, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle } from "@/components";
+import { useForm } from "@tanstack/react-form";
+import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
 import type {
   Contract,
   ContractTranslationInput,
@@ -7,10 +10,7 @@ import type {
   UpdateContractInput,
 } from "@/types";
 import { useContractHook } from "@/hooks";
-import { useForm } from "@tanstack/react-form";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 import { getFormErrors } from "@/lib/utils";
 
 interface ContractModalProps {
@@ -52,17 +52,17 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       onChange: contractSchema,
     },
     onSubmit: ({ value }) => {
-      const translations: ContractTranslationInput[] = [
+      const translations: Array<ContractTranslationInput> = [
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];
       if (isEdit) {
         updateContract({
           id: currentContract.id,
-          data: { key: value.key, translations } as UpdateContractInput,
+          data: { key: value.key, translations },
         });
       } else {
-        createContract({ key: value.key, translations } as CreateContractInput);
+        createContract({ key: value.key, translations });
       }
       onClose();
     },

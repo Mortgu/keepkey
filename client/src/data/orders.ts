@@ -1,9 +1,9 @@
+import type { Order } from "@/types";
 import { api } from "@/lib/api-client";
 
-import type { Order } from "@/types";
 
 export const getOrdersAction = () =>
-  api<Order[]>("/api/orders", { method: "GET" });
+  api<Array<Order>>("/api/orders", { method: "GET" });
 
 export const createOrderAction = (offerId: string) =>
   api<Order>('/api/orders', {

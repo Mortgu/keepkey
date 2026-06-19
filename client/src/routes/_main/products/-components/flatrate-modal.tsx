@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import type { CreateFlatRateInput, FlatRateTranslationInput, Language, UpdateFlatRateInput } from "@/types";
 import { getFormErrors } from "@/lib/utils";
 
-import type { CreateFlatRateInput, FlatRateTranslationInput, Language, UpdateFlatRateInput } from "@/types";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 
 interface FlatRateModalProps {
@@ -46,7 +46,7 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
       onMount: flatRateSchema,
     },
     onSubmit: ({ value }) => {
-      const translations: FlatRateTranslationInput[] = [
+      const translations: Array<FlatRateTranslationInput> = [
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];

@@ -1,7 +1,7 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import { Button } from "@/components";
 import type { ComponentSize } from "@/components/size";
+import { Button } from "@/components";
 
 export interface SortOption {
   value: string;
@@ -11,7 +11,7 @@ export interface SortOption {
 interface SortDropdownProps {
   value: string;
   onChange: (value: string) => void;
-  options: SortOption[];
+  options: Array<SortOption>;
   className?: string;
   size?: ComponentSize;
 }

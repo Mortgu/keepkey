@@ -1,12 +1,12 @@
+import type { CreateUserInput, UpdateUserInput, User } from "@/types";
 import { api } from "@/lib/api-client";
 
-import type { User, CreateUserInput, UpdateUserInput } from "@/types";
 
 export const getSessionUser = () =>
   api<User>("/api/users/session", { method: "GET" });
 
 export const getAllUsersAction = () =>
-  api<User[]>("/api/users", { method: "GET" });
+  api<Array<User>>("/api/users", { method: "GET" });
 
 export const createUserAction = (body: CreateUserInput) =>
   api<User>(`/api/users`, {

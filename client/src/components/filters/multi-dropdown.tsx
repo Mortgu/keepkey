@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { Button } from '../button/button';
 import type { ComponentSize } from "@/components/size";
@@ -11,9 +11,9 @@ export interface DropdownOption {
 
 interface MultiDropdownProps {
   label: string;
-  options: DropdownOption[];
-  values: string[];
-  onChange: (values: string[]) => void;
+  options: Array<DropdownOption>;
+  values: Array<string>;
+  onChange: (values: Array<string>) => void;
   className?: string;
   size?: ComponentSize;
 }
