@@ -1,15 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
-import type {FindFilesByIdResult} from "@/data/nextcloud";
+import {useQuery} from "@tanstack/react-query";
 import {
-    
     findFilesByIdAction,
+    type FindFilesByIdResult,
     findOfferFilesByIdAction,
     findOrderFilesByIdAction,
+    getCloudDirectoryAction,
     getNextcloudStatusAction
 } from "@/data/nextcloud";
+import type {CloudFile} from "@/types/cloud.ts";
 
 export const useNextcloudStatus = () => {
-    const { data, isPending, refetch } = useQuery({
+    const {data, isPending, refetch} = useQuery({
         queryKey: ["nextcloud", "status"],
         queryFn: getNextcloudStatusAction,
         staleTime: 60_000,
@@ -35,6 +36,15 @@ export const useFindFilesById = (id: string | undefined, options?: { enabled?: b
         staleTime: 30_000,
     });
 };
+
+export const useGetCloudDirectory = (path: string, options?: { enabled?: boolean }) => {
+    return useQuery<Array<CloudFile>>({
+        queryKey: ["cloud", "directory", path],
+        queryFn: () => getCloudDirectoryAction(path),
+        enabled: Boolean(path) && (options?.enabled ?? true),
+        staleTime: 30_000,
+    })
+}
 
 export const useFindOfferFilesById = (id: string | undefined, options?: { enabled?: boolean }) => {
     return useQuery<FindFilesByIdResult>({

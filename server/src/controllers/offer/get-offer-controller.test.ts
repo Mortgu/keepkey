@@ -4,12 +4,22 @@ import type { Request, Response } from "express";
 // Prisma-Client mocken, bevor der Controller importiert wird.
 const offerRevisionFindMany = vi.fn();
 const offerDocumentFindFirst = vi.fn();
+const fsAccess = vi.fn();
 
 vi.mock("../../lib/prismaClient.js", () => ({
   prisma: {
     offerRevision: { findMany: offerRevisionFindMany },
     offerDocument: { findFirst: offerDocumentFindFirst },
   },
+}));
+
+vi.mock("../../lib/env.js", () => ({
+  default: { OUTPUT_DIR: "/tmp/output" },
+}));
+
+vi.mock("fs/promises", () => ({
+  default: { access: fsAccess },
+  access: fsAccess,
 }));
 
 const { getOfferRevisions, downloadOfferDocument } = await import(
@@ -35,6 +45,7 @@ function buildResponse() {
     res.downloadArgs = args;
     return res;
   }) as unknown as Response["download"];
+  res.setHeader = vi.fn() as unknown as Response["setHeader"];
   return res;
 }
 
@@ -65,8 +76,19 @@ describe("getOfferRevisions", () => {
 
 describe("downloadOfferDocument", () => {
   const req = {
-    params: { id: "offer1", documentId: "doc1" },
+    params: { id: "offer1", documentId: "doc1", format: "pdf" },
   } as unknown as Request;
+
+  it("antwortet 400 bei ungültigem Format", async () => {
+    const badReq = {
+      params: { id: "offer1", documentId: "doc1", format: "txt" },
+    } as unknown as Request;
+    const res = buildResponse();
+
+    await downloadOfferDocument(badReq, res);
+
+    expect(res.status).toHaveBeenCalledWith(400);
+  });
 
   it("antwortet 404, wenn kein Dokument gefunden wird", async () => {
     offerDocumentFindFirst.mockResolvedValue(null);
@@ -80,7 +102,7 @@ describe("downloadOfferDocument", () => {
 
   it("antwortet 409, wenn das Dokument noch nicht generiert ist", async () => {
     offerDocumentFindFirst.mockResolvedValue({
-      document: { status: "PENDING", path: null },
+      document: { status: "PENDING" },
     });
     const res = buildResponse();
 
@@ -90,20 +112,60 @@ describe("downloadOfferDocument", () => {
     expect(res.json).toHaveBeenCalledWith({ message: "Document not yet generated" });
   });
 
+  it("antwortet 404, wenn die Datei auf der Festplatte fehlt", async () => {
+    offerDocumentFindFirst.mockResolvedValue({
+      document: {
+        id: "doc1",
+        status: "GENERATED",
+        displayName: "Angebot_001",
+      },
+    });
+    fsAccess.mockRejectedValue(new Error("ENOENT"));
+    const res = buildResponse();
+
+    await downloadOfferDocument(req, res);
+
+    expect(res.status).toHaveBeenCalledWith(404);
+    expect(res.json).toHaveBeenCalledWith({ message: "File not found on disk" });
+  });
+
   it("startet den Download bei generiertem Dokument", async () => {
     offerDocumentFindFirst.mockResolvedValue({
       document: {
         id: "doc1",
         status: "GENERATED",
-        path: "/tmp/doc1.pdf",
-        format: "PDF",
         displayName: "Angebot_001",
       },
     });
+    fsAccess.mockResolvedValue(undefined);
     const res = buildResponse();
 
     await downloadOfferDocument(req, res);
 
-    expect(res.download).toHaveBeenCalledWith("/tmp/doc1.pdf", "Angebot_001.pdf");
+    expect(res.setHeader).toHaveBeenCalledWith("Content-Type", "application/pdf");
+    expect(res.download).toHaveBeenCalledWith("/tmp/output/doc1.pdf", "Angebot_001.pdf");
+  });
+
+  it("lädt DOCX mit korrektem MIME-Typ herunter", async () => {
+    const docxReq = {
+      params: { id: "offer1", documentId: "doc1", format: "docx" },
+    } as unknown as Request;
+    offerDocumentFindFirst.mockResolvedValue({
+      document: {
+        id: "doc1",
+        status: "GENERATED",
+        displayName: "Angebot_001",
+      },
+    });
+    fsAccess.mockResolvedValue(undefined);
+    const res = buildResponse();
+
+    await downloadOfferDocument(docxReq, res);
+
+    expect(res.setHeader).toHaveBeenCalledWith(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    );
+    expect(res.download).toHaveBeenCalledWith("/tmp/output/doc1.docx", "Angebot_001.docx");
   });
 });

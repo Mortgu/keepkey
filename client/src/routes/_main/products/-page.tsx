@@ -13,7 +13,6 @@ export default function ProductPage() {
         isPending,
 
         createProduct,
-        isCreatingProduct,
     } = useProductHook();
 
     const modal = useModal();

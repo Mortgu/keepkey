@@ -39,7 +39,7 @@ export function RecentOrdersWidget() {
                         key={order.id}
                         title={order.customer.companyName}
                         subtitle={order.orderId}
-                        amount={formatEur(order.offer.net_amount)}
+                        amount={formatEur(0)} //order.offer.net_amount
                         date={formatDate(order.createdAt)}
                     />
                 ))

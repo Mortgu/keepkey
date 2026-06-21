@@ -36,6 +36,8 @@ export const createOrder = async (request: Request, response: Response, next: Ne
                     date: new Date(),
                     validUntil: existingOffer.validUntil,
                     requestFrom: existingOffer.requestFrom,
+
+                    net_amount: existingOffer.net_amount,
                 },
             });
 

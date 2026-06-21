@@ -1,4 +1,4 @@
-import {Request, Response} from "express";
+import {NextFunction, Request, Response} from "express";
 import {
     findFilesById,
     getNextCloudClient,
@@ -7,22 +7,23 @@ import {
     isNextcloudConfigured,
 } from "../../lib/nextcloud.js";
 import env from "../../lib/env.js";
+import logger from "../../middlewares/logger.js";
 
 const ALL_DIRECTORIES = [
-    { path: env.NEXTCLOUD_OFFER_PDF_PATH, label: "offer_pdf" },
-    { path: env.NEXTCLOUD_OFFER_ORIGINAL_PATH, label: "offer_original" },
-    { path: env.NEXTCLOUD_ORDER_PDF_PATH, label: "order_pdf" },
-    { path: env.NEXTCLOUD_ORDER_ORIGINAL_PATH, label: "order_original" },
+    {path: env.NEXTCLOUD_OFFER_PDF_PATH, label: "offer_pdf"},
+    {path: env.NEXTCLOUD_OFFER_ORIGINAL_PATH, label: "offer_original"},
+    {path: env.NEXTCLOUD_ORDER_PDF_PATH, label: "order_pdf"},
+    {path: env.NEXTCLOUD_ORDER_ORIGINAL_PATH, label: "order_original"},
 ];
 
 const OFFER_DIRECTORIES = [
-    { path: env.NEXTCLOUD_OFFER_PDF_PATH, label: "offer_pdf" },
-    { path: env.NEXTCLOUD_OFFER_ORIGINAL_PATH, label: "offer_original" },
+    {path: env.NEXTCLOUD_OFFER_PDF_PATH, label: "offer_pdf"},
+    {path: env.NEXTCLOUD_OFFER_ORIGINAL_PATH, label: "offer_original"},
 ];
 
 const ORDER_DIRECTORIES = [
-    { path: env.NEXTCLOUD_ORDER_PDF_PATH, label: "order_pdf" },
-    { path: env.NEXTCLOUD_ORDER_ORIGINAL_PATH, label: "order_original" },
+    {path: env.NEXTCLOUD_ORDER_PDF_PATH, label: "order_pdf"},
+    {path: env.NEXTCLOUD_ORDER_ORIGINAL_PATH, label: "order_original"},
 ];
 
 export const getCloudStatus = async (request: Request, response: Response) => {
@@ -50,6 +51,29 @@ export const getCloudStatus = async (request: Request, response: Response) => {
         message: "ok",
     });
 };
+
+export async function getCloudDirectory(request: Request, response: Response, next: NextFunction) {
+    const path = request.query.path as string;
+
+    if (!path) {
+        return response.status(400).json({
+            message: 'Bad request!',
+        });
+    }
+
+    const client = getNextCloudClient();
+
+    try {
+        const files = await client.getDirectoryContents(path);
+
+        return response.status(200).json(files.map(file => ({
+            ...file,
+        })));
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
 
 export const getFilesById = async (request: Request, response: Response) => {
     const id = request.params.id as string;

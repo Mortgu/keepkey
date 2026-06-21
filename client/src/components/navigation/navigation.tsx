@@ -1,3 +1,4 @@
+import type {ReactNode} from "react";
 import {useState} from "react";
 import {
     ChevronDown,
@@ -5,6 +6,7 @@ import {
     FileText,
     Languages,
     LayoutGrid,
+    LogOut,
     Package,
     Settings,
     ShoppingCart,
@@ -15,8 +17,7 @@ import {
 import {useTranslation} from "react-i18next";
 import {tv} from "tailwind-variants";
 import {NavLink} from "./nav-link.js";
-import type {ReactNode} from "react";
-import {DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle,} from "@/components";
+import {Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle,} from "@/components";
 import {useAuth} from "@/context/auth";
 
 const ICON_SIZE = 14;
@@ -64,7 +65,7 @@ function Section({title, collapsible = false, children}: SectionProps) {
 
 function UserFooter() {
     const {i18n} = useTranslation();
-    const {user} = useAuth();
+    const {user, logout} = useAuth();
 
     const displayName = user ? `${user.firstName} ${user.lastName}` : null;
 
@@ -90,6 +91,8 @@ function UserFooter() {
                         <p className="text-[13px] font-semibold">{displayName}</p>
                         <p className="text-[11px] text-(--fg-3)">{user.email}</p>
                     </div>
+                    <Button variant='ghost' size='sm' onClick={logout}
+                            icon={<LogOut className="size-4 "/>} iconOnly/>
                 </div>
             )}
         </div>

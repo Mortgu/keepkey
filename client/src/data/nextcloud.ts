@@ -1,4 +1,5 @@
 import {api} from "@/lib/api-client";
+import type {CloudFile} from "@/types/cloud.ts";
 
 export type NextcloudStatus = {
     message: string;
@@ -29,3 +30,13 @@ export const findOfferFilesByIdAction = (id: string) =>
 
 export const findOrderFilesByIdAction = (id: string) =>
     api<FindFilesByIdResult>(`/api/cloud/order/${id}`, {method: "GET"});
+
+export const getCloudDirectoryAction = (path: string) => {
+    const urlParams = new URLSearchParams();
+    urlParams.set("path", path);
+
+    const query = urlParams.toString();
+    return api<Array<CloudFile>>(`/api/cloud/directory?${query}`, {
+        method: "GET"
+    });
+}

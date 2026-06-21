@@ -1,16 +1,18 @@
-import {LogOut} from 'lucide-react';
-import {Button} from '@/components'
-import {useAuth} from '@/context/auth';
+import {useGetCloudDirectory} from "@/hooks/nextcloud-hook.ts";
+import TemplateList from "@/routes/_main/settings/-components/template-list.tsx";
 
 export default function SettingsPage() {
-    const {logout} = useAuth();
+    const {data: templates, isPending, error} = useGetCloudDirectory("/Templates");
+
+    if (isPending) {
+        return (
+            <p></p>
+        )
+    }
 
     return (
         <div className='grid gap-4'>
-            
-
-            <Button variant='secondary' size='sm' onClick={logout} icon={<LogOut className="size-4"/>}>Abmelden</Button>
-
+            <TemplateList templates={templates}/>
         </div>
     )
 }

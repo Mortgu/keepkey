@@ -65,12 +65,14 @@ export function Document({ offer, document }: Props) {
 
             <div className="flex items-center gap-2">
                 {status === "GENERATED" && (
-                    <a
-                        href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/${document.format.toLowerCase()}`}
-                        download
-                    >
-                        <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly />
-                    </a>
+                    <>
+                        <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/pdf`} download>
+                            <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly title="PDF herunterladen" />
+                        </a>
+                        <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/docx`} download>
+                            <Button variant="secondary" size="sm" icon={<File className="size-3.5" />} iconOnly title="DOCX herunterladen" />
+                        </a>
+                    </>
                 )}
 
                 <Button variant="secondary" size="sm" icon={<UploadCloud className="size-3.5" />} iconOnly

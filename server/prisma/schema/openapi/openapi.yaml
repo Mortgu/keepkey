@@ -456,6 +456,9 @@ components:
         requestFrom:
           type: string
           format: date-time
+        net_amount:
+          type: integer
+          format: int32
         orderPositions:
           type: array
           items:
@@ -487,6 +490,7 @@ components:
         - orderId
         - paymentTerm
         - date
+        - net_amount
         - orderPositions
         - flatRates
         - orderDocuments

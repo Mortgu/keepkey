@@ -1,21 +1,21 @@
-import {useEffect, useState} from "react";
-import {toast} from "react-toastify";
-import {Pen, Trash, UndoDot} from "lucide-react";
-import {Document, LineItemRow} from "./card-components";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { Pen, Trash, UndoDot } from "lucide-react";
+import { Document, LineItemRow } from "./card-components";
 import OfferRevisionHistory from "./card-components/offer-revision-history";
-import type {Offer, OfferDocument} from "@/types";
-import {formatDate} from "@/lib/format";
-import {formatEur} from "@/utils/utils";
-import {useLocale, useOfferHook} from "@/hooks";
-import {Badge, Button, Collapsable, Drawer} from "@/components";
-import {localized} from "@/lib/i18n-content";
+import type { Offer, OfferDocument } from "@/types";
+import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
+import { useLocale, useOfferHook } from "@/hooks";
+import { Badge, Button, Collapsable, Drawer } from "@/components";
+import { localized } from "@/lib/i18n-content";
 
 type OfferListItemProps = {
     offer: Offer;
     onEdit: (offer: Offer) => void;
 };
 
-function OfferPositionRow({op}: { op: Offer["offerPositions"][number] }) {
+function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
     const locale = useLocale();
     return (
         <LineItemRow
@@ -53,7 +53,7 @@ function OfferPositionRow({op}: { op: Offer["offerPositions"][number] }) {
     );
 }
 
-function OfferFlatRateRow({fr}: { fr: Offer["offerFlatRates"][number] }) {
+function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
     const locale = useLocale();
     return (
         <LineItemRow
@@ -82,7 +82,7 @@ function OfferFlatRateRow({fr}: { fr: Offer["offerFlatRates"][number] }) {
     );
 }
 
-export default function OfferCard({offer, onEdit}: OfferListItemProps) {
+export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
     const {
         customerContactPerson: ccp,
         quoteId,
@@ -102,7 +102,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
 
     const handleDeleteOffer = () => {
         if (confirm("Angebot löschen")) {
-            deleteOffer({id: offer.id});
+            deleteOffer({ id: offer.id });
         }
     };
 
@@ -165,16 +165,16 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
             >
                 <div className="grid gap-2 px-4 py-3">
                     {offerPositions.map((op, i) => (
-                        <OfferPositionRow key={i} op={op}/>
+                        <OfferPositionRow key={i} op={op} />
                     ))}
                     {offerFlatRates.map((fr, i) => (
-                        <OfferFlatRateRow key={i} fr={fr}/>
+                        <OfferFlatRateRow key={i} fr={fr} />
                     ))}
                     <LineItemRow
                         left={
                             <span className="text-sm text-(--text-secondary) font-light">
-                Gesamtpreis
-              </span>
+                                Gesamtpreis
+                            </span>
                         }
                         right={<p>{formatEur(offer.net_amount)}</p>}
                     />
@@ -200,7 +200,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
                         size="sm"
                         loading={isGeneratingDocument}
                         disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({offerId: offer.id})}
+                        onClick={() => generateDocument({ offerId: offer.id })}
                     >
                         Dokument generieren
                     </Button>
@@ -214,7 +214,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
                         onClick={() => setDrawerOpen(true)}
                         size="xs"
                         variant="secondary"
-                        icon={<UndoDot className="size-3"/>}
+                        icon={<UndoDot className="size-3" />}
                         iconOnly
                     />
 
@@ -222,7 +222,7 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
                         size="xs"
                         variant="secondary"
                         onClick={() => onEdit(offer)}
-                        icon={<Pen className="size-3"/>}
+                        icon={<Pen className="size-3" />}
                         iconOnly
                     />
 
@@ -230,16 +230,16 @@ export default function OfferCard({offer, onEdit}: OfferListItemProps) {
                         size="xs"
                         variant="secondary"
                         onClick={handleDeleteOffer}
-                        icon={<Trash className="size-3"/>}
+                        icon={<Trash className="size-3" />}
                         iconOnly
                     />
                 </div>
             </div>
 
             <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header title="History" subtitle="Vergangene Preistabellen"/>
+                <Drawer.Header title="History" subtitle="Vergangene Preistabellen" />
                 <Drawer.Body>
-                    <OfferRevisionHistory offerId={offer.id}/>
+                    <OfferRevisionHistory offerId={offer.id} />
                 </Drawer.Body>
             </Drawer>
         </div>
