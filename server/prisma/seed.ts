@@ -1,5 +1,5 @@
-import {auth} from "../src/lib/auth.js";
-import {prisma} from "../src/lib/prismaClient.js";
+import { auth } from "../src/lib/auth.js";
+import { prisma } from "../src/lib/prismaClient.js";
 
 const OWNER = {
     email: "admin@dignum.de",
@@ -15,8 +15,8 @@ const OWNER = {
    ─────────────────────────────── */
 
 const SUPPLIERS = [
-    {supplierId: "SUP-001", name: "Dignum IT-Services GmbH"},
-    {supplierId: "SUP-002", name: "CloudHosting AG"},
+    { supplierId: "SUP-001", name: "Dignum IT-Services GmbH" },
+    { supplierId: "SUP-002", name: "CloudHosting AG" },
 ];
 
 const CONTRACTS = [
@@ -106,7 +106,7 @@ const PRODUCTS = [
                 description: "Business-E-Mail mit Exchange- und IMAP-Unterstützung",
                 table: "email"
             },
-            EN: {name: "Email Hosting", description: "Business email with Exchange and IMAP support", table: "email"},
+            EN: { name: "Email Hosting", description: "Business email with Exchange and IMAP support", table: "email" },
         },
     },
     {
@@ -127,8 +127,8 @@ const PRODUCTS = [
     {
         key: "ddos-protection",
         translations: {
-            DE: {name: "DDoS Protection", description: "Edge-Schutz gegen DDoS-Angriffe", table: "security"},
-            EN: {name: "DDoS Protection", description: "Edge protection against DDoS attacks", table: "security"},
+            DE: { name: "DDoS Protection", description: "Edge-Schutz gegen DDoS-Angriffe", table: "security" },
+            EN: { name: "DDoS Protection", description: "Edge protection against DDoS attacks", table: "security" },
         },
     },
 ];
@@ -140,8 +140,8 @@ const TARIFF_DATA = [
         contractKey: "basic",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 5, prices: [4_900, 4_400]},
-            {min_quantity: 6, max_quantity: 25, prices: [3_900, 3_500]},
+            { min_quantity: 1, max_quantity: 5, prices: [4_900, 4_400] },
+            { min_quantity: 6, max_quantity: 25, prices: [3_900, 3_500] },
         ],
     },
     {
@@ -149,8 +149,8 @@ const TARIFF_DATA = [
         contractKey: "professional",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 10, prices: [9_900, 8_900]},
-            {min_quantity: 11, max_quantity: 50, prices: [8_400, 7_600]},
+            { min_quantity: 1, max_quantity: 10, prices: [9_900, 8_900] },
+            { min_quantity: 11, max_quantity: 50, prices: [8_400, 7_600] },
         ],
     },
     {
@@ -158,7 +158,7 @@ const TARIFF_DATA = [
         contractKey: "enterprise",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 999_999, prices: [19_900, 17_900]},
+            { min_quantity: 1, max_quantity: 999_999, prices: [19_900, 17_900] },
         ],
     },
     {
@@ -166,8 +166,8 @@ const TARIFF_DATA = [
         contractKey: "basic",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 10, prices: [2_900, 2_400]},
-            {min_quantity: 11, max_quantity: 100, prices: [2_200, 1_800]},
+            { min_quantity: 1, max_quantity: 10, prices: [2_900, 2_400] },
+            { min_quantity: 11, max_quantity: 100, prices: [2_200, 1_800] },
         ],
     },
     {
@@ -175,8 +175,8 @@ const TARIFF_DATA = [
         contractKey: "professional",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 10, prices: [5_900, 5_400]},
-            {min_quantity: 11, max_quantity: 100, prices: [4_900, 4_400]},
+            { min_quantity: 1, max_quantity: 10, prices: [5_900, 5_400] },
+            { min_quantity: 11, max_quantity: 100, prices: [4_900, 4_400] },
         ],
     },
     {
@@ -184,7 +184,7 @@ const TARIFF_DATA = [
         contractKey: "enterprise",
         terms: [12, 24, 36],
         rows: [
-            {min_quantity: 1, max_quantity: 999_999, prices: [14_900, 13_400, 11_900]},
+            { min_quantity: 1, max_quantity: 999_999, prices: [14_900, 13_400, 11_900] },
         ],
     },
     {
@@ -192,7 +192,7 @@ const TARIFF_DATA = [
         contractKey: "basic",
         terms: [12],
         rows: [
-            {min_quantity: 1, max_quantity: 50, prices: [1_900]},
+            { min_quantity: 1, max_quantity: 50, prices: [1_900] },
         ],
     },
     {
@@ -200,7 +200,7 @@ const TARIFF_DATA = [
         contractKey: "professional",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 50, prices: [3_900, 3_400]},
+            { min_quantity: 1, max_quantity: 50, prices: [3_900, 3_400] },
         ],
     },
     {
@@ -208,7 +208,7 @@ const TARIFF_DATA = [
         contractKey: "basic",
         terms: [12],
         rows: [
-            {min_quantity: 1, max_quantity: 5, prices: [1_500]},
+            { min_quantity: 1, max_quantity: 5, prices: [1_500] },
         ],
     },
     {
@@ -216,8 +216,8 @@ const TARIFF_DATA = [
         contractKey: "professional",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 5, prices: [3_200, 2_900]},
-            {min_quantity: 6, max_quantity: 25, prices: [2_700, 2_400]},
+            { min_quantity: 1, max_quantity: 5, prices: [3_200, 2_900] },
+            { min_quantity: 6, max_quantity: 25, prices: [2_700, 2_400] },
         ],
     },
     {
@@ -225,7 +225,7 @@ const TARIFF_DATA = [
         contractKey: "professional",
         terms: [12, 24],
         rows: [
-            {min_quantity: 1, max_quantity: 999_999, prices: [7_900, 7_200]},
+            { min_quantity: 1, max_quantity: 999_999, prices: [7_900, 7_200] },
         ],
     },
     {
@@ -233,7 +233,7 @@ const TARIFF_DATA = [
         contractKey: "enterprise",
         terms: [12, 24, 36],
         rows: [
-            {min_quantity: 1, max_quantity: 999_999, prices: [15_900, 14_400, 12_900]},
+            { min_quantity: 1, max_quantity: 999_999, prices: [15_900, 14_400, 12_900] },
         ],
     },
 ];
@@ -243,16 +243,16 @@ const FLAT_RATES = [
         key: "setup-fee",
         total_cents: 299_00,
         translations: {
-            DE: {name: "Einrichtungsgebühr", table: "setup_fee"},
-            EN: {name: "Setup fee", table: "setup_fee"},
+            DE: { name: "Einrichtungsgebühr", table: "setup_fee" },
+            EN: { name: "Setup fee", table: "setup_fee" },
         },
     },
     {
         key: "migration-service",
         total_cents: 499_00,
         translations: {
-            DE: {name: "Migrationsservice", table: "migration"},
-            EN: {name: "Migration service", table: "migration"},
+            DE: { name: "Migrationsservice", table: "migration" },
+            EN: { name: "Migration service", table: "migration" },
         },
     },
 ];
@@ -267,8 +267,8 @@ const CUSTOMERS = [
         plz: "12345",
         phone: "+49 123 456789",
         contactPersons: [
-            {salutation: "Herr", firstName: "Max", lastName: "Mustermann", email: "max.mustermann@musterfirma.de"},
-            {salutation: "Frau", firstName: "Erika", lastName: "Musterfrau", email: "erika.musterfrau@musterfirma.de"},
+            { salutation: "Herr", firstName: "Max", lastName: "Mustermann", email: "max.mustermann@musterfirma.de" },
+            { salutation: "Frau", firstName: "Erika", lastName: "Musterfrau", email: "erika.musterfrau@musterfirma.de" },
         ],
     },
     {
@@ -280,7 +280,7 @@ const CUSTOMERS = [
         plz: "54321",
         phone: "+49 987 654321",
         contactPersons: [
-            {salutation: "Herr", firstName: "Hans", lastName: "Beispiel", email: "hans.beispiel@beispiel-ag.de"},
+            { salutation: "Herr", firstName: "Hans", lastName: "Beispiel", email: "hans.beispiel@beispiel-ag.de" },
         ],
     },
 ];
@@ -291,7 +291,7 @@ const CUSTOMERS = [
 
 async function seedOwner() {
     const existing = await prisma.user.findUnique({
-        where: {email: OWNER.email},
+        where: { email: OWNER.email },
     });
 
     if (existing) {
@@ -311,8 +311,8 @@ async function seedOwner() {
     });
 
     await prisma.user.update({
-        where: {email: OWNER.email},
-        data: {role: "admin"},
+        where: { email: OWNER.email },
+        data: { role: "admin" },
     });
 
     console.log(`Created owner user: ${OWNER.email}`);
@@ -322,11 +322,11 @@ async function seedSuppliers() {
     const results = [];
     for (const data of SUPPLIERS) {
         let supplier = await prisma.supplier.findFirst({
-            where: {supplierId: data.supplierId},
+            where: { supplierId: data.supplierId },
         });
 
         if (!supplier) {
-            supplier = await prisma.supplier.create({data});
+            supplier = await prisma.supplier.create({ data });
             console.log(`Supplier created: ${supplier.name}`);
         } else {
             console.log(`Supplier exists: ${supplier.name}`);
@@ -340,7 +340,7 @@ async function seedContracts() {
     const results = [];
     for (const data of CONTRACTS) {
         let contract = await prisma.contract.findUnique({
-            where: {key: data.key},
+            where: { key: data.key },
         });
 
         if (!contract) {
@@ -349,8 +349,8 @@ async function seedContracts() {
                     key: data.key,
                     translations: {
                         create: [
-                            {language: "DE", ...data.translations.DE},
-                            {language: "EN", ...data.translations.EN},
+                            { language: "DE", ...data.translations.DE },
+                            { language: "EN", ...data.translations.EN },
                         ],
                     },
                 },
@@ -368,7 +368,7 @@ async function seedProducts() {
     const products = [];
     for (const data of PRODUCTS) {
         let product = await prisma.product.findUnique({
-            where: {key: data.key},
+            where: { key: data.key },
         });
 
         if (!product) {
@@ -377,8 +377,8 @@ async function seedProducts() {
                     key: data.key,
                     translations: {
                         create: [
-                            {language: "DE", ...data.translations.DE},
-                            {language: "EN", ...data.translations.EN},
+                            { language: "DE", ...data.translations.DE },
+                            { language: "EN", ...data.translations.EN },
                         ],
                     },
                 },
@@ -394,89 +394,16 @@ async function seedProducts() {
 }
 
 async function seedTariffs(
-    products: {id: string; key: string}[],
-    contracts: {id: string; key: string}[],
-    customers: {id: string; customerId: string | null; companyName: string}[]
+    products: { id: string; key: string }[],
+    contracts: { id: string; key: string }[],
+    customers: { id: string; customerId: string | null; companyName: string }[]
 ) {
-    const productMap = new Map(products.map((p) => [p.key, p.id]));
-    const contractMap = new Map(contracts.map((c) => [c.key, c.id]));
-
-    for (const data of TARIFF_DATA) {
-        const productId = productMap.get(data.productKey);
-        const contractId = contractMap.get(data.contractKey);
-        if (!productId || !contractId) continue;
-
-        const existing = await prisma.tariff.findFirst({
-            where: {productId, contractId},
-        });
-
-        if (existing) {
-            console.log(`Tariff exists: ${data.productKey} × ${data.contractKey}`);
-            continue;
-        }
-
-        const tariff = await prisma.tariff.create({
-            data: {productId, contractId, terms: data.terms},
-        });
-
-        for (let rowIndex = 0; rowIndex < data.rows.length; rowIndex++) {
-            const row = data.rows[rowIndex];
-            const tariffRow = await prisma.tariffRow.create({
-                data: {
-                    tariffId: tariff.id,
-                    min_quantity: row.min_quantity,
-                    max_quantity: row.max_quantity,
-                    order: rowIndex,
-                },
-            });
-
-            for (let i = 0; i < row.prices.length; i++) {
-                await prisma.tariffCell.create({
-                    data: {
-                        rowId: tariffRow.id,
-                        price: row.prices[i],
-                        order: i,
-                    },
-                });
-            }
-        }
-
-        console.log(
-            `Tariff created: ${data.productKey} × ${data.contractKey} (${data.rows.length} rows × ${data.terms.length} terms)`
-        );
-    }
-
-    // Seed a sample customer-specific price override
-    const enterpriseTariff = await prisma.tariff.findFirst({
-        where: {productId: productMap.get("managed-server")!, contractId: contractMap.get("enterprise")!},
-        include: {rows: {include: {cells: true}}},
-    });
-
-    const musterfirma = customers.find((c) => c.companyName === "Musterfirma GmbH");
-    if (enterpriseTariff && musterfirma && enterpriseTariff.rows.length > 0) {
-        const firstCell = enterpriseTariff.rows[0].cells[0];
-        if (firstCell) {
-            const existingOverride = await prisma.tariffCellCustomerPrice.findFirst({
-                where: {cellId: firstCell.id, customerId: musterfirma.id},
-            });
-            if (!existingOverride) {
-                await prisma.tariffCellCustomerPrice.create({
-                    data: {
-                        cellId: firstCell.id,
-                        customerId: musterfirma.id,
-                        price: 15_900,
-                    },
-                });
-                console.log(`Customer price override created: Musterfirma GmbH → Managed Server Enterprise 12M = 15900 ct`);
-            }
-        }
-    }
 }
 
 async function seedFlatRates() {
     for (const data of FLAT_RATES) {
         let flatRate = await prisma.flatRate.findUnique({
-            where: {key: data.key},
+            where: { key: data.key },
         });
 
         if (!flatRate) {
@@ -486,8 +413,8 @@ async function seedFlatRates() {
                     total_cents: data.total_cents,
                     translations: {
                         create: [
-                            {language: "DE", ...data.translations.DE},
-                            {language: "EN", ...data.translations.EN},
+                            { language: "DE", ...data.translations.DE },
+                            { language: "EN", ...data.translations.EN },
                         ],
                     },
                 },
@@ -502,14 +429,14 @@ async function seedFlatRates() {
 async function seedCustomers() {
     const results = [];
     for (const data of CUSTOMERS) {
-        const {contactPersons, ...customerData} = data;
+        const { contactPersons, ...customerData } = data;
 
         let customer = await prisma.customer.findUnique({
-            where: {email: customerData.email},
+            where: { email: customerData.email },
         });
 
         if (!customer) {
-            customer = await prisma.customer.create({data: customerData});
+            customer = await prisma.customer.create({ data: customerData });
             console.log(`Customer created: ${customer.companyName}`);
         } else {
             console.log(`Customer exists: ${customer.companyName}`);
@@ -517,12 +444,12 @@ async function seedCustomers() {
 
         for (const cp of contactPersons) {
             const existing = await prisma.contactPerson.findFirst({
-                where: {customerId: customer.id, email: cp.email},
+                where: { customerId: customer.id, email: cp.email },
             });
 
             if (!existing) {
                 await prisma.contactPerson.create({
-                    data: {...cp, customerId: customer.id},
+                    data: { ...cp, customerId: customer.id },
                 });
                 console.log(`  ContactPerson created: ${cp.firstName} ${cp.lastName}`);
             } else {
