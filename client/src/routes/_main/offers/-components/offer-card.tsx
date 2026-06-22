@@ -104,6 +104,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         if (confirm("Angebot löschen")) {
             deleteOffer({ id: offer.id });
         }
+
     };
 
     useEffect(() => {
@@ -123,6 +124,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <span>{quoteId}</span>
                         </div>
                     </div>
+
 
                     <div className="flex flex-wrap items-center gap-4">
                         <div className="flex items-center gap-1 text-sm font-light">
