@@ -116,12 +116,13 @@ export interface components {
         };
         OfferRevision: {
             id: string;
-            offer: components["schemas"]["Offer"];
-            offerId: string;
             /** Format: int32 */
             version: number;
             snapshot: Record<string, never>;
-            changedBy?: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            changedBy: components["schemas"]["User"];
+            changedById: string;
             /** Format: date-time */
             createdAt: string;
         };
@@ -302,6 +303,7 @@ export interface components {
             customerId?: string;
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
+            offerRevisions: components["schemas"]["OfferRevision"][];
         };
         Session: {
             id: string;

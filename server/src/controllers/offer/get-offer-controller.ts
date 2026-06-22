@@ -37,6 +37,12 @@ export const getOffers = async (request: Request, response: Response) => {
             customer: true,
             supplier: true,
             customerContactPerson: true,
+            revisions: {
+                orderBy: { version: "desc" },
+                include: {
+                    changedBy: true,
+                }
+            },
             offerDocuments: {
                 orderBy: { version: "desc" as const },
                 include: {

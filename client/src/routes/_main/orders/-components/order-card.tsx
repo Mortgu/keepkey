@@ -1,20 +1,20 @@
-import {useEffect} from "react";
-import {toast} from "react-toastify";
-import {Download, File, Loader, Trash} from "lucide-react";
-import {LineItemRow} from "../../offers/-components/card-components";
-import type {Order, OrderDocument, OrderFlatRate, OrderPosition} from "@/types";
-import {formatDate} from "@/lib/format";
-import {formatEur} from "@/utils/utils";
-import {useDocumentTask, useLocale, useOrderHook} from "@/hooks";
-import {Badge, Button, Collapsable} from "@/components";
-import {localized} from "@/lib/i18n-content";
-import {BASE_URL} from "@/lib/api-client";
+import { Badge, Button, Collapsable } from "@/components";
+import { useDocumentTask, useLocale, useOrderHook } from "@/hooks";
+import { BASE_URL } from "@/lib/api-client";
+import { formatDate } from "@/lib/format";
+import { localized } from "@/lib/i18n-content";
+import type { Order, OrderDocument, OrderPosition } from "@/types";
+import { formatEur } from "@/utils/utils";
+import { Download, File, Loader, Trash } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { LineItemRow } from "../../offers/-components/card-components";
 
 type Props = {
     order: Order;
 };
 
-function OrderPositionRow({op}: { op: OrderPosition }) {
+function OrderPositionRow({ op }: { op: OrderPosition }) {
     const locale = useLocale();
     return (
         <LineItemRow
@@ -52,7 +52,7 @@ function OrderPositionRow({op}: { op: OrderPosition }) {
     );
 }
 
-function OrderFlatRateRow({fr}: { fr: OrderFlatRate }) {
+function OrderFlatRateRow({ fr }: { fr: OrderFlatRate }) {
     const locale = useLocale();
     return (
         <LineItemRow
@@ -81,7 +81,7 @@ function OrderFlatRateRow({fr}: { fr: OrderFlatRate }) {
     );
 }
 
-function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDocument }) {
+function OrderDocumentItem({ order, orderDoc }: { order: Order; orderDoc: OrderDocument }) {
     const status = orderDoc.status;
     useDocumentTask(orderDoc.taskId);
 
@@ -89,9 +89,9 @@ function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDoc
         <div className="flex items-center justify-between border border-(--border) py-2 pl-4 pr-2 rounded-md gap-2">
             <div className="w-full flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                    {status === "GENERATED" && <File className="size-4.5"/>}
+                    {status === "GENERATED" && <File className="size-4.5" />}
                     {(status === "PENDING" || status === "PROCESSING" || status === "UPLOADING") && (
-                        <Loader className="size-4 animate-spin"/>
+                        <Loader className="size-4 animate-spin" />
                     )}
                 </div>
                 <div className="w-full flex flex-col justify-between">
@@ -104,10 +104,10 @@ function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDoc
                 {status === "GENERATED" && (
                     <>
                         <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.id}/pdf`} download>
-                            <Button variant="secondary" size="sm" icon={<Download className="size-3.5"/>} iconOnly title="PDF herunterladen"/>
+                            <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly title="PDF herunterladen" />
                         </a>
                         <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.id}/docx`} download>
-                            <Button variant="secondary" size="sm" icon={<File className="size-3.5"/>} iconOnly title="DOCX herunterladen"/>
+                            <Button variant="secondary" size="sm" icon={<File className="size-3.5" />} iconOnly title="DOCX herunterladen" />
                         </a>
                     </>
                 )}
@@ -116,7 +116,7 @@ function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDoc
     );
 }
 
-export default function OrderCard({order}: Props) {
+export default function OrderCard({ order }: Props) {
     const {
         customerContactPerson: ccp,
         orderId,
@@ -196,10 +196,10 @@ export default function OrderCard({order}: Props) {
             >
                 <div className="grid gap-2 px-4 py-3">
                     {orderPositions.map((op, i) => (
-                        <OrderPositionRow key={i} op={op}/>
+                        <OrderPositionRow key={i} op={op} />
                     ))}
                     {flatRates.map((fr, i) => (
-                        <OrderFlatRateRow key={i} fr={fr}/>
+                        <OrderFlatRateRow key={i} fr={fr} />
                     ))}
                     <LineItemRow
                         left={
@@ -231,7 +231,7 @@ export default function OrderCard({order}: Props) {
                         size="sm"
                         loading={isGeneratingDocument}
                         disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({orderId: order.id})}
+                        onClick={() => generateDocument({ orderId: order.id })}
                     >
                         Dokument generieren
                     </Button>
@@ -245,7 +245,7 @@ export default function OrderCard({order}: Props) {
                         size="xs"
                         variant="secondary"
                         onClick={handleDeleteOrder}
-                        icon={<Trash className="size-3"/>}
+                        icon={<Trash className="size-3" />}
                         iconOnly
                     />
                 </div>

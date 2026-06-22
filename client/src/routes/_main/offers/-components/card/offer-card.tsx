@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pen, Trash, UndoDot } from "lucide-react";
-import OfferRevisionHistory from "../card-components/offer-revision-history";
+
 import type { Offer, OfferDocument } from "@/types";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 import { useOfferHook } from "@/hooks";
-import { Button, Collapsable, Drawer } from "@/components";
+import { Button, Collapsable } from "@/components";
 import OfferCardProduct from "./offer-card-product";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardDocument from "./offer-card-document";
+import OfferDrawerHistory from "../drawer/offer-drawer-history";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -167,12 +168,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header title="History" subtitle="Vergangene Preistabellen" />
-                <Drawer.Body>
-                    <OfferRevisionHistory offerId={offer.id} />
-                </Drawer.Body>
-            </Drawer>
+            <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
         </div>
     );
 }

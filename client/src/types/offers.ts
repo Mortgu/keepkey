@@ -4,7 +4,7 @@ export type Offer = components["schemas"]["Offer"];
 // export type OfferTask = Offer["tasks"];
 export type OfferPosition = components["schemas"]["OfferPosition"];
 export type OfferFlatRate = components["schemas"]["OfferFlatRate"];
-export type OfferRevision = Pick<components["schemas"]["OfferRevision"], "id" | "version" | "changedBy" | "createdAt">;
+export type OfferRevision = components["schemas"]["OfferRevision"];
 export type OfferDocument = components["schemas"]["OfferDocument"];
 
 export type Language = components["schemas"]["Language"];

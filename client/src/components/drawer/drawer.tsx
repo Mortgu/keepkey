@@ -118,7 +118,7 @@ function Drawer({ open, onClose, children, wide, className }: DrawerProps) {
                     />
                 </div>
 
-                <div className="px-[22px] py-5 overflow-y-auto flex-1 flex flex-col gap-[18px]">
+                <div className="px-[22px] py-5 overflow-y-auto flex-1 flex flex-col">
                     {body}
                 </div>
 

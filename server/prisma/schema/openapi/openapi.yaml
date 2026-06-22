@@ -299,26 +299,30 @@ components:
       properties:
         id:
           type: string
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
-          type: string
         version:
           type: integer
           format: int32
         snapshot:
           type: object
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
         changedBy:
+          $ref: "#/components/schemas/User"
+        changedById:
           type: string
         createdAt:
           type: string
           format: date-time
       required:
         - id
-        - offer
-        - offerId
         - version
         - snapshot
+        - offer
+        - offerId
+        - changedBy
+        - changedById
         - createdAt
     OfferPosition:
       type: object
@@ -754,6 +758,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Order"
+        offerRevisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferRevision"
       required:
         - id
         - name
@@ -768,6 +776,7 @@ components:
         - accounts
         - offers
         - orders
+        - offerRevisions
     Session:
       type: object
       properties:

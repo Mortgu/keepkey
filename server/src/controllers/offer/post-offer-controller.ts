@@ -1,19 +1,33 @@
-import { NextFunction, Request, Response } from 'express';
-import { prisma } from "../../lib/prismaClient.js";
 import { OfferFlatRate, OfferPosition } from "@prisma/client";
-import { toDate } from '../../utils/utils.js';
-import calculatePrice from "../../utils/products.js";
+import { NextFunction, Request, Response } from 'express';
 import env from '../../lib/env.js';
+import { prisma } from "../../lib/prismaClient.js";
+import calculatePrice from "../../utils/products.js";
+import { toDate } from '../../utils/utils.js';
 
 import fs from 'fs';
 import path from 'path';
-import { createTask, enqueueTask, uploadDocument } from '../../lib/document.js';
+import { enqueueTask, uploadDocument } from '../../lib/document.js';
+import { generateOfferDisplayName } from '../../utils/documents.js';
+import { pickTranslation } from '../../utils/i18n.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUniqueOrThrow({
         where: { id: offerId },
+        include: {
+            customer: true,
+            offerPositions: {
+                include: {
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    }
+                }
+            }
+        }
     });
 
     if (!offer) {
@@ -29,6 +43,17 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
     });
 
     const nextVersion = (currentVersion?.version ?? 0) + 1;
+
+    const formatedWorkloads = offer.offerPositions.map((op) => (
+        pickTranslation(op.product.translations, offer.language)?.name ?? ""
+    ).replaceAll(" ", "").trim())
+
+    const displayName = generateOfferDisplayName(
+        offer.quoteId,
+        offer.customer.companyName,
+        formatedWorkloads,
+        nextVersion,
+    )
 
     const task = await prisma.$transaction(async (tx) => {
         await tx.offerDocument.updateMany({
@@ -46,6 +71,7 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
 
         await tx.offerDocument.create({
             data: {
+                displayName: displayName,
                 offerId,
                 version: nextVersion,
                 isCurrent: true,
