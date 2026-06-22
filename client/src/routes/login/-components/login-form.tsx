@@ -1,18 +1,18 @@
-import {useState} from "react";
-import {useForm} from "@tanstack/react-form";
-import {Eye, EyeOff} from "lucide-react";
-import {z} from "zod";
-import {Route} from "../";
+import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { Eye, EyeOff } from "lucide-react";
+import { z } from "zod";
+import { Route } from "../";
 
-import {Button, Input} from "@/components";
-import {authClient} from "@/lib/auth-client.js";
-import {getFormError} from "@/lib/utils";
+import { Button, Input } from "@/components";
+import { authClient } from "@/lib/auth-client.js";
+import { getFormError } from "@/lib/utils";
 
 export function LoginFormComponent() {
     const [error, setError] = useState<string | undefined>(undefined);
     const [showPassword, setShowPassword] = useState(false);
     const [remember, setRemember] = useState(false);
-    const {redirect} = Route.useSearch();
+    const { redirect } = Route.useSearch();
 
     const form = useForm({
         defaultValues: {
@@ -25,10 +25,10 @@ export function LoginFormComponent() {
                 password: z.string().min(8),
             }),
         },
-        onSubmit: async ({value}) => {
+        onSubmit: async ({ value }) => {
             setError(undefined);
             try {
-                const {data, error: err} = await authClient.signIn.email({
+                const { data, error: err } = await authClient.signIn.email({
                     ...value,
                     rememberMe: remember,
                     callbackURL: redirect ? `${redirect}` : "/",
@@ -42,7 +42,7 @@ export function LoginFormComponent() {
                 window.location.assign("/");
                 return data;
             } catch (exception: any) {
-                logger.error(exception);
+                console.error(exception);
             }
         },
     });
@@ -65,15 +65,15 @@ export function LoginFormComponent() {
                                 strokeWidth="2.2"
                                 strokeLinecap="round"
                             >
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                                <polyline points="14 2 14 8 20 8"/>
-                                <line x1="8" y1="13" x2="16" y2="13"/>
-                                <line x1="8" y1="17" x2="13" y2="17"/>
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                <polyline points="14 2 14 8 20 8" />
+                                <line x1="8" y1="13" x2="16" y2="13" />
+                                <line x1="8" y1="17" x2="13" y2="17" />
                             </svg>
                         </div>
                         <span className="font-semibold text-[17px] text-gray-900 tracking-tight">
-              keepit
-            </span>
+                            keepit
+                        </span>
                     </div>
 
                     {/* Heading */}
@@ -106,9 +106,9 @@ export function LoginFormComponent() {
                                     strokeLinecap="round"
                                     className="text-red-500 shrink-0 mt-0.5"
                                 >
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <line x1="12" y1="8" x2="12" y2="12"/>
-                                    <line x1="12" y1="16" x2="12.01" y2="16"/>
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
                                 </svg>
                                 <span className="text-sm text-red-700">{error}</span>
                             </div>
@@ -134,15 +134,15 @@ export function LoginFormComponent() {
                                         placeholder="du@firma.de"
                                         className={
                                             field.state.meta.isTouched &&
-                                            field.state.meta.errors.length > 0
+                                                field.state.meta.errors.length > 0
                                                 ? "border-red-400!"
                                                 : ""
                                         }
                                     />
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
-                      {getFormError(field.state.meta.errors)}
-                    </span>
+                                            {getFormError(field.state.meta.errors)}
+                                        </span>
                                     )}
                                 </div>
                             )}
@@ -174,13 +174,13 @@ export function LoginFormComponent() {
                                             onClick={() => setShowPassword((v) => !v)}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
                                         >
-                                            {showPassword ? <EyeOff size={15}/> : <Eye size={15}/>}
+                                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
                                         </button>
                                     </div>
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
-                      {getFormError(field.state.meta.errors)}
-                    </span>
+                                            {getFormError(field.state.meta.errors)}
+                                        </span>
                                     )}
                                 </div>
                             )}
@@ -205,7 +205,7 @@ export function LoginFormComponent() {
                                             strokeWidth="3.5"
                                             strokeLinecap="round"
                                         >
-                                            <polyline points="20 6 9 17 4 12"/>
+                                            <polyline points="20 6 9 17 4 12" />
                                         </svg>
                                     )}
                                 </div>
