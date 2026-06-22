@@ -1,27 +1,27 @@
-import React, { useEffect, useState} from "react";
-import {Pen, Settings, Trash, Users} from "lucide-react";
-import {toast} from 'react-toastify';
-import {useForm} from "@tanstack/react-form";
+import React, { useEffect, useState } from "react";
+import { Pen, Settings, Trash, Users } from "lucide-react";
+import { toast } from 'react-toastify';
+import { useForm } from "@tanstack/react-form";
 import CustomerModal from "./customer-modal";
 import ContactPersonModal from "./contact-person-modal";
-import type {SyntheticEvent} from "react";
+import type { SyntheticEvent } from "react";
 
-import type {Customer} from "@/types";
-import {formatDate} from "@/lib/format";
+import type { Customer } from "@/types";
+import { formatDate } from "@/lib/format";
 
-import {useCustomerHook, useModal} from "@/hooks";
-import {Button, Drawer, Textarea} from "@/components";
-import {api} from "@/lib/api-client.ts";
+import { useCustomerHook, useModal } from "@/hooks";
+import { Button, Drawer, Textarea } from "@/components";
+import { api } from "@/lib/api-client.ts";
 
 interface CustomerListItemProps {
     customer: Customer;
 }
 
-export default function CustomerListItem({customer}: CustomerListItemProps) {
+export default function CustomerListItem({ customer }: CustomerListItemProps) {
     const editModal = useModal<Customer>();
     const contactModal = useModal();
 
-    const {deleteCustomer, isDeleting, errorDeleting} = useCustomerHook();
+    const { deleteCustomer, isDeleting, errorDeleting } = useCustomerHook();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -34,9 +34,7 @@ export default function CustomerListItem({customer}: CustomerListItemProps) {
             salutation: customer.salutation ?? "",
         },
         validators: {},
-        onSubmit: async ({value}) => {
-            console.log(value)
-
+        onSubmit: async ({ value }) => {
             await api<void>(`/api/customers/${customer.id}`, {
                 method: "PATCH",
                 headers: {
@@ -69,44 +67,44 @@ export default function CustomerListItem({customer}: CustomerListItemProps) {
                     </p>
 
                     <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" icon={<Pen className="size-3.5"/>}
-                                iconOnly onClick={() => editModal.open(customer)}/>
+                        <Button variant="secondary" size="sm" icon={<Pen className="size-3.5" />}
+                            iconOnly onClick={() => editModal.open(customer)} />
 
-                        <Button variant="secondary" size="sm" icon={<Users className="size-3.5"/>}
-                                iconOnly onClick={() => contactModal.open()}/>
+                        <Button variant="secondary" size="sm" icon={<Users className="size-3.5" />}
+                            iconOnly onClick={() => contactModal.open()} />
 
-                        <Button variant="secondary" size="sm" icon={<Settings className="size-3.5"/>}
-                                iconOnly onClick={() => setDrawerOpen(true)}/>
+                        <Button variant="secondary" size="sm" icon={<Settings className="size-3.5" />}
+                            iconOnly onClick={() => setDrawerOpen(true)} />
 
                         <Button variant="secondary" size="sm" loading={isDeleting}
-                                icon={<Trash className="size-3.5"/>} iconOnly
-                                onClick={() => deleteCustomer({id: customer.id})}/>
+                            icon={<Trash className="size-3.5" />} iconOnly
+                            onClick={() => deleteCustomer({ id: customer.id })} />
                     </div>
                 </div>
             </div>
 
             {editModal.isOpen && (
-                <CustomerModal key={editModal.key} currentCustomer={editModal.data} onClose={editModal.close}/>
+                <CustomerModal key={editModal.key} currentCustomer={editModal.data} onClose={editModal.close} />
             )}
 
             {contactModal.isOpen && (
                 <ContactPersonModal key={contactModal.key} onClose={contactModal.close}
-                                    currentCustomerId={customer.id}
-                                    currentContactPersons={customer.contactPersons ?? []}/>
+                    currentCustomerId={customer.id}
+                    currentContactPersons={customer.contactPersons ?? []} />
             )}
 
 
             <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header eyebrow="" title="Kunden Einstellungen" subtitle=""/>
+                <Drawer.Header eyebrow="" title="Kunden Einstellungen" subtitle="" />
                 <Drawer.Body>
                     <form id="customer-settings-form" onSubmit={handleSubmit}>
                         <customerSettingsForm.Field name="salutation" children={(field) => (
                             <Textarea id={field.name} size="sm" rows={5} label="Salutation"
-                                      placeholder="Personalisierte Anrede"
-                                      value={field.state.value}
-                                      onChange={(e) => field.handleChange(e.target.value)}/>
+                                placeholder="Personalisierte Anrede"
+                                value={field.state.value}
+                                onChange={(e) => field.handleChange(e.target.value)} />
 
-                        )}/>
+                        )} />
 
                     </form>
 
@@ -116,10 +114,10 @@ export default function CustomerListItem({customer}: CustomerListItemProps) {
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
                             <Button form="customer-settings-form" type="submit" size="sm" disabled={!canSubmit}
-                                    loading={isSubmitting}>
+                                loading={isSubmitting}>
                                 Speichern
                             </Button>
-                        )}/>
+                        )} />
                 </Drawer.Footer>
             </Drawer>
         </React.Fragment>

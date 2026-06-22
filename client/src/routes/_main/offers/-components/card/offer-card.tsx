@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pen, Trash, UndoDot } from "lucide-react";
-import { Document, LineItemRow } from "../card-components";
 import OfferRevisionHistory from "../card-components/offer-revision-history";
-import type { FlatRate, Offer, OfferDocument } from "@/types";
+import type { Offer, OfferDocument } from "@/types";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { useLocale, useOfferHook } from "@/hooks";
-import { Badge, Button, Collapsable, Drawer } from "@/components";
-import { localized } from "@/lib/i18n-content";
+import { useOfferHook } from "@/hooks";
+import { Button, Collapsable, Drawer } from "@/components";
 import OfferCardProduct from "./offer-card-product";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardDocument from "./offer-card-document";
@@ -44,8 +42,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
     };
 
-    console.log(offer.offerDocuments);
-
     useEffect(() => {
         if (errorDeletingOffer) {
             toast.error(`${errorDeletingOffer}`);
@@ -58,9 +54,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2 text-md">
+                            <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
-                            <span>-</span>
-                            <span>{quoteId}</span>
+
                         </div>
                     </div>
 
@@ -124,24 +120,26 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <OfferCardDocument key={document.id} offerDocument={document} />
                         ))}
                     </div>
-
-                    <div className="py-2 ">
-                        <Button
-                            className="min-w-fit"
-                            variant="primary"
-                            size="sm"
-                            loading={isGeneratingDocument}
-                            disabled={isGeneratingDocument}
-                            onClick={() => generateDocument({ offerId: offer.id })}
-                        >
-                            Dokument generieren
-                        </Button>
-                    </div>
                 </div>
             </Collapsable>
 
-            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
-                <div className="flex items-center gap-2"></div>
+            <div className="flex items-center justify-between px-4 py-2 border-t border-(--border)">
+
+                {/* Actions left */}
+                <div className="flex items-center gap-2">
+                    <Button
+                        className="min-w-fit"
+                        variant="primary"
+                        size="xs"
+                        loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument}
+                        onClick={() => generateDocument({ offerId: offer.id })}
+                    >
+                        Dokument generieren
+                    </Button>
+                </div>
+
+                {/* Actions right */}
                 <div className="flex items-center gap-2">
                     <Button
                         onClick={() => setDrawerOpen(true)}
