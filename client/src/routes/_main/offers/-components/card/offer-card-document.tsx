@@ -1,12 +1,12 @@
+import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import type { OfferDocument } from "@/types"
 import { Button } from "@/components";
 import { useDocumentTask, useOfferHook } from "@/hooks";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
-import type { DocumentStatus, OfferDocument } from "@/types"
-import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 type Props = {
     offerDocument: OfferDocument;
@@ -14,9 +14,9 @@ type Props = {
 
 export default function OfferCardDocument({ offerDocument }: Props) {
     const { offerId } = offerDocument;
+    const status = offerDocument.status;
 
-    const [status, setStatus] = useState<DocumentStatus>(offerDocument.status);
-    const { task: polledTask } = useDocumentTask(offerDocument.taskId);
+    useDocumentTask(offerDocument.taskId);
 
     const {
         deleteDocument,
@@ -28,29 +28,20 @@ export default function OfferCardDocument({ offerDocument }: Props) {
     } = useOfferHook();
 
     useEffect(() => {
-        if (polledTask?.status === "COMPLETED") {
-            setStatus("GENERATED");
-            console.log("setStatus")
-        }
-    }, [polledTask?.status]);
-
-    useEffect(() => {
         if (errorUploading) {
             toast.error(errorUploading.message)
         }
     }, [errorDeletingDocument, errorUploading]);
 
-    console.log(status, offerDocument.status)
-
     return (
         <div className="flex items-center justify-between py-3 border-b border-(--border) last:border-0">
             <div className="w-full flex items-center gap-4">
-                {status === "GENERATED" && (
+                {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
                     <div className="grid gap-0.5">
                         <p className="text-md">{offerDocument.displayName ?? `v${offerDocument.version}`}</p>
                         <div className="flex items-center gap-2 text-sm">
                             <p><span className="text-(--text-secondary)">size: </span> {formatBytesToKB(offerDocument.pdf?.size || 0)}</p>
-                            <p><span className="text-(--text-secondary)">status: </span> {offerDocument.status}</p>
+                            <p><span className="text-(--text-secondary)">status: </span> {status}</p>
                             <p><span className="text-(--text-secondary)">created: </span> {formatDate(offerDocument.createdAt)}</p>
                         </div>
                     </div>
@@ -70,7 +61,7 @@ export default function OfferCardDocument({ offerDocument }: Props) {
             </div>
 
             <div className="flex items-center ">
-                {status === "GENERATED" && (
+                {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
                     <>
                         <a href={`${BASE_URL}/api/offers/${offerId}/documents/${offerDocument.id}/pdf`} download>
                             <Button variant="ghost" size="sm" icon={<Download className="size-4" />} iconOnly title="PDF herunterladen" />

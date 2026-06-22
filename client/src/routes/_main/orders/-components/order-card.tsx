@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from "react";
+import {useEffect} from "react";
 import {toast} from "react-toastify";
 import {Download, File, Loader, Trash} from "lucide-react";
 import {LineItemRow} from "../../offers/-components/card-components";
-import type {DocumentStatus, Order, OrderDocument, OrderFlatRate,OrderPosition} from "@/types";
+import type {Order, OrderDocument, OrderFlatRate, OrderPosition} from "@/types";
 import {formatDate} from "@/lib/format";
 import {formatEur} from "@/utils/utils";
-import {useLocale, useOrderHook} from "@/hooks";
+import {useDocumentTask, useLocale, useOrderHook} from "@/hooks";
 import {Badge, Button, Collapsable} from "@/components";
 import {localized} from "@/lib/i18n-content";
 import {BASE_URL} from "@/lib/api-client";
@@ -82,7 +82,8 @@ function OrderFlatRateRow({fr}: { fr: OrderFlatRate }) {
 }
 
 function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDocument }) {
-    const [status, setStatus] = useState<DocumentStatus>(orderDoc.status);
+    const status = orderDoc.status;
+    useDocumentTask(orderDoc.taskId);
 
     return (
         <div className="flex items-center justify-between border border-(--border) py-2 pl-4 pr-2 rounded-md gap-2">
