@@ -1,5 +1,5 @@
 import { tv } from "tailwind-variants";
-import { Loader, RefreshCw, Plus } from "lucide-react";
+import { Loader, Plus, RefreshCw } from "lucide-react";
 import { Button } from "@/components";
 
 export type IntegrationStatus =

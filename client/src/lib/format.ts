@@ -4,7 +4,7 @@ export const formatDate = (date: Date | string) => {
     })
 }
 
-export const sumItems = (items: { price36Raw: number }[]) => {
+export const sumItems = (items: Array<{ price36Raw: number }>) => {
     return items?.reduce((acc, i) => acc + i.price36Raw, 0) ?? 0;
 }
 

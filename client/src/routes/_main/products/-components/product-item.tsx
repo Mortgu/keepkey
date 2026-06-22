@@ -1,11 +1,11 @@
 import { Pen, Trash } from "lucide-react";
 
+import { Link } from "@tanstack/react-router";
 import ProductModal from "./product-modal";
+import type { Product } from "@/types";
 import { Button } from "@/components";
 import { useLocale, useModal, useProductHook } from "@/hooks";
-import type { Product } from "@/types";
 import { localized } from "@/lib/i18n-content";
-import { Link } from "@tanstack/react-router";
 
 export default function ProductItem({ product }: { product: Product }) {
   const { deleteProduct, updateProduct, isDeletingProduct } = useProductHook();

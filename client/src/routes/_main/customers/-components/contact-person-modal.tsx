@@ -1,15 +1,15 @@
-import { Button, Input, ModalDialog } from "@/components";
-import type { ContactPerson } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import ContactPersonForm from "./contact-person-form";
 import ContactListItem from "./contact-list-item";
+import type { ContactPerson } from "@/types";
+import { Button, Input, ModalDialog } from "@/components";
 import { useCustomerHook } from "@/hooks";
 
 type ContactPersonModalProps = {
     onClose: () => void;
     currentCustomerId: string;
-    currentContactPersons?: ContactPerson[];
+    currentContactPersons?: Array<ContactPerson>;
 };
 
 export default function ContactPersonModal({ onClose, currentCustomerId, currentContactPersons }: ContactPersonModalProps) {

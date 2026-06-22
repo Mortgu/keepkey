@@ -7,15 +7,38 @@ export type paths = Record<string, never>;
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        Contract: {
+            id: string;
+            key: string;
+            translations: components["schemas"]["ContractTranslation"][];
+            orderPositions: components["schemas"]["OrderPosition"][];
+            offerPositions: components["schemas"]["OfferPosition"][];
+            tariffs: components["schemas"]["Tariff"][];
+            /** Format: date-time */
+            createdAt?: string;
+        };
+        ContractTranslation: {
+            contractId: string;
+            language: components["schemas"]["Language"];
+            name: string;
+            features: string[];
+            table: string;
+            contract: components["schemas"]["Contract"];
+        };
         Customer: {
             id: string;
-            customerId: string;
+            customerId?: string;
             companyName: string;
             email?: string;
+            invoiceEmail?: string;
             street?: string;
             city?: string;
             plz?: string;
             phone?: string;
+            language?: components["schemas"]["Language"];
+            country?: string;
+            currency?: components["schemas"]["Currency"];
+            salutation?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -24,7 +47,7 @@ export interface components {
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
             users: components["schemas"]["User"][];
-            tariffCustomers: components["schemas"]["TariffCustomer"][];
+            tariffCells: components["schemas"]["TariffCellCustomer"][];
         };
         ContactPerson: {
             id: string;
@@ -215,13 +238,11 @@ export interface components {
             translations: components["schemas"]["ProductTranslation"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
-            tariff?: components["schemas"]["Tariff"];
-            tariffId?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            tariffCustomers: components["schemas"]["TariffCustomer"][];
+            tariffs: components["schemas"]["Tariff"][];
         };
         ProductTranslation: {
             productId: string;
@@ -230,50 +251,6 @@ export interface components {
             description?: string;
             table?: string;
             product: components["schemas"]["Product"];
-        };
-        Tariff: {
-            id: string;
-            products: components["schemas"]["Product"][];
-            configs: components["schemas"]["TariffConfig"][];
-            customers: components["schemas"]["TariffCustomer"][];
-            /** Format: date-time */
-            createdAt: string;
-            /** Format: date-time */
-            updatedAt: string;
-        };
-        TariffConfig: {
-            id: string;
-            tariff: components["schemas"]["Tariff"];
-            tariffId: string;
-            contract: components["schemas"]["Contract"];
-            contractId: string;
-            /** Format: int32 */
-            duration: number;
-            /** Format: int32 */
-            min_quantity: number;
-            /** Format: int32 */
-            max_quantity?: number;
-            /** Format: int32 */
-            price: number;
-        };
-        TariffCustomer: {
-            id: string;
-            tariff: components["schemas"]["Tariff"];
-            tariffId: string;
-            product: components["schemas"]["Product"];
-            productId: string;
-            contract: components["schemas"]["Contract"];
-            contractId: string;
-            customer: components["schemas"]["Customer"];
-            customerId: string;
-            /** Format: int32 */
-            duration: number;
-            /** Format: int32 */
-            min_quantity: number;
-            /** Format: int32 */
-            max_quantity?: number;
-            /** Format: int32 */
-            price: number;
         };
         User: {
             id: string;
@@ -374,24 +351,94 @@ export interface components {
             table: string;
             flatRate: components["schemas"]["FlatRate"];
         };
-        Contract: {
+        Tariff: {
             id: string;
-            key: string;
-            translations: components["schemas"]["ContractTranslation"][];
-            orderPositions: components["schemas"]["OrderPosition"][];
-            offerPositions: components["schemas"]["OfferPosition"][];
-            tariffConfigs: components["schemas"]["TariffConfig"][];
-            tariffCustomers: components["schemas"]["TariffCustomer"][];
-            /** Format: date-time */
-            createdAt?: string;
-        };
-        ContractTranslation: {
-            contractId: string;
-            language: components["schemas"]["Language"];
-            name: string;
-            features: string[];
-            table: string;
+            product: components["schemas"]["Product"];
+            productId: string;
             contract: components["schemas"]["Contract"];
+            contractId: string;
+            rows: components["schemas"]["TariffRow"][];
+            columns: components["schemas"]["TariffColumn"][];
+            cells: components["schemas"]["TariffCell"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffRow: {
+            id: string;
+            tariff: components["schemas"]["Tariff"];
+            tariffId: string;
+            /** Format: int32 */
+            min_quantity: number;
+            /** Format: int32 */
+            max_quantity?: number;
+            cells: components["schemas"]["TariffCell"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffColumn: {
+            id: string;
+            tariff: components["schemas"]["Tariff"];
+            tariffId: string;
+            /** Format: int32 */
+            duration: number;
+            cells: components["schemas"]["TariffCell"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffCell: {
+            id: string;
+            tariff: components["schemas"]["Tariff"];
+            tariffId: string;
+            row: components["schemas"]["TariffRow"];
+            rowId: string;
+            column: components["schemas"]["TariffColumn"];
+            columnId: string;
+            default_cells: components["schemas"]["TariffCellDefault"][];
+            customer_cells: components["schemas"]["TariffCellCustomer"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffCellDefault: {
+            id: string;
+            cell: components["schemas"]["TariffCell"];
+            cellId: string;
+            /** Format: int32 */
+            price: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffCellCustomer: {
+            id: string;
+            cell: components["schemas"]["TariffCell"];
+            cellId: string;
+            customer: components["schemas"]["Customer"];
+            customerId: string;
+            /** Format: int32 */
+            price: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffHistory: {
+            id: string;
+            productId: string;
+            contractId: string;
+            /** Format: int32 */
+            version: number;
+            snapshot: Record<string, never>;
+            /** Format: date-time */
+            createdAt: string;
         };
         Task: {
             id: string;
@@ -413,6 +460,8 @@ export interface components {
         DocumentFormat: "PDF" | "DOCX" | "RESERVED";
         /** @enum {string} */
         Language: "DE" | "EN";
+        /** @enum {string} */
+        Currency: "EUR" | "RAND" | "DOLLAR" | "CHF";
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */

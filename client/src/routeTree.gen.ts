@@ -12,10 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainUserIndexRouteImport } from './routes/_main/user/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
+import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
-import { Route as MainPricingIndexRouteImport } from './routes/_main/pricing/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
@@ -24,6 +23,7 @@ import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts
 import { Route as MainProductsPricingRouteImport } from './routes/_main/products/pricing'
 import { Route as MainProductsFlatratesRouteImport } from './routes/_main/products/flatrates'
 import { Route as MainProductsIdIndexRouteImport } from './routes/_main/products/$id/index'
+import { Route as MainOffersCreateIndexRouteImport } from './routes/_main/offers/create/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -39,24 +39,19 @@ const MainIndexRoute = MainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainUserIndexRoute = MainUserIndexRouteImport.update({
-  id: '/user/',
-  path: '/user/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
   id: '/suppliers/',
   path: '/suppliers/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
   id: '/products/',
   path: '/products/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainPricingIndexRoute = MainPricingIndexRouteImport.update({
-  id: '/pricing/',
-  path: '/pricing/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainOrdersIndexRoute = MainOrdersIndexRouteImport.update({
@@ -99,6 +94,11 @@ const MainProductsIdIndexRoute = MainProductsIdIndexRouteImport.update({
   path: '/products/$id/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainOffersCreateIndexRoute = MainOffersCreateIndexRouteImport.update({
+  id: '/offers/create/',
+  path: '/offers/create/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
@@ -110,10 +110,10 @@ export interface FileRoutesByFullPath {
   '/employees/': typeof MainEmployeesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
   '/orders/': typeof MainOrdersIndexRoute
-  '/pricing/': typeof MainPricingIndexRoute
   '/products/': typeof MainProductsIndexRoute
+  '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
-  '/user/': typeof MainUserIndexRoute
+  '/offers/create/': typeof MainOffersCreateIndexRoute
   '/products/$id/': typeof MainProductsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -126,10 +126,10 @@ export interface FileRoutesByTo {
   '/employees': typeof MainEmployeesIndexRoute
   '/offers': typeof MainOffersIndexRoute
   '/orders': typeof MainOrdersIndexRoute
-  '/pricing': typeof MainPricingIndexRoute
   '/products': typeof MainProductsIndexRoute
+  '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
-  '/user': typeof MainUserIndexRoute
+  '/offers/create': typeof MainOffersCreateIndexRoute
   '/products/$id': typeof MainProductsIdIndexRoute
 }
 export interface FileRoutesById {
@@ -144,10 +144,10 @@ export interface FileRoutesById {
   '/_main/employees/': typeof MainEmployeesIndexRoute
   '/_main/offers/': typeof MainOffersIndexRoute
   '/_main/orders/': typeof MainOrdersIndexRoute
-  '/_main/pricing/': typeof MainPricingIndexRoute
   '/_main/products/': typeof MainProductsIndexRoute
+  '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
-  '/_main/user/': typeof MainUserIndexRoute
+  '/_main/offers/create/': typeof MainOffersCreateIndexRoute
   '/_main/products/$id/': typeof MainProductsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -162,10 +162,10 @@ export interface FileRouteTypes {
     | '/employees/'
     | '/offers/'
     | '/orders/'
-    | '/pricing/'
     | '/products/'
+    | '/settings/'
     | '/suppliers/'
-    | '/user/'
+    | '/offers/create/'
     | '/products/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -178,10 +178,10 @@ export interface FileRouteTypes {
     | '/employees'
     | '/offers'
     | '/orders'
-    | '/pricing'
     | '/products'
+    | '/settings'
     | '/suppliers'
-    | '/user'
+    | '/offers/create'
     | '/products/$id'
   id:
     | '__root__'
@@ -195,10 +195,10 @@ export interface FileRouteTypes {
     | '/_main/employees/'
     | '/_main/offers/'
     | '/_main/orders/'
-    | '/_main/pricing/'
     | '/_main/products/'
+    | '/_main/settings/'
     | '/_main/suppliers/'
-    | '/_main/user/'
+    | '/_main/offers/create/'
     | '/_main/products/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -230,13 +230,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/user/': {
-      id: '/_main/user/'
-      path: '/user'
-      fullPath: '/user/'
-      preLoaderRoute: typeof MainUserIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/suppliers/': {
       id: '/_main/suppliers/'
       path: '/suppliers'
@@ -244,18 +237,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSuppliersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/settings/': {
+      id: '/_main/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof MainSettingsIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/products/': {
       id: '/_main/products/'
       path: '/products'
       fullPath: '/products/'
       preLoaderRoute: typeof MainProductsIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/pricing/': {
-      id: '/_main/pricing/'
-      path: '/pricing'
-      fullPath: '/pricing/'
-      preLoaderRoute: typeof MainPricingIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/orders/': {
@@ -314,6 +307,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainProductsIdIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/offers/create/': {
+      id: '/_main/offers/create/'
+      path: '/offers/create'
+      fullPath: '/offers/create/'
+      preLoaderRoute: typeof MainOffersCreateIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
   }
 }
 
@@ -326,10 +326,10 @@ interface MainRouteRouteChildren {
   MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
-  MainPricingIndexRoute: typeof MainPricingIndexRoute
   MainProductsIndexRoute: typeof MainProductsIndexRoute
+  MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
-  MainUserIndexRoute: typeof MainUserIndexRoute
+  MainOffersCreateIndexRoute: typeof MainOffersCreateIndexRoute
   MainProductsIdIndexRoute: typeof MainProductsIdIndexRoute
 }
 
@@ -342,10 +342,10 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainEmployeesIndexRoute: MainEmployeesIndexRoute,
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
-  MainPricingIndexRoute: MainPricingIndexRoute,
   MainProductsIndexRoute: MainProductsIndexRoute,
+  MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
-  MainUserIndexRoute: MainUserIndexRoute,
+  MainOffersCreateIndexRoute: MainOffersCreateIndexRoute,
   MainProductsIdIndexRoute: MainProductsIdIndexRoute,
 }
 

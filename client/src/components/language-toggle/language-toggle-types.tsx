@@ -1,4 +1,5 @@
 import type { Language } from "@/types";
+import type { ComponentSize } from "@/components/size";
 
 export interface LanguageOption {
   /** Language code used as the value, e.g. "de" or "en". */
@@ -17,6 +18,8 @@ export interface LanguageToggleProps {
   /** Called with the selected language code. */
   onChange: (code: Language) => void;
   className?: string;
+  /** Controls the size of the toggle. Defaults to "sm". */
+  size?: ComponentSize;
   /** Accessible label for the underlying tablist. */
   "aria-label"?: string;
 }

@@ -1,5 +1,8 @@
 import {NextFunction, Request, Response} from "express";
+import path from "path";
+import fs from "fs/promises";
 import {prisma} from "../../lib/prismaClient.js";
+import env from "../../lib/env.js";
 
 export const getOffers = async (request: Request, response: Response) => {
     const {search, companyIds, contactPersonIds, sort} = request.query;
@@ -43,8 +46,16 @@ export const getOffers = async (request: Request, response: Response) => {
             },
             offerPositions: {
                 include: {
-                    product: true,
-                    contract: true,
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    },
+                    contract: {
+                        include: {
+                            translations: true
+                        }
+                    },
                 },
             },
             offerFlatRates: {
@@ -105,6 +116,11 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
 export const downloadOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
     const documentId = request.params.documentId as string;
+    const format = (request.params.format as string).toLowerCase();
+
+    if (format !== "pdf" && format !== "docx") {
+        return response.status(400).json({message: "Invalid format. Use 'pdf' or 'docx'."});
+    }
 
     const offerDoc = await prisma.offerDocument.findFirst({
         where: {offerId, documentId},
@@ -117,10 +133,24 @@ export const downloadOfferDocument = async (request: Request, response: Response
 
     const {document} = offerDoc;
 
-    if (document.status !== "GENERATED" || !document.path) {
+    if (document.status !== "GENERATED") {
         return response.status(409).json({message: "Document not yet generated"});
     }
 
-    const downloadName = `${document.displayName ?? document.id}.${document.format.toLowerCase()}`;
-    return response.download(document.path, downloadName);
+    const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
+
+    try {
+        await fs.access(filePath);
+    } catch {
+        return response.status(404).json({message: "File not found on disk"});
+    }
+
+    const mimeTypes: Record<string, string> = {
+        pdf: "application/pdf",
+        docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    };
+
+    const downloadName = `${document.displayName ?? document.id}.${format}`;
+    response.setHeader("Content-Type", mimeTypes[format]);
+    return response.download(filePath, downloadName);
 };

@@ -1,9 +1,10 @@
+import { useForm } from "@tanstack/react-form";
+import { z } from 'zod';
+import type { Supplier } from "@/types";
+import type { SyntheticEvent } from "react";
 import { Button, Input, ModalDialog } from "@/components";
 import { useSupplierHook } from "@/hooks";
-import type { Supplier } from "@/types";
-import { useForm } from "@tanstack/react-form";
-import type { SyntheticEvent } from "react";
-import { z } from 'zod';
+import { getFormError } from '@/lib/utils';
 
 interface SupplierModalProps {
     onClose: () => void;
@@ -61,13 +62,13 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
                 <form id="supplier-form" onSubmit={handleSubmit}>
                     <div className="flex items-center gap-2">
                         <supplierForm.Field name="name" children={(field) => (
-                            <Input label="Name" value={field.state.value} error={field.state.meta.errors[0]?.message}
+                            <Input label="Name" value={field.state.value} error={getFormError(field.state.meta.errors)}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur} />
                         )} />
 
                         <supplierForm.Field name="supplierId" children={(field) => (
-                            <Input label="id" value={field.state.value} error={field.state.meta.errors[0]?.message}
+                            <Input label="id" value={field.state.value} error={getFormError(field.state.meta.errors)}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur} />
                         )} />

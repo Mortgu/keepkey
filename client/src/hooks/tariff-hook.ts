@@ -1,141 +1,158 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-import type {
-  CreateTariffConfigInput,
-  CreateTariffCustomerInput,
-  CreateTariffInput,
-  UpdateTariffConfigInput,
-  UpdateTariffCustomerInput,
-  UpdateTariffInput,
-} from "@/types";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 
 import {
-  addTariffConfigAction,
-  addTariffCustomerAction,
-  createTariffAction,
-  deleteTariffAction,
-  deleteTariffConfigAction,
-  deleteTariffCustomerAction,
-  getAllTariffsAction,
-  updateTariffAction,
-  updateTariffConfigAction,
-  updateTariffCustomerAction,
+    createTariffAction,
+    createTariffColumnAction,
+    createTariffRowAction,
+    deleteTariffAction,
+    deleteTariffColumnAction,
+    deleteTariffRowAction,
+    getAllTariffsAction,
+    getProductTariffsAction,
+    getTariffDurationsAction,
+    getTariffHistoryAction,
+    updateTariffCellAction,
+    updateTariffColumnAction,
+    updateTariffRowAction,
 } from "@/data/tariffs";
 
-export const useTariffHook = () => {
-  const queryClient = useQueryClient();
+export const useTariffHook = (productId?: string) => {
+    const queryClient = useQueryClient();
 
-  const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["tariffs"] });
+    const queryKey = productId ? ["tariffs", productId] : ["tariffs"];
 
-  const { data: tariffs = [], isPending, error } = useQuery({
-    queryKey: ["tariffs"],
-    queryFn: getAllTariffsAction,
-  });
+    const invalidateTariffs = () => {
+        queryClient.invalidateQueries({queryKey: ["tariffs"]});
+    };
 
-  const createMutation = useMutation({
-    mutationFn: (body: CreateTariffInput) => createTariffAction(body),
-    onSuccess: invalidate,
-  });
+    const invalidateAll = () => {
+        queryClient.invalidateQueries({queryKey: ["tariffs"]});
+        queryClient.invalidateQueries({queryKey: ["tariff-history"]});
+    };
 
-  const updateMutation = useMutation({
-    mutationFn: ({ id, body }: { id: string; body: UpdateTariffInput }) =>
-      updateTariffAction(id, body),
-    onSuccess: invalidate,
-  });
+    const {data: tariffs = [], isPending, error} = useQuery({
+        queryKey,
+        queryFn: productId ? () => getProductTariffsAction(productId) : getAllTariffsAction,
+    });
 
-  const deleteMutation = useMutation({
-    mutationFn: ({ id }: { id: string }) => deleteTariffAction(id),
-    onSuccess: invalidate,
-  });
+    const createTariffMutation = useMutation({
+        mutationFn: ({productId, contractId}: { productId: string, contractId: string }) =>
+            createTariffAction(productId, contractId),
+        onSuccess: invalidateAll,
+    });
 
-  const addConfigMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      body,
-    }: {
-      tariffId: string;
-      body: CreateTariffConfigInput;
-    }) => addTariffConfigAction(tariffId, body),
-    onSuccess: invalidate,
-  });
+    const deleteTariffMutation = useMutation({
+        mutationFn: ({tariffId}: { tariffId: string }) =>
+            deleteTariffAction(tariffId),
+        onSuccess: invalidateAll,
+    })
 
-  const updateConfigMutation = useMutation({
-    mutationFn: ({ tariffId, configId, body }: {
-      tariffId: string; configId: string; body: UpdateTariffConfigInput;
-    }) => updateTariffConfigAction(tariffId, configId, body),
-    onSuccess: invalidate,
-  });
+    const createTariffColumnMutation = useMutation({
+        mutationFn: ({tariffId, duration}: { tariffId: string, duration: number }) =>
+            createTariffColumnAction(tariffId, duration),
+        onSuccess: invalidateTariffs,
+    })
 
-  const deleteConfigMutation = useMutation({
-    mutationFn: ({ tariffId, configId }: {
-      tariffId: string; configId: string;
-    }) => deleteTariffConfigAction(tariffId, configId),
-    onSuccess: invalidate,
-  });
+    const deleteTariffColumnMutation = useMutation({
+        mutationFn: ({tariffId, columnId}: { tariffId: string, columnId: string }) =>
+            deleteTariffColumnAction(tariffId, columnId),
+        onSuccess: invalidateTariffs,
+    });
 
-  const addCustomerMutation = useMutation({
-    mutationFn: ({ tariffId, body }: {
-      tariffId: string; body: CreateTariffCustomerInput;
-    }) => addTariffCustomerAction(tariffId, body),
-    onSuccess: invalidate,
-  });
+    const updateTariffColumnMutation = useMutation({
+        mutationFn: ({tariffId, columnId, duration}: { tariffId: string, columnId: string, duration: number }) =>
+            updateTariffColumnAction(tariffId, columnId, duration),
+        onSuccess: invalidateTariffs,
+    });
 
-  const updateCustomerMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      tariffCustomerId,
-      body,
-    }: {
-      tariffId: string;
-      tariffCustomerId: string;
-      body: UpdateTariffCustomerInput;
-    }) => updateTariffCustomerAction(tariffId, tariffCustomerId, body),
-    onSuccess: invalidate,
-  });
+    const createTariffRowMutation = useMutation({
+        mutationFn: ({tariffId, min_qty, max_qty}: {
+            tariffId: string, min_qty: number, max_qty: number
+        }) => createTariffRowAction(tariffId, min_qty, max_qty),
+        onSuccess: invalidateTariffs,
+    });
 
-  const deleteCustomerMutation = useMutation({
-    mutationFn: ({
-      tariffId,
-      tariffCustomerId,
-    }: {
-      tariffId: string;
-      tariffCustomerId: string;
-    }) => deleteTariffCustomerAction(tariffId, tariffCustomerId),
-    onSuccess: invalidate,
-  });
+    const deleteTariffRowMutation = useMutation({
+        mutationFn: ({tariffId, rowId}: {
+            tariffId: string, rowId: string
+        }) => deleteTariffRowAction(tariffId, rowId),
+        onSuccess: invalidateTariffs,
+    });
 
-  return {
-    tariffs,
-    isPending,
-    error,
+    const updateTariffRowMutation = useMutation({
+        mutationFn: ({tariffId, rowId, min_qty, max_qty}: {
+            tariffId: string, rowId: string, min_qty: number, max_qty: number
+        }) => updateTariffRowAction(tariffId, rowId, min_qty, max_qty),
+        onSuccess: invalidateTariffs,
+    });
 
-    createTariff: createMutation.mutateAsync,
-    isCreating: createMutation.isPending,
-    errorCreatingTariff: createMutation.error,
+    const updateTariffCellMutation = useMutation({
+        mutationFn: ({tariffId, cellId, default_price, customer_price}: {
+            tariffId: string, cellId: string, default_price?: number, customer_price?: number
+        }) =>
+            updateTariffCellAction(tariffId, cellId, default_price, customer_price),
+        onSuccess: invalidateTariffs,
+    })
 
-    updateTariff: updateMutation.mutateAsync,
-    isUpdating: updateMutation.isPending,
+    return {
+        tariffs,
+        isPending,
+        error,
 
-    deleteTariff: deleteMutation.mutate,
-    isDeleting: deleteMutation.isPending,
+        createTariff: createTariffMutation.mutate,
+        createTariffPending: createTariffMutation.isPending,
+        createTariffError: createTariffMutation.error,
 
-    addConfig: addConfigMutation.mutateAsync,
-    isAddingConfig: addConfigMutation.isPending,
+        deleteTariff: deleteTariffMutation.mutateAsync,
+        deleteTariffPending: deleteTariffMutation.isPending,
+        deleteTariffError: deleteTariffMutation.error,
 
-    updateConfig: updateConfigMutation.mutateAsync,
-    isUpdatingConfig: updateConfigMutation.isPending,
+        createColumn: createTariffColumnMutation.mutateAsync,
+        creatingColumn: createTariffColumnMutation.isPending,
+        errorCreatingColumn: createTariffColumnMutation.error,
 
-    deleteConfig: deleteConfigMutation.mutate,
-    isDeletingConfig: deleteConfigMutation.isPending,
+        deleteColumn: deleteTariffColumnMutation.mutateAsync,
+        deletingColumn: deleteTariffColumnMutation.isPending,
+        errorDeletingColumn: deleteTariffColumnMutation.error,
 
-    addCustomerOverride: addCustomerMutation.mutateAsync,
-    isAddingCustomerOverride: addCustomerMutation.isPending,
+        updateColumn: updateTariffColumnMutation.mutateAsync,
+        updatingColumn: updateTariffColumnMutation.isPending,
+        errorUpdatingColumn: updateTariffColumnMutation.error,
 
-    updateCustomerOverride: updateCustomerMutation.mutateAsync,
-    isUpdatingCustomerOverride: updateCustomerMutation.isPending,
+        createRow: createTariffRowMutation.mutateAsync,
+        creatingRow: createTariffRowMutation.isPending,
+        errorCreatingRow: createTariffRowMutation.error,
 
-    deleteCustomerOverride: deleteCustomerMutation.mutate,
-    isDeletingCustomerOverride: deleteCustomerMutation.isPending,
-  };
+        deleteRow: deleteTariffRowMutation.mutateAsync,
+        deletingRow: deleteTariffRowMutation.isPending,
+        errorDeletingRow: deleteTariffRowMutation.error,
+
+        updateRow: updateTariffRowMutation.mutateAsync,
+        updatingRow: updateTariffRowMutation.isPending,
+        errorUpdatingRow: updateTariffRowMutation.error,
+
+        updateCell: updateTariffCellMutation.mutateAsync,
+        updatingCell: updateTariffCellMutation.isPending,
+        errorUpdatingCell: updateTariffCellMutation.error,
+    };
+};
+
+export const useTariffHistoryHook = (productId: string, contractId: string) => {
+    const {data: history = [], isPending, error} = useQuery({
+        queryKey: ["tariff-history", productId, contractId],
+        queryFn: () => getTariffHistoryAction(productId, contractId),
+        enabled: !!productId && !!contractId,
+    });
+
+    return {history, isPending, error};
+};
+
+export const useTariffDurationsHook = (productId: string, contractId: string) => {
+    const {data: durations = [], isPending, error} = useQuery({
+        queryKey: ["tariff-durations", productId, contractId],
+        queryFn: () => getTariffDurationsAction(productId, contractId),
+        enabled: !!productId && !!contractId,
+    });
+
+    return {durations, isPending, error};
 };

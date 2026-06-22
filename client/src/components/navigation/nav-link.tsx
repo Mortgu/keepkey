@@ -1,9 +1,9 @@
 import * as React from "react";
 import {tv} from "tailwind-variants";
-import type {LinkComponent} from "@tanstack/react-router";
 import {createLink} from "@tanstack/react-router";
 
 import {ChevronDown} from "lucide-react";
+import type {LinkComponent} from "@tanstack/react-router";
 
 const itemStyles = tv({
     base: [

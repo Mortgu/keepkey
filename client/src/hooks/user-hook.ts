@@ -1,3 +1,4 @@
+import { useMutation, useQuery, useQueryClient  } from "@tanstack/react-query";
 import type { CreateUserInput, UpdateUserInput } from "@/types";
 import {
   createUserAction,
@@ -5,8 +6,6 @@ import {
   getAllUsersAction,
   updateUserByIdAction,
 } from "@/data/user";
-import { useQueryClient } from "@tanstack/react-query";
-import { useMutation, useQuery } from "@tanstack/react-query";
 
 export const useUserHook = () => {
   const queryClient = useQueryClient();

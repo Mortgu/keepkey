@@ -1,5 +1,6 @@
 import { tv } from "tailwind-variants";
-import { VARIANT_LABELS, type BadgeComponentProps } from "./badge-types";
+import {  VARIANT_LABELS } from "./badge-types";
+import type {BadgeComponentProps} from "./badge-types";
 
 const badgeSizeStyles = {
   xs: "px-1.5 py-px text-[10px]",

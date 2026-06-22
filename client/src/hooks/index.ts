@@ -9,3 +9,4 @@ export * from './product-hook';
 export * from './tariff-hook';
 export * from './user-hook';
 export * from './supplier-hook';
+export * from './use-dashboard-stats';

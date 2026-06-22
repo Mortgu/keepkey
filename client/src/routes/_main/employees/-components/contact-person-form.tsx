@@ -27,7 +27,7 @@ export default function ContactPersonForm({ onSave, onCancel }: Props) {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
-    const [errors, setErrors] = useState<string[]>([]);
+    const [errors, setErrors] = useState<Array<string>>([]);
 
     const handleSave = () => {
         const result = contactPersonSchema.safeParse({ salutation, firstName, lastName, email: email || undefined });

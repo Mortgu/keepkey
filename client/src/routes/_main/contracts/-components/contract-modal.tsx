@@ -1,4 +1,7 @@
-import { Input, Button, ModalDialog, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle } from "@/components";
+import { useForm } from "@tanstack/react-form";
+import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
 import type {
   Contract,
   ContractTranslationInput,
@@ -7,10 +10,8 @@ import type {
   UpdateContractInput,
 } from "@/types";
 import { useContractHook } from "@/hooks";
-import { useForm } from "@tanstack/react-form";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
+import { getFormErrors } from "@/lib/utils";
 
 interface ContractModalProps {
   onClose: () => void;
@@ -51,17 +52,17 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       onChange: contractSchema,
     },
     onSubmit: ({ value }) => {
-      const translations: ContractTranslationInput[] = [
+      const translations: Array<ContractTranslationInput> = [
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];
       if (isEdit) {
         updateContract({
           id: currentContract.id,
-          data: { key: value.key, translations } as UpdateContractInput,
+          data: { key: value.key, translations },
         });
       } else {
-        createContract({ key: value.key, translations } as CreateContractInput);
+        createContract({ key: value.key, translations });
       }
       onClose();
     },
@@ -93,7 +94,7 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
             <div className="grid gap-2">
               <Input id={field.name} value={field.state.value} label="Schlüssel (sprachunabhängig)"
                 disabled={isEdit}
-                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                error={getFormErrors(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />
@@ -103,7 +104,7 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
           <contractForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-2">
               <Input id={field.name} value={field.state.value} label={`Name (${language})`}
-                error={field.state.meta.errors.map((e) => e?.message).join(" & ")}
+                error={getFormErrors(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />

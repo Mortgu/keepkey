@@ -1,13 +1,13 @@
+import { Pen, Trash, X } from "lucide-react";
+import { useState } from "react";
+import { tv } from "tailwind-variants";
+import OfferProductForm from "./offer-product-form";
 import type { Contract, Product } from "@/types";
 import type { OfferProductInput } from "./offer-product-form";
-import { Pen, Trash, X } from "lucide-react";
 import { formatEur } from "@/utils/utils";
 import { Button } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { useState } from "react";
-import OfferProductForm from "./offer-product-form";
-import { tv } from "tailwind-variants";
 
 type OfferProduct = Product & OfferProductInput;
 
@@ -15,7 +15,7 @@ type Props = {
     offerProduct: OfferProduct;
     offerContract: Contract;
 
-    setOfferProducts: React.Dispatch<React.SetStateAction<OfferProductInput[]>>;
+    setOfferProducts: React.Dispatch<React.SetStateAction<Array<OfferProductInput>>>;
 
     index: number;
 

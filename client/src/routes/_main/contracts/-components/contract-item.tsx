@@ -1,9 +1,9 @@
-import { formatDate } from "@/lib/format";
 import { Pen, Trash } from "lucide-react";
 import { Fragment } from "react";
 import ContractModal from "./contract-modal";
 
 import type { Contract } from "@/types";
+import { formatDate } from "@/lib/format";
 import { Button } from "@/components";
 import { useLocale, useModal } from "@/hooks";
 import { localized } from "@/lib/i18n-content";

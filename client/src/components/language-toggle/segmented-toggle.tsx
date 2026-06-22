@@ -1,7 +1,29 @@
 import type { ReactNode } from "react";
 import type { LanguageToggleProps } from "./language-toggle-types";
+import type { ComponentSize } from "@/components/size";
 
 import { cn } from "@/lib/utils";
+
+const SEGMENTED_SIZE_STYLES = {
+  xs: {
+    container: "p-0.5",
+    thumb: "top-0.5 bottom-0.5 left-0.5",
+    button: "px-3 py-1 text-xs",
+    thumbWidth: 4,
+  },
+  sm: {
+    container: "p-0.75",
+    thumb: "top-0.75 bottom-0.75 left-0.75",
+    button: "px-4 py-1.25 text-sm",
+    thumbWidth: 6,
+  },
+  md: {
+    container: "p-1",
+    thumb: "top-1 bottom-1 left-1",
+    button: "px-5 py-1.5 text-md",
+    thumbWidth: 8,
+  },
+} satisfies Record<ComponentSize, { container: string; thumb: string; button: string; thumbWidth: number }>;
 
 export interface SegmentedToggleOption<TValue extends string = string> {
   /** Stable option value used by the controlled toggle. */
@@ -18,6 +40,7 @@ export interface SegmentedToggleProps<TValue extends string = string> {
   className?: string;
   optionClassName?: string;
   thumbClassName?: string;
+  size?: ComponentSize;
   /** Accessible label for the underlying tablist. */
   "aria-label"?: string;
 }
@@ -33,6 +56,7 @@ export function SegmentedToggle<TValue extends string = string>({
   className,
   optionClassName,
   thumbClassName,
+  size = "sm",
   "aria-label": ariaLabel = "Segmented control",
 }: SegmentedToggleProps<TValue>) {
   const activeIndex = Math.max(
@@ -40,12 +64,15 @@ export function SegmentedToggle<TValue extends string = string>({
     options.findIndex((option) => option.value === value),
   );
 
+  const sizeStyles = SEGMENTED_SIZE_STYLES[size];
+
   return (
     <div
       role="tablist"
       aria-label={ariaLabel}
       className={cn(
-        "relative inline-flex rounded-md border border-(--border) bg-(--subtle-50) p-0.75",
+        "relative inline-flex rounded-md border border-(--border) bg-(--subtle-50)",
+        sizeStyles.container,
         className,
       )}
     >
@@ -53,11 +80,12 @@ export function SegmentedToggle<TValue extends string = string>({
         <span
           aria-hidden
           className={cn(
-            "absolute top-0.75 bottom-0.75 left-0.75 rounded bg-white shadow-sm transition-transform duration-200 ease-in-out",
+            "absolute rounded bg-white shadow-sm transition-transform duration-200 ease-in-out",
+            sizeStyles.thumb,
             thumbClassName,
           )}
           style={{
-            width: `calc((100% - 6px) / ${options.length})`,
+            width: `calc((100% - ${sizeStyles.thumbWidth}px) / ${options.length})`,
             transform: `translateX(${activeIndex * 100}%)`,
           }}
         />
@@ -74,8 +102,9 @@ export function SegmentedToggle<TValue extends string = string>({
             disabled={option.disabled}
             onClick={() => onChange(option.value)}
             className={cn(
-              "relative z-10 min-w-14 flex-1 rounded px-4 py-1.25 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
+              "relative z-10 min-w-14 flex-1 rounded font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50",
               active && "font-semibold text-(--primary)",
+              sizeStyles.button,
               optionClassName,
             )}
           >
@@ -98,12 +127,14 @@ export const SegmentedLanguageToggle = ({
   value,
   onChange,
   className,
+  size,
   "aria-label": ariaLabel = "Language",
 }: LanguageToggleProps) => {
   return (
     <SegmentedToggle
       aria-label={ariaLabel}
       className={className}
+      size={size}
       options={options.map((option) => ({
         value: option.code,
         label: option.label,

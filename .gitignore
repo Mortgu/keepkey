@@ -1,3 +1,4 @@
+.idea
 .idea/dataSources.xml
 .idea/inspectionProfiles/Project_Default.xml
 .idea/keepkey.iml
@@ -11,5 +12,7 @@ graphify-out/.graphify_root
 graphify-out/cache/
 *.tex
 graphify-out/2026-06-09/graph.json
+
+node_modules
 
 graphify-out

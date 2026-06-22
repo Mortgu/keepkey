@@ -87,6 +87,8 @@ const write: PipelineStage<OrderPipelineContext> = {
             fs.writeFile(docxPath, context.docxBuffer!),
             fs.writeFile(pdfPath, context.pdfBuffer!),
         ]);
+
+        context.path = docxPath;
     },
 };
 

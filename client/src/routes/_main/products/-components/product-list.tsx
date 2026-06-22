@@ -2,7 +2,7 @@ import ProductItem from "./product-item";
 import type {Product} from "@/types";
 
 type Props = {
-    products: Product[];
+    products: Array<Product>;
 }
 
 export default function ProductList({products}: Props) {

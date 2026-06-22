@@ -1,8 +1,8 @@
-import {Button} from "@/components/button/button";
 import {AlertCircle, AlertTriangle, Loader2} from "lucide-react";
 import {forwardRef} from "react";
 import {tv} from "tailwind-variants";
 import type {InputComponentProps} from "./input-types";
+import {Button} from "@/components/button/button";
 
 const styles = tv({
     base: [
@@ -110,7 +110,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
         return (
             <div className="w-full">
                 {(label || error || warning) && (
-                    <div className="flex items-center gap-1.5 mb-1">
+                    <div className="flex items-center gap-1.5 mb-1 justify-between">
                         {label && (
                             <label className="text-sm font-medium text-(--text)">
                                 {label}

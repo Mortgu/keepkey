@@ -23,6 +23,8 @@ model Order {
   validUntil  DateTime?
   requestFrom DateTime?
 
+  net_amount Int
+
   orderPositions OrderPosition[]
   flatRates      OrderFlatRate[]
   orderDocuments OrderDocument[]

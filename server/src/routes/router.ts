@@ -1,5 +1,5 @@
-import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
+import {Router} from "express";
+import {requireSession} from "../middlewares/auth.js";
 
 import productRouter from "./product-router.js";
 import supplierRouter from "./supplier-router.js";
@@ -12,7 +12,7 @@ import taskRouter from "./task-router.js";
 import contactPersonRouter from "./contact-person-router.js";
 import tariffRouter from './tariff-router.js';
 import documentRouter from './document-router.js';
-import nextCloudRouter from './nextcould-router.js';
+import cloudRouter from './nextcloud-router.js';
 import offerRouter from "./offer-router.js";
 
 const router = Router();
@@ -48,12 +48,12 @@ router.use("/tasks", requireSession, taskRouter);
 router.use("/contact-persons", requireSession, contactPersonRouter);
 
 /* /api/tariffs */
-router.use("/tariffs", requireSession, tariffRouter);
+router.use("/tariffs", tariffRouter);
 
 /* /api/documents */
 router.use('/documents', documentRouter);
 
-/* /api/nextcloud */
-router.use('/nextcloud', nextCloudRouter);
+/* /api/cloud */
+router.use('/cloud', cloudRouter);
 
 export default router;

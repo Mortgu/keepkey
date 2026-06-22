@@ -7,7 +7,7 @@ type Translatable = { language: Language };
  * first available translation. Returns undefined only if the list is empty.
  */
 export function pickTranslation<T extends Translatable>(
-  translations: T[] | undefined,
+  translations: Array<T> | undefined,
   locale: Language,
 ): T | undefined {
   if (!translations?.length) return undefined;
@@ -23,7 +23,7 @@ export function pickTranslation<T extends Translatable>(
  * Returns an empty string when nothing matches so it is render-safe.
  */
 export function localized<T extends Translatable, K extends keyof T>(
-  translations: T[] | undefined,
+  translations: Array<T> | undefined,
   locale: Language,
   field: K,
 ): T[K] | "" {

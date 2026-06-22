@@ -3,6 +3,7 @@ import {
   createOrder,
   createOrderTask,
   deleteOrderById,
+  downloadOrderDocument,
   generateOrderDocument,
   getAllOrders,
   getOrderById,
@@ -15,6 +16,8 @@ const router = Router();
 router.get("/", getAllOrders);
 
 router.get("/:orderId", getOrderById);
+
+router.get("/:orderId/documents/:documentId/:format", downloadOrderDocument);
 
 router.post('/:orderId/document', generateOrderDocument);
 

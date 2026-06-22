@@ -2,7 +2,7 @@ import {betterAuth} from "better-auth";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {admin as adminPlugin} from "better-auth/plugins";
 
-import {ac, admin, employee} from "./permissions.js";
+import {ac, admin, employee} from "../permissions/access.js";
 import env from "./env.js";
 import {prisma} from "./prismaClient.js";
 

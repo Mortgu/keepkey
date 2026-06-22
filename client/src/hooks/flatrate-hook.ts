@@ -1,4 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {
+  CreateFlatRateInput,
+  UpdateFlatRateInput
+} from '@/types';
 import {
   createFlatRateAction,
   deleteFlatRateAction,
@@ -6,10 +10,6 @@ import {
   updateFlatRateAction,
 } from "@/data/flatrates";
 
-import type {
-  CreateFlatRateInput,
-  UpdateFlatRateInput
-} from '@/types';
 
 export const useFlatRateHook = () => {
   const queryClient = useQueryClient();

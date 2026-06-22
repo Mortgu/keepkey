@@ -2,10 +2,13 @@ import fs from "fs/promises";
 import path from "path";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
+import InspectModule from "docxtemplater/js/inspect-module.js";
 
 import {PrismaClientKnownRequestError} from "@prisma/client/runtime/client";
+import {z} from "zod";
 import {prisma} from "../../lib/prismaClient.js";
-import {OfferFetchData, OfferFormatedData, OfferPipelineContext} from "./context.js";
+import {OfferFetchData, OfferPipelineContext} from "./context.js";
+import {type OfferContext, offerSchema} from "../../schemas/offer-template-schema.js";
 import logger from "../../middlewares/logger.js";
 import {PipelineStageError} from "../pipeline.js";
 import {pickTranslation} from "../../utils/i18n.js";
@@ -58,6 +61,21 @@ export const fetchOfferAction = async (context: OfferPipelineContext) => {
 }
 
 /* Helper function */
+type AugmentedContract = {
+    id: string;
+    name: string;
+    features: string[];
+    table: string;
+};
+
+const pickContractFields = (contract: AugmentedContract) => ({
+    id: contract.id,
+    name: contract.name,
+    features: contract.features,
+    table: contract.table,
+});
+
+/* Helper function */
 export const formatOfferData = async (fetchedData: OfferFetchData) => {
     const {offer, contracts} = fetchedData;
     const {customer, customerContactPerson: ccp, user: employee, language} = offer;
@@ -96,9 +114,11 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
     });
 
     const products = offerPositions.map((position) => ({
-        contract: position.contract,
-        ...position.product,
-
+        id: position.product.id,
+        name: position.product.name,
+        description: position.product.description,
+        table: position.product.table,
+        contract: pickContractFields(position.contract),
         duration_months: position.duration_months,
         duration: formatDuration(position.duration_months),
     }));
@@ -109,12 +129,11 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
     const grouped = Object.values(groups).map((group) => {
         const first = group![0];
 
-        const flatrate_total = offerFlatRates?.reduce((sum, p) => sum + p.total_cents, 0);
-        const group_total = group?.reduce((sum, p) => sum + p.total_cents, flatrate_total);
+        const group_total = group?.reduce((sum, p) => sum + p.total_cents, 0);
 
         return {
             names: group?.map((p) => p.product.name).join(" & "),
-            contract: first.contract,
+            contract: pickContractFields(first.contract),
             duration_months: first.duration_months,
             duration: formatDuration(first.duration_months),
             total: formatEur(group_total! / 100),
@@ -123,13 +142,15 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
                 description: item.product.description,
                 table: item.product.table,
                 quantity: item.quantity,
-                optional: item.optional,
-                contract: item.contract,
+                optional: item.optional ?? false,
+                contract: pickContractFields(item.contract),
                 duration_months: item.duration_months,
                 price: {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(
-                        item.total_cents / item.quantity / item.duration_months / 100,
+                        item.quantity && item.duration_months
+                            ? item.total_cents / item.quantity / item.duration_months / 100
+                            : 0
                     ),
                 },
             })),
@@ -137,7 +158,14 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
     });
 
     const flatRates = offerFlatRates.map((fr) => ({
-        ...fr,
+        id: fr.id,
+        quantity: fr.quantity,
+        total_cents: fr.total_cents,
+        flatRate: {
+            id: fr.flatRate.id,
+            name: fr.flatRate.name,
+            table: fr.flatRate.table,
+        },
         price: {
             total: formatEur(fr.total_cents / 100),
         },
@@ -158,7 +186,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
             plz: customer.plz || "",
             city: customer.city || "",
 
-            fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,
+            fullName: [ccp.salutation, ccp.firstName, ccp.lastName].filter(Boolean).join(" "),
             salutation: ccp.salutation || "",
             firstName: ccp.firstName || "",
             lastName: ccp.lastName || "",
@@ -167,7 +195,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
         },
 
         employee: {
-            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            fullName: [employee.salutation, employee.firstName, employee.lastName].filter(Boolean).join(" "),
             salutation: employee.salutation || "",
             firstName: employee.firstName || "",
             lastName: employee.lastName || "",
@@ -192,9 +220,16 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
     }
 
     try {
-        context.formatedData = await formatOfferData(context.fetchedData);
+        const formated = await formatOfferData(context.fetchedData);
+        context.formatedData = offerSchema.parse(formated);
     } catch (exception: any) {
-        logger.error(exception);
+        if (exception instanceof z.ZodError) {
+            logger.error(`[pipeline]: Formatted offer data failed schema validation: ${
+                JSON.stringify(exception.issues)
+            }`);
+        } else {
+            logger.error(exception);
+        }
         throw new PipelineStageError("An error occurred! Please try again later.");
     }
 }
@@ -209,18 +244,49 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
     context.formatedData = deepIterate(
         formatedData as Record<string, unknown>,
         formatedData as Record<string, unknown>,
-    ) as unknown as OfferFormatedData;
+    ) as unknown as OfferContext;
 }
 
 export const prepareAction = async (context: OfferPipelineContext) => {
     await fs.mkdir(env.OUTPUT_DIR, {recursive: true});
 }
 
+/* Drift detection: compare template tags against the offer schema. */
+const flattenTags = (tags: Record<string, unknown>, prefix = ""): string[] => {
+    const out: string[] = [];
+    for (const [k, v] of Object.entries(tags)) {
+        if (k === ".") continue; // self-reference loop element
+        const path = prefix ? `${prefix}.${k}` : k;
+        if (v && typeof v === "object" && Object.keys(v as object).length > 0) {
+            const children = flattenTags(v as Record<string, unknown>, path);
+            out.push(...children);
+        } else {
+            out.push(path);
+        }
+    }
+    return out;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const flattenSchema = (schema: any, prefix = ""): string[] => {
+    if (schema instanceof z.ZodObject) {
+        return Object.entries(schema.shape).flatMap(([k, v]: [string, any]) =>
+            flattenSchema(v, prefix ? `${prefix}.${k}` : k)
+        );
+    }
+    if (schema instanceof z.ZodArray) {
+        return flattenSchema(schema.element, prefix);
+    }
+    if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+        return flattenSchema(schema.unwrap(), prefix);
+    }
+    return prefix ? [prefix] : [];
+};
+
 export async function generateAction(context: OfferPipelineContext) {
     const {formatedData} = context;
-
-    // TODO:
-    //const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "offer.docx"), "binary");
+    // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
+    const iModule = InspectModule();
 
     const content = await fs.readFile(
         resolveTemplateName("offer", context.fetchedData!.offer.language),
@@ -230,10 +296,23 @@ export async function generateAction(context: OfferPipelineContext) {
     const zip = new PizZip(content);
 
     const doc = new Docxtemplater(zip, {
+        modules: [iModule],
         paragraphLoop: true,
         linebreaks: true,
         parser: customParser,
     });
+
+    const tags = iModule.getAllTags();
+    const templatePaths = flattenTags(tags as Record<string, unknown>);
+    const schemaPaths = flattenSchema(offerSchema);
+    const uncovered = templatePaths.filter((t) => !schemaPaths.includes(t));
+    if (uncovered.length > 0) {
+        logger.warn(
+            `[pipeline]: Template tags not covered by offer schema (possible drift): ${
+                uncovered.join(", ")
+            }`
+        );
+    }
 
     doc.render(formatedData);
 
@@ -258,8 +337,13 @@ export async function convertAction(context: OfferPipelineContext) {
 export async function writeAction(context: OfferPipelineContext) {
     const {fetchedData, documentId, version, docxBuffer, pdfBuffer} = context;
 
-    if (!fetchedData || !documentId || !version || !docxBuffer || !pdfBuffer) {
-        throw new PipelineStageError("Something went wrong! Failed to write to disk!");
+    if (!fetchedData || !documentId || version === null || !docxBuffer || !pdfBuffer) {
+        throw new PipelineStageError(
+            `
+        Something went wrong! Failed to write to disk!
+        fetchedData=${!!fetchedData}, documentId=${!!documentId}, version=${!!version}, docxBuffer=${!!docxBuffer}, pdfBuffer=${!!pdfBuffer}
+      `
+        );
     }
 
     const {quoteId, customer, offerPositions, language} = fetchedData.offer;
@@ -278,4 +362,8 @@ export async function writeAction(context: OfferPipelineContext) {
         fs.writeFile(docxPath, docxBuffer!),
         fs.writeFile(pdfPath, pdfBuffer!),
     ]);
+
+    // Expose the canonical document path (docx matches the document's format)
+    // so the worker can persist it for downloads.
+    context.path = docxPath;
 }

@@ -1,12 +1,12 @@
 import {Plus} from "lucide-react";
 
+import {useTranslation} from "react-i18next";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
-import {useCustomerHook, useModal} from "@/hooks";
 import type {Customer} from "@/types";
+import {useCustomerHook, useModal} from "@/hooks";
 import {Button} from "@/components";
-import {useTranslation} from "react-i18next";
 
 export default function CustomerList() {
     const {t} = useTranslation();

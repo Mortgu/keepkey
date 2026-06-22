@@ -7,7 +7,6 @@ import cors from "cors";
 
 import router from "./routes/router.js";
 import {exceptionHandler} from "./middlewares/exception-handler.js";
-import config from "./config/config.js";
 
 import path from "path";
 import env from "./lib/env.js";
@@ -82,6 +81,6 @@ if (!nextcloudInitialized) {
     logger.warn(`[nextcloud] ${getNextcloudInitError()}. Upload functionality is disabled.`);
 }
 
-app.listen(config.port, () => {
-    logger.info(`Server is listening on port ${config.port}`);
+app.listen(env.PORT, () => {
+    logger.info(`Server is listening on port ${env.PORT}`);
 });

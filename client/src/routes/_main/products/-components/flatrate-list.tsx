@@ -1,9 +1,9 @@
-import { Button } from "@/components";
-import type { FlatRate } from "@/types";
-import { useFlatRateHook, useModal } from "@/hooks";
 import { Loader, Plus } from "lucide-react";
 import FlatRateItem from "./flatrate-item";
 import FlatRateModal from "./flatrate-modal";
+import type { FlatRate } from "@/types";
+import { useFlatRateHook, useModal } from "@/hooks";
+import { Button } from "@/components";
 
 export default function FlatRateList() {
   const modal = useModal();

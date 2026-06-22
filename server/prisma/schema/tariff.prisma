@@ -1,54 +1,120 @@
 model Tariff {
   id String @id @default(cuid())
 
-  products  Product[]
-  configs   TariffConfig[]
-  customers TariffCustomer[]
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  rows    TariffRow[]
+  columns TariffColumn[]
+  cells   TariffCell[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([productId, contractId])
   @@map("tariff")
 }
 
-model TariffConfig {
+model TariffRow {
   id String @id @default(cuid())
 
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
-
-  duration     Int  @default(12)
   min_quantity Int
   max_quantity Int?
-  price        Int
 
-  @@unique([tariffId, contractId, duration, min_quantity])
-  @@map("tariff_config")
+  cells TariffCell[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_row")
 }
 
-model TariffCustomer {
+model TariffColumn {
   id String @id @default(cuid())
 
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
-  productId String
+  duration Int
 
-  contract   Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-  contractId String
+  cells TariffCell[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_column")
+}
+
+model TariffCell {
+  id String @id @default(cuid())
+
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
+
+  row   TariffRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
+  rowId String
+
+  column   TariffColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  columnId String
+
+  default_cells  TariffCellDefault[]
+  customer_cells TariffCellCustomer[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@unique([rowId, columnId])
+  @@map("tariff_cell")
+}
+
+model TariffCellDefault {
+  id String @id @default(cuid())
+
+  cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
+  cellId String
+
+  price Int
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_cell_default")
+}
+
+model TariffCellCustomer {
+  id String @id @default(cuid())
+
+  cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
+  cellId String
 
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId String
 
-  duration     Int  @default(12)
-  min_quantity Int
-  max_quantity Int?
-  price        Int
+  price Int
 
-  @@unique([tariffId, productId, customerId, contractId, duration, min_quantity])
-  @@map("tariff_customer")
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_cell_customer")
+}
+
+model TariffHistory {
+  id String @id @default(cuid())
+
+  productId String
+  contractId String
+
+  version  Int
+  snapshot Json
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([productId, contractId, version])
+  @@map("tariff_history")
 }

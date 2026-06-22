@@ -129,38 +129,14 @@ model FlatRateTranslation {
   @@map("flat_rate_translation")
 }
 
-model Contract {
-  id  String @id @default(uuid())
-  key String @unique // sprachunabhängiger Identifier
-
-  translations ContractTranslation[]
-
-  orderPositions OrderPosition[]
-  offerPositions OfferPosition[]
-
-  tariffConfigs   TariffConfig[]
-  tariffCustomers TariffCustomer[]
-
-  createdAt DateTime? @default(now())
-
-  @@map("contract")
-}
-
-model ContractTranslation {
-  contractId String
-  language   Language
-
-  name     String
-  features String[]
-  table    String @default("")
-
-  contract Contract @relation(fields: [contractId], references: [id], onDelete: Cascade)
-
-  @@id([contractId, language])
-  @@map("contract_translation")
-}
-
 enum Language {
   DE
   EN
+}
+
+enum Currency {
+  EUR
+  RAND
+  DOLLAR
+  CHF
 }

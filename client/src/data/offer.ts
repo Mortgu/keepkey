@@ -1,28 +1,16 @@
+import type {ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput} from '@/types';
 import { api } from "@/lib/api-client";
 
-import {
-    type ContactPerson,
-    type CreateOfferFlatRatesInput,
-    type CreateOfferInput,
-    type CreateOfferPositionInput,
-    type Document,
-    type Offer,
-    type OfferRevision,
-    type Task,
-    type UpdateOfferFlatRatesInput,
-    type UpdateOfferInput,
-    type UpdateOfferPositionInput,
-} from '@/types';
 
 interface GetOffersParams {
     search?: string;
-    companyIds?: string[];
-    contactPersonIds?: string[];
+    companyIds?: Array<string>;
+    contactPersonIds?: Array<string>;
     sort?: string;
 }
 
 export const getContactPersonsAction = () =>
-    api<ContactPerson[]>("/api/contact-persons", { method: "GET" });
+    api<Array<ContactPerson>>("/api/contact-persons", { method: "GET" });
 
 export const getOffersAction = (params?: GetOffersParams) => {
     const urlParams = new URLSearchParams();
@@ -32,10 +20,10 @@ export const getOffersAction = (params?: GetOffersParams) => {
     if (params?.sort) urlParams.set("sort", params.sort);
     const query = urlParams.toString();
     const url = query ? `/api/offers?${query}` : "/api/offers";
-    return api<Offer[]>(url, { method: "GET" });
+    return api<Array<Offer>>(url, { method: "GET" });
 };
 
-export const createOfferAction = (offer: CreateOfferInput, positions: CreateOfferPositionInput[], flatRates: CreateOfferFlatRatesInput[]) =>
+export const createOfferAction = (offer: CreateOfferInput, positions: Array<CreateOfferPositionInput>, flatRates: Array<CreateOfferFlatRatesInput>) =>
     api<Offer>("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -49,7 +37,7 @@ export const deleteOfferDocumentAction = (documentId: string) =>
     api<void>(`/api/documents/${documentId}`, { method: "DELETE" });
 
 export const updateOfferAction = (
-    id: string, offer: UpdateOfferInput, positions: UpdateOfferPositionInput[], flatRates: UpdateOfferFlatRatesInput[],
+    id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatRates: Array<UpdateOfferFlatRatesInput>,
 ) => api<Offer>(`/api/offers/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
@@ -57,7 +45,7 @@ export const updateOfferAction = (
 });
 
 export const getOfferRevisionsAction = (offerId: string) =>
-    api<OfferRevision[]>(`/api/offers/${offerId}/revisions`, { method: "GET" });
+    api<Array<OfferRevision>>(`/api/offers/${offerId}/revisions`, { method: "GET" });
 
 export const renameDocumentAction = (document_id: string, displayName: string) =>
     api<Document>(`/api/documents/${document_id}`, {
@@ -69,7 +57,7 @@ export const renameDocumentAction = (document_id: string, displayName: string) =
     });
 
 export const createReservationAction = (offer_id: string) =>
-    api<String>(`/api/offers/${offer_id}/reserve`, {
+    api<string>(`/api/offers/${offer_id}/reserve`, {
         method: 'POST',
     });
 

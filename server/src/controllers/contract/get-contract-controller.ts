@@ -3,7 +3,13 @@ import {prisma} from "../../lib/prismaClient.js";
 
 export const getAllContracts = async (request: Request, response: Response) => {
     const contracts = await prisma.contract.findMany({
-        include: {translations: true},
+        include: {
+            translations: true
+        },
+        orderBy: {
+            createdAt: "desc"
+        }
     });
+
     return response.status(200).json(contracts);
 };

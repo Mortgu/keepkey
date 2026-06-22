@@ -1,11 +1,11 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CreateSupplierInput, UpdateSupplierInput } from "@/types";
 import {
+  UpdateSupplierAction,
   createSupplierAction,
   deleteSupplierAction,
   getSuppliersAction,
-  UpdateSupplierAction,
 } from "@/data/supplier";
-import type { CreateSupplierInput, UpdateSupplierInput } from "@/types";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useSupplierHook = () => {
   const queryClient = useQueryClient();

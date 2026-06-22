@@ -6,11 +6,7 @@ export const getProducts = async (request: Request, response: Response, next: Ne
         orderBy: {createdAt: "asc"},
         include: {
             translations: true,
-            tariff: {
-                include: {
-                    configs: {include: {contract: {include: {translations: true}}}},
-                },
-            },
+            tariffs: true
         },
     });
 
@@ -23,7 +19,7 @@ export const getProducts = async (request: Request, response: Response, next: Ne
  * [GET] http://localhost:3000/api/products/{id}
  */
 export const getProduct = async (request: Request, response: Response, next: NextFunction) => {
-    const {id} = request.params;
+    const id = request.params.id as string;
 
     if (!id) {
         return response.status(400).json({
@@ -33,8 +29,11 @@ export const getProduct = async (request: Request, response: Response, next: Nex
     }
 
     const product = await prisma.product.findUnique({
-        where: {id: id as string},
-        include: {translations: true},
+        where: {id},
+        include: {
+            translations: true,
+            tariffs: true
+        },
     });
 
     return response.status(200).json(product);

@@ -1,13 +1,13 @@
-import { api } from "@/lib/api-client";
-
 import type {
-  Supplier,
   CreateSupplierInput,
+  Supplier,
   UpdateSupplierInput,
 } from "@/types";
+import { api } from "@/lib/api-client";
+
 
 export const getSuppliersAction = () =>
-  api<Supplier[]>("/api/suppliers", { method: "GET" });
+  api<Array<Supplier>>("/api/suppliers", { method: "GET" });
 
 export const createSupplierAction = (supplier: CreateSupplierInput) =>
   api<Supplier>("/api/suppliers", {

@@ -6,6 +6,7 @@ import { TaskJobData, taskQueue, taskQueueKey } from "./task-queue.js";
 import { prisma } from "../lib/prismaClient.js";
 import { runPipeline } from "../pipelines/pipeline.js";
 import runOfferPipeline from "../pipelines/offer/pipeline.js";
+import runOrderPipeline from "../pipelines/order/pipeline.js";
 
 export { taskQueue, taskQueueKey };
 
@@ -49,11 +50,37 @@ export default function registerTaskWorker() {
                     data: {
                         displayName: pipeline.displayName,
                         status: "GENERATED",
+                        path: pipeline.path,
                     }
                 })
 
                 break;
             case "ORDER":
+                const orderDocument = await prisma.orderDocument.findFirstOrThrow({
+                    where: { documentId: document.id },
+                });
+
+                const { orderId, version: orderVersion } = orderDocument;
+
+                const orderPipeline = await runOrderPipeline({
+                    orderId: orderId,
+                    taskId: taskId,
+                    documentId: document.id,
+                    version: orderVersion,
+
+                    docxBuffer: null,
+                    pdfBuffer: null,
+                });
+
+                await prisma.document.update({
+                    where: { id: document.id },
+                    data: {
+                        displayName: orderPipeline.displayName,
+                        status: "GENERATED",
+                        path: orderPipeline.path,
+                    },
+                });
+
                 break;
             case "RENEWAL":
                 break;
@@ -133,32 +160,4 @@ export default function registerTaskWorker() {
     });
 
     return taskWorker;
-}
-
-const taskHandler = async (job: Job<TaskJobData>) => {
-    const { taskId } = job.data;
-
-    const task = await prisma.task.findUnique({
-        where: { id: taskId },
-    });
-
-    if (!task) {
-        throw new Error("Task not found!");
-    }
-
-    switch (task.target) {
-        case "OFFER":
-            console.log("OFFER");
-            //await offerTaskHandler(task, job.data);
-            break;
-        case "ORDER":
-            console.log("ORDER");
-
-            //await orderTaskHandler(task, job.data);
-            break;
-        case "RENEWAL":
-            console.log("RENEWAL");
-
-            break;
-    }
 }

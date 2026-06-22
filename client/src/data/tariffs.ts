@@ -1,105 +1,94 @@
-import { api } from "@/lib/api-client";
+import type {Tariff, TariffCell, TariffHistory, TariffRow} from "@/types";
+import {api} from "@/lib/api-client";
 
-import type {
-  Tariff,
-  TariffConfig,
-  TariffCustomer,
-  CreateTariffInput,
-  UpdateTariffInput,
-  CreateTariffConfigInput,
-  UpdateTariffConfigInput,
-  CreateTariffCustomerInput,
-  UpdateTariffCustomerInput,
-} from "@/types";
 
 export const getAllTariffsAction = () =>
-  api<Tariff[]>("/api/tariffs", { method: "GET" });
+    api<Array<Tariff>>("/api/tariffs", {method: "GET"});
 
-export const createTariffAction = (body: CreateTariffInput) =>
-  api<Tariff>("/api/tariffs", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const createTariffAction = (productId: string, contractId: string) =>
+    api<Tariff>(`/api/tariffs/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({productId, contractId}),
+    });
 
-export const updateTariffAction = (id: string, body: UpdateTariffInput) =>
-  api<Tariff>(`/api/tariffs/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const deleteTariffAction = (tariffId: string) =>
+    api<void>(`/api/tariffs/${tariffId}`, {
+        method: "DELETE"
+    });
 
-export const deleteTariffAction = (id: string) =>
-  api<void>(`/api/tariffs/${id}`, { method: "DELETE" });
+export const getProductTariffsAction = (productId: string) =>
+    api<Array<Tariff>>(`/api/tariffs/${productId}`, {method: "GET"});
 
-export const addTariffConfigAction = (
-  tariffId: string,
-  body: CreateTariffConfigInput,
-) =>
-  api<TariffConfig>(`/api/tariffs/${tariffId}/configs`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const getTariffAction = (tariffId: string) =>
+    api<Tariff>(`/api/tariffs/tariff/${tariffId}`, {method: "GET"});
 
-export const updateTariffConfigAction = (
-  tariffId: string,
-  configId: string,
-  body: UpdateTariffConfigInput,
-) =>
-  api<TariffConfig>(`/api/tariffs/${tariffId}/configs/${configId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const getTariffHistoryAction = (productId: string, contractId: string) =>
+    api<Array<TariffHistory>>(`/api/tariffs/history/${productId}/${contractId}`, {method: "GET"});
 
-export const deleteTariffConfigAction = (tariffId: string, configId: string) =>
-  api<void>(`/api/tariffs/${tariffId}/configs/${configId}`, {
-    method: "DELETE",
-  });
+export const getTariffDurationsAction = (productId: string, contractId: string) =>
+    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, {method: "GET"});
 
-export const addTariffCustomerAction = (
-  tariffId: string,
-  body: CreateTariffCustomerInput,
-) =>
-  api<TariffCustomer>(`/api/tariffs/${tariffId}/customers`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const createTariffColumnAction = (tariffId: string, duration: number) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({duration}),
+    });
 
-export const updateTariffCustomerAction = (
-  tariffId: string,
-  tariffCustomerId: string,
-  body: UpdateTariffCustomerInput,
-) =>
-  api<TariffCustomer>(`/api/tariffs/${tariffId}/customers/${tariffCustomerId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+export const deleteTariffColumnAction = (tariffId: string, columnId: string) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column/${columnId}`, {
+        method: "DELETE",
+    });
 
-export const deleteTariffCustomerAction = (
-  tariffId: string,
-  tariffCustomerId: string,
-) =>
-  api<void>(`/api/tariffs/${tariffId}/customers/${tariffCustomerId}`, {
-    method: "DELETE",
-  });
+export const updateTariffColumnAction = (tariffId: string, columnId: string, duration: number) =>
+    api<Tariff>(`/api/tariffs/${tariffId}/column/${columnId}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({duration}),
+    });
+
+export const createTariffRowAction = (tariffId: string, min_quantity: number, max_quantity) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row`, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({min_quantity, max_quantity}),
+    });
+
+export const deleteTariffRowAction = (tariffId: string, rowId: string) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row/${rowId}`, {
+        method: "DELETE",
+    });
+
+export const updateTariffRowAction = (tariffId: string, rowId: string, min_qty: number, max_qty: number) =>
+    api<TariffRow>(`/api/tariffs/${tariffId}/row/${rowId}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({min_qty, max_qty}),
+    });
+
+export const updateTariffCellAction = (tariffId: string, cellId: string, default_price?: number, customer_price?: number) =>
+    api<TariffCell>(`/api/tariffs/${tariffId}/cell/${cellId}`, {
+        method: "PATCH",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({default_price, customer_price}),
+    });
 
 export const getTariffPrice = (
-  productId: string,
-  contractId: string,
-  duration: number,
-  quantity: number,
-  customerId?: string,
+    productId: string,
+    contractId: string,
+    duration: number,
+    quantity: number,
+    customerId?: string,
 ) => {
-  const params = new URLSearchParams({
-    productId,
-    contractId,
-    duration: String(duration),
-    quantity: String(quantity),
-    ...(customerId ? { customerId } : {}),
-  });
-  return api<number>(`/api/tariffs/price?${params}`, { method: "GET" });
+    const params = new URLSearchParams({
+        productId,
+        contractId,
+        duration: String(duration),
+        quantity: String(quantity),
+        ...(customerId ? {customerId} : {}),
+    });
+    return api<number>(`/api/tariffs/price?${params}`, {method: "GET"});
 };

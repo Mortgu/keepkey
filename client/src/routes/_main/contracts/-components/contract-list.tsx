@@ -1,11 +1,11 @@
 import {Loader, Plus} from "lucide-react";
-import {useContractHook, useModal} from "@/hooks";
+import {useTranslation} from "react-i18next";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
 import type {Contract} from "@/types";
+import {useContractHook, useModal} from "@/hooks";
 import {Button} from "@/components";
-import {useTranslation} from "react-i18next";
 
 export default function ContractList() {
     const {t} = useTranslation();

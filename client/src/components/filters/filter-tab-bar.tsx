@@ -1,5 +1,5 @@
-import { Button } from "@/components";
 import type { ComponentSize } from "@/components/size";
+import { Button } from "@/components";
 
 interface TabOption {
   value: string;
@@ -7,7 +7,7 @@ interface TabOption {
 }
 
 interface FilterTabBarProps {
-  tabs: TabOption[];
+  tabs: Array<TabOption>;
   value: string;
   onChange: (value: string) => void;
   className?: string;

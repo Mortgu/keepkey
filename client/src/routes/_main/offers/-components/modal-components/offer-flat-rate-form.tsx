@@ -6,7 +6,7 @@ import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 interface Props {
-  flatRates: FlatRate[];
+  flatRates: Array<FlatRate>;
   saveFn: (flatRate: CreateOfferFlatRatesInput) => void;
   cancelFn: () => void;
 }

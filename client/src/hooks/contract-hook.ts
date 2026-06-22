@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type { CreateContractInput, UpdateContractInput } from "@/types";
 import {
   createContractAction,
   deleteContractAction,
   getContractsAction,
   updateContractAction,
 } from "@/data/contracts.ts";
-import type { CreateContractInput, UpdateContractInput } from "@/types";
 
 export const useContractHook = () => {
   const queryClient = useQueryClient();

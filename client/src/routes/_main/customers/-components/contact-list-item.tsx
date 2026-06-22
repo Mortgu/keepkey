@@ -1,10 +1,10 @@
-import { Button } from "@/components";
-import type { ContactPerson } from "@/types";
 import { Pen, Trash } from "lucide-react";
-import ContactPersonForm from "./contact-person-form";
 import { useState } from "react";
-import { useCustomerHook } from "@/hooks";
 import { tv } from "tailwind-variants";
+import ContactPersonForm from "./contact-person-form";
+import type { ContactPerson } from "@/types";
+import { useCustomerHook } from "@/hooks";
+import { Button } from "@/components";
 
 type Props = {
     currentCustomerId: string;

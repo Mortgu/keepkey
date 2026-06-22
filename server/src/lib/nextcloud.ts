@@ -1,12 +1,94 @@
-import {createClient, type WebDAVClient} from "webdav";
+import {createClient, FileStat, type WebDAVClient} from "webdav";
 import env from "./env.js";
 import logger from "../middlewares/logger.js";
-import path from "path";
-import {AppException} from "../exceptions/exceptions.js";
+import {AppException} from "./exceptions.js";
 
 let client: WebDAVClient | null = null;
 export let isNextcloudAvailable = false;
 let nextcloudInitError: string | null = null;
+
+type DirectoryCache = {
+    data: FileStat[];
+    timestamp: number;
+};
+
+const directoryCache = new Map<string, DirectoryCache>();
+const CACHE_TTL = 60_000;
+
+export type NextcloudFileMetadata = {
+    basename: string;
+    filename: string;
+    size: number;
+    lastmod: string;
+    mime: string | null;
+};
+
+export type FindFilesByIdResult = {
+    id: string;
+    found: boolean;
+    files: Record<string, NextcloudFileMetadata[]>;
+};
+
+type DirectoryConfig = {
+    path: string;
+    label: string;
+};
+
+async function getCachedDirectoryContents(path: string): Promise<FileStat[]> {
+    const cached = directoryCache.get(path);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return cached.data;
+    }
+
+    const ncClient = getNextCloudClient();
+    const contents: FileStat[] = await ncClient.getDirectoryContents(path);
+    directoryCache.set(path, { data: contents, timestamp: Date.now() });
+    return contents;
+}
+
+export function clearDirectoryCache(path?: string): void {
+    if (path) {
+        directoryCache.delete(path);
+    } else {
+        directoryCache.clear();
+    }
+}
+
+export async function findFilesById(
+    id: string,
+    directories: DirectoryConfig[]
+): Promise<FindFilesByIdResult> {
+    const files: Record<string, NextcloudFileMetadata[]> = {};
+    let anyFound = false;
+
+    const results = await Promise.all(
+        directories.map(async (dir) => {
+            try {
+                const contents = await getCachedDirectoryContents(dir.path);
+                const matches = contents.filter(
+                    (f) => f.type === "file" && f.basename.startsWith(`${id}_`)
+                );
+                return { label: dir.label, matches };
+            } catch (exception: any) {
+                logger.error(`[findFilesById] ${dir.label}: ${exception.message}`);
+                return { label: dir.label, matches: [] as FileStat[] };
+            }
+        })
+    );
+
+    for (const { label, matches } of results) {
+        files[label] = matches.map((f) => ({
+            basename: f.basename,
+            filename: f.filename,
+            size: f.size,
+            lastmod: f.lastmod,
+            mime: (f as any).mime ?? null,
+        }));
+        if (matches.length > 0) anyFound = true;
+    }
+
+    return { id, found: anyFound, files };
+}
 
 export function isNextcloudConfigured(): boolean {
     return Boolean(env.NEXTCLOUD_URL && env.NEXTCLOUD_USER && env.NEXTCLOUD_PASSWORD);
@@ -69,63 +151,14 @@ export async function fileExists(filePath: string): Promise<boolean> {
     }
 }
 
-interface ReserveFileResult {
-    path: string;
-    filename: string;
-}
-
-export async function reserveFile(quoteId: string, directoryPath: string): Promise<ReserveFileResult> {
-    if (!isNextcloudAvailable) {
-        throw new AppException("Nextcloud is not available!", 503, "nextcloudUnavailable");
-    }
-
-    const filePath = path.join(directoryPath, `${quoteId}.reserved`);
-
-    const exists = await fileExists(filePath);
-
-    if (exists) {
-        logger.info(`[nextcloud] reservation file already exists: ${filePath}`);
-        throw new AppException("Reservation file already exists!", 409, "reserveFile");
-    }
+export async function getFilesInDirectory(path: string): Promise<Array<string>> {
+    const client = getNextCloudClient();
 
     try {
-        await getNextCloudClient().putFileContents(filePath, new ArrayBuffer(0));
-        logger.info(`[nextcloud] reservation file created: ${path}`);
-
-        return {
-            path: directoryPath,
-            filename: `${quoteId}.reserved`,
-        }
+        const fileStats: Array<FileStat> = await client.getDirectoryContents(path);
+        return fileStats.map(fs => fs.basename);
     } catch (exception: any) {
-        throw new AppException(
-            `NextCloud directory "${directoryPath}" not found or unreachable: ${exception.message}`,
-            503,
-            "reserveFile",
-        );
-    }
-}
-
-export async function uploadFile(
-    filePath: string,
-    buffer: Buffer,
-): Promise<void> {
-    if (!isNextcloudAvailable) {
-        throw new AppException("Nextcloud is not available!", 503, "nextcloudUnavailable");
-    }
-
-    const exists = await fileExists(filePath);
-    if (exists) {
-        throw new AppException(`File already exists in NextCloud: ${filePath}`, 409, "uploadFile");
-    }
-
-    try {
-        await getNextCloudClient().putFileContents(filePath, buffer);
-        logger.info(`[nextcloud] file uploaded: ${filePath}`);
-    } catch (exception: any) {
-        throw new AppException(
-            `NextCloud upload to "${filePath}" failed: ${exception.message}`,
-            500,
-            "uploadFile",
-        );
+        logger.error(`[getFilesInDirectory] ${exception.message}`);
+        return [];
     }
 }

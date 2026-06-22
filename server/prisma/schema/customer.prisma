@@ -1,14 +1,22 @@
 model Customer {
   id String @id @default(uuid())
 
-  customerId  String  @unique
+  customerId  String?
   companyName String
-  email       String? @unique
+
+  email        String? @unique
+  invoiceEmail String?
 
   street String?
   city   String?
   plz    String?
   phone  String?
+
+  language Language? @default(DE)
+  country  String?   @default("Deutschland")
+  currency Currency? @default(EUR)
+
+  salutation String? @default("")
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -18,8 +26,8 @@ model Customer {
   offers Offer[]
   orders Order[]
 
-  users           User[]
-  tariffCustomers TariffCustomer[]
+  users       User[]
+  tariffCells TariffCellCustomer[]
 
   @@map("customer")
 }
