@@ -11,32 +11,37 @@ interface Props {
   cancelFn: () => void;
 }
 
-export default function OfferFlatRateForm(props: Props) {
-  const { flatRates, saveFn, cancelFn } = props;
+export default function OfferFlatRateForm({ flatRates, saveFn, cancelFn }: Props) {
   const locale = useLocale();
 
-  const [flatRateIndex, setFlatRateIndex] = useState<number>(0);
+  const [flatRateId, setFlatRateId] = useState<string>(flatRates[0]?.id ?? "");
   const [quantity, setQuantity] = useState<number>(1);
 
+  const selected = flatRates.find((fr) => fr.id === flatRateId) ?? flatRates[0];
+
   const handleSave = () => {
-    const flatRate: CreateOfferFlatRatesInput = {
-      flatRateId: flatRates[flatRateIndex].id,
-      flatRate: flatRates[flatRateIndex],
+    if (!selected) return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+    saveFn({
+      flatRateId: selected.id,
+      flatRate: selected,
       offerId: "",
       quantity,
-      ...flatRates[flatRateIndex],
-    }
-
-    saveFn(flatRate);
+      total_cents: selected.total_cents * quantity,
+    });
   };
 
   return (
     <div className="bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-2 rounded-md">
       <div className="flex items-end gap-3">
         <div className="flex-3 grid gap-1">
-          <Select label="Pauschale" value={flatRates[0].id} onChange={(e) => setFlatRateIndex(parseInt(e.target.value))} className="bg-white">
-            {flatRates.map((fr, index) => (
-              <option key={index} value={index}>
+          <Select
+            label="Pauschale"
+            value={flatRateId}
+            onChange={(e) => setFlatRateId(e.target.value)}
+            className="bg-white"
+          >
+            {flatRates.map((fr) => (
+              <option key={fr.id} value={fr.id}>
                 {localized(fr.translations, locale, "name")}
               </option>
             ))}
@@ -44,8 +49,12 @@ export default function OfferFlatRateForm(props: Props) {
         </div>
 
         <div className="flex-1 grid gap-1">
-          <Input label="Anzahl" type="number" className="bg-white"
-            value={quantity} onChange={(e) => setQuantity(parseInt(e.target.value))}
+          <Input
+            label="Anzahl"
+            type="number"
+            className="bg-white"
+            value={quantity}
+            onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
           />
         </div>
       </div>
@@ -55,7 +64,7 @@ export default function OfferFlatRateForm(props: Props) {
           <Button type="button" variant="secondary" size="sm" onClick={cancelFn}>
             Abbrechen
           </Button>
-          <Button type="button" size="sm" onClick={handleSave}>
+          <Button type="button" size="sm" onClick={handleSave} disabled={!selected}>
             Hinzufügen
           </Button>
         </div>

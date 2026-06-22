@@ -1,12 +1,12 @@
 import "dotenv/config";
 
-import express, {type Express, Request, Response} from "express";
-import {toNodeHandler} from "better-auth/node";
-import {auth} from "./lib/auth.js";
+import express, { type Express, Request, Response } from "express";
+import { toNodeHandler } from "better-auth/node";
+import { auth } from "./lib/auth.js";
 import cors from "cors";
 
 import router from "./routes/router.js";
-import {exceptionHandler} from "./middlewares/exception-handler.js";
+import { exceptionHandler } from "./middlewares/exception-handler.js";
 
 import path from "path";
 import env from "./lib/env.js";
@@ -16,7 +16,7 @@ import swaggerui from 'swagger-ui-express';
 import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
-import {getNextcloudInitError, initNextcloud} from "./lib/nextcloud.js";
+import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
 
 const options = {
     definition: {

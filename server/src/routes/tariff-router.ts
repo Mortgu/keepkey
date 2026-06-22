@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 import {
     createTariff,
     createTariffColumn,
@@ -23,12 +23,15 @@ import {
     updateTariffColumnSchema,
     updateTariffRowSchema
 } from "../schemas/index.js";
-import {validate} from "../middlewares/validate.js";
+import { validate } from "../middlewares/validate.js";
 
 const router = Router();
 
 /* [GET] /api/tariffs */
 router.get('/', getTariffs);
+
+/* [GET] /api/tariffs?productId=...&contractId=...&... */
+router.get("/price", getTariffPrice);
 
 /* [GET] /api/tariffs/tariff/:tariffId */
 router.get('/tariff/:tariffId', getTariffById);
@@ -39,11 +42,9 @@ router.get('/history/:productId/:contractId', getTariffHistory);
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);
 
+
 /* [GET] /api/tariffs/:productId */
 router.get('/:productId', getProductTariffs);
-
-/* [GET] /api/tariffs?productId=...&contractId=...&... */
-router.get("/price", getTariffPrice);
 
 /* [POST] /api/tariffs */
 router.post('/', validate(createTariffSchema), createTariff);

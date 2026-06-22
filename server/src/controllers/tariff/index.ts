@@ -1,6 +1,6 @@
-import {NextFunction, Request, Response} from "express";
-import {prisma} from "../../lib/prismaClient.js";
-import calculatePrice, {snapshotTariff} from "../../utils/products.js";
+import { NextFunction, Request, Response } from "express";
+import { prisma } from "../../lib/prismaClient.js";
+import calculatePrice, { snapshotTariff } from "../../utils/products.js";
 import logger from "../../middlewares/logger.js";
 
 const TARIFF_INCLUDE = {
@@ -15,13 +15,13 @@ const TARIFF_INCLUDE = {
         }
     },
     rows: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { createdAt: 'asc' },
     },
     columns: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { createdAt: 'asc' },
     },
     cells: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { createdAt: 'asc' },
         include: {
             default_cells: true,
             customer_cells: true,
@@ -41,12 +41,12 @@ export async function getTariffById(request: Request, response: Response) {
     const id = request.params.tariffId as string;
 
     const tariff = await prisma.tariff.findUnique({
-        where: {id},
+        where: { id },
         include: TARIFF_INCLUDE,
     });
 
     if (!tariff) {
-        return response.status(404).json({success: false, message: "Tariff not found."});
+        return response.status(404).json({ success: false, message: "Tariff not found." });
     }
 
     return response.status(200).json(tariff);
@@ -56,7 +56,7 @@ export async function getProductTariffs(request: Request, response: Response) {
     const productId = request.params.productId as string;
 
     const tariff = await prisma.tariff.findMany({
-        where: {productId},
+        where: { productId },
         include: TARIFF_INCLUDE,
         orderBy: {
             createdAt: "desc",
@@ -67,16 +67,16 @@ export async function getProductTariffs(request: Request, response: Response) {
 }
 
 export async function createTariff(request: Request, response: Response, next: NextFunction) {
-    const {productId, contractId} = request.body;
+    const { productId, contractId } = request.body;
 
     try {
         const existing = await prisma.tariff.findFirst({
-            where: {productId, contractId},
+            where: { productId, contractId },
         });
 
         if (existing) {
             await snapshotTariff(productId, contractId);
-            await prisma.tariff.delete({where: {id: existing.id}});
+            await prisma.tariff.delete({ where: { id: existing.id } });
         }
 
         const tariff = await prisma.tariff.create({
@@ -87,7 +87,7 @@ export async function createTariff(request: Request, response: Response, next: N
         });
 
         const result = await prisma.tariff.findUniqueOrThrow({
-            where: {id: tariff.id},
+            where: { id: tariff.id },
             include: TARIFF_INCLUDE,
         });
 
@@ -102,7 +102,7 @@ export async function deleteTariff(request: Request, response: Response, next: N
 
     try {
         await prisma.tariff.delete({
-            where: {id: tariffId}
+            where: { id: tariffId }
         });
 
         return response.status(200).json({
@@ -114,7 +114,7 @@ export async function deleteTariff(request: Request, response: Response, next: N
 }
 
 export const getTariffPrice = async (request: Request, response: Response) => {
-    const {productId, contractId, duration, quantity, customerId} = request.query;
+    const { productId, contractId, duration, quantity, customerId } = request.query;
 
     if (!productId || !contractId || !duration || !quantity) {
         return response.status(400).json({
@@ -137,6 +137,9 @@ export const getTariffPrice = async (request: Request, response: Response) => {
         quantity: quantityNum,
         customerId: customerId as string | undefined,
     });
+
+    console.log("price", price);
+
     return response.status(200).json(price);
 };
 
@@ -148,13 +151,13 @@ export async function createTariffColumn(request: Request, response: Response, n
 
     try {
         const tariff = await prisma.tariff.findUniqueOrThrow({
-            where: {id: tariffId},
-            include: {rows: true}
+            where: { id: tariffId },
+            include: { rows: true }
         });
 
         const column = await prisma.$transaction(async (tx) => {
             const col = await tx.tariffColumn.create({
-                data: {tariffId, duration},
+                data: { tariffId, duration },
             });
 
             for (const row of tariff.rows) {
@@ -167,7 +170,7 @@ export async function createTariffColumn(request: Request, response: Response, n
                 });
 
                 await tx.tariffCellDefault.create({
-                    data: {cellId: cell.id, price: 1}
+                    data: { cellId: cell.id, price: 1 }
                 })
             }
 
@@ -175,7 +178,7 @@ export async function createTariffColumn(request: Request, response: Response, n
         });
 
         const updated = await prisma.tariff.findUniqueOrThrow({
-            where: {id: tariffId},
+            where: { id: tariffId },
             include: TARIFF_INCLUDE,
         });
 
@@ -192,7 +195,7 @@ export async function deleteTariffColumn(request: Request, response: Response, n
 
     try {
         const deletedColumn = await prisma.tariffColumn.delete({
-            where: {id: columnId}
+            where: { id: columnId }
         });
 
         return response.status(200).json({
@@ -211,7 +214,7 @@ export async function updateTariffColumn(request: Request, response: Response, n
 
     try {
         const updated = await prisma.tariffColumn.updateManyAndReturn({
-            where: {id: columnId},
+            where: { id: columnId },
             data: {
                 duration
             }
@@ -230,17 +233,17 @@ export async function updateTariffColumn(request: Request, response: Response, n
 export async function createTariffRow(request: Request, response: Response, next: NextFunction) {
     const tariffId = request.params.tariffId as string;
 
-    const {min_quantity, max_quantity} = request.body;
+    const { min_quantity, max_quantity } = request.body;
 
     try {
         const tariff = await prisma.tariff.findUniqueOrThrow({
-            where: {id: tariffId},
-            include: {columns: true}
+            where: { id: tariffId },
+            include: { columns: true }
         });
 
         const row = await prisma.$transaction(async (tx) => {
             const r = await tx.tariffRow.create({
-                data: {tariffId, min_quantity, max_quantity},
+                data: { tariffId, min_quantity, max_quantity },
             });
 
             for (const column of tariff.columns) {
@@ -253,7 +256,7 @@ export async function createTariffRow(request: Request, response: Response, next
                 });
 
                 await tx.tariffCellDefault.create({
-                    data: {cellId: cell.id, price: 1}
+                    data: { cellId: cell.id, price: 1 }
                 })
             }
 
@@ -261,7 +264,7 @@ export async function createTariffRow(request: Request, response: Response, next
         });
 
         const updated = await prisma.tariff.findUniqueOrThrow({
-            where: {id: tariffId},
+            where: { id: tariffId },
             include: TARIFF_INCLUDE,
         });
 
@@ -278,7 +281,7 @@ export async function deleteTariffRow(request: Request, response: Response, next
 
     try {
         const deletedRow = await prisma.tariffRow.delete({
-            where: {id: rowId},
+            where: { id: rowId },
         });
 
         return response.status(201).json({
@@ -294,11 +297,11 @@ export async function updateTariffRow(request: Request, response: Response, next
     const tariffId = request.params.tariffId as string;
     const rowId = request.params.rowId as string;
 
-    const {min_qty, max_qty} = request.body;
+    const { min_qty, max_qty } = request.body;
 
     try {
         const updated = await prisma.tariffRow.updateManyAndReturn({
-            where: {id: rowId},
+            where: { id: rowId },
             data: {
                 min_quantity: min_qty,
                 max_quantity: max_qty
@@ -318,7 +321,7 @@ export async function updateTariffCell(request: Request, response: Response, nex
     const tariffId = request.params.tariffId as string;
     const cellId = request.params.cellId as string;
 
-    const {default_price, customer_price} = request.body;
+    const { default_price, customer_price } = request.body;
 
     if (default_price === undefined && customer_price === undefined) {
         logger.error("default_price or customer_price is required");
@@ -330,7 +333,7 @@ export async function updateTariffCell(request: Request, response: Response, nex
     try {
         if (default_price !== undefined) {
             const updated = await prisma.tariffCellDefault.updateManyAndReturn({
-                where: {cellId: cellId},
+                where: { cellId: cellId },
                 data: {
                     price: default_price,
                 }
@@ -343,7 +346,7 @@ export async function updateTariffCell(request: Request, response: Response, nex
 
         if (customer_price !== undefined) {
             const updated = await prisma.tariffCellCustomer.updateManyAndReturn({
-                where: {cellId: cellId},
+                where: { cellId: cellId },
                 data: {
                     price: customer_price,
                 }
@@ -365,8 +368,8 @@ export async function getTariffHistory(request: Request, response: Response, nex
 
     try {
         const history = await prisma.tariffHistory.findMany({
-            where: {productId, contractId},
-            orderBy: {version: 'desc'},
+            where: { productId, contractId },
+            orderBy: { version: 'desc' },
         });
 
         return response.status(200).json(history);
@@ -382,8 +385,8 @@ export async function getTariffDurations(request: Request, response: Response, n
 
     try {
         const tariff = await prisma.tariff.findUnique({
-            where: {productId_contractId: {productId, contractId}},
-            select: {columns: {select: {duration: true}, orderBy: {createdAt: 'asc'}}},
+            where: { productId_contractId: { productId, contractId } },
+            select: { columns: { select: { duration: true }, orderBy: { createdAt: 'asc' } } },
         });
 
         if (!tariff) return response.status(200).json([]);

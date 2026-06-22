@@ -56,6 +56,8 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
       setError("Menge muss mindestens 1 sein.");
       return;
     }
+
+
     onSave({ productId, contractId, duration_months, quantity, optional, total_cents: 0 });
   };
 
