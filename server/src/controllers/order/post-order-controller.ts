@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { prisma, TaskStatus, TaskTarget, TaskType } from "../../lib/prismaClient.js";
-import { taskQueue, taskQueueKey } from "../../workers/task-queue.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { enqueueTask } from "../../lib/document.js";
 
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
@@ -73,18 +73,9 @@ export const createOrder = async (request: Request, response: Response, next: Ne
 };
 
 const createDocumentForOrder = async (orderId: string) => {
-    const task = await prisma.task.create({
-        data: {
-            target: TaskTarget.ORDER,
-            type: TaskType.GENERATION,
-            status: TaskStatus.PENDING,
-        },
-    });
-
-    await prisma.$transaction(async (tx) => {
-        // Mark existing current DOCX OrderDocuments as not current
+    const task = await prisma.$transaction(async (tx) => {
         await tx.orderDocument.updateMany({
-            where: { orderId, isCurrent: true, document: { format: "DOCX" } },
+            where: { orderId, isCurrent: true },
             data: { isCurrent: false },
         });
 
@@ -95,16 +86,28 @@ const createDocumentForOrder = async (orderId: string) => {
         });
         const nextVersion = (latestOrderDoc?.version ?? 0) + 1;
 
-        const doc = await tx.document.create({
-            data: { format: "DOCX", status: "PENDING", taskId: task.id },
+        const task = await tx.task.create({
+            data: {
+                status: "PENDING",
+                type: "GENERATION",
+                target: "ORDER",
+            },
         });
+
         await tx.orderDocument.create({
-            data: { orderId, documentId: doc.id, version: nextVersion, isCurrent: true },
+            data: {
+                orderId,
+                version: nextVersion,
+                isCurrent: true,
+                status: "PENDING",
+                taskId: task.id,
+            },
         });
+
+        return task;
     });
 
-    const job = await taskQueue.add(taskQueueKey, { taskId: task.id });
-    await prisma.task.update({ where: { id: task.id }, data: { jobId: job.id } });
+    await enqueueTask(task.id);
     return task;
 };
 

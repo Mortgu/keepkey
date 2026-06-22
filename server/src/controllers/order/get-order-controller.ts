@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs/promises";
 import { prisma } from "../../lib/prismaClient.js";
-import env from "../../lib/env.js";
 
 
 export const getAllOrders = async (request: Request, response: Response) => {
@@ -10,9 +9,13 @@ export const getAllOrders = async (request: Request, response: Response) => {
         include: {
             customer: true,
             customerContactPerson: true,
-            orderDocuments: {
+            documents: {
                 orderBy: { version: "desc" as const },
-                include: { document: true },
+                include: {
+                    pdf: true,
+                    docx: true,
+                    task: true,
+                },
             },
             orderPositions: {
                 include: {
@@ -39,9 +42,13 @@ export const getOrderById = async (request: Request, response: Response) => {
         include: {
             customer: true,
             customerContactPerson: true,
-            orderDocuments: {
+            documents: {
                 orderBy: { version: "desc" as const },
-                include: { document: true },
+                include: {
+                    pdf: true,
+                    docx: true,
+                    task: true,
+                },
             },
             orderPositions: {
                 include: {
@@ -70,21 +77,24 @@ export const downloadOrderDocument = async (request: Request, response: Response
     }
 
     const orderDoc = await prisma.orderDocument.findFirst({
-        where: {orderId, documentId},
-        include: {document: true},
+        where: { orderId, id: documentId },
+        include: { pdf: true, docx: true },
     });
 
     if (!orderDoc) {
         return response.status(404).json({message: "Document not found"});
     }
 
-    const {document} = orderDoc;
-
-    if (document.status !== "GENERATED") {
+    if (orderDoc.status !== "GENERATED") {
         return response.status(409).json({message: "Document not yet generated"});
     }
 
-    const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
+    const file = format === "pdf" ? orderDoc.pdf : orderDoc.docx;
+    if (!file) {
+        return response.status(404).json({ message: "File not found" });
+    }
+
+    const filePath = path.join(file.path, file.basename);
 
     try {
         await fs.access(filePath);
@@ -97,7 +107,7 @@ export const downloadOrderDocument = async (request: Request, response: Response
         docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     };
 
-    const downloadName = `${document.displayName ?? document.id}.${format}`;
+    const downloadName = `${orderDoc.displayName ?? orderDoc.id}.${format}`;
     response.setHeader("Content-Type", mimeTypes[format]);
     return response.download(filePath, downloadName);
 };

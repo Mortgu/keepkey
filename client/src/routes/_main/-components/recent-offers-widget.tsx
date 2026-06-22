@@ -36,10 +36,6 @@ export function RecentOffersWidget() {
                                 <Badge variant="generated">
                                     {t("dashboard.badge.converted")}
                                 </Badge>
-                            ) : offer.isReserved ? (
-                                <Badge variant="pending">
-                                    {t("dashboard.badge.reserved")}
-                                </Badge>
                             ) : undefined
                         }
                     />

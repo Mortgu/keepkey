@@ -2,7 +2,7 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
 import OfferModal from "./offer-modal";
-import OfferCard from "./offer-card";
+import OfferCard from "./card/offer-card";
 
 import type { ContactPerson, Customer, Offer } from "@/types";
 import { Button, FilterChip, SearchBar } from "@/components";

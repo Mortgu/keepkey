@@ -2,14 +2,13 @@ import React, {useEffect, useState} from "react";
 import {toast} from "react-toastify";
 import {Download, File, Loader, Trash} from "lucide-react";
 import {LineItemRow} from "../../offers/-components/card-components";
-import type {Order, OrderDocument, OrderPosition, OrderFlatRate} from "@/types";
+import type {DocumentStatus, Order, OrderDocument, OrderFlatRate,OrderPosition} from "@/types";
 import {formatDate} from "@/lib/format";
 import {formatEur} from "@/utils/utils";
 import {useLocale, useOrderHook} from "@/hooks";
 import {Badge, Button, Collapsable} from "@/components";
 import {localized} from "@/lib/i18n-content";
 import {BASE_URL} from "@/lib/api-client";
-import type {DocumentStatus} from "@/types";
 
 type Props = {
     order: Order;
@@ -83,7 +82,7 @@ function OrderFlatRateRow({fr}: { fr: OrderFlatRate }) {
 }
 
 function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDocument }) {
-    const [status, setStatus] = useState<DocumentStatus>(orderDoc.document.status);
+    const [status, setStatus] = useState<DocumentStatus>(orderDoc.status);
 
     return (
         <div className="flex items-center justify-between border border-(--border) py-2 pl-4 pr-2 rounded-md gap-2">
@@ -95,18 +94,18 @@ function OrderDocumentItem({order, orderDoc}: { order: Order; orderDoc: OrderDoc
                     )}
                 </div>
                 <div className="w-full flex flex-col justify-between">
-                    <h1 className="text-md">{orderDoc.document.displayName}</h1>
-                    <p className="text-sm text-(--text-secondary)">{orderDoc.document.status}</p>
+                    <h1 className="text-md">{orderDoc.displayName ?? `v${orderDoc.version}`}</h1>
+                    <p className="text-sm text-(--text-secondary)">{orderDoc.status}</p>
                 </div>
             </div>
 
             <div className="flex items-center gap-2">
                 {status === "GENERATED" && (
                     <>
-                        <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.document.id}/pdf`} download>
+                        <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.id}/pdf`} download>
                             <Button variant="secondary" size="sm" icon={<Download className="size-3.5"/>} iconOnly title="PDF herunterladen"/>
                         </a>
-                        <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.document.id}/docx`} download>
+                        <a href={`${BASE_URL}/api/orders/${order.id}/documents/${orderDoc.id}/docx`} download>
                             <Button variant="secondary" size="sm" icon={<File className="size-3.5"/>} iconOnly title="DOCX herunterladen"/>
                         </a>
                     </>
@@ -217,7 +216,7 @@ export default function OrderCard({order}: Props) {
                 className="w-full bg-(--subtle-50) justify-between rounded-none"
             >
                 <div className="grid gap-2 px-4 py-3">
-                    {order.orderDocuments.map((orderDoc: OrderDocument) => (
+                    {order.documents.map((orderDoc: OrderDocument) => (
                         <OrderDocumentItem
                             key={orderDoc.id}
                             order={order}

@@ -7,86 +7,167 @@ import { prisma } from "../lib/prismaClient.js";
 import { runPipeline } from "../pipelines/pipeline.js";
 import runOfferPipeline from "../pipelines/offer/pipeline.js";
 import runOrderPipeline from "../pipelines/order/pipeline.js";
+import path from "path";
+import env from "../lib/env.js";
 
 export { taskQueue, taskQueueKey };
+
+function createDocumentFiles(documentId: string, displayName: string) {
+    const docxBasename = `${documentId}.docx`;
+    const pdfBasename = `${documentId}.pdf`;
+    const outputPath = env.OUTPUT_DIR;
+
+    return {
+        pdf: { filename: path.join(outputPath, pdfBasename), basename: pdfBasename, path: outputPath },
+        docx: { filename: path.join(outputPath, docxBasename), basename: docxBasename, path: outputPath },
+        displayName,
+    };
+}
 
 export default function registerTaskWorker() {
     const taskWorker = new Worker<TaskJobData>(taskQueueKey, async (job: Job<TaskJobData>) => {
         const { taskId } = job.data;
 
-        const task = await prisma.task.findUniqueOrThrow({
+        const task = await prisma.task.findUnique({
             where: { id: taskId },
         });
 
-        const document = await prisma.document.findFirstOrThrow({
-            where: { taskId: task.id },
-        });
+        if (!task) {
+            logger.warn(`[task-worker] Task ${taskId} not found, skipping.`);
+            return;
+        }
 
         const taskTarget = task.target;
 
-        let pipeline;
-
         switch (taskTarget) {
-            case "OFFER":
-                const offerDocument = await prisma.offerDocument.findFirstOrThrow({
-                    where: { documentId: document.id },
+            case "OFFER": {
+                console.log("====================================")
+
+                const offerDocument = await prisma.offerDocument.findFirst({
+                    where: { taskId: task.id },
                 });
 
-                const { offerId, version } = offerDocument;
+                console.log("offerDocument", offerDocument)
 
-                pipeline = await runOfferPipeline({
-                    offerId: offerId,
-                    taskId: taskId,
-                    documentId: document.id,
-                    version: version,
+                if (!offerDocument) {
+                    logger.warn(`[task-worker] OfferDocument for task ${taskId} not found, skipping.`);
+                    return;
+                }
 
+                const { offerId, id: documentId, version } = offerDocument;
+
+                const pipeline = await runOfferPipeline({
+                    offerId,
+                    taskId,
+                    documentId,
+                    version,
                     docxBuffer: null,
                     pdfBuffer: null,
                 });
 
+                console.log("pipeline", pipeline);
 
-                await prisma.document.update({
-                    where: { id: document.id },
+
+                const files = createDocumentFiles(documentId, pipeline.displayName ?? documentId);
+
+                console.log("files", files);
+
+
+                const pdf = await prisma.document.create({
                     data: {
-                        displayName: pipeline.displayName,
-                        status: "GENERATED",
-                        path: pipeline.path,
-                    }
-                })
-
-                break;
-            case "ORDER":
-                const orderDocument = await prisma.orderDocument.findFirstOrThrow({
-                    where: { documentId: document.id },
+                        filename: files.pdf.filename,
+                        basename: files.pdf.basename,
+                        path: files.pdf.path,
+                        format: "PDF",
+                        size: pipeline.pdfBuffer?.length ?? null,
+                    },
                 });
 
-                const { orderId, version: orderVersion } = orderDocument;
+                console.log("pdf", pdf);
 
-                const orderPipeline = await runOrderPipeline({
-                    orderId: orderId,
-                    taskId: taskId,
-                    documentId: document.id,
-                    version: orderVersion,
-
-                    docxBuffer: null,
-                    pdfBuffer: null,
-                });
-
-                await prisma.document.update({
-                    where: { id: document.id },
+                const docx = await prisma.document.create({
                     data: {
-                        displayName: orderPipeline.displayName,
+                        filename: files.docx.filename,
+                        basename: files.docx.basename,
+                        path: files.docx.path,
+                        format: "DOCX",
+                        size: pipeline.docxBuffer?.length ?? null,
+                    },
+                });
+                console.log("docx", docx);
+
+
+                await prisma.offerDocument.update({
+                    where: { id: offerDocument.id },
+                    data: {
+                        pdfId: pdf.id,
+                        docxId: docx.id,
                         status: "GENERATED",
-                        path: orderPipeline.path,
+                        displayName: files.displayName,
                     },
                 });
 
                 break;
+            }
+            case "ORDER": {
+                const orderDocument = await prisma.orderDocument.findFirst({
+                    where: { taskId: task.id },
+                });
+
+                if (!orderDocument) {
+                    logger.warn(`[task-worker] OrderDocument for task ${taskId} not found, skipping.`);
+                    return;
+                }
+
+                const { orderId, id: documentId, version } = orderDocument;
+
+                const pipeline = await runOrderPipeline({
+                    orderId,
+                    taskId,
+                    documentId,
+                    version,
+                    docxBuffer: null,
+                    pdfBuffer: null,
+                });
+
+                const files = createDocumentFiles(documentId, pipeline.displayName ?? documentId);
+
+                const pdf = await prisma.document.create({
+                    data: {
+                        filename: files.pdf.filename,
+                        basename: files.pdf.basename,
+                        path: files.pdf.path,
+                        format: "PDF",
+                        size: pipeline.pdfBuffer?.length ?? null,
+                    },
+                });
+
+                const docx = await prisma.document.create({
+                    data: {
+                        filename: files.docx.filename,
+                        basename: files.docx.basename,
+                        path: files.docx.path,
+                        format: "DOCX",
+                        size: pipeline.docxBuffer?.length ?? null,
+                    },
+                });
+
+                await prisma.orderDocument.update({
+                    where: { id: orderDocument.id },
+                    data: {
+                        pdfId: pdf.id,
+                        docxId: docx.id,
+                        status: "GENERATED",
+                        displayName: files.displayName,
+                    },
+                });
+
+                break;
+            }
             case "RENEWAL":
                 break;
             default:
-                throw new Error("Undefined target!")
-                break;
+                throw new Error("Undefined target!");
         }
 
     }, {
@@ -152,6 +233,16 @@ export default function registerTaskWorker() {
                     status: TaskStatus.FAILED,
                     error: error.message
                 }
+            });
+
+            await prisma.offerDocument.updateMany({
+                where: { taskId },
+                data: { status: "FAILED", error: error.message },
+            });
+
+            await prisma.orderDocument.updateMany({
+                where: { taskId },
+                data: { status: "FAILED", error: error.message },
             });
         } catch (exception: any) {
             logger.error(exception);

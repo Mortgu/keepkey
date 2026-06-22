@@ -50,7 +50,7 @@ export const updateTariffColumnAction = (tariffId: string, columnId: string, dur
         body: JSON.stringify({ duration }),
     });
 
-export const createTariffRowAction = (tariffId: string, min_quantity: number, max_quantity) =>
+export const createTariffRowAction = (tariffId: string, min_quantity: number, max_quantity: number) =>
     api<TariffRow>(`/api/tariffs/${tariffId}/row`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

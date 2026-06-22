@@ -11,7 +11,6 @@ import type {
 
 import {
     createOfferAction,
-    createReservationAction,
     deleteOfferAction,
     deleteOfferDocumentAction,
     generateOfferDocumentAction,
@@ -114,19 +113,14 @@ export const useOfferHook = (params?: OfferQueryParams) => {
     });
 
     const deleteDocumentMutation = useMutation({
-        mutationFn: ({ documentId }: { documentId: string }) =>
-            deleteOfferDocumentAction(documentId),
+        mutationFn: ({ offerId, documentId }: { offerId: string, documentId: string }) =>
+            deleteOfferDocumentAction(offerId, documentId),
         onSuccess: invalidate,
     });
 
     const renameDocumentMutation = useMutation({
         mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
             renameDocumentAction(document_id, displayName),
-        onSuccess: invalidate,
-    });
-
-    const createReservationMutation = useMutation({
-        mutationFn: ({ offer_id }: { offer_id: string }) => createReservationAction(offer_id),
         onSuccess: invalidate,
     });
 
@@ -165,10 +159,6 @@ export const useOfferHook = (params?: OfferQueryParams) => {
         renameDocument: renameDocumentMutation.mutateAsync,
         isRenamingDocument: renameDocumentMutation.isPending,
         errorRenamingDocument: renameDocumentMutation.error,
-
-        createReservation: createReservationMutation.mutateAsync,
-        isCreatingReservation: createReservationMutation.isPending,
-        errorCreatingReservation: createReservationMutation.error,
 
         upload: uploadMutation.mutateAsync,
         isUploading: uploadMutation.isPending,

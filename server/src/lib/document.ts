@@ -1,31 +1,25 @@
-import { Document, Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
+import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
 import { prisma } from "./prismaClient.js";
 import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
 import { getNextCloudClient } from "./nextcloud.js";
 import logger from "../middlewares/logger.js";
 
-export async function generateDocument(document: Document): Promise<Task> {
-  const task = await prisma.task.create({
+export async function createTask(target: TaskTarget): Promise<Task> {
+  return prisma.task.create({
     data: {
       status: TaskStatus.PENDING,
-      type: TaskType.UPLOAD,
-      target: TaskTarget.OFFER,
-    }
+      type: TaskType.GENERATION,
+      target,
+    },
   });
+}
 
-  await prisma.document.update({
-    where: { id: document.id },
-    data: { taskId: task.id },
-  });
-
-  const job = await taskQueue.add(taskQueueKey, { taskId: task.id });
-
+export async function enqueueTask(taskId: string): Promise<void> {
+  const job = await taskQueue.add(taskQueueKey, { taskId });
   await prisma.task.update({
-    where: { id: task.id },
+    where: { id: taskId },
     data: { jobId: job.id },
   });
-
-  return task;
 }
 
 export async function uploadDocument(filename: string, uploadDir: string, content: Buffer): Promise<string> {

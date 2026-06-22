@@ -25,17 +25,13 @@ model Offer {
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
   offerDocuments OfferDocument[]
+  revisions      OfferRevision[]
 
   orders Order?
 
-  isReserved        Boolean @default(false)
-  reservationTaskId String? @unique
-  reservationTask   Task?   @relation("OfferReservationTask", fields: [reservationTaskId], references: [id])
+  net_amount Int
 
-  net_amount Int // Der reine Warenwert (netto) in cent
-
-  version   Int             @default(1)
-  revisions OfferRevision[]
+  version Int @default(1)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -98,17 +94,29 @@ model OfferFlatRate {
 }
 
 model OfferDocument {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
-  version   Int
-  isCurrent Boolean @default(false)
+  displayName String?
+  version     Int            @default(0)
+  status      DocumentStatus
+  isCurrent   Boolean        @default(false)
 
-  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
-  documentId String   @unique
+  error String?
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
-  @@unique([offerId, version, documentId])
-  @@map("offer_documents")
+  pdf   Document? @relation(name: "offerPdf", fields: [pdfId], references: [id], onDelete: Cascade)
+  pdfId String?   @unique
+
+  docx   Document? @relation(name: "offerDocx", fields: [docxId], references: [id], onDelete: Cascade)
+  docxId String?   @unique
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("offer_document")
 }

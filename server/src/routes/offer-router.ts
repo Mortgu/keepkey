@@ -2,7 +2,6 @@ import { Router } from "express";
 
 import {
   createOffer,
-  createReservation,
   deleteOffer,
   deleteOfferDocument,
   downloadOfferDocument,
@@ -28,8 +27,6 @@ router.get('/next', getNextQuoteId);
 router.get("/:id/revisions", getOfferRevisions);
 
 router.post('/:id/upload/:documentId', uploadOfferDocument);
-
-//router.post('/:id/reserve', createReservation);
 
 router.post('/:id/document', enqueueGeneration);
 

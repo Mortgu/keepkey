@@ -66,16 +66,20 @@ export interface components {
         };
         Document: {
             id: string;
-            displayName?: string;
+            filename: string;
+            basename: string;
+            path: string;
             format: components["schemas"]["DocumentFormat"];
-            status: components["schemas"]["DocumentStatus"];
-            path?: string;
-            taskId?: string;
-            task?: components["schemas"]["Task"];
-            offerDocument?: components["schemas"]["OfferDocument"];
-            orderDocument?: components["schemas"]["OrderDocument"];
+            /** Format: int32 */
+            size?: number;
             /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+            offerPdfDocument?: components["schemas"]["OfferDocument"];
+            offerDocxDocument?: components["schemas"]["OfferDocument"];
+            orderPdfDocument?: components["schemas"]["OrderDocument"];
+            orderDocxDocument?: components["schemas"]["OrderDocument"];
         };
         Offer: {
             id: string;
@@ -99,15 +103,12 @@ export interface components {
             offerFlatRates: components["schemas"]["OfferFlatRate"][];
             offerPositions: components["schemas"]["OfferPosition"][];
             offerDocuments: components["schemas"]["OfferDocument"][];
+            revisions: components["schemas"]["OfferRevision"][];
             orders?: components["schemas"]["Order"];
-            isReserved: boolean;
-            reservationTaskId?: string;
-            reservationTask?: components["schemas"]["Task"];
             /** Format: int32 */
             net_amount: number;
             /** Format: int32 */
             version: number;
-            revisions: components["schemas"]["OfferRevision"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -157,13 +158,24 @@ export interface components {
         };
         OfferDocument: {
             id: string;
+            displayName?: string;
             /** Format: int32 */
             version: number;
+            status: components["schemas"]["DocumentStatus"];
             isCurrent: boolean;
-            document: components["schemas"]["Document"];
-            documentId: string;
+            error?: string;
             offer: components["schemas"]["Offer"];
             offerId: string;
+            pdf?: components["schemas"]["Document"];
+            pdfId?: string;
+            docx?: components["schemas"]["Document"];
+            docxId?: string;
+            task: components["schemas"]["Task"];
+            taskId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Order: {
             id: string;
@@ -185,9 +197,11 @@ export interface components {
             validUntil?: string;
             /** Format: date-time */
             requestFrom?: string;
+            /** Format: int32 */
+            net_amount: number;
+            documents: components["schemas"]["OrderDocument"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             flatRates: components["schemas"]["OrderFlatRate"][];
-            orderDocuments: components["schemas"]["OrderDocument"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -224,13 +238,24 @@ export interface components {
         };
         OrderDocument: {
             id: string;
+            displayName?: string;
             /** Format: int32 */
             version: number;
+            status: components["schemas"]["DocumentStatus"];
             isCurrent: boolean;
-            document: components["schemas"]["Document"];
-            documentId: string;
+            error?: string;
             order: components["schemas"]["Order"];
             orderId: string;
+            pdf?: components["schemas"]["Document"];
+            pdfId?: string;
+            docx?: components["schemas"]["Document"];
+            docxId?: string;
+            task: components["schemas"]["Task"];
+            taskId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Product: {
             id: string;
@@ -447,17 +472,17 @@ export interface components {
             target: components["schemas"]["TaskTarget"];
             type: components["schemas"]["TaskType"];
             error?: string;
-            document?: components["schemas"]["Document"];
-            offerReservation?: components["schemas"]["Offer"];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            offerDocuments: components["schemas"]["OfferDocument"][];
+            orderDocuments: components["schemas"]["OrderDocument"][];
         };
         /** @enum {string} */
         DocumentStatus: "PENDING" | "PROCESSING" | "GENERATED" | "UPLOADING" | "UPLOADED" | "FAILED";
         /** @enum {string} */
-        DocumentFormat: "PDF" | "DOCX" | "RESERVED";
+        DocumentFormat: "PDF" | "DOCX";
         /** @enum {string} */
         Language: "DE" | "EN";
         /** @enum {string} */

@@ -1,4 +1,4 @@
-import type {ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput} from '@/types';
+import type { ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
 import { api } from "@/lib/api-client";
 
 
@@ -33,8 +33,10 @@ export const createOfferAction = (offer: CreateOfferInput, positions: Array<Crea
 export const deleteOfferAction = (id: string) =>
     api<void>(`/api/offers/${id}`, { method: "DELETE" });
 
-export const deleteOfferDocumentAction = (documentId: string) =>
-    api<void>(`/api/documents/${documentId}`, { method: "DELETE" });
+export const deleteOfferDocumentAction = (offerId: string, documentId: string) =>
+    api<void>(`/api/offers/${offerId}/documents/${documentId}`, {
+        method: "DELETE"
+    });
 
 export const updateOfferAction = (
     id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatRates: Array<UpdateOfferFlatRatesInput>,
@@ -54,11 +56,6 @@ export const renameDocumentAction = (document_id: string, displayName: string) =
         body: JSON.stringify({
             displayName
         })
-    });
-
-export const createReservationAction = (offer_id: string) =>
-    api<string>(`/api/offers/${offer_id}/reserve`, {
-        method: 'POST',
     });
 
 export const uploadAction = (offerId: string, documentId: string) =>

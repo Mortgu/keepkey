@@ -1,86 +1,22 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Pen, Trash, UndoDot } from "lucide-react";
-import { Document, LineItemRow } from "./card-components";
-import OfferRevisionHistory from "./card-components/offer-revision-history";
-import type { Offer, OfferDocument } from "@/types";
+import { Document, LineItemRow } from "../card-components";
+import OfferRevisionHistory from "../card-components/offer-revision-history";
+import type { FlatRate, Offer, OfferDocument } from "@/types";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 import { useLocale, useOfferHook } from "@/hooks";
 import { Badge, Button, Collapsable, Drawer } from "@/components";
 import { localized } from "@/lib/i18n-content";
+import OfferCardProduct from "./offer-card-product";
+import OfferCardFlatRate from "./offer-card-flatrate";
+import OfferCardDocument from "./offer-card-document";
 
 type OfferListItemProps = {
     offer: Offer;
     onEdit: (offer: Offer) => void;
 };
-
-function OfferPositionRow({ op }: { op: Offer["offerPositions"][number] }) {
-    const locale = useLocale();
-    return (
-        <LineItemRow
-            left={
-                <div className="grid">
-                    <div className="flex gap-2">
-                        <p className="text-sm">
-                            {localized(op.product.translations, locale, "name")}
-                        </p>
-                        <Badge variant="draft">
-                            {localized(op.contract.translations, locale, "name")}
-                        </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <div className="flex gap-1 text-sm font-light">
-                            <span className="text-(--text-secondary)">Seats:</span>
-                            <p>{op.quantity}</p>
-                        </div>
-                        <div className="flex gap-1 text-sm font-light">
-                            <span className="text-(--text-secondary)">Laufzeit:</span>
-                            <p>{op.duration_months} Monate</p>
-                        </div>
-                    </div>
-                </div>
-            }
-            right={
-                <>
-                    <p className="text-sm font-semibold">{formatEur(op.total_cents)}</p>
-                    <p className="text-(--text-secondary) font-light text-sm">
-                        Gesamtpreis (netto)
-                    </p>
-                </>
-            }
-        />
-    );
-}
-
-function OfferFlatRateRow({ fr }: { fr: Offer["offerFlatRates"][number] }) {
-    const locale = useLocale();
-    return (
-        <LineItemRow
-            left={
-                <div className="grid">
-                    <p className="text-sm">
-                        {localized(fr.flatRate.translations, locale, "name")}
-                    </p>
-                    <div className="flex items-center gap-2">
-                        <div className="flex gap-1 text-sm font-light">
-                            <span className="text-(--text-secondary)">Anzahl:</span>
-                            <p>{fr.quantity}</p>
-                        </div>
-                    </div>
-                </div>
-            }
-            right={
-                <>
-                    <p className="text-sm font-semibold">{formatEur(fr.total_cents)}</p>
-                    <p className="text-(--text-secondary) font-light text-sm">
-                        Gesamtpreis (netto)
-                    </p>
-                </>
-            }
-        />
-    );
-}
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
     const {
@@ -90,6 +26,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         offerFlatRates,
         customer,
     } = offer;
+
     const {
         deleteOffer,
         errorDeletingOffer,
@@ -106,6 +43,8 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         }
 
     };
+
+    console.log(offer.offerDocuments);
 
     useEffect(() => {
         if (errorDeletingOffer) {
@@ -161,25 +100,17 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Collapsable
-                label="Produkte"
+            <Collapsable label="Produkte"
                 className="w-full bg-(--subtle-50) justify-between rounded-none"
             >
-                <div className="grid gap-2 px-4 py-3">
-                    {offerPositions.map((op, i) => (
-                        <OfferPositionRow key={i} op={op} />
+                <div className="grid gap-0">
+                    {offerPositions.map((position, i) => (
+                        <OfferCardProduct key={i} position={position} />
                     ))}
-                    {offerFlatRates.map((fr, i) => (
-                        <OfferFlatRateRow key={i} fr={fr} />
+
+                    {offerFlatRates.map((flatrate, i) => (
+                        <OfferCardFlatRate key={i} flatrate={flatrate} />
                     ))}
-                    <LineItemRow
-                        left={
-                            <span className="text-sm text-(--text-secondary) font-light">
-                                Gesamtpreis
-                            </span>
-                        }
-                        right={<p>{formatEur(offer.net_amount)}</p>}
-                    />
                 </div>
             </Collapsable>
 
@@ -187,25 +118,25 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 label="Dokumente"
                 className="w-full bg-(--subtle-50) justify-between rounded-none"
             >
-                <div className="grid gap-2 px-4 py-3">
-                    {offer.offerDocuments.map((document: OfferDocument) => (
-                        <Document
-                            key={document.id}
-                            offer={offer}
-                            document={document.document}
-                        />
-                    ))}
+                <div className="grid mx-4">
+                    <div>
+                        {offer.offerDocuments.map((document: OfferDocument) => (
+                            <OfferCardDocument key={document.id} offerDocument={document} />
+                        ))}
+                    </div>
 
-                    <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="sm"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({ offerId: offer.id })}
-                    >
-                        Dokument generieren
-                    </Button>
+                    <div className="py-2 ">
+                        <Button
+                            className="min-w-fit"
+                            variant="primary"
+                            size="sm"
+                            loading={isGeneratingDocument}
+                            disabled={isGeneratingDocument}
+                            onClick={() => generateDocument({ offerId: offer.id })}
+                        >
+                            Dokument generieren
+                        </Button>
+                    </div>
                 </div>
             </Collapsable>
 

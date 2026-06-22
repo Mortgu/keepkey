@@ -1,30 +1,19 @@
-import {NextFunction, Request, Response} from 'express';
-import {prisma} from "../../lib/prismaClient.js";
-import {OfferFlatRate, OfferPosition, Task} from "@prisma/client";
-import {toDate} from '../../utils/utils.js';
+import { NextFunction, Request, Response } from 'express';
+import { prisma } from "../../lib/prismaClient.js";
+import { OfferFlatRate, OfferPosition } from "@prisma/client";
+import { toDate } from '../../utils/utils.js';
 import calculatePrice from "../../utils/products.js";
 import env from '../../lib/env.js';
 
 import fs from 'fs';
 import path from 'path';
-import {generateDocument, uploadDocument} from '../../lib/document.js';
-
-/*
- * Function to enqueue a new reservation job for an offer.
- * [POST] /api/offer/:id/reserve
- */
-
-export const createReservation = async (request: Request, response: Response, next: NextFunction) => {
-    /* This function creates two ".reserved" files in the NEXTCLOUD_OFFER_PATH (NEXTCLOUD_OFFER_PDF_PATH, NEXTCLOUD_OFFER_ORIGINAL_PATH) */
-
-    const {id} = request.params;
-};
+import { createTask, enqueueTask, uploadDocument } from '../../lib/document.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUniqueOrThrow({
-        where: {id: offerId}
+        where: { id: offerId },
     });
 
     if (!offer) {
@@ -33,45 +22,57 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
         });
     }
 
-    const document = await prisma.document.create({
-        data: {
-            displayName: null,
-            status: "PENDING",
-            taskId: null,
-            format: "DOCX"
-        }
-    });
-
     const currentVersion = await prisma.offerDocument.findFirst({
-        where: {offerId: offerId},
-        select: {version: true},
-        orderBy: {version: "desc"}
+        where: { offerId },
+        select: { version: true },
+        orderBy: { version: "desc" },
     });
 
-    const offerDocument = await prisma.offerDocument.create({
-        data: {
-            offerId: offerId,
-            documentId: document.id,
-            version: (currentVersion?.version ?? -1) + 1,
-        }
+    const nextVersion = (currentVersion?.version ?? 0) + 1;
+
+    const task = await prisma.$transaction(async (tx) => {
+        await tx.offerDocument.updateMany({
+            where: { offerId, isCurrent: true },
+            data: { isCurrent: false },
+        });
+
+        const task = await tx.task.create({
+            data: {
+                status: "PENDING",
+                type: "GENERATION",
+                target: "OFFER",
+            },
+        });
+
+        await tx.offerDocument.create({
+            data: {
+                offerId,
+                version: nextVersion,
+                isCurrent: true,
+                status: "PENDING",
+                taskId: task.id,
+            },
+        });
+
+        return task;
     });
 
-    const task: Task = await generateDocument(document);
+    await enqueueTask(task.id);
 
     return response.status(200).json(task);
 };
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
-    const {body} = request;
+    const { body } = request;
 
     if (!body) {
-        return response.status(400).json({message: "Bad request"});
+        return response.status(400).json({ message: "Bad request" });
     }
 
-    const {offer, positions, flatRates} = body;
+    const { offer, positions, flatRates } = body;
 
     if (!offer || !positions) {
-        return response.status(400).json({message: "Bad request."});
+        return response.status(400).json({ message: "Bad request." });
     }
 
     for (const position of positions) {
@@ -94,7 +95,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
             let net_amount = net_amount_positions + net_amount_flatrates;
 
-            const {supplierId, validUntil, requestFrom, date, ...offerFields} = body.offer;
+            const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
             const offer = await tx.offer.create({
                 data: {
                     ...offerFields,
@@ -107,9 +108,9 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             });
 
             for (const position of positions) {
-                const {productId, contractId, duration_months, quantity, optional, total_cents} = position;
+                const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
                 await tx.offerPosition.create({
-                    data: {offerId: offer.id, productId, contractId, duration_months, quantity, total_cents, optional},
+                    data: { offerId: offer.id, productId, contractId, duration_months, quantity, total_cents, optional },
                 });
             }
 
@@ -137,38 +138,41 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 };
 
 export const uploadOfferDocument = async (request: Request, response: Response) => {
-    const {id, documentId} = request.params;
+    const { id, documentId } = request.params;
 
     const PDF_PATH = env.NEXTCLOUD_OFFER_PDF_PATH;
     const DOCX_PATH = env.NEXTCLOUD_OFFER_ORIGINAL_PATH;
 
-    const document = await prisma.document.findUniqueOrThrow({
-        where: {id: documentId as string},
+    const offerDoc = await prisma.offerDocument.findFirstOrThrow({
+        where: { id: documentId as string, offerId: id as string },
+        include: { pdf: true, docx: true },
     });
 
-    if (!document || !document.displayName) {
+    if (!offerDoc.pdf || !offerDoc.docx) {
         return response.status(404).json({
-            message: 'Something went wrong! Document not found!'
+            message: 'Documents not yet generated!'
         });
     }
 
+    const displayName = offerDoc.displayName ?? offerDoc.id;
+
     const [pdfContent, docxContent] = await Promise.all([
-        fs.readFileSync(path.join(env.OUTPUT_DIR, document.id + ".pdf")),
-        fs.readFileSync(path.join(env.OUTPUT_DIR, document.id + ".docx")),
+        fs.readFileSync(path.join(offerDoc.pdf.path, offerDoc.pdf.basename)),
+        fs.readFileSync(path.join(offerDoc.docx.path, offerDoc.docx.basename)),
     ]);
 
     const [pdfUploadResponse, docxUploadResponse] = await Promise.all([
-        await uploadDocument(document.displayName + ".pdf", PDF_PATH, pdfContent),
-        await uploadDocument(document.displayName + ".docx", DOCX_PATH, docxContent),
+        uploadDocument(displayName + ".pdf", PDF_PATH, pdfContent),
+        uploadDocument(displayName + ".docx", DOCX_PATH, docxContent),
     ]);
 
     if (!pdfUploadResponse || !docxUploadResponse) {
         throw new Error("Something went wrong while trying to upload docx and pdf! Please try again.");
     }
 
-    await prisma.document.update({
-        where: {id: documentId as string},
-        data: {status: "UPLOADED"}
+    await prisma.offerDocument.update({
+        where: { id: offerDoc.id },
+        data: { status: "UPLOADED" },
     });
 
     return response.status(200).json({

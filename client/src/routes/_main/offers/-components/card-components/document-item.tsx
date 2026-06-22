@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { Download, File, Loader, Trash, UploadCloud } from "lucide-react";
-import type { Document, DocumentStatus, Offer } from "@/types";
+import type { DocumentStatus, Offer, OfferDocument } from "@/types";
 import { useDocumentTask, useOfferHook } from "@/hooks";
 import { Button, Input } from "@/components";
 import { BASE_URL } from "@/lib/api-client";
 
 type Props = {
-    document: Document;
-    offer: Offer;
+  document: OfferDocument;
+  offer: Offer;
 }
 
 export function Document({ offer, document }: Props) {
@@ -38,17 +38,17 @@ export function Document({ offer, document }: Props) {
           {(status === "PENDING" ||
             status === "PROCESSING" ||
             status === "UPLOADING") && (
-            <Loader className="size-4 animate-spin" />
-          )}
+              <Loader className="size-4 animate-spin" />
+            )}
         </div>
         <div className="w-full flex flex-col justify-between">
           {!edit && (
             <>
               <h1 className="text-md" onClick={() => setEdit(true)}>
-                {document.displayName}
+                {document.displayName ?? `v${document.version}`}
               </h1>
               <p className="text-sm text-(--text-secondary)">
-                {document.status}
+                {status}
               </p>
             </>
           )}
@@ -56,31 +56,31 @@ export function Document({ offer, document }: Props) {
             <Input
               size="xs"
               autoFocus
-              onBlur={(e) => setEdit(false)}
-              value={document.displayName}
+              onBlur={() => setEdit(false)}
+              value={document.displayName ?? ""}
             />
           )}
         </div>
       </div>
 
-            <div className="flex items-center gap-2">
-                {status === "GENERATED" && (
-                    <>
-                        <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/pdf`} download>
-                            <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly title="PDF herunterladen" />
-                        </a>
-                        <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/docx`} download>
-                            <Button variant="secondary" size="sm" icon={<File className="size-3.5" />} iconOnly title="DOCX herunterladen" />
-                        </a>
-                    </>
-                )}
+      <div className="flex items-center gap-2">
+        {status === "GENERATED" && (
+          <>
+            <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/pdf`} download>
+              <Button variant="secondary" size="sm" icon={<Download className="size-3.5" />} iconOnly title="PDF herunterladen" />
+            </a>
+            <a href={`${BASE_URL}/api/offers/${offer.id}/documents/${document.id}/docx`} download>
+              <Button variant="secondary" size="sm" icon={<File className="size-3.5" />} iconOnly title="DOCX herunterladen" />
+            </a>
+          </>
+        )}
 
-                <Button variant="secondary" size="sm" icon={<UploadCloud className="size-3.5" />} iconOnly
-                    onClick={() => upload({ offerId: offer.id, documentId: document.id })} loading={isUploading} disabled={document.status === "UPLOADED"} />
+        <Button variant="secondary" size="sm" icon={<UploadCloud className="size-3.5" />} iconOnly
+          onClick={() => upload({ offerId: offer.id, documentId: document.id })} loading={isUploading} disabled={status === "UPLOADED"} />
 
-                <Button variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
-                    onClick={() => deleteDocument({ documentId: document.id })} loading={isDeletingDocument || !!errorDeletingDocument} disabled={isDeletingDocument || !!errorDeletingDocument} />
-            </div>
-        </div>
-    )
+        <Button variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
+          onClick={() => deleteDocument({ offerId: offer.id, documentId: document.id })} loading={isDeletingDocument || !!errorDeletingDocument} disabled={isDeletingDocument || !!errorDeletingDocument} />
+      </div>
+    </div>
+  )
 }

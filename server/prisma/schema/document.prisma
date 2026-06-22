@@ -10,24 +10,27 @@ enum DocumentStatus {
 enum DocumentFormat {
   PDF
   DOCX
-  RESERVED
 }
 
 model Document {
   id String @id @default(cuid())
 
-  displayName String?
-  format      DocumentFormat
-  status      DocumentStatus @default(PENDING)
-  path        String?
+  filename String // generated/xdawdawd.pdf
+  basename String // xdawdawd.pdf
+  path     String // generated
+  format   DocumentFormat // PDF || DOCX
 
-  taskId String? @unique
-  task   Task?   @relation("DocumentTask", fields: [taskId], references: [id])
+  size Int?
 
-  offerDocument OfferDocument?
-  orderDocument OrderDocument?
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  createdAt DateTime @default(now())
+  offerPdfDocument  OfferDocument? @relation("offerPdf")
+  offerDocxDocument OfferDocument? @relation("offerDocx")
 
+  orderPdfDocument  OrderDocument? @relation("orderPdf")
+  orderDocxDocument OrderDocument? @relation("orderDocx")
+
+  @@unique([filename])
   @@map("document")
 }

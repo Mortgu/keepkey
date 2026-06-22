@@ -1,11 +1,11 @@
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import path from "path";
 import fs from "fs/promises";
-import {prisma} from "../../lib/prismaClient.js";
+import { prisma } from "../../lib/prismaClient.js";
 import env from "../../lib/env.js";
 
 export const getOffers = async (request: Request, response: Response) => {
-    const {search, companyIds, contactPersonIds, sort} = request.query;
+    const { search, companyIds, contactPersonIds, sort } = request.query;
 
     const where: {
         AND?: any[];
@@ -15,20 +15,20 @@ export const getOffers = async (request: Request, response: Response) => {
     } = {};
 
     if (search && typeof search === "string") {
-        where.quoteId = {contains: search};
+        where.quoteId = { contains: search };
     }
 
     if (companyIds) {
         const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
-        where.customerId = {in: ids as string[]};
+        where.customerId = { in: ids as string[] };
     }
 
     if (contactPersonIds) {
         const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
-        where.contactPersonId = {in: ids as string[]};
+        where.contactPersonId = { in: ids as string[] };
     }
 
-    const orderBy = sort === "createdAt:asc" ? {createdAt: "asc" as const} : {createdAt: "desc" as const};
+    const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
 
     const offers = await prisma.offer.findMany({
         where: Object.keys(where).length > 0 ? where : undefined,
@@ -37,11 +37,12 @@ export const getOffers = async (request: Request, response: Response) => {
             customer: true,
             supplier: true,
             customerContactPerson: true,
-            reservationTask: true,
             offerDocuments: {
-                orderBy: {version: "desc" as const},
+                orderBy: { version: "desc" as const },
                 include: {
-                    document: true,
+                    pdf: true,
+                    docx: true,
+                    task: true,
                 },
             },
             offerPositions: {
@@ -60,7 +61,11 @@ export const getOffers = async (request: Request, response: Response) => {
             },
             offerFlatRates: {
                 include: {
-                    flatRate: true,
+                    flatRate: {
+                        include: {
+                            translations: true,
+                        }
+                    },
                 },
             },
         },
@@ -70,16 +75,19 @@ export const getOffers = async (request: Request, response: Response) => {
 };
 
 export const getOfferById = async (request: Request, response: Response) => {
-    const {id} = request.params;
+    const { id } = request.params;
 
     try {
         const offer = await prisma.offer.findFirstOrThrow({
-            where: {id: id as string},
+            where: { id: id as string },
             include: {
-                reservationTask: true,
                 offerDocuments: {
-                    orderBy: {version: "desc" as const},
-                    include: {document: true},
+                    orderBy: { version: "desc" as const },
+                    include: {
+                        pdf: true,
+                        docx: true,
+                        task: true,
+                    },
                 },
             },
         });
@@ -93,12 +101,12 @@ export const getOfferById = async (request: Request, response: Response) => {
 };
 
 export const getOfferRevisions = async (request: Request, response: Response) => {
-    const {id} = request.params;
+    const { id } = request.params;
 
     const revisions = await prisma.offerRevision.findMany({
-        where: {offerId: id as string},
-        orderBy: {version: "desc"},
-        select: {id: true, version: true, changedBy: true, createdAt: true},
+        where: { offerId: id as string },
+        orderBy: { version: "desc" },
+        select: { id: true, version: true, changedBy: true, createdAt: true },
     });
 
     return response.status(200).json(revisions);
@@ -119,30 +127,33 @@ export const downloadOfferDocument = async (request: Request, response: Response
     const format = (request.params.format as string).toLowerCase();
 
     if (format !== "pdf" && format !== "docx") {
-        return response.status(400).json({message: "Invalid format. Use 'pdf' or 'docx'."});
+        return response.status(400).json({ message: "Invalid format. Use 'pdf' or 'docx'." });
     }
 
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: {offerId, documentId},
-        include: {document: true},
+        where: { offerId, id: documentId },
+        include: { pdf: true, docx: true },
     });
 
     if (!offerDoc) {
-        return response.status(404).json({message: "Document not found"});
+        return response.status(404).json({ message: "Document not found" });
     }
 
-    const {document} = offerDoc;
-
-    if (document.status !== "GENERATED") {
-        return response.status(409).json({message: "Document not yet generated"});
+    if (offerDoc.status !== "GENERATED") {
+        return response.status(409).json({ message: "Document not yet generated" });
     }
 
-    const filePath = path.join(env.OUTPUT_DIR, `${document.id}.${format}`);
+    const file = format === "pdf" ? offerDoc.pdf : offerDoc.docx;
+    if (!file) {
+        return response.status(404).json({ message: "File not found" });
+    }
+
+    const filePath = path.join(file.path, file.basename);
 
     try {
         await fs.access(filePath);
     } catch {
-        return response.status(404).json({message: "File not found on disk"});
+        return response.status(404).json({ message: "File not found on disk" });
     }
 
     const mimeTypes: Record<string, string> = {
@@ -150,7 +161,7 @@ export const downloadOfferDocument = async (request: Request, response: Response
         docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     };
 
-    const downloadName = `${document.displayName ?? document.id}.${format}`;
+    const downloadName = `${offerDoc.displayName ?? offerDoc.id}.${format}`;
     response.setHeader("Content-Type", mimeTypes[format]);
     return response.download(filePath, downloadName);
 };

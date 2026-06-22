@@ -57,7 +57,6 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
                     requestFrom: toDate(requestFrom),
                     net_amount,
                     version: {increment: 1},
-                    ...(quoteIdChanged && {isReserved: false, reservationTaskId: null}),
                 },
             });
 

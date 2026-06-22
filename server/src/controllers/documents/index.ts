@@ -6,19 +6,16 @@ export const renameDocument = async (request: Request, response: Response) => {
     const { displayName } = request.body;
 
     try {
-        const updatedDocument = await prisma.document.update({
+        const updatedDocument = await prisma.offerDocument.update({
             where: { id: id as string },
-            data: {
-                displayName: displayName
-            }
+            data: { displayName },
         });
 
-
-        return response.status(200).json(updatedDocument)
+        return response.status(200).json(updatedDocument);
     } catch (exception: any) {
         return response.status(500).json({
-            message: 'Something went wrong trying to rename doucment!'
-        })
+            message: 'Something went wrong trying to rename document!'
+        });
     }
 }
 
@@ -32,10 +29,10 @@ export const deleteDocument = async (request: Request, response: Response) => {
 
         return response.status(200).json({
             message: 'Document deleted!'
-        })
+        });
     } catch (exception: any) {
         return response.status(500).json({
             message: "Something went wrong trying to delete document!", exception: exception.message
-        })
+        });
     }
 }

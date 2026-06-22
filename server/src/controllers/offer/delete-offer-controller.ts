@@ -1,4 +1,5 @@
 import fs from 'fs';
+import path from 'path';
 
 import { Request, Response } from 'express';
 
@@ -9,8 +10,8 @@ export const deleteOfferDocument = async (request: Request, response: Response) 
     const documentId = request.params.documentId as string;
 
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, documentId },
-        include: { document: true },
+        where: { offerId, id: documentId },
+        include: { pdf: true, docx: true },
     });
 
     if (!offerDoc) {
@@ -18,11 +19,13 @@ export const deleteOfferDocument = async (request: Request, response: Response) 
     }
 
     try {
-        await prisma.document.delete({ where: { id: offerDoc.documentId } });
-
-        if (offerDoc.document.path) {
-            await fs.promises.rm(offerDoc.document.path, { force: true });
+        for (const file of [offerDoc.pdf, offerDoc.docx]) {
+            if (file) {
+                await fs.promises.rm(path.join(file.path, file.basename), { force: true });
+            }
         }
+
+        await prisma.offerDocument.delete({ where: { id: offerDoc.id } });
 
         return response.status(200).json({ success: true });
     } catch (exception: any) {
