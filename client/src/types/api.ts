@@ -38,6 +38,8 @@ export interface components {
             language?: components["schemas"]["Language"];
             country?: string;
             currency?: components["schemas"]["Currency"];
+            /** Format: double */
+            taxRate?: number;
             salutation?: string;
             /** Format: date-time */
             createdAt: string;
@@ -72,6 +74,8 @@ export interface components {
             format: components["schemas"]["DocumentFormat"];
             /** Format: int32 */
             size?: number;
+            /** Format: date-time */
+            uploadedAt?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -116,12 +120,13 @@ export interface components {
         };
         OfferRevision: {
             id: string;
-            offer: components["schemas"]["Offer"];
-            offerId: string;
             /** Format: int32 */
             version: number;
             snapshot: Record<string, never>;
-            changedBy?: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            changedBy: components["schemas"]["User"];
+            changedById: string;
             /** Format: date-time */
             createdAt: string;
         };
@@ -191,6 +196,9 @@ export interface components {
             offerId: string;
             orderId: string;
             paymentTerm: string;
+            projectNumber?: string;
+            projectDescription?: string;
+            orderDetails?: string;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -302,6 +310,7 @@ export interface components {
             customerId?: string;
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
+            offerRevisions: components["schemas"]["OfferRevision"][];
         };
         Session: {
             id: string;

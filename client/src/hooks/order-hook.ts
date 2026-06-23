@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getOrdersAction } from "@/data/orders";
+import type { CreateOrderInput } from "@/data/orders";
+import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction } from "@/data/orders";
 
 export const useOrderHook = () => {
   const queryClient = useQueryClient();
@@ -12,8 +13,13 @@ export const useOrderHook = () => {
     queryFn: getOrdersAction,
   });
 
+  const { data: nextOrderNumber } = useQuery({
+    queryKey: ["orders", "next-number"],
+    queryFn: getNextOrderNumberAction,
+  });
+
   const createMutation = useMutation({
-    mutationFn: ({ offerId }: { offerId: string }) => createOrderAction(offerId),
+    mutationFn: (input: CreateOrderInput) => createOrderAction(input),
     onSuccess: invalidate,
   });
 
@@ -31,6 +37,8 @@ export const useOrderHook = () => {
     orders,
     isPending,
     error,
+
+    nextOrderNumber: nextOrderNumber?.orderId,
 
     createOrder: createMutation.mutateAsync,
     isCreatingOrder: createMutation.isPending,

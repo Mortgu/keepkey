@@ -1,19 +1,34 @@
-import { NextFunction, Request, Response } from 'express';
-import { prisma } from "../../lib/prismaClient.js";
 import { OfferFlatRate, OfferPosition } from "@prisma/client";
-import { toDate } from '../../utils/utils.js';
-import calculatePrice from "../../utils/products.js";
+import { NextFunction, Request, Response } from 'express';
 import env from '../../lib/env.js';
+import { prisma } from "../../lib/prismaClient.js";
+import calculatePrice from "../../utils/products.js";
+import { toDate } from '../../utils/utils.js';
 
 import fs from 'fs';
 import path from 'path';
-import { createTask, enqueueTask, uploadDocument } from '../../lib/document.js';
+import { enqueueTask, uploadDocument, type UploadResult } from '../../lib/document.js';
+import { generateOfferDisplayName } from '../../utils/documents.js';
+import { pickTranslation } from '../../utils/i18n.js';
+import logger from '../../middlewares/logger.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
     const offer = await prisma.offer.findUniqueOrThrow({
         where: { id: offerId },
+        include: {
+            customer: true,
+            offerPositions: {
+                include: {
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    }
+                }
+            }
+        }
     });
 
     if (!offer) {
@@ -29,6 +44,17 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
     });
 
     const nextVersion = (currentVersion?.version ?? 0) + 1;
+
+    const formatedWorkloads = offer.offerPositions.map((op) => (
+        pickTranslation(op.product.translations, offer.language)?.name ?? ""
+    ).replaceAll(" ", "").trim())
+
+    const displayName = generateOfferDisplayName(
+        offer.quoteId,
+        offer.customer.companyName,
+        formatedWorkloads,
+        nextVersion,
+    )
 
     const task = await prisma.$transaction(async (tx) => {
         await tx.offerDocument.updateMany({
@@ -46,6 +72,7 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
 
         await tx.offerDocument.create({
             data: {
+                displayName: displayName,
                 offerId,
                 version: nextVersion,
                 isCurrent: true,
@@ -155,27 +182,79 @@ export const uploadOfferDocument = async (request: Request, response: Response) 
     }
 
     const displayName = offerDoc.displayName ?? offerDoc.id;
+    const pdfFilename = `${displayName}.pdf`;
+    const docxFilename = `${displayName}.docx`;
 
-    const [pdfContent, docxContent] = await Promise.all([
-        fs.readFileSync(path.join(offerDoc.pdf.path, offerDoc.pdf.basename)),
-        fs.readFileSync(path.join(offerDoc.docx.path, offerDoc.docx.basename)),
-    ]);
+    const [pdfLocalPath, docxLocalPath] = [
+        path.join(offerDoc.pdf.path, offerDoc.pdf.basename),
+        path.join(offerDoc.docx.path, offerDoc.docx.basename),
+    ];
 
-    const [pdfUploadResponse, docxUploadResponse] = await Promise.all([
-        uploadDocument(displayName + ".pdf", PDF_PATH, pdfContent),
-        uploadDocument(displayName + ".docx", DOCX_PATH, docxContent),
-    ]);
+    let pdfResult: UploadResult;
+    let docxResult: UploadResult;
 
-    if (!pdfUploadResponse || !docxUploadResponse) {
-        throw new Error("Something went wrong while trying to upload docx and pdf! Please try again.");
+    try {
+        const [pdfContent, docxContent] = await Promise.all([
+            fs.promises.readFile(pdfLocalPath),
+            fs.promises.readFile(docxLocalPath),
+        ]);
+
+        [pdfResult, docxResult] = await Promise.all([
+            uploadDocument(pdfFilename, PDF_PATH, pdfContent),
+            uploadDocument(docxFilename, DOCX_PATH, docxContent),
+        ]);
+    } catch (exception: any) {
+        logger.error(`[uploadOfferDocument] upload failed: ${exception.message}`);
+        await prisma.offerDocument.update({
+            where: { id: offerDoc.id },
+            data: { status: "FAILED", error: exception.message },
+        }).catch((e: any) => logger.error(`[uploadOfferDocument] failed to persist error: ${e.message}`));
+
+        return response.status(500).json({
+            message: "Something went wrong while trying to upload docx and pdf: " + exception.message,
+        });
     }
 
-    await prisma.offerDocument.update({
-        where: { id: offerDoc.id },
-        data: { status: "UPLOADED" },
+    await prisma.$transaction([
+        prisma.offerDocument.update({
+            where: { id: offerDoc.id },
+            data: { status: "UPLOADED" },
+        }),
+        prisma.document.update({
+            where: { id: offerDoc.pdf.id },
+            data: {
+                path: PDF_PATH,
+                basename: pdfFilename,
+                filename: pdfResult.remotePath,
+                size: pdfResult.size,
+                uploadedAt: pdfResult.uploadedAt,
+            },
+        }),
+        prisma.document.update({
+            where: { id: offerDoc.docx.id },
+            data: {
+                path: DOCX_PATH,
+                basename: docxFilename,
+                filename: docxResult.remotePath,
+                size: docxResult.size,
+                uploadedAt: docxResult.uploadedAt,
+            },
+        }),
+    ]);
+
+    await Promise.allSettled([
+        fs.promises.rm(pdfLocalPath, { force: true }),
+        fs.promises.rm(docxLocalPath, { force: true }),
+    ]).then((results) => {
+        results.forEach((r, i) => {
+            if (r.status === "rejected") {
+                logger.warn(`[uploadOfferDocument] failed to remove local file ${i === 0 ? "pdf" : "docx"}: ${r.reason?.message}`);
+            }
+        });
     });
 
     return response.status(200).json({
-        docx: docxUploadResponse, pdf: pdfUploadResponse,
+        docx: docxResult,
+        pdf: pdfResult,
     });
 }

@@ -1,40 +1,40 @@
+import Docxtemplater from "docxtemplater";
+import InspectModule from "docxtemplater/js/inspect-module.js";
 import fs from "fs/promises";
 import path from "path";
 import PizZip from "pizzip";
-import Docxtemplater from "docxtemplater";
-import InspectModule from "docxtemplater/js/inspect-module.js";
 
-import {PrismaClientKnownRequestError} from "@prisma/client/runtime/client";
-import {z} from "zod";
-import {prisma} from "../../lib/prismaClient.js";
-import {OfferFetchData, OfferPipelineContext} from "./context.js";
-import {type OfferContext, offerSchema} from "../../schemas/offer-template-schema.js";
-import logger from "../../middlewares/logger.js";
-import {PipelineStageError} from "../pipeline.js";
-import {pickTranslation} from "../../utils/i18n.js";
-import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
-import {customParser, deepIterate, resolveTemplateName} from "./utils.js";
-import {convert as libconvert} from "libreoffice-convert";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { convert as libconvert } from "libreoffice-convert";
+import { z } from "zod";
 import env from "../../lib/env.js";
+import { prisma } from "../../lib/prismaClient.js";
+import logger from "../../middlewares/logger.js";
+import { type OfferContext, offerSchema } from "../../schemas/offer-template-schema.js";
+import { pickTranslation } from "../../utils/i18n.js";
+import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { PipelineStageError } from "../pipeline.js";
+import { OfferFetchData, OfferPipelineContext } from "./context.js";
+import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
     const [offer, contracts] = await Promise.all([
         await prisma.offer.findUniqueOrThrow({
-            where: {id: offerId},
+            where: { id: offerId },
             include: {
                 customer: true,
                 customerContactPerson: true,
                 user: true,
                 offerPositions: {
                     include: {
-                        product: {include: {translations: true}},
-                        contract: {include: {translations: true}},
+                        product: { include: { translations: true } },
+                        contract: { include: { translations: true } },
                     },
                 },
                 offerFlatRates: {
                     include: {
-                        flatRate: {include: {translations: true}},
+                        flatRate: { include: { translations: true } },
                     },
                 },
             }
@@ -43,7 +43,7 @@ export const fetchOfferData = async (offerId: string) => {
         await prisma.contract.findMany(),
     ]);
 
-    return {offer, contracts};
+    return { offer, contracts };
 }
 
 /* Stage function */
@@ -77,8 +77,8 @@ const pickContractFields = (contract: AugmentedContract) => ({
 
 /* Helper function */
 export const formatOfferData = async (fetchedData: OfferFetchData) => {
-    const {offer, contracts} = fetchedData;
-    const {customer, customerContactPerson: ccp, user: employee, language} = offer;
+    const { offer, contracts } = fetchedData;
+    const { customer, customerContactPerson: ccp, user: employee, language } = offer;
 
     const offerPositions = offer.offerPositions.map((position) => {
         const product = pickTranslation(position.product.translations, language);
@@ -224,9 +224,8 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
         context.formatedData = offerSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {
-            logger.error(`[pipeline]: Formatted offer data failed schema validation: ${
-                JSON.stringify(exception.issues)
-            }`);
+            logger.error(`[pipeline]: Formatted offer data failed schema validation: ${JSON.stringify(exception.issues)
+                }`);
         } else {
             logger.error(exception);
         }
@@ -235,7 +234,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 }
 
 export const postProcessingAction = async (context: OfferPipelineContext) => {
-    const {formatedData} = context;
+    const { formatedData } = context;
 
     if (!formatedData) {
         throw new Error("Failed to postprocess! No formatted data!");
@@ -248,7 +247,7 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
 }
 
 export const prepareAction = async (context: OfferPipelineContext) => {
-    await fs.mkdir(env.OUTPUT_DIR, {recursive: true});
+    await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
 }
 
 /* Drift detection: compare template tags against the offer schema. */
@@ -284,7 +283,7 @@ const flattenSchema = (schema: any, prefix = ""): string[] => {
 };
 
 export async function generateAction(context: OfferPipelineContext) {
-    const {formatedData} = context;
+    const { formatedData } = context;
     // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
     const iModule = InspectModule();
 
@@ -308,8 +307,7 @@ export async function generateAction(context: OfferPipelineContext) {
     const uncovered = templatePaths.filter((t) => !schemaPaths.includes(t));
     if (uncovered.length > 0) {
         logger.warn(
-            `[pipeline]: Template tags not covered by offer schema (possible drift): ${
-                uncovered.join(", ")
+            `[pipeline]: Template tags not covered by offer schema (possible drift): ${uncovered.join(", ")
             }`
         );
     }
@@ -320,7 +318,7 @@ export async function generateAction(context: OfferPipelineContext) {
 }
 
 export async function convertAction(context: OfferPipelineContext) {
-    const {docxBuffer} = context;
+    const { docxBuffer } = context;
 
     if (!docxBuffer) {
         throw new PipelineStageError("Something went wrong! Empty docx buffer.");
@@ -335,7 +333,7 @@ export async function convertAction(context: OfferPipelineContext) {
 }
 
 export async function writeAction(context: OfferPipelineContext) {
-    const {fetchedData, documentId, version, docxBuffer, pdfBuffer} = context;
+    const { fetchedData, documentId, version, docxBuffer, pdfBuffer } = context;
 
     if (!fetchedData || !documentId || version === null || !docxBuffer || !pdfBuffer) {
         throw new PipelineStageError(
@@ -346,7 +344,7 @@ export async function writeAction(context: OfferPipelineContext) {
         );
     }
 
-    const {quoteId, customer, offerPositions, language} = fetchedData.offer;
+    const { quoteId, customer, offerPositions, language } = fetchedData.offer;
 
     const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
     const formatedWorkloads = offerPositions

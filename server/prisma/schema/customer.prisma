@@ -15,6 +15,7 @@ model Customer {
   language Language? @default(DE)
   country  String?   @default("Deutschland")
   currency Currency? @default(EUR)
+  taxRate  Float?    @default(0)
 
   salutation String? @default("")
 

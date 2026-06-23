@@ -2,8 +2,14 @@ import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import type { Customer } from "@/types";
 import { useCustomerHook } from "@/hooks";
-import { Button, Input, ModalDialog } from "@/components";
+import { Button, Input, ModalDialog, Select } from "@/components";
 import { getFormError } from "@/lib/utils";
+import {
+  COUNTRY_OPTIONS,
+  CURRENCY_OPTIONS,
+  LANGUAGE_OPTIONS,
+  findCountryByName,
+} from "@/lib/countries";
 
 interface CustomerModalProps {
   onClose: () => void;
@@ -25,6 +31,10 @@ const customerSchema = z.object({
   city: z.string(),
   plz: z.string(),
   phone: z.string(),
+
+  language: z.enum(["DE", "EN"]),
+  currency: z.enum(["EUR", "RAND", "DOLLAR", "CHF"]),
+  taxRate: z.number(),
 });
 
 export default function CustomerModal({
@@ -36,6 +46,8 @@ export default function CustomerModal({
   const { updateCustomer, createCustomer, errorCreatingCustomer } =
     useCustomerHook();
 
+  const initialCountry = findCountryByName(currentCustomer?.country);
+
   const customerForm = useForm({
     defaultValues: {
       customerId: currentCustomer?.customerId ?? undefined,
@@ -43,11 +55,15 @@ export default function CustomerModal({
       email: currentCustomer?.email ?? "",
       invoiceEmail: currentCustomer?.invoiceEmail ?? undefined,
 
-      country: currentCustomer?.country || "",
+      country: currentCustomer?.country || initialCountry.name,
       street: currentCustomer?.street || "",
       city: currentCustomer?.city || "",
       plz: currentCustomer?.plz || "",
       phone: currentCustomer?.phone || "",
+
+      language: currentCustomer?.language ?? initialCountry.language,
+      currency: currentCustomer?.currency ?? initialCountry.currency,
+      taxRate: currentCustomer?.taxRate ?? initialCountry.taxRate,
     },
     validators: {
       onChange: customerSchema,
@@ -181,18 +197,88 @@ export default function CustomerModal({
               name="country"
               children={(field) => (
                 <div className="flex-2 grid gap-2">
-                  <Input
+                  <Select
                     id={field.name}
                     size="sm"
                     label="Land"
+                    options={COUNTRY_OPTIONS}
+                    placeholder="Land wählen"
                     value={field.state.value}
                     error={getFormError(field.state.meta.errors)}
-                    onChange={(e) => field.handleChange(e.target.value)}
+                    onChange={(e) => {
+                      const cfg = findCountryByName(e.target.value);
+                      field.handleChange(cfg.name);
+                      customerForm.setFieldValue("language", cfg.language);
+                      customerForm.setFieldValue("currency", cfg.currency);
+                      customerForm.setFieldValue("taxRate", cfg.taxRate);
+                    }}
                   />
                 </div>
               )}
             />
 
+            <customerForm.Field
+              name="language"
+              children={(field) => (
+                <div className="flex-1 grid gap-2">
+                  <Select
+                    id={field.name}
+                    size="sm"
+                    label="Sprache"
+                    options={LANGUAGE_OPTIONS}
+                    value={field.state.value}
+                    error={getFormError(field.state.meta.errors)}
+                    onChange={(e) =>
+                      field.handleChange(e.target.value as "DE" | "EN")
+                    }
+                  />
+                </div>
+              )}
+            />
+
+            <customerForm.Field
+              name="currency"
+              children={(field) => (
+                <div className="flex-1 grid gap-2">
+                  <Select
+                    id={field.name}
+                    size="sm"
+                    label="Währung"
+                    options={CURRENCY_OPTIONS}
+                    value={field.state.value}
+                    error={getFormError(field.state.meta.errors)}
+                    onChange={(e) =>
+                      field.handleChange(
+                        e.target.value as "EUR" | "RAND" | "DOLLAR" | "CHF",
+                      )
+                    }
+                  />
+                </div>
+              )}
+            />
+
+            <customerForm.Field
+              name="taxRate"
+              children={(field) => (
+                <div className="flex-1 grid gap-2">
+                  <Input
+                    id={field.name}
+                    size="sm"
+                    label="Steuersatz (%)"
+                    type="number"
+                    step="0.1"
+                    value={field.state.value}
+                    error={getFormError(field.state.meta.errors)}
+                    onChange={(e) =>
+                      field.handleChange(e.target.valueAsNumber || 0)
+                    }
+                  />
+                </div>
+              )}
+            />
+          </div>
+
+          <div className="flex items-center gap-4">
             <customerForm.Field
               name="street"
               children={(field) => (

@@ -90,6 +90,9 @@ components:
           type: string
         currency:
           $ref: "#/components/schemas/Currency"
+        taxRate:
+          type: number
+          format: double
         salutation:
           type: string
         createdAt:
@@ -186,6 +189,9 @@ components:
         size:
           type: integer
           format: int32
+        uploadedAt:
+          type: string
+          format: date-time
         createdAt:
           type: string
           format: date-time
@@ -299,26 +305,30 @@ components:
       properties:
         id:
           type: string
-        offer:
-          $ref: "#/components/schemas/Offer"
-        offerId:
-          type: string
         version:
           type: integer
           format: int32
         snapshot:
           type: object
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
         changedBy:
+          $ref: "#/components/schemas/User"
+        changedById:
           type: string
         createdAt:
           type: string
           format: date-time
       required:
         - id
-        - offer
-        - offerId
         - version
         - snapshot
+        - offer
+        - offerId
+        - changedBy
+        - changedById
         - createdAt
     OfferPosition:
       type: object
@@ -471,6 +481,12 @@ components:
         orderId:
           type: string
         paymentTerm:
+          type: string
+        projectNumber:
+          type: string
+        projectDescription:
+          type: string
+        orderDetails:
           type: string
         date:
           type: string
@@ -754,6 +770,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Order"
+        offerRevisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferRevision"
       required:
         - id
         - name
@@ -768,6 +788,7 @@ components:
         - accounts
         - offers
         - orders
+        - offerRevisions
     Session:
       type: object
       properties:

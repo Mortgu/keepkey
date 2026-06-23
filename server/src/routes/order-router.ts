@@ -6,7 +6,9 @@ import {
   downloadOrderDocument,
   generateOrderDocument,
   getAllOrders,
+  getNextOrderNumber,
   getOrderById,
+  uploadOrderDocument,
 } from "../controllers/index.js";
 import {validate} from "../middlewares/validate.js";
 import {createOrderSchema} from "../schemas/index.js";
@@ -15,11 +17,15 @@ const router = Router();
 
 router.get("/", getAllOrders);
 
+router.get("/next-number", getNextOrderNumber);
+
 router.get("/:orderId", getOrderById);
 
 router.get("/:orderId/documents/:documentId/:format", downloadOrderDocument);
 
 router.post('/:orderId/document', generateOrderDocument);
+
+router.post('/:orderId/documents/:documentId/upload', uploadOrderDocument);
 
 router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
 

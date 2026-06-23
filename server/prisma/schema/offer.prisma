@@ -40,13 +40,16 @@ model Offer {
 }
 
 model OfferRevision {
-  id      String @id @default(uuid())
+  id String @id @default(uuid())
+
+  version  Int
+  snapshot Json
+
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
-  version   Int
-  snapshot  Json
-  changedBy String?
+  changedBy   User   @relation(fields: [changedById], references: [id])
+  changedById String
 
   createdAt DateTime @default(now())
 

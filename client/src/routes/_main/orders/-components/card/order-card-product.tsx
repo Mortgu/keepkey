@@ -1,20 +1,20 @@
 import { Badge } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OfferPosition } from "@/types";
+import type { OrderPosition } from "@/types"
 import { formatEur } from "@/utils/utils";
 
 type Props = {
-    position: OfferPosition;
-};
+    position: OrderPosition;
+}
 
-export default function OfferCardProduct({ position }: Props) {
+export default function OrderCardProduct({ position }: Props) {
     const { product, contract, quantity, duration_months, total_cents } = position;
 
     const locale = useLocale();
 
     return (
-        <div className="flex items-center justify-between gap-2 py-3 border-b border-(--border) last:border-0">
+        <div className="flex items-center justify-between gap-2 py-3 px-4 rounded-md">
             <div className="grid">
                 <div className="flex gap-2">
                     <p className="text-md">

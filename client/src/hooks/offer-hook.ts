@@ -1,9 +1,13 @@
 import { useEffect } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {  useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import type {QueryClient} from "@tanstack/react-query";
 import type {
     CreateOfferFlatRatesInput,
     CreateOfferInput,
     CreateOfferPositionInput,
+    DocumentStatus,
+    Offer,
+    Order,
     UpdateOfferFlatRatesInput,
     UpdateOfferInput,
     UpdateOfferPositionInput,
@@ -41,6 +45,44 @@ export const useOfferRevisionsHook = (offerId: string) => {
     return { revisions };
 };
 
+function updateOfferDocumentStatus(
+    queryClient: QueryClient,
+    taskId: string,
+    status: DocumentStatus,
+    error?: string,
+) {
+    queryClient.setQueriesData<Array<Offer>>({ queryKey: ["offers"] }, (offers) => {
+        if (!Array.isArray(offers) || (offers.length > 0 && !('offerDocuments' in offers[0]))) return offers;
+        return offers.map((offer) => ({
+            ...offer,
+            offerDocuments: offer.offerDocuments.map((doc) =>
+                doc.taskId === taskId
+                    ? { ...doc, status, ...(error ? { error } : {}) }
+                    : doc
+            ),
+        }));
+    });
+}
+
+function updateOrderDocumentStatus(
+    queryClient: QueryClient,
+    taskId: string,
+    status: DocumentStatus,
+    error?: string,
+) {
+    queryClient.setQueriesData<Array<Order>>({ queryKey: ["orders"], exact: true }, (orders) => {
+        if (!Array.isArray(orders)) return orders;
+        return orders.map((order) => ({
+            ...order,
+            documents: order.documents.map((doc) =>
+                doc.taskId === taskId
+                    ? { ...doc, status, ...(error ? { error } : {}) }
+                    : doc
+            ),
+        }));
+    });
+}
+
 export const useDocumentTask = (taskId?: string) => {
     const queryClient = useQueryClient();
 
@@ -63,16 +105,23 @@ export const useDocumentTask = (taskId?: string) => {
     });
 
     useEffect(() => {
-        if (task?.status === "COMPLETED") {
+        if (!task || !taskId) return;
+
+        if (task.status === "COMPLETED") {
+            updateOfferDocumentStatus(queryClient, taskId, "GENERATED");
+            updateOrderDocumentStatus(queryClient, taskId, "GENERATED");
             queryClient.invalidateQueries({ queryKey: ["offers"] });
             queryClient.invalidateQueries({ queryKey: ["orders"] });
         }
-    }, [task?.status, queryClient]);
+
+        if (task.status === "FAILED") {
+            updateOfferDocumentStatus(queryClient, taskId, "FAILED", task.error ?? undefined);
+            updateOrderDocumentStatus(queryClient, taskId, "FAILED", task.error ?? undefined);
+        }
+    }, [task?.status, taskId, queryClient]);
 
     return { task };
 };
-
-export const useReservationTask = (taskId?: string) => useDocumentTask(taskId);
 
 export const useOfferHook = (params?: OfferQueryParams) => {
     const queryClient = useQueryClient();

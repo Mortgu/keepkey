@@ -1,19 +1,19 @@
-import {NextFunction, Request, Response} from "express";
+import { NextFunction, Request, Response } from "express";
 import calculatePrice from "../../utils/products.js";
-import {OfferFlatRate, OfferPosition} from "@prisma/client";
-import {prisma} from "../../lib/prismaClient.js";
-import {toDate} from "../../utils/utils.js";
+import { OfferFlatRate, OfferPosition } from "@prisma/client";
+import { prisma } from "../../lib/prismaClient.js";
+import { toDate } from "../../utils/utils.js";
 
 export const updateOffer = async (request: Request, response: Response, next: NextFunction) => {
     const oid = request.params.id as string;
     const data = request.body;
 
     if (!data) {
-        return response.status(400).json({message: 'Bad request! Missing body!'});
+        return response.status(400).json({ message: 'Bad request! Missing body!' });
     }
 
-    const {positions = [], flatRates = []} = data;
-    const {id: _, supplierId, validUntil, requestFrom, date, ...scalarFields} = data.offer;
+    const { positions = [], flatRates = [] } = data;
+    const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
 
     for (const position of positions) {
         position["total_cents"] = await calculatePrice({
@@ -32,15 +32,15 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
                 flatRates.reduce((sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
 
             const current = await tx.offer.findFirstOrThrow({
-                where: {id: oid},
-                include: {offerPositions: true, offerFlatRates: true},
+                where: { id: oid },
+                include: { offerPositions: true, offerFlatRates: true },
             });
 
             await tx.offerRevision.create({
                 data: {
                     offerId: oid,
                     version: current.version,
-                    changedBy: data.offer?.userId ?? null,
+                    changedById: data.offer.userId,
                     snapshot: current as any
                 },
             });
@@ -48,7 +48,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
             const quoteIdChanged = 'quoteId' in scalarFields && scalarFields.quoteId !== current.quoteId;
 
             const [offer] = await tx.offer.updateManyAndReturn({
-                where: {id: oid},
+                where: { id: oid },
                 data: {
                     ...scalarFields,
                     date: toDate(date) ?? new Date(),
@@ -56,7 +56,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
                     validUntil: toDate(validUntil),
                     requestFrom: toDate(requestFrom),
                     net_amount,
-                    version: {increment: 1},
+                    version: { increment: 1 },
                 },
             });
 
@@ -78,19 +78,19 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
 }
 
 async function replacePositions(tx: any, offerId: string, positions: OfferPosition[]) {
-    await tx.offerPosition.deleteMany({where: {offerId}});
-    for (const {productId, contractId, duration_months, quantity, optional, total_cents} of positions) {
+    await tx.offerPosition.deleteMany({ where: { offerId } });
+    for (const { productId, contractId, duration_months, quantity, optional, total_cents } of positions) {
         await tx.offerPosition.create({
-            data: {offerId, productId, contractId, duration_months, quantity, total_cents, optional},
+            data: { offerId, productId, contractId, duration_months, quantity, total_cents, optional },
         });
     }
 }
 
 async function replaceFlatRates(tx: any, offerId: string, flatRates: OfferFlatRate[]) {
-    await tx.offerFlatRate.deleteMany({where: {offerId}});
-    for (const {flatRateId, quantity, total_cents} of flatRates) {
+    await tx.offerFlatRate.deleteMany({ where: { offerId } });
+    for (const { flatRateId, quantity, total_cents } of flatRates) {
         await tx.offerFlatRate.create({
-            data: {offerId, flatRateId, quantity, total_cents},
+            data: { offerId, flatRateId, quantity, total_cents },
         });
     }
 }

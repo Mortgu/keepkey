@@ -41,13 +41,9 @@ export default function registerTaskWorker() {
 
         switch (taskTarget) {
             case "OFFER": {
-                console.log("====================================")
-
                 const offerDocument = await prisma.offerDocument.findFirst({
                     where: { taskId: task.id },
                 });
-
-                console.log("offerDocument", offerDocument)
 
                 if (!offerDocument) {
                     logger.warn(`[task-worker] OfferDocument for task ${taskId} not found, skipping.`);
@@ -65,13 +61,7 @@ export default function registerTaskWorker() {
                     pdfBuffer: null,
                 });
 
-                console.log("pipeline", pipeline);
-
-
                 const files = createDocumentFiles(documentId, pipeline.displayName ?? documentId);
-
-                console.log("files", files);
-
 
                 const pdf = await prisma.document.create({
                     data: {
@@ -83,8 +73,6 @@ export default function registerTaskWorker() {
                     },
                 });
 
-                console.log("pdf", pdf);
-
                 const docx = await prisma.document.create({
                     data: {
                         filename: files.docx.filename,
@@ -94,8 +82,6 @@ export default function registerTaskWorker() {
                         size: pipeline.docxBuffer?.length ?? null,
                     },
                 });
-                console.log("docx", docx);
-
 
                 await prisma.offerDocument.update({
                     where: { id: offerDocument.id },

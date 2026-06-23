@@ -19,6 +19,10 @@ model Order {
   orderId     String // Beleg-Nr.
   paymentTerm String @default("") // Zahlungsbedingung
 
+  projectNumber      String? // Projekt-Nr.
+  projectDescription String? // Projektbezug
+  orderDetails       String? // Bestelldetails (Registrierung, Absprachen etc.)
+
   date        DateTime  @default(now()) // Datum
   validUntil  DateTime?
   requestFrom DateTime?

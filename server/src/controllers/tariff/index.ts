@@ -138,8 +138,6 @@ export const getTariffPrice = async (request: Request, response: Response) => {
         customerId: customerId as string | undefined,
     });
 
-    console.log("price", price);
-
     return response.status(200).json(price);
 };
 

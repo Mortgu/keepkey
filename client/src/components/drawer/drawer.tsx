@@ -19,7 +19,7 @@ const scrimStyles = tv({
 
 const drawerStyles = tv({
     base: [
-        "fixed top-0 right-0 bottom-0 z-50",
+        "fixed top-0 right-0 bottom-0 z-50 transition-all",
         "bg-white shadow-[-8px_0_24px_rgba(0,0,0,0.12)]",
         "flex flex-col",
         "transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
@@ -118,7 +118,7 @@ function Drawer({ open, onClose, children, wide, className }: DrawerProps) {
                     />
                 </div>
 
-                <div className="px-[22px] py-5 overflow-y-auto flex-1 flex flex-col gap-[18px]">
+                <div className="px-[22px] py-5 overflow-y-auto flex-1 flex flex-col">
                     {body}
                 </div>
 
