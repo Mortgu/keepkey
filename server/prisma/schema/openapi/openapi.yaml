@@ -479,6 +479,12 @@ components:
           type: string
         paymentTerm:
           type: string
+        projectNumber:
+          type: string
+        projectDescription:
+          type: string
+        orderDetails:
+          type: string
         date:
           type: string
           format: date-time

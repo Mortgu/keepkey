@@ -1,46 +1,29 @@
 import { Button } from "@/components";
-import { useDocumentTask, useOfferHook } from "@/hooks";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
-import type { OfferDocument } from "@/types";
+import type { OrderDocument } from "@/types";
 import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
 import { useEffect } from "react";
-import { toast } from "react-toastify";
 
 type Props = {
-    offerDocument: OfferDocument;
+    orderDocument: OrderDocument;
 }
 
-export default function OfferCardDocument({ offerDocument }: Props) {
-    const { offerId, status, taskId } = offerDocument;
+export default function OrderCardDocument({ orderDocument }: Props) {
+    const { id, orderId, status, taskId, displayName, version, pdf, docx, createdAt } = orderDocument;
 
-    useDocumentTask(taskId);
-
-    const {
-        deleteDocument,
-        isDeletingDocument,
-        errorDeletingDocument,
-        upload,
-        isUploading,
-        errorUploading
-    } = useOfferHook();
-
-    useEffect(() => {
-        if (errorUploading) {
-            toast.error(errorUploading.message)
-        }
-    }, [errorDeletingDocument, errorUploading]);
+    useEffect(() => { }, []);
 
     return (
         <div className="flex items-center justify-between py-3 border-b border-(--border) last:border-0">
             <div className="w-full flex items-center gap-4">
                 <div className="grid gap-0.5">
-                    <p className="text-md">{offerDocument.displayName ?? `v${offerDocument.version}`}</p>
+                    <p className="text-md">{displayName ?? `v${version}`}</p>
                     <div className="flex items-center gap-2 text-sm">
-                        <p><span className="text-(--text-secondary)">size: </span> {formatBytesToKB(offerDocument.pdf?.size || 0)}</p>
+                        <p><span className="text-(--text-secondary)">size: </span> {formatBytesToKB(pdf?.size || 0)}</p>
                         <p><span className="text-(--text-secondary)">status: </span> {status}</p>
-                        <p><span className="text-(--text-secondary)">created: </span> {formatDate(offerDocument.createdAt)}</p>
+                        <p><span className="text-(--text-secondary)">created: </span> {formatDate(createdAt)}</p>
                     </div>
                 </div>
 
@@ -54,10 +37,10 @@ export default function OfferCardDocument({ offerDocument }: Props) {
             <div className="flex items-center ">
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
                     <>
-                        <a href={`${BASE_URL}/api/offers/${offerId}/documents/${offerDocument.id}/pdf`} download>
+                        <a href={`${BASE_URL}/api/orders/${orderId}/documents/${id}/pdf`} download>
                             <Button variant="ghost" size="sm" icon={<Download className="size-4" />} iconOnly title="PDF herunterladen" />
                         </a>
-                        <a href={`${BASE_URL}/api/offers/${offerId}/documents/${offerDocument.id}/docx`} download>
+                        <a href={`${BASE_URL}/api/orders/${orderId}/documents/${id}/docx`} download>
                             <Button variant="ghost" size="sm" icon={<File className="size-4" />} iconOnly title="DOCX herunterladen" />
                         </a>
                     </>
@@ -66,14 +49,14 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
                     <>
                         <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
-                            onClick={() => upload({ offerId: offerDocument.offerId, documentId: offerDocument.id })} loading={isUploading}
+                            onClick={() => { }} loading={false}
                             disabled={status === "UPLOADED"}
                         />
 
                         <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
-                            onClick={() => deleteDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
-                            loading={isDeletingDocument || !!errorDeletingDocument}
-                            disabled={isDeletingDocument || !!errorDeletingDocument}
+                            onClick={() => { }}
+                            loading={false}
+                            disabled={false}
                         />
                     </>
                 )}
@@ -86,5 +69,5 @@ export default function OfferCardDocument({ offerDocument }: Props) {
 
             </div>
         </div>
-    )
+    );
 }

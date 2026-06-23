@@ -52,7 +52,7 @@ function updateOfferDocumentStatus(
     error?: string,
 ) {
     queryClient.setQueriesData<Array<Offer>>({ queryKey: ["offers"] }, (offers) => {
-        if (!offers) return offers;
+        if (!Array.isArray(offers) || (offers.length > 0 && !('offerDocuments' in offers[0]))) return offers;
         return offers.map((offer) => ({
             ...offer,
             offerDocuments: offer.offerDocuments.map((doc) =>
@@ -70,8 +70,8 @@ function updateOrderDocumentStatus(
     status: DocumentStatus,
     error?: string,
 ) {
-    queryClient.setQueriesData<Array<Order>>({ queryKey: ["orders"] }, (orders) => {
-        if (!orders) return orders;
+    queryClient.setQueriesData<Array<Order>>({ queryKey: ["orders"], exact: true }, (orders) => {
+        if (!Array.isArray(orders)) return orders;
         return orders.map((order) => ({
             ...order,
             documents: order.documents.map((doc) =>

@@ -5,10 +5,11 @@ import { prisma } from "../../lib/prismaClient.js";
 import { enqueueTask, uploadDocument, type UploadResult } from "../../lib/document.js";
 import env from "../../lib/env.js";
 import logger from "../../middlewares/logger.js";
+import { toDate } from "../../utils/utils.js";
 
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
-    const { id } = request.body;
+    const { id, orderId, date, projectNumber, projectDescription, orderDetails } = request.body;
 
     const existingOffer = await prisma.offer.findUnique({
         where: { id: id as string },
@@ -34,10 +35,14 @@ export const createOrder = async (request: Request, response: Response, next: Ne
                     employeeId: existingOffer.userId,
                     offerId: existingOffer.id,
 
-                    orderId: existingOffer.quoteId, // TODO: REMOVE THIS PLACEHOLDER
+                    orderId,
                     paymentTerm: existingOffer.paymentTerm,
 
-                    date: new Date(),
+                    projectNumber: projectNumber ?? null,
+                    projectDescription: projectDescription ?? null,
+                    orderDetails: orderDetails ?? null,
+
+                    date: toDate(date) ?? new Date(),
                     validUntil: existingOffer.validUntil,
                     requestFrom: existingOffer.requestFrom,
 

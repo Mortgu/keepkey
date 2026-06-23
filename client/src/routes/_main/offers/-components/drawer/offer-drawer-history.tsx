@@ -9,10 +9,6 @@ type Props = {
 }
 
 export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
-    if (!open) return null;
-
-    console.log(offer)
-
     return (
         <Drawer open={open} onClose={onClose} wide>
             <Drawer.Header title="History" subtitle="Vergangene Angebots versionen" />

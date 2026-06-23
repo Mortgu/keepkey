@@ -100,7 +100,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <Collapsable label="Produkte"
                 className="w-full bg-(--subtle-50) justify-between rounded-none"
             >
-                <div className="grid gap-0">
+                <div className="grid mx-4">
                     {offerPositions.map((position, i) => (
                         <OfferCardProduct key={i} position={position} />
                     ))}
@@ -116,11 +116,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 className="w-full bg-(--subtle-50) justify-between rounded-none"
             >
                 <div className="grid mx-4">
-                    <div>
-                        {offer.offerDocuments.map((document: OfferDocument) => (
-                            <OfferCardDocument key={document.id} offerDocument={document} />
-                        ))}
-                    </div>
+                    {offer.offerDocuments.map((document: OfferDocument) => (
+                        <OfferCardDocument key={document.id} offerDocument={document} />
+                    ))}
                 </div>
             </Collapsable>
 

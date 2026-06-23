@@ -6,6 +6,7 @@ import {
   downloadOrderDocument,
   generateOrderDocument,
   getAllOrders,
+  getNextOrderNumber,
   getOrderById,
   uploadOrderDocument,
 } from "../controllers/index.js";
@@ -15,6 +16,8 @@ import {createOrderSchema} from "../schemas/index.js";
 const router = Router();
 
 router.get("/", getAllOrders);
+
+router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", getOrderById);
 

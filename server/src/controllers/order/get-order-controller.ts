@@ -36,6 +36,29 @@ export const getAllOrders = async (request: Request, response: Response) => {
     return response.status(200).json(orders);
 };
 
+export const getNextOrderNumber = async (request: Request, response: Response) => {
+    const year = new Date().getFullYear();
+    const prefix = `AB-${year}-`;
+
+    const latest = await prisma.order.findFirst({
+        where: { orderId: { startsWith: prefix } },
+        select: { orderId: true },
+        orderBy: { orderId: "desc" },
+    });
+
+    let nextNumber = 1;
+    if (latest?.orderId) {
+        const match = latest.orderId.match(/(\d+)$/);
+        if (match) {
+            nextNumber = parseInt(match[1], 10) + 1;
+        }
+    }
+
+    const nextOrderId = `${prefix}${String(nextNumber).padStart(3, "0")}`;
+
+    return response.status(200).json({ orderId: nextOrderId });
+};
+
 export const getOrderById = async (request: Request, response: Response) => {
     const { orderId } = request.params;
 
