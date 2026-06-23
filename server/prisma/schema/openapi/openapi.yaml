@@ -90,6 +90,9 @@ components:
           type: string
         currency:
           $ref: "#/components/schemas/Currency"
+        taxRate:
+          type: number
+          format: double
         salutation:
           type: string
         createdAt:

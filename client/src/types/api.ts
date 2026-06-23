@@ -38,6 +38,8 @@ export interface components {
             language?: components["schemas"]["Language"];
             country?: string;
             currency?: components["schemas"]["Currency"];
+            /** Format: double */
+            taxRate?: number;
             salutation?: string;
             /** Format: date-time */
             createdAt: string;
@@ -72,6 +74,8 @@ export interface components {
             format: components["schemas"]["DocumentFormat"];
             /** Format: int32 */
             size?: number;
+            /** Format: date-time */
+            uploadedAt?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -192,6 +196,9 @@ export interface components {
             offerId: string;
             orderId: string;
             paymentTerm: string;
+            projectNumber?: string;
+            projectDescription?: string;
+            orderDetails?: string;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
