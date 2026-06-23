@@ -60,6 +60,8 @@ export default function ProductSectionItem({
     const handlePriceBlur = () => {
         onPriceChange(price);
         setEditPrice(false);
+
+        console.log(price, offerProduct.quantity)
     };
 
     return (
@@ -80,13 +82,8 @@ export default function ProductSectionItem({
 
                 <div className="flex gap-1">
                     {!editPrice && (
-                        <Button
-                            type="button"
-                            size="xs"
-                            variant="link"
-                            onClick={startEditPrice}
-                        >
-                            {formatEur(displayPrice)}
+                        <Button type="button" size="xs" variant="link" onClick={startEditPrice}>
+                            {formatEur(offerProduct.total_cents)}
                         </Button>
                     )}
 

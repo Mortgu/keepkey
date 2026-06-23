@@ -226,5 +226,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         checkingQuoteId,
         checkQuoteId,
         clearQuoteIdWarning,
+
+        fetchPrice
     };
 }

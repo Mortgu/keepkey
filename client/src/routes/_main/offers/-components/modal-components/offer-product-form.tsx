@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { CreateOfferPositionInput } from "@/types";
 import { Button, Checkbox, Input, Select } from "@/components";
-import { useContractHook, useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
+import { useContractHook, useCustomerHook, useLocale, useProductHook, useSupplierHook, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
@@ -16,6 +16,9 @@ interface Props {
 export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
   const { products } = useProductHook();
   const { contracts } = useContractHook();
+  const { customers } = useCustomerHook();
+  const { suppliers } = useSupplierHook();
+
   const locale = useLocale();
 
   const [productId, setProductId] = useState(currentProduct?.productId ?? products[0]?.id ?? "");
@@ -30,6 +33,7 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
 
   const { durations } = useTariffDurationsHook(productId, contractId);
 
+
   useEffect(() => {
     if (durations.length > 0 && !durations.includes(duration_months)) {
       setDurationMonths(durations[0]);
@@ -38,6 +42,10 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
       setDurationMonths(0);
     }
   }, [durations]);
+
+  useEffect(() => {
+    console.log('Now')
+  }, [duration_months, quantity, productId, contractId]);
 
   const handleSave = () => {
     if (!productId) {
@@ -102,7 +110,12 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
           <Input label="Menge" type="number" value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
             className="bg-white" />
+        </div>
 
+        <div className="w-20 grid gap-1">
+          <Input label="Preis" value={0}
+            onChange={(e) => { }}
+            className="bg-white" />
         </div>
       </div>
 
