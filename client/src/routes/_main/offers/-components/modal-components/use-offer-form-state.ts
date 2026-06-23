@@ -1,24 +1,21 @@
-import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
 
-import { offerSchema } from "../offer-utils";
-import type { z } from "zod";
+import { useAuth } from "@/context/auth";
+import { findOfferFilesByIdAction } from "@/data/nextcloud";
+import { getPrice } from "@/data/products";
+import { useOfferManager } from "@/hooks/offers/offer-mutations";
 import type {
-    CreateOfferFlatRatesInput,
-    CreateOfferInput,
-    CreateOfferPositionInput,
-    Offer,
+    CreateOfferFlatrateInput, CreateOfferInput, Offer,
     OfferFlatRate,
     OfferPosition,
     UpdateOfferInput,
-    User,
+    User
 } from "@/types";
+import type { z } from "zod";
+import { offerSchema } from "../offer-utils";
 import type { OfferProductInput } from "./offer-product-form";
-import { getPrice } from "@/data/products";
-import { findOfferFilesByIdAction } from "@/data/nextcloud";
-import { useOfferHook } from "@/hooks";
-import { useAuth } from "@/context/auth";
 
 
 type OfferFormValues = z.infer<typeof offerSchema>;
@@ -70,12 +67,10 @@ const toOfferProductInput = (pos: OfferPosition): OfferProductInput => ({
     total_cents: typeof pos.total_cents === "number" ? pos.total_cents : 0,
 });
 
-const toOfferFlatRateInput = (fr: OfferFlatRate): CreateOfferFlatRatesInput => ({
+const toOfferFlatRateInput = (fr: OfferFlatRate): CreateOfferFlatrateInput => ({
     flatRateId: fr.flatRateId,
-    flatRate: fr.flatRate,
     offerId: fr.offerId,
     quantity: fr.quantity,
-    total_cents: typeof fr.total_cents === "number" ? fr.total_cents : 0,
 });
 
 interface UseOfferFormStateProps {
@@ -91,12 +86,29 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
 
     const isEdit = currentOffer !== undefined;
     const { user } = useAuth();
-    const { createOffer, updateOffer, errorCreatingOffer, errorUpdatingOffer } = useOfferHook();
+
+    const {
+        createOffer,
+        isCreatingOffer,
+        errorCreatingOffer,
+
+        updateOffer,
+        isUpdatingOffer,
+        errorUpdatingOffer,
+
+        createOfferPositions,
+        isCreatingOfferPositions,
+        errorCreatingOfferPositions,
+
+        createOfferFlatrates,
+        isCreatingOfferFlatrates,
+        errorCreatingOfferFlatrates,
+    } = useOfferManager();
 
     const [offerProducts, setOfferProducts] = useState<Array<OfferProductInput>>(
         currentOffer?.offerPositions.map(toOfferProductInput) ?? [],
     );
-    const [offerFlatRates, setOfferFlatRates] = useState<Array<CreateOfferFlatRatesInput>>(
+    const [offerFlatRates, setOfferFlatRates] = useState<Array<CreateOfferFlatrateInput>>(
         currentOffer?.offerFlatRates.map(toOfferFlatRateInput) ?? [],
     );
 
@@ -147,7 +159,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         setOfferProducts((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const addFlatRate = (data: CreateOfferFlatRatesInput) => {
+    const addFlatRate = (data: CreateOfferFlatrateInput) => {
         setOfferFlatRates((prev) => [...prev, data]);
     };
 
@@ -190,11 +202,27 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
                         flatRates: offerFlatRates,
                     });
                 } else {
-                    await createOffer({
-                        offer: value as CreateOfferInput,
-                        positions: offerProducts as Array<CreateOfferPositionInput>,
-                        flatRates: offerFlatRates,
+                    const offer = await createOffer(value as CreateOfferInput);
+
+                    const positions = await createOfferPositions({
+                        id: offer.id,
+                        input: offerProducts.map(op => ({
+                            productId: op.productId,
+                            contractId: op.contractId,
+                            duration_months: op.duration_months,
+                            quantity: op.quantity,
+                            optional: op.optional,
+                        }))
                     });
+
+                    const flatrates = await createOfferFlatrates({
+                        id: offer.id, input: offerFlatRates.map(fr => ({
+                            quantity: fr.quantity,
+                            flatRateId: fr.flatRateId,
+                        }))
+                    })
+
+                    console.log(offer, positions, flatrates);
                 }
                 onClose();
             } catch (exception) {

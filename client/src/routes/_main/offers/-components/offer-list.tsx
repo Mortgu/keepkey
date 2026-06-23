@@ -1,14 +1,15 @@
 import { Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import { useMemo, useState } from "react";
-import OfferModal from "./offer-modal";
+import { useTranslation } from "react-i18next";
 import OfferCard from "./card/offer-card";
+import OfferModal from "./offer-modal";
 
-import type { ContactPerson, Customer, Offer } from "@/types";
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
 import { useCustomerHook, useModal, useOfferHook } from "@/hooks";
+import { useOffers } from "@/hooks/offers/offer-hooks";
+import type { ContactPerson, Customer, Offer } from "@/types";
 
 const sort_options = [
   { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -37,9 +38,12 @@ export default function OfferList() {
     }),
     [searchInput, customerFilter, contactPersonFilter, sort],
   );
+  const { offers } = useOffers();
 
-  const { offers, contactPersons } = useOfferHook(params);
+  const { contactPersons } = useOfferHook(params);
   const { customers } = useCustomerHook();
+
+
 
   const customerFilterOptions = useMemo(
     () =>
@@ -143,7 +147,7 @@ export default function OfferList() {
       )}
 
       <div className="grid gap-2">
-        {offers.map((offer) => (
+        {offers?.map((offer) => (
           <OfferCard
             key={offer.id}
             offer={offer}

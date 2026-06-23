@@ -2,44 +2,88 @@ import { Router } from "express";
 
 import {
   createOffer,
+  createOfferFlatrates,
+  createOfferPositions,
   deleteOffer,
-  deleteOfferDocument,
-  downloadOfferDocument,
-  enqueueGeneration,
-  getNextQuoteId,
-  getOfferById,
-  getOfferRevisions,
   getOffers,
-  updateOffer,
-  uploadOfferDocument
+  updateOffer
 } from "../controllers/index.js";
 
 import { validate } from "../middlewares/validate.js";
-import { createOfferSchema } from "../schemas/index.js";
-
+import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, updateOfferDocumentSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
 
 const router = Router();
 
-router.get("/", getOffers);
+/* ========== Offer ========== */
 
-router.get('/next', getNextQuoteId);
+/* [GET] /api/offers */
+router.get('/', getOffers);
 
-router.get("/:id/revisions", getOfferRevisions);
+/* [POST] /api/offers  */
+router.post('/', validate(createOfferSchema), createOffer);
 
-router.post('/:id/upload/:documentId', uploadOfferDocument);
+/* [PATCH] /api/offers */
+router.patch('/', validate(updateOfferSchema), updateOffer);
 
-router.post('/:id/document', enqueueGeneration);
+/* [DELETE] /api/offers/:id */
+router.delete('/:id', deleteOffer);
 
-router.get("/:id/documents/:documentId/:format", downloadOfferDocument);
+/* ========== Offer Position ========== */
 
-router.delete("/:id/documents/:documentId", deleteOfferDocument);
+/* [GET] /api/offers/:id/positions */
+router.get('/:id/positions', () => { });
 
-router.get("/:id", getOfferById);
+/* [POST] /api/offers/:id/positions */
+router.post('/:id/positions', validate(createOfferPositionsSchema), createOfferPositions);
 
-router.put('/:id', updateOffer);
+/* [PATCH] /api/offers/:id/positions/:positionId */
+router.patch('/:id/positions/:positionId', validate(updateOfferPositionSchema), () => { });
 
-router.delete("/:id", deleteOffer);
+/* [DELETE] /api/offers/:id/position/:positionId */
+router.delete('/:id/positions/:positionId', () => { });
 
-router.post("/", validate(createOfferSchema), createOffer);
+/* ========== Offer Flatrates ========== */
+
+/* [GET] /api/offers/:id/flatrates */
+router.get('/:id/flatrates', () => { });
+
+/* [POST] /api/offers/:id/flatrates */
+router.post('/:id/flatrates', validate(createOfferFlatratesSchema), createOfferFlatrates);
+
+/* [PATCH] /api/offers/:id/flatrates/:flatrateId */
+router.patch('/:id/flatrates/:flatrateId', validate(updateOfferFlatrateSchema), () => { });
+
+/* [DELETE] /api/offers/:id/flatrates/:flatrateId */
+router.delete('/:id/flatrates/:flatrateId', () => { });
+
+/* ========== Offer Documents ========== */
+
+/* [GET] /api/offers/:id/documents */
+router.get('/:id/documents', () => { });
+
+/* [POST] /api/offers/:id/documents */
+router.post('/:id/documents', () => { });
+
+/* [POST] /api/offers/:id/documents/:documentId/upload */
+router.post('/:id/documents/documentId/upload', () => { });
+
+/* [PATCH] /api/offers/:id/documents/:documentId */
+router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), () => { });
+
+/* [DELETE] /api/offers/:id/documents/:documentId */
+router.delete('/:id/documents/:documentId', () => { });
+
+/* ========== Offer Revisions ========== */
+
+/* [GET] /api/offers/:id/revisions */
+router.get('/:id/revisions', () => { });
+
+/* [DELETE] /api/offers/:id/revisions/:revisionsId */
+router.delete('/:id/revisions/:revisionsId', () => { });
+
+/* ========== Offer Tasks ========== */
+
+/* [GET] /api/offers/:id/tasks */
+router.get('/:id/tasks', () => { });
 
 export default router;

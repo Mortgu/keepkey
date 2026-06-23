@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { useOfferHook } from "./offer-hook";
+import { useOffers } from "./offers/offer-hooks";
 import { useOrderHook } from "./order-hook";
 
 export type DashboardStats = {
@@ -14,7 +14,8 @@ export type DashboardStats = {
 };
 
 export const useDashboardStats = () => {
-    const { offers, isPending: offersPending } = useOfferHook();
+    const { offers } = useOffers();
+
     const { orders, isPending: ordersPending } = useOrderHook();
 
     const stats = useMemo<DashboardStats>(() => {
@@ -36,5 +37,5 @@ export const useDashboardStats = () => {
         };
     }, [offers, orders]);
 
-    return { stats, isPending: offersPending || ordersPending };
+    return { stats, isPending: ordersPending };
 };

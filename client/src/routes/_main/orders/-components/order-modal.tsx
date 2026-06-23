@@ -1,13 +1,14 @@
-import { useState } from "react";
-import { useForm } from "@tanstack/react-form";
-import { ArrowLeft, Search } from "lucide-react";
-import { z } from "zod";
-import type { Offer } from "@/types";
-import { useOfferHook, useOrderHook } from "@/hooks";
+import { useOrderHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { getFormErrors } from "@/lib/utils";
+import type { Offer } from "@/types";
+import { useForm } from "@tanstack/react-form";
+import { ArrowLeft, Search } from "lucide-react";
+import { useState } from "react";
+import { z } from "zod";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
+import { useOffers } from "@/hooks/offers/offer-hooks";
 
 interface OrderModalProps {
   onClose: () => void;
@@ -26,7 +27,7 @@ function toInputDate(date: Date): string {
 }
 
 export default function OrderModal({ onClose }: OrderModalProps) {
-  const { offers } = useOfferHook();
+  const { offers } = useOffers();
   const { createOrder, nextOrderNumber } = useOrderHook();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 

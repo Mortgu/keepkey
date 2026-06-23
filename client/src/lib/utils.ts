@@ -1,6 +1,6 @@
-import {  clsx } from 'clsx';
+import type { ClassValue } from 'clsx';
+import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import type {ClassValue} from 'clsx';
 
 export function cn(...inputs: Array<ClassValue>) {
     return twMerge(clsx(inputs));
@@ -20,4 +20,14 @@ export function formatBytesToMB(bytes: number): string {
 
 export function formatBytesToKB(bytes: number): string {
     return `${(bytes / 1024).toFixed(1)} KB`;
+}
+
+export function formatQueryString(obj: Record<string, any>): string {
+    const params = new URLSearchParams();
+    for (const [key, value] of Object.entries(obj)) {
+        if (value !== undefined && value !== null) {
+            params.append(key, String(value));
+        }
+    }
+    return params.toString();
 }
