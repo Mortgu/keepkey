@@ -7,11 +7,9 @@ import { findOfferFilesByIdAction } from "@/data/nextcloud";
 import { getPrice } from "@/data/products";
 import { useOfferManager } from "@/hooks/offers/offer-mutations";
 import type {
-    CreateOfferFlatrateInput, CreateOfferInput, Offer,
+    CreateOfferInput, GetOfferFlatrate, Offer,
     OfferFlatRate,
-    OfferPosition,
-    UpdateOfferInput,
-    User
+    OfferPosition, User
 } from "@/types";
 import type { z } from "zod";
 import { offerSchema } from "../offer-utils";
@@ -67,10 +65,12 @@ const toOfferProductInput = (pos: OfferPosition): OfferProductInput => ({
     total_cents: typeof pos.total_cents === "number" ? pos.total_cents : 0,
 });
 
-const toOfferFlatRateInput = (fr: OfferFlatRate): CreateOfferFlatrateInput => ({
+const toOfferFlatRateInput = (fr: OfferFlatRate): GetOfferFlatrate => ({
     flatRateId: fr.flatRateId,
+    flatRate: fr.flatRate,
     offerId: fr.offerId,
     quantity: fr.quantity,
+    total_cents: typeof fr.total_cents === "number" ? fr.total_cents : 0,
 });
 
 interface UseOfferFormStateProps {
@@ -95,20 +95,12 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         updateOffer,
         isUpdatingOffer,
         errorUpdatingOffer,
-
-        createOfferPositions,
-        isCreatingOfferPositions,
-        errorCreatingOfferPositions,
-
-        createOfferFlatrates,
-        isCreatingOfferFlatrates,
-        errorCreatingOfferFlatrates,
     } = useOfferManager();
 
     const [offerProducts, setOfferProducts] = useState<Array<OfferProductInput>>(
         currentOffer?.offerPositions.map(toOfferProductInput) ?? [],
     );
-    const [offerFlatRates, setOfferFlatRates] = useState<Array<CreateOfferFlatrateInput>>(
+    const [offerFlatRates, setOfferFlatRates] = useState<Array<GetOfferFlatrate>>(
         currentOffer?.offerFlatRates.map(toOfferFlatRateInput) ?? [],
     );
 
@@ -159,7 +151,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         setOfferProducts((prev) => prev.filter((_, i) => i !== index));
     };
 
-    const addFlatRate = (data: CreateOfferFlatrateInput) => {
+    const addFlatRate = (data: GetOfferFlatrate) => {
         setOfferFlatRates((prev) => [...prev, data]);
     };
 
@@ -196,33 +188,37 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
             try {
                 if (currentOffer) {
                     await updateOffer({
-                        id: currentOffer.id,
-                        offer: { ...value, id: currentOffer.id } as UpdateOfferInput,
-                        positions: offerProducts,
-                        flatRates: offerFlatRates,
-                    });
-                } else {
-                    const offer = await createOffer(value as CreateOfferInput);
-
-                    const positions = await createOfferPositions({
-                        id: offer.id,
-                        input: offerProducts.map(op => ({
+                        offerId: currentOffer.id,
+                        offer: value as CreateOfferInput,
+                        positions: offerProducts.map(op => ({
                             productId: op.productId,
                             contractId: op.contractId,
                             duration_months: op.duration_months,
                             quantity: op.quantity,
                             optional: op.optional,
-                        }))
-                    });
-
-                    const flatrates = await createOfferFlatrates({
-                        id: offer.id, input: offerFlatRates.map(fr => ({
+                        })),
+                        flatrates: offerFlatRates.map(fr => ({
                             quantity: fr.quantity,
                             flatRateId: fr.flatRateId,
                         }))
                     })
 
-                    console.log(offer, positions, flatrates);
+                } else {
+
+                    await createOffer({
+                        offer: value as CreateOfferInput,
+                        positions: offerProducts.map(op => ({
+                            productId: op.productId,
+                            contractId: op.contractId,
+                            duration_months: op.duration_months,
+                            quantity: op.quantity,
+                            optional: op.optional,
+                        })),
+                        flatrates: offerFlatRates.map(fr => ({
+                            quantity: fr.quantity,
+                            flatRateId: fr.flatRateId,
+                        }))
+                    });
                 }
                 onClose();
             } catch (exception) {

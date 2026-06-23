@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import env from '../../lib/env.js';
-import { prisma } from "../../lib/prismaClient.js";
+import { OfferFlatRate, OfferPosition, prisma } from "../../lib/prismaClient.js";
 
 import fs from 'fs';
 import path from 'path';
@@ -9,6 +9,7 @@ import logger from '../../middlewares/logger.js';
 import { generateOfferDisplayName } from '../../utils/documents.js';
 import { pickTranslation } from '../../utils/i18n.js';
 import calculatePrice from '../../utils/products.js';
+import { toDate } from '../../utils/utils.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
@@ -88,14 +89,72 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
 };
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
-    const body = request.body;
+    const { positions, flatrates } = request.body;
 
     try {
-        const offer = await prisma.offer.create({
-            data: { ...body, net_amount: 0 },
+        for (const position of positions) {
+            position["total_cents"] = await calculatePrice({
+                productId: position.productId,
+                contractId: position.contractId,
+                duration: position.duration_months,
+                quantity: position.quantity,
+                customerId: request.body.offer.customerId,
+            });
+        }
+
+        for (const flatrate of flatrates) {
+            const rate = await prisma.flatRate.findUniqueOrThrow({
+                where: { id: flatrate.flatRateId },
+                select: { total_cents: true }
+            });
+            flatrate["total_cents"] = rate.total_cents * flatrate.quantity;
+        }
+
+        request.body.offer = await prisma.$transaction(async (tx) => {
+            let net_amount_positions = positions.reduce(
+                (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
+
+            let net_amount_flatrates = flatrates.reduce(
+                (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+
+            let net_amount = net_amount_positions + net_amount_flatrates;
+
+            const { supplierId, validUntil, requestFrom, date, ...offerFields } = request.body.offer;
+
+            const offer = await tx.offer.create({
+                data: {
+                    ...offerFields,
+                    date: toDate(date) ?? new Date(),
+                    supplierId: supplierId || null,
+                    validUntil: toDate(validUntil),
+                    requestFrom: toDate(requestFrom),
+                    net_amount: net_amount,
+                },
+            });
+
+            for (const position of positions) {
+                const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
+                await tx.offerPosition.create({
+                    data: { offerId: offer.id, productId, contractId, duration_months, quantity, total_cents, optional },
+                });
+            }
+
+            for (const flatrate of flatrates) {
+                console.log(flatrate)
+                await tx.offerFlatRate.create({
+                    data: {
+                        offerId: offer.id,
+                        flatRateId: flatrate.flatRateId,
+                        quantity: flatrate.quantity,
+                        total_cents: flatrate.total_cents
+                    },
+                });
+            }
+
+            return offer;
         });
 
-        return response.status(200).json(offer);
+        return response.status(200).json(request.body.offer);
     } catch (exception: any) {
         return response.status(408).json({
             message: "Something went wrong trying to create offer: " + exception.message,

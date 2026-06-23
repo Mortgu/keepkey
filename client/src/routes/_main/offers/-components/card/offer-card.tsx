@@ -3,8 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
 import { Button, Collapsable } from "@/components";
-import { useOfferHook } from "@/hooks";
-import { useDeleteOffer } from "@/hooks/offers/offer-mutations";
+import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import type { Offer, OfferDocument } from "@/types";
 import { formatEur } from "@/utils/utils";
@@ -33,10 +32,8 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         errorDeletingOffer
     } = useDeleteOffer();
 
-    const {
-        generateDocument,
-        isGeneratingDocument,
-    } = useOfferHook();
+
+    const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -134,9 +131,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         className="min-w-fit"
                         variant="primary"
                         size="xs"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({ offerId: offer.id })}
+                        loading={isGenerating}
+                        disabled={isGenerating}
+                        onClick={() => generateOfferDocument({ offerId: offer.id })}
                     >
                         Dokument generieren
                     </Button>

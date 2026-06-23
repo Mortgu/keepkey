@@ -42,18 +42,24 @@ export const getOffers = async (filters: OfferFilters) =>
         method: "GET"
     });
 
-export const createOffer = (input: CreateOfferInput) =>
+export const createOffer = (
+    offer: CreateOfferInput,
+    positions: Array<CreateOfferPositionInput>,
+    flatrates: Array<CreateOfferFlatrateInput>
+) =>
     api<Offer>("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify({
+            offer, positions, flatrates
+        }),
     });
 
-export const updateOffer = async (id: string, input: UpdateOfferInput) =>
+export const updateOffer = async (id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
+        body: JSON.stringify({ offer, positions, flatrates }),
     });
 
 export const deleteOffer = async (id: string) =>
@@ -122,6 +128,11 @@ export const deleteOfferDocument = async (id: string, documentId: string) =>
 
 export const uploadOfferDocument = async (id: string, documentId: string) =>
     api<void>(`/api/offers/${id}/documents/${documentId}/upload`, {
+        method: "POST"
+    });
+
+export const generateOfferDocument = async (id: string) =>
+    api<Task>(`/api/offers/${id}/documents`, {
         method: "POST"
     });
 

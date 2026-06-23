@@ -5,8 +5,10 @@ import {
   createOfferFlatrates,
   createOfferPositions,
   deleteOffer,
+  enqueueGeneration,
   getOffers,
-  updateOffer
+  updateOffer,
+  uploadOfferDocument
 } from "../controllers/index.js";
 
 import { validate } from "../middlewares/validate.js";
@@ -62,10 +64,10 @@ router.delete('/:id/flatrates/:flatrateId', () => { });
 router.get('/:id/documents', () => { });
 
 /* [POST] /api/offers/:id/documents */
-router.post('/:id/documents', () => { });
+router.post('/:id/documents', enqueueGeneration);
 
 /* [POST] /api/offers/:id/documents/:documentId/upload */
-router.post('/:id/documents/documentId/upload', () => { });
+router.post('/:id/documents/documentId/upload', uploadOfferDocument);
 
 /* [PATCH] /api/offers/:id/documents/:documentId */
 router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), () => { });

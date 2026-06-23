@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 
-import type { CreateOfferPositionInput } from "@/types";
 import { Button, Checkbox, Input, Select } from "@/components";
 import { useContractHook, useCustomerHook, useLocale, useProductHook, useSupplierHook, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import type { OfferPosition } from "@/types";
 
-export type OfferProductInput = Omit<CreateOfferPositionInput, "offerId">;
+export type OfferProductInput = Omit<OfferPosition,
+  "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
+>;
 
 interface Props {
   onSave: (data: OfferProductInput) => void;

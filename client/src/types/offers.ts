@@ -37,6 +37,8 @@ export type CreateOfferPositionInput = Pick<OfferPosition,
 
 export type UpdateOfferPositionInput = Partial<CreateOfferPositionInput>;
 
+export type GetOfferFlatrate = Omit<OfferFlatRate, "id" | "offer">;
+
 export type CreateOfferFlatrateInput = Pick<OfferFlatRate,
     "flatRateId" |
     "quantity"

@@ -1,6 +1,6 @@
 import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
@@ -8,7 +8,11 @@ export function useCreateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: (input: CreateOfferInput) => createOffer(input),
+        mutationFn: ({ offer, positions, flatrates }: {
+            offer: CreateOfferInput,
+            positions: Array<CreateOfferPositionInput>,
+            flatrates: Array<CreateOfferFlatrateInput>,
+        }) => createOffer(offer, positions, flatrates),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
@@ -25,9 +29,9 @@ export function useUpdateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offerId, input }: {
-            offerId: string, input: UpdateOfferInput
-        }) => updateOffer(offerId, input),
+        mutationFn: ({ offerId, offer, positions, flatrates }: {
+            offerId: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>
+        }) => updateOffer(offerId, offer, positions, flatrates),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
@@ -194,30 +198,51 @@ export function useOfferManager(filters: OfferFilters = {}) {
     const offerQuery = useOffers(filters);
 
     const createOfferMutation = useCreateOffer();
-    const createOfferPositionMutation = useCreateOfferPositions();
-    const createOfferFlatrateMutation = useCreateOfferFlatrates();
-
     const updateOfferMutation = useUpdateOffer();
-    const updateOfferPositionMutation = useUpdateOfferPosition();
-    const updateOfferFlatrateMutation = useUpdateOfferFlatrate();
-
     const deleteOfferMutation = useDeleteOffer();
-    const deleteOfferPositionMutation = useDeleteOfferPosition();
-    const deleteOfferFlatrateMutation = useDeleteOfferFlatrate();
 
     return {
         ...offerQuery,
-
         ...createOfferMutation,
-        ...createOfferPositionMutation,
-        ...createOfferFlatrateMutation,
-
         ...updateOfferMutation,
-        ...updateOfferPositionMutation,
-        ...updateOfferFlatrateMutation,
-
         ...deleteOfferMutation,
-        ...deleteOfferPositionMutation,
-        ...deleteOfferFlatrateMutation
+    }
+}
+
+export function useOfferDocumentUpload() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ offerId, documentId }: {
+            offerId: string, documentId: string
+        }) => uploadOfferDocument(offerId, documentId),
+        onSuccess: (position, args) => queryClient.invalidateQueries({
+            queryKey: offerKeys.detail(args.offerId)
+        }),
+    });
+
+    return {
+        uploadOfferDocument: mutation.mutateAsync,
+        isUploading: mutation.isPending,
+        errorUploading: mutation.error,
+    }
+}
+
+export function useGenerateOfferDocument() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ offerId }: {
+            offerId: string
+        }) => generateOfferDocument(offerId),
+        onSuccess: (position, args) => queryClient.invalidateQueries({
+            queryKey: offerKeys.detail(args.offerId)
+        }),
+    });
+
+    return {
+        generateOfferDocument: mutation.mutateAsync,
+        isGenerating: mutation.isPending,
+        errorGenerating: mutation.error,
     }
 }

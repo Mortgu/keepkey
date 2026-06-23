@@ -9,7 +9,7 @@ export const createOfferFlatratesSchema = z.array(createOfferFlatrateSchema);
 
 export const updateOfferFlatrateSchema = createOfferFlatrateSchema.partial();
 
-export const createOfferSchema = z.object({
+const createOfferFieldsSchema = z.object({
   customerId: z.string().min(1),
   contactPersonId: z.string().min(1),
   userId: z.string().min(1),
@@ -20,9 +20,7 @@ export const createOfferSchema = z.object({
   paymentTerm: z.string().nullable(),
   validUntil: z.string().nullable(),
   requestFrom: z.string().nullable(),
-});
-
-export const updateOfferSchema = createOfferSchema.partial();
+})
 
 const createOfferPositionSchema = z.object({
   productId: z.string().min(1),
@@ -41,3 +39,11 @@ export const updateOfferDocumentSchema = z.object({
   isCurrent: z.boolean().optional(),
   version: z.number().int().optional(),
 });
+
+export const createOfferSchema = z.object({
+  offer: createOfferFieldsSchema,
+  positions: createOfferPositionsSchema,
+  flatrates: createOfferFlatratesSchema,
+});
+
+export const updateOfferSchema = createOfferSchema.partial();
