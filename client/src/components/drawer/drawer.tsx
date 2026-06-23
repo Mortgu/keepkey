@@ -19,7 +19,7 @@ const scrimStyles = tv({
 
 const drawerStyles = tv({
     base: [
-        "fixed top-0 right-0 bottom-0 z-50",
+        "fixed top-0 right-0 bottom-0 z-50 transition-all",
         "bg-white shadow-[-8px_0_24px_rgba(0,0,0,0.12)]",
         "flex flex-col",
         "transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)]",

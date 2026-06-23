@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import path from "path";
 import fs from "fs/promises";
 import { prisma } from "../../lib/prismaClient.js";
+import { downloadDocumentStream } from "../../lib/nextcloud.js";
+import { AppException } from "../../lib/exceptions.js";
 
 
 export const getAllOrders = async (request: Request, response: Response) => {
@@ -85,13 +87,35 @@ export const downloadOrderDocument = async (request: Request, response: Response
         return response.status(404).json({message: "Document not found"});
     }
 
-    if (orderDoc.status !== "GENERATED") {
+    if (orderDoc.status !== "GENERATED" && orderDoc.status !== "UPLOADED") {
         return response.status(409).json({message: "Document not yet generated"});
     }
 
     const file = format === "pdf" ? orderDoc.pdf : orderDoc.docx;
     if (!file) {
         return response.status(404).json({ message: "File not found" });
+    }
+
+    const mimeTypes: Record<string, string> = {
+        pdf: "application/pdf",
+        docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    };
+
+    const downloadName = `${orderDoc.displayName ?? orderDoc.id}.${format}`;
+    response.setHeader("Content-Type", mimeTypes[format]);
+    response.setHeader("Content-Disposition", `attachment; filename="${downloadName}"`);
+
+    if (orderDoc.status === "UPLOADED") {
+        try {
+            const stream = await downloadDocumentStream(file.filename);
+            stream.pipe(response);
+            return;
+        } catch (exception: any) {
+            if (exception instanceof AppException) {
+                return response.status(exception.statusCode).json({ message: exception.message });
+            }
+            return response.status(500).json({ message: "Failed to download from Nextcloud: " + exception.message });
+        }
     }
 
     const filePath = path.join(file.path, file.basename);
@@ -102,12 +126,5 @@ export const downloadOrderDocument = async (request: Request, response: Response
         return response.status(404).json({message: "File not found on disk"});
     }
 
-    const mimeTypes: Record<string, string> = {
-        pdf: "application/pdf",
-        docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    };
-
-    const downloadName = `${orderDoc.displayName ?? orderDoc.id}.${format}`;
-    response.setHeader("Content-Type", mimeTypes[format]);
     return response.download(filePath, downloadName);
 };

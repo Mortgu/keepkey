@@ -1,4 +1,5 @@
 import {createClient, FileStat, type WebDAVClient} from "webdav";
+import {Readable} from "stream";
 import env from "./env.js";
 import logger from "../middlewares/logger.js";
 import {AppException} from "./exceptions.js";
@@ -160,5 +161,15 @@ export async function getFilesInDirectory(path: string): Promise<Array<string>> 
     } catch (exception: any) {
         logger.error(`[getFilesInDirectory] ${exception.message}`);
         return [];
+    }
+}
+
+export async function downloadDocumentStream(remotePath: string): Promise<Readable> {
+    const client = getNextCloudClient();
+    try {
+        return client.createReadStream(remotePath);
+    } catch (exception: any) {
+        logger.error(`[downloadDocumentStream] ${exception.message}`);
+        throw new AppException("Nextcloud download failed!", 503, "nextcloudDownloadFailed");
     }
 }

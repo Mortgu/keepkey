@@ -7,6 +7,7 @@ import {
   generateOrderDocument,
   getAllOrders,
   getOrderById,
+  uploadOrderDocument,
 } from "../controllers/index.js";
 import {validate} from "../middlewares/validate.js";
 import {createOrderSchema} from "../schemas/index.js";
@@ -20,6 +21,8 @@ router.get("/:orderId", getOrderById);
 router.get("/:orderId/documents/:documentId/:format", downloadOrderDocument);
 
 router.post('/:orderId/document', generateOrderDocument);
+
+router.post('/:orderId/documents/:documentId/upload', uploadOrderDocument);
 
 router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
 
