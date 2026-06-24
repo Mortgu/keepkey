@@ -32,9 +32,10 @@ export function useUpdateOffer() {
         mutationFn: ({ offerId, offer, positions, flatrates }: {
             offerId: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>
         }) => updateOffer(offerId, offer, positions, flatrates),
-        onSuccess: () => queryClient.invalidateQueries({
-            queryKey: offerKeys.lists()
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
+        },
     });
 
     return {
@@ -68,8 +69,9 @@ export function useDeleteOffer() {
                 queryClient.setQueryData(key, data);
             });
         },
-        onSettled: () => {
+        onSettled: (_, __, { id }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(id) });
         },
     });
 
@@ -87,9 +89,10 @@ export function useCreateOfferPositions() {
         mutationFn: ({ id, input }: {
             id: string, input: Array<CreateOfferPositionInput>
         }) => createOfferPositions(id, input),
-        onSuccess: (_, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.list()
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.id) });
+        },
     });
 
     return {
@@ -144,9 +147,10 @@ export function useCreateOfferFlatrates() {
         mutationFn: ({ id, input }: {
             id: string, input: Array<CreateOfferFlatrateInput>
         }) => createOfferFlatrates(id, input),
-        onSuccess: (_, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.list()
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.id) });
+        },
     });
 
     return {
@@ -216,7 +220,7 @@ export function useOfferDocumentUpload() {
         mutationFn: ({ offerId, documentId }: {
             offerId: string, documentId: string
         }) => uploadOfferDocument(offerId, documentId),
-        onSuccess: (position, args) => queryClient.invalidateQueries({
+        onSuccess: (_, args) => queryClient.invalidateQueries({
             queryKey: offerKeys.detail(args.offerId)
         }),
     });
@@ -235,8 +239,8 @@ export function useGenerateOfferDocument() {
         mutationFn: ({ offerId }: {
             offerId: string
         }) => generateOfferDocument(offerId),
-        onSuccess: (position, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.list()
+        onSuccess: (_, args) => queryClient.invalidateQueries({
+            queryKey: offerKeys.detail(args.offerId)
         }),
     });
 
@@ -254,8 +258,8 @@ export function useDeleteOfferDocument() {
         mutationFn: ({ offerId, documentId }: {
             offerId: string, documentId: string
         }) => deleteOfferDocument(offerId, documentId),
-        onSuccess: (position, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.list()
+        onSuccess: (_, args) => queryClient.invalidateQueries({
+            queryKey: offerKeys.detail(args.offerId)
         }),
     });
 
