@@ -8,14 +8,14 @@
     "close": "Schließen"
   },
   "nav": {
-    "catalog": "Katalog",
+    "catalog": "Keepit",
     "overview": "Übersicht",
     "sales": "Vertrieb",
     "management": "Verwaltung",
     "settings": "Einstellungen"
   },
   "section": {
-    "products": "Textbausteine",
+    "products": "Produkte",
     "pricing": "Preise",
     "flatRates": "Pauschalen",
     "suppliers": "Lieferanten",

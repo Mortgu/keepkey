@@ -240,9 +240,10 @@ export function useGenerateOfferDocument() {
         mutationFn: ({ offerId }: {
             offerId: string
         }) => generateOfferDocument(offerId),
-        onSuccess: (_, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.detail(args.offerId)
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
+        },
     });
 
     return {
@@ -259,9 +260,10 @@ export function useDeleteOfferDocument() {
         mutationFn: ({ offerId, documentId }: {
             offerId: string, documentId: string
         }) => deleteOfferDocument(offerId, documentId),
-        onSuccess: (_, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.detail(args.offerId)
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
+        },
     });
 
     return {
