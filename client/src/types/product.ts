@@ -13,7 +13,6 @@ export type ProductTranslationInput = Pick<
     "language" | "name" | "description" | "table"
 >;
 export type CreateProductInput = {
-    key: string;
     translations: Array<ProductTranslationInput>;
 };
 export type UpdateProductInput = Partial<CreateProductInput>;
@@ -23,7 +22,6 @@ export type FlatRateTranslationInput = Pick<
     "language" | "name" | "table"
 >;
 export type CreateFlatRateInput = {
-    key: string;
     total_cents: number;
     translations: Array<FlatRateTranslationInput>;
 };
@@ -34,7 +32,6 @@ export type ContractTranslationInput = Pick<
     "language" | "name" | "features" | "table"
 >;
 export type CreateContractInput = {
-    key: string;
     translations: Array<ContractTranslationInput>;
 };
 export type UpdateContractInput = Partial<CreateContractInput>;

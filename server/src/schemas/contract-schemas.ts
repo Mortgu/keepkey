@@ -8,11 +8,9 @@ const contractTranslationSchema = z.object({
 });
 
 export const createContractSchema = z.object({
-  key: z.string().min(1),
   translations: z.array(contractTranslationSchema).min(1),
 });
 
 export const updateContractSchema = z.object({
-  key: z.string().min(1).optional(),
   translations: z.array(contractTranslationSchema).optional(),
 });

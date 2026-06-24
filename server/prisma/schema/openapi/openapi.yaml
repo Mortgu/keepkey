@@ -11,8 +11,6 @@ components:
       properties:
         id:
           type: string
-        key:
-          type: string
         translations:
           type: array
           items:
@@ -34,7 +32,6 @@ components:
           format: date-time
       required:
         - id
-        - key
         - translations
         - orderPositions
         - offerPositions
@@ -661,8 +658,6 @@ components:
       properties:
         id:
           type: string
-        key:
-          type: string
         translations:
           type: array
           items:
@@ -687,7 +682,6 @@ components:
             $ref: "#/components/schemas/Tariff"
       required:
         - id
-        - key
         - translations
         - orderPositions
         - offerPositions
@@ -925,8 +919,6 @@ components:
       properties:
         id:
           type: string
-        key:
-          type: string
         total_cents:
           type: integer
           format: int32
@@ -944,7 +936,6 @@ components:
             $ref: "#/components/schemas/OrderFlatRate"
       required:
         - id
-        - key
         - total_cents
         - translations
         - offerFlatRates

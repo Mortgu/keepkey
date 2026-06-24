@@ -45,7 +45,7 @@ export default function FlatRateItem({ item }: { item: FlatRate }) {
           key={modal.key}
           onClose={modal.close}
           submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatrate: value })}
-          currentItem={{ key: item.key, total_cents: item.total_cents, translations: item.translations }}
+          currentItem={{ total_cents: item.total_cents, translations: item.translations }}
         />
       )}
     </>

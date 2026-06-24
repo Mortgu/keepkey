@@ -16,12 +16,11 @@ export const updateProduct = async (request: Request, response: Response, next: 
         });
     }
 
-    const {key, translations} = body;
+    const {translations} = body;
 
     const result = await prisma.product.update({
         where: {id: id as string},
         data: {
-            ...(key !== undefined ? {key} : {}),
             ...(Array.isArray(translations)
                 ? {
                       translations: {

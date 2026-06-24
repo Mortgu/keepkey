@@ -21,7 +21,6 @@ const SUPPLIERS = [
 
 const CONTRACTS = [
     {
-        key: "basic",
         translations: {
             DE: {
                 name: "Basic",
@@ -36,7 +35,6 @@ const CONTRACTS = [
         },
     },
     {
-        key: "professional",
         translations: {
             DE: {
                 name: "Professional",
@@ -51,7 +49,6 @@ const CONTRACTS = [
         },
     },
     {
-        key: "enterprise",
         translations: {
             DE: {
                 name: "Enterprise",
@@ -69,7 +66,6 @@ const CONTRACTS = [
 
 const PRODUCTS = [
     {
-        key: "managed-server",
         translations: {
             DE: {
                 name: "Managed Server",
@@ -84,7 +80,6 @@ const PRODUCTS = [
         },
     },
     {
-        key: "cloud-storage",
         translations: {
             DE: {
                 name: "Cloud Storage",
@@ -99,7 +94,6 @@ const PRODUCTS = [
         },
     },
     {
-        key: "email-hosting",
         translations: {
             DE: {
                 name: "E-Mail Hosting",
@@ -110,7 +104,6 @@ const PRODUCTS = [
         },
     },
     {
-        key: "webhosting",
         translations: {
             DE: {
                 name: "Webhosting",
@@ -125,7 +118,6 @@ const PRODUCTS = [
         },
     },
     {
-        key: "ddos-protection",
         translations: {
             DE: { name: "DDoS Protection", description: "Edge-Schutz gegen DDoS-Angriffe", table: "security" },
             EN: { name: "DDoS Protection", description: "Edge protection against DDoS attacks", table: "security" },
@@ -133,114 +125,8 @@ const PRODUCTS = [
     },
 ];
 
-/** Price in cents (Euro) — matrix: product × contract × terms × quantity tiers */
-const TARIFF_DATA = [
-    {
-        productKey: "managed-server",
-        contractKey: "basic",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 5, prices: [4_900, 4_400] },
-            { min_quantity: 6, max_quantity: 25, prices: [3_900, 3_500] },
-        ],
-    },
-    {
-        productKey: "managed-server",
-        contractKey: "professional",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 10, prices: [9_900, 8_900] },
-            { min_quantity: 11, max_quantity: 50, prices: [8_400, 7_600] },
-        ],
-    },
-    {
-        productKey: "managed-server",
-        contractKey: "enterprise",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 999_999, prices: [19_900, 17_900] },
-        ],
-    },
-    {
-        productKey: "cloud-storage",
-        contractKey: "basic",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 10, prices: [2_900, 2_400] },
-            { min_quantity: 11, max_quantity: 100, prices: [2_200, 1_800] },
-        ],
-    },
-    {
-        productKey: "cloud-storage",
-        contractKey: "professional",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 10, prices: [5_900, 5_400] },
-            { min_quantity: 11, max_quantity: 100, prices: [4_900, 4_400] },
-        ],
-    },
-    {
-        productKey: "cloud-storage",
-        contractKey: "enterprise",
-        terms: [12, 24, 36],
-        rows: [
-            { min_quantity: 1, max_quantity: 999_999, prices: [14_900, 13_400, 11_900] },
-        ],
-    },
-    {
-        productKey: "email-hosting",
-        contractKey: "basic",
-        terms: [12],
-        rows: [
-            { min_quantity: 1, max_quantity: 50, prices: [1_900] },
-        ],
-    },
-    {
-        productKey: "email-hosting",
-        contractKey: "professional",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 50, prices: [3_900, 3_400] },
-        ],
-    },
-    {
-        productKey: "webhosting",
-        contractKey: "basic",
-        terms: [12],
-        rows: [
-            { min_quantity: 1, max_quantity: 5, prices: [1_500] },
-        ],
-    },
-    {
-        productKey: "webhosting",
-        contractKey: "professional",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 5, prices: [3_200, 2_900] },
-            { min_quantity: 6, max_quantity: 25, prices: [2_700, 2_400] },
-        ],
-    },
-    {
-        productKey: "ddos-protection",
-        contractKey: "professional",
-        terms: [12, 24],
-        rows: [
-            { min_quantity: 1, max_quantity: 999_999, prices: [7_900, 7_200] },
-        ],
-    },
-    {
-        productKey: "ddos-protection",
-        contractKey: "enterprise",
-        terms: [12, 24, 36],
-        rows: [
-            { min_quantity: 1, max_quantity: 999_999, prices: [15_900, 14_400, 12_900] },
-        ],
-    },
-];
-
 const FLAT_RATES = [
     {
-        key: "setup-fee",
         total_cents: 299_00,
         translations: {
             DE: { name: "Einrichtungsgebühr", table: "setup_fee" },
@@ -248,7 +134,6 @@ const FLAT_RATES = [
         },
     },
     {
-        key: "migration-service",
         total_cents: 499_00,
         translations: {
             DE: { name: "Migrationsservice", table: "migration" },
@@ -339,14 +224,18 @@ async function seedSuppliers() {
 async function seedContracts() {
     const results = [];
     for (const data of CONTRACTS) {
-        let contract = await prisma.contract.findUnique({
-            where: { key: data.key },
+        let contract = await prisma.contract.findFirst({
+            where: {
+                translations: {
+                    some: { language: "DE", name: data.translations.DE.name },
+                },
+            },
+            include: { translations: true },
         });
 
         if (!contract) {
             contract = await prisma.contract.create({
                 data: {
-                    key: data.key,
                     translations: {
                         create: [
                             { language: "DE", ...data.translations.DE },
@@ -354,10 +243,11 @@ async function seedContracts() {
                         ],
                     },
                 },
+                include: { translations: true },
             });
-            console.log(`Contract created: ${data.key}`);
+            console.log(`Contract created: ${data.translations.DE.name}`);
         } else {
-            console.log(`Contract exists: ${data.key}`);
+            console.log(`Contract exists: ${data.translations.DE.name}`);
         }
         results.push(contract);
     }
@@ -367,14 +257,18 @@ async function seedContracts() {
 async function seedProducts() {
     const products = [];
     for (const data of PRODUCTS) {
-        let product = await prisma.product.findUnique({
-            where: { key: data.key },
+        let product = await prisma.product.findFirst({
+            where: {
+                translations: {
+                    some: { language: "DE", name: data.translations.DE.name },
+                },
+            },
+            include: { translations: true },
         });
 
         if (!product) {
             product = await prisma.product.create({
                 data: {
-                    key: data.key,
                     translations: {
                         create: [
                             { language: "DE", ...data.translations.DE },
@@ -382,10 +276,11 @@ async function seedProducts() {
                         ],
                     },
                 },
+                include: { translations: true },
             });
-            console.log(`Product created: ${data.key}`);
+            console.log(`Product created: ${data.translations.DE.name}`);
         } else {
-            console.log(`Product exists: ${data.key}`);
+            console.log(`Product exists: ${data.translations.DE.name}`);
         }
         products.push(product);
     }
@@ -394,22 +289,26 @@ async function seedProducts() {
 }
 
 async function seedTariffs(
-    products: { id: string; key: string }[],
-    contracts: { id: string; key: string }[],
+    products: { id: string }[],
+    contracts: { id: string }[],
     customers: { id: string; customerId: string | null; companyName: string }[]
 ) {
 }
 
 async function seedFlatRates() {
     for (const data of FLAT_RATES) {
-        let flatRate = await prisma.flatRate.findUnique({
-            where: { key: data.key },
+        let flatRate = await prisma.flatRate.findFirst({
+            where: {
+                translations: {
+                    some: { language: "DE", name: data.translations.DE.name },
+                },
+            },
+            include: { translations: true },
         });
 
         if (!flatRate) {
             flatRate = await prisma.flatRate.create({
                 data: {
-                    key: data.key,
                     total_cents: data.total_cents,
                     translations: {
                         create: [
@@ -418,10 +317,11 @@ async function seedFlatRates() {
                         ],
                     },
                 },
+                include: { translations: true },
             });
-            console.log(`FlatRate created: ${data.key}`);
+            console.log(`FlatRate created: ${data.translations.DE.name}`);
         } else {
-            console.log(`FlatRate exists: ${data.key}`);
+            console.log(`FlatRate exists: ${data.translations.DE.name}`);
         }
     }
 }

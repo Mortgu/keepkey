@@ -18,7 +18,6 @@ const langFields = z.object({
 });
 
 const flatRateSchema = z.object({
-  key: z.string().min(1, "Schlüssel erforderlich"),
   total_cents: z.number().int().nonnegative(),
   DE: langFields,
   EN: langFields,
@@ -36,7 +35,6 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
 
   const form = useForm({
     defaultValues: {
-      key: currentItem?.key ?? "",
       total_cents: currentItem?.total_cents ?? 0,
       DE: seedLang(currentItem?.translations, "DE"),
       EN: seedLang(currentItem?.translations, "EN"),
@@ -50,7 +48,7 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];
-      submitFn({ key: value.key, total_cents: value.total_cents, translations });
+      submitFn({ total_cents: value.total_cents, translations });
       onClose();
     },
   });
@@ -78,20 +76,6 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
 
       <ModalDialog.Content>
         <form id="flatrate-form" onSubmit={handleSubmit} className="grid gap-4">
-          <form.Field name="key">
-            {(field) => (
-              <div className="grid gap-1">
-                <Input id={field.name} name={field.name} value={field.state.value}
-                  label="Schlüssel (sprachunabhängig)"
-                  disabled={isEdit}
-                  error={getFormErrors(field.state.meta.errors)}
-                  placeholder="z.B. setup-fee"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          </form.Field>
-
           <form.Field name={`${language}.name`}>
             {(field) => (
               <div className="grid gap-1">

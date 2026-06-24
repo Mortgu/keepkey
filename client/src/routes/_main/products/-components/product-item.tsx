@@ -87,7 +87,7 @@ export default function ProductItem({ product }: { product: Product }) {
           submitFn={(value) =>
             updateProduct({ id: product.id, product: value })
           }
-          currentItem={{ key: product.key, translations: product.translations }}
+          currentItem={{ translations: product.translations }}
         />
       )}
     </>

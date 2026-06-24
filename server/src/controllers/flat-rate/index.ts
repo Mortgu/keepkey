@@ -3,7 +3,7 @@ import {prisma} from "../../lib/prismaClient.js";
 
 export const getFlatRates = async (request: Request, response: Response) => {
     const flatrates = await prisma.flatRate.findMany({
-        orderBy: {key: "asc"},
+        orderBy: {id: "asc"},
         include: {translations: true},
     });
     return response.status(200).json(flatrates);
@@ -32,11 +32,10 @@ export const createFlatRate = async (
     next: NextFunction,
 ) => {
     try {
-        const {key, total_cents, translations} = request.body;
+        const {total_cents, translations} = request.body;
 
         const flatrate = await prisma.flatRate.create({
             data: {
-                key,
                 total_cents,
                 translations: {create: translations},
             },
@@ -56,12 +55,11 @@ export const updateFlatRate = async (
 ) => {
     try {
         const id = request.params.id as string;
-        const {key, total_cents, translations} = request.body;
+        const {total_cents, translations} = request.body;
 
         const flatrate = await prisma.flatRate.update({
             where: {id},
             data: {
-                ...(key !== undefined ? {key} : {}),
                 ...(total_cents !== undefined ? {total_cents} : {}),
                 ...(Array.isArray(translations)
                     ? {

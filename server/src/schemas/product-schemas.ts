@@ -8,11 +8,9 @@ const productTranslationSchema = z.object({
 });
 
 export const createProductSchema = z.object({
-  key: z.string().min(1),
   translations: z.array(productTranslationSchema).min(1),
 });
 
 export const updateProductSchema = z.object({
-  key: z.string().min(1).optional(),
   translations: z.array(productTranslationSchema).optional(),
 });

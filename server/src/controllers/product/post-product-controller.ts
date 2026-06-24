@@ -14,11 +14,10 @@ export const createProduct = async (request: Request, response: Response, next: 
             });
         }
 
-        const {key, translations} = body;
+        const {translations} = body;
 
         const newProduct = await prisma.product.create({
             data: {
-                key,
                 translations: {create: translations},
             },
             include: {translations: true},
