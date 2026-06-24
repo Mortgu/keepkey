@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { prisma } from "../../lib/prismaClient.js";
+import logger from "../../middlewares/logger.js";
 
 export const createCustomer = async (request: Request, response: Response) => {
     const { body } = request;
@@ -41,12 +42,18 @@ export const createCustomer = async (request: Request, response: Response) => {
     }
 };
 
-export const createContact = async (request: Request, response: Response) => {
+export const createCustomerContact = async (request: Request, response: Response, next: NextFunction) => {
+    const id = request.params.id as string;
     const body = request.body;
 
-    const createdContact = await prisma.contactPerson.create({
-        data: { ...body }
-    });
+    try {
+        const createdContact = await prisma.contactPerson.create({
+            data: { ...body }
+        });
 
-    return response.status(200).json(createdContact);
+        return response.status(200).json(createdContact);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
 }

@@ -1,7 +1,6 @@
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
 import type {
-    ContactPerson,
     CreateOfferFlatrateInput,
     CreateOfferInput,
     CreateOfferPositionInput,
@@ -11,30 +10,11 @@ import type {
     OfferPosition,
     OfferRevision,
     Task,
-    UpdateContactPersonInput,
     UpdateOfferDocumentInput,
     UpdateOfferFlatrateInput,
     UpdateOfferInput,
     UpdateOfferPositionInput
 } from "@/types";
-
-/* Contact Person */
-export const getContactPersons = async () =>
-    api<Array<ContactPerson>>(`/api/contact-persons`, {
-        method: "GET"
-    });
-
-export const updateContactPerson = async (id: string, input: UpdateContactPersonInput) =>
-    api<ContactPerson>(`/api/contact-person/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input)
-    });
-
-export const deleteContactPerson = async (id: string) =>
-    api<void>(`/api/contact-persons/${id}`, {
-        method: "DELETE"
-    });
 
 /* Offer */
 export const getOffers = async (filters: OfferFilters) =>
@@ -57,7 +37,7 @@ export const createOffer = (
 
 export const updateOffer = async (id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>) =>
     api<Offer>(`/api/offers/${id}`, {
-        method: "PUT",
+        method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ offer, positions, flatrates }),
     });

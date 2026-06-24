@@ -25,8 +25,8 @@ router.get('/', getOffers);
 /* [POST] /api/offers  */
 router.post('/', validate(createOfferSchema), createOffer);
 
-/* [PATCH] /api/offers */
-router.patch('/', validate(updateOfferSchema), updateOffer);
+/* [PATCH] /api/offers/:id */
+router.patch('/:id', validate(updateOfferSchema), updateOffer);
 
 /* [DELETE] /api/offers/:id */
 router.delete('/:id', deleteOffer);
@@ -68,7 +68,7 @@ router.get('/:id/documents', () => { });
 router.post('/:id/documents', enqueueGeneration);
 
 /* [POST] /api/offers/:id/documents/:documentId/upload */
-router.post('/:id/documents/documentId/upload', uploadOfferDocument);
+router.post('/:id/documents/:documentId/upload', uploadOfferDocument);
 
 /* [PATCH] /api/offers/:id/documents/:documentId */
 router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), () => { });

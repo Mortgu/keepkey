@@ -5,6 +5,7 @@ import ContactPersonForm from "./contact-person-form";
 import type { ContactPerson } from "@/types";
 import { useCustomerHook } from "@/hooks";
 import { Button } from "@/components";
+import { useDeleteCustomerContact } from "@/hooks/customers/customer-mutations";
 
 type Props = {
     currentCustomerId: string;
@@ -15,6 +16,10 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
     const [isEditing, setEditing] = useState<boolean>(false);
 
     const { updateContact, isUpdatingContact, deleteContact, isDeletingContact, errorDeletingContact } = useCustomerHook();
+
+    const {
+        deleteCustomerContact
+    } = useDeleteCustomerContact();
 
     const styles = tv({
         base: [
@@ -48,7 +53,9 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
 
                     <Button type="button" variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
                         loading={isDeletingContact}
-                        onClick={() => deleteContact({ id: cp.id })} />
+                        onClick={() => deleteCustomerContact({
+                            id: currentCustomerId, contactId: cp.id
+                        })} />
                 </div>
             </div>
 

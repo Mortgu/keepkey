@@ -1,13 +1,13 @@
-import {Request, Response} from "express";
-import {prisma} from "../../lib/prismaClient.js";
-import {logger} from "better-auth";
+import { Request, Response } from "express";
+import { prisma } from "../../lib/prismaClient.js";
+import { logger } from "better-auth";
 
 export const deleteCustomer = async (request: Request, response: Response) => {
-    const {id} = request.params;
+    const { id } = request.params;
 
     try {
         await prisma.customer.delete({
-            where: {id: id as string},
+            where: { id: id as string },
         });
 
         return response.status(200).json({
@@ -21,13 +21,13 @@ export const deleteCustomer = async (request: Request, response: Response) => {
     }
 };
 
-
-export const deleteContactById = async (request: Request, response: Response) => {
-    const {cid} = request.params;
+export const deleteCustomerContact = async (request: Request, response: Response) => {
+    const id = request.params.id as string;
+    const contactId = request.params.contactId as string;
 
     try {
         await prisma.contactPerson.delete({
-            where: {id: cid as string}
+            where: { id: contactId },
         });
 
         return response.status(200).json({

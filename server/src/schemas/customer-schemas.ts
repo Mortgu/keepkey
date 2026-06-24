@@ -1,4 +1,4 @@
-import {z} from "zod";
+import { z } from "zod";
 
 export const contactPersonSchema = z.object({
     salutation: z.string().optional(),
@@ -24,7 +24,7 @@ export const createCustomerSchema = z.object({
     contactPersons: z.array(contactPersonSchema).optional(),
 });
 
-export const createContactSchema = z.object({
+export const createCustomerContactSchema = z.object({
     customerId: z.string().optional(),
 
     salutation: z.string().optional(),
@@ -50,7 +50,7 @@ export const updateCustomerSchema = z.object({
     contactPersons: z.array(contactPersonSchema).optional(),
 });
 
-export const updateContactSchema = z.object({
+export const updateCustomerContactSchema = z.object({
     salutation: z.string().optional(),
     firstName: z.string().optional(),
     lastName: z.string().optional(),

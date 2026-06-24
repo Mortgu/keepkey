@@ -34,7 +34,8 @@ model Customer {
 }
 
 model ContactPerson {
-  id         String   @id @default(uuid())
+  id String @id @default(uuid())
+
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
@@ -42,12 +43,14 @@ model ContactPerson {
   firstName  String
   lastName   String
   email      String?
-  createdAt  DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt  DateTime @updatedAt @db.Timestamptz(6)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   offers Offer[]
   orders Order[]
 
+  @@unique([id, customerId])
   @@index([customerId])
   @@map("contact_person")
 }

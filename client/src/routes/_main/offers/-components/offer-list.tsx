@@ -38,12 +38,10 @@ export default function OfferList() {
     }),
     [searchInput, customerFilter, contactPersonFilter, sort],
   );
-  const { offers } = useOffers();
+  const { offers } = useOffers(params);
 
   const { contactPersons } = useOfferHook(params);
   const { customers } = useCustomerHook();
-
-
 
   const customerFilterOptions = useMemo(
     () =>

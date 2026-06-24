@@ -220,9 +220,10 @@ export function useOfferDocumentUpload() {
         mutationFn: ({ offerId, documentId }: {
             offerId: string, documentId: string
         }) => uploadOfferDocument(offerId, documentId),
-        onSuccess: (_, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.detail(args.offerId)
-        }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
+        },
     });
 
     return {

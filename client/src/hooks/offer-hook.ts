@@ -1,28 +1,15 @@
 import type {
-    CreateOfferFlatRatesInput,
-    CreateOfferInput,
-    CreateOfferPositionInput,
     DocumentStatus,
     Offer,
-    Order,
-    UpdateOfferFlatRatesInput,
-    UpdateOfferInput,
-    UpdateOfferPositionInput,
+    Order
 } from "@/types";
 import type { QueryClient } from "@tanstack/react-query";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
 import {
-    createOfferAction,
-    deleteOfferAction,
-    deleteOfferDocumentAction,
-    generateOfferDocumentAction,
     getContactPersonsAction,
-    getOfferRevisionsAction, getTaskByIdAction,
-    renameDocumentAction,
-    updateOfferAction,
-    uploadAction
+    getOfferRevisionsAction, getTaskByIdAction
 } from "@/data/offer";
 
 
@@ -124,86 +111,12 @@ export const useDocumentTask = (taskId?: string) => {
 export const useOfferHook = (params?: OfferQueryParams) => {
     const queryClient = useQueryClient();
 
-    const invalidate = () =>
-        queryClient.invalidateQueries({ queryKey: ["offers"] });
-
     const { data: contactPersons = [] } = useQuery({
         queryKey: ["contact-persons"],
         queryFn: getContactPersonsAction,
     });
 
-    const createMutation = useMutation({
-        mutationFn: ({ offer, positions, flatRates }: {
-            offer: CreateOfferInput; positions: Array<CreateOfferPositionInput>; flatRates: Array<CreateOfferFlatRatesInput>;
-        }) => createOfferAction(offer, positions, flatRates),
-        onSuccess: invalidate,
-    });
-
-    const updateMutation = useMutation({
-        mutationFn: ({ id, offer, positions, flatRates }: {
-            id: string,
-            offer: UpdateOfferInput;
-            positions: Array<UpdateOfferPositionInput>;
-            flatRates: Array<UpdateOfferFlatRatesInput>;
-        }) => updateOfferAction(id, offer, positions, flatRates),
-        onSuccess: invalidate,
-    });
-
-    const deleteMutation = useMutation({
-        mutationFn: ({ id }: { id: string }) => deleteOfferAction(id),
-        onSuccess: invalidate,
-    });
-
-    const deleteDocumentMutation = useMutation({
-        mutationFn: ({ offerId, documentId }: { offerId: string, documentId: string }) =>
-            deleteOfferDocumentAction(offerId, documentId),
-        onSuccess: invalidate,
-    });
-
-    const renameDocumentMutation = useMutation({
-        mutationFn: ({ document_id, displayName }: { document_id: string, displayName: string }) =>
-            renameDocumentAction(document_id, displayName),
-        onSuccess: invalidate,
-    });
-
-    const uploadMutation = useMutation({
-        mutationFn: ({ offerId, documentId }: { offerId: string, documentId: string }) => uploadAction(offerId, documentId),
-        onSuccess: invalidate
-    });
-
-    const generateDocumentMutation = useMutation({
-        mutationFn: ({ offerId }: { offerId: string }) => generateOfferDocumentAction(offerId),
-        onSuccess: invalidate,
-    });
-
     return {
         contactPersons,
-
-        createOffer: createMutation.mutateAsync,
-        isCreatingOffer: createMutation.isPaused,
-        errorCreatingOffer: createMutation.error,
-
-        deleteOffer: deleteMutation.mutate,
-        isDeletingOffer: deleteMutation.isPending,
-        errorDeletingOffer: deleteMutation.error,
-
-        deleteDocument: deleteDocumentMutation.mutate,
-        isDeletingDocument: deleteDocumentMutation.isPending,
-        errorDeletingDocument: deleteDocumentMutation.error,
-
-        updateOffer: updateMutation.mutateAsync,
-        isUpdatingOffer: updateMutation.isPending,
-        errorUpdatingOffer: updateMutation.error,
-
-        renameDocument: renameDocumentMutation.mutateAsync,
-        isRenamingDocument: renameDocumentMutation.isPending,
-        errorRenamingDocument: renameDocumentMutation.error,
-
-        upload: uploadMutation.mutateAsync,
-        isUploading: uploadMutation.isPending,
-        errorUploading: uploadMutation.error,
-
-        generateDocument: generateDocumentMutation.mutate,
-        isGeneratingDocument: generateDocumentMutation.isPending,
     };
 };
