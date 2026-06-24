@@ -1,6 +1,6 @@
 import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferDocument, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
@@ -236,7 +236,7 @@ export function useGenerateOfferDocument() {
             offerId: string
         }) => generateOfferDocument(offerId),
         onSuccess: (position, args) => queryClient.invalidateQueries({
-            queryKey: offerKeys.detail(args.offerId)
+            queryKey: offerKeys.list()
         }),
     });
 
@@ -244,5 +244,24 @@ export function useGenerateOfferDocument() {
         generateOfferDocument: mutation.mutateAsync,
         isGenerating: mutation.isPending,
         errorGenerating: mutation.error,
+    }
+}
+
+export function useDeleteOfferDocument() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ offerId, documentId }: {
+            offerId: string, documentId: string
+        }) => deleteOfferDocument(offerId, documentId),
+        onSuccess: (position, args) => queryClient.invalidateQueries({
+            queryKey: offerKeys.list()
+        }),
+    });
+
+    return {
+        deleteOfferDocument: mutation.mutateAsync,
+        isDeleting: mutation.isPending,
+        errorDeleting: mutation.error,
     }
 }

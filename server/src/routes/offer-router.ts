@@ -5,6 +5,7 @@ import {
   createOfferFlatrates,
   createOfferPositions,
   deleteOffer,
+  deleteOfferDocument,
   enqueueGeneration,
   getOffers,
   updateOffer,
@@ -73,7 +74,7 @@ router.post('/:id/documents/documentId/upload', uploadOfferDocument);
 router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), () => { });
 
 /* [DELETE] /api/offers/:id/documents/:documentId */
-router.delete('/:id/documents/:documentId', () => { });
+router.delete('/:id/documents/:documentId', deleteOfferDocument);
 
 /* ========== Offer Revisions ========== */
 
