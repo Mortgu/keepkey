@@ -1,12 +1,13 @@
-import type { CustomerFilters } from "@/types";
 import { queryOptions } from "@tanstack/react-query";
+import { getCustomer, getCustomers } from "./customer-api";
 import { customerKeys } from "./customer-keys";
+import type { CustomerFilters } from "@/types";
 
 export const customerQueries = {
     list: (filters: CustomerFilters = {}) => {
         return queryOptions({
             queryKey: customerKeys.list(filters),
-            queryFn: () => { },
+            queryFn: () => getCustomers(),
             staleTime: 30_000,
         });
     },
@@ -14,7 +15,7 @@ export const customerQueries = {
     detail: (id: string) => {
         return queryOptions({
             queryKey: customerKeys.detail(id),
-            queryFn: () => { },
+            queryFn: () => getCustomer(id),
             enabled: Boolean(id)
         });
     },

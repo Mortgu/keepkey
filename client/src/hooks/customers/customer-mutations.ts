@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { customerKeys } from "./customer-keys";
-import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, updateCustomer } from "./customer-api";
-import type { CreateCustomerContactInput, CreateCustomerInput } from "@/types";
+import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, updateCustomer, updateCustomerContact } from "./customer-api";
+import type { CreateCustomerContactInput, CreateCustomerInput, UpdateCustomerContactInput } from "@/types";
 
 export function useCreateCustomer() {
     const queryClient = useQueryClient();
@@ -62,7 +62,7 @@ export function useDeleteCustomer() {
     }
 }
 
-export function useCustomerHook() {
+export function useCustomerManager() {
     const createCustomerMutation = useCreateCustomer();
     const updateCustomerMutation = useUpdateCustomer();
     const deleteCustomerMutation = useDeleteCustomer();
@@ -97,7 +97,21 @@ export function useCreateCustomerContact() {
 export function useUpdateCustomerContact() {
     const queryClient = useQueryClient();
 
-    return {}
+    const mutation = useMutation({
+        mutationFn: ({ id, contactId, input }: {
+            id: string, contactId: string, input: UpdateCustomerContactInput
+        }) => updateCustomerContact(id, contactId, input),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: customerKeys.detail(args.id) });
+        }
+    });
+
+    return {
+        updateCustomerContact: mutation.mutateAsync,
+        isUpdatingCustomerContact: mutation.isPending,
+        errorUpdatingCustomerContact: mutation.error,
+    }
 }
 
 export function useDeleteCustomerContact() {
@@ -122,11 +136,11 @@ export function useDeleteCustomerContact() {
 export function useCustomerContactHook() {
     const createCustomerContactMutation = useCreateCustomerContact();
     const updateCustomerContactMutation = useUpdateCustomerContact();
-    const delteCustomerContactMutation = useDeleteCustomerContact();
+    const deleteCustomerContactMutation = useDeleteCustomerContact();
 
     return {
         ...createCustomerContactMutation,
         ...updateCustomerContactMutation,
-        ...delteCustomerContactMutation,
+        ...deleteCustomerContactMutation,
     }
 }

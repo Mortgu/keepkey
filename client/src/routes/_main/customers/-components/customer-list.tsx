@@ -5,14 +5,14 @@ import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type {Customer} from "@/types";
-import {useCustomerHook, useModal} from "@/hooks";
+import {useCustomers, useModal} from "@/hooks";
 import {Button} from "@/components";
 
 export default function CustomerList() {
     const {t} = useTranslation();
 
     const modal = useModal();
-    const {customers} = useCustomerHook();
+    const {customers} = useCustomers();
 
     return (
         <div>

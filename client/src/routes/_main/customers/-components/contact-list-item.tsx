@@ -3,9 +3,8 @@ import { useState } from "react";
 import { tv } from "tailwind-variants";
 import ContactPersonForm from "./contact-person-form";
 import type { ContactPerson } from "@/types";
-import { useCustomerHook } from "@/hooks";
+import { useDeleteCustomerContact, useUpdateCustomerContact } from "@/hooks";
 import { Button } from "@/components";
-import { useDeleteCustomerContact } from "@/hooks/customers/customer-mutations";
 
 type Props = {
     currentCustomerId: string;
@@ -15,11 +14,8 @@ type Props = {
 export default function ContactListItem({ currentCustomerId, cp }: Props) {
     const [isEditing, setEditing] = useState<boolean>(false);
 
-    const { updateContact, isUpdatingContact, deleteContact, isDeletingContact, errorDeletingContact } = useCustomerHook();
-
-    const {
-        deleteCustomerContact
-    } = useDeleteCustomerContact();
+    const { updateCustomerContact, isUpdatingCustomerContact } = useUpdateCustomerContact();
+    const { deleteCustomerContact, isDeletingCustomerContact, errorDeletingCustomerContact } = useDeleteCustomerContact();
 
     const styles = tv({
         base: [
@@ -37,11 +33,11 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
 
     return (
         <div className="grid gap-2">
-            {errorDeletingContact && (
-                <p className="text-sm text-(--destructive)">{errorDeletingContact.message}</p>
+            {errorDeletingCustomerContact && (
+                <p className="text-sm text-(--destructive)">{errorDeletingCustomerContact.message}</p>
             )}
 
-            <div className={styles({ error: errorDeletingContact !== null })}>
+            <div className={styles({ error: errorDeletingCustomerContact !== null })}>
                 <div className="grid">
                     <p className="text-sm">{cp.salutation} {cp.firstName} {cp.lastName}</p>
                     <p className="text-sm font-light text-(--text-secondary)">{cp.email}</p>
@@ -49,10 +45,10 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
 
                 <div className="flex gap-2">
                     <Button type="button" variant="secondary" size="sm" icon={<Pen className="size-3.5" />} iconOnly
-                        onClick={() => setEditing(true)} loading={isUpdatingContact} />
+                        onClick={() => setEditing(true)} loading={isUpdatingCustomerContact} />
 
                     <Button type="button" variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
-                        loading={isDeletingContact}
+                        loading={isDeletingCustomerContact}
                         onClick={() => deleteCustomerContact({
                             id: currentCustomerId, contactId: cp.id
                         })} />
@@ -61,7 +57,7 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
 
             {isEditing && (
                 <ContactPersonForm saveFn={(data) => {
-                    updateContact({ id: cp.id, body: data });
+                    updateCustomerContact({ id: currentCustomerId, contactId: cp.id, input: data });
                     setEditing(false);
                 }} cancelFn={() => setEditing(false)}
                     currentCustomerId={currentCustomerId} currentContactPerson={cp} />

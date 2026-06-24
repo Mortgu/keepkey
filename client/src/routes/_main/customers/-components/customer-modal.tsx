@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import type { Customer } from "@/types";
-import { useCustomerHook } from "@/hooks";
+import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import { Button, Input, ModalDialog, Select } from "@/components";
 import { getFormError } from "@/lib/utils";
 import {
@@ -43,8 +43,8 @@ export default function CustomerModal({
 }: CustomerModalProps) {
   const isEdit = currentCustomer !== null;
 
-  const { updateCustomer, createCustomer, errorCreatingCustomer } =
-    useCustomerHook();
+  const { createCustomer, errorCreatingCustomer } = useCreateCustomer();
+  const { updateCustomer } = useUpdateCustomer();
 
   const initialCountry = findCountryByName(currentCustomer?.country);
 
@@ -68,17 +68,17 @@ export default function CustomerModal({
     validators: {
       onChange: customerSchema,
     },
-    onSubmit: ({ value }) => {
+    onSubmit: async ({ value }) => {
       if (isEdit) {
         try {
-          updateCustomer({ id: currentCustomer.id, body: value });
+          await updateCustomer({ customerId: currentCustomer.id, input: value });
           onClose();
         } catch (exception: any) {
           console.error(exception);
         }
       } else {
         try {
-          createCustomer({ body: value });
+          await createCustomer({ input: value });
           onClose();
         } catch (exception: any) {
           console.error(exception);

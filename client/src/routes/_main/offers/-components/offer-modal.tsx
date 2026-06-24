@@ -21,7 +21,7 @@ import {
   Select,
 } from "@/components";
 import {
-  useCustomerHook,
+  useCustomers,
   useLocale,
   useSupplierHook,
   useUserHook,
@@ -33,7 +33,7 @@ interface OfferModalProps {
 }
 
 export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
-  const { customers } = useCustomerHook();
+  const { customers } = useCustomers();
   const { suppliers } = useSupplierHook();
   const { users } = useUserHook();
   const locale = useLocale();

@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import OrderModal from "./order-modal";
 import OrderCard from "./card/order-card";
 import type { Customer, Order } from "@/types";
-import { useCustomerHook, useModal, useOrderHook } from "@/hooks";
+import { useCustomers, useModal, useOrderHook } from "@/hooks";
 
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
@@ -22,7 +22,7 @@ export default function OrderList() {
     const [contactPersonFilter] = useState<Array<string>>([]);
 
     const { orders } = useOrderHook();
-    const { customers } = useCustomerHook();
+    const { customers } = useCustomers();
 
     const customerFilterOptions = useMemo(() =>
         customers.map((c: Customer) => ({

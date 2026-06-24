@@ -1,6 +1,6 @@
 import type { ContactPerson, Customer, Offer, Supplier, User } from "@/types";
 import { useOfferFormState } from "../../-components/modal-components/use-offer-form-state";
-import { useCustomerHook, useLocale, useSupplierHook, useUserHook } from "@/hooks";
+import { useCustomers, useLocale, useSupplierHook, useUserHook } from "@/hooks";
 import type { SyntheticEvent } from "react";
 import { Input, Select } from "@/components";
 import { useTranslation } from "react-i18next";
@@ -13,7 +13,7 @@ type Props = {
 }
 
 export default function CreateOfferForm({ currentOffer }: Props) {
-    const { customers } = useCustomerHook();
+    const { customers } = useCustomers();
     const { suppliers } = useSupplierHook();
     const { users } = useUserHook();
     const locale = useLocale();

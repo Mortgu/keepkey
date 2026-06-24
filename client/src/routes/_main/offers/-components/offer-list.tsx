@@ -7,7 +7,7 @@ import OfferModal from "./offer-modal";
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useCustomerHook, useModal, useOfferHook } from "@/hooks";
+import { useCustomers, useModal, useOfferHook } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 import type { ContactPerson, Customer, Offer } from "@/types";
 
@@ -41,7 +41,7 @@ export default function OfferList() {
   const { offers } = useOffers(params);
 
   const { contactPersons } = useOfferHook(params);
-  const { customers } = useCustomerHook();
+  const { customers } = useCustomers();
 
   const customerFilterOptions = useMemo(
     () =>

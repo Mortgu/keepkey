@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Button, Checkbox, Input, Select } from "@/components";
-import { useContractHook, useCustomerHook, useLocale, useProductHook, useSupplierHook, useTariffDurationsHook } from "@/hooks";
+import { useContractHook, useCustomers, useLocale, useProductHook, useSupplierHook, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import type { OfferPosition } from "@/types";
 
@@ -18,7 +18,7 @@ interface Props {
 export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
   const { products } = useProductHook();
   const { contracts } = useContractHook();
-  const { customers } = useCustomerHook();
+  const { customers } = useCustomers();
   const { suppliers } = useSupplierHook();
 
   const locale = useLocale();
