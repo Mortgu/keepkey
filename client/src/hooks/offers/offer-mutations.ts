@@ -1,6 +1,6 @@
 import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferDocument, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferDocument, deleteOfferFlatrate, deleteOfferPosition, deleteOfferRevision, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
@@ -270,5 +270,25 @@ export function useDeleteOfferDocument() {
         deleteOfferDocument: mutation.mutateAsync,
         isDeleting: mutation.isPending,
         errorDeleting: mutation.error,
+    }
+}
+
+export function useDeleteOfferRevision() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ offerId, revisionId }: {
+            offerId: string, revisionId: string
+        }) => deleteOfferRevision(offerId, revisionId),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
+        },
+    });
+
+    return {
+        deleteOfferRevision: mutation.mutateAsync,
+        isDeletingRevision: mutation.isPending,
+        errorDeletingRevision: mutation.error,
     }
 }

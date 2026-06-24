@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Sidebar Navigation" subtitle="Sectioned nav (Übersicht / Katalog / Vertrieb / Verwaltung) with expandable subsections" viewport="700x720" -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #F7F8F7; -webkit-font-smoothing: antialiased; color: #111A14; }
+  #root { padding: 24px; display: flex; gap: 24px; align-items: flex-start; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const T = {
+  green600:'#00683F', green50:'#E6F2EC', green100:'#D4EDE1',
+  neutral25:'#F7F8F7', neutral50:'#F0F4F1', neutral100:'#E0E4E1', neutral200:'#C4CFC8',
+  neutral300:'#8A9E93', neutral500:'#4B5C52', neutral900:'#111A14', white:'#FFFFFF',
+  red:'#C0392B',
+};
+
+// ── Icons ──────────────────────────────────────────────────────────────────
+const I = {
+  dashboard: <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>,
+  product:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>,
+  tariff:    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>,
+  user:      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>,
+  customer:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  offer:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></svg>,
+  order:     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>,
+  settings:  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>,
+  team:      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>,
+  api:       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>,
+  signOut:   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
+  globe:     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>,
+  chevron:   (open) => <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" style={{ transform: open?'rotate(180deg)':'none', transition:'transform 150ms' }}><polyline points="6 9 12 15 18 9"/></svg>,
+};
+
+// ── Localized copy (DE default / EN) ───────────────────────────────────────
+const LANG = {
+  de: {
+    secOverview:'Übersicht', secCatalog:'Katalog', secSales:'Vertrieb', secAdmin:'Verwaltung',
+    dashboard:'Dashboard', products:'Produkte', prodAll:'Alle Produkte', prodPricing:'Preisstaffeln',
+    prodFlat:'Flatrates', prodArchive:'Archiv', tariffs:'Tarife',
+    customers:'Kunden', custActive:'Aktive Kunden', custLeads:'Leads', custInactive:'Inaktiv',
+    offers:'Angebote', orders:'Bestellungen',
+    users:'Nutzer', teams:'Teams', api:'API-Schlüssel', settings:'Einstellungen',
+    signOut:'Abmelden',
+  },
+  en: {
+    secOverview:'Overview', secCatalog:'Catalog', secSales:'Sales', secAdmin:'Administration',
+    dashboard:'Dashboard', products:'Products', prodAll:'All products', prodPricing:'Price tiers',
+    prodFlat:'Flat rates', prodArchive:'Archive', tariffs:'Tariffs',
+    customers:'Customers', custActive:'Active customers', custLeads:'Leads', custInactive:'Inactive',
+    offers:'Offers', orders:'Orders',
+    users:'Users', teams:'Teams', api:'API keys', settings:'Settings',
+    signOut:'Sign out',
+  },
+};
+
+// ── Language toggle (segmented control) ────────────────────────────────────
+const LangToggle = ({ lang, onChange }) => {
+  const langs = [['de','DE'],['en','EN']];
+  return (
+    <div role="tablist" aria-label="Sprache / Language" style={{
+      position:'relative', display:'flex', background:T.neutral50,
+      border:`1px solid ${T.neutral100}`, borderRadius:6, padding:3, gap:2,
+    }}>
+      <span aria-hidden="true" style={{
+        position:'absolute', top:3, bottom:3, left:3, width:'calc(50% - 3px)',
+        background:T.white, borderRadius:4, boxShadow:'0 1px 3px rgba(0,0,0,0.08)',
+        transform: lang==='en' ? 'translateX(calc(100% + 2px))' : 'none',
+        transition:'transform 180ms cubic-bezier(0.4,0,0.2,1)',
+      }}/>
+      {langs.map(([code,label]) => {
+        const on = lang===code;
+        return (
+          <button key={code} role="tab" aria-selected={on} onClick={()=>onChange(code)} style={{
+            position:'relative', zIndex:1, flex:1, fontFamily:'inherit',
+            fontSize:12, fontWeight: on?600:500, letterSpacing:'0.02em',
+            color: on?T.green600:T.neutral500, background:'none', border:'none',
+            cursor:'pointer', padding:'4px 0', borderRadius:4, transition:'color 160ms',
+          }}>{label}</button>
+        );
+      })}
+    </div>
+  );
+};
+
+// ── Item primitive ─────────────────────────────────────────────────────────
+const NavItem = ({ icon, label, active, badge, onClick, indent=false, expandable, expanded }) => {
+  const [hover, setHover] = React.useState(false);
+  return (
+    <div onClick={onClick}
+      onMouseEnter={()=>setHover(true)} onMouseLeave={()=>setHover(false)}
+      style={{
+        padding: indent ? '6px 14px 6px 38px' : '7px 14px',
+        fontSize:13, display:'flex', alignItems:'center', gap:10, cursor:'pointer',
+        color: active ? T.green600 : (hover ? T.neutral900 : T.neutral500),
+        background: active ? T.green50 : (hover ? T.neutral50 : 'transparent'),
+        fontWeight: active ? 500 : 400,
+        borderRadius:5, margin:'0 6px',
+        transition:'background 100ms, color 100ms',
+      }}>
+      {icon && <span style={{ display:'flex', flexShrink:0, color: active ? T.green600 : T.neutral300 }}>{icon}</span>}
+      <span style={{ flex:1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{label}</span>
+      {badge !== undefined && (
+        <span style={{
+          fontSize:10, fontWeight:600, padding:'1px 7px', borderRadius:9999,
+          background: active ? T.green100 : T.neutral50,
+          color: active ? T.green600 : T.neutral500,
+          fontVariantNumeric:'tabular-nums',
+        }}>{badge}</span>
+      )}
+      {expandable && <span style={{ color:T.neutral300, display:'flex' }}>{I.chevron(expanded)}</span>}
+    </div>
+  );
+};
+
+// ── Section header with optional collapse ─────────────────────────────────
+const SectionHeader = ({ children, collapsible, collapsed, onToggle }) => (
+  <div onClick={onToggle} style={{
+    padding:'10px 14px 4px', fontSize:10, fontWeight:600, color:T.neutral300,
+    letterSpacing:'0.08em', textTransform:'uppercase',
+    display:'flex', alignItems:'center', justifyContent:'space-between',
+    cursor: collapsible ? 'pointer' : 'default', userSelect:'none',
+  }}>
+    <span>{children}</span>
+    {collapsible && <span style={{ display:'flex' }}>{I.chevron(!collapsed)}</span>}
+  </div>
+);
+
+// ── Sidebar (sectioned + subsections) ─────────────────────────────────────
+const Sidebar = () => {
+  const [active, setActive] = React.useState('products.list');
+  const [expanded, setExpanded] = React.useState({ products:true, customers:false });
+  const [collapsedSec, setCollapsedSec] = React.useState({});
+  const [lang, setLang] = React.useState('de');
+  const t = LANG[lang];
+  React.useEffect(()=>{ document.documentElement.lang = lang; }, [lang]);
+
+  const toggleGroup = k => setExpanded(s => ({ ...s, [k]: !s[k] }));
+  const toggleSec   = k => setCollapsedSec(s => ({ ...s, [k]: !s[k] }));
+
+  const isOpen = (k) => !collapsedSec[k];
+
+  return (
+    <div style={{
+      width:240, background:T.white, border:`1px solid ${T.neutral100}`, borderRadius:8,
+      display:'flex', flexDirection:'column', padding:'10px 0', height:680, overflow:'hidden',
+    }}>
+      {/* Brand */}
+      <div style={{ padding:'4px 16px 10px', display:'flex', alignItems:'center', gap:8 }}>
+        <div style={{ width:26, height:26, background:T.green600, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.4" strokeLinecap="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <span style={{ fontWeight:600, fontSize:14, color:T.neutral900, letterSpacing:'-0.01em' }}>Keepit</span>
+      </div>
+
+      <div style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column', gap:2 }}>
+
+        {/* Section: Übersicht */}
+        <SectionHeader>{t.secOverview}</SectionHeader>
+        <NavItem icon={I.dashboard} label={t.dashboard} onClick={()=>setActive('dashboard')} active={active==='dashboard'}/>
+
+        {/* Section: Katalog (with subsections) */}
+        <div style={{ height:1, background:T.neutral100, margin:'8px 14px 0' }}/>
+        <SectionHeader collapsible collapsed={!isOpen('catalog')} onToggle={()=>toggleSec('catalog')}>{t.secCatalog}</SectionHeader>
+        {isOpen('catalog') && <>
+          {/* Group: Products w/ subsections */}
+          <NavItem icon={I.product} label={t.products} badge={2}
+            expandable expanded={expanded.products}
+            onClick={()=>toggleGroup('products')}
+            active={active.startsWith('products')}/>
+          {expanded.products && <>
+            <NavItem indent label={t.prodAll}     onClick={()=>setActive('products.list')}     active={active==='products.list'}/>
+            <NavItem indent label={t.prodPricing} onClick={()=>setActive('products.pricing')}  active={active==='products.pricing'}/>
+            <NavItem indent label={t.prodFlat}    badge={1} onClick={()=>setActive('products.flat')} active={active==='products.flat'}/>
+            <NavItem indent label={t.prodArchive} onClick={()=>setActive('products.archive')}  active={active==='products.archive'}/>
+          </>}
+          <NavItem icon={I.tariff} label={t.tariffs} onClick={()=>setActive('tariffs')} active={active==='tariffs'}/>
+        </>}
+
+        {/* Section: Vertrieb */}
+        <div style={{ height:1, background:T.neutral100, margin:'8px 14px 0' }}/>
+        <SectionHeader collapsible collapsed={!isOpen('sales')} onToggle={()=>toggleSec('sales')}>{t.secSales}</SectionHeader>
+        {isOpen('sales') && <>
+          <NavItem icon={I.customer} label={t.customers} badge={42}
+            expandable expanded={expanded.customers}
+            onClick={()=>toggleGroup('customers')}
+            active={active.startsWith('customers')}/>
+          {expanded.customers && <>
+            <NavItem indent label={t.custActive}   onClick={()=>setActive('customers.active')} active={active==='customers.active'}/>
+            <NavItem indent label={t.custLeads}    onClick={()=>setActive('customers.leads')}  active={active==='customers.leads'}/>
+            <NavItem indent label={t.custInactive} onClick={()=>setActive('customers.inactive')} active={active==='customers.inactive'}/>
+          </>}
+          <NavItem icon={I.offer} label={t.offers} badge={8} onClick={()=>setActive('offers')}  active={active==='offers'}/>
+          <NavItem icon={I.order} label={t.orders} badge={3} onClick={()=>setActive('orders')}  active={active==='orders'}/>
+        </>}
+
+        {/* Section: Verwaltung */}
+        <div style={{ height:1, background:T.neutral100, margin:'8px 14px 0' }}/>
+        <SectionHeader collapsible collapsed={!isOpen('admin')} onToggle={()=>toggleSec('admin')}>{t.secAdmin}</SectionHeader>
+        {isOpen('admin') && <>
+          <NavItem icon={I.user}     label={t.users}    onClick={()=>setActive('users')}    active={active==='users'}/>
+          <NavItem icon={I.team}     label={t.teams}    onClick={()=>setActive('teams')}    active={active==='teams'}/>
+          <NavItem icon={I.api}      label={t.api}      onClick={()=>setActive('api')}      active={active==='api'}/>
+          <NavItem icon={I.settings} label={t.settings} onClick={()=>setActive('settings')} active={active==='settings'}/>
+        </>}
+      </div>
+
+      {/* Language toggle */}
+      <div style={{ borderTop:`1px solid ${T.neutral100}`, padding:'10px 14px 8px', display:'flex', alignItems:'center', gap:10 }}>
+        <span style={{ display:'flex', color:T.neutral300, flexShrink:0 }}>{I.globe}</span>
+        <span style={{ flex:1, fontSize:12, color:T.neutral500 }}>{lang==='de' ? 'Sprache' : 'Language'}</span>
+        <div style={{ width:96 }}><LangToggle lang={lang} onChange={setLang}/></div>
+      </div>
+
+      {/* Signed-in user */}
+      <div style={{ borderTop:`1px solid ${T.neutral100}`, padding:'10px 14px', display:'flex', alignItems:'center', gap:10 }}>
+        <div style={{ width:28, height:28, borderRadius:'50%', background:T.green600, color:'white', display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:600, flexShrink:0 }}>AL</div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontSize:13, fontWeight:500, color:T.neutral900, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>Alice Lambert</div>
+          <div style={{ fontSize:11, color:T.neutral300, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>alice@keepit.com</div>
+        </div>
+        <button title={t.signOut} style={{ background:'none', border:'none', cursor:'pointer', color:T.neutral300, padding:5, borderRadius:4, display:'flex' }}
+          onMouseEnter={e=>{ e.currentTarget.style.background=T.neutral50; e.currentTarget.style.color=T.red; }}
+          onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; e.currentTarget.style.color=T.neutral300; }}
+        >{I.signOut}</button>
+      </div>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<Sidebar/>);
+</script>
+</body>
+</html>

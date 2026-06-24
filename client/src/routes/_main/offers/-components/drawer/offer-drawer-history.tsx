@@ -1,6 +1,10 @@
 import { Button, Drawer } from "@/components";
+import { useDeleteOfferRevision } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import type { Offer, OfferRevision } from "@/types";
+import { Trash } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 type Props = {
     open: boolean;
@@ -9,6 +13,18 @@ type Props = {
 }
 
 export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
+    const {
+        deleteOfferRevision,
+        isDeletingRevision,
+        errorDeletingRevision
+    } = useDeleteOfferRevision();
+
+    useEffect(() => {
+        if (errorDeletingRevision) {
+            toast.error(errorDeletingRevision.message);
+        }
+    }, [errorDeletingRevision]);
+
     return (
         <Drawer open={open} onClose={onClose} wide>
             <Drawer.Header title="History" subtitle="Vergangene Angebots versionen" />
@@ -57,6 +73,10 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                                     <Button size="xs" variant="secondary">
                                         Restore this version
                                     </Button>
+
+                                    <Button size="xs" variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
+                                        onClick={() => deleteOfferRevision({ offerId: offer.id, revisionId: revision.id })}
+                                        loading={isDeletingRevision} disabled={errorDeletingRevision ? true : false || isDeletingRevision} />
                                 </div>
                             </div>
                         </div>

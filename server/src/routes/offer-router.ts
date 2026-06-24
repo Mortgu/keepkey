@@ -6,6 +6,7 @@ import {
   createOfferPositions,
   deleteOffer,
   deleteOfferDocument,
+  deleteOfferRevision,
   enqueueGeneration,
   getOffers,
   updateOffer,
@@ -81,8 +82,8 @@ router.delete('/:id/documents/:documentId', deleteOfferDocument);
 /* [GET] /api/offers/:id/revisions */
 router.get('/:id/revisions', () => { });
 
-/* [DELETE] /api/offers/:id/revisions/:revisionsId */
-router.delete('/:id/revisions/:revisionsId', () => { });
+/* [DELETE] /api/offers/:id/revisions/:revisionId */
+router.delete('/:id/revisions/:revisionId', deleteOfferRevision);
 
 /* ========== Offer Tasks ========== */
 

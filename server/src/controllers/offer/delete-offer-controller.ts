@@ -1,9 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 
 import { prisma } from "../../lib/prismaClient.js";
+import logger from '../../middlewares/logger.js';
 
 export const deleteOfferDocument = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
@@ -53,3 +54,21 @@ export const deleteOffer = async (request: Request, response: Response) => {
         message: "Successfully deleted offer!",
     });
 };
+
+export const deleteOfferRevision = async (request: Request, response: Response, next: NextFunction) => {
+    const id = request.params.id as string;
+    const revisionId = request.params.revisionId as string;
+
+    try {
+        await prisma.offerRevision.delete({
+            where: { id: revisionId },
+        });
+
+        return response.status(200).json({
+            message: "Successfully deleted revision!"
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}

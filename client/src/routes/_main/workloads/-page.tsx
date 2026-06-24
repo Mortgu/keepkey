@@ -1,13 +1,13 @@
-import {useTranslation} from "react-i18next";
-import {LoaderCircle, Plus} from "lucide-react";
-import {useState} from "react";
+import { useTranslation } from "react-i18next";
+import { LoaderCircle, Plus } from "lucide-react";
+import { useState } from "react";
 import ProductList from './-components/product-list';
-import {Button, PageWidth, SearchBar} from "@/components";
-import {useModal, useProductHook} from "@/hooks";
-import ProductModal from "@/routes/_main/products/-components/product-modal.tsx";
+import { Button, PageWidth, SearchBar } from "@/components";
+import { useModal, useProductHook } from "@/hooks";
+import ProductModal from "@/routes/_main/workloads/-components/product-modal.tsx";
 
 export default function ProductPage() {
-    const {t} = useTranslation()
+    const { t } = useTranslation()
     const {
         products,
         isPending,
@@ -22,7 +22,7 @@ export default function ProductPage() {
     const renderLoading = () => {
         return (
             <div className="flex items-center justify-center my-5">
-                <LoaderCircle className="animate-spin"/>
+                <LoaderCircle className="animate-spin" />
             </div>
         )
     }
@@ -39,12 +39,12 @@ export default function ProductPage() {
                 <div className="flex items-center justify-between gap-4">
                     <div className="w-full flex items-center gap-4">
                         <SearchBar value={searchQuery} onChange={setSearchQuery}
-                                   onSubmit={() => {
-                                   }} placeholder="Nach Produkt Namen suchen"/>
+                            onSubmit={() => {
+                            }} placeholder="Nach Produkt Namen suchen" />
 
                         <div className="flex items-center gap-2">
                             <Button onClick={() => modal.open()} size="sm">
-                                {t('button.create')} <Plus className="size-4"/>
+                                {t('button.create')} <Plus className="size-4" />
                             </Button>
                         </div>
                     </div>
@@ -53,13 +53,13 @@ export default function ProductPage() {
                 {/* body */}
                 <div className="grid gap-4">
                     {isPending ? renderLoading() : (
-                        <ProductList products={products}/>
+                        <ProductList products={products} />
                     )}
                 </div>
 
                 {modal.isOpen && (
                     <ProductModal key={modal.key} onClose={modal.close}
-                                  submitFn={(value) => createProduct({...value})}/>
+                        submitFn={(value) => createProduct({ ...value })} />
                 )}
             </div>
         </PageWidth>

@@ -1,14 +1,14 @@
-import {useParams} from "@tanstack/react-router";
-import type {Product} from "@/types";
-import {localized} from "@/lib/i18n-content";
-import {useContractHook, useLocale, useProductHook,} from "@/hooks";
-import {PageWidth} from "@/components";
-import ContractCollapsable from "@/routes/_main/products/$id/-components/contract-collapsable.tsx";
+import { useParams } from "@tanstack/react-router";
+import type { Product } from "@/types";
+import { localized } from "@/lib/i18n-content";
+import { useContractHook, useLocale, useProductHook, } from "@/hooks";
+import { PageWidth } from "@/components";
+import ContractCollapsable from "./-components/contract-collapsable";
 
 export function ProductDetailContainer() {
-    const params = useParams({from: "/_main/products/$id/"});
+    const params = useParams({ from: "/_main/workloads/$id/" });
 
-    const {getProduct} = useProductHook();
+    const { getProduct } = useProductHook();
 
     const {
         data: product,
@@ -25,7 +25,7 @@ export function ProductDetailContainer() {
     }
 
     return (
-        <ProductDetailPage key={product.id} product={product}/>
+        <ProductDetailPage key={product.id} product={product} />
     );
 }
 
@@ -33,10 +33,10 @@ interface ProductDetailPageProps {
     product: Product;
 }
 
-export function ProductDetailPage({product}: ProductDetailPageProps) {
+export function ProductDetailPage({ product }: ProductDetailPageProps) {
     const locale = useLocale();
 
-    const {contracts} = useContractHook();
+    const { contracts } = useContractHook();
 
     return (
         <PageWidth variant="full">

@@ -1,21 +1,21 @@
-import { useState} from "react";
-import {Trash} from "lucide-react";
-import type {ChangeEvent} from "react";
-import type {TariffColumn} from "@/types";
-import {Button, Input} from "@/components";
-import {useTariffHook} from "@/hooks";
-import TariffCellComponent from "@/routes/_main/products/$id/-components/tariff-cell-component.tsx";
+import { useState } from "react";
+import { Trash } from "lucide-react";
+import type { ChangeEvent } from "react";
+import type { TariffColumn } from "@/types";
+import { Button, Input } from "@/components";
+import { useTariffHook } from "@/hooks";
+import TariffCellComponent from "@/routes/_main/workloads/$id/-components/tariff-cell-component.tsx";
 
 type Props = {
     tariffId: string;
     column: TariffColumn;
 }
 
-export default function TariffColumnComponent({tariffId, column}: Props) {
+export default function TariffColumnComponent({ tariffId, column }: Props) {
     const [edit, setEdit] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(column.duration);
 
-    const {deleteColumn, updateColumn} = useTariffHook();
+    const { deleteColumn, updateColumn } = useTariffHook();
 
     const handleBlur = async () => {
         setEdit(false);
@@ -53,16 +53,16 @@ export default function TariffColumnComponent({tariffId, column}: Props) {
                 )}
 
                 <Button
-                    icon={<Trash className="size-3.5"/>}
+                    icon={<Trash className="size-3.5" />}
                     iconOnly
                     variant="link"
                     size="xs"
-                    onClick={() => deleteColumn({tariffId, columnId: column.id})}
+                    onClick={() => deleteColumn({ tariffId, columnId: column.id })}
                 />
             </div>
 
             {column.cells.map((cell) => (
-                <TariffCellComponent tariffId={tariffId} cell={cell.default_cells[0]}/>
+                <TariffCellComponent tariffId={tariffId} cell={cell.default_cells[0]} />
             ))}
         </div>
     )

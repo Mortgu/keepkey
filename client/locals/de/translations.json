@@ -8,14 +8,16 @@
     "close": "Schließen"
   },
   "nav": {
-    "catalog": "Keepit  ",
+    "catalog": "Katalog",
     "overview": "Übersicht",
     "sales": "Vertrieb",
     "management": "Verwaltung",
     "settings": "Einstellungen"
   },
   "section": {
-    "products": "Produkte",
+    "workloads": "Workloads",
+    "workload_pricing": "Preistabelle",
+    "workload_text": "Textbausteine",
     "pricing": "Preise",
     "flatRates": "Pauschalen",
     "suppliers": "Lieferanten",
