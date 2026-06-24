@@ -1,15 +1,15 @@
 import { Button } from "@/components";
 import { useFlatRateHook, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { CreateOfferFlatRatesInput } from "@/types";
 import { formatEur } from "@/utils/utils";
 import { Plus, Trash, X } from "lucide-react";
 import { useState } from "react";
 import OfferFlatRateForm from "./offer-flat-rate-form";
+import type { CreateOfferFlatrateInput, OfferFlatRate } from "@/types";
 
 type Props = {
-    offerFlatRates: Array<CreateOfferFlatRatesInput>;
-    onAdd: (data: CreateOfferFlatRatesInput) => void;
+    offerFlatRates: Array<OfferFlatRate>;
+    onAdd: (data: CreateOfferFlatrateInput) => void;
     onRemove: (index: number) => void;
 };
 
@@ -21,8 +21,6 @@ export default function FlatRateModalSection({
     const [showForm, setShowForm] = useState(false);
     const { flatRates } = useFlatRateHook();
     const locale = useLocale();
-
-    console.log(offerFlatRates, flatRates)
 
     return (
         <div className="grid gap-4">

@@ -4,7 +4,6 @@ export * from './contract-hook';
 export * from './customers/customer-hooks';
 export * from './customers/customer-mutations';
 export * from './flatrate-hook';
-export * from './offer-hook';
 export * from './order-hook';
 export * from './product-hook';
 export * from './tariff-hook';

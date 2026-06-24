@@ -60,8 +60,6 @@ export default function ProductSectionItem({
     const handlePriceBlur = () => {
         onPriceChange(price);
         setEditPrice(false);
-
-        console.log(price, offerProduct.quantity)
     };
 
     return (

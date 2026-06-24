@@ -7,7 +7,7 @@ import OfferModal from "./offer-modal";
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useCustomers, useModal, useOfferHook } from "@/hooks";
+import { useContacts, useCustomers, useModal } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 import type { ContactPerson, Customer, Offer } from "@/types";
 
@@ -40,7 +40,8 @@ export default function OfferList() {
   );
   const { offers } = useOffers(params);
 
-  const { contactPersons } = useOfferHook(params);
+  const { contacts } = useContacts();
+
   const { customers } = useCustomers();
 
   const customerFilterOptions = useMemo(
@@ -54,11 +55,11 @@ export default function OfferList() {
 
   const contactPersonFilterOptions = useMemo(
     () =>
-      contactPersons.map((cp: ContactPerson) => ({
+      contacts.map((cp: ContactPerson) => ({
         value: cp.id,
         label: `${cp.firstName} ${cp.lastName}`,
       })),
-    [contactPersons],
+    [contacts],
   );
 
   const activeFilterCount = customerFilter.length + contactPersonFilter.length;

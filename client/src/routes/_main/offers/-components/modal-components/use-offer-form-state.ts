@@ -131,8 +131,6 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
 
     const addProduct = async (data: OfferProductInput) => {
         const priced = await resolvePrice(data);
-
-        console.log(priced)
         setOfferProducts((prev) => [...prev, priced]);
     };
 

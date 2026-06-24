@@ -46,7 +46,6 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
   }, [durations]);
 
   useEffect(() => {
-    console.log('Now')
   }, [duration_months, quantity, productId, contractId]);
 
   const handleSave = () => {

@@ -13,6 +13,11 @@ export const getCustomers = () =>
         method: "GET",
     });
 
+export const getContacts = () =>
+    api<Array<ContactPerson>>(`/api/contact-persons`, {
+        method: "GET",
+    });
+
 export const getCustomer = (id: string) =>
     api<Customer>(`/api/customers/${id}`, {
         method: "GET",

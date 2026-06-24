@@ -95,11 +95,8 @@ async function replacePositions(tx: any, offerId: string, positions: OfferPositi
 }
 
 async function replaceFlatRates(tx: any, offerId: string, flatRates: OfferFlatRate[]) {
-    console.log(offerId, flatRates);
-
     await tx.offerFlatRate.deleteMany({ where: { offerId } });
     for (const { flatRateId, quantity, total_cents } of flatRates) {
-        console.log(flatRateId, quantity, total_cents);
         await tx.offerFlatRate.create({
             data: { offerId, flatRateId, quantity, total_cents },
         });
