@@ -7,3 +7,5 @@ export * from "./supplier";
 export * from "./user";
 export * from "./task";
 export * from "./tariff";
+export * from "./contract";
+export * from "./language";

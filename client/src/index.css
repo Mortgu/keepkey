@@ -62,7 +62,6 @@ body {
   font-family: var(--font-sans), serif;
   color: var(--text);
 
-  background: var(--text);
 }
 
 * {
@@ -78,14 +77,14 @@ body {
   grid-template-columns: auto 1fr;
 }
 
-#app {
-}
+#app {}
 
 li {
   list-style: disc;
 }
 
 @layer components {
+
   /* Type scale */
   .text-display {
     font-size: 36px;

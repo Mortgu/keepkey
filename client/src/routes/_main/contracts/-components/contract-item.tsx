@@ -1,5 +1,5 @@
 import { Pen, Trash } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import ContractModal from "./contract-modal";
 
 import type { Contract } from "@/types";
@@ -7,18 +7,27 @@ import { formatDate } from "@/lib/format";
 import { Button } from "@/components";
 import { useLocale, useModal } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { useDeleteContract } from "@/hooks/contracts/contract-mutations";
+import { toast } from "react-toastify";
 
 interface ContractListItemProps {
   contract: Contract;
-  deleteContract: (id: string) => void;
 }
 
-export default function ContractListItem({ contract, deleteContract }: ContractListItemProps) {
+export default function ContractListItem({ contract }: ContractListItemProps) {
   const modal = useModal<Contract>();
   const locale = useLocale();
 
   const name = localized(contract.translations, locale, "name");
   const features = localized(contract.translations, locale, "features") || [];
+
+  const { deleteContract, isDeletingContract, errorDeletingContract } = useDeleteContract();
+
+  useEffect(() => {
+    if (errorDeletingContract) {
+      toast.error(errorDeletingContract.message);
+    }
+  }, [errorDeletingContract]);
 
   return (
     <Fragment>
@@ -35,7 +44,7 @@ export default function ContractListItem({ contract, deleteContract }: ContractL
               onClick={() => modal.open(contract)} />
 
             <Button variant="ghost" size="sm" icon={<Trash className="size-3.5" />} iconOnly
-              onClick={() => deleteContract(contract.id)} />
+              onClick={() => deleteContract({ id: contract.id })} loading={isDeletingContract} disabled={isDeletingContract} />
           </div>
         </div>
 

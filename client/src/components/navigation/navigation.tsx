@@ -102,7 +102,7 @@ export function Navigation() {
     const { t } = useTranslation();
 
     return (
-        <aside className="flex h-screen w-74 flex-col overflow-hidden">
+        <aside className="flex h-screen w-74 flex-col overflow-hidden bg-(--text)">
             <div className="grid items-center justify-between gap-2 px-4 pb-2.5 pt-4">
                 <h1 className="text-lg font-semibold tracking-[-0.01em] text-(--text-inv)">
                     dignum
