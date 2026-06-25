@@ -1,9 +1,19 @@
 import { Button } from "@/components";
+import { useLocale } from "@/hooks";
+import { formatDate } from "@/lib/format";
+import { localized } from "@/lib/i18n-content";
+import type { Contract } from "@/types";
 import { ChevronDown, UndoDot, Plus } from "lucide-react";
 import { useState } from "react";
 
-export default function PricingTableItem() {
+type Props = {
+    contract: Contract;
+}
+
+export default function PricingTableItem({ contract }: Props) {
+    const locale = useLocale();
     const [open, setOpen] = useState<boolean>(false);
+
 
     return (
         <div>
@@ -13,8 +23,8 @@ export default function PricingTableItem() {
                     <div className="flex items-center gap-4">
                         <Button size="fit_xs" variant="link" icon={<ChevronDown className="size-4" />} iconOnly />
                         <div>
-                            <p>Buisness Esentials</p>
-                            <p className="text-sm text-(--text-secondary)">20. April 2026</p>
+                            <p>{localized(contract.translations, locale, "name")}</p>
+                            <p className="text-sm text-(--text-secondary)">{formatDate(contract.createdAt)}</p>
                         </div>
                     </div>
                 </div>
@@ -26,7 +36,9 @@ export default function PricingTableItem() {
             </div>
 
             {open && (
-                <div className="p-4 border"></div>
+                <div className="p-4 border">
+
+                </div>
             )}
         </div>
     )

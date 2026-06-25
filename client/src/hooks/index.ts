@@ -5,7 +5,7 @@ export * from './customers/customer-mutations';
 export * from './flatrate-hook';
 export * from './order-hook';
 export * from './product-hook';
-export * from './tariff-hook';
+export * from './tariffs/tariff-hooks';
 export * from './user-hook';
 export * from './supplier-hook';
 export * from './use-dashboard-stats';

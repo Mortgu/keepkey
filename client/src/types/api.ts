@@ -14,7 +14,9 @@ export interface components {
             offerPositions: components["schemas"]["OfferPosition"][];
             tariffs: components["schemas"]["Tariff"][];
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         ContractTranslation: {
             contractId: string;
@@ -23,6 +25,10 @@ export interface components {
             features: string[];
             table: string;
             contract: components["schemas"]["Contract"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Customer: {
             id: string;

@@ -30,12 +30,17 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - translations
         - orderPositions
         - offerPositions
         - tariffs
+        - createdAt
+        - updatedAt
     ContractTranslation:
       type: object
       properties:
@@ -53,6 +58,12 @@ components:
           type: string
         contract:
           $ref: "#/components/schemas/Contract"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - contractId
         - language
@@ -60,6 +71,8 @@ components:
         - features
         - table
         - contract
+        - createdAt
+        - updatedAt
     Customer:
       type: object
       properties:

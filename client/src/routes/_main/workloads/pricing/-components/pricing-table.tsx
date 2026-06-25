@@ -1,8 +1,12 @@
 import { Button } from "@/components";
 import { Plus } from "lucide-react";
 import PricingTableItem from "./pricing-table-icon";
+import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 export default function PricingTable() {
+
+    const { contracts } = useContracts();
+
     return (
         <div className="border border-(--border) rounded-md overflow-hidden">
             <div className="px-4 py-3 flex items-center justify-between border-b border-(--border) bg-(--page-bg)">
@@ -20,8 +24,9 @@ export default function PricingTable() {
             </div>
 
             <div className="grid">
-                <PricingTableItem />
-                <PricingTableItem />
+                {contracts.map(contract => (
+                    <PricingTableItem key={contract.id} contract={contract} />
+                ))}
             </div>
         </div>
 

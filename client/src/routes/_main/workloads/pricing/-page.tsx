@@ -3,6 +3,7 @@ import PricingTable from "./-components/pricing-table";
 import { t } from "i18next";
 
 export default function PricingPage() {
+
     return (
         <PageWidth variant="constrained">
             <div className="grid gap-4">
