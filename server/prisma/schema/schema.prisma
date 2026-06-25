@@ -106,7 +106,6 @@ model Supplier {
 
 model FlatRate {
   id          String @id @default(uuid())
-  key         String @unique // sprachunabhängiger Identifier
   total_cents Int
 
   translations FlatRateTranslation[]

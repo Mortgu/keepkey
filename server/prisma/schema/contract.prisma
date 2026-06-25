@@ -1,6 +1,5 @@
 model Contract {
-  id  String @id @default(uuid())
-  key String @unique // sprachunabhängiger Identifier
+  id String @id @default(uuid())
 
   translations   ContractTranslation[]
   orderPositions OrderPosition[]

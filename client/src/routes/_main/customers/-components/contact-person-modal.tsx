@@ -4,7 +4,7 @@ import ContactPersonForm from "./contact-person-form";
 import ContactListItem from "./contact-list-item";
 import type { ContactPerson } from "@/types";
 import { Button, Input, ModalDialog } from "@/components";
-import { useCustomerHook } from "@/hooks";
+import { useCreateCustomerContact } from "@/hooks/customers/customer-mutations";
 
 type ContactPersonModalProps = {
     onClose: () => void;
@@ -15,7 +15,9 @@ type ContactPersonModalProps = {
 export default function ContactPersonModal({ onClose, currentCustomerId, currentContactPersons }: ContactPersonModalProps) {
     const [add, setAdd] = useState<boolean>(false);
 
-    const { createContact } = useCustomerHook();
+    const {
+        createCustomerContact,
+    } = useCreateCustomerContact();
 
     return (
         <ModalDialog onClose={onClose}>
@@ -41,9 +43,21 @@ export default function ContactPersonModal({ onClose, currentCustomerId, current
 
                     {add && (
                         <ContactPersonForm saveFn={(data) => {
-                            createContact(data);
+                            createCustomerContact({
+                                id: currentCustomerId,
+                                input: {
+                                    salutation: data.salutation,
+                                    firstName: data.firstName,
+                                    lastName: data.lastName,
+                                    email: data.email || "",
+                                    customerId: currentCustomerId,
+                                }
+                            })
+
                             setAdd(false);
-                        }} cancelFn={() => setAdd(false)} currentCustomerId={currentCustomerId} />
+                        }}
+                            cancelFn={() => setAdd(false)}
+                            currentCustomerId={currentCustomerId} />
                     )}
                 </div>
             </ModalDialog.Content>

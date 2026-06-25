@@ -15,7 +15,9 @@
     "settings": "Settings"
   },
   "section": {
-    "products": "Products",
+    "workloads": "Workloads",
+    "workload_pricing": "Pricing",
+    "workload_text": "Text blocks",
     "pricing": "Pricing",
     "flatRates": "Flat Rates",
     "suppliers": "Suppliers",

@@ -1,5 +1,6 @@
 import { Button } from "@/components";
-import { useDocumentTask, useOfferHook } from "@/hooks";
+import { useDocumentTask } from "@/hooks";
+import { useDeleteOfferDocument, useOfferDocumentUpload } from "@/hooks/offers/offer-mutations";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
@@ -18,19 +19,22 @@ export default function OfferCardDocument({ offerDocument }: Props) {
     useDocumentTask(taskId);
 
     const {
-        deleteDocument,
-        isDeletingDocument,
-        errorDeletingDocument,
-        upload,
+        uploadOfferDocument,
         isUploading,
-        errorUploading
-    } = useOfferHook();
+        errorUploading,
+    } = useOfferDocumentUpload();
+
+    const { deleteOfferDocument, isDeleting, errorDeleting } = useDeleteOfferDocument();
 
     useEffect(() => {
         if (errorUploading) {
-            toast.error(errorUploading.message)
+            toast.error(errorUploading.message);
         }
-    }, [errorDeletingDocument, errorUploading]);
+
+        if (errorDeleting) {
+            toast.error(errorDeleting.message);
+        }
+    }, [errorDeleting, errorUploading]);
 
     return (
         <div className="flex items-center justify-between py-3 border-b border-(--border) last:border-0">
@@ -66,14 +70,14 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
                     <>
                         <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
-                            onClick={() => upload({ offerId: offerDocument.offerId, documentId: offerDocument.id })} loading={isUploading}
+                            onClick={() => uploadOfferDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })} loading={isUploading}
                             disabled={status === "UPLOADED"}
                         />
 
                         <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
-                            onClick={() => deleteDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
-                            loading={isDeletingDocument || !!errorDeletingDocument}
-                            disabled={isDeletingDocument || !!errorDeletingDocument}
+                            onClick={() => deleteOfferDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
+                            loading={isDeleting || !!errorDeleting}
+                            disabled={isDeleting || !!errorDeleting}
                         />
                     </>
                 )}

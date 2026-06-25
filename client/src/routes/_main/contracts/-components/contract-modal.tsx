@@ -25,7 +25,6 @@ const langFields = z.object({
 });
 
 const contractSchema = z.object({
-  key: z.string().min(1, "Schlüssel erforderlich"),
   DE: langFields,
   EN: langFields,
 });
@@ -44,7 +43,6 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
 
   const contractForm = useForm({
     defaultValues: {
-      key: currentContract?.key ?? "",
       DE: seedLang(currentContract?.translations, "DE"),
       EN: seedLang(currentContract?.translations, "EN"),
     },
@@ -59,10 +57,10 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       if (isEdit) {
         updateContract({
           id: currentContract.id,
-          data: { key: value.key, translations },
+          data: { translations },
         });
       } else {
-        createContract({ key: value.key, translations });
+        createContract({ translations });
       }
       onClose();
     },
@@ -90,17 +88,6 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       </ModalDialog.Header>
       <ModalDialog.Content>
         <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4">
-          <contractForm.Field name="key" children={(field) => (
-            <div className="grid gap-2">
-              <Input id={field.name} value={field.state.value} label="Schlüssel (sprachunabhängig)"
-                disabled={isEdit}
-                error={getFormErrors(field.state.meta.errors)}
-                onChange={(e) => field.handleChange(e.target.value)}
-                onBlur={field.handleBlur}
-              />
-            </div>
-          )} />
-
           <contractForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-2">
               <Input id={field.name} value={field.state.value} label={`Name (${language})`}

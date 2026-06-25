@@ -29,7 +29,6 @@ const langFields = z.object({
 });
 
 const productScheme = z.object({
-  key: z.string().min(1, "Schlüssel erforderlich"),
   DE: langFields,
   EN: langFields,
 });
@@ -57,7 +56,6 @@ export default function ProductModal({
 
   const productForm = useForm({
     defaultValues: {
-      key: currentItem?.key ?? "",
       DE: seedLang(currentItem?.translations, "DE"),
       EN: seedLang(currentItem?.translations, "EN"),
     },
@@ -70,7 +68,7 @@ export default function ProductModal({
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];
-      submitFn({ key: value.key, translations });
+      submitFn({ translations });
       onClose();
     },
   });
@@ -99,40 +97,19 @@ export default function ProductModal({
 
       <ModalDialog.Content>
         <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
-          <productForm.Field
-            name="key"
-            children={(field) => (
-              <div className="grid gap-1">
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  label="Schlüssel (sprachunabhängig)"
-                  disabled={isEdit}
-                  error={getFormError(field.state.meta.errors)}
-                  placeholder="z.B. managed-server"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          />
-
-          <productForm.Field
-            name={`${language}.name`}
-            children={(field) => (
-              <div className="grid gap-1">
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  label={`Produkt Name (${language})`}
-                  error={getFormError(field.state.meta.errors)}
-                  placeholder="Produkt Name"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          />
+          <productForm.Field name={`${language}.name`} children={(field) => (
+            <div className="grid gap-1">
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                label={`Produkt Name (${language})`}
+                error={getFormError(field.state.meta.errors)}
+                placeholder="Produkt Name"
+                onChange={(e) => field.handleChange(e.target.value)}
+              />
+            </div>
+          )} />
 
           <productForm.Field
             name={`${language}.description`}

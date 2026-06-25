@@ -1,6 +1,6 @@
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OfferFlatRate } from "@/types"
+import type { OfferFlatRate } from "@/types";
 import { formatEur } from "@/utils/utils";
 
 type Props = {
@@ -13,7 +13,7 @@ export default function OfferCardFlatRate({ flatrate }: Props) {
     const locale = useLocale();
 
     return (
-        <div className="flex items-center justify-between gap-2 px-4 py-3">
+        <div className="flex items-center justify-between gap-2 py-3 border-b border-(--border) last:border-0">
             <div className="grid">
                 <p className="text-md">
                     {localized(flatRate.translations, locale, "name")}

@@ -12,7 +12,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
         return response.status(400).json({ message: 'Bad request! Missing body!' });
     }
 
-    const { positions = [], flatRates = [] } = data;
+    const { positions = [], flatrates = [] } = data;
     const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
 
     for (const position of positions) {
@@ -26,10 +26,18 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
     }
 
     try {
+        for (const flatrate of flatrates) {
+            const rate = await prisma.flatRate.findUniqueOrThrow({
+                where: { id: flatrate.flatRateId },
+                select: { total_cents: true }
+            });
+            flatrate["total_cents"] = rate.total_cents * flatrate.quantity;
+        }
+
         const offer = await prisma.$transaction(async (tx) => {
             const net_amount =
                 positions.reduce((sum: number, p: OfferPosition) => sum + p.total_cents, 0) +
-                flatRates.reduce((sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
+                flatrates.reduce((sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
 
             const current = await tx.offer.findFirstOrThrow({
                 where: { id: oid },
@@ -61,7 +69,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
             });
 
             await replacePositions(tx, oid, positions);
-            await replaceFlatRates(tx, oid, flatRates);
+            await replaceFlatRates(tx, oid, flatrates);
 
             return offer;
         });

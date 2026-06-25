@@ -12,17 +12,18 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
+import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
-import { Route as MainProductsIndexRouteImport } from './routes/_main/products/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
+import { Route as MainFlatratesIndexRouteImport } from './routes/_main/flatrates/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
 import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
-import { Route as MainProductsPricingRouteImport } from './routes/_main/products/pricing'
-import { Route as MainProductsFlatratesRouteImport } from './routes/_main/products/flatrates'
-import { Route as MainProductsIdIndexRouteImport } from './routes/_main/products/$id/index'
+import { Route as MainWorkloadsTextsRouteImport } from './routes/_main/workloads/texts'
+import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
+import { Route as MainWorkloadsIdIndexRouteImport } from './routes/_main/workloads/$id/index'
 import { Route as MainOffersCreateIndexRouteImport } from './routes/_main/offers/create/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
@@ -39,6 +40,11 @@ const MainIndexRoute = MainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainWorkloadsIndexRoute = MainWorkloadsIndexRouteImport.update({
+  id: '/workloads/',
+  path: '/workloads/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
   id: '/suppliers/',
   path: '/suppliers/',
@@ -49,11 +55,6 @@ const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainProductsIndexRoute = MainProductsIndexRouteImport.update({
-  id: '/products/',
-  path: '/products/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainOrdersIndexRoute = MainOrdersIndexRouteImport.update({
   id: '/orders/',
   path: '/orders/',
@@ -62,6 +63,11 @@ const MainOrdersIndexRoute = MainOrdersIndexRouteImport.update({
 const MainOffersIndexRoute = MainOffersIndexRouteImport.update({
   id: '/offers/',
   path: '/offers/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainFlatratesIndexRoute = MainFlatratesIndexRouteImport.update({
+  id: '/flatrates/',
+  path: '/flatrates/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainEmployeesIndexRoute = MainEmployeesIndexRouteImport.update({
@@ -79,19 +85,20 @@ const MainContractsIndexRoute = MainContractsIndexRouteImport.update({
   path: '/contracts/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainProductsPricingRoute = MainProductsPricingRouteImport.update({
-  id: '/products/pricing',
-  path: '/products/pricing',
+const MainWorkloadsTextsRoute = MainWorkloadsTextsRouteImport.update({
+  id: '/workloads/texts',
+  path: '/workloads/texts',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainProductsFlatratesRoute = MainProductsFlatratesRouteImport.update({
-  id: '/products/flatrates',
-  path: '/products/flatrates',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainProductsIdIndexRoute = MainProductsIdIndexRouteImport.update({
-  id: '/products/$id/',
-  path: '/products/$id/',
+const MainWorkloadsPricingIndexRoute =
+  MainWorkloadsPricingIndexRouteImport.update({
+    id: '/workloads/pricing/',
+    path: '/workloads/pricing/',
+    getParentRoute: () => MainRouteRoute,
+  } as any)
+const MainWorkloadsIdIndexRoute = MainWorkloadsIdIndexRouteImport.update({
+  id: '/workloads/$id/',
+  path: '/workloads/$id/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainOffersCreateIndexRoute = MainOffersCreateIndexRouteImport.update({
@@ -103,103 +110,109 @@ const MainOffersCreateIndexRoute = MainOffersCreateIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/products/flatrates': typeof MainProductsFlatratesRoute
-  '/products/pricing': typeof MainProductsPricingRoute
+  '/workloads/texts': typeof MainWorkloadsTextsRoute
   '/contracts/': typeof MainContractsIndexRoute
   '/customers/': typeof MainCustomersIndexRoute
   '/employees/': typeof MainEmployeesIndexRoute
+  '/flatrates/': typeof MainFlatratesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
   '/orders/': typeof MainOrdersIndexRoute
-  '/products/': typeof MainProductsIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
+  '/workloads/': typeof MainWorkloadsIndexRoute
   '/offers/create/': typeof MainOffersCreateIndexRoute
-  '/products/$id/': typeof MainProductsIdIndexRoute
+  '/workloads/$id/': typeof MainWorkloadsIdIndexRoute
+  '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof MainIndexRoute
   '/login': typeof LoginIndexRoute
-  '/products/flatrates': typeof MainProductsFlatratesRoute
-  '/products/pricing': typeof MainProductsPricingRoute
+  '/workloads/texts': typeof MainWorkloadsTextsRoute
   '/contracts': typeof MainContractsIndexRoute
   '/customers': typeof MainCustomersIndexRoute
   '/employees': typeof MainEmployeesIndexRoute
+  '/flatrates': typeof MainFlatratesIndexRoute
   '/offers': typeof MainOffersIndexRoute
   '/orders': typeof MainOrdersIndexRoute
-  '/products': typeof MainProductsIndexRoute
   '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
+  '/workloads': typeof MainWorkloadsIndexRoute
   '/offers/create': typeof MainOffersCreateIndexRoute
-  '/products/$id': typeof MainProductsIdIndexRoute
+  '/workloads/$id': typeof MainWorkloadsIdIndexRoute
+  '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/_main/products/flatrates': typeof MainProductsFlatratesRoute
-  '/_main/products/pricing': typeof MainProductsPricingRoute
+  '/_main/workloads/texts': typeof MainWorkloadsTextsRoute
   '/_main/contracts/': typeof MainContractsIndexRoute
   '/_main/customers/': typeof MainCustomersIndexRoute
   '/_main/employees/': typeof MainEmployeesIndexRoute
+  '/_main/flatrates/': typeof MainFlatratesIndexRoute
   '/_main/offers/': typeof MainOffersIndexRoute
   '/_main/orders/': typeof MainOrdersIndexRoute
-  '/_main/products/': typeof MainProductsIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
+  '/_main/workloads/': typeof MainWorkloadsIndexRoute
   '/_main/offers/create/': typeof MainOffersCreateIndexRoute
-  '/_main/products/$id/': typeof MainProductsIdIndexRoute
+  '/_main/workloads/$id/': typeof MainWorkloadsIdIndexRoute
+  '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/login/'
-    | '/products/flatrates'
-    | '/products/pricing'
+    | '/workloads/texts'
     | '/contracts/'
     | '/customers/'
     | '/employees/'
+    | '/flatrates/'
     | '/offers/'
     | '/orders/'
-    | '/products/'
     | '/settings/'
     | '/suppliers/'
+    | '/workloads/'
     | '/offers/create/'
-    | '/products/$id/'
+    | '/workloads/$id/'
+    | '/workloads/pricing/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
-    | '/products/flatrates'
-    | '/products/pricing'
+    | '/workloads/texts'
     | '/contracts'
     | '/customers'
     | '/employees'
+    | '/flatrates'
     | '/offers'
     | '/orders'
-    | '/products'
     | '/settings'
     | '/suppliers'
+    | '/workloads'
     | '/offers/create'
-    | '/products/$id'
+    | '/workloads/$id'
+    | '/workloads/pricing'
   id:
     | '__root__'
     | '/_main'
     | '/_main/'
     | '/login/'
-    | '/_main/products/flatrates'
-    | '/_main/products/pricing'
+    | '/_main/workloads/texts'
     | '/_main/contracts/'
     | '/_main/customers/'
     | '/_main/employees/'
+    | '/_main/flatrates/'
     | '/_main/offers/'
     | '/_main/orders/'
-    | '/_main/products/'
     | '/_main/settings/'
     | '/_main/suppliers/'
+    | '/_main/workloads/'
     | '/_main/offers/create/'
-    | '/_main/products/$id/'
+    | '/_main/workloads/$id/'
+    | '/_main/workloads/pricing/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -230,6 +243,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/workloads/': {
+      id: '/_main/workloads/'
+      path: '/workloads'
+      fullPath: '/workloads/'
+      preLoaderRoute: typeof MainWorkloadsIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/suppliers/': {
       id: '/_main/suppliers/'
       path: '/suppliers'
@@ -244,13 +264,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSettingsIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/products/': {
-      id: '/_main/products/'
-      path: '/products'
-      fullPath: '/products/'
-      preLoaderRoute: typeof MainProductsIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/orders/': {
       id: '/_main/orders/'
       path: '/orders'
@@ -263,6 +276,13 @@ declare module '@tanstack/react-router' {
       path: '/offers'
       fullPath: '/offers/'
       preLoaderRoute: typeof MainOffersIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/flatrates/': {
+      id: '/_main/flatrates/'
+      path: '/flatrates'
+      fullPath: '/flatrates/'
+      preLoaderRoute: typeof MainFlatratesIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/employees/': {
@@ -286,25 +306,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainContractsIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/products/pricing': {
-      id: '/_main/products/pricing'
-      path: '/products/pricing'
-      fullPath: '/products/pricing'
-      preLoaderRoute: typeof MainProductsPricingRouteImport
+    '/_main/workloads/texts': {
+      id: '/_main/workloads/texts'
+      path: '/workloads/texts'
+      fullPath: '/workloads/texts'
+      preLoaderRoute: typeof MainWorkloadsTextsRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/products/flatrates': {
-      id: '/_main/products/flatrates'
-      path: '/products/flatrates'
-      fullPath: '/products/flatrates'
-      preLoaderRoute: typeof MainProductsFlatratesRouteImport
+    '/_main/workloads/pricing/': {
+      id: '/_main/workloads/pricing/'
+      path: '/workloads/pricing'
+      fullPath: '/workloads/pricing/'
+      preLoaderRoute: typeof MainWorkloadsPricingIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/products/$id/': {
-      id: '/_main/products/$id/'
-      path: '/products/$id'
-      fullPath: '/products/$id/'
-      preLoaderRoute: typeof MainProductsIdIndexRouteImport
+    '/_main/workloads/$id/': {
+      id: '/_main/workloads/$id/'
+      path: '/workloads/$id'
+      fullPath: '/workloads/$id/'
+      preLoaderRoute: typeof MainWorkloadsIdIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/offers/create/': {
@@ -319,34 +339,36 @@ declare module '@tanstack/react-router' {
 
 interface MainRouteRouteChildren {
   MainIndexRoute: typeof MainIndexRoute
-  MainProductsFlatratesRoute: typeof MainProductsFlatratesRoute
-  MainProductsPricingRoute: typeof MainProductsPricingRoute
+  MainWorkloadsTextsRoute: typeof MainWorkloadsTextsRoute
   MainContractsIndexRoute: typeof MainContractsIndexRoute
   MainCustomersIndexRoute: typeof MainCustomersIndexRoute
   MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
+  MainFlatratesIndexRoute: typeof MainFlatratesIndexRoute
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
-  MainProductsIndexRoute: typeof MainProductsIndexRoute
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
+  MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
   MainOffersCreateIndexRoute: typeof MainOffersCreateIndexRoute
-  MainProductsIdIndexRoute: typeof MainProductsIdIndexRoute
+  MainWorkloadsIdIndexRoute: typeof MainWorkloadsIdIndexRoute
+  MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainIndexRoute: MainIndexRoute,
-  MainProductsFlatratesRoute: MainProductsFlatratesRoute,
-  MainProductsPricingRoute: MainProductsPricingRoute,
+  MainWorkloadsTextsRoute: MainWorkloadsTextsRoute,
   MainContractsIndexRoute: MainContractsIndexRoute,
   MainCustomersIndexRoute: MainCustomersIndexRoute,
   MainEmployeesIndexRoute: MainEmployeesIndexRoute,
+  MainFlatratesIndexRoute: MainFlatratesIndexRoute,
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
-  MainProductsIndexRoute: MainProductsIndexRoute,
   MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
+  MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
   MainOffersCreateIndexRoute: MainOffersCreateIndexRoute,
-  MainProductsIdIndexRoute: MainProductsIdIndexRoute,
+  MainWorkloadsIdIndexRoute: MainWorkloadsIdIndexRoute,
+  MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(

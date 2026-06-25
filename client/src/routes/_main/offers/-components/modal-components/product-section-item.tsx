@@ -80,13 +80,8 @@ export default function ProductSectionItem({
 
                 <div className="flex gap-1">
                     {!editPrice && (
-                        <Button
-                            type="button"
-                            size="xs"
-                            variant="link"
-                            onClick={startEditPrice}
-                        >
-                            {formatEur(displayPrice)}
+                        <Button type="button" size="xs" variant="link" onClick={startEditPrice}>
+                            {formatEur(offerProduct.total_cents)}
                         </Button>
                     )}
 

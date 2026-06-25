@@ -1,9 +1,9 @@
 import { Pen, Trash } from "lucide-react";
-import FlatRateModal from "./flatrate-modal";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
 import { useFlatRateHook, useLocale, useModal } from "@/hooks";
 import { Button } from "@/components";
 import { localized } from "@/lib/i18n-content";
+import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateItem({ item }: { item: FlatRate }) {
   const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRateHook();
@@ -45,7 +45,7 @@ export default function FlatRateItem({ item }: { item: FlatRate }) {
           key={modal.key}
           onClose={modal.close}
           submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatrate: value })}
-          currentItem={{ key: item.key, total_cents: item.total_cents, translations: item.translations }}
+          currentItem={{ total_cents: item.total_cents, translations: item.translations }}
         />
       )}
     </>

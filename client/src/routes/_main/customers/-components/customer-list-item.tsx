@@ -9,7 +9,7 @@ import type { SyntheticEvent } from "react";
 import type { Customer } from "@/types";
 import { formatDate } from "@/lib/format";
 
-import { useCustomerHook, useModal } from "@/hooks";
+import { useDeleteCustomer, useModal } from "@/hooks";
 import { Button, Drawer, Textarea } from "@/components";
 import { api } from "@/lib/api-client.ts";
 
@@ -21,13 +21,13 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
     const editModal = useModal<Customer>();
     const contactModal = useModal();
 
-    const { deleteCustomer, isDeleting, errorDeleting } = useCustomerHook();
+    const { deleteCustomer, isDeletingCustomer, errorDeletingCustomer } = useDeleteCustomer();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
     useEffect(() => {
-        toast.error(errorDeleting?.message)
-    }, [errorDeleting]);
+        toast.error(errorDeletingCustomer?.message)
+    }, [errorDeletingCustomer]);
 
     const customerSettingsForm = useForm({
         defaultValues: {
@@ -76,9 +76,9 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
                         <Button variant="secondary" size="sm" icon={<Settings className="size-3.5" />}
                             iconOnly onClick={() => setDrawerOpen(true)} />
 
-                        <Button variant="secondary" size="sm" loading={isDeleting}
+                        <Button variant="secondary" size="sm" loading={isDeletingCustomer}
                             icon={<Trash className="size-3.5" />} iconOnly
-                            onClick={() => deleteCustomer({ id: customer.id })} />
+                            onClick={() => deleteCustomer({ customerId: customer.id })} />
                     </div>
                 </div>
             </div>

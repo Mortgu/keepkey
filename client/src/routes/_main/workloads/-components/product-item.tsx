@@ -21,7 +21,7 @@ export default function ProductItem({ product }: { product: Product }) {
         <div className="flex items-center justify-between px-4 py-3">
           <div>
             <Link
-              to="/products/$id"
+              to="/workloads/$id"
               params={{ id: product.id }}
               className="text-md text-gray-900"
             >
@@ -87,7 +87,7 @@ export default function ProductItem({ product }: { product: Product }) {
           submitFn={(value) =>
             updateProduct({ id: product.id, product: value })
           }
-          currentItem={{ key: product.key, translations: product.translations }}
+          currentItem={{ translations: product.translations }}
         />
       )}
     </>

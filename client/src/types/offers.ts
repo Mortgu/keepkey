@@ -1,39 +1,49 @@
 import type { components } from "./api";
 
+export interface OfferFilters {
+    search?: string;
+    companyIds?: Array<string>;
+    contactPersonIds?: Array<string>;
+    sort?: string;
+}
+
 export type Offer = components["schemas"]["Offer"];
-// export type OfferTask = Offer["tasks"];
 export type OfferPosition = components["schemas"]["OfferPosition"];
 export type OfferFlatRate = components["schemas"]["OfferFlatRate"];
 export type OfferRevision = components["schemas"]["OfferRevision"];
 export type OfferDocument = components["schemas"]["OfferDocument"];
 
-export type Language = components["schemas"]["Language"];
-
-export type CreateOfferInput = Omit<
-    Offer,
-    | "id"
-    | "createdAt"
-    | "updatedAt"
-    | "supplier"
-    | "customer"
-    | "customerContactPerson"
-    | "user"
-    | "offerFlatRates"
-    | "offerPositions"
-    | "order"
-    | "documents"
-    | "tasks"
-    | "net_amount"
+export type CreateOfferInput = Pick<Offer,
+    "customerId" |
+    "contactPersonId" |
+    "language" |
+    "quoteId" |
+    "paymentTerm" |
+    "validUntil" |
+    "requestFrom" |
+    "userId" |
+    "supplierId"
 >;
-export type UpdateOfferInput = Partial<Offer>;
 
-export type CreateOfferPositionInput = Omit<
-    OfferPosition,
-    "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract"
+export type UpdateOfferInput = Partial<CreateOfferInput>;
+
+export type CreateOfferPositionInput = Pick<OfferPosition,
+    "contractId" |
+    "duration_months" |
+    "productId" |
+    "quantity" |
+    "optional"
 >;
+
 export type UpdateOfferPositionInput = Partial<CreateOfferPositionInput>;
 
-export type CreateOfferFlatRatesInput = Omit<OfferFlatRate,
-    "id" | "offer">;
+export type GetOfferFlatrate = Omit<OfferFlatRate, "id" | "offer">;
 
-export type UpdateOfferFlatRatesInput = Partial<CreateOfferFlatRatesInput>;
+export type CreateOfferFlatrateInput = Pick<OfferFlatRate,
+    "flatRateId" |
+    "quantity"
+>;
+
+export type UpdateOfferFlatrateInput = Partial<CreateOfferFlatrateInput>;
+
+export type UpdateOfferDocumentInput = Partial<Pick<OfferDocument, "displayName" | "isCurrent" | "version">>;

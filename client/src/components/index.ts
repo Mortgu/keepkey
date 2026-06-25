@@ -13,3 +13,4 @@ export * from './integration-status-card';
 export * from './stat-card/stat-card';
 export * from './drawer';
 export * from './definitions.ts';
+export * from './layout';

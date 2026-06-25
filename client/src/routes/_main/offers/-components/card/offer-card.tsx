@@ -1,16 +1,16 @@
+import { Pen, Trash, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { Pen, Trash, UndoDot } from "lucide-react";
 
-import type { Offer, OfferDocument } from "@/types";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
-import { useOfferHook } from "@/hooks";
 import { Button, Collapsable } from "@/components";
-import OfferCardProduct from "./offer-card-product";
-import OfferCardFlatRate from "./offer-card-flatrate";
-import OfferCardDocument from "./offer-card-document";
+import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import { formatDate } from "@/lib/format";
+import type { Offer, OfferDocument } from "@/types";
+import { formatEur } from "@/utils/utils";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
+import OfferCardDocument from "./offer-card-document";
+import OfferCardFlatRate from "./offer-card-flatrate";
+import OfferCardProduct from "./offer-card-product";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -28,11 +28,12 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
     const {
         deleteOffer,
-        errorDeletingOffer,
+        isDeletingOffer,
+        errorDeletingOffer
+    } = useDeleteOffer();
 
-        generateDocument,
-        isGeneratingDocument,
-    } = useOfferHook();
+
+    const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
@@ -130,9 +131,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         className="min-w-fit"
                         variant="primary"
                         size="xs"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({ offerId: offer.id })}
+                        loading={isGenerating}
+                        disabled={isGenerating}
+                        onClick={() => generateOfferDocument({ offerId: offer.id })}
                     >
                         Dokument generieren
                     </Button>
@@ -160,6 +161,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         size="xs"
                         variant="secondary"
                         onClick={handleDeleteOffer}
+                        loading={isDeletingOffer}
                         icon={<Trash className="size-3" />}
                         iconOnly
                     />

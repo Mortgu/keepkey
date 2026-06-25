@@ -1,6 +1,5 @@
 model Product {
-  id  String @id @default(uuid())
-  key String @unique // sprachunabhängiger Identifier (ersetzt das bisherige @unique auf name)
+  id String @id @default(uuid())
 
   translations ProductTranslation[]
 

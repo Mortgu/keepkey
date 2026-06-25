@@ -7,7 +7,6 @@ const flatRateTranslationSchema = z.object({
 });
 
 export const flatRateSchema = z.object({
-  key: z.string().min(1),
   total_cents: z.number().int().nonnegative(),
   translations: z.array(flatRateTranslationSchema).min(1),
 });

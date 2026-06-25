@@ -1,15 +1,15 @@
+import { Button } from "@/components";
+import { useFlatRateHook, useLocale } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
+import { formatEur } from "@/utils/utils";
 import { Plus, Trash, X } from "lucide-react";
 import { useState } from "react";
 import OfferFlatRateForm from "./offer-flat-rate-form";
-import type { CreateOfferFlatRatesInput } from "@/types";
-import { useFlatRateHook, useLocale } from "@/hooks";
-import { Button } from "@/components";
-import { formatEur } from "@/utils/utils";
-import { localized } from "@/lib/i18n-content";
+import type { CreateOfferFlatrateInput, OfferFlatRate } from "@/types";
 
 type Props = {
-    offerFlatRates: Array<CreateOfferFlatRatesInput>;
-    onAdd: (data: CreateOfferFlatRatesInput) => void;
+    offerFlatRates: Array<OfferFlatRate>;
+    onAdd: (data: CreateOfferFlatrateInput) => void;
     onRemove: (index: number) => void;
 };
 

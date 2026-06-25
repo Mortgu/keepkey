@@ -1,8 +1,8 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import type {SyntheticEvent} from "react";
+import type { SyntheticEvent } from "react";
 
-import type { ContactPerson, CreateContactPersonInput } from "@/types";
+import type { ContactPerson, CreateCustomerContactInput, } from "@/types";
 import { Button, Input } from "@/components";
 import { getFormError } from "@/lib/utils";
 
@@ -14,7 +14,7 @@ const contactPersonSchema = z.object({
 });
 
 interface Props {
-  saveFn: (data: CreateContactPersonInput) => void;
+  saveFn: (data: CreateCustomerContactInput) => void;
   cancelFn: () => void;
 
   currentCustomerId: string;

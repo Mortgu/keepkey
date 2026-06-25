@@ -11,11 +11,10 @@ export const createContract = async (request: Request, response: Response) => {
         });
     }
 
-    const {key, translations} = body;
+    const {translations} = body;
 
     const createdContract = await prisma.contract.create({
         data: {
-            key,
             translations: {create: translations},
         },
         include: {translations: true},

@@ -12,12 +12,11 @@ export const updateContract = async (request: Request, response: Response) => {
             .json({message: "Bad request", success: false});
     }
 
-    const {key, translations} = body;
+    const {translations} = body;
 
     const updatedContract = await prisma.contract.update({
         where: {id},
         data: {
-            ...(key !== undefined ? {key} : {}),
             ...(Array.isArray(translations)
                 ? {
                       translations: {

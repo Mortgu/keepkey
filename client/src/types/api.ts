@@ -9,7 +9,6 @@ export interface components {
     schemas: {
         Contract: {
             id: string;
-            key: string;
             translations: components["schemas"]["ContractTranslation"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
@@ -267,7 +266,6 @@ export interface components {
         };
         Product: {
             id: string;
-            key: string;
             translations: components["schemas"]["ProductTranslation"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             offerPositions: components["schemas"]["OfferPosition"][];
@@ -371,7 +369,6 @@ export interface components {
         };
         FlatRate: {
             id: string;
-            key: string;
             /** Format: int32 */
             total_cents: number;
             translations: components["schemas"]["FlatRateTranslation"][];

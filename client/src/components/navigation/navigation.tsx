@@ -1,5 +1,5 @@
-import type {ReactNode} from "react";
-import {useState} from "react";
+import type { ReactNode } from "react";
+import { useState } from "react";
 import {
     ChevronDown,
     DollarSign,
@@ -14,11 +14,11 @@ import {
     UserCircle2,
     Users,
 } from "lucide-react";
-import {useTranslation} from "react-i18next";
-import {tv} from "tailwind-variants";
-import {NavLink} from "./nav-link.js";
-import {Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle,} from "@/components";
-import {useAuth} from "@/context/auth";
+import { useTranslation } from "react-i18next";
+import { tv } from "tailwind-variants";
+import { NavGroup, NavLink } from "./nav-link.js";
+import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
+import { useAuth } from "@/context/auth";
 
 const ICON_SIZE = 14;
 
@@ -28,7 +28,7 @@ type SectionProps = {
     children: ReactNode;
 };
 
-function Section({title, collapsible = false, children}: SectionProps) {
+function Section({ title, collapsible = false, children }: SectionProps) {
     const [collapsed, setCollapsed] = useState(false);
 
     const sectionStyle = tv({
@@ -45,16 +45,15 @@ function Section({title, collapsible = false, children}: SectionProps) {
                 type="button"
                 onClick={() => collapsible && setCollapsed((v) => !v)}
                 className={sectionStyle()}
-                style={{cursor: collapsible ? "pointer" : "default"}}
+                style={{ cursor: collapsible ? "pointer" : "default" }}
             >
                 <span>{title}</span>
                 {collapsible && (
                     <ChevronDown
                         size={11}
                         strokeWidth={2.4}
-                        className={`transition-transform duration-150 ${
-                            collapsed ? "-rotate-90" : ""
-                        }`}
+                        className={`transition-transform duration-150 ${collapsed ? "-rotate-90" : ""
+                            }`}
                     />
                 )}
             </button>
@@ -64,8 +63,8 @@ function Section({title, collapsible = false, children}: SectionProps) {
 }
 
 function UserFooter() {
-    const {i18n} = useTranslation();
-    const {user, logout} = useAuth();
+    const { i18n } = useTranslation();
+    const { user, logout } = useAuth();
 
     const displayName = user ? `${user.firstName} ${user.lastName}` : null;
 
@@ -73,7 +72,7 @@ function UserFooter() {
         <div>
             {/* Language toggle */}
             <div className="flex items-center justify-between mx-3.5 py-3.5 border-t border-(--fg-2)">
-                <Languages className="size-5 text-(--text-inv)"/>
+                <Languages className="size-5 text-(--text-inv)" />
                 <SegmentedLanguageToggle
                     className="bg-(--fg-2) text-white border-none"
                     options={DEFAULT_LANGUAGE_OPTIONS}
@@ -85,14 +84,14 @@ function UserFooter() {
             {user && (
                 <div className="flex items-center gap-2.5 border-t border-(--fg-2) mx-3.5 py-3.5">
                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary-100)">
-                        <UserCircle2 className="size-4"/>
+                        <UserCircle2 className="size-4" />
                     </div>
                     <div className="min-w-0 flex-1 text-white">
                         <p className="text-[13px] font-semibold">{displayName}</p>
                         <p className="text-[11px] text-(--fg-3)">{user.email}</p>
                     </div>
                     <Button variant='ghost' size='sm' onClick={logout}
-                            icon={<LogOut className="size-4 "/>} iconOnly/>
+                        icon={<LogOut className="size-4 " />} iconOnly />
                 </div>
             )}
         </div>
@@ -100,7 +99,7 @@ function UserFooter() {
 }
 
 export function Navigation() {
-    const {t} = useTranslation();
+    const { t } = useTranslation();
 
     return (
         <aside className="flex h-screen w-74 flex-col overflow-hidden">
@@ -114,68 +113,61 @@ export function Navigation() {
                 <Section title={t("nav.overview")}>
                     <NavLink
                         to="/"
-                        icon={<LayoutGrid size={ICON_SIZE}/>}
+                        icon={<LayoutGrid size={ICON_SIZE} />}
                         label="Dashboard"
                     />
                 </Section>
 
                 <Section title={t("nav.catalog")} collapsible>
-                    <NavLink
-                        to="/products"
-                        label={t("section.products")}
-                        icon={<Package size={ICON_SIZE}/>}
-                    />
-                    <NavLink
-                        to="/products/flatrates"
-                        label={t("section.flatRates")}
-                        icon={<DollarSign size={ICON_SIZE}/>}
-                    />
 
-                    <NavLink
-                        to="/suppliers"
-                        label={t("section.suppliers")}
-                        icon={<Truck size={ICON_SIZE}/>}
-                    />
-                    <NavLink
-                        to="/contracts"
-                        label={t("section.contracts")}
-                        icon={<Users size={ICON_SIZE}/>}
-                    />
+                    <NavGroup label={t("section.workloads")} icon={<Package size={ICON_SIZE} />} defaultOpen>
+                        <NavLink to="/workloads" label={t("section.workload_text")} indent />
+                        <NavLink to="/workloads/pricing" label={t("section.workload_pricing")} indent />
+                    </NavGroup>
+
+                    <NavLink to="/flatrates" label={t("section.flatRates")} icon={<DollarSign size={ICON_SIZE} />} />
+
+                    <NavLink to="/contracts" label={t("section.contracts")} icon={<Users size={ICON_SIZE} />} />
                 </Section>
 
                 <Section title={t("nav.sales")} collapsible>
                     <NavLink
                         to="/customers"
                         label={t("section.customers")}
-                        icon={<Users size={ICON_SIZE}/>}
+                        icon={<Users size={ICON_SIZE} />}
                     />
                     <NavLink
                         to="/offers"
                         label={t("section.offers")}
-                        icon={<FileText size={ICON_SIZE}/>}
+                        icon={<FileText size={ICON_SIZE} />}
                     />
                     <NavLink
                         to="/orders"
                         label={t("section.orders")}
-                        icon={<ShoppingCart size={ICON_SIZE}/>}
+                        icon={<ShoppingCart size={ICON_SIZE} />}
                     />
                 </Section>
 
                 <Section title={t("nav.management")} collapsible>
                     <NavLink
+                        to="/suppliers"
+                        label={t("section.suppliers")}
+                        icon={<Truck size={ICON_SIZE} />}
+                    />
+                    <NavLink
                         to="/employees"
                         label={t("section.employees")}
-                        icon={<UserCircle2 size={ICON_SIZE}/>}
+                        icon={<UserCircle2 size={ICON_SIZE} />}
                     />
                     <NavLink
                         to="/settings"
                         label={t("nav.settings")}
-                        icon={<Settings size={ICON_SIZE}/>}
+                        icon={<Settings size={ICON_SIZE} />}
                     />
                 </Section>
             </nav>
 
-            <UserFooter/>
+            <UserFooter />
         </aside>
     );
 }

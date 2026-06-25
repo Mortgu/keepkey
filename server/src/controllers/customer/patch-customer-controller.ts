@@ -1,16 +1,16 @@
-import {Request, Response} from "express";
-import {prisma} from "../../lib/prismaClient.js";
+import { Request, Response } from "express";
+import { prisma } from "../../lib/prismaClient.js";
 
-export const updateCustomerById = async (request: Request, response: Response) => {
-    const {body, params} = request;
-    const {id} = params;
+export const updateCustomer = async (request: Request, response: Response) => {
+    const { body, params } = request;
+    const { id } = params;
 
     try {
-        const {contactPersons, ...customerFields} = body;
+        const { contactPersons, ...customerFields } = body;
 
         await prisma.customer.update({
-            where: {id: id as string},
-            data: {...customerFields},
+            where: { id: id as string },
+            data: { ...customerFields },
         });
 
         if (contactPersons !== undefined) {
@@ -46,13 +46,14 @@ export const updateCustomerById = async (request: Request, response: Response) =
 };
 
 
-export const updateContact = async (request: Request, response: Response) => {
-    const {cid} = request.params;
+export const updateCustomerContact = async (request: Request, response: Response) => {
+    const id = request.params.id as string;
+    const contactId = request.params.contactId as string;
+
     const body = request.body;
 
-
     const contact = await prisma.contactPerson.update({
-        where: {id: cid as string},
+        where: { id: contactId },
         data: {
             ...body
         }

@@ -1,15 +1,18 @@
-import { useTranslation } from "react-i18next";
-import { RecentActivityRow } from "./recent-activity-row";
 import { Badge } from "@/components";
-import { useOfferHook } from "@/hooks";
+import { useOffers } from "@/hooks/offers/offer-hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import { useTranslation } from "react-i18next";
+import { RecentActivityRow } from "./recent-activity-row";
 
 const LIMIT = 3;
 
 export function RecentOffersWidget() {
     const { t } = useTranslation();
-    const { offers, isPending } = useOfferHook({ sort: "createdAt:desc" });
+
+    const { offers, isPending } = useOffers({
+        sort: "createdAt:desc"
+    });
 
     const recent = offers.slice(0, LIMIT);
 

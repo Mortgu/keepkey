@@ -1,6 +1,6 @@
 import {createFileRoute} from "@tanstack/react-router";
 import {ProductDetailContainer} from "./-page";
 
-export const Route = createFileRoute("/_main/products/$id/")({
+export const Route = createFileRoute("/_main/workloads/$id/")({
     component: ProductDetailContainer,
 });

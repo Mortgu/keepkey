@@ -107,7 +107,7 @@ model TariffCellCustomer {
 model TariffHistory {
   id String @id @default(cuid())
 
-  productId String
+  productId  String
   contractId String
 
   version  Int

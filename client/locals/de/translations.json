@@ -15,7 +15,9 @@
     "settings": "Einstellungen"
   },
   "section": {
-    "products": "Textbausteine",
+    "workloads": "Workloads",
+    "workload_pricing": "Preistabelle",
+    "workload_text": "Textbausteine",
     "pricing": "Preise",
     "flatRates": "Pauschalen",
     "suppliers": "Lieferanten",

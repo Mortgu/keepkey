@@ -1,16 +1,15 @@
-import { OfferFlatRate, OfferPosition } from "@prisma/client";
 import { NextFunction, Request, Response } from 'express';
 import env from '../../lib/env.js';
-import { prisma } from "../../lib/prismaClient.js";
-import calculatePrice from "../../utils/products.js";
-import { toDate } from '../../utils/utils.js';
+import { OfferFlatRate, OfferPosition, prisma } from "../../lib/prismaClient.js";
 
 import fs from 'fs';
 import path from 'path';
 import { enqueueTask, uploadDocument, type UploadResult } from '../../lib/document.js';
+import logger from '../../middlewares/logger.js';
 import { generateOfferDisplayName } from '../../utils/documents.js';
 import { pickTranslation } from '../../utils/i18n.js';
-import logger from '../../middlewares/logger.js';
+import calculatePrice from '../../utils/products.js';
+import { toDate } from '../../utils/utils.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
@@ -90,39 +89,38 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
 };
 
 export const createOffer = async (request: Request, response: Response, next: NextFunction) => {
-    const { body } = request;
-
-    if (!body) {
-        return response.status(400).json({ message: "Bad request" });
-    }
-
-    const { offer, positions, flatRates } = body;
-
-    if (!offer || !positions) {
-        return response.status(400).json({ message: "Bad request." });
-    }
-
-    for (const position of positions) {
-        position["total_cents"] = await calculatePrice({
-            productId: position.productId,
-            contractId: position.contractId,
-            duration: position.duration_months,
-            quantity: position.quantity,
-            customerId: offer.customerId,
-        });
-    }
+    const { positions, flatrates } = request.body;
 
     try {
+        for (const position of positions) {
+            position["total_cents"] = await calculatePrice({
+                productId: position.productId,
+                contractId: position.contractId,
+                duration: position.duration_months,
+                quantity: position.quantity,
+                customerId: request.body.offer.customerId,
+            });
+        }
+
+        for (const flatrate of flatrates) {
+            const rate = await prisma.flatRate.findUniqueOrThrow({
+                where: { id: flatrate.flatRateId },
+                select: { total_cents: true }
+            });
+            flatrate["total_cents"] = rate.total_cents * flatrate.quantity;
+        }
+
         request.body.offer = await prisma.$transaction(async (tx) => {
             let net_amount_positions = positions.reduce(
                 (sum: number, p: OfferPosition) => sum + p.total_cents, 0);
 
-            let net_amount_flatrates = flatRates.reduce(
+            let net_amount_flatrates = flatrates.reduce(
                 (sum: number, p: OfferFlatRate) => sum + p.total_cents, 0);
 
             let net_amount = net_amount_positions + net_amount_flatrates;
 
-            const { supplierId, validUntil, requestFrom, date, ...offerFields } = body.offer;
+            const { supplierId, validUntil, requestFrom, date, ...offerFields } = request.body.offer;
+
             const offer = await tx.offer.create({
                 data: {
                     ...offerFields,
@@ -141,13 +139,13 @@ export const createOffer = async (request: Request, response: Response, next: Ne
                 });
             }
 
-            for (const flatRate of flatRates) {
+            for (const flatrate of flatrates) {
                 await tx.offerFlatRate.create({
                     data: {
                         offerId: offer.id,
-                        flatRateId: flatRate.id,
-                        quantity: flatRate.quantity,
-                        total_cents: flatRate.total_cents
+                        flatRateId: flatrate.flatRateId,
+                        quantity: flatrate.quantity,
+                        total_cents: flatrate.total_cents
                     },
                 });
             }
@@ -155,7 +153,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             return offer;
         });
 
-        return response.status(200).json(offer);
+        return response.status(200).json(request.body.offer);
     } catch (exception: any) {
         return response.status(408).json({
             message: "Something went wrong trying to create offer: " + exception.message,
@@ -163,6 +161,106 @@ export const createOffer = async (request: Request, response: Response, next: Ne
         });
     }
 };
+
+export const createOfferPositions = async (request: Request, response: Response, next: NextFunction) => {
+    const id = request.params.id as string;
+    const body = request.body;
+
+    if (!(body instanceof Array)) {
+        return response.status(400).json({
+            message: ""
+        })
+    }
+
+    try {
+        const offerPositions = [];
+
+        for (const element of body) {
+            const total_cents = await calculatePrice({
+                productId: element.productId,
+                contractId: element.contractId,
+                duration: element.duration_months,
+                quantity: element.quantity,
+            });
+
+            const offerPosition = await prisma.offerPosition.create({
+                data: {
+                    offerId: id,
+                    ...element,
+                    total_cents
+                }
+            });
+
+            offerPositions.push(offerPosition);
+        }
+
+        const offer = await prisma.offer.findUniqueOrThrow({
+            where: { id },
+            select: { net_amount: true }
+        });
+
+        await prisma.offer.update({
+            where: { id },
+            data: {
+                net_amount: offerPositions.reduce((acc, position) => acc + position.total_cents, offer.net_amount ?? 0),
+            }
+        })
+
+        return response.status(200).json(offerPositions);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export const createOfferFlatrates = async (request: Request, response: Response, next: NextFunction) => {
+    const id = request.params.id as string;
+    const body = request.body;
+
+    if (!(body instanceof Array)) {
+        return response.status(400).json({
+            message: "dwadwa"
+        })
+    }
+
+    try {
+        const flatrates = [];
+
+        for (const element of body) {
+            const rate = await prisma.flatRate.findUniqueOrThrow({
+                where: { id: element.flatRateId },
+                select: { total_cents: true }
+            });
+
+            const created = await prisma.offerFlatRate.create({
+                data: {
+                    offerId: id,
+                    ...element,
+                    total_cents: rate.total_cents,
+                }
+            });
+
+            flatrates.push(created);
+        }
+
+        const offer = await prisma.offer.findUniqueOrThrow({
+            where: { id },
+            select: { net_amount: true }
+        });
+
+        await prisma.offer.update({
+            where: { id },
+            data: {
+                net_amount: flatrates.reduce((acc, flatrate) => acc + flatrate.total_cents, offer.net_amount ?? 0),
+            }
+        })
+
+        return response.status(200).json(flatrates);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
 
 export const uploadOfferDocument = async (request: Request, response: Response) => {
     const { id, documentId } = request.params;

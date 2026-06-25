@@ -1,27 +1,11 @@
-import type { ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
 import { api } from "@/lib/api-client";
+import type { ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
 
 
-interface GetOffersParams {
-    search?: string;
-    companyIds?: Array<string>;
-    contactPersonIds?: Array<string>;
-    sort?: string;
-}
 
 export const getContactPersonsAction = () =>
     api<Array<ContactPerson>>("/api/contact-persons", { method: "GET" });
 
-export const getOffersAction = (params?: GetOffersParams) => {
-    const urlParams = new URLSearchParams();
-    if (params?.search) urlParams.set("search", params.search);
-    if (params?.companyIds) params.companyIds.forEach(id => urlParams.append("companyIds", id));
-    if (params?.contactPersonIds) params.contactPersonIds.forEach(id => urlParams.append("contactPersonIds", id));
-    if (params?.sort) urlParams.set("sort", params.sort);
-    const query = urlParams.toString();
-    const url = query ? `/api/offers?${query}` : "/api/offers";
-    return api<Array<Offer>>(url, { method: "GET" });
-};
 
 export const createOfferAction = (offer: CreateOfferInput, positions: Array<CreateOfferPositionInput>, flatRates: Array<CreateOfferFlatRatesInput>) =>
     api<Offer>("/api/offers", {
