@@ -1,8 +1,22 @@
 import { Router } from "express";
-import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, getCustomer, getCustomerContacts, getCustomers, updateCustomer, updateCustomerContact } from "../controllers/index.js";
+import {
+    createCustomer,
+    createCustomerContact,
+    deleteCustomer,
+    deleteCustomerContact,
+    getCustomer,
+    getCustomerContacts,
+    getCustomers,
+    updateCustomer,
+    updateCustomerContact
+} from "../controllers/index.js";
 import { validate } from "../middlewares/validate.js";
-import { createCustomerContactSchema, createCustomerSchema, updateCustomerContactSchema, updateCustomerSchema } from "../schemas/customer-schemas.js";
-import { router } from "better-auth/api";
+import {
+    createCustomerContactSchema,
+    createCustomerSchema,
+    updateCustomerContactSchema,
+    updateCustomerSchema
+} from "../schemas/customer-schemas.js";
 
 const router = Router();
 
