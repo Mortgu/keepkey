@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../../lib/prismaClient.js";
-import calculatePrice, { snapshotTariff } from "../../utils/products.js";
+import { calculatePrice, snapshotTariff, type PriceFailureReason } from "../../utils/products.js";
 import logger from "../../middlewares/logger.js";
 
 const TARIFF_INCLUDE = {
@@ -109,32 +109,83 @@ export async function deleteTariff(request: Request, response: Response, next: N
     }
 }
 
-export const getTariffPrice = async (request: Request, response: Response) => {
+export const getTariffPrice = async (
+    request: Request,
+    response: Response,
+    next: NextFunction,
+) => {
     const { productId, contractId, duration, quantity, customerId } = request.query;
 
-    if (!productId || !contractId || !duration || !quantity) {
+    if (!productId || !contractId || duration === undefined || quantity === undefined) {
         return response.status(400).json({
+            success: false,
             message: "productId, contractId, duration und quantity sind erforderlich.",
         });
     }
 
-    const durationNum = parseInt(duration as string);
-    const quantityNum = parseInt(quantity as string);
-    if (!Number.isFinite(durationNum) || !Number.isFinite(quantityNum)) {
+    const durationNum = Number(duration);
+    const quantityNum = Number(quantity);
+
+    if (!Number.isInteger(durationNum) || !Number.isInteger(quantityNum)
+        || durationNum <= 0 || quantityNum <= 0) {
         return response.status(400).json({
-            message: "duration und quantity müssen Ganzzahlen sein.",
+            success: false,
+            message: "duration und quantity müssen positive Ganzzahlen sein.",
         });
     }
 
-    const price = await calculatePrice({
-        productId: productId as string,
-        contractId: contractId as string,
-        duration: durationNum,
-        quantity: quantityNum,
-        customerId: customerId as string | undefined,
-    });
+    try {
+        const result = await calculatePrice({
+            productId: productId as string,
+            contractId: contractId as string,
+            duration: durationNum,
+            quantity: quantityNum,
+            customerId: customerId as string | undefined,
+        });
 
-    return response.status(200).json(price);
+        if (!result.ok) {
+            const statusByReason: Record<PriceFailureReason, number> = {
+                NO_TARIFF: 404,
+                NO_CELL: 404,
+                NO_DEFAULT: 404,
+                NO_COLUMN: 422,
+                NO_ROW: 422,
+                INVALID_INPUT: 400,
+            };
+            const status = statusByReason[result.reason];
+
+            if (status === 400) {
+                return response.status(400).json({
+                    success: false,
+                    reason: result.reason,
+                    message: "duration und quantity müssen positive Ganzzahlen sein.",
+                });
+            }
+
+            const messageByReason: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, string> = {
+                NO_TARIFF: "Tariff für das Produkt/den Vertrag wurde nicht gefunden.",
+                NO_CELL: "Keine Zelle für die gewählte Zeile/Spalte konfiguriert.",
+                NO_DEFAULT: "Kein Default-Preis für die Zelle hinterlegt.",
+                NO_COLUMN: "Laufzeit ist in keiner Tariff-Spalte konfiguriert.",
+                NO_ROW: "Menge liegt außerhalb aller konfigurierten Mengenbereiche.",
+            };
+
+            return response.status(status).json({
+                success: false,
+                reason: result.reason,
+                message: messageByReason[result.reason as Exclude<PriceFailureReason, 'INVALID_INPUT'>],
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            price: result.price,
+            breakdown: result.breakdown,
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
 };
 
 

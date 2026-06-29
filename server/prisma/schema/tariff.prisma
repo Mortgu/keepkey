@@ -102,7 +102,7 @@ model TariffCellDefault {
   id String @id @default(cuid())
 
   cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
-  cellId String
+  cellId String @unique
 
   price Int
 
@@ -126,6 +126,7 @@ model TariffCellCustomer {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([cellId, customerId])
   @@map("tariff_cell_customer")
 }
 

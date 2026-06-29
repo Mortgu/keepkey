@@ -8,7 +8,7 @@ import { enqueueTask, uploadDocument, type UploadResult } from '../../lib/docume
 import logger from '../../middlewares/logger.js';
 import { generateOfferDisplayName } from '../../utils/documents.js';
 import { pickTranslation } from '../../utils/i18n.js';
-import calculatePrice from '../../utils/products.js';
+import { calculatePriceOrThrow } from '../../utils/products.js';
 import { toDate } from '../../utils/utils.js';
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
@@ -93,14 +93,18 @@ export const createOffer = async (request: Request, response: Response, next: Ne
 
     try {
         for (const position of positions) {
-            position["total_cents"] = await calculatePrice({
+            position["total_cents"] = await calculatePriceOrThrow({
                 productId: position.productId,
                 contractId: position.contractId,
                 duration: position.duration_months,
                 quantity: position.quantity,
                 customerId: request.body.offer.customerId,
             });
+
+            console.log(position)
         }
+
+        console.dir(positions, { depth: 999 });
 
         for (const flatrate of flatrates) {
             const rate = await prisma.flatRate.findUniqueOrThrow({
@@ -176,7 +180,7 @@ export const createOfferPositions = async (request: Request, response: Response,
         const offerPositions = [];
 
         for (const element of body) {
-            const total_cents = await calculatePrice({
+            const total_cents = await calculatePriceOrThrow({
                 productId: element.productId,
                 contractId: element.contractId,
                 duration: element.duration_months,

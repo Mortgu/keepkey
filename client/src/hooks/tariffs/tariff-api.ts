@@ -141,5 +141,5 @@ export const getTariffPrice = (
         quantity: String(quantity),
         ...(customerId ? { customerId } : {}),
     });
-    return api<number>(`/api/tariffs/price?${params}`, { method: "GET" });
+    return api<any>(`/api/tariffs/price?${params}`, { method: "GET" });
 };

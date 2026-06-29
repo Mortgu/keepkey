@@ -120,14 +120,14 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
     });
 
     const resolvePrice = async (data: OfferProductInput): Promise<OfferProductInput> => {
-        const total_cents = await fetchPrice({
+        const fetched = await fetchPrice({
             productId: data.productId,
             contractId: data.contractId,
             quantity: data.quantity,
             duration: data.duration_months,
         });
 
-        return { ...data, total_cents: typeof total_cents === "number" ? total_cents : 0 };
+        return { ...data, total_cents: fetched.price };
     };
 
     const addProduct = async (data: OfferProductInput) => {
