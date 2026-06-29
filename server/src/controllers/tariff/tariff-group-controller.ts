@@ -69,16 +69,35 @@ export async function createTariffGroup(request: Request, response: Response, ne
     const { products } = request.body as { products: string[] };
 
     try {
-        const group = await prisma.tariffGroup.create({
-            data: {
-                products: {
-                    create: products.map(productId => ({ productId })),
+        const contracts = await prisma.contract.findMany({ select: { id: true } });
+
+        const group = await prisma.$transaction(async (tx) => {
+            const created = await tx.tariffGroup.create({
+                data: {
+                    products: {
+                        create: products.map(productId => ({ productId })),
+                    },
                 },
-            },
+            });
+
+            if (contracts.length > 0) {
+                await tx.tariff.createMany({
+                    data: contracts.map(c => ({
+                        tariffGroupId: created.id,
+                        contractId: c.id,
+                    })),
+                });
+            }
+
+            return created;
+        });
+
+        const result = await prisma.tariffGroup.findUniqueOrThrow({
+            where: { id: group.id },
             include: TARIFF_GROUP_INCLUDE,
         });
 
-        return response.status(201).json(group);
+        return response.status(201).json(result);
     } catch (exception: any) {
         logger.error(exception);
         next(exception);
