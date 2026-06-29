@@ -41,15 +41,12 @@ function CellInput({ groupId, tariffId, cell }: { groupId: string; tariffId: str
 
     return (
         <div onClick={() => setEdit(true)}
-            className="h-15 border border-(--border) rounded-sm flex items-center justify-end p-2 hover:bg-(--page-bg)">
+            className="flex items-center justify-end px-2 py-1 hover:bg-(--page-bg)">
             {edit && (
                 <Input autoFocus size="xs" onBlur={handleBlur} value={price} onChange={handleChange} />
             )}
             {!edit && (
-                <div>
-                    <p className="text-md font-semibold">{formatEur(price || 0)}</p>
-                    <p className="text-(--fg-3) text-sm font-light">/Nutzer</p>
-                </div>
+                <p className="text-md font-semibold">{formatEur(price || 0)}</p>
             )}
         </div>
     );
@@ -77,7 +74,7 @@ function ColumnHeader({ groupId, tariffId, columnId, duration }: {
     };
 
     return (
-        <div className="flex items-center justify-between relative text-center rounded-md px-3">
+        <div className="flex items-center justify-between relative text-center rounded-md">
             <div onClick={() => setEdit(true)}>{value} Monate</div>
             {edit && (
                 <div className="absolute top-0 left-0 w-full">
@@ -126,8 +123,8 @@ function RowLabel({ groupId, tariffId, rowId, minQty, maxQty }: {
     };
 
     return (
-        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center gap-2">
-            <div className="flex-1 flex gap-1 items-center">
+        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center">
+            <div className="flex-1 flex items-center">
                 {!editMin ? <p onClick={() => setEditMin(true)}>{min}</p> : (
                     <Input autoFocus size="xs" onBlur={handleMinBlur} value={min} onChange={handleMinChange} />
                 )}
@@ -152,36 +149,43 @@ export default function TariffComponent(props: Props) {
     const cellMap = useMemo(() => buildCellMap(tariff.cells), [tariff.cells]);
 
     return (
-        <div className="grid ">
-            <div className="grid gap-2">
+        <div className="border-b border-(--border)">
+            <div className="flex items-center">
                 <table className="w-full">
-                    <thead>
-                        <tr>
-                            <th className="text-left p-2" />
+                    <thead className="h-fit">
+                        <tr className="border-b border-(--border) bg-(--subtle-50)">
+
+                            <th className="border-r border-(--border)" />
+
                             {tariff.columns.map(column => (
-                                <th key={column.id} className="p-2">
+                                <th key={column.id} className="border-r border-(--border) px-3 py-1">
                                     <ColumnHeader groupId={groupId} tariffId={tariff.id} columnId={column.id}
                                         duration={column.duration} />
                                 </th>
                             ))}
-                            <th className="p-1">
-                                <Button className="border-dashed" variant="secondary" size="xs"
+
+                            <th>
+                                <Button variant="ghost" size="xs"
                                     onClick={() => createColumn({ groupId, tariffId: tariff.id, duration: 1 })}
-                                    icon={<Plus className="size-4" />} />
+                                    icon={<Plus className="size-4" />} iconOnly />
                             </th>
+
                         </tr>
+
                     </thead>
+
+
                     <tbody>
                         {tariff.rows.map(row => (
                             <tr key={row.id}>
-                                <td className="p-2">
+                                <td className="px-4 py-1 border-b border-r border-(--border)">
                                     <RowLabel groupId={groupId} tariffId={tariff.id} rowId={row.id}
                                         minQty={row.min_quantity} maxQty={row.max_quantity ?? 0} />
                                 </td>
                                 {tariff.columns.map(column => {
                                     const cell = cellMap.get(`${row.id}:${column.id}`);
                                     return (
-                                        <td key={column.id} className="p-2">
+                                        <td key={column.id} className="border-b border-r border-(--border)">
                                             {cell && <CellInput groupId={groupId} tariffId={tariff.id} cell={cell} />}
                                         </td>
                                     );
@@ -189,14 +193,21 @@ export default function TariffComponent(props: Props) {
                                 <td />
                             </tr>
                         ))}
+
+                        <tr>
+                            <td className=" border-b border-r border-(--border)">
+                                <Button variant="secondary" size="xs" className="w-full px-4 py-1 border-none rounded-none"
+                                    onClick={() => createRow({ groupId, tariffId: tariff.id, min_qty: 1, max_qty: 100 })}
+                                    icon={<Plus className="size-4" />} iconOnly />
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
 
-                <Button className="border-dashed h-full w-full" variant="secondary" size="sm"
-                    onClick={() => createRow({ groupId, tariffId: tariff.id, min_qty: 1, max_qty: 100 })}>
-                    Create Row
-                </Button>
+
             </div>
+
+
         </div>
     );
 }

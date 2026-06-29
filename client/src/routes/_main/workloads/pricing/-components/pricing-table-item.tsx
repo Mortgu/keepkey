@@ -41,9 +41,7 @@ export default function PricingTableItem({ tariff }: Props) {
             </div>
 
             {open && (
-                <div className="p-4">
-                    <TariffComponent tariff={tariff} />
-                </div>
+                <TariffComponent tariff={tariff} />
             )}
 
             <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>

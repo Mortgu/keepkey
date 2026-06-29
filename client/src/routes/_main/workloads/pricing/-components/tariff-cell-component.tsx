@@ -1,9 +1,9 @@
-import { useState} from "react";
-import type {ChangeEvent} from "react";
-import type {TariffCellDefault} from "@/types";
-import {Input} from "@/components";
-import {useTariffGroupHook} from "@/hooks";
-import {formatEur} from "@/utils/utils.ts";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
+import type { TariffCellDefault } from "@/types";
+import { Input } from "@/components";
+import { useTariffGroupHook } from "@/hooks";
+import { formatEur } from "@/utils/utils.ts";
 
 type Props = {
     groupId: string;
@@ -12,12 +12,12 @@ type Props = {
 }
 
 export default function TariffCellComponent(props: Props) {
-    const {groupId, tariffId, cell} = props;
+    const { groupId, tariffId, cell } = props;
 
     const [edit, setEdit] = useState<boolean>(false);
     const [price, setPrice] = useState<number>(cell.price);
 
-    const {updateCell} = useTariffGroupHook();
+    const { updateCell } = useTariffGroupHook();
 
     const handleBlur = async () => {
         await updateCell({
@@ -40,9 +40,9 @@ export default function TariffCellComponent(props: Props) {
 
     return (
         <div onClick={() => setEdit(true)}
-             className="w-auto h-15 border border-(--border) rounded-sm flex items-center justify-end p-2 hover:bg-(--page-bg)">
+            className="w-auto h-15 border border-(--border) rounded-sm flex items-center justify-end p-2 hover:bg-(--page-bg)">
             {edit && (
-                <div className="">
+                <div className="w-fit">
                     <Input
                         autoFocus
                         size="xs"
