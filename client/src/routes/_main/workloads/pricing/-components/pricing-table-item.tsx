@@ -1,19 +1,23 @@
-import { Button } from "@/components";
+import { ChevronDown, Plus, UndoDot } from "lucide-react";
+import { useState } from "react";
+import TariffComponent from "./tariff-component";
+import type { Tariff } from "@/types";
+import { Button, Drawer } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
-import type { Contract } from "@/types";
-import { ChevronDown, UndoDot, Plus } from "lucide-react";
-import { useState } from "react";
 
 type Props = {
-    contract: Contract;
+    tariff: Tariff;
 }
 
-export default function PricingTableItem({ contract }: Props) {
+export default function PricingTableItem({ tariff }: Props) {
     const locale = useLocale();
-    const [open, setOpen] = useState<boolean>(false);
 
+    const [open, setOpen] = useState<boolean>(false);
+    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+
+    const contract = tariff.contract;
 
     return (
         <div>
@@ -24,22 +28,31 @@ export default function PricingTableItem({ contract }: Props) {
                         <Button size="fit_xs" variant="link" icon={<ChevronDown className="size-4" />} iconOnly />
                         <div>
                             <p>{localized(contract.translations, locale, "name")}</p>
-                            <p className="text-sm text-(--text-secondary)">{formatDate(contract.createdAt)}</p>
+                            <p className="text-sm text-(--text-secondary)">{formatDate(tariff.createdAt)}</p>
                         </div>
                     </div>
                 </div>
 
                 <div className="px-4 py-2 flex items-center gap-2">
-                    <Button size="sm" variant="secondary" icon={<UndoDot className="size-3.5" />} iconOnly />
+                    <Button size="sm" variant="secondary" icon={<UndoDot className="size-3.5" />} iconOnly
+                        onClick={() => setDrawerOpen(true)} />
                     <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />} iconOnly />
                 </div>
             </div>
 
             {open && (
-                <div className="p-4 border">
-
+                <div className="p-4">
+                    <TariffComponent tariff={tariff} />
                 </div>
             )}
+
+            <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
+                <Drawer.Header eyebrow="" title="History"
+                    subtitle="Vergangene Preistabellen" />
+                <Drawer.Body>
+
+                </Drawer.Body>
+            </Drawer>
         </div>
     )
 }

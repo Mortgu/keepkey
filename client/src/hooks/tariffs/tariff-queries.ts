@@ -1,24 +1,23 @@
 import {queryOptions} from "@tanstack/react-query";
 import {tariffKeys} from "./tariff-keys";
 import {
-    getAllTariffsAction,
-    getProductTariffsAction,
-    getTariffDurationsAction,
-    getTariffHistoryAction,
-} from "@/data/tariffs";
+    getTariffDurations,
+    getTariffGroups,
+    getTariffHistory,
+} from "./tariff-api";
 
 export const tariffQueries = {
-    list: (productId?: string) => {
+    groups: () => {
         return queryOptions({
-            queryKey: tariffKeys.list(productId),
-            queryFn: productId ? () => getProductTariffsAction(productId) : getAllTariffsAction,
+            queryKey: tariffKeys.groups(),
+            queryFn: getTariffGroups,
         });
     },
 
     history: (productId: string, contractId: string) => {
         return queryOptions({
             queryKey: tariffKeys.history(productId, contractId),
-            queryFn: () => getTariffHistoryAction(productId, contractId),
+            queryFn: () => getTariffHistory(productId, contractId),
             enabled: Boolean(productId) && Boolean(contractId),
         });
     },
@@ -26,7 +25,7 @@ export const tariffQueries = {
     durations: (productId: string, contractId: string) => {
         return queryOptions({
             queryKey: tariffKeys.durations(productId, contractId),
-            queryFn: () => getTariffDurationsAction(productId, contractId),
+            queryFn: () => getTariffDurations(productId, contractId),
             enabled: Boolean(productId) && Boolean(contractId),
         });
     },

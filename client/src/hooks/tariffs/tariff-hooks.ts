@@ -3,19 +3,22 @@ import {tariffQueries} from "./tariff-queries";
 import {
     useCreateTariff,
     useCreateTariffColumn,
+    useCreateTariffGroup,
     useCreateTariffRow,
     useDeleteTariff,
     useDeleteTariffColumn,
+    useDeleteTariffGroup,
     useDeleteTariffRow,
     useUpdateTariffCell,
     useUpdateTariffColumn,
+    useUpdateTariffGroup,
     useUpdateTariffRow,
 } from "./tariff-mutations";
 
-export function useTariffs(productId?: string) {
-    const {data: tariffs = [], isPending, error} = useQuery(tariffQueries.list(productId));
+export function useTariffGroups() {
+    const {data: groups = [], isPending, error} = useQuery(tariffQueries.groups());
 
-    return {tariffs, isPending, error};
+    return {groups, isPending, error};
 }
 
 export function useTariffHistoryHook(productId: string, contractId: string) {
@@ -30,8 +33,12 @@ export function useTariffDurationsHook(productId: string, contractId: string) {
     return {durations, isPending, error};
 }
 
-export function useTariffHook(productId?: string) {
-    const tariffQuery = useTariffs(productId);
+export function useTariffGroupHook() {
+    const groupsQuery = useTariffGroups();
+
+    const createTariffGroup = useCreateTariffGroup();
+    const updateTariffGroup = useUpdateTariffGroup();
+    const deleteTariffGroup = useDeleteTariffGroup();
 
     const createTariff = useCreateTariff();
     const deleteTariff = useDeleteTariff();
@@ -44,7 +51,10 @@ export function useTariffHook(productId?: string) {
     const updateCell = useUpdateTariffCell();
 
     return {
-        ...tariffQuery,
+        ...groupsQuery,
+        ...createTariffGroup,
+        ...updateTariffGroup,
+        ...deleteTariffGroup,
         ...createTariff,
         ...deleteTariff,
         ...createColumn,

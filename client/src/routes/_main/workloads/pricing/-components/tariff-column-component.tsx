@@ -3,24 +3,26 @@ import { Trash } from "lucide-react";
 import type { ChangeEvent } from "react";
 import type { TariffColumn } from "@/types";
 import { Button, Input } from "@/components";
-import { useTariffHook } from "@/hooks";
-import TariffCellComponent from "@/routes/_main/workloads/$id/-components/tariff-cell-component.tsx";
+import { useTariffGroupHook } from "@/hooks";
+import TariffCellComponent from "@/routes/_main/workloads/pricing/-components/tariff-cell-component";
 
 type Props = {
+    groupId: string;
     tariffId: string;
     column: TariffColumn;
 }
 
-export default function TariffColumnComponent({ tariffId, column }: Props) {
+export default function TariffColumnComponent({ groupId, tariffId, column }: Props) {
     const [edit, setEdit] = useState<boolean>(false);
     const [duration, setDuration] = useState<number>(column.duration);
 
-    const { deleteColumn, updateColumn } = useTariffHook();
+    const { deleteColumn, updateColumn } = useTariffGroupHook();
 
     const handleBlur = async () => {
         setEdit(false);
 
         await updateColumn({
+            groupId: groupId,
             tariffId: tariffId,
             columnId: column.id,
             duration: duration,
@@ -57,12 +59,12 @@ export default function TariffColumnComponent({ tariffId, column }: Props) {
                     iconOnly
                     variant="link"
                     size="xs"
-                    onClick={() => deleteColumn({ tariffId, columnId: column.id })}
+                    onClick={() => deleteColumn({ groupId, tariffId, columnId: column.id })}
                 />
             </div>
 
             {column.cells.map((cell) => (
-                <TariffCellComponent tariffId={tariffId} cell={cell.default_cells[0]} />
+                <TariffCellComponent key={cell.id} groupId={groupId} tariffId={tariffId} cell={cell.default_cells[0]} />
             ))}
         </div>
     )

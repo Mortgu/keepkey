@@ -279,7 +279,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            tariffs: components["schemas"]["Tariff"][];
+            tariffGroupProducts: components["schemas"]["TariffGroupProduct"][];
         };
         ProductTranslation: {
             productId: string;
@@ -388,12 +388,32 @@ export interface components {
             table: string;
             flatRate: components["schemas"]["FlatRate"];
         };
-        Tariff: {
+        TariffGroup: {
             id: string;
+            products: components["schemas"]["TariffGroupProduct"][];
+            tariffs: components["schemas"]["Tariff"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffGroupProduct: {
+            id: string;
+            tariffGroup: components["schemas"]["TariffGroup"];
+            tariffGroupId: string;
             product: components["schemas"]["Product"];
             productId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        Tariff: {
+            id: string;
             contract: components["schemas"]["Contract"];
             contractId: string;
+            tariffGroup: components["schemas"]["TariffGroup"];
+            tariffGroupId: string;
             rows: components["schemas"]["TariffRow"][];
             columns: components["schemas"]["TariffColumn"][];
             cells: components["schemas"]["TariffCell"][];

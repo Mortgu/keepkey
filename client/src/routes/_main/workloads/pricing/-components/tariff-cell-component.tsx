@@ -2,24 +2,26 @@ import { useState} from "react";
 import type {ChangeEvent} from "react";
 import type {TariffCellDefault} from "@/types";
 import {Input} from "@/components";
-import {useTariffHook} from "@/hooks";
+import {useTariffGroupHook} from "@/hooks";
 import {formatEur} from "@/utils/utils.ts";
 
 type Props = {
+    groupId: string;
     tariffId: string;
     cell: TariffCellDefault;
 }
 
 export default function TariffCellComponent(props: Props) {
-    const {tariffId, cell} = props;
+    const {groupId, tariffId, cell} = props;
 
     const [edit, setEdit] = useState<boolean>(false);
     const [price, setPrice] = useState<number>(cell.price);
 
-    const {updateCell} = useTariffHook();
+    const {updateCell} = useTariffGroupHook();
 
     const handleBlur = async () => {
         await updateCell({
+            groupId: groupId,
             tariffId: tariffId,
             cellId: cell.cellId,
             default_price: price,

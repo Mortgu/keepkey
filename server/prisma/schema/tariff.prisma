@@ -1,11 +1,36 @@
+model TariffGroup {
+  id String @id @default(cuid())
+
+  products TariffGroupProduct[]
+  tariffs Tariff[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_group")
+}
+
+model TariffGroupProduct {
+  id            String @id @default(cuid())
+  tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id], onDelete: Cascade)
+  tariffGroupId String
+  product       Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId     String  @unique
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("tariff_group_product")
+}
+
 model Tariff {
   id String @id @default(cuid())
 
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
+
+  tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id])
+  tariffGroupId String
 
   rows    TariffRow[]
   columns TariffColumn[]
@@ -14,7 +39,7 @@ model Tariff {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([productId, contractId])
+  @@unique([tariffGroupId, contractId])
   @@map("tariff")
 }
 

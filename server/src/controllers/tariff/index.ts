@@ -9,9 +9,17 @@ const TARIFF_INCLUDE = {
             translations: true
         }
     },
-    product: {
+    tariffGroup: {
         include: {
-            translations: true
+            products: {
+                include: {
+                    product: {
+                        include: {
+                            translations: true
+                        }
+                    }
+                }
+            }
         }
     },
     rows: {
@@ -29,59 +37,47 @@ const TARIFF_INCLUDE = {
     }
 } as const;
 
-export async function getTariffs(request: Request, response: Response) {
-    const tariffs = await prisma.tariff.findMany({
-        include: TARIFF_INCLUDE,
-    });
+export async function getTariff(request: Request, response: Response, next: NextFunction) {
+    const tariffId = request.params.tariffId as string;
 
-    return response.status(200).json(tariffs);
-}
+    try {
+        const tariff = await prisma.tariff.findUnique({
+            where: { id: tariffId },
+            include: TARIFF_INCLUDE,
+        });
 
-export async function getTariffById(request: Request, response: Response) {
-    const id = request.params.tariffId as string;
+        if (!tariff) {
+            return response.status(404).json({ success: false, message: "Tariff not found." });
+        }
 
-    const tariff = await prisma.tariff.findUnique({
-        where: { id },
-        include: TARIFF_INCLUDE,
-    });
-
-    if (!tariff) {
-        return response.status(404).json({ success: false, message: "Tariff not found." });
+        return response.status(200).json(tariff);
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
     }
-
-    return response.status(200).json(tariff);
-}
-
-export async function getProductTariffs(request: Request, response: Response) {
-    const productId = request.params.productId as string;
-
-    const tariff = await prisma.tariff.findMany({
-        where: { productId },
-        include: TARIFF_INCLUDE,
-        orderBy: {
-            createdAt: "desc",
-        },
-    });
-
-    return response.status(200).json(tariff);
 }
 
 export async function createTariff(request: Request, response: Response, next: NextFunction) {
-    const { productId, contractId } = request.body;
+    const tariffGroupId = request.params.id as string;
+    const { contractId } = request.body;
 
     try {
         const existing = await prisma.tariff.findFirst({
-            where: { productId, contractId },
+            where: { tariffGroupId, contractId },
         });
 
         if (existing) {
+            const groupProduct = await prisma.tariffGroupProduct.findFirst({
+                where: { tariffGroupId },
+            });
+            const productId = groupProduct?.productId ?? "";
             await snapshotTariff(productId, contractId);
             await prisma.tariff.delete({ where: { id: existing.id } });
         }
 
         const tariff = await prisma.tariff.create({
             data: {
-                productId,
+                tariffGroupId,
                 contractId,
             },
         });
@@ -144,7 +140,6 @@ export const getTariffPrice = async (request: Request, response: Response) => {
 
 export async function createTariffColumn(request: Request, response: Response, next: NextFunction) {
     const tariffId = request.params.tariffId as string;
-
     const duration = request.body.duration;
 
     try {
@@ -188,7 +183,6 @@ export async function createTariffColumn(request: Request, response: Response, n
 }
 
 export async function deleteTariffColumn(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
     const columnId = request.params.columnId as string;
 
     try {
@@ -205,9 +199,7 @@ export async function deleteTariffColumn(request: Request, response: Response, n
 }
 
 export async function updateTariffColumn(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
     const columnId = request.params.columnId as string;
-
     const duration = request.body.duration;
 
     try {
@@ -230,7 +222,6 @@ export async function updateTariffColumn(request: Request, response: Response, n
 
 export async function createTariffRow(request: Request, response: Response, next: NextFunction) {
     const tariffId = request.params.tariffId as string;
-
     const { min_quantity, max_quantity } = request.body;
 
     try {
@@ -274,7 +265,6 @@ export async function createTariffRow(request: Request, response: Response, next
 }
 
 export async function deleteTariffRow(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
     const rowId = request.params.rowId as string;
 
     try {
@@ -292,9 +282,7 @@ export async function deleteTariffRow(request: Request, response: Response, next
 }
 
 export async function updateTariffRow(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
     const rowId = request.params.rowId as string;
-
     const { min_qty, max_qty } = request.body;
 
     try {
@@ -316,9 +304,7 @@ export async function updateTariffRow(request: Request, response: Response, next
 }
 
 export async function updateTariffCell(request: Request, response: Response, next: NextFunction) {
-    const tariffId = request.params.tariffId as string;
     const cellId = request.params.cellId as string;
-
     const { default_price, customer_price } = request.body;
 
     if (default_price === undefined && customer_price === undefined) {
@@ -382,8 +368,14 @@ export async function getTariffDurations(request: Request, response: Response, n
     const contractId = request.params.contractId as string;
 
     try {
+        const groupProduct = await prisma.tariffGroupProduct.findUnique({
+            where: { productId },
+        });
+
+        if (!groupProduct) return response.status(200).json([]);
+
         const tariff = await prisma.tariff.findUnique({
-            where: { productId_contractId: { productId, contractId } },
+            where: { tariffGroupId_contractId: { tariffGroupId: groupProduct.tariffGroupId, contractId } },
             select: { columns: { select: { duration: true }, orderBy: { createdAt: 'asc' } } },
         });
 

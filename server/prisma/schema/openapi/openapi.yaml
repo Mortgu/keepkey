@@ -689,10 +689,10 @@ components:
         updatedAt:
           type: string
           format: date-time
-        tariffs:
+        tariffGroupProducts:
           type: array
           items:
-            $ref: "#/components/schemas/Tariff"
+            $ref: "#/components/schemas/TariffGroupProduct"
       required:
         - id
         - translations
@@ -700,7 +700,7 @@ components:
         - offerPositions
         - createdAt
         - updatedAt
-        - tariffs
+        - tariffGroupProducts
     ProductTranslation:
       type: object
       properties:
@@ -972,18 +972,70 @@ components:
         - name
         - table
         - flatRate
-    Tariff:
+    TariffGroup:
       type: object
       properties:
         id:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffGroupProduct"
+        tariffs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tariff"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - products
+        - tariffs
+        - createdAt
+        - updatedAt
+    TariffGroupProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        tariffGroup:
+          $ref: "#/components/schemas/TariffGroup"
+        tariffGroupId:
           type: string
         product:
           $ref: "#/components/schemas/Product"
         productId:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - tariffGroup
+        - tariffGroupId
+        - product
+        - productId
+        - createdAt
+        - updatedAt
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
         contract:
           $ref: "#/components/schemas/Contract"
         contractId:
+          type: string
+        tariffGroup:
+          $ref: "#/components/schemas/TariffGroup"
+        tariffGroupId:
           type: string
         rows:
           type: array
@@ -1005,10 +1057,10 @@ components:
           format: date-time
       required:
         - id
-        - product
-        - productId
         - contract
         - contractId
+        - tariffGroup
+        - tariffGroupId
         - rows
         - columns
         - cells

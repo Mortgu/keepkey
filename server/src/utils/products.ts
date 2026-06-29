@@ -83,8 +83,16 @@ export function selectPrice(
 }
 
 export async function snapshotTariff(productId: string, contractId: string) {
-    const tariff = await prisma.tariff.findFirst({
-        where: {productId, contractId},
+    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+        where: {productId},
+    });
+
+    if (!groupProduct) return;
+
+    const {tariffGroupId} = groupProduct;
+
+    const tariff = await prisma.tariff.findUnique({
+        where: {tariffGroupId_contractId: {tariffGroupId, contractId}},
         include: TARIFF_SNAPSHOT_INCLUDE,
     });
 
@@ -107,8 +115,16 @@ export async function snapshotTariff(productId: string, contractId: string) {
 export default async function calculatePrice(props: PriceCalculatorProps): Promise<number> {
     const {productId, contractId, duration, quantity, customerId} = props;
 
+    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+        where: {productId},
+    });
+
+    if (!groupProduct) return 0;
+
+    const {tariffGroupId} = groupProduct;
+
     const tariff = await prisma.tariff.findUnique({
-        where: {productId_contractId: {productId, contractId}},
+        where: {tariffGroupId_contractId: {tariffGroupId, contractId}},
         include: {
             rows: true,
             columns: true,
