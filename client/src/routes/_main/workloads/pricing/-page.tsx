@@ -1,19 +1,27 @@
 import { t } from "i18next";
 import { LoaderCircle, Plus } from "lucide-react";
 import { toast } from "react-toastify";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import PricingTable from "./-components/pricing-table";
-import { useTariffGroups } from "@/hooks";
+import TariffGroupModal from "./-components/tariff-group-modal";
+import { useModal, useProductHook, useTariffGroupHook } from "@/hooks";
 import { Button, PageWidth } from "@/components";
 
 export default function PricingPage() {
-    const { groups, isPending, error } = useTariffGroups();
+    const { groups, isPending, error, createTariffGroup, createTariffGroupPending } = useTariffGroupHook();
+    const { products } = useProductHook();
+    const modal = useModal();
 
     useEffect(() => {
         if (error) {
             toast.error(error.message);
         }
     }, [error]);
+
+    const assignedProductIds = useMemo(
+        () => new Set(groups.flatMap(g => g.products.map(p => p.productId))),
+        [groups],
+    );
 
     if (isPending) {
         return (
@@ -34,7 +42,7 @@ export default function PricingPage() {
                     <div></div>
 
                     <div className="flex items-center gap-2">
-                        <Button onClick={() => { }} size="sm">
+                        <Button onClick={() => modal.open()} size="sm">
                             {t('button.create')} <Plus className="size-4" />
                         </Button>
                     </div>
@@ -44,6 +52,17 @@ export default function PricingPage() {
                     <PricingTable key={group.id} group={group} />
                 ))}
             </div>
+
+            {modal.isOpen && (
+                <TariffGroupModal
+                    key={modal.key}
+                    onClose={modal.close}
+                    products={products}
+                    excludeProductIds={assignedProductIds}
+                    loading={createTariffGroupPending}
+                    submitFn={(value) => createTariffGroup({ products: value.products })}
+                />
+            )}
         </PageWidth>
     )
 }

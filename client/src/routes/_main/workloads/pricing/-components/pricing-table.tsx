@@ -1,10 +1,13 @@
-import { Plus } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import PricingTableItem from "./pricing-table-item";
 import type { TariffGroup } from "@/types";
 import { Button } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatDate } from "@/lib/format";
+import { useDeleteTariffGroup } from "@/hooks/tariffs/tariff-mutations";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
 
 type Props = {
     group: TariffGroup;
@@ -12,6 +15,14 @@ type Props = {
 
 export default function PricingTable({ group }: Props) {
     const locale = useLocale();
+
+    const { deleteTariffGroup, deleteTariffGroupPending, deleteTariffGroupError } = useDeleteTariffGroup();
+
+    useEffect(() => {
+        if (deleteTariffGroupError) {
+            toast.error(deleteTariffGroupError.message);
+        }
+    }, [deleteTariffGroupError]);
 
     return (
         <div className="border border-(--border) rounded-md overflow-hidden">
@@ -30,8 +41,10 @@ export default function PricingTable({ group }: Props) {
                     <p className="text-sm text-(--text-secondary)">{formatDate(group.createdAt)}</p>
                 </div>
 
-                <div>
-                    <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />} iconOnly />
+                <div className="flex items-center gap-2">
+                    <Button size="sm" variant="secondary" icon={<Pen className="size-3.5" />} iconOnly />
+                    <Button size="sm" variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
+                        onClick={() => deleteTariffGroup({ id: group.id })} loading={deleteTariffGroupPending} disabled={deleteTariffGroupPending} />
                 </div>
             </div>
 

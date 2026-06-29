@@ -9,7 +9,7 @@ export interface DropdownOption {
   dot?: string;
 }
 
-interface MultiDropdownProps {
+export interface MultiDropdownProps {
   label: string;
   options: Array<DropdownOption>;
   values: Array<string>;
