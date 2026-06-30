@@ -4,7 +4,9 @@ import type { ChangeEvent } from "react";
 import type { Tariff, TariffCell } from "@/types";
 import { useTariffGroupHook } from "@/hooks";
 import { Button, Input } from "@/components";
-import { formatEur } from "@/utils/utils.ts";
+import TariffCellComponent from "./cell-component";
+import TariffColumnComponent from "./column-component";
+import TariffRowComponent from "./row-component";
 
 type Props = {
     tariff: Tariff;
@@ -16,75 +18,6 @@ function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
         map.set(`${cell.rowId}:${cell.columnId}`, cell);
     }
     return map;
-}
-
-function CellInput({ groupId, tariffId, cell }: { groupId: string; tariffId: string; cell: TariffCell }) {
-    const { updateCell } = useTariffGroupHook();
-    const [edit, setEdit] = useState(false);
-    const [price, setPrice] = useState(cell.default_cells[0]?.price ?? 0);
-
-    const handleBlur = async () => {
-        setEdit(false);
-        await updateCell({
-            groupId,
-            tariffId,
-            cellId: cell.id,
-            default_price: price,
-        });
-    };
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = Number(e.target.value);
-        if (isNaN(value)) return;
-        setPrice(value);
-    };
-
-    return (
-        <div onClick={() => setEdit(true)}
-            className="flex items-center justify-end px-2 py-1 hover:bg-(--page-bg)">
-            {edit && (
-                <Input autoFocus size="xs" onBlur={handleBlur} value={price} onChange={handleChange} />
-            )}
-            {!edit && (
-                <p className="text-md font-semibold">{formatEur(price || 0)}</p>
-            )}
-        </div>
-    );
-}
-
-function ColumnHeader({ groupId, tariffId, columnId, duration }: {
-    groupId: string;
-    tariffId: string;
-    columnId: string;
-    duration: number;
-}) {
-    const { deleteColumn, updateColumn } = useTariffGroupHook();
-    const [edit, setEdit] = useState(false);
-    const [value, setValue] = useState(duration);
-
-    const handleBlur = async () => {
-        setEdit(false);
-        await updateColumn({ groupId, tariffId, columnId, duration: value });
-    };
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const v = Number(e.target.value);
-        if (isNaN(v)) return;
-        setValue(v);
-    };
-
-    return (
-        <div className="flex items-center justify-between relative text-center rounded-md">
-            <div onClick={() => setEdit(true)}>{value} Monate</div>
-            {edit && (
-                <div className="absolute top-0 left-0 w-full">
-                    <Input autoFocus size="xs" onBlur={handleBlur} value={value} onChange={handleChange} />
-                </div>
-            )}
-            <Button icon={<Trash className="size-3.5" />} iconOnly variant="link" size="xs"
-                onClick={() => deleteColumn({ groupId, tariffId, columnId })} />
-        </div>
-    );
 }
 
 function RowLabel({ groupId, tariffId, rowId, minQty, maxQty }: {
@@ -123,7 +56,7 @@ function RowLabel({ groupId, tariffId, rowId, minQty, maxQty }: {
     };
 
     return (
-        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center">
+        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center px-3 py-1">
             <div className="flex-1 flex items-center">
                 {!editMin ? <p onClick={() => setEditMin(true)}>{min}</p> : (
                     <Input autoFocus size="xs" onBlur={handleMinBlur} value={min} onChange={handleMinChange} />
@@ -158,10 +91,7 @@ export default function TariffComponent(props: Props) {
                             <th className="border-r border-(--border)" />
 
                             {tariff.columns.map(column => (
-                                <th key={column.id} className="border-r border-(--border) px-3 py-1">
-                                    <ColumnHeader groupId={groupId} tariffId={tariff.id} columnId={column.id}
-                                        duration={column.duration} />
-                                </th>
+                                <TariffColumnComponent key={column.id} groupId={groupId} tariffId={tariff.id} columnId={column.id} duration={column.duration} />
                             ))}
 
                             <th>
@@ -178,16 +108,18 @@ export default function TariffComponent(props: Props) {
                     <tbody>
                         {tariff.rows.map(row => (
                             <tr key={row.id}>
-                                <td className="px-4 py-1 border-b border-r border-(--border)">
-                                    <RowLabel groupId={groupId} tariffId={tariff.id} rowId={row.id}
-                                        minQty={row.min_quantity} maxQty={row.max_quantity ?? 0} />
-                                </td>
+                                <TariffRowComponent groupId={groupId} tariffId={tariff.id} rowId={row.id}
+                                    minQty={row.min_quantity} maxQty={row.max_quantity ?? 0} />
+
                                 {tariff.columns.map(column => {
                                     const cell = cellMap.get(`${row.id}:${column.id}`);
+
+                                    if (!cell) {
+                                        return <>NaC</>
+                                    }
+
                                     return (
-                                        <td key={column.id} className="border-b border-r border-(--border)">
-                                            {cell && <CellInput groupId={groupId} tariffId={tariff.id} cell={cell} />}
-                                        </td>
+                                        <TariffCellComponent key={cell.id} groupId={groupId} tariffId={tariff.id} cell={cell} />
                                     );
                                 })}
                                 <td />

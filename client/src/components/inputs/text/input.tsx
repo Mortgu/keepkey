@@ -1,8 +1,8 @@
-import {AlertCircle, AlertTriangle, Loader2} from "lucide-react";
-import {forwardRef} from "react";
-import {tv} from "tailwind-variants";
-import type {InputComponentProps} from "./input-types";
-import {Button} from "@/components/button/button";
+import { AlertCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { forwardRef } from "react";
+import { tv } from "tailwind-variants";
+import type { InputComponentProps } from "./input-types";
+import { Button } from "@/components/button/button";
 
 const styles = tv({
     base: [
@@ -41,10 +41,10 @@ const adornmentButtonClass =
     "absolute right-1 top-1/2 -translate-y-1/2 h-[26px] w-7 rounded-md";
 
 function LabelBadge({
-                        kind,
-                        label,
-                        tooltip,
-                    }: {
+    kind,
+    label,
+    tooltip,
+}: {
     kind: "error" | "warning";
     label: string;
     tooltip?: string;
@@ -62,7 +62,7 @@ function LabelBadge({
             role="button"
             aria-label={`${kind} details`}
         >
-      <Icon size={11} strokeWidth={2.5} className="shrink-0"/>
+            <Icon size={11} strokeWidth={2.5} className="shrink-0" />
             {label}
             {tooltip && (
                 <span
@@ -79,10 +79,10 @@ function LabelBadge({
                         "before:w-2 before:h-2 before:bg-(--text) before:rotate-45",
                     ].join(" ")}
                 >
-          {tooltip}
-        </span>
+                    {tooltip}
+                </span>
             )}
-    </span>
+        </span>
     );
 }
 
@@ -117,29 +117,29 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                             </label>
                         )}
                         {error && (
-                            <LabelBadge kind="error" label={error} tooltip={errorTooltip}/>
+                            <LabelBadge kind="error" label={error} tooltip={errorTooltip} />
                         )}
                         {!error && warning && (
-                            <LabelBadge kind="warning" label={warning} tooltip={warningTooltip}/>
+                            <LabelBadge kind="warning" label={warning} tooltip={warningTooltip} />
                         )}
                     </div>
                 )}
                 <div className="relative">
                     <input
                         ref={ref}
-                        className={styles({input_size: size, state, adornment, className})}
+                        className={styles({ input_size: size, state, adornment, className })}
                         {...rest}
                     />
 
                     {loading && (
                         <span
                             className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--border-200)">
-              <Loader2 size={16} className="animate-spin border-t-(--primary)"/>
-            </span>
+                            <Loader2 size={16} className="animate-spin border-t-(--primary)" />
+                        </span>
                     )}
 
                     {!loading && rightButton && (() => {
-                        const {icon, className: btnClassName, type, ...btnRest} = rightButton;
+                        const { icon, className: btnClassName, type, ...btnRest } = rightButton;
                         return (
                             <Button
                                 size="xs"
@@ -155,8 +155,8 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                     {!loading && !rightButton && rightIcon && (
                         <span
                             className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--text-secondary)">
-              {rightIcon}
-            </span>
+                            {rightIcon}
+                        </span>
                     )}
                 </div>
             </div>

@@ -7,6 +7,7 @@ import {
   deleteOffer,
   deleteOfferDocument,
   deleteOfferRevision,
+  downloadOfferDocument,
   enqueueGeneration,
   getOffers,
   updateOffer,
@@ -76,6 +77,9 @@ router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), 
 
 /* [DELETE] /api/offers/:id/documents/:documentId */
 router.delete('/:id/documents/:documentId', deleteOfferDocument);
+
+/* [GET] /api/offers/:id/documents/:documentId/:format */
+router.get('/:id/documents/:documentId/:format', downloadOfferDocument);
 
 /* ========== Offer Revisions ========== */
 
