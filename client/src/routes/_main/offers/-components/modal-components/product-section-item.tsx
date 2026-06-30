@@ -1,14 +1,13 @@
-import { Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { tv } from "tailwind-variants";
+import { Pen, Trash, X } from "lucide-react";
 import OfferProductForm from "./offer-product-form";
-import type { ChangeEvent } from "react";
 import type { Contract, Product } from "@/types";
 import type { OfferProductInput } from "./offer-product-form";
-import { formatEur } from "@/utils/utils";
-import { Button, Input } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { Button } from "@/components";
+import { formatEur } from "@/utils/utils";
 
 type OfferProduct = Product & OfferProductInput;
 
@@ -16,109 +15,74 @@ type Props = {
     offerProduct: OfferProduct;
     offerContract: Contract;
     index: number;
+    customerId: string;
     onUpdate: (data: OfferProductInput) => void;
     onRemove: () => void;
-    onPriceChange: (price: number) => void;
+    onPersistOverride: (
+        data: OfferProductInput,
+        unitPriceCents: number,
+    ) => Promise<number>;
 }
 
 const styles = tv({
-    base: ["grid gap-2"],
+    base: [
+        "grid bg-(--subtle-50) border border-(--border) rounded-md"
+    ],
     variants: {
         edit: {
-            true: "outline-2 outline-offset-2 rounded-md outline-(--primary)",
+            true: "border-(--primary)",
             false: ""
         }
     }
 })
 
-export default function ProductSectionItem({
-    offerProduct,
-    offerContract,
-    onUpdate,
-    onRemove,
-    onPriceChange,
-}: Props) {
+export default function ProductSectionItem(props: Props) {
+    const { offerProduct, offerContract, onUpdate, onRemove, onPersistOverride } = props;
+
     const [edit, setEdit] = useState<boolean>(false);
-    const [editPrice, setEditPrice] = useState<boolean>(false);
-    const [price, setPrice] = useState(offerProduct.total_cents);
 
     const locale = useLocale();
 
-    const displayPrice = editPrice ? price : offerProduct.total_cents;
-
-    const startEditPrice = () => {
-        setPrice(offerProduct.total_cents);
-        setEditPrice(true);
-    };
-
-    const handlePriceChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const value = Number(e.target.value);
-        if (isNaN(value)) return;
-        setPrice(value);
-    };
-
-    const handlePriceBlur = () => {
-        onPriceChange(price);
-        setEditPrice(false);
-    };
-
     return (
         <div className={styles({ edit })}>
-            <div className="flex items-center justify-between bg-(--subtle-50) border border-(--border) px-3 py-2 rounded-md">
+
+            <div className="flex items-center justify-between px-4 py-3 ">
                 <div className="grid">
-                    <p className="flex items-center gap-1 text-sm">
+                    <p className="flex items-center gap-1 text-sm font-normal">
                         {offerProduct.quantity} <X className="size-3" />{" "}
                         {localized(offerProduct.translations, locale, "name")}
                     </p>
                     <div className="flex items-center">
-                        <p className="text-xs text-(--text-secondary)">
+                        <p className="text-sm text-(--text-secondary)">
                             {localized(offerContract.translations, locale, "name")}{" "}
                             | {offerProduct.duration_months} Monate
                         </p>
                     </div>
                 </div>
 
-                <div className="flex gap-1">
-                    {!editPrice && (
-                        <Button type="button" size="xs" variant="link" onClick={startEditPrice}>
-                            {formatEur(offerProduct.total_cents)}
-                        </Button>
-                    )}
+                {/* Right */}
+                <div className="flex items-center gap-5">
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm">{formatEur(offerProduct.total_cents)}</p>
+                    </div>
 
-                    {editPrice && (
-                        <Input
-                            autoFocus
-                            size="xs"
-                            value={displayPrice}
-                            onChange={handlePriceChange}
-                            onBlur={handlePriceBlur}
-                        />
-                    )}
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                        <Button variant="secondary" type="button" size="xs" disabled={edit}
+                            icon={<Pen className="size-3" />} iconOnly onClick={() => setEdit(true)} />
 
-                    <Button
-                        disabled={edit}
-                        type="button"
-                        size="xs"
-                        variant="secondary"
-                        icon={<Pen className="size-3" />}
-                        iconOnly
-                        onClick={() => setEdit(true)}
-                    />
-
-                    <Button
-                        type="button"
-                        size="xs"
-                        variant="secondary"
-                        icon={<Trash className="size-3" />}
-                        iconOnly
-                        onClick={onRemove}
-                    />
+                        <Button variant="secondary" type="button" size="xs"
+                            icon={<Trash className="size-3" />} iconOnly onClick={onRemove} />
+                    </div>
                 </div>
+
             </div>
 
             {edit && (
                 <OfferProductForm
                     currentProduct={offerProduct}
+                    customerId={props.customerId}
+                    onPersistOverride={onPersistOverride}
                     onSave={(data) => {
                         onUpdate(data);
                         setEdit(false);
@@ -126,6 +90,7 @@ export default function ProductSectionItem({
                     onCancel={() => setEdit(false)}
                 />
             )}
+
         </div>
     );
 }

@@ -143,3 +143,51 @@ export const getTariffPrice = (
     });
     return api<any>(`/api/tariffs/price?${params}`, { method: "GET" });
 };
+
+/* ───────────────────────────────
+   Customer Price Override
+   ─────────────────────────────── */
+
+export type TariffPriceResult = {
+    success: boolean;
+    price: number;
+    breakdown: { unitPrice: number; quantity: number; duration: number };
+};
+
+export const upsertCustomerPrice = (
+    input: {
+        productId: string;
+        contractId: string;
+        duration: number;
+        quantity: number;
+        customerId: string;
+        price: number;
+        optional: boolean;
+    },
+) =>
+    api<TariffPriceResult>('/api/tariffs/customer-price', {
+        method: 'PUT',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+    });
+
+export const deleteCustomerPrice = (
+    input: {
+        productId: string;
+        contractId: string;
+        duration: number;
+        quantity: number;
+        customerId: string;
+    },
+) => {
+    const params = new URLSearchParams({
+        productId: input.productId,
+        contractId: input.contractId,
+        duration: String(input.duration),
+        quantity: String(input.quantity),
+        customerId: input.customerId,
+    });
+    return api<TariffPriceResult>(`/api/tariffs/customer-price?${params}`, {
+        method: 'DELETE',
+    });
+};

@@ -98,10 +98,14 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                       const newCustomer = customers.find(
                         (c: Customer) => c.id === newCustomerId,
                       );
-                      form.setFieldValue(
-                        "contactPersonId",
+                      form.setFieldValue("contactPersonId",
                         newCustomer?.contactPersons[0]?.id ?? "",
                       );
+
+                      // Sprache nur bei Create übernehmen
+                      if (!isEdit && newCustomer?.language) {
+                        form.setFieldValue("language", newCustomer.language)
+                      }
                     }}
                   >
                     {customers.map((customer: Customer) => (
@@ -289,10 +293,11 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
 
           <ProductModalSection
             offerProducts={state.offerProducts}
+            customerId={state.customerId}
             onAdd={state.addProduct}
             onUpdate={state.updateProduct}
             onRemove={state.removeProduct}
-            onPriceChange={state.updateProductPrice}
+            onPersistOverride={state.persistCustomerOverride}
           />
 
           <FlatRateModalSection

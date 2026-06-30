@@ -34,3 +34,20 @@ export const updateTariffCellSchema = z.object({
     default_price: z.number().int().optional(),
     customer_price: z.number().int().optional(),
 });
+
+export const upsertCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.number().int().positive(),
+    quantity: z.number().int().positive(),
+    customerId: z.string().min(1),
+    price: z.number().int().nonnegative(),
+});
+
+export const deleteCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.number().int().positive(),
+    quantity: z.number().int().positive(),
+    customerId: z.string().min(1),
+});
