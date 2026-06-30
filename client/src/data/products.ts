@@ -21,5 +21,3 @@ export const updateProductAction = (id: string, product: UpdateProductInput) =>
 
 export const deleteProductAction = (id: string) =>
     api<void>(`/api/products/${id}`, {method: "DELETE"});
-
-export {getTariffPrice as getPrice} from "./tariffs";

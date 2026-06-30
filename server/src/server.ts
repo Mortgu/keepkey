@@ -58,6 +58,8 @@ app.use(express.json());
 
 app.use("/api", router);
 
+app.use("/api/*splat", (_req, res) => res.status(404).json({ message: "Not found" }));
+
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
 
 app.get("{*path}", (req, res) => {

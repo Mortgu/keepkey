@@ -1,12 +1,11 @@
-import {NextFunction, Request, Response} from "express";
-import {prisma} from "../../lib/prismaClient.js";
+import { NextFunction, Request, Response } from "express";
+import { prisma } from "../../lib/prismaClient.js";
 
 export const getProducts = async (request: Request, response: Response, next: NextFunction) => {
     const products = await prisma.product.findMany({
-        orderBy: {createdAt: "asc"},
+        orderBy: { createdAt: "asc" },
         include: {
             translations: true,
-            tariffs: true
         },
     });
 
@@ -29,10 +28,9 @@ export const getProduct = async (request: Request, response: Response, next: Nex
     }
 
     const product = await prisma.product.findUnique({
-        where: {id},
+        where: { id },
         include: {
             translations: true,
-            tariffs: true
         },
     });
 

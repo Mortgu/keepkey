@@ -30,12 +30,17 @@ components:
         createdAt:
           type: string
           format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - id
         - translations
         - orderPositions
         - offerPositions
         - tariffs
+        - createdAt
+        - updatedAt
     ContractTranslation:
       type: object
       properties:
@@ -53,6 +58,12 @@ components:
           type: string
         contract:
           $ref: "#/components/schemas/Contract"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
       required:
         - contractId
         - language
@@ -60,6 +71,8 @@ components:
         - features
         - table
         - contract
+        - createdAt
+        - updatedAt
     Customer:
       type: object
       properties:
@@ -676,10 +689,10 @@ components:
         updatedAt:
           type: string
           format: date-time
-        tariffs:
+        tariffGroupProducts:
           type: array
           items:
-            $ref: "#/components/schemas/Tariff"
+            $ref: "#/components/schemas/TariffGroupProduct"
       required:
         - id
         - translations
@@ -687,7 +700,7 @@ components:
         - offerPositions
         - createdAt
         - updatedAt
-        - tariffs
+        - tariffGroupProducts
     ProductTranslation:
       type: object
       properties:
@@ -959,18 +972,70 @@ components:
         - name
         - table
         - flatRate
-    Tariff:
+    TariffGroup:
       type: object
       properties:
         id:
+          type: string
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffGroupProduct"
+        tariffs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tariff"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - products
+        - tariffs
+        - createdAt
+        - updatedAt
+    TariffGroupProduct:
+      type: object
+      properties:
+        id:
+          type: string
+        tariffGroup:
+          $ref: "#/components/schemas/TariffGroup"
+        tariffGroupId:
           type: string
         product:
           $ref: "#/components/schemas/Product"
         productId:
           type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - tariffGroup
+        - tariffGroupId
+        - product
+        - productId
+        - createdAt
+        - updatedAt
+    Tariff:
+      type: object
+      properties:
+        id:
+          type: string
         contract:
           $ref: "#/components/schemas/Contract"
         contractId:
+          type: string
+        tariffGroup:
+          $ref: "#/components/schemas/TariffGroup"
+        tariffGroupId:
           type: string
         rows:
           type: array
@@ -992,10 +1057,10 @@ components:
           format: date-time
       required:
         - id
-        - product
-        - productId
         - contract
         - contractId
+        - tariffGroup
+        - tariffGroupId
         - rows
         - columns
         - cells
@@ -1016,6 +1081,9 @@ components:
         max_quantity:
           type: integer
           format: int32
+        order:
+          type: integer
+          format: int32
         cells:
           type: array
           items:
@@ -1031,6 +1099,7 @@ components:
         - tariff
         - tariffId
         - min_quantity
+        - order
         - cells
         - createdAt
         - updatedAt
@@ -1044,6 +1113,9 @@ components:
         tariffId:
           type: string
         duration:
+          type: integer
+          format: int32
+        order:
           type: integer
           format: int32
         cells:
@@ -1061,6 +1133,7 @@ components:
         - tariff
         - tariffId
         - duration
+        - order
         - cells
         - createdAt
         - updatedAt

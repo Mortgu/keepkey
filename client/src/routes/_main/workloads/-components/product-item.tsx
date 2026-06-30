@@ -1,6 +1,5 @@
 import { Pen, Trash } from "lucide-react";
 
-import { Link } from "@tanstack/react-router";
 import ProductModal from "./product-modal";
 import type { Product } from "@/types";
 import { Button } from "@/components";
@@ -17,30 +16,26 @@ export default function ProductItem({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="bg-white border border-(--border) rounded-md overflow-hidden">
+      <div className="bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3">
           <div>
-            <Link
-              to="/workloads/$id"
-              params={{ id: product.id }}
-              className="text-md text-gray-900"
-            >
+            <div className="text-md text-gray-900">
               {name}
-            </Link>
+            </div>
             <p className="text-sm font-light text-gray-400 mt-0.5">
               {description}
             </p>
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-2">
             <Button
-              variant="ghost"
+              variant="secondary"
               icon={<Pen className="size-3.5" />}
               iconOnly
               onClick={() => modal.open(product)}
               size="sm"
             />
             <Button
-              variant="ghost"
+              variant="secondary"
               loading={isDeletingProduct}
               icon={<Trash className="size-3.5" />}
               iconOnly

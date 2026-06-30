@@ -1,14 +1,14 @@
-import {prisma} from "../lib/prismaClient.js";
+import { prisma } from "../lib/prismaClient.js";
 
 const TARIFF_SNAPSHOT_INCLUDE = {
     rows: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { order: 'asc' },
     },
     columns: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { order: 'asc' },
     },
     cells: {
-        orderBy: {createdAt: 'asc'},
+        orderBy: { createdAt: 'asc' },
         include: {
             default_cells: true,
             customer_cells: true,
@@ -42,21 +42,49 @@ export interface TariffForPricing {
     }>;
 }
 
+export type PriceFailureReason =
+    | 'NO_TARIFF'
+    | 'NO_COLUMN'
+    | 'NO_ROW'
+    | 'NO_CELL'
+    | 'NO_DEFAULT'
+    | 'INVALID_INPUT';
+
+export type PriceResult =
+    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number } }
+    | { ok: false; reason: PriceFailureReason };
+
+export class PriceError extends Error {
+    constructor(public reason: PriceFailureReason) {
+        super(`Price calculation failed: ${reason}`);
+        this.name = 'PriceError';
+    }
+}
+
 /**
  * Pure pricing logic: given an already-loaded tariff, selects the matching
  * column (by duration), row (by quantity range) and cell, applies an optional
  * customer-specific override and returns the total price.
  *
- * Returns 0 when no matching column/row/cell/default price exists.
+ * `price` is the unit price per piece per time unit (Stückpreis pro
+ * Zeiteinheit). Total = unitPrice * quantity * duration. The `duration`
+ * selects the column AND is a multiplier.
+ *
+ * Returns a discriminated union so callers can distinguish "not configured"
+ * from "out of range" from "invalid input".
  */
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
     { duration, quantity, customerId }: SelectPriceParams,
-): number {
-    if (!tariff) return 0;
+): PriceResult {
+    if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
+
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+        return { ok: false, reason: 'INVALID_INPUT' };
+    }
 
     const column = tariff.columns.find(c => c.duration === duration);
-    if (!column) return 0;
+    if (!column) return { ok: false, reason: 'NO_COLUMN' };
 
     const row = tariff.rows.find(r => {
         const withinMin = quantity >= r.min_quantity;
@@ -64,34 +92,46 @@ export function selectPrice(
         const withinMax = noUpperLimit || quantity <= r.max_quantity!;
         return withinMin && withinMax;
     });
-    if (!row) return 0;
+    if (!row) return { ok: false, reason: 'NO_ROW' };
 
     const cell = tariff.cells.find(c => c.rowId === row.id && c.columnId === column.id);
-    if (!cell) return 0;
+    if (!cell) return { ok: false, reason: 'NO_CELL' };
 
     const defaultCell = cell.default_cells[0];
-    if (!defaultCell) return 0;
+    if (!defaultCell) return { ok: false, reason: 'NO_DEFAULT' };
 
-    let price = defaultCell.price;
+    let unitPrice = defaultCell.price;
 
-    if (customerId) {
+    if (customerId !== undefined && customerId !== '') {
         const override = cell.customer_cells.find(cc => cc.customerId === customerId);
-        if (override) price = override.price;
+        if (override) unitPrice = override.price;
     }
 
-    return price * quantity * duration;
+    return {
+        ok: true,
+        price: unitPrice * quantity * duration,
+        breakdown: { unitPrice, quantity, duration },
+    };
 }
 
 export async function snapshotTariff(productId: string, contractId: string) {
-    const tariff = await prisma.tariff.findFirst({
-        where: {productId, contractId},
+    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+        where: { productId },
+    });
+
+    if (!groupProduct) return;
+
+    const { tariffGroupId } = groupProduct;
+
+    const tariff = await prisma.tariff.findUnique({
+        where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
         include: TARIFF_SNAPSHOT_INCLUDE,
     });
 
     if (!tariff) return;
 
     const versionCount = await prisma.tariffHistory.count({
-        where: {productId, contractId},
+        where: { productId, contractId },
     });
 
     await prisma.tariffHistory.create({
@@ -99,27 +139,57 @@ export async function snapshotTariff(productId: string, contractId: string) {
             productId,
             contractId,
             version: versionCount + 1,
-            snapshot: tariff as any,
+            snapshot: tariff as object,
         },
     });
 }
 
-export default async function calculatePrice(props: PriceCalculatorProps): Promise<number> {
-    const {productId, contractId, duration, quantity, customerId} = props;
-
-    const tariff = await prisma.tariff.findUnique({
-        where: {productId_contractId: {productId, contractId}},
+const CALCULATE_PRICE_INCLUDE = {
+    rows: {
+        orderBy: { order: 'asc' },
+    },
+    columns: {
+        orderBy: { order: 'asc' },
+    },
+    cells: {
+        orderBy: { createdAt: 'asc' },
         include: {
-            rows: true,
-            columns: true,
-            cells: {
-                include: {
-                    default_cells: true,
-                    customer_cells: true,
-                },
-            },
+            default_cells: true,
+            customer_cells: true,
         },
-    });
+    },
+} as const;
 
-    return selectPrice(tariff, {duration, quantity, customerId});
+export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
+    const { productId, contractId, duration, quantity, customerId } = props;
+
+    try {
+        const groupProduct = await prisma.tariffGroupProduct.findUnique({
+            where: { productId },
+        });
+
+        if (!groupProduct) return { ok: false, reason: 'NO_TARIFF' };
+
+        const { tariffGroupId } = groupProduct;
+
+        const tariff = await prisma.tariff.findUnique({
+            where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
+            include: CALCULATE_PRICE_INCLUDE,
+        });
+
+        return selectPrice(tariff, { duration, quantity, customerId });
+    } catch (error) {
+        throw error;
+    }
+}
+
+/**
+ * Convenience wrapper for callers that only need the numeric price.
+ * Throws a {@link PriceError} when the tariff is not fully configured or
+ * the inputs are invalid — prevents silently storing `total_cents: 0`.
+ */
+export async function calculatePriceOrThrow(props: PriceCalculatorProps): Promise<number> {
+    const result = await calculatePrice(props);
+    if (!result.ok) throw new PriceError(result.reason);
+    return result.price;
 }

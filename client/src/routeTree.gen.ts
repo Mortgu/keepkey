@@ -23,8 +23,6 @@ import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers
 import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
 import { Route as MainWorkloadsTextsRouteImport } from './routes/_main/workloads/texts'
 import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
-import { Route as MainWorkloadsIdIndexRouteImport } from './routes/_main/workloads/$id/index'
-import { Route as MainOffersCreateIndexRouteImport } from './routes/_main/offers/create/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -96,16 +94,6 @@ const MainWorkloadsPricingIndexRoute =
     path: '/workloads/pricing/',
     getParentRoute: () => MainRouteRoute,
   } as any)
-const MainWorkloadsIdIndexRoute = MainWorkloadsIdIndexRouteImport.update({
-  id: '/workloads/$id/',
-  path: '/workloads/$id/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainOffersCreateIndexRoute = MainOffersCreateIndexRouteImport.update({
-  id: '/offers/create/',
-  path: '/offers/create/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
@@ -120,8 +108,6 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
   '/workloads/': typeof MainWorkloadsIndexRoute
-  '/offers/create/': typeof MainOffersCreateIndexRoute
-  '/workloads/$id/': typeof MainWorkloadsIdIndexRoute
   '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -137,8 +123,6 @@ export interface FileRoutesByTo {
   '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
   '/workloads': typeof MainWorkloadsIndexRoute
-  '/offers/create': typeof MainOffersCreateIndexRoute
-  '/workloads/$id': typeof MainWorkloadsIdIndexRoute
   '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesById {
@@ -156,8 +140,6 @@ export interface FileRoutesById {
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
   '/_main/workloads/': typeof MainWorkloadsIndexRoute
-  '/_main/offers/create/': typeof MainOffersCreateIndexRoute
-  '/_main/workloads/$id/': typeof MainWorkloadsIdIndexRoute
   '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRouteTypes {
@@ -175,8 +157,6 @@ export interface FileRouteTypes {
     | '/settings/'
     | '/suppliers/'
     | '/workloads/'
-    | '/offers/create/'
-    | '/workloads/$id/'
     | '/workloads/pricing/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -192,8 +172,6 @@ export interface FileRouteTypes {
     | '/settings'
     | '/suppliers'
     | '/workloads'
-    | '/offers/create'
-    | '/workloads/$id'
     | '/workloads/pricing'
   id:
     | '__root__'
@@ -210,8 +188,6 @@ export interface FileRouteTypes {
     | '/_main/settings/'
     | '/_main/suppliers/'
     | '/_main/workloads/'
-    | '/_main/offers/create/'
-    | '/_main/workloads/$id/'
     | '/_main/workloads/pricing/'
   fileRoutesById: FileRoutesById
 }
@@ -320,20 +296,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainWorkloadsPricingIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/workloads/$id/': {
-      id: '/_main/workloads/$id/'
-      path: '/workloads/$id'
-      fullPath: '/workloads/$id/'
-      preLoaderRoute: typeof MainWorkloadsIdIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/offers/create/': {
-      id: '/_main/offers/create/'
-      path: '/offers/create'
-      fullPath: '/offers/create/'
-      preLoaderRoute: typeof MainOffersCreateIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
   }
 }
 
@@ -349,8 +311,6 @@ interface MainRouteRouteChildren {
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
-  MainOffersCreateIndexRoute: typeof MainOffersCreateIndexRoute
-  MainWorkloadsIdIndexRoute: typeof MainWorkloadsIdIndexRoute
   MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
 }
 
@@ -366,8 +326,6 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
-  MainOffersCreateIndexRoute: MainOffersCreateIndexRoute,
-  MainWorkloadsIdIndexRoute: MainWorkloadsIdIndexRoute,
   MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,
 }
 

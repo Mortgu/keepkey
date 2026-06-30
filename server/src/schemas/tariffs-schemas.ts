@@ -1,7 +1,14 @@
 import {z} from "zod";
 
+export const createTariffGroupSchema = z.object({
+    products: z.array(z.string().min(1)).min(1),
+});
+
+export const updateTariffGroupSchema = z.object({
+    products: z.array(z.string().min(1)).optional(),
+});
+
 export const createTariffSchema = z.object({
-    productId: z.string().min(1),
     contractId: z.string().min(1),
 });
 

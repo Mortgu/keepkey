@@ -3,15 +3,11 @@ import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
 import type {
-  Contract,
-  ContractTranslationInput,
-  CreateContractInput,
-  Language,
-  UpdateContractInput,
+  Contract, ContractTranslationInput, Language
 } from "@/types";
-import { useContractHook } from "@/hooks";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
 import { getFormErrors } from "@/lib/utils";
+import { useContractManager } from "@/hooks/contracts/contract-mutations";
 
 interface ContractModalProps {
   onClose: () => void;
@@ -37,7 +33,10 @@ function seedLang(translations: Contract["translations"] | undefined, lang: Lang
 export default function ContractModal({ onClose, currentContract = null }: ContractModalProps) {
   const isEdit = currentContract !== null;
 
-  const { updateContract, createContract } = useContractHook();
+  const {
+    createContract,
+    updateContract
+  } = useContractManager();
 
   const [language, setLanguage] = useState<Language>("DE");
 
@@ -54,13 +53,16 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];
+
       if (isEdit) {
         updateContract({
           id: currentContract.id,
-          data: { translations },
+          input: { translations },
         });
       } else {
-        createContract({ translations });
+        createContract({
+          input: { translations }
+        });
       }
       onClose();
     },

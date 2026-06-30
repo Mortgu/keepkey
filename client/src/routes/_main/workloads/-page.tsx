@@ -32,7 +32,7 @@ export default function ProductPage() {
             <div className="grid gap-4">
                 {/* Page header */}
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-medium">{t('section.products')}</h1>
+                    <h1 className="text-2xl font-medium">{t('section.workloads')}</h1>
                 </div>
 
                 {/* Page header actions */}

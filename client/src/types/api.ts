@@ -14,7 +14,9 @@ export interface components {
             offerPositions: components["schemas"]["OfferPosition"][];
             tariffs: components["schemas"]["Tariff"][];
             /** Format: date-time */
-            createdAt?: string;
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         ContractTranslation: {
             contractId: string;
@@ -23,6 +25,10 @@ export interface components {
             features: string[];
             table: string;
             contract: components["schemas"]["Contract"];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Customer: {
             id: string;
@@ -273,7 +279,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            tariffs: components["schemas"]["Tariff"][];
+            tariffGroupProducts: components["schemas"]["TariffGroupProduct"][];
         };
         ProductTranslation: {
             productId: string;
@@ -382,12 +388,32 @@ export interface components {
             table: string;
             flatRate: components["schemas"]["FlatRate"];
         };
-        Tariff: {
+        TariffGroup: {
             id: string;
+            products: components["schemas"]["TariffGroupProduct"][];
+            tariffs: components["schemas"]["Tariff"][];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        TariffGroupProduct: {
+            id: string;
+            tariffGroup: components["schemas"]["TariffGroup"];
+            tariffGroupId: string;
             product: components["schemas"]["Product"];
             productId: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
+        };
+        Tariff: {
+            id: string;
             contract: components["schemas"]["Contract"];
             contractId: string;
+            tariffGroup: components["schemas"]["TariffGroup"];
+            tariffGroupId: string;
             rows: components["schemas"]["TariffRow"][];
             columns: components["schemas"]["TariffColumn"][];
             cells: components["schemas"]["TariffCell"][];
@@ -404,6 +430,8 @@ export interface components {
             min_quantity: number;
             /** Format: int32 */
             max_quantity?: number;
+            /** Format: int32 */
+            order: number;
             cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;
@@ -416,6 +444,8 @@ export interface components {
             tariffId: string;
             /** Format: int32 */
             duration: number;
+            /** Format: int32 */
+            order: number;
             cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;

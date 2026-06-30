@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import calculatePrice from "../../utils/products.js";
+import { calculatePriceOrThrow } from "../../utils/products.js";
 import { OfferFlatRate, OfferPosition } from "@prisma/client";
 import { prisma } from "../../lib/prismaClient.js";
 import { toDate } from "../../utils/utils.js";
@@ -16,13 +16,15 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
     const { id: _, supplierId, validUntil, requestFrom, date, ...scalarFields } = data.offer;
 
     for (const position of positions) {
-        position["total_cents"] = await calculatePrice({
+        position["total_cents"] = await calculatePriceOrThrow({
             productId: position.productId,
             contractId: position.contractId,
             duration: position.duration_months,
             quantity: position.quantity,
             customerId: data.offer?.customerId,
         });
+
+        console.log(position)
     }
 
     try {

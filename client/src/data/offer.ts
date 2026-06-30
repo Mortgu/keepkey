@@ -1,5 +1,5 @@
 import { api } from "@/lib/api-client";
-import type { ContactPerson, CreateOfferFlatRatesInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatRatesInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
+import type { ContactPerson, CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
 
 
 
@@ -7,7 +7,7 @@ export const getContactPersonsAction = () =>
     api<Array<ContactPerson>>("/api/contact-persons", { method: "GET" });
 
 
-export const createOfferAction = (offer: CreateOfferInput, positions: Array<CreateOfferPositionInput>, flatRates: Array<CreateOfferFlatRatesInput>) =>
+export const createOfferAction = (offer: CreateOfferInput, positions: Array<CreateOfferPositionInput>, flatRates: Array<CreateOfferFlatrateInput>) =>
     api<Offer>("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -23,7 +23,7 @@ export const deleteOfferDocumentAction = (offerId: string, documentId: string) =
     });
 
 export const updateOfferAction = (
-    id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatRates: Array<UpdateOfferFlatRatesInput>,
+    id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatRates: Array<UpdateOfferFlatrateInput>,
 ) => api<Offer>(`/api/offers/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },

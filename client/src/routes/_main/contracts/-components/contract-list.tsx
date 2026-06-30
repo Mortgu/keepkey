@@ -1,20 +1,22 @@
-import {Loader, Plus} from "lucide-react";
-import {useTranslation} from "react-i18next";
+import { Loader, Plus } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
-import type {Contract} from "@/types";
-import {useContractHook, useModal} from "@/hooks";
-import {Button} from "@/components";
+import type { Contract } from "@/types";
+import { useModal } from "@/hooks";
+import { Button } from "@/components";
+import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 export default function ContractList() {
-    const {t} = useTranslation();
-    const {contracts, isPending, error, deleteContract} = useContractHook();
+    const { t } = useTranslation();
+
+    const { contracts, isPending, error } = useContracts();
 
     const modal = useModal();
 
     if (isPending) {
-        return <Loader className="animate-spin"/>;
+        return <Loader className="animate-spin" />;
     }
 
     if (error) {
@@ -33,17 +35,17 @@ export default function ContractList() {
                     {t("section.contracts")} ({contracts.length})
                 </h1>
                 <Button onClick={() => modal.open()} size="sm">
-                    Create <Plus className="size-4"/>
+                    Create <Plus className="size-4" />
                 </Button>
             </div>
             <div className="grid gap-2">
                 {contracts.map((contract: Contract, index) => (
-                    <ContractListItem key={index} contract={contract} deleteContract={deleteContract}/>
+                    <ContractListItem key={index} contract={contract} />
                 ))}
             </div>
 
             {modal.isOpen && (
-                <ContractModal key={modal.key} onClose={modal.close}/>
+                <ContractModal key={modal.key} onClose={modal.close} />
             )}
         </div>
     );

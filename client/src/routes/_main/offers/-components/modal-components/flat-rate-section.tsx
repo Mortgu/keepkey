@@ -5,22 +5,20 @@ import { formatEur } from "@/utils/utils";
 import { Plus, Trash, X } from "lucide-react";
 import { useState } from "react";
 import OfferFlatRateForm from "./offer-flat-rate-form";
-import type { CreateOfferFlatrateInput, OfferFlatRate } from "@/types";
+import type { GetOfferFlatrate } from "@/types";
 
 type Props = {
-    offerFlatRates: Array<OfferFlatRate>;
-    onAdd: (data: CreateOfferFlatrateInput) => void;
+    offerFlatRates: Array<GetOfferFlatrate>;
+    onAdd: (data: GetOfferFlatrate) => void;
     onRemove: (index: number) => void;
 };
 
-export default function FlatRateModalSection({
-    offerFlatRates,
-    onAdd,
-    onRemove,
-}: Props) {
+export default function FlatRateModalSection({ offerFlatRates, onAdd, onRemove }: Props) {
     const [showForm, setShowForm] = useState(false);
     const { flatRates } = useFlatRateHook();
     const locale = useLocale();
+
+    console.log(flatRates);
 
     return (
         <div className="grid gap-4">
@@ -58,11 +56,7 @@ export default function FlatRateModalSection({
                                 <p className="flex items-center gap-1 text-sm">
                                     {flatRate.quantity}{" "}
                                     <X className="size-3" />{" "}
-                                    {localized(
-                                        flatRate.flatRate.translations,
-                                        locale,
-                                        "name",
-                                    )}
+                                    {localized(flatRate.flatRate.translations, locale, "name")}
                                 </p>
                                 <p className="text-xs text-(--text-secondary)">
                                     {formatEur(flatRate.total_cents)}

@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { useAuth } from "@/context/auth";
 import { findOfferFilesByIdAction } from "@/data/nextcloud";
-import { getPrice } from "@/data/products";
+import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { useOfferManager } from "@/hooks/offers/offer-mutations";
 import type {
     CreateOfferInput, GetOfferFlatrate, Offer,
@@ -104,6 +104,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         currentOffer?.offerFlatRates.map(toOfferFlatRateInput) ?? [],
     );
 
+
     const [quoteIdWarning, setQuoteIdWarning] = useState<string | undefined>(undefined);
     const [checkingQuoteId, setCheckingQuoteId] = useState(false);
     const [submitError, setSubmitError] = useState<Error | undefined>(undefined);
@@ -115,18 +116,18 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
             contractId: string;
             quantity: number;
             duration: number;
-        }) => getPrice(args.productId, args.contractId, args.duration, args.quantity),
+        }) => getTariffPrice(args.productId, args.contractId, args.duration, args.quantity),
     });
 
     const resolvePrice = async (data: OfferProductInput): Promise<OfferProductInput> => {
-        const total_cents = await fetchPrice({
+        const fetched = await fetchPrice({
             productId: data.productId,
             contractId: data.contractId,
             quantity: data.quantity,
             duration: data.duration_months,
         });
 
-        return { ...data, total_cents: typeof total_cents === "number" ? total_cents : 0 };
+        return { ...data, total_cents: fetched.price };
     };
 
     const addProduct = async (data: OfferProductInput) => {

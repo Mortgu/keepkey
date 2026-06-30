@@ -3,8 +3,9 @@ import { useMemo, useState } from "react";
 import OfferProductForm from "./offer-product-form";
 import ProductSectionItem from "./product-section-item";
 import type { OfferProductInput } from "./offer-product-form";
-import { useContractHook, useProductHook } from "@/hooks";
+import { useProductHook } from "@/hooks";
 import { Button } from "@/components";
+import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 type Props = {
     offerProducts: Array<OfferProductInput>;
@@ -24,7 +25,7 @@ export default function ProductModalSection({
     const [showForm, setShowForm] = useState<boolean>(false);
 
     const { products } = useProductHook();
-    const { contracts } = useContractHook();
+    const { contracts } = useContracts();
 
     const productMap = useMemo(
         () => new Map(products.map((p) => [p.id, p])),

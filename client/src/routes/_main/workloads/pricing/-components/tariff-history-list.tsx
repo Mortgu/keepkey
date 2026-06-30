@@ -1,18 +1,15 @@
+import { useTariffHistoryHook } from "@/hooks";
+import { formatDate } from "@/lib/format";
+import type { TariffHistory } from "@/types";
+import { ChevronRight } from "lucide-react";
 import { useState } from "react";
-import { ChevronRight, Plus, UndoDot } from "lucide-react";
-import type { Contract, Product, TariffHistory } from "@/types";
-import { Button, Drawer } from "@/components";
-import { localized } from "@/lib/i18n-content.ts";
-import { useLocale, useTariffHistoryHook, useTariffHook } from "@/hooks";
-import TariffComponent from "@/routes/_main/workloads/$id/-components/tariff-component.tsx";
-import { formatDate } from "@/lib/format.ts";
 
 type Props = {
-    product: Product;
-    contract: Contract;
+    productId: string;
+    contractId: string;
 }
 
-function TariffHistoryList({ productId, contractId }: { productId: string; contractId: string }) {
+export function TariffHistoryList({ productId, contractId }: Props) {
     const { history, isPending } = useTariffHistoryHook(productId, contractId);
     const [expandedVersion, setExpandedVersion] = useState<number | null>(null);
 
@@ -68,52 +65,6 @@ function TariffHistoryList({ productId, contractId }: { productId: string; contr
                     )}
                 </div>
             ))}
-        </div>
-    );
-}
-
-export default function ContractCollapsable(props: Props) {
-    const locale = useLocale();
-    const { product, contract } = props;
-
-    const [modalOpen, setModalOpen] = useState<boolean>(false);
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-
-    const { tariffs, createTariff } = useTariffHook(product.id);
-
-    const tariff = tariffs.find(t => t.contractId === contract.id);
-
-    return (
-        <div className="grid bg-white border border-(--border) rounded-md shadow-xs">
-            <div className="flex items-center justify-between border-b border-(--border)">
-                <div onClick={() => setModalOpen(!modalOpen)}
-                    className="w-full flex items-center gap-2 py-4 px-5 hover:bg-(--page-bg) hover:cursor-pointer select-none">
-                    <ChevronRight className={modalOpen ? "size-4 rotate-90 transition-all" : "transition-all size-4"} />
-                    <h1>{localized(contract.translations, locale, "name")}</h1>
-                </div>
-
-                <div className="flex items-center gap-2 px-2">
-                    <Button icon={<UndoDot className="size-4" />} iconOnly variant="secondary" size="sm"
-                        onClick={() => setDrawerOpen(true)} />
-
-                    <Button icon={<Plus className="size-4" />} iconOnly variant="secondary" size="sm"
-                        onClick={() => createTariff({ productId: product.id, contractId: contract.id })} />
-                </div>
-            </div>
-
-            {modalOpen && tariff && (
-                <div className="w-full grid gap-2 p-4">
-                    <TariffComponent key={tariff.id} tariff={tariff} />
-                </div>
-            )}
-
-            <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header eyebrow="" title="History"
-                    subtitle="Vergangene Preistabellen" />
-                <Drawer.Body>
-                    <TariffHistoryList productId={product.id} contractId={contract.id} />
-                </Drawer.Body>
-            </Drawer>
         </div>
     );
 }

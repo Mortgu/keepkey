@@ -1,13 +1,13 @@
 import { useState } from "react";
 
-import type { CreateOfferFlatRatesInput, FlatRate } from "@/types";
+import type { FlatRate, GetOfferFlatrate } from "@/types";
 import { Button, Input, Select } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 interface Props {
   flatRates: Array<FlatRate>;
-  saveFn: (flatRate: CreateOfferFlatRatesInput) => void;
+  saveFn: (flatRate: GetOfferFlatrate) => void;
   cancelFn: () => void;
 }
 
@@ -20,13 +20,14 @@ export default function OfferFlatRateForm({ flatRates, saveFn, cancelFn }: Props
   const selected = flatRates.find((fr) => fr.id === flatRateId) ?? flatRates[0];
 
   const handleSave = () => {
-    if (!selected) return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+    if (!selected) return;
+
     saveFn({
       flatRateId: selected.id,
+      quantity,
       flatRate: selected,
       offerId: "",
-      quantity,
-      total_cents: selected.total_cents * quantity,
+      total_cents: 0
     });
   };
 
