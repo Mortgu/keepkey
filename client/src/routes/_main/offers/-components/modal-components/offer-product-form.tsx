@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 
 import { Pen } from "lucide-react";
 import type { OfferPosition } from "@/types";
-import type {TariffPriceResult} from "@/hooks/tariffs/tariff-api";
+import type { TariffPriceResult } from "@/hooks/tariffs/tariff-api";
 import { Button, Checkbox, Input, Select } from "@/components";
 import { useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
-import {  getTariffPrice } from "@/hooks/tariffs/tariff-api";
+import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { localized } from "@/lib/i18n-content";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 import { formatEur } from "@/utils/utils";
@@ -119,6 +119,7 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
         const overrideCents = eurToCents(parsed);
         await onPersistOverride(data, overrideCents);
       }
+
       onSave(data);
     } catch (exception: unknown) {
       setError(exception instanceof Error ? exception.message : "Preis konnte nicht gespeichert werden.");
@@ -203,7 +204,7 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <div className="flex items-center justify-between gap-2">
-        <Checkbox label="Optional?" onChange={() => setOptional(!optional)} />
+        <Checkbox label="Optional?" onChange={() => setOptional(!optional)} checked={currentProduct?.optional ?? false} />
 
         <div className="flex gap-2">
           <Button type="button" variant="secondary" size="sm" onClick={onCancel}>

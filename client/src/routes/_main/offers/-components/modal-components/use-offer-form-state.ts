@@ -178,6 +178,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
             quantity: number;
             customerId: string;
             price: number;
+            optional: boolean;
         }) => upsertCustomerPrice(args),
     });
 
@@ -214,6 +215,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
             quantity: data.quantity,
             customerId,
             price: unitPriceCents,
+            optional: data.optional ?? false,
         });
 
         return result.price;

@@ -162,6 +162,7 @@ export const upsertCustomerPrice = (
         quantity: number;
         customerId: string;
         price: number;
+        optional: boolean;
     },
 ) =>
     api<TariffPriceResult>('/api/tariffs/customer-price', {

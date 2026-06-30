@@ -60,15 +60,20 @@ export default function ProductSectionItem(props: Props) {
                     </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-1">
-                    <p>{formatEur(offerProduct.total_cents)}</p>
+                {/* Right */}
+                <div className="flex items-center gap-5">
+                    <div className="flex items-center justify-between">
+                        <p className="text-sm">{formatEur(offerProduct.total_cents)}</p>
+                    </div>
 
-                    <Button variant="secondary" type="button" size="xs" disabled={edit}
-                        icon={<Pen className="size-3" />} iconOnly onClick={() => setEdit(true)} />
+                    {/* Actions */}
+                    <div className="flex gap-2">
+                        <Button variant="secondary" type="button" size="xs" disabled={edit}
+                            icon={<Pen className="size-3" />} iconOnly onClick={() => setEdit(true)} />
 
-                    <Button variant="secondary" type="button" size="xs"
-                        icon={<Trash className="size-3" />} iconOnly onClick={onRemove} />
+                        <Button variant="secondary" type="button" size="xs"
+                            icon={<Trash className="size-3" />} iconOnly onClick={onRemove} />
+                    </div>
                 </div>
 
             </div>
