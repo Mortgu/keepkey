@@ -38,7 +38,7 @@ const styles = tv({
 });
 
 const adornmentButtonClass =
-    "absolute right-1 top-1/2 -translate-y-1/2 h-[26px] w-7 rounded-md";
+    "absolute right-1 top-1/2 -translate-y-1/2 h-[29px] w-[29px] rounded-md";
 
 function LabelBadge({
     kind,

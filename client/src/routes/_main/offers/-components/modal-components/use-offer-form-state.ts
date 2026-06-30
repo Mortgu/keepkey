@@ -7,7 +7,7 @@ import { findOfferFilesByIdAction } from "@/data/nextcloud";
 import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { useOfferManager } from "@/hooks/offers/offer-mutations";
 import type {
-    CreateOfferInput, GetOfferFlatrate, Offer,
+    CreateOfferInput, GetOfferFlatrate, Language, Offer,
     OfferFlatRate,
     OfferPosition, User
 } from "@/types";
@@ -19,7 +19,7 @@ import type { OfferProductInput } from "./offer-product-form";
 type OfferFormValues = z.infer<typeof offerSchema>;
 
 type OfferFormDefaultSources = {
-    customers: Array<{ id: string; contactPersons: Array<{ id: string }> }>;
+    customers: Array<{ id: string; language?: Language; contactPersons: Array<{ id: string }> }>;
     suppliers: Array<{ id: string }>;
     user: User | null | undefined;
     locale: "DE" | "EN";
@@ -35,7 +35,7 @@ const getFormDefaults = (
             contactPersonId: currentOffer.contactPersonId,
             userId: currentOffer.userId,
             quoteId: currentOffer.quoteId,
-            language: currentOffer.language,
+            language: sources.customers[0]?.language ?? sources.locale,
             supplierId: currentOffer.supplierId ?? null,
             paymentTerm: currentOffer.paymentTerm,
             validUntil: currentOffer.validUntil ?? null,

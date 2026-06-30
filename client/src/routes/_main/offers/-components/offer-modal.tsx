@@ -98,10 +98,14 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
                       const newCustomer = customers.find(
                         (c: Customer) => c.id === newCustomerId,
                       );
-                      form.setFieldValue(
-                        "contactPersonId",
+                      form.setFieldValue("contactPersonId",
                         newCustomer?.contactPersons[0]?.id ?? "",
                       );
+
+                      // Sprache nur bei Create übernehmen
+                      if (!isEdit && newCustomer?.language) {
+                        form.setFieldValue("language", newCustomer.language)
+                      }
                     }}
                   >
                     {customers.map((customer: Customer) => (

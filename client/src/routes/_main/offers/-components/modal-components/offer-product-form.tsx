@@ -5,6 +5,8 @@ import { useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import type { OfferPosition } from "@/types";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
+import { formatEur } from "@/utils/utils";
+import { Pen } from "lucide-react";
 
 export type OfferProductInput = Omit<OfferPosition,
   "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
@@ -70,8 +72,9 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
   };
 
   return (
-    <div className="bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-2 rounded-md">
+    <div className="w-full grid gap-3 border-t border-(--border) py-4 px-4">
       <div className="flex items-end gap-3">
+
         <div className="flex-2 grid gap-1">
           <Select label="Produkt" value={productId} onChange={(e) => setProductId(e.target.value)} className="bg-white">
             {products.map((p) => (
@@ -112,17 +115,28 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
             className="bg-white" />
         </div>
 
-        <div className="w-20 grid gap-1">
-          <Input label="Preis" value={0}
-            onChange={(e) => { }}
-            className="bg-white" />
+
+      </div>
+
+      <div className="flex items-end gap-3">
+
+        <div className="flex-2 grid gap-1">
+          <Input label="Listenpreis (pro Seat)" className="bg-white" value={formatEur((currentProduct?.total_cents || 0) / (currentProduct?.quantity || 1) / (currentProduct?.duration_months || 1))}
+            disabled rightButton={{
+              icon: <Pen className="size-3" />,
+              variant: "secondary",
+              onClick: () => { }
+            }} />
         </div>
+
+
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <div className="flex items-center justify-between gap-2">
         <Checkbox label="Optional?" onChange={() => setOptional(!optional)} />
+
         <div className="flex gap-2">
           <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
             Abbrechen

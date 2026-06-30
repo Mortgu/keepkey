@@ -41,6 +41,9 @@ export default function ProductModalSection({
             <hr className="text-gray-200" />
             <div className="grid gap-4">
                 <div className="flex items-center justify-between w-full">
+                    <span className="text-sm font-medium text-gray-700">
+                        Workloads
+                    </span>
                     <Button
                         variant="link"
                         size="fit_sm"
@@ -48,7 +51,7 @@ export default function ProductModalSection({
                         icon={<Plus className="size-4" />}
                         onClick={() => setShowForm(true)}
                     >
-                        Produkt hinzufügen
+                        Workload hinzufügen
                     </Button>
                 </div>
 
@@ -84,13 +87,15 @@ export default function ProductModalSection({
                 </div>
 
                 {showForm && (
-                    <OfferProductForm
-                        onSave={async (data) => {
-                            await onAdd(data);
-                            setShowForm(false);
-                        }}
-                        onCancel={() => setShowForm(false)}
-                    />
+                    <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
+                        <OfferProductForm
+                            onSave={async (data) => {
+                                await onAdd(data);
+                                setShowForm(false);
+                            }}
+                            onCancel={() => setShowForm(false)}
+                        />
+                    </div>
                 )}
             </div>
         </div>
