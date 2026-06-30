@@ -1,10 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { LoaderCircle, Plus } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import ProductList from './-components/product-list';
 import { Button, PageWidth, SearchBar } from "@/components";
-import { useModal, useProductHook } from "@/hooks";
+import { useLocale, useModal, useProductHook } from "@/hooks";
 import ProductModal from "@/routes/_main/workloads/-components/product-modal.tsx";
+import { localized } from "@/lib/i18n-content";
 
 export default function ProductPage() {
     const { t } = useTranslation()
@@ -16,8 +17,18 @@ export default function ProductPage() {
     } = useProductHook();
 
     const modal = useModal();
+    const locale = useLocale();
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+
+    const filteredProducts = useMemo(() => {
+        if (!searchQuery.trim()) return products;
+        const query = searchQuery.toLowerCase();
+        return products.filter((product) => {
+            const name = localized(product.translations, locale, "name");
+            return name.toLowerCase().includes(query);
+        });
+    }, [products, searchQuery, locale]);
 
     const renderLoading = () => {
         return (
@@ -53,7 +64,7 @@ export default function ProductPage() {
                 {/* body */}
                 <div className="grid gap-4">
                     {isPending ? renderLoading() : (
-                        <ProductList products={products} />
+                        <ProductList products={filteredProducts} />
                     )}
                 </div>
 
