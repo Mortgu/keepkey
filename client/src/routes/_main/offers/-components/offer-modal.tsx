@@ -293,10 +293,11 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
 
           <ProductModalSection
             offerProducts={state.offerProducts}
+            customerId={state.customerId}
             onAdd={state.addProduct}
             onUpdate={state.updateProduct}
             onRemove={state.removeProduct}
-            onPriceChange={state.updateProductPrice}
+            onPersistOverride={state.persistCustomerOverride}
           />
 
           <FlatRateModalSection

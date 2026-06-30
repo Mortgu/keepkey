@@ -1,19 +1,19 @@
-import { useForm } from "@tanstack/react-form";
+import { useForm, useStore } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { useAuth } from "@/context/auth";
-import { findOfferFilesByIdAction } from "@/data/nextcloud";
-import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
-import { useOfferManager } from "@/hooks/offers/offer-mutations";
+import { offerSchema } from "../offer-utils";
 import type {
     CreateOfferInput, GetOfferFlatrate, Language, Offer,
     OfferFlatRate,
     OfferPosition, User
 } from "@/types";
 import type { z } from "zod";
-import { offerSchema } from "../offer-utils";
 import type { OfferProductInput } from "./offer-product-form";
+import { useAuth } from "@/context/auth";
+import { findOfferFilesByIdAction } from "@/data/nextcloud";
+import { useOfferManager } from "@/hooks/offers/offer-mutations";
+import { getTariffPrice, upsertCustomerPrice } from "@/hooks/tariffs/tariff-api";
 
 
 type OfferFormValues = z.infer<typeof offerSchema>;
@@ -89,11 +89,8 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
 
     const {
         createOffer,
-        isCreatingOffer,
         errorCreatingOffer,
-
         updateOffer,
-        isUpdatingOffer,
         errorUpdatingOffer,
     } = useOfferManager();
 
@@ -108,73 +105,6 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
     const [quoteIdWarning, setQuoteIdWarning] = useState<string | undefined>(undefined);
     const [checkingQuoteId, setCheckingQuoteId] = useState(false);
     const [submitError, setSubmitError] = useState<Error | undefined>(undefined);
-
-    const { mutateAsync: fetchPrice } = useMutation({
-        mutationKey: ["price"],
-        mutationFn: (args: {
-            productId: string;
-            contractId: string;
-            quantity: number;
-            duration: number;
-        }) => getTariffPrice(args.productId, args.contractId, args.duration, args.quantity),
-    });
-
-    const resolvePrice = async (data: OfferProductInput): Promise<OfferProductInput> => {
-        const fetched = await fetchPrice({
-            productId: data.productId,
-            contractId: data.contractId,
-            quantity: data.quantity,
-            duration: data.duration_months,
-        });
-
-        return { ...data, total_cents: fetched.price };
-    };
-
-    const addProduct = async (data: OfferProductInput) => {
-        const priced = await resolvePrice(data);
-        setOfferProducts((prev) => [...prev, priced]);
-    };
-
-    const updateProduct = async (index: number, data: OfferProductInput) => {
-        const priced = await resolvePrice(data);
-        setOfferProducts((prev) => prev.map((p, i) => (i === index ? priced : p)));
-    };
-
-    const updateProductPrice = (index: number, price: number) => {
-        setOfferProducts((prev) =>
-            prev.map((p, i) => (i === index ? { ...p, total_cents: price } : p)),
-        );
-    };
-
-    const removeProduct = (index: number) => {
-        setOfferProducts((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const addFlatRate = (data: GetOfferFlatrate) => {
-        setOfferFlatRates((prev) => [...prev, data]);
-    };
-
-    const removeFlatRate = (index: number) => {
-        setOfferFlatRates((prev) => prev.filter((_, i) => i !== index));
-    };
-
-    const clearQuoteIdWarning = () => setQuoteIdWarning(undefined);
-
-    const checkQuoteId = async (id: string) => {
-        if (!id) {
-            setQuoteIdWarning(undefined);
-            return;
-        }
-        setCheckingQuoteId(true);
-        try {
-            const result = await findOfferFilesByIdAction(id);
-            setQuoteIdWarning(result.found ? "Datei existiert bereits" : undefined);
-        } catch {
-            setQuoteIdWarning(undefined);
-        } finally {
-            setCheckingQuoteId(false);
-        }
-    };
 
     const form = useForm({
         defaultValues: getFormDefaults(currentOffer, { customers, suppliers, user, locale }),
@@ -226,6 +156,99 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         },
     });
 
+    const customerId = useStore(form.store, (s) => s.values.customerId);
+
+    const { mutateAsync: fetchPrice } = useMutation({
+        mutationKey: ["price"],
+        mutationFn: (args: {
+            productId: string;
+            contractId: string;
+            quantity: number;
+            duration: number;
+            customerId?: string;
+        }) => getTariffPrice(args.productId, args.contractId, args.duration, args.quantity, args.customerId),
+    });
+
+    const { mutateAsync: persistOverride } = useMutation({
+        mutationKey: ["customer-price"],
+        mutationFn: (args: {
+            productId: string;
+            contractId: string;
+            duration: number;
+            quantity: number;
+            customerId: string;
+            price: number;
+        }) => upsertCustomerPrice(args),
+    });
+
+    const resolvePrice = async (data: OfferProductInput): Promise<OfferProductInput> => {
+        const fetched = await fetchPrice({
+            productId: data.productId,
+            contractId: data.contractId,
+            quantity: data.quantity,
+            duration: data.duration_months,
+            customerId,
+        });
+
+        return { ...data, total_cents: fetched.price };
+    };
+
+    const addProduct = async (data: OfferProductInput) => {
+        const priced = await resolvePrice(data);
+        setOfferProducts((prev) => [...prev, priced]);
+    };
+
+    const updateProduct = async (index: number, data: OfferProductInput) => {
+        const priced = await resolvePrice(data);
+        setOfferProducts((prev) => prev.map((p, i) => (i === index ? priced : p)));
+    };
+
+    const persistCustomerOverride = async (
+        data: OfferProductInput,
+        unitPriceCents: number,
+    ): Promise<number> => {
+        const result = await persistOverride({
+            productId: data.productId,
+            contractId: data.contractId,
+            duration: data.duration_months,
+            quantity: data.quantity,
+            customerId,
+            price: unitPriceCents,
+        });
+
+        return result.price;
+    };
+
+    const removeProduct = (index: number) => {
+        setOfferProducts((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const addFlatRate = (data: GetOfferFlatrate) => {
+        setOfferFlatRates((prev) => [...prev, data]);
+    };
+
+    const removeFlatRate = (index: number) => {
+        setOfferFlatRates((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const clearQuoteIdWarning = () => setQuoteIdWarning(undefined);
+
+    const checkQuoteId = async (id: string) => {
+        if (!id) {
+            setQuoteIdWarning(undefined);
+            return;
+        }
+        setCheckingQuoteId(true);
+        try {
+            const result = await findOfferFilesByIdAction(id);
+            setQuoteIdWarning(result.found ? "Datei existiert bereits" : undefined);
+        } catch {
+            setQuoteIdWarning(undefined);
+        } finally {
+            setCheckingQuoteId(false);
+        }
+    };
+
     const submit = async () => {
         await form.handleSubmit();
     };
@@ -241,7 +264,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         addProduct,
         updateProduct,
         removeProduct,
-        updateProductPrice,
+        persistCustomerOverride,
         offerFlatRates,
         addFlatRate,
         removeFlatRate,
@@ -250,6 +273,7 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         checkQuoteId,
         clearQuoteIdWarning,
 
+        customerId,
         fetchPrice
     };
 }

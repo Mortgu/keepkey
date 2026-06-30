@@ -9,18 +9,23 @@ import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 type Props = {
     offerProducts: Array<OfferProductInput>;
+    customerId: string;
     onAdd: (data: OfferProductInput) => Promise<void>;
     onUpdate: (index: number, data: OfferProductInput) => Promise<void>;
     onRemove: (index: number) => void;
-    onPriceChange: (index: number, price: number) => void;
+    onPersistOverride: (
+        data: OfferProductInput,
+        unitPriceCents: number,
+    ) => Promise<number>;
 };
 
 export default function ProductModalSection({
     offerProducts,
+    customerId,
     onAdd,
     onUpdate,
     onRemove,
-    onPriceChange,
+    onPersistOverride,
 }: Props) {
     const [showForm, setShowForm] = useState<boolean>(false);
 
@@ -76,11 +81,10 @@ export default function ProductModalSection({
                                 offerProduct={op}
                                 offerContract={contract}
                                 index={index}
+                                customerId={customerId}
                                 onUpdate={(data) => onUpdate(index, data)}
                                 onRemove={() => onRemove(index)}
-                                onPriceChange={(price) =>
-                                    onPriceChange(index, price)
-                                }
+                                onPersistOverride={onPersistOverride}
                             />
                         );
                     })}
@@ -89,6 +93,7 @@ export default function ProductModalSection({
                 {showForm && (
                     <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
                         <OfferProductForm
+                            customerId={customerId}
                             onSave={async (data) => {
                                 await onAdd(data);
                                 setShowForm(false);

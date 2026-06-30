@@ -21,18 +21,21 @@ function buildTariff(): TariffForPricing {
     ],
     cells: [
       {
+        id: "cell1",
         rowId: "rowSmall",
         columnId: "col12",
         default_cells: [{ price: 10 }],
         customer_cells: [{ customerId: "vip", price: 8 }],
       },
       {
+        id: "cell2",
         rowId: "rowSmall",
         columnId: "col24",
         default_cells: [{ price: 9 }],
         customer_cells: [],
       },
       {
+        id: "cell3",
         rowId: "rowLarge",
         columnId: "col12",
         default_cells: [{ price: 5 }],

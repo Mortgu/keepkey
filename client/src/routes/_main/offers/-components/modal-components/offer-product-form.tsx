@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 
+import { Pen } from "lucide-react";
+import type { OfferPosition } from "@/types";
+import type {TariffPriceResult} from "@/hooks/tariffs/tariff-api";
 import { Button, Checkbox, Input, Select } from "@/components";
 import { useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
+import {  getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { localized } from "@/lib/i18n-content";
-import type { OfferPosition } from "@/types";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 import { formatEur } from "@/utils/utils";
-import { Pen } from "lucide-react";
 
 export type OfferProductInput = Omit<OfferPosition,
   "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
@@ -16,9 +18,16 @@ interface Props {
   onSave: (data: OfferProductInput) => void;
   onCancel: () => void;
   currentProduct?: OfferProductInput;
+  customerId?: string;
+  onPersistOverride?: (
+    data: OfferProductInput,
+    unitPriceCents: number,
+  ) => Promise<number>;
 }
 
-export default function OfferProductForm({ currentProduct, onSave, onCancel }: Props) {
+const eurToCents = (eur: number): number => Math.round(eur * 100);
+
+export default function OfferProductForm({ currentProduct, customerId, onPersistOverride, onSave, onCancel }: Props) {
   const { products } = useProductHook();
   const { contracts } = useContracts();
 
@@ -36,6 +45,10 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
 
   const { durations } = useTariffDurationsHook(productId, contractId);
 
+  const [unitPriceCents, setUnitPriceCents] = useState<number>(0);
+  const [priceLoading, setPriceLoading] = useState<boolean>(false);
+  const [editingPrice, setEditingPrice] = useState<boolean>(false);
+  const [overrideEur, setOverrideEur] = useState<string>("");
 
   useEffect(() => {
     if (durations.length > 0 && !durations.includes(duration_months)) {
@@ -47,9 +60,36 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
   }, [durations]);
 
   useEffect(() => {
-  }, [duration_months, quantity, productId, contractId]);
+    let cancelled = false;
 
-  const handleSave = () => {
+    if (!productId || !contractId || duration_months <= 0 || quantity < 1 || !customerId) {
+      setUnitPriceCents(0);
+      return;
+    }
+
+    setPriceLoading(true);
+    getTariffPrice(productId, contractId, duration_months, quantity, customerId)
+      .then((res: TariffPriceResult) => {
+        if (cancelled) return;
+        setUnitPriceCents(res.breakdown.unitPrice);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setUnitPriceCents(0);
+      })
+      .finally(() => {
+        if (!cancelled) setPriceLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [productId, contractId, duration_months, quantity, customerId]);
+
+  const startEditPrice = () => {
+    setOverrideEur((unitPriceCents / 100).toString());
+    setEditingPrice(true);
+  };
+
+  const handleSave = async () => {
     if (!productId) {
       setError("Bitte ein Produkt auswählen.");
       return;
@@ -67,9 +107,27 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
       return;
     }
 
+    const data: OfferProductInput = { productId, contractId, duration_months, quantity, optional, total_cents: 0 };
 
-    onSave({ productId, contractId, duration_months, quantity, optional, total_cents: 0 });
+    try {
+      if (editingPrice && onPersistOverride && customerId) {
+        const parsed = Number(overrideEur.replace(",", "."));
+        if (isNaN(parsed) || parsed < 0) {
+          setError("Ungültiger Preis.");
+          return;
+        }
+        const overrideCents = eurToCents(parsed);
+        await onPersistOverride(data, overrideCents);
+      }
+      onSave(data);
+    } catch (exception: unknown) {
+      setError(exception instanceof Error ? exception.message : "Preis konnte nicht gespeichert werden.");
+    }
   };
+
+  const displayUnitPrice = editingPrice
+    ? overrideEur
+    : formatEur(unitPriceCents);
 
   return (
     <div className="w-full grid gap-3 border-t border-(--border) py-4 px-4">
@@ -121,12 +179,22 @@ export default function OfferProductForm({ currentProduct, onSave, onCancel }: P
       <div className="flex items-end gap-3">
 
         <div className="flex-2 grid gap-1">
-          <Input label="Listenpreis (pro Seat)" className="bg-white" value={formatEur((currentProduct?.total_cents || 0) / (currentProduct?.quantity || 1) / (currentProduct?.duration_months || 1))}
-            disabled rightButton={{
+          <Input
+            label="Stückpreis / Monat (pro Seat)"
+            className="bg-white"
+            value={displayUnitPrice}
+            disabled={!editingPrice || priceLoading}
+            type={editingPrice ? "number" : "text"}
+            step={editingPrice ? "0.01" : undefined}
+            min={editingPrice ? "0" : undefined}
+            onChange={(e) => setOverrideEur(e.target.value)}
+            rightButton={onPersistOverride && customerId ? {
               icon: <Pen className="size-3" />,
               variant: "secondary",
-              onClick: () => { }
-            }} />
+              type: "button",
+              onClick: () => editingPrice ? setEditingPrice(false) : startEditPrice(),
+            } : undefined}
+          />
         </div>
 
 

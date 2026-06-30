@@ -35,6 +35,7 @@ export interface TariffForPricing {
     columns: Array<{ id: string; duration: number }>;
     rows: Array<{ id: string; min_quantity: number; max_quantity: number | null }>;
     cells: Array<{
+        id: string;
         rowId: string;
         columnId: string;
         default_cells: Array<{ price: number }>;
@@ -73,6 +74,36 @@ export class PriceError extends Error {
  * Returns a discriminated union so callers can distinguish "not configured"
  * from "out of range" from "invalid input".
  */
+/**
+ * Resolve the concrete cell for a given tariff, duration and quantity.
+ * Returns the matching column, row and cell, or a {@link PriceFailureReason}
+ * describing why no cell matched. Shared between {@link selectPrice} and
+ * customer-price upsert/delete so both use the same resolution rules.
+ */
+export function resolveCell(
+    tariff: TariffForPricing | null | undefined,
+    { duration, quantity }: { duration: number; quantity: number },
+):
+    | { ok: true; column: TariffForPricing['columns'][number]; row: TariffForPricing['rows'][number]; cell: TariffForPricing['cells'][number] }
+    | { ok: false; reason: Exclude<PriceFailureReason, 'INVALID_INPUT'> } {
+
+    const column = tariff?.columns.find(c => c.duration === duration);
+    if (!column) return { ok: false, reason: 'NO_COLUMN' };
+
+    const row = tariff?.rows.find(r => {
+        const withinMin = quantity >= r.min_quantity;
+        const noUpperLimit = r.max_quantity === null;
+        const withinMax = noUpperLimit || quantity <= r.max_quantity!;
+        return withinMin && withinMax;
+    });
+    if (!row) return { ok: false, reason: 'NO_ROW' };
+
+    const cell = tariff?.cells.find(c => c.rowId === row.id && c.columnId === column.id);
+    if (!cell) return { ok: false, reason: 'NO_CELL' };
+
+    return { ok: true, column, row, cell };
+}
+
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
     { duration, quantity, customerId }: SelectPriceParams,
@@ -83,19 +114,10 @@ export function selectPrice(
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
-    const column = tariff.columns.find(c => c.duration === duration);
-    if (!column) return { ok: false, reason: 'NO_COLUMN' };
+    const resolved = resolveCell(tariff, { duration, quantity });
+    if (!resolved.ok) return { ok: false, reason: resolved.reason };
 
-    const row = tariff.rows.find(r => {
-        const withinMin = quantity >= r.min_quantity;
-        const noUpperLimit = r.max_quantity === null;
-        const withinMax = noUpperLimit || quantity <= r.max_quantity!;
-        return withinMin && withinMax;
-    });
-    if (!row) return { ok: false, reason: 'NO_ROW' };
-
-    const cell = tariff.cells.find(c => c.rowId === row.id && c.columnId === column.id);
-    if (!cell) return { ok: false, reason: 'NO_CELL' };
+    const cell = resolved.cell;
 
     const defaultCell = cell.default_cells[0];
     if (!defaultCell) return { ok: false, reason: 'NO_DEFAULT' };
@@ -160,22 +182,31 @@ const CALCULATE_PRICE_INCLUDE = {
     },
 } as const;
 
+/**
+ * Loads the tariff (with default + customer cells) for a product/contract
+ * combination, resolving the tariff group via {@link TariffGroupProduct}.
+ * Returns `null` when no tariff is configured.
+ */
+export async function loadTariffForPricing(productId: string, contractId: string) {
+    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+        where: { productId },
+    });
+
+    if (!groupProduct) return null;
+
+    return prisma.tariff.findUnique({
+        where: { tariffGroupId_contractId: { tariffGroupId: groupProduct.tariffGroupId, contractId } },
+        include: CALCULATE_PRICE_INCLUDE,
+    });
+}
+
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
     const { productId, contractId, duration, quantity, customerId } = props;
 
     try {
-        const groupProduct = await prisma.tariffGroupProduct.findUnique({
-            where: { productId },
-        });
+        const tariff = await loadTariffForPricing(productId, contractId);
 
-        if (!groupProduct) return { ok: false, reason: 'NO_TARIFF' };
-
-        const { tariffGroupId } = groupProduct;
-
-        const tariff = await prisma.tariff.findUnique({
-            where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
-            include: CALCULATE_PRICE_INCLUDE,
-        });
+        if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
         return selectPrice(tariff, { duration, quantity, customerId });
     } catch (error) {

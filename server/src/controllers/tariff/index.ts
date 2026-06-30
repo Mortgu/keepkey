@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { prisma } from "../../lib/prismaClient.js";
-import { calculatePrice, snapshotTariff, type PriceFailureReason } from "../../utils/products.js";
+import { calculatePrice, loadTariffForPricing, resolveCell, snapshotTariff, selectPrice, type PriceFailureReason } from "../../utils/products.js";
+import { deleteCustomerPriceSchema, upsertCustomerPriceSchema } from "../../schemas/index.js";
 import logger from "../../middlewares/logger.js";
 
 const TARIFF_INCLUDE = {
@@ -442,6 +443,142 @@ export async function getTariffDurations(request: Request, response: Response, n
 
         if (!tariff) return response.status(200).json([]);
         return response.status(200).json(tariff.columns.map(c => c.duration));
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+const CUSTOMER_PRICE_STATUS: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, number> = {
+    NO_TARIFF: 404,
+    NO_CELL: 404,
+    NO_DEFAULT: 404,
+    NO_COLUMN: 422,
+    NO_ROW: 422,
+};
+
+const CUSTOMER_PRICE_MESSAGE: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, string> = {
+    NO_TARIFF: "Tariff für das Produkt/den Vertrag wurde nicht gefunden.",
+    NO_CELL: "Keine Zelle für die gewählte Zeile/Spalte konfiguriert.",
+    NO_DEFAULT: "Kein Default-Preis für die Zelle hinterlegt.",
+    NO_COLUMN: "Laufzeit ist in keiner Tariff-Spalte konfiguriert.",
+    NO_ROW: "Menge liegt außerhalb aller konfigurierten Mengenbereiche.",
+};
+
+export async function upsertCustomerPrice(request: Request, response: Response, next: NextFunction) {
+    const parsed = upsertCustomerPriceSchema.safeParse(request.body);
+    if (!parsed.success) {
+        return response.status(400).json({
+            success: false,
+            message: parsed.error.issues.map(i => i.message).join(' & '),
+        });
+    }
+
+    const { productId, contractId, duration, quantity, customerId, price } = parsed.data;
+
+    try {
+        const tariff = await loadTariffForPricing(productId, contractId);
+
+        if (!tariff) {
+            return response.status(404).json({
+                success: false,
+                reason: 'NO_TARIFF',
+                message: CUSTOMER_PRICE_MESSAGE.NO_TARIFF,
+            });
+        }
+
+        const resolved = resolveCell(tariff, { duration, quantity });
+        if (!resolved.ok) {
+            const status = CUSTOMER_PRICE_STATUS[resolved.reason];
+            return response.status(status).json({
+                success: false,
+                reason: resolved.reason,
+                message: CUSTOMER_PRICE_MESSAGE[resolved.reason],
+            });
+        }
+
+        const cellId = resolved.cell.id;
+
+        await prisma.tariffCellCustomer.upsert({
+            where: { cellId_customerId: { cellId, customerId } },
+            create: { cellId, customerId, price },
+            update: { price },
+        });
+
+        const result = selectPrice(tariff, { duration, quantity, customerId });
+
+        if (!result.ok) {
+            return response.status(500).json({
+                success: false,
+                reason: result.reason,
+                message: "Override gespeichert, aber Preis konnte nicht neu berechnet werden.",
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            price: result.price,
+            breakdown: result.breakdown,
+        });
+    } catch (exception: any) {
+        logger.error(exception);
+        next(exception);
+    }
+}
+
+export async function deleteCustomerPrice(request: Request, response: Response, next: NextFunction) {
+    const parsed = deleteCustomerPriceSchema.safeParse(request.query);
+    if (!parsed.success) {
+        return response.status(400).json({
+            success: false,
+            message: parsed.error.issues.map(i => i.message).join(' & '),
+        });
+    }
+
+    const { productId, contractId, duration, quantity, customerId } = parsed.data;
+
+    try {
+        const tariff = await loadTariffForPricing(productId, contractId);
+
+        if (!tariff) {
+            return response.status(404).json({
+                success: false,
+                reason: 'NO_TARIFF',
+                message: CUSTOMER_PRICE_MESSAGE.NO_TARIFF,
+            });
+        }
+
+        const resolved = resolveCell(tariff, { duration, quantity });
+        if (!resolved.ok) {
+            const status = CUSTOMER_PRICE_STATUS[resolved.reason];
+            return response.status(status).json({
+                success: false,
+                reason: resolved.reason,
+                message: CUSTOMER_PRICE_MESSAGE[resolved.reason],
+            });
+        }
+
+        const cellId = resolved.cell.id;
+
+        await prisma.tariffCellCustomer.deleteMany({
+            where: { cellId, customerId },
+        });
+
+        const result = selectPrice(tariff, { duration, quantity, customerId });
+
+        if (!result.ok) {
+            return response.status(500).json({
+                success: false,
+                reason: result.reason,
+                message: "Override gelöscht, aber Default-Preis konnte nicht berechnet werden.",
+            });
+        }
+
+        return response.status(200).json({
+            success: true,
+            price: result.price,
+            breakdown: result.breakdown,
+        });
     } catch (exception: any) {
         logger.error(exception);
         next(exception);

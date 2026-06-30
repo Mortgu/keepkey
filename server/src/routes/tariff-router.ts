@@ -3,6 +3,7 @@ import {
     createTariff,
     createTariffColumn,
     createTariffRow,
+    deleteCustomerPrice,
     deleteTariff,
     deleteTariffColumn,
     deleteTariffRow,
@@ -13,6 +14,7 @@ import {
     updateTariffCell,
     updateTariffColumn,
     updateTariffRow,
+    upsertCustomerPrice,
 } from "../controllers/index.js";
 import {
     createTariffGroup,
@@ -22,14 +24,15 @@ import {
     updateTariffGroup,
 } from "../controllers/tariff/tariff-group-controller.js";
 import {
+    createTariffColumnSchema,
     createTariffGroupSchema,
+    createTariffRowSchema,
     createTariffSchema,
+    updateTariffCellSchema,
     updateTariffColumnSchema,
     updateTariffGroupSchema,
     updateTariffRowSchema,
-    createTariffRowSchema,
-    updateTariffCellSchema,
-    createTariffColumnSchema,
+    upsertCustomerPriceSchema,
 } from "../schemas/index.js";
 import { validate } from "../middlewares/validate.js";
 
@@ -43,6 +46,12 @@ router.post('/', validate(createTariffGroupSchema), createTariffGroup);
 
 /* [GET] /api/tariffs/price */
 router.get("/price", getTariffPrice);
+
+/* [PUT] /api/tariffs/customer-price — kundenspezifischen Stückpreis upserten */
+router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustomerPrice);
+
+/* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
+router.delete("/customer-price", deleteCustomerPrice);
 
 /* [GET] /api/tariffs/history/:productId/:contractId */
 router.get('/history/:productId/:contractId', getTariffHistory);
