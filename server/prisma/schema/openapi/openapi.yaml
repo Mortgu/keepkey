@@ -1081,6 +1081,9 @@ components:
         max_quantity:
           type: integer
           format: int32
+        order:
+          type: integer
+          format: int32
         cells:
           type: array
           items:
@@ -1096,6 +1099,7 @@ components:
         - tariff
         - tariffId
         - min_quantity
+        - order
         - cells
         - createdAt
         - updatedAt
@@ -1109,6 +1113,9 @@ components:
         tariffId:
           type: string
         duration:
+          type: integer
+          format: int32
+        order:
           type: integer
           format: int32
         cells:
@@ -1126,6 +1133,7 @@ components:
         - tariff
         - tariffId
         - duration
+        - order
         - cells
         - createdAt
         - updatedAt

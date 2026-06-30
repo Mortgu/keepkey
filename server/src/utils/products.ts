@@ -2,10 +2,10 @@ import { prisma } from "../lib/prismaClient.js";
 
 const TARIFF_SNAPSHOT_INCLUDE = {
     rows: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     columns: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },
@@ -146,10 +146,10 @@ export async function snapshotTariff(productId: string, contractId: string) {
 
 const CALCULATE_PRICE_INCLUDE = {
     rows: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     columns: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },

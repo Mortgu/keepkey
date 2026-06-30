@@ -23,10 +23,10 @@ const TARIFF_INCLUDE = {
         }
     },
     rows: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     columns: {
-        orderBy: { createdAt: 'asc' },
+        orderBy: { order: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },
@@ -196,12 +196,17 @@ export async function createTariffColumn(request: Request, response: Response, n
     try {
         const tariff = await prisma.tariff.findUniqueOrThrow({
             where: { id: tariffId },
-            include: { rows: true }
+            include: {
+                rows: true,
+                columns: { select: { order: true }, orderBy: { order: 'asc' } },
+            }
         });
+
+        const nextOrder = tariff.columns.length;
 
         const column = await prisma.$transaction(async (tx) => {
             const col = await tx.tariffColumn.create({
-                data: { tariffId, duration },
+                data: { tariffId, duration, order: nextOrder },
             });
 
             for (const row of tariff.rows) {
@@ -278,12 +283,17 @@ export async function createTariffRow(request: Request, response: Response, next
     try {
         const tariff = await prisma.tariff.findUniqueOrThrow({
             where: { id: tariffId },
-            include: { columns: true }
+            include: {
+                columns: true,
+                rows: { select: { order: true }, orderBy: { order: 'asc' } },
+            }
         });
+
+        const nextOrder = tariff.rows.length;
 
         const row = await prisma.$transaction(async (tx) => {
             const r = await tx.tariffRow.create({
-                data: { tariffId, min_quantity, max_quantity },
+                data: { tariffId, min_quantity, max_quantity, order: nextOrder },
             });
 
             for (const column of tariff.columns) {

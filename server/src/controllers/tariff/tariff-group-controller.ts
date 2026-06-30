@@ -20,10 +20,10 @@ const TARIFF_GROUP_INCLUDE = {
                 },
             },
             rows: {
-                orderBy: { createdAt: 'asc' },
+                orderBy: { order: 'asc' },
             },
             columns: {
-                orderBy: { createdAt: 'asc' },
+                orderBy: { order: 'asc' },
             },
             cells: {
                 orderBy: { createdAt: 'asc' },
@@ -39,7 +39,7 @@ const TARIFF_GROUP_INCLUDE = {
 export async function getTariffGroups(_request: Request, response: Response) {
     const groups = await prisma.tariffGroup.findMany({
         include: TARIFF_GROUP_INCLUDE,
-        orderBy: { createdAt: 'asc' },
+        orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     });
 
     return response.status(200).json(groups);

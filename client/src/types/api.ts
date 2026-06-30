@@ -430,6 +430,8 @@ export interface components {
             min_quantity: number;
             /** Format: int32 */
             max_quantity?: number;
+            /** Format: int32 */
+            order: number;
             cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;
@@ -442,6 +444,8 @@ export interface components {
             tariffId: string;
             /** Format: int32 */
             duration: number;
+            /** Format: int32 */
+            order: number;
             cells: components["schemas"]["TariffCell"][];
             /** Format: date-time */
             createdAt: string;
