@@ -3,12 +3,13 @@ import { useEffect, useMemo } from "react";
 import { toast } from "react-toastify";
 import PricingTableItem from "./pricing-table-item";
 import AddContractsModal from "./add-contracts-modal";
+import EditProductsModal from "./edit-products-modal";
 import type { TariffGroup } from "@/types";
 import { Button } from "@/components";
-import { useContracts, useLocale, useModal } from "@/hooks";
+import { useContracts, useLocale, useModal, useProductHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatDate } from "@/lib/format";
-import { useCreateTariff, useDeleteTariffGroup } from "@/hooks/tariffs/tariff-mutations";
+import { useCreateTariff, useDeleteTariffGroup, useUpdateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
     group: TariffGroup;
@@ -19,8 +20,11 @@ export default function PricingTable({ group }: Props) {
 
     const { deleteTariffGroup, deleteTariffGroupPending, deleteTariffGroupError } = useDeleteTariffGroup();
     const { createTariff, createTariffPending, createTariffError } = useCreateTariff();
+    const { updateTariffGroup, updateTariffGroupPending, updateTariffGroupError } = useUpdateTariffGroup();
+    const { products } = useProductHook();
     const { contracts } = useContracts();
     const modal = useModal();
+    const editModal = useModal();
 
     useEffect(() => {
         if (deleteTariffGroupError) {
@@ -34,6 +38,12 @@ export default function PricingTable({ group }: Props) {
         }
     }, [createTariffError]);
 
+    useEffect(() => {
+        if (updateTariffGroupError) {
+            toast.error(updateTariffGroupError.message);
+        }
+    }, [updateTariffGroupError]);
+
     const excludeContractIds = useMemo(
         () => new Set(group.tariffs.map(t => t.contractId)),
         [group.tariffs],
@@ -43,6 +53,10 @@ export default function PricingTable({ group }: Props) {
         for (const contractId of contractIds) {
             await createTariff({ groupId: group.id, input: { contractId } });
         }
+    };
+
+    const handleUpdateProducts = (productIds: Array<string>) => {
+        updateTariffGroup({ id: group.id, input: { products: productIds } });
     };
 
     return (
@@ -65,7 +79,8 @@ export default function PricingTable({ group }: Props) {
                 <div className="flex items-center gap-2">
                     <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />} iconOnly
                         onClick={() => modal.open()} />
-                    <Button size="sm" variant="secondary" icon={<Pen className="size-3.5" />} iconOnly />
+                    <Button size="sm" variant="secondary" icon={<Pen className="size-3.5" />} iconOnly
+                        onClick={() => editModal.open()} loading={updateTariffGroupPending} disabled={updateTariffGroupPending} />
                     <Button size="sm" variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
                         onClick={() => deleteTariffGroup({ id: group.id })} loading={deleteTariffGroupPending} disabled={deleteTariffGroupPending} />
                 </div>
@@ -85,6 +100,17 @@ export default function PricingTable({ group }: Props) {
                     excludeContractIds={excludeContractIds}
                     loading={createTariffPending}
                     submitFn={handleAddContracts}
+                />
+            )}
+
+            {editModal.isOpen && (
+                <EditProductsModal
+                    key={editModal.key}
+                    onClose={editModal.close}
+                    products={products}
+                    selectedProductIds={group.products.map(gp => gp.productId)}
+                    loading={updateTariffGroupPending}
+                    submitFn={handleUpdateProducts}
                 />
             )}
         </div>
