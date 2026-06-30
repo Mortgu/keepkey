@@ -341,18 +341,18 @@ async function seedTariffs(
 
         // 3. Columns (Laufzeiten): 12 und 24 Monate
         const column12 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 12 },
+            data: { tariffId: tariff.id, duration: 12, order: 0 },
         });
         const column24 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 24 },
+            data: { tariffId: tariff.id, duration: 24, order: 1 },
         });
 
         // 4. Rows (Mengenbereiche)
         const rowSmall = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 1, max_quantity: 10 },
+            data: { tariffId: tariff.id, min_quantity: 1, max_quantity: 10, order: 0 },
         });
         const rowLarge = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 11, max_quantity: null },
+            data: { tariffId: tariff.id, min_quantity: 11, max_quantity: null, order: 1 },
         });
 
         // 5. Cells + Default-Preise
