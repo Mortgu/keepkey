@@ -2,7 +2,6 @@ import { Loader } from "lucide-react";
 
 import ProductModalSection from "./modal-components/product-section";
 import FlatRateModalSection from "./modal-components/flat-rate-section";
-import { useOfferFormState } from "./modal-components/use-offer-form-state";
 
 import type {
   ContactPerson,
@@ -20,45 +19,40 @@ import {
   SegmentedLanguageToggle,
   Select,
 } from "@/components";
-import {
-  useCustomers,
-  useLocale,
-  useSupplierHook,
-  useUserHook,
-} from "@/hooks";
+import useOfferFormState from "../-hooks/use-offer-form-state";
+import type { SyntheticEvent } from "react";
 
 interface OfferModalProps {
-  onClose: () => void;
-  currentOffer?: Offer;
+  closeFn: () => void;
+
+  currentOffer: Offer | undefined;
+
+  customers: Array<Customer>;
+  suppliers: Array<Supplier>;
+  users: Array<User>;
 }
 
-export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
-  const { customers } = useCustomers();
-  const { suppliers } = useSupplierHook();
-  const { users } = useUserHook();
-  const locale = useLocale();
+export default function OfferModal(props: OfferModalProps) {
+  const { closeFn, currentOffer, customers, suppliers, users } = props;
 
   const state = useOfferFormState({
+    closeFn,
     currentOffer,
-    onClose,
     customers,
     suppliers,
-    locale,
+    users
   });
 
   const { form, isEdit, error } = state;
 
-  const handleFormSubmit = (e: {
-    preventDefault: () => void;
-    stopPropagation: () => void;
-  }) => {
+  const handleFormSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     e.stopPropagation();
     form.handleSubmit();
   };
 
   return (
-    <ModalDialog onClose={onClose}>
+    <ModalDialog onClose={closeFn}>
       <ModalDialog.Header>
         <div className="flex items-center justify-between w-full mr-2">
           <h1 className="text-lg">
@@ -316,7 +310,7 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
           </p>
           <div className="flex gap-2">
             <Button
-              onClick={onClose}
+              onClick={closeFn}
               type="button"
               size="sm"
               variant="secondary"

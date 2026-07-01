@@ -12,12 +12,12 @@ model Customer {
   plz    String?
   phone  String?
 
-  language Language? @default(DE)
-  country  String?   @default("Deutschland")
-  currency Currency? @default(EUR)
-  taxRate  Float?    @default(0)
+  language Language @default(DE)
+  country  String   @default("Deutschland")
+  currency Currency @default(EUR)
+  taxRate  Float    @default(0)
 
-  salutation String? @default("")
+  salutation String?
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

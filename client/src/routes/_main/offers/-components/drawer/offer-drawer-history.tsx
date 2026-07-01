@@ -39,7 +39,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                     const isLast = index === offer.revisions.length - 1;
 
                     return (
-                        <div className="flex relative gap-3.25 py-3.5 first:py-0 first:pb-3.5 border-b border-(--border) last:border-b-0">
+                        <div key={index} className="flex relative gap-3.25 py-3.5 first:py-0 first:pb-3.5 border-b border-(--border) last:border-b-0">
                             {/* vertical-rail */}
                             <div className="flex flex-col items-center shrink-0 pt-0.75">
                                 {/* vertical-dot */}

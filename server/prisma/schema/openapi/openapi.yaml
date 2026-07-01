@@ -134,6 +134,10 @@ components:
       required:
         - id
         - companyName
+        - language
+        - country
+        - currency
+        - taxRate
         - createdAt
         - updatedAt
         - contactPersons

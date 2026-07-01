@@ -198,13 +198,21 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
           />
         </div>
 
+        <div className="flex-1 grid gap-1">
+          <Input
+            label="Freimonate"
+            className="bg-white"
+            type="number"
+          />
+        </div>
+
 
       </div>
 
       {error && <p className="text-sm text-red-400">{error}</p>}
 
       <div className="flex items-center justify-between gap-2">
-        <Checkbox label="Optional?" onChange={() => setOptional(!optional)} checked={currentProduct?.optional ?? false} />
+        <Checkbox label="Optional?" onChange={() => setOptional(!optional)} checked={optional} />
 
         <div className="flex gap-2">
           <Button type="button" variant="secondary" size="sm" onClick={onCancel}>

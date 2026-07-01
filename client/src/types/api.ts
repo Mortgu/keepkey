@@ -40,11 +40,11 @@ export interface components {
             city?: string;
             plz?: string;
             phone?: string;
-            language?: components["schemas"]["Language"];
-            country?: string;
-            currency?: components["schemas"]["Currency"];
+            language: components["schemas"]["Language"];
+            country: string;
+            currency: components["schemas"]["Currency"];
             /** Format: double */
-            taxRate?: number;
+            taxRate: number;
             salutation?: string;
             /** Format: date-time */
             createdAt: string;
