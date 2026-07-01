@@ -251,6 +251,8 @@ components:
           type: string
         paymentTerm:
           type: string
+        featureComparison:
+          type: boolean
         date:
           type: string
           format: date-time
@@ -301,6 +303,7 @@ components:
         - language
         - quoteId
         - paymentTerm
+        - featureComparison
         - date
         - offerFlatRates
         - offerPositions

@@ -27,6 +27,9 @@
     "offers": "Angebote",
     "orders": "Bestellungen"
   },
+  "offerModal": {
+    "compare": "Vergleichen?"
+  },
   "common": {
     "search": "Suchen",
     "filter": "Filtern",

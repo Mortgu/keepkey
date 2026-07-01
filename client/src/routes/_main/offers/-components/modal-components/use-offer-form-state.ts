@@ -40,6 +40,7 @@ const getFormDefaults = (
             paymentTerm: currentOffer.paymentTerm,
             validUntil: currentOffer.validUntil ?? null,
             requestFrom: currentOffer.requestFrom ?? null,
+            featureComparison: currentOffer.featureComparison,
         };
     }
 
@@ -53,6 +54,7 @@ const getFormDefaults = (
         paymentTerm: "30 Tage",
         validUntil: null,
         requestFrom: null,
+        featureComparison: false,
     };
 };
 
@@ -157,6 +159,9 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
     });
 
     const customerId = useStore(form.store, (s) => s.values.customerId);
+    const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
+    const toggleFeatureComparison = (value: boolean) =>
+        form.setFieldValue("featureComparison", value);
 
     const { mutateAsync: fetchPrice } = useMutation({
         mutationKey: ["price"],
@@ -276,6 +281,8 @@ export function useOfferFormState(props: UseOfferFormStateProps) {
         clearQuoteIdWarning,
 
         customerId,
-        fetchPrice
+        fetchPrice,
+        featureComparison,
+        toggleFeatureComparison,
     };
 }

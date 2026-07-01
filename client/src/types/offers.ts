@@ -22,7 +22,8 @@ export type CreateOfferInput = Pick<Offer,
     "validUntil" |
     "requestFrom" |
     "userId" |
-    "supplierId"
+    "supplierId" |
+    "featureComparison"
 >;
 
 export type UpdateOfferInput = Partial<CreateOfferInput>;

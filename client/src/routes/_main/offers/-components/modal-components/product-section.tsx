@@ -1,15 +1,18 @@
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import OfferProductForm from "./offer-product-form";
 import ProductSectionItem from "./product-section-item";
 import type { OfferProductInput } from "./offer-product-form";
 import { useProductHook } from "@/hooks";
-import { Button } from "@/components";
+import { Button, Checkbox } from "@/components";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 type Props = {
     offerProducts: Array<OfferProductInput>;
     customerId: string;
+    featureComparison: boolean;
+    onToggleFeatureComparison: (value: boolean) => void;
     onAdd: (data: OfferProductInput) => Promise<void>;
     onUpdate: (index: number, data: OfferProductInput) => Promise<void>;
     onRemove: (index: number) => void;
@@ -22,12 +25,15 @@ type Props = {
 export default function ProductModalSection({
     offerProducts,
     customerId,
+    featureComparison,
+    onToggleFeatureComparison,
     onAdd,
     onUpdate,
     onRemove,
     onPersistOverride,
 }: Props) {
     const [showForm, setShowForm] = useState<boolean>(false);
+    const { t } = useTranslation();
 
     const { products } = useProductHook();
     const { contracts } = useContracts();
@@ -59,6 +65,12 @@ export default function ProductModalSection({
                         Workload hinzufügen
                     </Button>
                 </div>
+
+                <Checkbox
+                    label={t("offerModal.compare")}
+                    checked={featureComparison}
+                    onChange={(e) => onToggleFeatureComparison(e.target.checked)}
+                />
 
                 {offerProducts.length === 0 && !showForm && (
                     <p className="text-sm text-gray-500 text-center py-2">

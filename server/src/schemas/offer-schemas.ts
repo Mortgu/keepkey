@@ -15,6 +15,7 @@ const createOfferFieldsSchema = z.object({
   userId: z.string().min(1),
   quoteId: z.string().min(1),
   language: z.enum(["DE", "EN"]).default("DE"),
+  featureComparison: z.boolean().default(false),
 
   supplierId: z.string().nullable(),
   paymentTerm: z.string().nullable(),

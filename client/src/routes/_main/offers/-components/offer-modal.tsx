@@ -294,6 +294,8 @@ export default function OfferModal({ onClose, currentOffer }: OfferModalProps) {
           <ProductModalSection
             offerProducts={state.offerProducts}
             customerId={state.customerId}
+            featureComparison={state.featureComparison}
+            onToggleFeatureComparison={state.toggleFeatureComparison}
             onAdd={state.addProduct}
             onUpdate={state.updateProduct}
             onRemove={state.removeProduct}

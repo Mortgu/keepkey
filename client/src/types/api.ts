@@ -103,6 +103,7 @@ export interface components {
             language: components["schemas"]["Language"];
             quoteId: string;
             paymentTerm: string;
+            featureComparison: boolean;
             /** Format: date-time */
             date: string;
             /** Format: date-time */

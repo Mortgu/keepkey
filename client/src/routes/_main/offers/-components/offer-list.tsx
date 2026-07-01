@@ -28,20 +28,15 @@ export default function OfferList() {
     [],
   );
 
-  const params = useMemo(
-    () => ({
-      search: searchInput || undefined,
-      companyIds: customerFilter.length > 0 ? customerFilter : undefined,
-      contactPersonIds:
-        contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
-      sort,
-    }),
-    [searchInput, customerFilter, contactPersonFilter, sort],
-  );
+  const params = useMemo(() => ({
+    search: searchInput || undefined,
+    companyIds: customerFilter.length > 0 ? customerFilter : undefined,
+    contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
+    sort,
+  }), [searchInput, customerFilter, contactPersonFilter, sort]);
+
   const { offers } = useOffers(params);
-
   const { contacts } = useContacts();
-
   const { customers } = useCustomers();
 
   const customerFilterOptions = useMemo(

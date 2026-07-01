@@ -18,6 +18,8 @@ model Offer {
   quoteId     String // quoteId / voucherId
   paymentTerm String
 
+  featureComparison Boolean @default(false)
+
   date        DateTime  @default(now())
   validUntil  DateTime?
   requestFrom DateTime?

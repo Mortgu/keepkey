@@ -12,4 +12,5 @@ export const offerSchema = z.object({
 
   validUntil: z.string().datetime().nullable(),
   requestFrom: z.string().datetime().nullable(),
+  featureComparison: z.boolean().default(false),
 });
