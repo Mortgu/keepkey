@@ -1,8 +1,9 @@
-import { SortDropdown, MultiDropdown, SearchBar, Button, FilterChip } from "@/components";
+import { Button, FilterChip, MultiDropdown, SearchBar, SortDropdown } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 import type { Customer } from "@/types";
 import { Plus } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 const sort_options = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -11,6 +12,7 @@ const sort_options = [
 
 export default function InvoiceList() {
     const modal = useModal();
+    const { t } = useTranslation();
 
     const [searchInput, setSearchInput] = useState("");
     const [sort, setSort] = useState(sort_options[0].value);
@@ -46,7 +48,7 @@ export default function InvoiceList() {
                         onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => modal.open()} size='sm'>Create <Plus className='size-4' /></Button>
+                    <Button onClick={() => modal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
                 </div>
             </div>
 

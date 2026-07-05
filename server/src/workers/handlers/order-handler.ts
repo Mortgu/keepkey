@@ -7,6 +7,11 @@ import { runPipeline } from "../../pipelines/pipeline.js";
 import { createDocumentFiles } from "../task-worker.js";
 
 export default async function orderTaskHandler(task: Task): Promise<void> {
+    if (!task) {
+        logger.error("called orderTaskHandler with undefined or nul task!")
+        return;
+    }
+
     const orderDocument = await prisma.orderDocument.findFirst({
         where: { taskId: task.id },
     });

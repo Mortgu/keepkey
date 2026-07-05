@@ -529,7 +529,7 @@ export interface components {
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */
-        TaskTarget: "OFFER" | "ORDER" | "RENEWAL";
+        TaskTarget: "OFFER" | "ORDER" | "RENEWAL" | "INVOICE";
         /** @enum {string} */
         TaskType: "UPLOAD" | "RESERVATION" | "GENERATION";
     };

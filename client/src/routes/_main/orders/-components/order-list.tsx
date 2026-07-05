@@ -1,13 +1,14 @@
+import { useCustomers, useModal, useOrderHook } from "@/hooks";
+import type { Customer, Order } from "@/types";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import OrderModal from "./order-modal";
 import OrderCard from "./card/order-card";
-import type { Customer, Order } from "@/types";
-import { useCustomers, useModal, useOrderHook } from "@/hooks";
+import OrderModal from "./order-modal";
 
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
+import { useTranslation } from "react-i18next";
 
 const sort_options = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -16,6 +17,9 @@ const sort_options = [
 
 export default function OrderList() {
     const modal = useModal();
+
+    const { t } = useTranslation();
+
     const [searchInput, setSearchInput] = useState("");
     const [sort, setSort] = useState(sort_options[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
@@ -50,7 +54,7 @@ export default function OrderList() {
                         onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => modal.open()} size='sm'>Create <Plus className='size-4' /></Button>
+                    <Button onClick={() => modal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
                 </div>
             </div>
 

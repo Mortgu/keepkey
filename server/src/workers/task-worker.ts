@@ -5,7 +5,9 @@ import env from "../lib/env.js";
 import { prisma } from "../lib/prismaClient.js";
 import connection from "../lib/redis.js";
 import logger from "../middlewares/logger.js";
+import invoiceTaskHandler from "./handlers/invoice-handler.js";
 import offerTaskHandler from "./handlers/offer-handler.js";
+import orderTaskHandler from "./handlers/order-handler.js";
 import { TaskJobData, taskQueue, taskQueueKey } from "./task-queue.js";
 
 export { taskQueue, taskQueueKey };
@@ -26,6 +28,8 @@ type TaskHandlerFn = (task: Task) => Promise<void>;
 
 const handlers: Partial<Record<TaskTarget, TaskHandlerFn>> = {
     OFFER: offerTaskHandler,
+    ORDER: orderTaskHandler,
+    INVOICE: invoiceTaskHandler,
 }
 
 export default function registerTaskWorker() {

@@ -1348,6 +1348,7 @@ components:
         - OFFER
         - ORDER
         - RENEWAL
+        - INVOICE
     TaskType:
       type: string
       enum:

@@ -9,6 +9,7 @@ enum TaskTarget {
   OFFER
   ORDER
   RENEWAL
+  INVOICE
 }
 
 enum TaskType {
