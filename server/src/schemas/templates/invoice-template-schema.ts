@@ -2,22 +2,35 @@ import { z } from "zod";
 
 // --- Reusable sub-schemas ---------------------------------------------------
 
-const person = z.object({
-    fullName: z.string(),
-    salutation: z.string(),
-    firstName: z.string(),
-    lastName: z.string(),
-    phone: z.string(),
-    email: z.string(),
-});
-
 const address = z.object({
-    companyName: z.string(),
-    department: z.string(),
     street: z.string(),
     zip: z.string(),
     city: z.string(),
 });
+
+const employee = z.object({
+    firstName: z.string(),
+    lastName: z.string(),
+    salutation: z.string(),
+
+    phone: z.string(),
+    email: z.string(),
+
+    address: address
+});
+
+const customer = z.object({
+    companyName: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    salutation: z.string(),
+
+    phone: z.string(),
+    email: z.string(),
+
+    address: address
+});
+
 
 // A single invoice line item (table row)
 const item = z.object({
@@ -41,23 +54,12 @@ export const invoiceContract = z.object({
     customerNumber: z.string(),
     supplierNumber: z.string(),
     orderNumber: z.string(),
-    yourContact: person,
-    ourContact: person,
 
-    // Recipient block (top left)
-    customer: address,
+    customer: customer,
+    employee: employee,
 
-    // Project reference
-    projectReference: z.object({
-        shortDescription: z.string(),
-    }),
-
-    // Delivery/service details
-    deliveryDetails: z.object({
-        deliveryNoteNumber: z.string(),
-        deliveryDate: z.string(),
-        deliveryAddressRecipient: z.string(),
-    }),
+    projectDescription: z.string(),
+    orderDetails: z.string(),
 
     // Line items table
     items: z.array(item),
