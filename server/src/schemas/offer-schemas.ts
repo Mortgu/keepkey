@@ -27,6 +27,7 @@ const createOfferPositionSchema = z.object({
   productId: z.string().min(1),
   contractId: z.string().min(1),
   duration_months: z.number().int().positive(),
+  free_months: z.number().int().min(0).default(0),
   quantity: z.number().int().positive(),
   optional: z.boolean().optional(),
 });

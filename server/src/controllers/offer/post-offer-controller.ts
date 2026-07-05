@@ -99,6 +99,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
                 duration: position.duration_months,
                 quantity: position.quantity,
                 customerId: request.body.offer.customerId,
+                freeMonths: position.free_months ?? 0,
             });
 
             console.log(position)
@@ -137,9 +138,9 @@ export const createOffer = async (request: Request, response: Response, next: Ne
             });
 
             for (const position of positions) {
-                const { productId, contractId, duration_months, quantity, optional, total_cents } = position;
+                const { productId, contractId, duration_months, free_months, quantity, optional, total_cents } = position;
                 await tx.offerPosition.create({
-                    data: { offerId: offer.id, productId, contractId, duration_months, quantity, total_cents, optional },
+                    data: { offerId: offer.id, productId, contractId, duration_months, free_months, quantity, total_cents, optional },
                 });
             }
 
@@ -185,6 +186,7 @@ export const createOfferPositions = async (request: Request, response: Response,
                 contractId: element.contractId,
                 duration: element.duration_months,
                 quantity: element.quantity,
+                freeMonths: element.free_months ?? 0,
             });
 
             const offerPosition = await prisma.offerPosition.create({

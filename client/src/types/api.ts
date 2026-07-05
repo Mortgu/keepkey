@@ -147,6 +147,8 @@ export interface components {
             /** Format: int32 */
             duration_months: number;
             /** Format: int32 */
+            free_months: number;
+            /** Format: int32 */
             quantity: number;
             optional?: boolean;
             /** Format: int32 */

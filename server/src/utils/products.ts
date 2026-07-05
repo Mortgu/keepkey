@@ -22,12 +22,14 @@ interface PriceCalculatorProps {
     duration: number;
     quantity: number;
     customerId?: string;
+    freeMonths?: number;
 }
 
 interface SelectPriceParams {
     duration: number;
     quantity: number;
     customerId?: string;
+    freeMonths?: number;
 }
 
 /** Minimal tariff shape required by {@link selectPrice}. */
@@ -52,7 +54,7 @@ export type PriceFailureReason =
     | 'INVALID_INPUT';
 
 export type PriceResult =
-    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number } }
+    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number; freeMonths: number; effectiveDuration: number } }
     | { ok: false; reason: PriceFailureReason };
 
 export class PriceError extends Error {
@@ -106,11 +108,15 @@ export function resolveCell(
 
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
-    { duration, quantity, customerId }: SelectPriceParams,
+    { duration, quantity, customerId, freeMonths = 0 }: SelectPriceParams,
 ): PriceResult {
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
+        return { ok: false, reason: 'INVALID_INPUT' };
+    }
+
+    if (!Number.isInteger(freeMonths) || freeMonths < 0 || freeMonths > duration) {
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
@@ -129,10 +135,12 @@ export function selectPrice(
         if (override) unitPrice = override.price;
     }
 
+    const effectiveDuration = duration - freeMonths;
+
     return {
         ok: true,
-        price: unitPrice * quantity * duration,
-        breakdown: { unitPrice, quantity, duration },
+        price: unitPrice * quantity * effectiveDuration,
+        breakdown: { unitPrice, quantity, duration, freeMonths, effectiveDuration },
     };
 }
 
@@ -201,14 +209,14 @@ export async function loadTariffForPricing(productId: string, contractId: string
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
-    const { productId, contractId, duration, quantity, customerId } = props;
+    const { productId, contractId, duration, quantity, customerId, freeMonths } = props;
 
     try {
         const tariff = await loadTariffForPricing(productId, contractId);
 
         if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-        return selectPrice(tariff, { duration, quantity, customerId });
+        return selectPrice(tariff, { duration, quantity, customerId, freeMonths });
     } catch (error) {
         throw error;
     }

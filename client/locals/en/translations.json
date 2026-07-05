@@ -25,6 +25,7 @@
     "customers": "Customers",
     "employees": "Employees",
     "offers": "Offers",
+    "invoices": "Invoices",
     "orders": "Orders"
   },
   "offerModal": {

@@ -6,7 +6,7 @@ import OfferModal from "./offer-modal";
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useContacts, useCustomers, useModal, useSupplierHook, useUserHook } from "@/hooks";
+import { useContacts, useContracts, useCustomers, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 import type { Offer } from "@/types";
 import useOfferFilters from "../-hooks/use-offer-filters";
@@ -23,6 +23,8 @@ export default function OfferList() {
   const { customers } = useCustomers();
   const { suppliers } = useSupplierHook();
   const { users } = useUserHook();
+  const { products } = useProductHook();
+  const { contracts } = useContracts();
 
   const { customerFilterOptions, contactPersonFilterOptions } = useOfferFilterOptions(customers, contacts);
 
@@ -41,6 +43,13 @@ export default function OfferList() {
 
           <MultiDropdown
             label="Kontakt"
+            options={contactPersonFilterOptions}
+            values={filters.contactPersonFilter}
+            onChange={filters.setContactPersonFilter}
+          />
+
+          <MultiDropdown
+            label="Workload"
             options={contactPersonFilterOptions}
             values={filters.contactPersonFilter}
             onChange={filters.setContactPersonFilter}
@@ -105,6 +114,8 @@ export default function OfferList() {
           customers={customers}
           suppliers={suppliers}
           users={users}
+          products={products}
+          contracts={contracts}
         />
       )}
     </>

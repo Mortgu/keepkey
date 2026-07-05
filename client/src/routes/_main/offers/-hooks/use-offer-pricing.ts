@@ -11,7 +11,8 @@ export default function useOfferPricing(customerId: string) {
             quantity: number;
             duration: number;
             customerId?: string;
-        }) => getTariffPrice(args.productId, args.contractId, args.duration, args.quantity, args.customerId),
+            freeMonths?: number;
+        }) => getTariffPrice(args.productId, args.contractId, args.duration, args.quantity, args.customerId, args.freeMonths),
     });
 
     const { mutateAsync: persistOverride } = useMutation({
@@ -34,6 +35,7 @@ export default function useOfferPricing(customerId: string) {
             quantity: data.quantity,
             duration: data.duration_months,
             customerId,
+            freeMonths: data.free_months,
         });
         return { ...data, total_cents: fetched.price };
     };

@@ -10,7 +10,7 @@ import { z } from "zod";
 import env from "../../lib/env.js";
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "../../middlewares/logger.js";
-import { type OfferContext, offerSchema } from "../../schemas/offer-template-schema.js";
+import { type OfferContext, offerSchema } from "../../schemas/templates/offer-template-schema.js";
 import { pickTranslation } from "../../utils/i18n.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { PipelineStageError } from "../pipeline.js";

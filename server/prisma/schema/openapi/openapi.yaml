@@ -367,6 +367,9 @@ components:
         duration_months:
           type: integer
           format: int32
+        free_months:
+          type: integer
+          format: int32
         quantity:
           type: integer
           format: int32
@@ -390,6 +393,7 @@ components:
         - contract
         - contractId
         - duration_months
+        - free_months
         - quantity
         - total_cents
         - createdAt

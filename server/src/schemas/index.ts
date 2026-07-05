@@ -9,4 +9,4 @@ export * from "./tariffs-schemas.js";
 export * from "./flatrate-schemas.js";
 export * from "./document-schemas.js";
 export * from "./settings-schema.js";
-export * from "./offer-template-schema.js";
+export * from "./templates/offer-template-schema.js";

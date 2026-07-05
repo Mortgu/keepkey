@@ -5,8 +5,10 @@ import FlatRateModalSection from "./modal-components/flat-rate-section";
 
 import type {
   ContactPerson,
+  Contract,
   Customer,
   Offer,
+  Product,
   Supplier,
   User,
 } from "@/types";
@@ -30,10 +32,12 @@ interface OfferModalProps {
   customers: Array<Customer>;
   suppliers: Array<Supplier>;
   users: Array<User>;
+  products: Array<Product>;
+  contracts: Array<Contract>;
 }
 
 export default function OfferModal(props: OfferModalProps) {
-  const { closeFn, currentOffer, customers, suppliers, users } = props;
+  const { closeFn, currentOffer, customers, suppliers, users, products, contracts } = props;
 
   const state = useOfferFormState({
     closeFn,
@@ -284,6 +288,10 @@ export default function OfferModal(props: OfferModalProps) {
               )}
             />
           </div>
+
+          {/*
+          <WorkloadSection state={state} products={products} contracts={contracts} />
+          */}
 
           <ProductModalSection
             offerProducts={state.offerProducts}

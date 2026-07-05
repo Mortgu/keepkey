@@ -22,6 +22,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
             duration: position.duration_months,
             quantity: position.quantity,
             customerId: data.offer?.customerId,
+            freeMonths: position.free_months ?? 0,
         });
 
         console.log(position)
@@ -89,9 +90,9 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
 
 async function replacePositions(tx: any, offerId: string, positions: OfferPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
-    for (const { productId, contractId, duration_months, quantity, optional, total_cents } of positions) {
+    for (const { productId, contractId, duration_months, free_months, quantity, optional, total_cents } of positions) {
         await tx.offerPosition.create({
-            data: { offerId, productId, contractId, duration_months, quantity, total_cents, optional },
+            data: { offerId, productId, contractId, duration_months, free_months, quantity, total_cents, optional },
         });
     }
 }

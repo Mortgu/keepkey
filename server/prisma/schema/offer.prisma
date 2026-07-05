@@ -71,6 +71,7 @@ model OfferPosition {
   contractId String
 
   duration_months Int
+  free_months     Int @default(0)
   quantity        Int
 
   optional Boolean? @default(false)

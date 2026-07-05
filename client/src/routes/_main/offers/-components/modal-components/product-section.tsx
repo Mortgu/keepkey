@@ -49,7 +49,7 @@ export default function ProductModalSection({
 
     return (
         <div className="grid gap-4">
-            <hr className="text-gray-200" />
+            <hr className="text-(--border)" />
             <div className="grid gap-4">
                 <div className="flex items-center justify-between w-full">
                     <span className="text-sm font-medium text-gray-700">

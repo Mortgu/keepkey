@@ -31,6 +31,7 @@ export type UpdateOfferInput = Partial<CreateOfferInput>;
 export type CreateOfferPositionInput = Pick<OfferPosition,
     "contractId" |
     "duration_months" |
+    "free_months" |
     "productId" |
     "quantity" |
     "optional"

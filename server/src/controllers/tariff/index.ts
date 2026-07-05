@@ -115,7 +115,7 @@ export const getTariffPrice = async (
     response: Response,
     next: NextFunction,
 ) => {
-    const { productId, contractId, duration, quantity, customerId } = request.query;
+    const { productId, contractId, duration, quantity, customerId, freeMonths } = request.query;
 
     if (!productId || !contractId || duration === undefined || quantity === undefined) {
         return response.status(400).json({
@@ -126,12 +126,20 @@ export const getTariffPrice = async (
 
     const durationNum = Number(duration);
     const quantityNum = Number(quantity);
+    const freeMonthsNum = freeMonths === undefined ? 0 : Number(freeMonths);
 
     if (!Number.isInteger(durationNum) || !Number.isInteger(quantityNum)
         || durationNum <= 0 || quantityNum <= 0) {
         return response.status(400).json({
             success: false,
             message: "duration und quantity müssen positive Ganzzahlen sein.",
+        });
+    }
+
+    if (!Number.isInteger(freeMonthsNum) || freeMonthsNum < 0 || freeMonthsNum > durationNum) {
+        return response.status(400).json({
+            success: false,
+            message: "freeMonths muss eine Ganzzahl >= 0 und <= duration sein.",
         });
     }
 
@@ -142,6 +150,7 @@ export const getTariffPrice = async (
             duration: durationNum,
             quantity: quantityNum,
             customerId: customerId as string | undefined,
+            freeMonths: freeMonthsNum,
         });
 
         if (!result.ok) {

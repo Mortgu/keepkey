@@ -7,6 +7,7 @@ const toOfferProductInput = (pos: OfferPosition): OfferProductInput => ({
     productId: pos.productId,
     contractId: pos.contractId,
     duration_months: pos.duration_months,
+    free_months: pos.free_months ?? 0,
     quantity: pos.quantity,
     optional: pos.optional ?? false,
     total_cents: typeof pos.total_cents === "number" ? pos.total_cents : 0,
