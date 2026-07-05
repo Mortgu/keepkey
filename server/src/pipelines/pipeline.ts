@@ -1,6 +1,6 @@
 import { TaskStatus } from "@prisma/client";
-import logger from "../middlewares/logger.js";
 import { prisma } from "../lib/prismaClient.js";
+import logger from "../middlewares/logger.js";
 
 export class PipelineStageError extends Error {
   constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
@@ -17,10 +17,10 @@ export interface PipelineContext {
   documentId: string;
   version: number;
 
-  docxBuffer?: Buffer | null;
-  pdfBuffer?: Buffer | null;
+  docxBuffer: Buffer | null;
+  pdfBuffer: Buffer | null;
 
-  displayName?: string;
+  displayName: string | null;
 
   /** Filesystem path of the generated document that should be persisted/served. */
   path?: string;

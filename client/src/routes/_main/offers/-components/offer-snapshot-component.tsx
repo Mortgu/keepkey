@@ -1,10 +1,11 @@
+import { Button } from "@/components";
+
 type Props = {
   version: number;
   changes: Array<string>;
 };
 
 export default function OfferSnapshot(props: Props) {
-  const { version, changes } = props;
 
   return (
     <div className="flex relative gap-3.25 py-3.5 border-b border-(--border)">
