@@ -82,6 +82,16 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                     </>
                 )}
 
+                {(status === "FAILED" && (
+                    <>
+                        <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
+                            onClick={() => deleteOfferDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
+                            loading={isDeleting || !!errorDeleting}
+                            disabled={isDeleting || !!errorDeleting}
+                        />
+                    </>
+                ))}
+
                 {(status === "PENDING" || status === "PROCESSING") && (
                     <div className="grid">
                         <LoaderCircle className="size-4 animate-spin" />
