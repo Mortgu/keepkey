@@ -65,6 +65,8 @@ const groupedSchema = z.object({
   items: z.array(groupedItemSchema),
 });
 
+export type GroupSchema = z.infer<typeof groupedSchema>;
+
 const productsSchema = z.object({
   names: z.string(),
   grouped: z.array(groupedSchema),

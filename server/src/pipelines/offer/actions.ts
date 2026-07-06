@@ -16,6 +16,7 @@ import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
+import { formatPositionGroups, groupOfferPositions } from "../../utils/pipeline/group.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
@@ -122,6 +123,9 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
         duration_months: position.duration_months,
         duration: formatDuration(position.duration_months),
     }));
+
+    const positionGroups = groupOfferPositions(offerPositions);
+    const formattedGroups = formatPositionGroups(positionGroups);
 
     const groups = Object.groupBy(offerPositions, (p) =>
         `${p.contract.id}_${p.duration_months}`);
