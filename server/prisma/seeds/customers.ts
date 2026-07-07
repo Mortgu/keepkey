@@ -1,4 +1,4 @@
-import type { PrismaClient, Customer } from "@prisma/client";
+import type { Customer, PrismaClient } from "@prisma/client";
 
 const CUSTOMERS = [
     {
@@ -7,11 +7,21 @@ const CUSTOMERS = [
         email: "info@musterfirma.de",
         street: "Musterstraße 12",
         city: "Musterstadt",
-        plz: "12345",
+        zip: "12345",
         phone: "+49 123 456789",
         contactPersons: [
-            { salutation: "Herr", firstName: "Max", lastName: "Mustermann", email: "max.mustermann@musterfirma.de" },
-            { salutation: "Frau", firstName: "Erika", lastName: "Musterfrau", email: "erika.musterfrau@musterfirma.de" },
+            {
+                salutation: "Herr",
+                firstName: "Max",
+                lastName: "Mustermann",
+                email: "max.mustermann@musterfirma.de"
+            },
+            {
+                salutation: "Frau",
+                firstName: "Erika",
+                lastName: "Musterfrau",
+                email: "erika.musterfrau@musterfirma.de"
+            },
         ],
     },
     {
@@ -20,10 +30,15 @@ const CUSTOMERS = [
         email: "kontakt@beispiel-ag.de",
         street: "Beispielallee 45",
         city: "Beispielburg",
-        plz: "54321",
+        zip: "54321",
         phone: "+49 987 654321",
         contactPersons: [
-            { salutation: "Herr", firstName: "Hans", lastName: "Beispiel", email: "hans.beispiel@beispiel-ag.de" },
+            {
+                salutation: "Herr",
+                firstName: "Hans",
+                lastName: "Beispiel",
+                email: "hans.beispiel@beispiel-ag.de"
+            },
         ],
     },
 ];

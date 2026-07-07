@@ -25,7 +25,7 @@ export const updateUserSchema = z.object({
 
 export const upsertAddressSchema = z.object({
   street: z.string().optional(),
-  plz: z.string().optional(),
+  zip: z.string().optional(),
   city: z.string().optional(),
   phone: z.string().optional(),
 });

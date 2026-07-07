@@ -16,7 +16,7 @@ export type CreateCustomerInput = Pick<Customer,
     | "language"
     | "street"
     | "salutation"
-    | "plz"
+    | "zip"
     | "phone"
     | "currency"
     | "city"

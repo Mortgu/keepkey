@@ -9,7 +9,7 @@ const customerSchema = z.object({
   id: z.string(),
   companyName: z.string(),
   street: z.string(),
-  plz: z.string(),
+  zip: z.string(),
   city: z.string(),
   fullName: z.string(),
   salutation: z.string(),

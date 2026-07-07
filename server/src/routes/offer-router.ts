@@ -12,10 +12,10 @@ import {
   getOffers,
   updateOffer,
   uploadOfferDocument
-} from "../controllers/index.js";
+} from "../controllers/offer.controller.js";
 
-import { validate } from "../middlewares/validate.js";
 import { notImplemented } from "../middlewares/not-implemented.js";
+import { validate } from "../middlewares/validate.js";
 import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, updateOfferDocumentSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
 
 const router = Router();

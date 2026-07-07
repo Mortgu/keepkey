@@ -36,10 +36,10 @@ export interface components {
             companyName: string;
             email?: string;
             invoiceEmail?: string;
-            street?: string;
-            city?: string;
-            plz?: string;
             phone?: string;
+            street: string;
+            city: string;
+            zip: string;
             language: components["schemas"]["Language"];
             country: string;
             currency: components["schemas"]["Currency"];

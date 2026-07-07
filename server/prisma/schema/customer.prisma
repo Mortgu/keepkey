@@ -6,11 +6,11 @@ model Customer {
 
   email        String? @unique
   invoiceEmail String?
+  phone        String?
 
-  street String?
-  city   String?
-  plz    String?
-  phone  String?
+  street String
+  city   String
+  zip    String
 
   language Language @default(DE)
   country  String   @default("Deutschland")

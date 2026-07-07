@@ -2,34 +2,33 @@ import { z } from "zod";
 
 // --- Reusable sub-schemas ---------------------------------------------------
 
-const address = z.object({
-    street: z.string(),
-    zip: z.string(),
-    city: z.string(),
-});
-
 const employee = z.object({
     firstName: z.string(),
     lastName: z.string(),
     salutation: z.string(),
 
-    phone: z.string(),
+    phone: z.string().nullish().transform(v => v ?? ''),
     email: z.string(),
-
-    address: address
 });
 
-const customer = z.object({
+export type EmployeeTemplate = z.infer<typeof employee>;
+
+export const CustomerTemplateSchema = z.object({
+    id: z.string().nullish().transform(v => v ?? ''),
     companyName: z.string(),
     firstName: z.string(),
     lastName: z.string(),
     salutation: z.string(),
 
-    phone: z.string(),
-    email: z.string(),
+    phone: z.string().nullish().transform(v => v ?? ''),
+    email: z.string().nullish().transform(v => v ?? ''),
 
-    address: address
+    street: z.string(),
+    zip: z.string(),
+    city: z.string(),
 });
+
+export type CustomerTemplate = z.infer<typeof CustomerTemplateSchema>;
 
 
 // A single invoice line item (table row)
@@ -55,7 +54,7 @@ export const invoiceContract = z.object({
     supplierNumber: z.string(),
     orderNumber: z.string(),
 
-    customer: customer,
+    customer: CustomerTemplateSchema,
     employee: employee,
 
     projectDescription: z.string(),

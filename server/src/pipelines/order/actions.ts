@@ -1,14 +1,14 @@
-import { prisma } from "../../lib/prismaClient.js";
-import { OrderFetchedData, OrderFormattedData } from "./context.js";
-import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
-import { pickTranslation } from "../../utils/i18n.js";
-import { customParser, deepIterate } from "../offer/utils.js";
-import fs from "fs/promises";
-import path from "path";
-import env from "../../lib/env.js";
-import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
+import fs from "fs/promises";
 import { convert as libconvert } from "libreoffice-convert";
+import path from "path";
+import PizZip from "pizzip";
+import env from "../../lib/env.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { pickTranslation } from "../../utils/i18n.js";
+import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { customParser, deepIterate } from "../offer/utils.js";
+import { OrderFetchedData, OrderFormattedData } from "./context.js";
 
 export async function fetchOrderData(orderId: string) {
     const [order] = await Promise.all([
@@ -129,7 +129,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             id: customer.customerId || "",
             companyName: customer.companyName || "",
             street: customer.street || "",
-            plz: customer.plz || "",
+            zip: customer.zip || "",
             city: customer.city || "",
 
             fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,

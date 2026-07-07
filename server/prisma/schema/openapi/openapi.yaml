@@ -86,13 +86,13 @@ components:
           type: string
         invoiceEmail:
           type: string
+        phone:
+          type: string
         street:
           type: string
         city:
           type: string
-        plz:
-          type: string
-        phone:
+        zip:
           type: string
         language:
           $ref: "#/components/schemas/Language"
@@ -134,6 +134,9 @@ components:
       required:
         - id
         - companyName
+        - street
+        - city
+        - zip
         - language
         - country
         - currency

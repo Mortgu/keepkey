@@ -1,6 +1,6 @@
-import {describe, expect, it} from "vitest";
-import {formatOrderData, postprocessing} from "../actions.js";
-import type {OrderFetchedData} from "../context.js";
+import { describe, expect, it } from "vitest";
+import { formatOrderData, postprocessing } from "../actions.js";
+import type { OrderFetchedData } from "../context.js";
 
 function buildFetchData(overrides?: {
     positions?: Array<{
@@ -34,12 +34,12 @@ function buildFetchData(overrides?: {
             customerId: "K-100",
             companyName: "ACME GmbH",
             street: "Hauptstr. 1",
-            plz: "12345",
+            zip: "12345",
             city: "Berlin",
             phone: "030-123",
             email: "info@acme.test",
         },
-        supplier: {id: "sup1"},
+        supplier: { id: "sup1" },
         customerContactPerson: {
             salutation: "Herr",
             firstName: "Max",
@@ -61,13 +61,13 @@ function buildFetchData(overrides?: {
             product: {
                 id: `prod${i}`,
                 translations: [
-                    {language: "DE", name: p.productName ?? "Produkt", description: "Beschreibung", table: ""},
+                    { language: "DE", name: p.productName ?? "Produkt", description: "Beschreibung", table: "" },
                 ],
             },
             contract: {
                 id: p.contractId,
                 translations: [
-                    {language: "DE", name: "Standard", features: ["f1"], table: ""},
+                    { language: "DE", name: "Standard", features: ["f1"], table: "" },
                 ],
             },
         })),
@@ -76,12 +76,12 @@ function buildFetchData(overrides?: {
             total_cents: fr.total_cents,
             flatRate: {
                 id: `flat${i}`,
-                translations: [{language: "DE", name: fr.name ?? "Pauschale", table: ""}],
+                translations: [{ language: "DE", name: fr.name ?? "Pauschale", table: "" }],
             },
         })),
     };
 
-    return {order} as unknown as OrderFetchedData;
+    return { order } as unknown as OrderFetchedData;
 }
 
 describe("formatOrderData", () => {
@@ -102,9 +102,9 @@ describe("formatOrderData", () => {
         const result = await formatOrderData(
             buildFetchData({
                 positions: [
-                    {contractId: "c1", duration_months: 12, total_cents: 10000, quantity: 1},
+                    { contractId: "c1", duration_months: 12, total_cents: 10000, quantity: 1 },
                 ],
-                flatRates: [{total_cents: 5000}],
+                flatRates: [{ total_cents: 5000 }],
             }),
         );
 
@@ -116,7 +116,7 @@ describe("formatOrderData", () => {
         const result = await formatOrderData(
             buildFetchData({
                 positions: [
-                    {contractId: "c1", duration_months: 0, total_cents: 0, quantity: 0},
+                    { contractId: "c1", duration_months: 0, total_cents: 0, quantity: 0 },
                 ],
             }),
         );
