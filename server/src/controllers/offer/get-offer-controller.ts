@@ -1,158 +1,25 @@
 import { NextFunction, Request, Response } from "express";
-import path from "path";
-import fs from "fs/promises";
-import { prisma } from "../../lib/prismaClient.js";
-import env from "../../lib/env.js";
-import { downloadDocumentStream } from "../../lib/nextcloud.js";
-import { AppException } from "../../lib/exceptions.js";
+
+import * as offerService from "../../services/offer.service.js";
 
 export const getOffers = async (request: Request, response: Response) => {
-    const { search, companyIds, contactPersonIds, sort, cursor } = request.query;
-
-    const limitRaw = Number(request.query.limit);
-    const limit = Number.isFinite(limitRaw) && limitRaw > 0
-        ? Math.min(Math.trunc(limitRaw), 100)
-        : 50;
-
-    const where: {
-        AND?: any[];
-        quoteId?: { contains: string };
-        customerId?: { in: string[] };
-        contactPersonId?: { in: string[] };
-    } = {};
-
-    if (search && typeof search === "string") {
-        where.quoteId = { contains: search };
-    }
-
-    if (companyIds) {
-        const ids = Array.isArray(companyIds) ? companyIds : [companyIds];
-        where.customerId = { in: ids as string[] };
-    }
-
-    if (contactPersonIds) {
-        const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
-        where.contactPersonId = { in: ids as string[] };
-    }
-
-    const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
-
-    const items = await prisma.offer.findMany({
-        where: Object.keys(where).length > 0 ? where : undefined,
-        orderBy,
-        take: limit,
-        skip: cursor ? 1 : 0,
-        cursor: cursor && typeof cursor === "string" ? { id: cursor } : undefined,
-        include: {
-            customer: { select: { id: true, companyName: true } },
-            customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
-            revisions: {
-                orderBy: { version: "desc" },
-                select: {
-                    id: true,
-                    version: true,
-                    createdAt: true,
-                    changedBy: { select: { id: true, name: true } },
-                },
-            },
-            offerDocuments: {
-                orderBy: { version: "desc" as const },
-                select: {
-                    id: true,
-                    displayName: true,
-                    version: true,
-                    status: true,
-                    createdAt: true,
-                    offerId: true,
-                    taskId: true,
-                    pdf: { select: { size: true } },
-                },
-            },
-            offerPositions: {
-                select: {
-                    id: true,
-                    quantity: true,
-                    duration_months: true,
-                    free_months: true,
-                    optional: true,
-                    total_cents: true,
-                    product: {
-                        include: {
-                            translations: true
-                        }
-                    },
-                    contract: {
-                        include: {
-                            translations: true
-                        }
-                    },
-                },
-            },
-            offerFlatRates: {
-                select: {
-                    id: true,
-                    quantity: true,
-                    total_cents: true,
-                    flatRate: {
-                        include: {
-                            translations: true,
-                        }
-                    },
-                },
-            },
-        },
-    });
-
-    const nextCursor = items.length === limit ? items[items.length - 1]?.id ?? null : null;
-
-    return response.status(200).json({ items, nextCursor });
+    const result = await offerService.getOffers(request.query);
+    return response.status(200).json(result);
 };
 
 export const getOfferById = async (request: Request, response: Response) => {
-    const { id } = request.params;
-
-    try {
-        const offer = await prisma.offer.findFirstOrThrow({
-            where: { id: id as string },
-            include: {
-                offerDocuments: {
-                    orderBy: { version: "desc" as const },
-                    include: {
-                        pdf: true,
-                        docx: true,
-                        task: true,
-                    },
-                },
-            },
-        });
-
-        return response.status(200).json(offer);
-    } catch (exception: any) {
-        return response.status(404).json({
-            message: "Offer not found!",
-        });
-    }
+    const offer = await offerService.getOfferById(request.params.id as string);
+    return response.status(200).json(offer);
 };
 
 export const getOfferRevisions = async (request: Request, response: Response) => {
-    const { id } = request.params;
-
-    const revisions = await prisma.offerRevision.findMany({
-        where: { offerId: id as string },
-        orderBy: { version: "desc" },
-        select: { id: true, version: true, changedBy: true, createdAt: true },
-    });
-
+    const revisions = await offerService.getOfferRevisions(request.params.id as string);
     return response.status(200).json(revisions);
 };
 
 export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-    try {
-        const quoteId = 0; //await getLatestQuoteId();
-        return response.status(200).json(quoteId + 1);
-    } catch (exception: any) {
-        return next(exception);
-    }
+    const quoteId = await offerService.getNextQuoteId();
+    return response.status(200).json(quoteId);
 };
 
 export const downloadOfferDocument = async (request: Request, response: Response) => {
@@ -160,57 +27,15 @@ export const downloadOfferDocument = async (request: Request, response: Response
     const documentId = request.params.documentId as string;
     const format = (request.params.format as string).toLowerCase();
 
-    if (format !== "pdf" && format !== "docx") {
-        return response.status(400).json({ message: "Invalid format. Use 'pdf' or 'docx'." });
+    const download = await offerService.downloadOfferDocument(offerId, documentId, format);
+
+    response.setHeader("Content-Type", download.contentType);
+    response.setHeader("Content-Disposition", `attachment; filename="${download.downloadName}"`);
+
+    if (download.kind === "stream") {
+        download.stream.pipe(response);
+        return;
     }
 
-    const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId },
-        include: { pdf: true, docx: true },
-    });
-
-    if (!offerDoc) {
-        return response.status(404).json({ message: "Document not found" });
-    }
-
-    if (offerDoc.status !== "GENERATED" && offerDoc.status !== "UPLOADED") {
-        return response.status(409).json({ message: "Document not yet generated" });
-    }
-
-    const file = format === "pdf" ? offerDoc.pdf : offerDoc.docx;
-    if (!file) {
-        return response.status(404).json({ message: "File not found" });
-    }
-
-    const mimeTypes: Record<string, string> = {
-        pdf: "application/pdf",
-        docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    };
-
-    const downloadName = `${offerDoc.displayName ?? offerDoc.id}.${format}`;
-    response.setHeader("Content-Type", mimeTypes[format]);
-    response.setHeader("Content-Disposition", `attachment; filename="${downloadName}"`);
-
-    if (offerDoc.status === "UPLOADED") {
-        try {
-            const stream = await downloadDocumentStream(file.filename);
-            stream.pipe(response);
-            return;
-        } catch (exception: any) {
-            if (exception instanceof AppException) {
-                return response.status(exception.statusCode).json({ message: exception.message });
-            }
-            return response.status(500).json({ message: "Failed to download from Nextcloud: " + exception.message });
-        }
-    }
-
-    const filePath = path.join(file.path, file.basename);
-
-    try {
-        await fs.access(filePath);
-    } catch {
-        return response.status(404).json({ message: "File not found on disk" });
-    }
-
-    return response.download(filePath, downloadName);
+    return response.download(download.filePath, download.downloadName);
 };

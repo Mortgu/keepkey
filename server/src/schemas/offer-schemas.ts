@@ -18,7 +18,8 @@ export const createOfferFieldsSchema = z.object({
   featureComparison: z.boolean().default(false),
 
   supplierId: z.string().nullable(),
-  paymentTerm: z.string().nullable(),
+  // DB-Feld ist non-nullable (Offer.paymentTerm String) — null führte bisher zu einem 500er in Prisma
+  paymentTerm: z.string(),
   validUntil: z.string().nullable(),
   requestFrom: z.string().nullable(),
   date: z.string().nullable().optional(),
