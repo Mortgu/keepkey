@@ -12,6 +12,17 @@ import { pickTranslation } from '../../utils/i18n.js';
 import { calculatePriceOrThrow } from '../../utils/products.js';
 import { toDate } from '../../utils/utils.js';
 
+interface OfferPositionCreateData {
+    offerId: string;
+    productId: string;
+    contractId: string;
+    duration_months: number;
+    free_months: number;
+    quantity: number;
+    optional?: boolean;
+    total_cents: number;
+}
+
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const offerId = request.params.id as string;
 
@@ -176,7 +187,7 @@ export const createOfferPositions = async (request: Request, response: Response,
     }
 
     try {
-        const positionsData = [];
+        const positionsData: OfferPositionCreateData[] = [];
 
         for (const element of body) {
             const total_cents = await calculatePriceOrThrow({
@@ -194,21 +205,31 @@ export const createOfferPositions = async (request: Request, response: Response,
             });
         }
 
-        const offerPositions = await prisma.offerPosition.createManyAndReturn({
-            data: positionsData,
-        });
+        const offerPositions = await prisma.$transaction(async (tx) => {
+            const created = await tx.offerPosition.createManyAndReturn({
+                data: positionsData,
+            });
 
-        const offer = await prisma.offer.findUniqueOrThrow({
-            where: { id },
-            select: { net_amount: true }
-        });
+            const [positionsSum, flatratesSum] = await Promise.all([
+                tx.offerPosition.aggregate({
+                    where: { offerId: id },
+                    _sum: { total_cents: true },
+                }),
+                tx.offerFlatRate.aggregate({
+                    where: { offerId: id },
+                    _sum: { total_cents: true },
+                }),
+            ]);
 
-        await prisma.offer.update({
-            where: { id },
-            data: {
-                net_amount: offerPositions.reduce((acc, position) => acc + position.total_cents, offer.net_amount ?? 0),
-            }
-        })
+            await tx.offer.update({
+                where: { id },
+                data: {
+                    net_amount: (positionsSum._sum.total_cents ?? 0) + (flatratesSum._sum.total_cents ?? 0),
+                },
+            });
+
+            return created;
+        });
 
         return response.status(200).json(offerPositions);
     } catch (exception: any) {
@@ -234,32 +255,42 @@ export const createOfferFlatrates = async (request: Request, response: Response,
         });
         const rateById = new Map(rates.map((r) => [r.id, r.total_cents]));
 
-        const flatrates = await prisma.offerFlatRate.createManyAndReturn({
-            data: body.map((element) => {
-                const rate_cents = rateById.get(element.flatRateId);
-                if (rate_cents === undefined) {
-                    throw new AppException(`FlatRate ${element.flatRateId} not found!`, 404, "FLAT_RATE_NOT_FOUND");
-                }
+        const flatrates = await prisma.$transaction(async (tx) => {
+            const created = await tx.offerFlatRate.createManyAndReturn({
+                data: body.map((element) => {
+                    const rate_cents = rateById.get(element.flatRateId);
+                    if (rate_cents === undefined) {
+                        throw new AppException(`FlatRate ${element.flatRateId} not found!`, 404, "FLAT_RATE_NOT_FOUND");
+                    }
 
-                return {
-                    offerId: id,
-                    ...element,
-                    total_cents: rate_cents,
-                };
-            }),
+                    return {
+                        offerId: id,
+                        ...element,
+                        total_cents: rate_cents,
+                    };
+                }),
+            });
+
+            const [positionsSum, flatratesSum] = await Promise.all([
+                tx.offerPosition.aggregate({
+                    where: { offerId: id },
+                    _sum: { total_cents: true },
+                }),
+                tx.offerFlatRate.aggregate({
+                    where: { offerId: id },
+                    _sum: { total_cents: true },
+                }),
+            ]);
+
+            await tx.offer.update({
+                where: { id },
+                data: {
+                    net_amount: (positionsSum._sum.total_cents ?? 0) + (flatratesSum._sum.total_cents ?? 0),
+                },
+            });
+
+            return created;
         });
-
-        const offer = await prisma.offer.findUniqueOrThrow({
-            where: { id },
-            select: { net_amount: true }
-        });
-
-        await prisma.offer.update({
-            where: { id },
-            data: {
-                net_amount: flatrates.reduce((acc, flatrate) => acc + flatrate.total_cents, offer.net_amount ?? 0),
-            }
-        })
 
         return response.status(200).json(flatrates);
     } catch (exception: any) {
