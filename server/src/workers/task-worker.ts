@@ -55,7 +55,7 @@ export default function registerTaskWorker() {
 
         await handler(task);
 
-    }, { connection, concurrency: 2 });
+    }, { connection, concurrency: env.WORKER_CONCURRENCY });
 
     taskWorker.on("active", async (job: Job<TaskJobData>) => {
         const { taskId } = job.data;

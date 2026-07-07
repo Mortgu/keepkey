@@ -9,7 +9,7 @@ export const createOfferFlatratesSchema = z.array(createOfferFlatrateSchema);
 
 export const updateOfferFlatrateSchema = createOfferFlatrateSchema.partial();
 
-const createOfferFieldsSchema = z.object({
+export const createOfferFieldsSchema = z.object({
   customerId: z.string().min(1),
   contactPersonId: z.string().min(1),
   userId: z.string().min(1),

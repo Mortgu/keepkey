@@ -27,6 +27,7 @@ const env = createEnv({
         NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().default('/'),
 
         REDIS_URL: z.string().min(1),
+        WORKER_CONCURRENCY: z.coerce.number().default(2),
 
         CORS_ORIGIN: z.string(),
     },

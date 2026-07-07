@@ -107,11 +107,7 @@ export const createOffer = async (request: Request, response: Response, next: Ne
                 customerId: request.body.offer.customerId,
                 freeMonths: position.free_months ?? 0,
             });
-
-            console.log(position)
         }
-
-        console.dir(positions, { depth: 999 });
 
         const rates = await prisma.flatRate.findMany({
             where: { id: { in: flatrates.map((f: OfferFlatRate) => f.flatRateId) } },
