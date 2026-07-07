@@ -90,18 +90,18 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
 
 async function replacePositions(tx: any, offerId: string, positions: OfferPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
-    for (const { productId, contractId, duration_months, free_months, quantity, optional, total_cents } of positions) {
-        await tx.offerPosition.create({
-            data: { offerId, productId, contractId, duration_months, free_months, quantity, total_cents, optional },
-        });
-    }
+    await tx.offerPosition.createMany({
+        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, total_cents }) => ({
+            offerId, productId, contractId, duration_months, free_months, quantity, total_cents, optional,
+        })),
+    });
 }
 
 async function replaceFlatRates(tx: any, offerId: string, flatRates: OfferFlatRate[]) {
     await tx.offerFlatRate.deleteMany({ where: { offerId } });
-    for (const { flatRateId, quantity, total_cents } of flatRates) {
-        await tx.offerFlatRate.create({
-            data: { offerId, flatRateId, quantity, total_cents },
-        });
-    }
+    await tx.offerFlatRate.createMany({
+        data: flatRates.map(({ flatRateId, quantity, total_cents }) => ({
+            offerId, flatRateId, quantity, total_cents,
+        })),
+    });
 }

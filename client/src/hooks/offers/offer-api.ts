@@ -9,6 +9,7 @@ import type {
     OfferFilters,
     OfferPosition,
     OfferRevision,
+    OffersPage,
     Task,
     UpdateOfferDocumentInput,
     UpdateOfferFlatrateInput,
@@ -18,7 +19,7 @@ import type {
 
 /* Offer */
 export const getOffers = async (filters: OfferFilters) =>
-    api<Array<Offer>>(`/api/offers?${formatQueryString(filters)}`, {
+    api<OffersPage>(`/api/offers?${formatQueryString(filters)}`, {
         method: "GET"
     });
 

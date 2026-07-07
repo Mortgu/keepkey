@@ -5,6 +5,13 @@ export interface OfferFilters {
     companyIds?: Array<string>;
     contactPersonIds?: Array<string>;
     sort?: string;
+    cursor?: string;
+    limit?: number;
+}
+
+export interface OffersPage {
+    items: Array<Offer>;
+    nextCursor: string | null;
 }
 
 export type Offer = components["schemas"]["Offer"];

@@ -1,9 +1,11 @@
-import type { OfferFilters } from "@/types";
+import type { OfferFilters, OffersPage } from "@/types";
 import { useQuery } from "@tanstack/react-query";
 import { offerQueries } from "./offer-queries";
 
-export function useOffers(filters: OfferFilters = {}) {
-    const { data: offers = [], isPending, error } = useQuery(offerQueries.list(filters));
+const EMPTY_PAGE: OffersPage = { items: [], nextCursor: null };
 
-    return { offers, isPending, error }
+export function useOffers(filters: OfferFilters = {}) {
+    const { data = EMPTY_PAGE, isPending, error } = useQuery(offerQueries.list(filters));
+
+    return { items: data.items, nextCursor: data.nextCursor, isPending, error }
 }

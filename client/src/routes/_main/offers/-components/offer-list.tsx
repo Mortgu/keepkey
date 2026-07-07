@@ -17,7 +17,7 @@ export default function OfferList() {
   const modal = useModal<Offer>();
 
   const filters = useOfferFilters();
-  const { offers } = useOffers(filters.params);
+  const { items: offers } = useOffers(filters.params);
 
   const { contacts } = useContacts();
   const { customers } = useCustomers();

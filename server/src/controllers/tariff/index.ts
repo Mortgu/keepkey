@@ -63,29 +63,31 @@ export async function createTariff(request: Request, response: Response, next: N
     const { contractId } = request.body;
 
     try {
-        const existing = await prisma.tariff.findFirst({
-            where: { tariffGroupId, contractId },
-        });
-
-        if (existing) {
-            const groupProduct = await prisma.tariffGroupProduct.findFirst({
-                where: { tariffGroupId },
+        const result = await prisma.$transaction(async (tx) => {
+            const existing = await tx.tariff.findFirst({
+                where: { tariffGroupId, contractId },
             });
-            const productId = groupProduct?.productId ?? "";
-            await snapshotTariff(productId, contractId);
-            await prisma.tariff.delete({ where: { id: existing.id } });
-        }
 
-        const tariff = await prisma.tariff.create({
-            data: {
-                tariffGroupId,
-                contractId,
-            },
-        });
+            if (existing) {
+                const groupProduct = await tx.tariffGroupProduct.findFirst({
+                    where: { tariffGroupId },
+                });
+                const productId = groupProduct?.productId ?? "";
+                await snapshotTariff(productId, contractId, tx);
+                await tx.tariff.delete({ where: { id: existing.id } });
+            }
 
-        const result = await prisma.tariff.findUniqueOrThrow({
-            where: { id: tariff.id },
-            include: TARIFF_INCLUDE,
+            const tariff = await tx.tariff.create({
+                data: {
+                    tariffGroupId,
+                    contractId,
+                },
+            });
+
+            return tx.tariff.findUniqueOrThrow({
+                where: { id: tariff.id },
+                include: TARIFF_INCLUDE,
+            });
         });
 
         return response.status(201).json(result);
@@ -219,19 +221,18 @@ export async function createTariffColumn(request: Request, response: Response, n
                 data: { tariffId, duration, order: nextOrder },
             });
 
-            for (const row of tariff.rows) {
-                const cell = await tx.tariffCell.create({
-                    data: {
-                        tariffId,
-                        rowId: row.id,
-                        columnId: col.id
-                    },
-                });
+            const cells = await tx.tariffCell.createManyAndReturn({
+                data: tariff.rows.map((row) => ({
+                    tariffId,
+                    rowId: row.id,
+                    columnId: col.id,
+                })),
+                select: { id: true },
+            });
 
-                await tx.tariffCellDefault.create({
-                    data: { cellId: cell.id, price: 1 }
-                })
-            }
+            await tx.tariffCellDefault.createMany({
+                data: cells.map((cell) => ({ cellId: cell.id, price: 1 })),
+            });
 
             return col;
         });
@@ -306,19 +307,18 @@ export async function createTariffRow(request: Request, response: Response, next
                 data: { tariffId, min_quantity, max_quantity, order: nextOrder },
             });
 
-            for (const column of tariff.columns) {
-                const cell = await tx.tariffCell.create({
-                    data: {
-                        tariffId,
-                        rowId: r.id,
-                        columnId: column.id
-                    },
-                });
+            const cells = await tx.tariffCell.createManyAndReturn({
+                data: tariff.columns.map((column) => ({
+                    tariffId,
+                    rowId: r.id,
+                    columnId: column.id,
+                })),
+                select: { id: true },
+            });
 
-                await tx.tariffCellDefault.create({
-                    data: { cellId: cell.id, price: 1 }
-                })
-            }
+            await tx.tariffCellDefault.createMany({
+                data: cells.map((cell) => ({ cellId: cell.id, price: 1 })),
+            });
 
             return r;
         });

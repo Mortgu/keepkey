@@ -39,8 +39,8 @@ app.use(morganMiddleware);
 
 app.use(
     cors({
-        origin: env.CORS_ORIGIN ?? "http://localhost:5173",
-        methods: ["*", "DELETE", "PUT", "PATCH"],
+        origin: env.CORS_ORIGIN,
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
         credentials: true,
     }),
 );

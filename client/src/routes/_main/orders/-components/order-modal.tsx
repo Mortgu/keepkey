@@ -27,7 +27,7 @@ function toInputDate(date: Date): string {
 }
 
 export default function OrderModal({ onClose }: OrderModalProps) {
-  const { offers } = useOffers();
+  const { items: offers } = useOffers();
   const { createOrder, nextOrderNumber } = useOrderHook();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 

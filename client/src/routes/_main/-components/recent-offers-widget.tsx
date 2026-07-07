@@ -5,16 +5,15 @@ import { formatEur } from "@/utils/utils";
 import { useTranslation } from "react-i18next";
 import { RecentActivityRow } from "./recent-activity-row";
 
-const LIMIT = 3;
-
 export function RecentOffersWidget() {
     const { t } = useTranslation();
 
-    const { offers, isPending } = useOffers({
-        sort: "createdAt:desc"
+    const { items: offers, isPending } = useOffers({
+        sort: "createdAt:desc",
+        limit: 3,
     });
 
-    const recent = offers.slice(0, LIMIT);
+    const recent = offers;
 
     return (
         <div className="border border-(--border) rounded-md bg-white">

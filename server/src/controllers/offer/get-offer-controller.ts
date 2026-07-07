@@ -7,7 +7,12 @@ import { downloadDocumentStream } from "../../lib/nextcloud.js";
 import { AppException } from "../../lib/exceptions.js";
 
 export const getOffers = async (request: Request, response: Response) => {
-    const { search, companyIds, contactPersonIds, sort } = request.query;
+    const { search, companyIds, contactPersonIds, sort, cursor } = request.query;
+
+    const limitRaw = Number(request.query.limit);
+    const limit = Number.isFinite(limitRaw) && limitRaw > 0
+        ? Math.min(Math.trunc(limitRaw), 100)
+        : 50;
 
     const where: {
         AND?: any[];
@@ -32,29 +37,45 @@ export const getOffers = async (request: Request, response: Response) => {
 
     const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
 
-    const offers = await prisma.offer.findMany({
+    const items = await prisma.offer.findMany({
         where: Object.keys(where).length > 0 ? where : undefined,
         orderBy,
+        take: limit,
+        skip: cursor ? 1 : 0,
+        cursor: cursor && typeof cursor === "string" ? { id: cursor } : undefined,
         include: {
-            customer: true,
-            supplier: true,
-            customerContactPerson: true,
+            customer: { select: { id: true, companyName: true } },
+            customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             revisions: {
                 orderBy: { version: "desc" },
-                include: {
-                    changedBy: true,
-                }
+                select: {
+                    id: true,
+                    version: true,
+                    createdAt: true,
+                    changedBy: { select: { id: true, name: true } },
+                },
             },
             offerDocuments: {
                 orderBy: { version: "desc" as const },
-                include: {
-                    pdf: true,
-                    docx: true,
-                    task: true,
+                select: {
+                    id: true,
+                    displayName: true,
+                    version: true,
+                    status: true,
+                    createdAt: true,
+                    offerId: true,
+                    taskId: true,
+                    pdf: { select: { size: true } },
                 },
             },
             offerPositions: {
-                include: {
+                select: {
+                    id: true,
+                    quantity: true,
+                    duration_months: true,
+                    free_months: true,
+                    optional: true,
+                    total_cents: true,
                     product: {
                         include: {
                             translations: true
@@ -68,7 +89,10 @@ export const getOffers = async (request: Request, response: Response) => {
                 },
             },
             offerFlatRates: {
-                include: {
+                select: {
+                    id: true,
+                    quantity: true,
+                    total_cents: true,
                     flatRate: {
                         include: {
                             translations: true,
@@ -79,7 +103,9 @@ export const getOffers = async (request: Request, response: Response) => {
         },
     });
 
-    return response.status(200).json(offers);
+    const nextCursor = items.length === limit ? items[items.length - 1]?.id ?? null : null;
+
+    return response.status(200).json({ items, nextCursor });
 };
 
 export const getOfferById = async (request: Request, response: Response) => {

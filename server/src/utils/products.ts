@@ -144,8 +144,8 @@ export function selectPrice(
     };
 }
 
-export async function snapshotTariff(productId: string, contractId: string) {
-    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+export async function snapshotTariff(productId: string, contractId: string, tx: any = prisma) {
+    const groupProduct = await tx.tariffGroupProduct.findUnique({
         where: { productId },
     });
 
@@ -153,18 +153,18 @@ export async function snapshotTariff(productId: string, contractId: string) {
 
     const { tariffGroupId } = groupProduct;
 
-    const tariff = await prisma.tariff.findUnique({
+    const tariff = await tx.tariff.findUnique({
         where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
         include: TARIFF_SNAPSHOT_INCLUDE,
     });
 
     if (!tariff) return;
 
-    const versionCount = await prisma.tariffHistory.count({
+    const versionCount = await tx.tariffHistory.count({
         where: { productId, contractId },
     });
 
-    await prisma.tariffHistory.create({
+    await tx.tariffHistory.create({
         data: {
             productId,
             contractId,
