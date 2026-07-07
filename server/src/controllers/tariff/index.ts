@@ -376,7 +376,7 @@ export async function updateTariffRow(request: Request, response: Response, next
 
 export async function updateTariffCell(request: Request, response: Response, next: NextFunction) {
     const cellId = request.params.cellId as string;
-    const { default_price, customer_price } = request.body;
+    const { default_price, customer_price, customerId } = request.body;
 
     if (default_price === undefined && customer_price === undefined) {
         logger.error("default_price or customer_price is required");
@@ -400,11 +400,10 @@ export async function updateTariffCell(request: Request, response: Response, nex
         }
 
         if (customer_price !== undefined) {
-            const updated = await prisma.tariffCellCustomer.updateManyAndReturn({
-                where: { cellId: cellId },
-                data: {
-                    price: customer_price,
-                }
+            const updated = await prisma.tariffCellCustomer.upsert({
+                where: { cellId_customerId: { cellId: cellId, customerId } },
+                create: { cellId: cellId, customerId, price: customer_price },
+                update: { price: customer_price },
             });
 
             return response.status(200).json({

@@ -21,6 +21,7 @@ const createOfferFieldsSchema = z.object({
   paymentTerm: z.string().nullable(),
   validUntil: z.string().nullable(),
   requestFrom: z.string().nullable(),
+  date: z.string().nullable().optional(),
 })
 
 const createOfferPositionSchema = z.object({

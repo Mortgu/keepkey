@@ -51,7 +51,7 @@ export const updateOffer = async (request: Request, response: Response, next: Ne
                 data: {
                     offerId: oid,
                     version: current.version,
-                    changedById: data.offer.userId,
+                    changedById: request.user!.id,
                     snapshot: current as any
                 },
             });

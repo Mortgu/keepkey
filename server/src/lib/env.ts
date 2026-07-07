@@ -13,8 +13,8 @@ const env = createEnv({
 
         DATABASE_URL: z.url(),
 
-        PORT: z.string(),
-        NODE_ENV: z.string(),
+        PORT: z.coerce.number(),
+        NODE_ENV: z.enum(["development", "production", "test"]),
 
         NEXTCLOUD_URL: z.string().url().optional(),
         NEXTCLOUD_USER: z.string().optional(),

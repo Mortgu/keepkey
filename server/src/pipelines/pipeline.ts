@@ -6,9 +6,7 @@ export class PipelineStageError extends Error {
   constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {
     super(`[PipelineStageError] ${message}`);
     super.cause = cause;
-    super.name = "PiplineStageError";
-
-    logger.error(message, cause);
+    super.name = "PipelineStageError";
   }
 }
 
