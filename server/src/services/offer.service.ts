@@ -209,8 +209,23 @@ export async function getOffers(query: OfferListQuery) {
                 },
             },
             offerDocuments: true,
-            offerPositions: true,
-            offerFlatRates: true,
+            offerPositions: {
+                include: {
+                    product: {
+                        include: { translations: true }
+                    },
+                    contract: {
+                        include: { translations: true }
+                    }
+                }
+            },
+            offerFlatRates: {
+                include: {
+                    flatRate: {
+                        include: { translations: true }
+                    }
+                }
+            },
         },
     });
 
@@ -231,7 +246,16 @@ export async function getOfferById(id: string) {
                     task: true,
                 },
             },
-            offerPositions: true,
+            offerPositions: {
+                include: {
+                    product: {
+                        include: { translations: true }
+                    },
+                    contract: {
+                        include: { translations: true }
+                    }
+                }
+            },
             offerFlatRates: true
         },
     });
@@ -355,7 +379,10 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
         const current = await tx.offer.findFirstOrThrow({
             where: { id: offerId },
-            include: { offerPositions: true, offerFlatRates: true },
+            include: {
+                offerPositions: true,
+                offerFlatRates: true
+            },
         });
 
         await tx.offerRevision.create({
