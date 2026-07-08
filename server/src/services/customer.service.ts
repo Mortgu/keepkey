@@ -1,6 +1,5 @@
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
-import type { Customer, ContactPerson } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import {
     createCustomerSchema,
@@ -28,7 +27,7 @@ export async function getCustomers() {
     });
 }
 
-export async function getCustomerById(id: string): Promise<Customer> {
+export async function getCustomerById(id: string) {
     const customer = await prisma.customer.findUnique({
         where: { id },
         include: {
@@ -45,7 +44,7 @@ export async function getCustomerById(id: string): Promise<Customer> {
     return customer;
 }
 
-export async function getCustomerContacts(customerId: string): Promise<ContactPerson[]> {
+export async function getCustomerContacts(customerId: string) {
     return prisma.contactPerson.findMany({
         where: { customerId },
     });
@@ -53,7 +52,7 @@ export async function getCustomerContacts(customerId: string): Promise<ContactPe
 
 /* ========== Mutations ========== */
 
-export async function createCustomer(input: CreateCustomerInput): Promise<Customer> {
+export async function createCustomer(input: CreateCustomerInput) {
     const { contactPersons, ...customerFields } = input;
 
     return prisma.$transaction(async (tx) => {
@@ -103,13 +102,13 @@ export async function updateCustomer(id: string, input: UpdateCustomerInput): Pr
     });
 }
 
-export async function createCustomerContact(customerId: string, input: CreateCustomerContactInput): Promise<ContactPerson> {
+export async function createCustomerContact(customerId: string, input: CreateCustomerContactInput) {
     return prisma.contactPerson.create({
         data: { ...input, customerId }
     });
 }
 
-export async function updateCustomerContact(contactId: string, input: UpdateCustomerContactInput): Promise<ContactPerson> {
+export async function updateCustomerContact(contactId: string, input: UpdateCustomerContactInput) {
     const contact = await prisma.contactPerson.update({
         where: { id: contactId },
         data: input

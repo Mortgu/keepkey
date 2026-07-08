@@ -1,4 +1,3 @@
-import type { TariffColumn, TariffGroup, TariffHistory, TariffRow } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import {
@@ -129,7 +128,7 @@ export async function getTariffGroups() {
     });
 }
 
-export async function getTariffGroup(id: string): Promise<TariffGroup> {
+export async function getTariffGroup(id: string) {
     const group = await prisma.tariffGroup.findUnique({
         where: { id },
         include: TARIFF_GROUP_INCLUDE,
@@ -155,7 +154,7 @@ export async function getTariff(tariffId: string) {
     return tariff;
 }
 
-export async function getTariffHistory(productId: string, contractId: string): Promise<TariffHistory[]> {
+export async function getTariffHistory(productId: string, contractId: string) {
     return prisma.tariffHistory.findMany({
         where: { productId, contractId },
         orderBy: { version: 'desc' },
@@ -365,7 +364,7 @@ export async function updateTariffColumn(columnId: string, input: UpdateTariffCo
     });
 }
 
-export async function deleteTariffColumn(columnId: string): Promise<TariffColumn> {
+export async function deleteTariffColumn(columnId: string) {
     return prisma.tariffColumn.delete({
         where: { id: columnId }
     });
@@ -421,7 +420,7 @@ export async function updateTariffRow(rowId: string, input: UpdateTariffRowInput
     });
 }
 
-export async function deleteTariffRow(rowId: string): Promise<TariffRow> {
+export async function deleteTariffRow(rowId: string) {
     return prisma.tariffRow.delete({
         where: { id: rowId },
     });

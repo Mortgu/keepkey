@@ -3,7 +3,6 @@ import path from "path";
 import { Readable } from "stream";
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
-import type { Order, Task } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import { enqueueTask, uploadDocument, type UploadResult } from "../lib/document.js";
 import { downloadDocumentStream } from "../lib/nextcloud.js";
@@ -55,7 +54,7 @@ export async function getAllOrders() {
     });
 }
 
-export async function getOrderById(orderId: string): Promise<Order | null> {
+export async function getOrderById(orderId: string) {
     return prisma.order.findUnique({
         where: { id: orderId },
         include: {
@@ -162,7 +161,7 @@ export async function downloadOrderDocument(
 
 /* ========== Mutations ========== */
 
-export async function createOrder(input: CreateOrderInput): Promise<Order> {
+export async function createOrder(input: CreateOrderInput) {
     const { id, orderId, date, projectNumber, projectDescription, orderDetails } = input;
 
     const existingOffer = await prisma.offer.findUnique({
@@ -226,7 +225,7 @@ export async function createOrder(input: CreateOrderInput): Promise<Order> {
     });
 }
 
-async function createDocumentForOrder(orderId: string): Promise<Task> {
+async function createDocumentForOrder(orderId: string) {
     const task = await prisma.$transaction(async (tx) => {
         await tx.orderDocument.updateMany({
             where: { orderId, isCurrent: true },
@@ -269,7 +268,7 @@ export async function createOrderTask(orderId: string): Promise<void> {
     await createDocumentForOrder(orderId);
 }
 
-export async function generateOrderDocument(orderId: string): Promise<Task> {
+export async function generateOrderDocument(orderId: string) {
     const order = await prisma.order.findUnique({
         where: { id: orderId },
         select: { id: true },

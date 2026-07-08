@@ -1,6 +1,5 @@
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
-import type { Supplier } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import {
     createSupplierSchema,
@@ -24,11 +23,11 @@ export async function getSuppliers() {
 
 /* ========== Mutations ========== */
 
-export async function createSupplier(input: CreateSupplierInput): Promise<Supplier> {
+export async function createSupplier(input: CreateSupplierInput) {
     return prisma.supplier.create({ data: input });
 }
 
-export async function updateSupplier(id: string, input: UpdateSupplierInput): Promise<Supplier> {
+export async function updateSupplier(id: string, input: UpdateSupplierInput) {
     if (!id) {
         throw new AppException("Bad request! Missing id!", 400, "MISSING_ID");
     }

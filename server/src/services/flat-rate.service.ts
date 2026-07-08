@@ -1,6 +1,5 @@
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
-import type { FlatRate } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import {
     createFlatRateSchema,
@@ -21,7 +20,7 @@ export async function getFlatRates() {
     });
 }
 
-export async function getFlatRateById(id: string): Promise<FlatRate> {
+export async function getFlatRateById(id: string) {
     const flatrate = await prisma.flatRate.findUnique({
         where: { id },
         include: { translations: true },
@@ -36,7 +35,7 @@ export async function getFlatRateById(id: string): Promise<FlatRate> {
 
 /* ========== Mutations ========== */
 
-export async function createFlatRate(input: CreateFlatRateInput): Promise<FlatRate> {
+export async function createFlatRate(input: CreateFlatRateInput) {
     const { total_cents, translations } = input;
 
     return prisma.flatRate.create({
@@ -48,7 +47,7 @@ export async function createFlatRate(input: CreateFlatRateInput): Promise<FlatRa
     });
 }
 
-export async function updateFlatRate(id: string, input: UpdateFlatRateInput): Promise<FlatRate> {
+export async function updateFlatRate(id: string, input: UpdateFlatRateInput) {
     const { total_cents, translations } = input;
 
     const flatrate = await prisma.flatRate.update({

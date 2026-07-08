@@ -1,9 +1,8 @@
-import { Product } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { CreateProductInput, UpdateProductInput } from "../schemas/product-schemas.js";
 
-export async function getProducts(): Promise<Array<Product>> {
+export async function getProducts() {
     const products = await prisma.product.findMany({
         orderBy: { createdAt: "asc" },
         include: {
@@ -14,7 +13,7 @@ export async function getProducts(): Promise<Array<Product>> {
     return products;
 }
 
-export async function getProduct(productId: string): Promise<Product> {
+export async function getProduct(productId: string) {
     const product = await prisma.product.findUnique({
         where: { id: productId },
         include: {
@@ -29,7 +28,7 @@ export async function getProduct(productId: string): Promise<Product> {
     return product;
 }
 
-export async function createProduct(input: CreateProductInput): Promise<Product> {
+export async function createProduct(input: CreateProductInput) {
     const { translations } = input;
 
     const product = await prisma.product.create({
@@ -46,7 +45,7 @@ export async function createProduct(input: CreateProductInput): Promise<Product>
     return product;
 }
 
-export async function updateProduct(productId: string, input: UpdateProductInput): Promise<Product> {
+export async function updateProduct(productId: string, input: UpdateProductInput) {
     const { translations } = input;
 
     const result = await prisma.product.update({

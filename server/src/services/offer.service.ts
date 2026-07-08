@@ -4,7 +4,6 @@ import { Readable } from "stream";
 import z from "zod";
 
 import { prisma } from "../lib/prismaClient.js";
-import type { Offer, OfferFlatRate, OfferPosition, Task } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import { enqueueTask, uploadDocument, type UploadResult } from "../lib/document.js";
 import { downloadDocumentStream } from "../lib/nextcloud.js";
@@ -333,7 +332,7 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
 
 /* ========== Mutations ========== */
 
-export async function createOffer(input: CreateOfferInput): Promise<Offer> {
+export async function createOffer(input: CreateOfferInput) {
     const positions = await pricePositions(input.positions, input.offer.customerId);
     const flatrates = await priceFlatrates(input.flatrates);
 
@@ -365,7 +364,7 @@ export async function createOffer(input: CreateOfferInput): Promise<Offer> {
     });
 }
 
-export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string): Promise<Offer> {
+export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
     const { positions: rawPositions = [], flatrates: rawFlatrates = [] } = input;
     const { id: _, ...offerFields } = (input.offer ?? {}) as CreateOfferFieldsInput & { id?: string };
 
@@ -406,11 +405,11 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         await replacePositions(tx, offerId, positions);
         await replaceFlatRates(tx, offerId, flatrates);
 
-        return offer as Offer;
+        return offer;
     });
 }
 
-export async function createOfferPositions(offerId: string, positions: PositionInput[]): Promise<OfferPosition[]> {
+export async function createOfferPositions(offerId: string, positions: PositionInput[]) {
     const priced = await pricePositions(positions);
 
     return prisma.$transaction(async (tx) => {
@@ -424,7 +423,7 @@ export async function createOfferPositions(offerId: string, positions: PositionI
     });
 }
 
-export async function createOfferFlatrates(offerId: string, flatrates: FlatrateInput[]): Promise<OfferFlatRate[]> {
+export async function createOfferFlatrates(offerId: string, flatrates: FlatrateInput[]) {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return prisma.$transaction(async (tx) => {
@@ -451,7 +450,7 @@ export async function createOfferFlatrates(offerId: string, flatrates: FlatrateI
 
 /* ========== Documents ========== */
 
-export async function enqueueGeneration(offerId: string): Promise<Task> {
+export async function enqueueGeneration(offerId: string) {
     const offer = await prisma.offer.findUniqueOrThrow({
         where: { id: offerId },
         include: {

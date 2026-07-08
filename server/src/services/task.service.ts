@@ -1,14 +1,13 @@
 import { prisma } from "../lib/prismaClient.js";
-import type { Task } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 
 /* ========== Queries ========== */
 
-export async function getAllTasks(): Promise<Task[]> {
+export async function getAllTasks() {
     return prisma.task.findMany();
 }
 
-export async function getTaskById(id: string): Promise<Task | null> {
+export async function getTaskById(id: string) {
     if (!id) {
         throw new AppException("Bad request!", 400, "MISSING_ID");
     }

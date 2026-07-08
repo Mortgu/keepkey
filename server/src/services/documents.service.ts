@@ -1,5 +1,4 @@
 import { prisma } from "../lib/prismaClient.js";
-import type { OfferDocument, Document } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 
 /* ========== Types ========== */
@@ -8,7 +7,7 @@ export type RenameDocumentInput = { displayName: string };
 
 /* ========== Mutations ========== */
 
-export async function renameDocument(id: string, input: RenameDocumentInput): Promise<OfferDocument> {
+export async function renameDocument(id: string, input: RenameDocumentInput) {
     const { displayName } = input;
 
     return prisma.offerDocument.update({

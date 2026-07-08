@@ -1,7 +1,6 @@
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { auth } from "../lib/auth.js";
-import type { User } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import {
     createUserSchema,
@@ -27,7 +26,7 @@ export async function getAllUsers() {
     });
 }
 
-export async function getUserById(id: string): Promise<User | null> {
+export async function getUserById(id: string) {
     return prisma.user.findUnique({
         where: { id },
         include: {
@@ -41,7 +40,7 @@ export async function getUserById(id: string): Promise<User | null> {
     });
 }
 
-export async function getSessionUser(userId: string): Promise<User> {
+export async function getSessionUser(userId: string) {
     const user = await prisma.user.findUnique({
         where: { id: userId },
     });
@@ -81,7 +80,7 @@ export async function createUser(input: CreateUserInput & { password: string; sa
     }
 }
 
-export async function updateUser(id: string, input: UpdateUserInput): Promise<User> {
+export async function updateUser(id: string, input: UpdateUserInput) {
     if (!id) {
         throw new AppException("Missing user id!", 400, "MISSING_ID");
     }

@@ -1,6 +1,5 @@
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
-import type { Contract } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import {
     createContractSchema,
@@ -27,7 +26,7 @@ export async function getAllContracts() {
 
 /* ========== Mutations ========== */
 
-export async function createContract(input: CreateContractInput): Promise<Contract> {
+export async function createContract(input: CreateContractInput) {
     const { translations } = input;
 
     return prisma.contract.create({
@@ -38,7 +37,7 @@ export async function createContract(input: CreateContractInput): Promise<Contra
     });
 }
 
-export async function updateContract(id: string, input: UpdateContractInput): Promise<Contract> {
+export async function updateContract(id: string, input: UpdateContractInput) {
     if (!id) {
         throw new AppException("Bad request! Missing id!", 400, "MISSING_ID");
     }
