@@ -12,7 +12,7 @@ import { prisma } from "../../lib/prismaClient.js";
 import logger from "../../middlewares/logger.js";
 import { type OfferContext, offerSchema } from "../../schemas/templates/offer-template-schema.js";
 import { pickTranslation } from "../../utils/i18n.js";
-import { formatPositionGroups, formatTemplateCustomer, formatTemplateEmployee, groupOfferPositions } from "../../utils/pipeline/group.js";
+import { formatPositionGroups, groupOfferPositions } from "../../utils/pipeline/group.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
@@ -183,8 +183,28 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
         requestFrom: offer.requestFrom ? formatDate(offer.requestFrom) : "",
         supplierId: offer.supplierId || "",
 
-        customer: formatTemplateCustomer(customer, ccp),
-        employee: formatTemplateEmployee(employee),
+        customer: {
+            id: customer.customerId || "",
+            companyName: customer.companyName || "",
+            street: customer.street || "",
+            zip: customer.zip || "",
+            city: customer.city || "",
+            fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,
+            salutation: ccp.salutation || "",
+            firstName: ccp.firstName || "",
+            lastName: ccp.lastName || "",
+            phone: customer.phone || "",
+            email: customer.email || "",
+        },
+
+        employee: {
+            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            salutation: employee.salutation || "",
+            firstName: employee.firstName || "",
+            lastName: employee.lastName || "",
+            phone: employee.phone || "",
+            email: employee.email || "",
+        },
 
         products: {
             names: offerPositions.map((p) => p.product.name).join(" & "),
