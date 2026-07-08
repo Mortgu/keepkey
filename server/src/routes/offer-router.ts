@@ -11,7 +11,8 @@ import {
   enqueueGeneration,
   getOffers,
   updateOffer,
-  uploadOfferDocument
+  uploadOfferDocument,
+  getOfferById
 } from "../controllers/offer.controller.js";
 
 import { notImplemented } from "../middlewares/not-implemented.js";
@@ -24,6 +25,9 @@ const router = Router();
 
 /* [GET] /api/offers */
 router.get('/', getOffers);
+
+/* [GET] /api/offers/:id */
+router.get('/:id', getOfferById);
 
 /* [POST] /api/offers  */
 router.post('/', validate(createOfferSchema), createOffer);

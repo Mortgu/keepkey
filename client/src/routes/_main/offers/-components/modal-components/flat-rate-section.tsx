@@ -18,8 +18,6 @@ export default function FlatRateModalSection({ offerFlatRates, onAdd, onRemove }
     const { flatRates } = useFlatRateHook();
     const locale = useLocale();
 
-    console.log(flatRates);
-
     return (
         <div className="grid gap-4">
             <hr className="text-gray-200" />

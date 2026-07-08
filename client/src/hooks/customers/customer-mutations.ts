@@ -1,7 +1,7 @@
 import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { customerKeys } from "./customer-keys";
 import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, updateCustomer, updateCustomerContact } from "./customer-api";
-import type { CreateCustomerContactInput, CreateCustomerInput, DocumentStatus, Offer, Order, UpdateCustomerContactInput } from "@/types";
+import type { CreateCustomerContactInput, CreateCustomerInput, DocumentStatus, OffersPage, Order, UpdateCustomerContactInput } from "@/types";
 import { getTaskByIdAction } from "@/data/offer";
 import { useEffect } from "react";
 
@@ -155,16 +155,16 @@ function updateOfferDocumentStatus(
     status: DocumentStatus,
     error?: string,
 ) {
-    queryClient.setQueriesData<Array<Offer>>({ queryKey: ["offers"] }, (offers) => {
-        if (!Array.isArray(offers) || (offers.length > 0 && !('offerDocuments' in offers[0]))) return offers;
-        return offers.map((offer) => ({
-            ...offer,
-            offerDocuments: offer.offerDocuments.map((doc) =>
-                doc.taskId === taskId
-                    ? { ...doc, status, ...(error ? { error } : {}) }
-                    : doc
-            ),
-        }));
+    queryClient.setQueriesData<OffersPage>({ queryKey: ["offers"] }, (page) => {
+        if (!page || !page.items?.length || !('offerDocuments' in page.items[0])) return page;
+        return {
+            ...page, items: page.items.map((offer) => ({
+                ...offer,
+                offerDocuments: offer.offerDocuments.map((doc) =>
+                    doc.taskId === taskId ? { ...doc, status, ...(error ? { error } : {}) } : doc
+                ),
+            }))
+        };
     });
 }
 

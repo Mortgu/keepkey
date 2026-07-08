@@ -208,51 +208,9 @@ export async function getOffers(query: OfferListQuery) {
                     changedBy: { select: { id: true, name: true } },
                 },
             },
-            offerDocuments: {
-                orderBy: { version: "desc" as const },
-                select: {
-                    id: true,
-                    displayName: true,
-                    version: true,
-                    status: true,
-                    createdAt: true,
-                    offerId: true,
-                    taskId: true,
-                    pdf: { select: { size: true } },
-                },
-            },
-            offerPositions: {
-                select: {
-                    id: true,
-                    quantity: true,
-                    duration_months: true,
-                    free_months: true,
-                    optional: true,
-                    total_cents: true,
-                    product: {
-                        include: {
-                            translations: true
-                        }
-                    },
-                    contract: {
-                        include: {
-                            translations: true
-                        }
-                    },
-                },
-            },
-            offerFlatRates: {
-                select: {
-                    id: true,
-                    quantity: true,
-                    total_cents: true,
-                    flatRate: {
-                        include: {
-                            translations: true,
-                        }
-                    },
-                },
-            },
+            offerDocuments: true,
+            offerPositions: true,
+            offerFlatRates: true,
         },
     });
 
@@ -273,6 +231,8 @@ export async function getOfferById(id: string) {
                     task: true,
                 },
             },
+            offerPositions: true,
+            offerFlatRates: true
         },
     });
 

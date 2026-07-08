@@ -1,4 +1,4 @@
-import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
+import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferDocument, deleteOfferFlatrate, deleteOfferPosition, deleteOfferRevision, generateOfferDocument, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
 import { useOffers } from "./offer-hooks";
@@ -57,9 +57,9 @@ export function useDeleteOffer() {
                 queryKey: offerKeys.lists(),
             });
 
-            queryClient.setQueriesData<Array<Offer>>(
+            queryClient.setQueriesData<OffersPage>(
                 { queryKey: offerKeys.lists() },
-                (old) => old?.filter((offer) => offer.id !== id),
+                (old) => old ? { ...old, items: old.items.filter((o) => o.id !== id) } : old,
             );
 
             return { previous };
