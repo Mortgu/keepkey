@@ -12,7 +12,6 @@ import { prisma } from "../../lib/prismaClient.js";
 import logger from "../../middlewares/logger.js";
 import { type OfferContext, offerSchema } from "../../schemas/templates/offer-template-schema.js";
 import { pickTranslation } from "../../utils/i18n.js";
-import { formatPositionGroups, groupOfferPositions } from "../../utils/pipeline/group.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
@@ -124,11 +123,8 @@ export const formatOfferData = async (fetchedData: OfferFetchData) => {
         duration: formatDuration(position.duration_months),
     }));
 
-    const positionGroups = groupOfferPositions(offerPositions);
-    const formattedGroups = formatPositionGroups(positionGroups);
-
     const groups = Object.groupBy(offerPositions, (p) =>
-        `${p.contract.id}_${p.duration_months}`);
+        `${p.productId}_${p.contract.id}_${p.duration_months}`);
 
     const grouped = Object.values(groups).map((group) => {
         const first = group![0];

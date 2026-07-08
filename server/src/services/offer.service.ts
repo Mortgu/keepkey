@@ -207,7 +207,12 @@ export async function getOffers(query: OfferListQuery) {
                     changedBy: { select: { id: true, name: true } },
                 },
             },
-            offerDocuments: true,
+            offerDocuments: {
+                include: {
+                    docx: true,
+                    pdf: true
+                }
+            },
             offerPositions: {
                 include: {
                     product: {
