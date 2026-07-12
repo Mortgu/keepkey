@@ -78,6 +78,7 @@ model OfferPosition {
 
   eur_user_month Int
   total_cents    Int
+  discount_cents Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

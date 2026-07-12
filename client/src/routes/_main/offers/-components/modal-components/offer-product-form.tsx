@@ -112,7 +112,7 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
       return;
     }
 
-    const data: OfferProductInput = { productId, contractId, duration_months, free_months: freeMonths, quantity, optional, total_cents: 0 };
+    const data: OfferProductInput = { productId, contractId, duration_months, free_months: freeMonths, quantity, optional, total_cents: 0, eur_user_month: 0, discount_cents: 0 };
 
     try {
       if (editingPrice && onPersistOverride && customerId) {

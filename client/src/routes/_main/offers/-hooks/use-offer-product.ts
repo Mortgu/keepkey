@@ -11,6 +11,8 @@ const toOfferProductInput = (pos: OfferPosition): OfferProductInput => ({
     quantity: pos.quantity,
     optional: pos.optional ?? false,
     total_cents: typeof pos.total_cents === "number" ? pos.total_cents : 0,
+    eur_user_month: typeof pos.eur_user_month === "number" ? pos.eur_user_month : 0,
+    discount_cents: typeof pos.discount_cents === "number" ? pos.discount_cents : 0,
 });
 
 const toOfferFlatRateInput = (fr: OfferFlatRate): GetOfferFlatrate => ({

@@ -67,7 +67,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const { customer, customerContactPerson: cp, user: employee, offerPositions, offerFlatRates, language } = offer;
     let total = 0;
 
-    const product_items: Array<OfferTemplateItem> = offerPositions.map(offerPosition => {
+    const product_items: Array<OfferTemplateItem> = offerPositions.flatMap(offerPosition => {
         const translation = pickTranslation(offerPosition.product.translations, language);
         const contract_translation = pickTranslation(offerPosition.contract.translations, language);
 
@@ -79,7 +79,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
         total = total + offerPosition.total_cents;
 
-        return {
+        const item: OfferTemplateItem = {
             name: product_name,
             description: translation.description,
             content: translation?.table ? [translation.table] : [],
@@ -89,7 +89,20 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             total: formatEur(offerPosition.total_cents / 100),
             contract: contract_translation.name,
             optional: offerPosition.optional ? true : null,
+            discount: null,
         }
+
+        if (offerPosition.free_months > 0) {
+            const totalFreeMonths = offerPosition.total_cents / (offerPosition.duration_months - offerPosition.free_months) * offerPosition.free_months;
+
+            item.discount = {
+                free_months: offerPosition.free_months,
+                valid_until: formatDate(offer.validUntil) ?? "",
+                total: formatEur(-totalFreeMonths / 100),
+            }
+        }
+
+        return [item];
     });
 
     const groups = Object.values(Object.groupBy(offerPositions, (p) =>

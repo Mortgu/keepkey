@@ -10,6 +10,11 @@ const offerTemplateProductItemSchema = z.object({
     total: z.string(),
     contract: z.string(),
     optional: z.boolean().nullish().transform(v => (v === undefined ? null : v)),
+    discount: z.object({
+        free_months: z.number().int(),
+        valid_until: z.string(),
+        total: z.string(),
+    }).nullish().transform(v => (v === undefined ? null : v)),
 });
 
 export type OfferTemplateItem = z.infer<typeof offerTemplateProductItemSchema>;

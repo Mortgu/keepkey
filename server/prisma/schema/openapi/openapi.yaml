@@ -380,6 +380,9 @@ components:
         total_cents:
           type: integer
           format: int32
+        discount_cents:
+          type: integer
+          format: int32
         createdAt:
           type: string
           format: date-time
@@ -399,6 +402,7 @@ components:
         - quantity
         - eur_user_month
         - total_cents
+        - discount_cents
         - createdAt
         - updatedAt
     OfferFlatRate:

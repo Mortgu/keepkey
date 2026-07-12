@@ -12,7 +12,7 @@ import env from "../lib/env.js";
 import logger from "../middlewares/logger.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
-import { calculatePriceOrThrow } from "../utils/products.js";
+import { calculatePrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
 import {
     createOfferFieldsSchema,
@@ -33,6 +33,7 @@ export type FlatrateInput = z.infer<typeof createOfferFlatratesSchema>[number];
 type PricedPosition = PositionInput & {
     total_cents: number;
     eur_user_month: number;
+    discount_cents: number;
 };
 type PricedFlatrate = FlatrateInput & { total_cents: number };
 
@@ -62,7 +63,7 @@ async function pricePositions(positions: PositionInput[], customerId?: string): 
 
     for (const position of positions) {
         try {
-            const total_cents = await calculatePriceOrThrow({
+            const result = await calculatePrice({
                 productId: position.productId,
                 contractId: position.contractId,
                 duration: position.duration_months,
@@ -71,7 +72,18 @@ async function pricePositions(positions: PositionInput[], customerId?: string): 
                 freeMonths: position.free_months ?? 0,
             });
 
-            priced.push({ ...position, total_cents, eur_user_month: 0 });
+            if (!result.ok) {
+                throw new AppException(
+                    `Price calculation failed for product ${position.productId}: ${result.reason}`,
+                    422,
+                    "PRICE_CALCULATION_FAILED",
+                );
+            }
+
+            const eur_user_month = result.breakdown.unitPrice;
+            const discount_cents = eur_user_month * position.quantity * (position.free_months ?? 0);
+
+            priced.push({ ...position, total_cents: result.price, eur_user_month, discount_cents });
         } catch (exception: any) {
             if (exception instanceof AppException) throw exception;
             throw new AppException(
@@ -146,8 +158,8 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
 async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents }) => ({
-            offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, optional,
+        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents }) => ({
+            offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
         })),
     });
 }
@@ -358,8 +370,8 @@ export async function createOffer(input: CreateOfferInput) {
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents }) => ({
-                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, optional,
+            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents }) => ({
+                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
             })),
         });
 

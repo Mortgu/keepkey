@@ -155,6 +155,8 @@ export interface components {
             eur_user_month: number;
             /** Format: int32 */
             total_cents: number;
+            /** Format: int32 */
+            discount_cents: number;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
