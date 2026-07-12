@@ -26,8 +26,6 @@ export default function OfferCardDocument({ offerDocument }: Props) {
 
     const { deleteOfferDocument, isDeleting, errorDeleting } = useDeleteOfferDocument();
 
-    console.log(offerDocument)
-
     useEffect(() => {
         if (errorUploading) {
             toast.error(errorUploading.message);

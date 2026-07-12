@@ -16,7 +16,7 @@ import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
 import { OfferTemplate, OfferTemplateGroup, OfferTemplateItem, offerTemplateSchema } from "../../schemas/templates/offer.template.schema.js";
-import { formatDate, formatEur } from "../../utils/utils.js";
+import { formatCentsToEur, formatDate } from "../../utils/utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
@@ -77,28 +77,26 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
         const product_name = `${offerPosition.optional ? `(optional)\n` : ''}Keepit - ${contract_translation.name} Backup für ${translation.name}`;
 
-        total = total + offerPosition.total_cents;
+        total = total + offerPosition.total_cents - offerPosition.discount_cents;
 
         const item: OfferTemplateItem = {
             name: product_name,
             description: translation.description,
-            content: translation?.table ? [translation.table] : [],
+            content: translation.table,
             quantity: String(offerPosition.quantity),
-            eur_user_month: formatEur(offerPosition.total_cents / 100 / offerPosition.quantity / (offerPosition.duration_months - offerPosition.free_months)),
+            eur_user_month: formatCentsToEur(offerPosition.eur_user_month),
             duration: String(offerPosition.duration_months),
-            total: formatEur(offerPosition.total_cents / 100),
+            total: formatCentsToEur(offerPosition.total_cents),
             contract: contract_translation.name,
             optional: offerPosition.optional ? true : null,
             discount: null,
         }
 
         if (offerPosition.free_months > 0) {
-            const totalFreeMonths = offerPosition.total_cents / (offerPosition.duration_months - offerPosition.free_months) * offerPosition.free_months;
-
             item.discount = {
                 free_months: offerPosition.free_months,
                 valid_until: formatDate(offer.validUntil) ?? "",
-                total: formatEur(-totalFreeMonths / 100),
+                total: formatCentsToEur(-offerPosition.discount_cents),
             }
         }
 
@@ -137,10 +135,12 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             throw new PipelineStageError("Translations not found!")
         }
 
+        total = total + position.total_cents;
+
         return {
             name: translation.name,
             content: translation.table,
-            total: formatEur(position.total_cents),
+            total: formatCentsToEur(position.total_cents),
         }
     });
 
@@ -182,7 +182,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             names: offerPositions.map(position => pickTranslation(position.product.translations, language)?.name).join(" & "),
             grouped: product_groups,
             items: product_items,
-            total: formatEur(total / 100),
+            total: formatCentsToEur(total),
         },
 
         flatrates: flatrates

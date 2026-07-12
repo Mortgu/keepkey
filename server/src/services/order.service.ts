@@ -208,7 +208,7 @@ export async function createOrder(input: CreateOrderInput) {
                 duration_months: offerPosition.duration_months,
                 quantity: offerPosition.quantity,
                 optional: offerPosition.optional,
-                total_cents: offerPosition.total_cents,
+                total_cents: offerPosition.total_cents - offerPosition.discount_cents,
             })),
         });
 

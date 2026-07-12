@@ -69,7 +69,7 @@ async function pricePositions(positions: PositionInput[], customerId?: string): 
                 duration: position.duration_months,
                 quantity: position.quantity,
                 customerId,
-                freeMonths: position.free_months ?? 0,
+                freeMonths: 0,
             });
 
             if (!result.ok) {
@@ -136,10 +136,14 @@ function mapOfferData<T extends { supplierId?: string | null; validUntil?: strin
 
 /** Summiert Positionen + Flatrates neu und schreibt net_amount am Offer. */
 async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    const [positionsSum, flatratesSum] = await Promise.all([
+    const [positionsSum, positionsDiscountSum, flatratesSum] = await Promise.all([
         tx.offerPosition.aggregate({
             where: { offerId },
             _sum: { total_cents: true },
+        }),
+        tx.offerPosition.aggregate({
+            where: { offerId },
+            _sum: { discount_cents: true },
         }),
         tx.offerFlatRate.aggregate({
             where: { offerId },
@@ -147,10 +151,12 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
         }),
     ]);
 
+    const positionsNet = (positionsSum._sum.total_cents ?? 0) - (positionsDiscountSum._sum.discount_cents ?? 0);
+
     await tx.offer.update({
         where: { id: offerId },
         data: {
-            net_amount: (positionsSum._sum.total_cents ?? 0) + (flatratesSum._sum.total_cents ?? 0),
+            net_amount: positionsNet + (flatratesSum._sum.total_cents ?? 0),
         },
     });
 }
@@ -359,7 +365,7 @@ export async function createOffer(input: CreateOfferInput) {
 
     return prisma.$transaction(async (tx) => {
         const net_amount =
-            positions.reduce((sum, p) => sum + p.total_cents, 0) +
+            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
             flatrates.reduce((sum, f) => sum + f.total_cents, 0);
 
         const offer = await tx.offer.create({
@@ -394,7 +400,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
     return prisma.$transaction(async (tx) => {
         const net_amount =
-            positions.reduce((sum, p) => sum + p.total_cents, 0) +
+            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
             flatrates.reduce((sum, f) => sum + f.total_cents, 0);
 
         const current = await tx.offer.findFirstOrThrow({

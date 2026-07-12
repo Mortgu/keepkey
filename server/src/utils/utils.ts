@@ -16,6 +16,10 @@ export const formatEur = (value: number): string => {
   );
 };
 
+export const formatCentsToEur = (value: number): string => {
+  return formatEur(value / 100);
+}
+
 export const formatDuration = (value: number): string => {
   switch (value) {
     case 12:

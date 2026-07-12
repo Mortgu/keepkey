@@ -3,7 +3,7 @@ import z from "zod";
 const offerTemplateProductItemSchema = z.object({
     name: z.string().optional().transform(v => (v === undefined ? "" : v)),
     description: z.string().nullish().transform(v => (v === undefined ? "" : v)),
-    content: z.array(z.string()),
+    content: z.string().nullish().transform(v => (v === undefined ? "" : v)),
     quantity: z.string(),
     eur_user_month: z.string(),
     duration: z.string(),
