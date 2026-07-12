@@ -134,9 +134,6 @@ components:
       required:
         - id
         - companyName
-        - street
-        - city
-        - zip
         - language
         - country
         - currency
@@ -159,11 +156,11 @@ components:
           $ref: "#/components/schemas/Customer"
         salutation:
           type: string
+        email:
+          type: string
         firstName:
           type: string
         lastName:
-          type: string
-        email:
           type: string
         createdAt:
           type: string
@@ -183,7 +180,6 @@ components:
         - id
         - customerId
         - customer
-        - salutation
         - firstName
         - lastName
         - createdAt
@@ -935,7 +931,6 @@ components:
             $ref: "#/components/schemas/Order"
       required:
         - id
-        - supplierId
         - name
         - createdAt
         - updatedAt

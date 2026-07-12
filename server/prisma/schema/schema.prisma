@@ -92,7 +92,7 @@ model Verification {
 model Supplier {
   id String @id @default(uuid())
 
-  supplierId String
+  supplierId String?
   name       String
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)

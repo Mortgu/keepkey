@@ -37,9 +37,9 @@ export interface components {
             email?: string;
             invoiceEmail?: string;
             phone?: string;
-            street: string;
-            city: string;
-            zip: string;
+            street?: string;
+            city?: string;
+            zip?: string;
             language: components["schemas"]["Language"];
             country: string;
             currency: components["schemas"]["Currency"];
@@ -60,10 +60,10 @@ export interface components {
             id: string;
             customerId: string;
             customer: components["schemas"]["Customer"];
-            salutation: string;
+            salutation?: string;
+            email?: string;
             firstName: string;
             lastName: string;
-            email?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -367,7 +367,7 @@ export interface components {
         };
         Supplier: {
             id: string;
-            supplierId: string;
+            supplierId?: string;
             name: string;
             /** Format: date-time */
             createdAt: string;

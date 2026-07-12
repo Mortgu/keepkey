@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 
 const TARIFF_SNAPSHOT_INCLUDE = {
@@ -144,7 +145,7 @@ export function selectPrice(
     };
 }
 
-export async function snapshotTariff(productId: string, contractId: string, tx: any = prisma) {
+export async function snapshotTariff(productId: string, contractId: string, tx: Prisma.TransactionClient = prisma) {
     const groupProduct = await tx.tariffGroupProduct.findUnique({
         where: { productId },
     });

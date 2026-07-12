@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import { Readable } from "stream";
 import z from "zod";
+import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
@@ -119,7 +120,7 @@ function mapOfferData<T extends { supplierId?: string | null; validUntil?: strin
 }
 
 /** Summiert Positionen + Flatrates neu und schreibt net_amount am Offer. */
-async function recomputeNetAmount(tx: any, offerId: string): Promise<void> {
+async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
     const [positionsSum, flatratesSum] = await Promise.all([
         tx.offerPosition.aggregate({
             where: { offerId },
@@ -139,7 +140,7 @@ async function recomputeNetAmount(tx: any, offerId: string): Promise<void> {
     });
 }
 
-async function replacePositions(tx: any, offerId: string, positions: PricedPosition[]) {
+async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
         data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, total_cents }) => ({
@@ -148,7 +149,7 @@ async function replacePositions(tx: any, offerId: string, positions: PricedPosit
     });
 }
 
-async function replaceFlatRates(tx: any, offerId: string, flatRates: PricedFlatrate[]) {
+async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatrate[]) {
     await tx.offerFlatRate.deleteMany({ where: { offerId } });
     await tx.offerFlatRate.createMany({
         data: flatRates.map(({ flatRateId, quantity, total_cents }) => ({
@@ -417,7 +418,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 export async function createOfferPositions(offerId: string, positions: PositionInput[]) {
     const priced = await pricePositions(positions);
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const created = await tx.offerPosition.createManyAndReturn({
             data: priced.map((position) => ({ offerId, ...position })),
         });
@@ -426,6 +427,8 @@ export async function createOfferPositions(offerId: string, positions: PositionI
 
         return created;
     });
+
+
 }
 
 export async function createOfferFlatrates(offerId: string, flatrates: FlatrateInput[]) {

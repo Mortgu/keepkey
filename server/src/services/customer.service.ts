@@ -1,5 +1,5 @@
 import z from "zod";
-import { prisma } from "../lib/prismaClient.js";
+import { Prisma, prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     createCustomerSchema,
@@ -55,7 +55,7 @@ export async function getCustomerContacts(customerId: string) {
 export async function createCustomer(input: CreateCustomerInput) {
     const { contactPersons, ...customerFields } = input;
 
-    return prisma.$transaction(async (tx) => {
+    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const customer = await tx.customer.create({
             data: customerFields,
         });

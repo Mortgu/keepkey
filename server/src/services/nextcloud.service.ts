@@ -50,7 +50,7 @@ export function getCloudStatus(): CloudStatus {
         return {
             configured: true,
             available: false,
-            message: getNextcloudInitError(),
+            message: getNextcloudInitError() || "",
         };
     }
 

@@ -66,7 +66,6 @@ export async function createUser(input: CreateUserInput & { password: string; sa
                 firstName,
                 lastName,
                 salutation,
-                role,
             },
         });
 

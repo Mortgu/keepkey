@@ -8,9 +8,9 @@ model Customer {
   invoiceEmail String?
   phone        String?
 
-  street String
-  city   String
-  zip    String
+  street String?
+  city   String?
+  zip    String?
 
   language Language @default(DE)
   country  String   @default("Deutschland")
@@ -39,10 +39,11 @@ model ContactPerson {
   customerId String
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  salutation String
-  firstName  String
-  lastName   String
+  salutation String?
   email      String?
+
+  firstName String
+  lastName  String
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
