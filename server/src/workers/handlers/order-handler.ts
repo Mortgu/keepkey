@@ -62,6 +62,7 @@ export default async function orderTaskHandler(task: Task): Promise<void> {
             docxId: docx.id,
             status: "GENERATED",
             displayName: files.displayName,
+            error: null,
         },
     });
 

@@ -1,4 +1,4 @@
-import { Task, TaskStatus, TaskTarget } from "@prisma/client";
+import { Task, TaskTarget } from "@prisma/client";
 import { Job, Worker } from "bullmq";
 import path from "path";
 import env from "../lib/env.js";
@@ -9,6 +9,7 @@ import invoiceTaskHandler from "./handlers/invoice-handler.js";
 import offerTaskHandler from "./handlers/offer-handler.js";
 import orderTaskHandler from "./handlers/order-handler.js";
 import { TaskJobData, taskQueue, taskQueueKey } from "./task-queue.js";
+import { handleTaskFailure, markTaskCompleted, markTaskRunning } from "./task-lifecycle.js";
 
 export { taskQueue, taskQueueKey };
 
@@ -53,30 +54,11 @@ export default function registerTaskWorker() {
             return;
         }
 
+        await markTaskRunning(taskId);
+
         await handler(task);
 
     }, { connection, concurrency: env.WORKER_CONCURRENCY });
-
-    taskWorker.on("active", async (job: Job<TaskJobData>) => {
-        const { taskId } = job.data;
-
-        if (!taskId) {
-            throw new Error("No taskId provided!");
-        }
-
-        try {
-            await prisma.task.update({
-                where: { id: taskId },
-                data: {
-                    status: TaskStatus.RUNNING,
-                }
-            })
-        } catch (exception: any) {
-            const message = "An error occurred while running task";
-            logger.error(exception);
-            throw new Error(message);
-        }
-    });
 
     taskWorker.on("completed", async (job: Job<TaskJobData>) => {
         const { taskId } = job.data;
@@ -86,50 +68,17 @@ export default function registerTaskWorker() {
         }
 
         try {
-            await prisma.task.update({
-                where: { id: taskId },
-                data: {
-                    status: TaskStatus.COMPLETED,
-                }
-            });
-        } catch (exception: any) {
+            await markTaskCompleted(taskId);
+        } catch (exception: unknown) {
             logger.error(exception);
-            throw new Error("Something went wrong!");
         }
     })
 
-    taskWorker.on("failed", async (job, error, prev) => {
-        if (!job) {
-            throw new Error("Something went wrong!");
-        }
-
-        const { taskId } = job.data;
-
-        if (!taskId) {
-            throw new Error("No taskId provided!");
-        }
-
+    taskWorker.on("failed", async (job, error) => {
         try {
-            await prisma.task.update({
-                where: { id: taskId },
-                data: {
-                    status: TaskStatus.FAILED,
-                    error: error.message
-                }
-            });
-
-            await prisma.offerDocument.updateMany({
-                where: { taskId },
-                data: { status: "FAILED", error: error.message },
-            });
-
-            await prisma.orderDocument.updateMany({
-                where: { taskId },
-                data: { status: "FAILED", error: error.message },
-            });
-        } catch (exception: any) {
+            await handleTaskFailure(job, error);
+        } catch (exception: unknown) {
             logger.error(exception);
-            throw new Error("An error occurred while running task");
         }
     });
 

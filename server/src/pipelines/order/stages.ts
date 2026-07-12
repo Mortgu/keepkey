@@ -1,4 +1,3 @@
-import {TaskStatus} from "@prisma/client";
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
 import {converting, fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
@@ -9,7 +8,6 @@ import path from "path";
 
 const loadOrderData: PipelineStage<OrderPipelineContext> = {
     name: "fetch",
-    status: TaskStatus.RUNNING,
     run: async (context) => {
         context.fetchedData = await fetchOrderData(context.orderId);
     }

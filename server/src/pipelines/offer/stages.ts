@@ -1,4 +1,3 @@
-import {TaskStatus} from "@prisma/client";
 import {PipelineStage} from "../pipeline.js";
 import {OfferPipelineContext} from "./context.js";
 import {
@@ -14,7 +13,6 @@ import {
 /* fetching everything need from the database */
 const fetchingStage: PipelineStage<OfferPipelineContext> = {
     name: "fetch",
-    status: TaskStatus.RUNNING,
     run: fetchOfferAction,
 }
 
