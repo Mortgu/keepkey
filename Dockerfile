@@ -3,7 +3,7 @@ WORKDIR /app
 
 COPY server/package*.json ./server/
 COPY server/prisma ./server/prisma/
-RUN cd server && npm ci && npx prisma generate --schema prisma/schema
+RUN cd server && npm install && npx prisma generate --schema prisma/schema
 
 COPY client/package*.json ./client/
 RUN cd client && npm install
@@ -16,10 +16,10 @@ RUN cd server && npx tsc --project tsconfig.json && npx tsc --project tsconfig.s
 FROM node:22-slim
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        libreoffice \
-        libreoffice-writer \
-        default-jre \
-        ghostscript \
+    libreoffice \
+    libreoffice-writer \
+    default-jre \
+    ghostscript \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app/server
