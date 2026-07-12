@@ -8,6 +8,7 @@
   "main": "dist/server.js",
   "type": "module",
   "scripts": {
+    "predev": "prisma generate",
     "dev": "nodemon --exec tsx src/server.ts",
     "start": "node dist/server.js",
     "build": "prisma generate && tsc",

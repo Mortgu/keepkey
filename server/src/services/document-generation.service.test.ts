@@ -121,6 +121,10 @@ describe("document generation service", () => {
         expect(mocks.documentCreate).toHaveBeenCalledTimes(2);
         expect(mocks.transaction).toHaveBeenCalledOnce();
         expect(mocks.offerDocumentUpdateMany).toHaveBeenCalledWith({
+            where: { offerId: "offer-1", isCurrent: true },
+            data: { isCurrent: false },
+        });
+        expect(mocks.offerDocumentUpdateMany).toHaveBeenLastCalledWith({
             where: { id: "document-1", status: "PROCESSING" },
             data: {
                 pdfId: "pdf-1",
@@ -128,6 +132,7 @@ describe("document generation service", () => {
                 status: "GENERATED",
                 displayName: "generated-document",
                 error: null,
+                isCurrent: true,
             },
         });
     });
@@ -153,6 +158,10 @@ describe("document generation service", () => {
         }, ["order-stage"]);
         expect(mocks.transaction).toHaveBeenCalledOnce();
         expect(mocks.orderDocumentUpdateMany).toHaveBeenCalledWith({
+            where: { orderId: "order-1", isCurrent: true },
+            data: { isCurrent: false },
+        });
+        expect(mocks.orderDocumentUpdateMany).toHaveBeenLastCalledWith({
             where: { id: "document-1", status: "PROCESSING" },
             data: {
                 pdfId: "pdf-1",
@@ -160,6 +169,7 @@ describe("document generation service", () => {
                 status: "GENERATED",
                 displayName: "generated-document",
                 error: null,
+                isCurrent: true,
             },
         });
     });

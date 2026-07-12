@@ -16,6 +16,8 @@ model Offer {
   language Language @default(DE)
 
   quoteId     String // quoteId / voucherId
+  /// @openapi.ignore
+  documentVersion Int @default(0)
   paymentTerm String
 
   featureComparison Boolean @default(false)
@@ -123,10 +125,11 @@ model OfferDocument {
   docxId String?   @unique
 
   task   Task   @relation(fields: [taskId], references: [id])
-  taskId String
+  taskId String @unique
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([offerId, version])
   @@map("offer_document")
 }

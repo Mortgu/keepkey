@@ -14,31 +14,51 @@ export async function createTask(target: TaskTarget): Promise<Task> {
   });
 }
 
-export async function enqueueTask(taskId: string): Promise<void> {
+export async function enqueueTask(
+  taskId: string,
+  options: { markFailedOnError?: boolean } = {},
+): Promise<void> {
+  const { markFailedOnError = true } = options;
   let job;
   try {
-    job = await taskQueue.add(taskQueueKey, { taskId });
+    const existing = await taskQueue.getJob(taskId);
+    if (existing) {
+      const state = await existing.getState();
+      if (state === "completed") {
+        await prisma.task.updateMany({
+          where: { id: taskId, status: TaskStatus.COMPLETED },
+          data: { status: TaskStatus.PENDING, error: null, runToken: null },
+        });
+        await existing.retry("completed");
+      } else if (state === "failed") {
+        await existing.retry(state);
+      }
+      job = existing;
+    } else {
+      job = await taskQueue.add(taskQueueKey, { taskId }, { jobId: taskId });
+    }
   } catch (exception: any) {
     logger.error(`[enqueueTask] failed to enqueue task ${taskId}: ${exception.message}`);
 
-    // Best-effort: Task + zugehörige Dokumente auf FAILED setzen (Muster aus task-worker.ts)
-    try {
-      await prisma.task.update({
-        where: { id: taskId },
-        data: { status: TaskStatus.FAILED, error: exception.message },
-      });
-
-      await prisma.offerDocument.updateMany({
-        where: { taskId },
-        data: { status: "FAILED", error: exception.message },
-      });
-
-      await prisma.orderDocument.updateMany({
-        where: { taskId },
-        data: { status: "FAILED", error: exception.message },
-      });
-    } catch (dbException: any) {
-      logger.error(`[enqueueTask] failed to persist FAILED state for task ${taskId}: ${dbException.message}`);
+    if (markFailedOnError) {
+      try {
+        await prisma.$transaction([
+          prisma.task.updateMany({
+            where: { id: taskId, status: TaskStatus.PENDING },
+            data: { status: TaskStatus.FAILED, error: exception.message },
+          }),
+          prisma.offerDocument.updateMany({
+            where: { taskId, status: "PENDING" },
+            data: { status: "FAILED", error: exception.message },
+          }),
+          prisma.orderDocument.updateMany({
+            where: { taskId, status: "PENDING" },
+            data: { status: "FAILED", error: exception.message },
+          }),
+        ]);
+      } catch (dbException: any) {
+        logger.error(`[enqueueTask] failed to persist FAILED state for task ${taskId}: ${dbException.message}`);
+      }
     }
 
     throw new AppException(

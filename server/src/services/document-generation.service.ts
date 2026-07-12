@@ -134,6 +134,10 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
     try {
         await prisma.$transaction(async (tx) => {
             const { pdf, docx } = await createArtifactDocuments(tx, files);
+            await tx.offerDocument.updateMany({
+                where: { offerId: offerDocument.offerId, isCurrent: true },
+                data: { isCurrent: false },
+            });
             const finalized = await tx.offerDocument.updateMany({
                 where: {
                     id: offerDocument.id,
@@ -145,6 +149,7 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
                     status: DocumentStatus.GENERATED,
                     displayName: generated.displayName,
                     error: null,
+                    isCurrent: true,
                 },
             });
 
@@ -194,6 +199,10 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
     try {
         await prisma.$transaction(async (tx) => {
             const { pdf, docx } = await createArtifactDocuments(tx, files);
+            await tx.orderDocument.updateMany({
+                where: { orderId: orderDocument.orderId, isCurrent: true },
+                data: { isCurrent: false },
+            });
             const finalized = await tx.orderDocument.updateMany({
                 where: {
                     id: orderDocument.id,
@@ -205,6 +214,7 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
                     status: DocumentStatus.GENERATED,
                     displayName: generated.displayName,
                     error: null,
+                    isCurrent: true,
                 },
             });
 

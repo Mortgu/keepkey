@@ -6,9 +6,9 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { enqueueTask } from "../lib/document.js";
 import { downloadDocumentStream } from "../lib/nextcloud.js";
 import { uploadOfferDocument as uploadOfferDocumentUseCase } from "./document-upload.service.js";
+import { requestOfferGeneration } from "./document-generation-request.service.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
 import { calculatePrice } from "../utils/products.js";
@@ -495,56 +495,16 @@ export async function enqueueGeneration(offerId: string) {
         }
     });
 
-    const currentVersion = await prisma.offerDocument.findFirst({
-        where: { offerId },
-        select: { version: true },
-        orderBy: { version: "desc" },
-    });
-
-    const nextVersion = (currentVersion?.version ?? 0) + 1;
-
     const formatedWorkloads = offer.offerPositions.map((op) => (
         pickTranslation(op.product.translations, offer.language)?.name ?? ""
     ).replaceAll(" ", "").trim());
 
-    const displayName = generateOfferDisplayName(
+    return requestOfferGeneration(offerId, (version) => generateOfferDisplayName(
         offer.quoteId,
         offer.customer.companyName,
         formatedWorkloads,
-        nextVersion,
-    );
-
-    const task = await prisma.$transaction(async (tx) => {
-        await tx.offerDocument.updateMany({
-            where: { offerId, isCurrent: true },
-            data: { isCurrent: false },
-        });
-
-        const task = await tx.task.create({
-            data: {
-                status: "PENDING",
-                type: "GENERATION",
-                target: "OFFER",
-            },
-        });
-
-        await tx.offerDocument.create({
-            data: {
-                displayName,
-                offerId,
-                version: nextVersion,
-                isCurrent: true,
-                status: "PENDING",
-                taskId: task.id,
-            },
-        });
-
-        return task;
-    });
-
-    await enqueueTask(task.id);
-
-    return task;
+        version,
+    ));
 }
 
 export async function uploadOfferDocument(offerId: string, documentId: string) {

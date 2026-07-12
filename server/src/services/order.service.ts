@@ -4,9 +4,9 @@ import { Readable } from "stream";
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { enqueueTask } from "../lib/document.js";
 import { downloadDocumentStream } from "../lib/nextcloud.js";
 import { uploadOrderDocument as uploadOrderDocumentUseCase } from "./document-upload.service.js";
+import { requestOrderGeneration } from "./document-generation-request.service.js";
 import { toDate } from "../utils/utils.js";
 import { createOrderSchema } from "../schemas/order-schemas.js";
 
@@ -225,42 +225,7 @@ export async function createOrder(input: CreateOrderInput) {
 }
 
 async function createDocumentForOrder(orderId: string) {
-    const task = await prisma.$transaction(async (tx) => {
-        await tx.orderDocument.updateMany({
-            where: { orderId, isCurrent: true },
-            data: { isCurrent: false },
-        });
-
-        const latestOrderDoc = await tx.orderDocument.findFirst({
-            where: { orderId },
-            orderBy: { version: "desc" },
-            select: { version: true },
-        });
-        const nextVersion = (latestOrderDoc?.version ?? 0) + 1;
-
-        const task = await tx.task.create({
-            data: {
-                status: "PENDING",
-                type: "GENERATION",
-                target: "ORDER",
-            },
-        });
-
-        await tx.orderDocument.create({
-            data: {
-                orderId,
-                version: nextVersion,
-                isCurrent: true,
-                status: "PENDING",
-                taskId: task.id,
-            },
-        });
-
-        return task;
-    });
-
-    await enqueueTask(task.id);
-    return task;
+    return requestOrderGeneration(orderId);
 }
 
 export async function createOrderTask(orderId: string): Promise<void> {
