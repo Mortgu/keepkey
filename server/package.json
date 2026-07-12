@@ -19,7 +19,7 @@
   "dependencies": {
     "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.5.0",
-    "@t3-oss/env-nextjs": "^0.13.11",
+    "@t3-oss/env-core": "^0.13.11",
     "angular-expressions": "^1.4.3",
     "better-auth": "^1.6.9",
     "bullmq": "^5.71.1",

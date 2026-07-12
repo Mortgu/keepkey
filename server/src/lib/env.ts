@@ -1,5 +1,5 @@
-import {createEnv} from "@t3-oss/env-nextjs";
-import {z} from "zod";
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
 import "dotenv/config";
 
@@ -32,7 +32,7 @@ const env = createEnv({
         CORS_ORIGIN: z.string(),
     },
 
-    experimental__runtimeEnv: {},
+    runtimeEnv: process.env,
 });
 
 export default env;
