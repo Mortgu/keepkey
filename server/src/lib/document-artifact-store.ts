@@ -1,4 +1,4 @@
-import { randomUUID } from "crypto";
+import { createHash, randomUUID } from "crypto";
 import fs from "fs/promises";
 import path from "path";
 import env from "./env.js";
@@ -8,6 +8,7 @@ export type StoredDocumentArtifact = {
     basename: string;
     path: string;
     size: number;
+    sha256: string;
 };
 
 export type StoredDocumentArtifacts = {
@@ -73,12 +74,14 @@ export async function storeDocumentArtifacts(
             basename: pdfBasename,
             path: outputDirectory,
             size: pdfBuffer.length,
+            sha256: createHash("sha256").update(pdfBuffer).digest("hex"),
         },
         docx: {
             filename: docxFilename,
             basename: docxBasename,
             path: outputDirectory,
             size: docxBuffer.length,
+            sha256: createHash("sha256").update(docxBuffer).digest("hex"),
         },
     };
 }

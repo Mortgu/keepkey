@@ -2,7 +2,6 @@ import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
 import logger from "../middlewares/logger.js";
 import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
 import { AppException } from "./exceptions.js";
-import { getNextCloudClient } from "./nextcloud.js";
 import { prisma } from "./prismaClient.js";
 
 export async function createTask(target: TaskTarget): Promise<Task> {
@@ -57,30 +56,4 @@ export async function enqueueTask(taskId: string): Promise<void> {
   }).catch((exception: any) => {
     logger.warn(`[enqueueTask] failed to persist jobId for task ${taskId}: ${exception.message}`);
   });
-}
-
-export type UploadResult = {
-  remotePath: string;
-  uploadedAt: Date;
-  size: number;
-};
-
-export async function uploadDocument(filename: string, uploadDir: string, content: Buffer): Promise<UploadResult> {
-  const client = getNextCloudClient();
-  const remotePath = `${uploadDir}/${filename}`;
-
-  try {
-    await client.putFileContents(remotePath, content, {
-      overwrite: false,
-    });
-
-    return {
-      remotePath,
-      uploadedAt: new Date(),
-      size: content.length,
-    };
-  } catch (exception: any) {
-    logger.error(exception);
-    throw new Error("Upload failed!");
-  }
 }

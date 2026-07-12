@@ -52,12 +52,14 @@ const files = {
         basename: "document-1.pdf",
         path: "uploads",
         size: 3,
+        sha256: "pdf-hash",
     },
     docx: {
         filename: "uploads/document-1.docx",
         basename: "document-1.docx",
         path: "uploads",
         size: 4,
+        sha256: "docx-hash",
     },
 };
 

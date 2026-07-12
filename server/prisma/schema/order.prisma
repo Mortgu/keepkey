@@ -87,6 +87,8 @@ model OrderDocument {
   isCurrent   Boolean        @default(false)
 
   error String?
+  /// @openapi.ignore
+  uploadToken String?
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String

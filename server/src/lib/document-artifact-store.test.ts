@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
+import { createHash } from "crypto";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { removeDocumentArtifacts, storeDocumentArtifacts } from "./document-artifact-store.js";
 
@@ -29,12 +30,14 @@ describe("storeDocumentArtifacts", () => {
             basename: "document-1-generation-1.docx",
             path: outputDirectory,
             size: 12,
+            sha256: createHash("sha256").update("docx-content").digest("hex"),
         });
         expect(stored.pdf).toEqual({
             filename: path.join(outputDirectory, "document-1-generation-1.pdf"),
             basename: "document-1-generation-1.pdf",
             path: outputDirectory,
             size: 11,
+            sha256: createHash("sha256").update("pdf-content").digest("hex"),
         });
         expect(await fs.readFile(stored.docx.filename, "utf8")).toBe("docx-content");
         expect(await fs.readFile(stored.pdf.filename, "utf8")).toBe("pdf-content");

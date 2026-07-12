@@ -110,6 +110,8 @@ model OfferDocument {
   isCurrent   Boolean        @default(false)
 
   error String?
+  /// @openapi.ignore
+  uploadToken String?
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String

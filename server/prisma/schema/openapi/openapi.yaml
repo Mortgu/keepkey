@@ -202,9 +202,15 @@ components:
         size:
           type: integer
           format: int32
+        sha256:
+          type: string
         uploadedAt:
           type: string
           format: date-time
+        remotePath:
+          type: string
+        remoteEtag:
+          type: string
         createdAt:
           type: string
           format: date-time

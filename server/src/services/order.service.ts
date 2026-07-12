@@ -4,10 +4,9 @@ import { Readable } from "stream";
 import z from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { enqueueTask, uploadDocument, type UploadResult } from "../lib/document.js";
+import { enqueueTask } from "../lib/document.js";
 import { downloadDocumentStream } from "../lib/nextcloud.js";
-import env from "../lib/env.js";
-import logger from "../middlewares/logger.js";
+import { uploadOrderDocument as uploadOrderDocumentUseCase } from "./document-upload.service.js";
 import { toDate } from "../utils/utils.js";
 import { createOrderSchema } from "../schemas/order-schemas.js";
 
@@ -136,7 +135,7 @@ export async function downloadOrderDocument(
 
     if (orderDoc.status === "UPLOADED") {
         try {
-            const stream = await downloadDocumentStream(file.filename);
+            const stream = await downloadDocumentStream(file.remotePath ?? file.filename);
             return { kind: "stream", stream, contentType, downloadName };
         } catch (exception: any) {
             if (exception instanceof AppException) throw exception;
@@ -284,94 +283,8 @@ export async function generateOrderDocument(orderId: string) {
 export async function uploadOrderDocument(
     orderId: string,
     documentId: string
-): Promise<{ pdf: UploadResult; docx: UploadResult }> {
-    const PDF_PATH = env.NEXTCLOUD_ORDER_PDF_PATH;
-    const DOCX_PATH = env.NEXTCLOUD_ORDER_ORIGINAL_PATH;
-
-    const orderDoc = await prisma.orderDocument.findFirstOrThrow({
-        where: { id: documentId, orderId },
-        include: { pdf: true, docx: true },
-    });
-
-    if (!orderDoc.pdf || !orderDoc.docx) {
-        throw new AppException("Documents not yet generated!", 404, "DOCUMENTS_NOT_GENERATED");
-    }
-
-    const displayName = orderDoc.displayName ?? orderDoc.id;
-    const pdfFilename = `${displayName}.pdf`;
-    const docxFilename = `${displayName}.docx`;
-
-    const [pdfLocalPath, docxLocalPath] = [
-        path.join(orderDoc.pdf.path, orderDoc.pdf.basename),
-        path.join(orderDoc.docx.path, orderDoc.docx.basename),
-    ];
-
-    let pdfResult: UploadResult;
-    let docxResult: UploadResult;
-
-    try {
-        const [pdfContent, docxContent] = await Promise.all([
-            fs.promises.readFile(pdfLocalPath),
-            fs.promises.readFile(docxLocalPath),
-        ]);
-
-        [pdfResult, docxResult] = await Promise.all([
-            uploadDocument(pdfFilename, PDF_PATH, pdfContent),
-            uploadDocument(docxFilename, DOCX_PATH, docxContent),
-        ]);
-    } catch (exception: any) {
-        logger.error(`[uploadOrderDocument] upload failed: ${exception.message}`);
-        await prisma.orderDocument.update({
-            where: { id: orderDoc.id },
-            data: { status: "FAILED", error: exception.message },
-        }).catch((e: any) => logger.error(`[uploadOrderDocument] failed to persist error: ${e.message}`));
-
-        throw new AppException(
-            "Something went wrong while trying to upload docx and pdf: " + exception.message,
-            500,
-            "DOCUMENT_UPLOAD_FAILED",
-        );
-    }
-
-    await prisma.$transaction([
-        prisma.orderDocument.update({
-            where: { id: orderDoc.id },
-            data: { status: "UPLOADED" },
-        }),
-        prisma.document.update({
-            where: { id: orderDoc.pdf.id },
-            data: {
-                path: PDF_PATH,
-                basename: pdfFilename,
-                filename: pdfResult.remotePath,
-                size: pdfResult.size,
-                uploadedAt: pdfResult.uploadedAt,
-            },
-        }),
-        prisma.document.update({
-            where: { id: orderDoc.docx.id },
-            data: {
-                path: DOCX_PATH,
-                basename: docxFilename,
-                filename: docxResult.remotePath,
-                size: docxResult.size,
-                uploadedAt: docxResult.uploadedAt,
-            },
-        }),
-    ]);
-
-    await Promise.allSettled([
-        fs.promises.rm(pdfLocalPath, { force: true }),
-        fs.promises.rm(docxLocalPath, { force: true }),
-    ]).then((results) => {
-        results.forEach((r, i) => {
-            if (r.status === "rejected") {
-                logger.warn(`[uploadOrderDocument] failed to remove local file ${i === 0 ? "pdf" : "docx"}: ${r.reason?.message}`);
-            }
-        });
-    });
-
-    return { pdf: pdfResult, docx: docxResult };
+) {
+    return uploadOrderDocumentUseCase(orderId, documentId);
 }
 
 /* ========== Deletes ========== */
