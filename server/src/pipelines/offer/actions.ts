@@ -62,41 +62,33 @@ export const fetchOfferAction = async (context: OfferPipelineContext) => {
 }
 
 /* Helper function */
-type AugmentedContract = {
-    id: string;
-    name: string;
-    features: string[];
-    table: string;
-};
-
-const pickContractFields = (contract: AugmentedContract) => ({
-    id: contract.id,
-    name: contract.name,
-    features: contract.features,
-    table: contract.table,
-});
-
-/* Helper function */
 export const formatOfferData = async (fetchedData: OfferFetchData): Promise<OfferTemplate> => {
     const { offer, contracts } = fetchedData;
     const { customer, customerContactPerson: cp, user: employee, offerPositions, offerFlatRates, language } = offer;
+    let total = 0;
 
     const product_items: Array<OfferTemplateItem> = offerPositions.map(offerPosition => {
         const translation = pickTranslation(offerPosition.product.translations, language);
+        const contract_translation = pickTranslation(offerPosition.contract.translations, language);
 
-        if (!translation) {
+        if (!translation || !contract_translation) {
             throw new PipelineStageError("Translations not found!")
         }
 
+        const product_name = `${offerPosition.optional ? `(optional)\n` : ''}Keepit - ${contract_translation.name} Backup für ${translation.name}`;
+
+        total = total + offerPosition.total_cents;
+
         return {
-            name: translation.name,
+            name: product_name,
             description: translation.description,
             content: translation?.table ? [translation.table] : [],
             quantity: String(offerPosition.quantity),
-            eur_user_month: formatEur(offerPosition.total_cents / offerPosition.quantity / offerPosition.duration_months),
+            eur_user_month: formatEur(offerPosition.total_cents / 100 / offerPosition.quantity / (offerPosition.duration_months - offerPosition.free_months)),
             duration: String(offerPosition.duration_months),
-            total: formatEur(offerPosition.total_cents),
-            optional: offerPosition.optional,
+            total: formatEur(offerPosition.total_cents / 100),
+            contract: contract_translation.name,
+            optional: offerPosition.optional ? true : null,
         }
     });
 
@@ -146,6 +138,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         validUntil: formatDate(offer.validUntil),
         requestFrom: formatDate(offer.requestFrom),
         supplierId: offer.supplierId,
+        compare: offer.featureComparison,
 
         customer: {
             id: customer.customerId,
@@ -176,6 +169,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             names: offerPositions.map(position => pickTranslation(position.product.translations, language)?.name).join(" & "),
             grouped: product_groups,
             items: product_items,
+            total: formatEur(total / 100),
         },
 
         flatrates: flatrates

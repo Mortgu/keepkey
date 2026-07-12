@@ -10,6 +10,7 @@ model Product {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   tariffGroupProducts TariffGroupProduct[]
+  tariffCellCustomers TariffCellCustomer[]
 
   @@map("product")
 }

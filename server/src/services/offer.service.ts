@@ -30,7 +30,10 @@ export type CreateOfferFieldsInput = z.infer<typeof createOfferFieldsSchema>;
 export type PositionInput = z.infer<typeof createOfferPositionsSchema>[number];
 export type FlatrateInput = z.infer<typeof createOfferFlatratesSchema>[number];
 
-type PricedPosition = PositionInput & { total_cents: number };
+type PricedPosition = PositionInput & {
+    total_cents: number;
+    eur_user_month: number;
+};
 type PricedFlatrate = FlatrateInput & { total_cents: number };
 
 export interface OfferListQuery {
@@ -68,7 +71,7 @@ async function pricePositions(positions: PositionInput[], customerId?: string): 
                 freeMonths: position.free_months ?? 0,
             });
 
-            priced.push({ ...position, total_cents });
+            priced.push({ ...position, total_cents, eur_user_month: 0 });
         } catch (exception: any) {
             if (exception instanceof AppException) throw exception;
             throw new AppException(
@@ -143,8 +146,8 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
 async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, total_cents }) => ({
-            offerId, productId, contractId, duration_months, free_months, quantity, total_cents, optional,
+        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents }) => ({
+            offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, optional,
         })),
     });
 }
@@ -355,8 +358,8 @@ export async function createOffer(input: CreateOfferInput) {
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, total_cents }) => ({
-                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, total_cents, optional,
+            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents }) => ({
+                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, optional,
             })),
         });
 

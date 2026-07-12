@@ -25,7 +25,7 @@ function buildTariff(): TariffForPricing {
         rowId: "rowSmall",
         columnId: "col12",
         default_cells: [{ price: 10 }],
-        customer_cells: [{ customerId: "vip", price: 8 }],
+        customer_cells: [{ customerId: "vip", price: 8, productId: null }],
       },
       {
         id: "cell2",

@@ -437,10 +437,17 @@ export async function updateTariffCell(cellId: string, input: UpdateTariffCellIn
     }
 
     if (customer_price !== undefined && customerId) {
-        return prisma.tariffCellCustomer.upsert({
-            where: { cellId_customerId: { cellId, customerId } },
-            create: { cellId, customerId, price: customer_price },
-            update: { price: customer_price },
+        const existing = await prisma.tariffCellCustomer.findFirst({
+            where: { cellId, customerId, productId: null },
+        });
+        if (existing) {
+            return prisma.tariffCellCustomer.update({
+                where: { id: existing.id },
+                data: { price: customer_price },
+            });
+        }
+        return prisma.tariffCellCustomer.create({
+            data: { cellId, customerId, productId: null, price: customer_price },
         });
     }
 
@@ -472,12 +479,12 @@ export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
     const cellId = resolved.cell.id;
 
     await prisma.tariffCellCustomer.upsert({
-        where: { cellId_customerId: { cellId, customerId } },
-        create: { cellId, customerId, price },
+        where: { cellId_customerId_productId: { cellId, customerId, productId } },
+        create: { cellId, customerId, productId, price },
         update: { price },
     });
 
-    const result = selectPrice(tariff, { duration, quantity, customerId });
+    const result = selectPrice(tariff, { productId, duration, quantity, customerId });
 
     if (!result.ok) {
         throw new AppException(
@@ -518,10 +525,10 @@ export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
     const cellId = resolved.cell.id;
 
     await prisma.tariffCellCustomer.deleteMany({
-        where: { cellId, customerId },
+        where: { cellId, customerId, productId },
     });
 
-    const result = selectPrice(tariff, { duration, quantity, customerId });
+    const result = selectPrice(tariff, { productId, duration, quantity, customerId });
 
     if (!result.ok) {
         throw new AppException(

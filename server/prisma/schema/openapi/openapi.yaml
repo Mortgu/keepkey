@@ -374,6 +374,9 @@ components:
           format: int32
         optional:
           type: boolean
+        eur_user_month:
+          type: integer
+          format: int32
         total_cents:
           type: integer
           format: int32
@@ -394,6 +397,7 @@ components:
         - duration_months
         - free_months
         - quantity
+        - eur_user_month
         - total_cents
         - createdAt
         - updatedAt
@@ -703,6 +707,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffGroupProduct"
+        tariffCellCustomers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCellCustomer"
       required:
         - id
         - translations
@@ -711,6 +719,7 @@ components:
         - createdAt
         - updatedAt
         - tariffGroupProducts
+        - tariffCellCustomers
     ProductTranslation:
       type: object
       properties:
@@ -1226,6 +1235,10 @@ components:
         customer:
           $ref: "#/components/schemas/Customer"
         customerId:
+          type: string
+        product:
+          $ref: "#/components/schemas/Product"
+        productId:
           type: string
         price:
           type: integer

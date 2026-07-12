@@ -27,6 +27,7 @@ interface PriceCalculatorProps {
 }
 
 interface SelectPriceParams {
+    productId?: string;
     duration: number;
     quantity: number;
     customerId?: string;
@@ -42,7 +43,7 @@ export interface TariffForPricing {
         rowId: string;
         columnId: string;
         default_cells: Array<{ price: number }>;
-        customer_cells: Array<{ customerId: string; price: number }>;
+        customer_cells: Array<{ customerId: string; price: number; productId: string | null }>;
     }>;
 }
 
@@ -109,7 +110,7 @@ export function resolveCell(
 
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
-    { duration, quantity, customerId, freeMonths = 0 }: SelectPriceParams,
+    { productId, duration, quantity, customerId, freeMonths = 0 }: SelectPriceParams,
 ): PriceResult {
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
@@ -132,7 +133,10 @@ export function selectPrice(
     let unitPrice = defaultCell.price;
 
     if (customerId !== undefined && customerId !== '') {
-        const override = cell.customer_cells.find(cc => cc.customerId === customerId);
+        const overrides = cell.customer_cells.filter(cc => cc.customerId === customerId);
+        const productSpecific = overrides.find(cc => cc.productId === productId);
+        const groupWide = overrides.find(cc => cc.productId === null);
+        const override = productSpecific ?? groupWide;
         if (override) unitPrice = override.price;
     }
 
@@ -217,7 +221,7 @@ export async function calculatePrice(props: PriceCalculatorProps): Promise<Price
 
         if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-        return selectPrice(tariff, { duration, quantity, customerId, freeMonths });
+        return selectPrice(tariff, { productId, duration, quantity, customerId, freeMonths });
     } catch (error) {
         throw error;
     }

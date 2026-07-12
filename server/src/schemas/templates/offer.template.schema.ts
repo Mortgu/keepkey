@@ -8,7 +8,8 @@ const offerTemplateProductItemSchema = z.object({
     eur_user_month: z.string(),
     duration: z.string(),
     total: z.string(),
-    optional: z.boolean().nullish().transform(v => (v === undefined ? false : v)),
+    contract: z.string(),
+    optional: z.boolean().nullish().transform(v => (v === undefined ? null : v)),
 });
 
 export type OfferTemplateItem = z.infer<typeof offerTemplateProductItemSchema>;
@@ -30,6 +31,7 @@ export const offerTemplateSchema = z.object({
     validUntil: z.string().nullish().transform(v => (v === undefined ? null : v)),
     requestFrom: z.string().nullish().transform(v => (v === undefined ? null : v)),
     supplierId: z.string().nullish().transform(v => (v === undefined ? null : v)),
+    compare: z.boolean().nullish().transform(v => ((v === undefined || v === null) ? false : v)),
 
     customer: z.object({
         id: z.string().nullish().transform(v => (v === undefined ? null : v)),
@@ -61,7 +63,8 @@ export const offerTemplateSchema = z.object({
     products: z.object({
         names: z.string(),
         grouped: z.array(offerTemplateProductGroupSchema),
-        items: z.array(offerTemplateProductItemSchema)
+        items: z.array(offerTemplateProductItemSchema),
+        total: z.string(),
     }),
 
     flatrates: z.array(

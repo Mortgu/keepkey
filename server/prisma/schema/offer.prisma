@@ -76,7 +76,8 @@ model OfferPosition {
 
   optional Boolean? @default(false)
 
-  total_cents Int
+  eur_user_month Int
+  total_cents    Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

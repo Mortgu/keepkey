@@ -152,6 +152,8 @@ export interface components {
             quantity: number;
             optional?: boolean;
             /** Format: int32 */
+            eur_user_month: number;
+            /** Format: int32 */
             total_cents: number;
             /** Format: date-time */
             createdAt: string;
@@ -283,6 +285,7 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             tariffGroupProducts: components["schemas"]["TariffGroupProduct"][];
+            tariffCellCustomers: components["schemas"]["TariffCellCustomer"][];
         };
         ProductTranslation: {
             productId: string;
@@ -487,6 +490,8 @@ export interface components {
             cellId: string;
             customer: components["schemas"]["Customer"];
             customerId: string;
+            product?: components["schemas"]["Product"];
+            productId?: string;
             /** Format: int32 */
             price: number;
             /** Format: date-time */
