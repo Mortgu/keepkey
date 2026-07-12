@@ -41,7 +41,11 @@ export const fetchOfferData = async (offerId: string) => {
             }
         }),
 
-        await prisma.contract.findMany(),
+        await prisma.contract.findMany({
+            include: {
+                translations: true,
+            }
+        }),
     ]);
 
     return { offer, contracts };
@@ -106,7 +110,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const groups = Object.values(Object.groupBy(offerPositions, (p) =>
         `${p.contract}_${p.duration_months}`));
 
-    const product_groups: Array<OfferTemplateGroup> = groups.map(group => {
+    const product_groups: Array<OfferTemplateGroup> = groups.flatMap(group => {
         const positions = group?.map(position => {
             const product = pickTranslation(position.product.translations, language);
             const contract = pickTranslation(position.contract.translations, language);
@@ -119,13 +123,25 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             { language: "EN", text: "Months" }
         ], language)?.text;
 
-        return {
+        const item: OfferTemplateGroup = {
             names: positions?.map(p => p.product?.name).join(" & ") ?? "",
             contract: positions![0].contract?.name ?? "",
             features: positions![0].contract?.features ?? [],
             _duration: positions![0].duration_months,
             duration: `${positions![0].duration_months} ${months_translation}`,
-        };
+        }
+
+        if (offer.featureComparison) {
+            return contracts.map(contract => ({
+                names: positions?.map(p => p.product?.name).join(" & ") ?? "",
+                contract: pickTranslation(contract.translations, language)?.name ?? "",
+                features: pickTranslation(contract.translations, language)?.features ?? [],
+                _duration: positions![0].duration_months,
+                duration: `${positions![0].duration_months} ${months_translation}`,
+            }))
+        }
+
+        return [item];
     });
 
     const flatrates = offerFlatRates.map(position => {
