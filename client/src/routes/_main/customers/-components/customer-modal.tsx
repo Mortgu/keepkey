@@ -1,15 +1,15 @@
-import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
-import type { Customer } from "@/types";
-import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import { Button, Input, ModalDialog, Select } from "@/components";
-import { getFormError } from "@/lib/utils";
+import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {
   COUNTRY_OPTIONS,
   CURRENCY_OPTIONS,
   LANGUAGE_OPTIONS,
   findCountryByName,
 } from "@/lib/countries";
+import { getFormError } from "@/lib/utils";
+import type { Customer } from "@/types";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 
 interface CustomerModalProps {
   onClose: () => void;
@@ -29,7 +29,7 @@ const customerSchema = z.object({
   country: z.string(),
   street: z.string(),
   city: z.string(),
-  plz: z.string(),
+  zip: z.string(),
   phone: z.string(),
 
   language: z.enum(["DE", "EN"]),
@@ -58,7 +58,7 @@ export default function CustomerModal({
       country: currentCustomer?.country || initialCountry.name,
       street: currentCustomer?.street || "",
       city: currentCustomer?.city || "",
-      plz: currentCustomer?.plz || "",
+      zip: currentCustomer?.zip || "",
       phone: currentCustomer?.phone || "",
 
       language: currentCustomer?.language ?? initialCountry.language,
@@ -312,7 +312,7 @@ export default function CustomerModal({
             />
 
             <customerForm.Field
-              name="plz"
+              name="zip"
               children={(field) => (
                 <div className="flex-1 grid gap-2">
                   <Input

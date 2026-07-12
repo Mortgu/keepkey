@@ -1,5 +1,5 @@
-import {createEnv} from "@t3-oss/env-nextjs";
-import {z} from "zod";
+import { createEnv } from "@t3-oss/env-core";
+import { z } from "zod";
 
 import "dotenv/config";
 
@@ -13,8 +13,8 @@ const env = createEnv({
 
         DATABASE_URL: z.url(),
 
-        PORT: z.string(),
-        NODE_ENV: z.string(),
+        PORT: z.coerce.number(),
+        NODE_ENV: z.enum(["development", "production", "test"]),
 
         NEXTCLOUD_URL: z.string().url().optional(),
         NEXTCLOUD_USER: z.string().optional(),
@@ -27,11 +27,12 @@ const env = createEnv({
         NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().default('/'),
 
         REDIS_URL: z.string().min(1),
+        WORKER_CONCURRENCY: z.coerce.number().default(2),
 
         CORS_ORIGIN: z.string(),
     },
 
-    experimental__runtimeEnv: {},
+    runtimeEnv: process.env,
 });
 
 export default env;

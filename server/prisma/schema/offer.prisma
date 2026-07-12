@@ -16,7 +16,11 @@ model Offer {
   language Language @default(DE)
 
   quoteId     String // quoteId / voucherId
+  /// @openapi.ignore
+  documentVersion Int @default(0)
   paymentTerm String
+
+  featureComparison Boolean @default(false)
 
   date        DateTime  @default(now())
   validUntil  DateTime?
@@ -69,11 +73,14 @@ model OfferPosition {
   contractId String
 
   duration_months Int
+  free_months     Int @default(0)
   quantity        Int
 
   optional Boolean? @default(false)
 
-  total_cents Int
+  eur_user_month Int
+  total_cents    Int
+  discount_cents Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -105,6 +112,8 @@ model OfferDocument {
   isCurrent   Boolean        @default(false)
 
   error String?
+  /// @openapi.ignore
+  uploadToken String?
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
@@ -116,10 +125,11 @@ model OfferDocument {
   docxId String?   @unique
 
   task   Task   @relation(fields: [taskId], references: [id])
-  taskId String
+  taskId String @unique
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([offerId, version])
   @@map("offer_document")
 }

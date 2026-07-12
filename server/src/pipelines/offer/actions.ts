@@ -1,21 +1,20 @@
 import Docxtemplater from "docxtemplater";
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import fs from "fs/promises";
-import path from "path";
 import PizZip from "pizzip";
 
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
-import env from "../../lib/env.js";
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "../../middlewares/logger.js";
-import { type OfferContext, offerSchema } from "../../schemas/offer-template-schema.js";
+import { offerSchema } from "../../schemas/templates/offer-template-schema.js";
 import { pickTranslation } from "../../utils/i18n.js";
-import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
+import { OfferTemplate, OfferTemplateGroup, OfferTemplateItem, offerTemplateSchema } from "../../schemas/templates/offer.template.schema.js";
+import { formatCentsToEur, formatDate } from "../../utils/utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
@@ -40,7 +39,11 @@ export const fetchOfferData = async (offerId: string) => {
             }
         }),
 
-        await prisma.contract.findMany(),
+        await prisma.contract.findMany({
+            include: {
+                translations: true,
+            }
+        }),
     ]);
 
     return { offer, contracts };
@@ -61,156 +64,143 @@ export const fetchOfferAction = async (context: OfferPipelineContext) => {
 }
 
 /* Helper function */
-type AugmentedContract = {
-    id: string;
-    name: string;
-    features: string[];
-    table: string;
-};
-
-const pickContractFields = (contract: AugmentedContract) => ({
-    id: contract.id,
-    name: contract.name,
-    features: contract.features,
-    table: contract.table,
-});
-
-/* Helper function */
-export const formatOfferData = async (fetchedData: OfferFetchData) => {
+export const formatOfferData = async (fetchedData: OfferFetchData): Promise<OfferTemplate> => {
     const { offer, contracts } = fetchedData;
-    const { customer, customerContactPerson: ccp, user: employee, language } = offer;
+    const { customer, customerContactPerson: cp, user: employee, offerPositions, offerFlatRates, language } = offer;
+    let total = 0;
 
-    const offerPositions = offer.offerPositions.map((position) => {
-        const product = pickTranslation(position.product.translations, language);
-        const contract = pickTranslation(position.contract.translations, language);
+    const product_items: Array<OfferTemplateItem> = offerPositions.flatMap(offerPosition => {
+        const translation = pickTranslation(offerPosition.product.translations, language);
+        const contract_translation = pickTranslation(offerPosition.contract.translations, language);
 
-        return {
-            ...position,
-            product: {
-                ...position.product,
-                name: product?.name ?? "",
-                description: product?.description ?? "",
-                table: product?.table ?? "",
-            },
-            contract: {
-                ...position.contract,
-                name: contract?.name ?? "",
-                features: contract?.features ?? [],
-                table: contract?.table ?? "",
+        if (!translation || !contract_translation) {
+            throw new PipelineStageError("Translations not found!")
+        }
+
+        const product_name = `${offerPosition.optional ? `(optional)\n` : ''}Keepit - ${contract_translation.name} Backup für ${translation.name}`;
+
+        total = total + offerPosition.total_cents - offerPosition.discount_cents;
+
+        const item: OfferTemplateItem = {
+            name: product_name,
+            description: translation.description,
+            content: translation.table,
+            quantity: String(offerPosition.quantity),
+            eur_user_month: formatCentsToEur(offerPosition.eur_user_month),
+            duration: String(offerPosition.duration_months),
+            total: formatCentsToEur(offerPosition.total_cents),
+            contract: contract_translation.name,
+            optional: offerPosition.optional ? true : null,
+            discount: null,
+        }
+
+        if (offerPosition.free_months > 0) {
+            item.discount = {
+                free_months: offerPosition.free_months,
+                valid_until: formatDate(offer.validUntil) ?? "",
+                total: formatCentsToEur(-offerPosition.discount_cents),
             }
-        };
+        }
+
+        return [item];
     });
 
-    const offerFlatRates = offer.offerFlatRates.map((fr) => {
-        const ft = pickTranslation(fr.flatRate.translations, language);
+    const groups = Object.values(Object.groupBy(offerPositions, (p) =>
+        `${p.contract}_${p.duration_months}`));
+
+    const product_groups: Array<OfferTemplateGroup> = groups.flatMap(group => {
+        const positions = group?.map(position => {
+            const product = pickTranslation(position.product.translations, language);
+            const contract = pickTranslation(position.contract.translations, language);
+
+            return { ...position, product, contract };
+        });
+
+        const months_translation = pickTranslation([
+            { language: "DE", text: "Monate" },
+            { language: "EN", text: "Months" }
+        ], language)?.text;
+
+        const item: OfferTemplateGroup = {
+            names: positions?.map(p => p.product?.name).join(" & ") ?? "",
+            contract: positions![0].contract?.name ?? "",
+            features: positions![0].contract?.features ?? [],
+            _duration: positions![0].duration_months,
+            duration: `${positions![0].duration_months} ${months_translation}`,
+        }
+
+        if (offer.featureComparison) {
+            return contracts.map(contract => ({
+                names: positions?.map(p => p.product?.name).join(" & ") ?? "",
+                contract: pickTranslation(contract.translations, language)?.name ?? "",
+                features: pickTranslation(contract.translations, language)?.features ?? [],
+                _duration: positions![0].duration_months,
+                duration: `${positions![0].duration_months} ${months_translation}`,
+            }))
+        }
+
+        return [item];
+    });
+
+    const flatrates = offerFlatRates.map(position => {
+        const translation = pickTranslation(position.flatRate.translations, language);
+
+        if (!translation) {
+            throw new PipelineStageError("Translations not found!")
+        }
+
+        total = total + position.total_cents;
+
         return {
-            ...fr,
-            flatRate: {
-                ...fr.flatRate,
-                name: ft?.name ?? "",
-                table: ft?.table ?? ""
-            }
-        };
+            name: translation.name,
+            content: translation.table,
+            total: formatCentsToEur(position.total_cents),
+        }
     });
-
-    const products = offerPositions.map((position) => ({
-        id: position.product.id,
-        name: position.product.name,
-        description: position.product.description,
-        table: position.product.table,
-        contract: pickContractFields(position.contract),
-        duration_months: position.duration_months,
-        duration: formatDuration(position.duration_months),
-    }));
-
-    const groups = Object.groupBy(offerPositions, (p) =>
-        `${p.contract.id}_${p.duration_months}`);
-
-    const grouped = Object.values(groups).map((group) => {
-        const first = group![0];
-
-        const group_total = group?.reduce((sum, p) => sum + p.total_cents, 0);
-
-        return {
-            names: group?.map((p) => p.product.name).join(" & "),
-            contract: pickContractFields(first.contract),
-            duration_months: first.duration_months,
-            duration: formatDuration(first.duration_months),
-            total: formatEur(group_total! / 100),
-            items: group?.map((item) => ({
-                name: item.product.name,
-                description: item.product.description,
-                table: item.product.table,
-                quantity: item.quantity,
-                optional: item.optional ?? false,
-                contract: pickContractFields(item.contract),
-                duration_months: item.duration_months,
-                price: {
-                    total: formatEur(item.total_cents / 100),
-                    unit: formatEur(
-                        item.quantity && item.duration_months
-                            ? item.total_cents / item.quantity / item.duration_months / 100
-                            : 0
-                    ),
-                },
-            })),
-        };
-    });
-
-    const flatRates = offerFlatRates.map((fr) => ({
-        id: fr.id,
-        quantity: fr.quantity,
-        total_cents: fr.total_cents,
-        flatRate: {
-            id: fr.flatRate.id,
-            name: fr.flatRate.name,
-            table: fr.flatRate.table,
-        },
-        price: {
-            total: formatEur(fr.total_cents / 100),
-        },
-    }));
 
     return {
         quoteId: offer.quoteId,
         date: formatDate(offer.date),
         paymentTerm: offer.paymentTerm,
-        validUntil: offer.validUntil ? formatDate(offer.validUntil) : "",
-        requestFrom: offer.requestFrom ? formatDate(offer.requestFrom) : "",
-        supplierId: offer.supplierId || "",
+        validUntil: formatDate(offer.validUntil),
+        requestFrom: formatDate(offer.requestFrom),
+        supplierId: offer.supplierId,
+        compare: offer.featureComparison,
 
         customer: {
-            id: customer.customerId || "",
-            companyName: customer.companyName || "",
-            street: customer.street || "",
-            plz: customer.plz || "",
-            city: customer.city || "",
+            id: customer.customerId,
+            companyName: customer.companyName,
+            street: customer.street,
+            zip: customer.zip,
+            city: customer.city,
 
-            fullName: [ccp.salutation, ccp.firstName, ccp.lastName].filter(Boolean).join(" "),
-            salutation: ccp.salutation || "",
-            firstName: ccp.firstName || "",
-            lastName: ccp.lastName || "",
-            phone: customer.phone || "",
-            email: customer.email || "",
+            fullName: `${cp.salutation} ${cp.firstName} ${cp.lastName}`,
+            salutation: cp.salutation,
+            firstName: cp.firstName,
+            lastName: cp.lastName,
+
+            phone: customer.phone,
+            email: cp.email,
         },
 
         employee: {
-            fullName: [employee.salutation, employee.firstName, employee.lastName].filter(Boolean).join(" "),
-            salutation: employee.salutation || "",
-            firstName: employee.firstName || "",
-            lastName: employee.lastName || "",
-            phone: employee.phone || "",
-            email: employee.email || "",
+            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            salutation: employee.salutation,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            phone: employee.phone,
+            email: employee.email,
         },
 
         products: {
-            names: offerPositions.map((p) => p.product.name).join(" & "),
-            grouped: grouped,
-            items: [...products],
+            names: offerPositions.map(position => pickTranslation(position.product.translations, language)?.name).join(" & "),
+            grouped: product_groups,
+            items: product_items,
+            total: formatCentsToEur(total),
         },
 
-        flatRates: flatRates,
-    };
+        flatrates: flatrates
+    }
 }
 
 /* Stage function */
@@ -221,9 +211,10 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 
     try {
         const formated = await formatOfferData(context.fetchedData);
-        context.formatedData = offerSchema.parse(formated);
+        context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {
+            logger.error(exception)
             logger.error(`[pipeline]: Formatted offer data failed schema validation: ${JSON.stringify(exception.issues)
                 }`);
         } else {
@@ -243,11 +234,7 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
     context.formatedData = deepIterate(
         formatedData as Record<string, unknown>,
         formatedData as Record<string, unknown>,
-    ) as unknown as OfferContext;
-}
-
-export const prepareAction = async (context: OfferPipelineContext) => {
-    await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
+    ) as unknown as OfferTemplate;
 }
 
 /* Drift detection: compare template tags against the offer schema. */
@@ -332,16 +319,11 @@ export async function convertAction(context: OfferPipelineContext) {
     });
 }
 
-export async function writeAction(context: OfferPipelineContext) {
-    const { fetchedData, documentId, version, docxBuffer, pdfBuffer } = context;
+export async function createDisplayNameAction(context: OfferPipelineContext) {
+    const { fetchedData, version } = context;
 
-    if (!fetchedData || !documentId || version === null || !docxBuffer || !pdfBuffer) {
-        throw new PipelineStageError(
-            `
-        Something went wrong! Failed to write to disk!
-        fetchedData=${!!fetchedData}, documentId=${!!documentId}, version=${!!version}, docxBuffer=${!!docxBuffer}, pdfBuffer=${!!pdfBuffer}
-      `
-        );
+    if (!fetchedData || version === null) {
+        throw new PipelineStageError("Failed to create document display name.");
     }
 
     const { quoteId, customer, offerPositions, language } = fetchedData.offer;
@@ -352,16 +334,4 @@ export async function writeAction(context: OfferPipelineContext) {
         .join("+");
 
     context.displayName = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
-
-    const docxPath = path.join(env.OUTPUT_DIR, `${documentId}.docx`);
-    const pdfPath = path.join(env.OUTPUT_DIR, `${documentId}.pdf`);
-
-    await Promise.all([
-        fs.writeFile(docxPath, docxBuffer!),
-        fs.writeFile(pdfPath, pdfBuffer!),
-    ]);
-
-    // Expose the canonical document path (docx matches the document's format)
-    // so the worker can persist it for downloads.
-    context.path = docxPath;
 }

@@ -1,8 +1,8 @@
 import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
-import { prisma } from "./prismaClient.js";
-import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
-import { getNextCloudClient } from "./nextcloud.js";
 import logger from "../middlewares/logger.js";
+import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
+import { AppException } from "./exceptions.js";
+import { prisma } from "./prismaClient.js";
 
 export async function createTask(target: TaskTarget): Promise<Task> {
   return prisma.task.create({
@@ -14,36 +14,66 @@ export async function createTask(target: TaskTarget): Promise<Task> {
   });
 }
 
-export async function enqueueTask(taskId: string): Promise<void> {
-  const job = await taskQueue.add(taskQueueKey, { taskId });
+export async function enqueueTask(
+  taskId: string,
+  options: { markFailedOnError?: boolean } = {},
+): Promise<void> {
+  const { markFailedOnError = true } = options;
+  let job;
+  try {
+    const existing = await taskQueue.getJob(taskId);
+    if (existing) {
+      const state = await existing.getState();
+      if (state === "completed") {
+        await prisma.task.updateMany({
+          where: { id: taskId, status: TaskStatus.COMPLETED },
+          data: { status: TaskStatus.PENDING, error: null, runToken: null },
+        });
+        await existing.retry("completed");
+      } else if (state === "failed") {
+        await existing.retry(state);
+      }
+      job = existing;
+    } else {
+      job = await taskQueue.add(taskQueueKey, { taskId }, { jobId: taskId });
+    }
+  } catch (exception: any) {
+    logger.error(`[enqueueTask] failed to enqueue task ${taskId}: ${exception.message}`);
+
+    if (markFailedOnError) {
+      try {
+        await prisma.$transaction([
+          prisma.task.updateMany({
+            where: { id: taskId, status: TaskStatus.PENDING },
+            data: { status: TaskStatus.FAILED, error: exception.message },
+          }),
+          prisma.offerDocument.updateMany({
+            where: { taskId, status: "PENDING" },
+            data: { status: "FAILED", error: exception.message },
+          }),
+          prisma.orderDocument.updateMany({
+            where: { taskId, status: "PENDING" },
+            data: { status: "FAILED", error: exception.message },
+          }),
+        ]);
+      } catch (dbException: any) {
+        logger.error(`[enqueueTask] failed to persist FAILED state for task ${taskId}: ${dbException.message}`);
+      }
+    }
+
+    throw new AppException(
+      "Dokument-Generierung konnte nicht eingereiht werden!",
+      503,
+      "TASK_ENQUEUE_FAILED",
+    );
+  }
+
+  // Job ist bereits enqueued — schlägt nur das jobId-Update fehl, den Task NICHT
+  // auf FAILED setzen (der Worker verarbeitet den Job trotzdem), nur loggen.
   await prisma.task.update({
     where: { id: taskId },
     data: { jobId: job.id },
+  }).catch((exception: any) => {
+    logger.warn(`[enqueueTask] failed to persist jobId for task ${taskId}: ${exception.message}`);
   });
-}
-
-export type UploadResult = {
-    remotePath: string;
-    uploadedAt: Date;
-    size: number;
-};
-
-export async function uploadDocument(filename: string, uploadDir: string, content: Buffer): Promise<UploadResult> {
-    const client = getNextCloudClient();
-    const remotePath = `${uploadDir}/${filename}`;
-
-    try {
-        await client.putFileContents(remotePath, content, {
-            overwrite: false,
-        });
-
-        return {
-            remotePath,
-            uploadedAt: new Date(),
-            size: content.length,
-        };
-    } catch (exception: any) {
-        logger.error(exception);
-        throw new Error("Upload failed!");
-    }
 }

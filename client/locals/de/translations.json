@@ -21,11 +21,15 @@
     "pricing": "Preise",
     "flatRates": "Pauschalen",
     "suppliers": "Lieferanten",
-    "contracts": "Verträge",
+    "contracts": "Tarife",
     "customers": "Kunden",
     "employees": "Angestellte",
     "offers": "Angebote",
+    "invoices": "Rechnungen",
     "orders": "Bestellungen"
+  },
+  "offerModal": {
+    "compare": "Vergleichen?"
   },
   "common": {
     "search": "Suchen",

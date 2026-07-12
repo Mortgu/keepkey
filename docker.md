@@ -1,6 +1,6 @@
 ### Build the image and push
 ```bash
-docker build buildx --platform linux/amd64,linux/arm64 --push --rm --tag=docker.io/oskarsammet/app:260623v1 .
+docker buildx build --platform linux/amd64,linux/arm64 --push --rm --tag=docker.io/oskarsammet/app:260623v1 .
 ```
 
 ```bash
@@ -14,7 +14,7 @@ docker network create --driver=overlay --attachable [NETWORK_NAME]
 
 ### Service
 ```bash
-docker service create --network=[NETWORK_NAME] --replicas=2 -p 9000:8081 -t -d docker.io/oskarsammet/app.:260623v1 --name=[SERVICE_NAME]
+docker service create --name=[SERVICE_NAME] --network=[NETWORK_NAME] --replicas=2 -p 9000:8081 -t -d docker.io/oskarsammet/app:260623v1
 ```
 -d = als deamon service
 

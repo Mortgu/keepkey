@@ -33,6 +33,22 @@ export const updateTariffRowSchema = z.object({
 export const updateTariffCellSchema = z.object({
     default_price: z.number().int().optional(),
     customer_price: z.number().int().optional(),
+    customerId: z.string().min(1).optional(),
+}).superRefine((data, ctx) => {
+    if (data.customer_price !== undefined && !data.customerId) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['customerId'],
+            message: 'customerId is required when customer_price is set',
+        });
+    }
+    if (data.default_price === undefined && data.customer_price === undefined) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['default_price'],
+            message: 'default_price or customer_price is required',
+        });
+    }
 });
 
 export const upsertCustomerPriceSchema = z.object({

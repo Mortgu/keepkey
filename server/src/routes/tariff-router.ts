@@ -2,27 +2,27 @@ import { Router } from "express";
 import {
     createTariff,
     createTariffColumn,
+    createTariffGroup,
     createTariffRow,
     deleteCustomerPrice,
     deleteTariff,
     deleteTariffColumn,
+    deleteTariffGroup,
     deleteTariffRow,
     getTariff,
     getTariffDurations,
+    getTariffGroup,
+    getTariffGroups,
     getTariffHistory,
     getTariffPrice,
     updateTariffCell,
     updateTariffColumn,
-    updateTariffRow,
-    upsertCustomerPrice,
-} from "../controllers/index.js";
-import {
-    createTariffGroup,
-    deleteTariffGroup,
-    getTariffGroup,
-    getTariffGroups,
     updateTariffGroup,
-} from "../controllers/tariff/tariff-group-controller.js";
+    updateTariffRow,
+    upsertCustomerPrice
+} from "../controllers/index.js";
+
+import { validate } from "../middlewares/validate.js";
 import {
     createTariffColumnSchema,
     createTariffGroupSchema,
@@ -34,7 +34,6 @@ import {
     updateTariffRowSchema,
     upsertCustomerPriceSchema,
 } from "../schemas/index.js";
-import { validate } from "../middlewares/validate.js";
 
 const router = Router();
 

@@ -1,1 +1,0 @@
-export * from './get-contact-controller.js';

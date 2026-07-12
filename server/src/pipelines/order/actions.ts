@@ -1,19 +1,19 @@
-import {prisma} from "../../lib/prismaClient.js";
-import {OrderFetchedData, OrderFormattedData} from "./context.js";
-import {formatDate, formatDuration, formatEur} from "../../utils/utils.js";
-import {pickTranslation} from "../../utils/i18n.js";
-import {customParser, deepIterate} from "../offer/utils.js";
-import fs from "fs/promises";
-import path from "path";
-import env from "../../lib/env.js";
-import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
-import {convert as libconvert} from "libreoffice-convert";
+import fs from "fs/promises";
+import { convert as libconvert } from "libreoffice-convert";
+import path from "path";
+import PizZip from "pizzip";
+import env from "../../lib/env.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { pickTranslation } from "../../utils/i18n.js";
+import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { customParser, deepIterate } from "../offer/utils.js";
+import { OrderFetchedData, OrderFormattedData } from "./context.js";
 
 export async function fetchOrderData(orderId: string) {
     const [order] = await Promise.all([
         await prisma.order.findUniqueOrThrow({
-            where: {id: orderId},
+            where: { id: orderId },
             include: {
                 customer: true,
                 supplier: true,
@@ -22,21 +22,21 @@ export async function fetchOrderData(orderId: string) {
 
                 orderPositions: {
                     include: {
-                        product: {include: {translations: true}},
-                        contract: {include: {translations: true}},
+                        product: { include: { translations: true } },
+                        contract: { include: { translations: true } },
                     }
                 },
 
                 flatRates: {
                     include: {
-                        flatRate: {include: {translations: true}}
+                        flatRate: { include: { translations: true } }
                     }
                 }
             }
         }),
     ]);
 
-    return {order};
+    return { order };
 }
 
 export async function formatOrderData(fetchedData?: OrderFetchedData) {
@@ -46,7 +46,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
 
     const order = fetchedData.order;
     const lang = "DE"; // Orders carry no language yet — default to German.
-    const {customer, customerContactPerson: ccp, employee} = order;
+    const { customer, customerContactPerson: ccp, employee } = order;
 
     // Resolve the language variant once and flatten it onto each entity so the
     // docx template can keep referencing name/description/table/features directly.
@@ -55,13 +55,13 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         const ct = pickTranslation(position.contract.translations, lang);
         return {
             ...position,
-            product: {...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? ""},
-            contract: {...position.contract, name: ct?.name ?? "", features: ct?.features ?? [], table: ct?.table ?? ""},
+            product: { ...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? "" },
+            contract: { ...position.contract, name: ct?.name ?? "", features: ct?.features ?? [], table: ct?.table ?? "" },
         };
     });
     const flatRates = order.flatRates.map((fr) => {
         const ft = pickTranslation(fr.flatRate.translations, lang);
-        return {...fr, flatRate: {...fr.flatRate, name: ft?.name ?? "", table: ft?.table ?? ""}};
+        return { ...fr, flatRate: { ...fr.flatRate, name: ft?.name ?? "", table: ft?.table ?? "" } };
     });
 
     const products = orderPositions.map((position) => ({
@@ -129,7 +129,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             id: customer.customerId || "",
             companyName: customer.companyName || "",
             street: customer.street || "",
-            plz: customer.plz || "",
+            zip: customer.zip || "",
             city: customer.city || "",
 
             fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,

@@ -42,7 +42,8 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                 <div className="grid gap-0.5">
                     <p className="text-md">{offerDocument.displayName ?? `v${offerDocument.version}`}</p>
                     <div className="flex items-center gap-2 text-sm">
-                        <p><span className="text-(--text-secondary)">size: </span> {formatBytesToKB(offerDocument.pdf?.size || 0)}</p>
+                        <p><span className="text-(--text-secondary)">docx-size: </span> {formatBytesToKB(offerDocument.docx?.size || 0)}</p>
+                        <p><span className="text-(--text-secondary)">pdf-size: </span> {formatBytesToKB(offerDocument.pdf?.size || 0)}</p>
                         <p><span className="text-(--text-secondary)">status: </span> {status}</p>
                         <p><span className="text-(--text-secondary)">created: </span> {formatDate(offerDocument.createdAt)}</p>
                     </div>
@@ -81,6 +82,16 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                         />
                     </>
                 )}
+
+                {(status === "FAILED" && (
+                    <>
+                        <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
+                            onClick={() => deleteOfferDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
+                            loading={isDeleting || !!errorDeleting}
+                            disabled={isDeleting || !!errorDeleting}
+                        />
+                    </>
+                ))}
 
                 {(status === "PENDING" || status === "PROCESSING") && (
                     <div className="grid">

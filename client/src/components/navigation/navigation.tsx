@@ -146,6 +146,11 @@ export function Navigation() {
                         label={t("section.orders")}
                         icon={<ShoppingCart size={ICON_SIZE} />}
                     />
+                    <NavLink
+                        to="/invoices"
+                        label={t("section.invoices")}
+                        icon={<ShoppingCart size={ICON_SIZE} />}
+                    />
                 </Section>
 
                 <Section title={t("nav.management")} collapsible>

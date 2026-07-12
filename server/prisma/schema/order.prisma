@@ -17,6 +17,8 @@ model Order {
   offerId String @unique // One-to-one relation
 
   orderId     String // Beleg-Nr.
+  /// @openapi.ignore
+  documentVersion Int @default(0)
   paymentTerm String @default("") // Zahlungsbedingung
 
   projectNumber      String? // Projekt-Nr.
@@ -87,6 +89,8 @@ model OrderDocument {
   isCurrent   Boolean        @default(false)
 
   error String?
+  /// @openapi.ignore
+  uploadToken String?
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
@@ -98,10 +102,11 @@ model OrderDocument {
   docxId String?   @unique
 
   task   Task   @relation(fields: [taskId], references: [id])
-  taskId String
+  taskId String @unique
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@unique([orderId, version])
   @@map("order_document")
 }

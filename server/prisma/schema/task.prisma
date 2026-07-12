@@ -9,6 +9,7 @@ enum TaskTarget {
   OFFER
   ORDER
   RENEWAL
+  INVOICE
 }
 
 enum TaskType {
@@ -20,6 +21,8 @@ enum TaskType {
 model Task {
   id    String  @id @default(cuid())
   jobId String?
+  /// @openapi.ignore
+  runToken String?
 
   status TaskStatus @default(PENDING)
   target TaskTarget

@@ -21,8 +21,11 @@ model Document {
   format   DocumentFormat // PDF || DOCX
 
   size Int?
+  sha256 String?
 
   uploadedAt DateTime? @db.Timestamptz(6)
+  remotePath String? @unique
+  remoteEtag String?
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

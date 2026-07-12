@@ -14,7 +14,7 @@ export type DashboardStats = {
 };
 
 export const useDashboardStats = () => {
-    const { offers } = useOffers();
+    const { items: offers } = useOffers();
 
     const { orders, isPending: ordersPending } = useOrderHook();
 

@@ -17,5 +17,6 @@ export type CreateUserInput = Omit<
     | "offers"
     | "orders"
     | "emailVerified"
+    | "offerRevisions"
 >;
 export type UpdateUserInput = Partial<CreateUserInput>;

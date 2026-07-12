@@ -133,6 +133,7 @@ export const getTariffPrice = (
     duration: number,
     quantity: number,
     customerId?: string,
+    freeMonths?: number,
 ) => {
     const params = new URLSearchParams({
         productId,
@@ -140,6 +141,7 @@ export const getTariffPrice = (
         duration: String(duration),
         quantity: String(quantity),
         ...(customerId ? { customerId } : {}),
+        ...(freeMonths ? { freeMonths: String(freeMonths) } : {}),
     });
     return api<any>(`/api/tariffs/price?${params}`, { method: "GET" });
 };
@@ -151,7 +153,7 @@ export const getTariffPrice = (
 export type TariffPriceResult = {
     success: boolean;
     price: number;
-    breakdown: { unitPrice: number; quantity: number; duration: number };
+    breakdown: { unitPrice: number; quantity: number; duration: number; freeMonths: number; effectiveDuration: number };
 };
 
 export const upsertCustomerPrice = (

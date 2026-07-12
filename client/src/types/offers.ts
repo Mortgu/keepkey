@@ -5,6 +5,13 @@ export interface OfferFilters {
     companyIds?: Array<string>;
     contactPersonIds?: Array<string>;
     sort?: string;
+    cursor?: string;
+    limit?: number;
+}
+
+export interface OffersPage {
+    items: Array<Offer>;
+    nextCursor: string | null;
 }
 
 export type Offer = components["schemas"]["Offer"];
@@ -22,7 +29,8 @@ export type CreateOfferInput = Pick<Offer,
     "validUntil" |
     "requestFrom" |
     "userId" |
-    "supplierId"
+    "supplierId" |
+    "featureComparison"
 >;
 
 export type UpdateOfferInput = Partial<CreateOfferInput>;
@@ -30,6 +38,7 @@ export type UpdateOfferInput = Partial<CreateOfferInput>;
 export type CreateOfferPositionInput = Pick<OfferPosition,
     "contractId" |
     "duration_months" |
+    "free_months" |
     "productId" |
     "quantity" |
     "optional"

@@ -36,15 +36,15 @@ export interface components {
             companyName: string;
             email?: string;
             invoiceEmail?: string;
+            phone?: string;
             street?: string;
             city?: string;
-            plz?: string;
-            phone?: string;
-            language?: components["schemas"]["Language"];
-            country?: string;
-            currency?: components["schemas"]["Currency"];
+            zip?: string;
+            language: components["schemas"]["Language"];
+            country: string;
+            currency: components["schemas"]["Currency"];
             /** Format: double */
-            taxRate?: number;
+            taxRate: number;
             salutation?: string;
             /** Format: date-time */
             createdAt: string;
@@ -60,10 +60,10 @@ export interface components {
             id: string;
             customerId: string;
             customer: components["schemas"]["Customer"];
-            salutation: string;
+            salutation?: string;
+            email?: string;
             firstName: string;
             lastName: string;
-            email?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -103,6 +103,7 @@ export interface components {
             language: components["schemas"]["Language"];
             quoteId: string;
             paymentTerm: string;
+            featureComparison: boolean;
             /** Format: date-time */
             date: string;
             /** Format: date-time */
@@ -146,10 +147,16 @@ export interface components {
             /** Format: int32 */
             duration_months: number;
             /** Format: int32 */
+            free_months: number;
+            /** Format: int32 */
             quantity: number;
             optional?: boolean;
             /** Format: int32 */
+            eur_user_month: number;
+            /** Format: int32 */
             total_cents: number;
+            /** Format: int32 */
+            discount_cents: number;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -280,6 +287,7 @@ export interface components {
             /** Format: date-time */
             updatedAt: string;
             tariffGroupProducts: components["schemas"]["TariffGroupProduct"][];
+            tariffCellCustomers: components["schemas"]["TariffCellCustomer"][];
         };
         ProductTranslation: {
             productId: string;
@@ -364,7 +372,7 @@ export interface components {
         };
         Supplier: {
             id: string;
-            supplierId: string;
+            supplierId?: string;
             name: string;
             /** Format: date-time */
             createdAt: string;
@@ -484,6 +492,8 @@ export interface components {
             cellId: string;
             customer: components["schemas"]["Customer"];
             customerId: string;
+            product?: components["schemas"]["Product"];
+            productId?: string;
             /** Format: int32 */
             price: number;
             /** Format: date-time */
@@ -526,7 +536,7 @@ export interface components {
         /** @enum {string} */
         TaskStatus: "COMPLETED" | "RUNNING" | "PENDING" | "FAILED";
         /** @enum {string} */
-        TaskTarget: "OFFER" | "ORDER" | "RENEWAL";
+        TaskTarget: "OFFER" | "ORDER" | "RENEWAL" | "INVOICE";
         /** @enum {string} */
         TaskType: "UPLOAD" | "RESERVATION" | "GENERATION";
     };

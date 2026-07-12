@@ -17,6 +17,7 @@ import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
+import { Route as MainInvoicesIndexRouteImport } from './routes/_main/invoices/index'
 import { Route as MainFlatratesIndexRouteImport } from './routes/_main/flatrates/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
@@ -63,6 +64,11 @@ const MainOffersIndexRoute = MainOffersIndexRouteImport.update({
   path: '/offers/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainInvoicesIndexRoute = MainInvoicesIndexRouteImport.update({
+  id: '/invoices/',
+  path: '/invoices/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainFlatratesIndexRoute = MainFlatratesIndexRouteImport.update({
   id: '/flatrates/',
   path: '/flatrates/',
@@ -103,6 +109,7 @@ export interface FileRoutesByFullPath {
   '/customers/': typeof MainCustomersIndexRoute
   '/employees/': typeof MainEmployeesIndexRoute
   '/flatrates/': typeof MainFlatratesIndexRoute
+  '/invoices/': typeof MainInvoicesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
   '/orders/': typeof MainOrdersIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
@@ -118,6 +125,7 @@ export interface FileRoutesByTo {
   '/customers': typeof MainCustomersIndexRoute
   '/employees': typeof MainEmployeesIndexRoute
   '/flatrates': typeof MainFlatratesIndexRoute
+  '/invoices': typeof MainInvoicesIndexRoute
   '/offers': typeof MainOffersIndexRoute
   '/orders': typeof MainOrdersIndexRoute
   '/settings': typeof MainSettingsIndexRoute
@@ -135,6 +143,7 @@ export interface FileRoutesById {
   '/_main/customers/': typeof MainCustomersIndexRoute
   '/_main/employees/': typeof MainEmployeesIndexRoute
   '/_main/flatrates/': typeof MainFlatratesIndexRoute
+  '/_main/invoices/': typeof MainInvoicesIndexRoute
   '/_main/offers/': typeof MainOffersIndexRoute
   '/_main/orders/': typeof MainOrdersIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
@@ -152,6 +161,7 @@ export interface FileRouteTypes {
     | '/customers/'
     | '/employees/'
     | '/flatrates/'
+    | '/invoices/'
     | '/offers/'
     | '/orders/'
     | '/settings/'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
     | '/customers'
     | '/employees'
     | '/flatrates'
+    | '/invoices'
     | '/offers'
     | '/orders'
     | '/settings'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '/_main/customers/'
     | '/_main/employees/'
     | '/_main/flatrates/'
+    | '/_main/invoices/'
     | '/_main/offers/'
     | '/_main/orders/'
     | '/_main/settings/'
@@ -254,6 +266,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainOffersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/invoices/': {
+      id: '/_main/invoices/'
+      path: '/invoices'
+      fullPath: '/invoices/'
+      preLoaderRoute: typeof MainInvoicesIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/flatrates/': {
       id: '/_main/flatrates/'
       path: '/flatrates'
@@ -306,6 +325,7 @@ interface MainRouteRouteChildren {
   MainCustomersIndexRoute: typeof MainCustomersIndexRoute
   MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
   MainFlatratesIndexRoute: typeof MainFlatratesIndexRoute
+  MainInvoicesIndexRoute: typeof MainInvoicesIndexRoute
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
   MainSettingsIndexRoute: typeof MainSettingsIndexRoute
@@ -321,6 +341,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainCustomersIndexRoute: MainCustomersIndexRoute,
   MainEmployeesIndexRoute: MainEmployeesIndexRoute,
   MainFlatratesIndexRoute: MainFlatratesIndexRoute,
+  MainInvoicesIndexRoute: MainInvoicesIndexRoute,
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
   MainSettingsIndexRoute: MainSettingsIndexRoute,

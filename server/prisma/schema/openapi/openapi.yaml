@@ -86,13 +86,13 @@ components:
           type: string
         invoiceEmail:
           type: string
+        phone:
+          type: string
         street:
           type: string
         city:
           type: string
-        plz:
-          type: string
-        phone:
+        zip:
           type: string
         language:
           $ref: "#/components/schemas/Language"
@@ -134,6 +134,10 @@ components:
       required:
         - id
         - companyName
+        - language
+        - country
+        - currency
+        - taxRate
         - createdAt
         - updatedAt
         - contactPersons
@@ -152,11 +156,11 @@ components:
           $ref: "#/components/schemas/Customer"
         salutation:
           type: string
+        email:
+          type: string
         firstName:
           type: string
         lastName:
-          type: string
-        email:
           type: string
         createdAt:
           type: string
@@ -176,7 +180,6 @@ components:
         - id
         - customerId
         - customer
-        - salutation
         - firstName
         - lastName
         - createdAt
@@ -199,9 +202,15 @@ components:
         size:
           type: integer
           format: int32
+        sha256:
+          type: string
         uploadedAt:
           type: string
           format: date-time
+        remotePath:
+          type: string
+        remoteEtag:
+          type: string
         createdAt:
           type: string
           format: date-time
@@ -251,6 +260,8 @@ components:
           type: string
         paymentTerm:
           type: string
+        featureComparison:
+          type: boolean
         date:
           type: string
           format: date-time
@@ -301,6 +312,7 @@ components:
         - language
         - quoteId
         - paymentTerm
+        - featureComparison
         - date
         - offerFlatRates
         - offerPositions
@@ -360,12 +372,21 @@ components:
         duration_months:
           type: integer
           format: int32
+        free_months:
+          type: integer
+          format: int32
         quantity:
           type: integer
           format: int32
         optional:
           type: boolean
+        eur_user_month:
+          type: integer
+          format: int32
         total_cents:
+          type: integer
+          format: int32
+        discount_cents:
           type: integer
           format: int32
         createdAt:
@@ -383,8 +404,11 @@ components:
         - contract
         - contractId
         - duration_months
+        - free_months
         - quantity
+        - eur_user_month
         - total_cents
+        - discount_cents
         - createdAt
         - updatedAt
     OfferFlatRate:
@@ -693,6 +717,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TariffGroupProduct"
+        tariffCellCustomers:
+          type: array
+          items:
+            $ref: "#/components/schemas/TariffCellCustomer"
       required:
         - id
         - translations
@@ -701,6 +729,7 @@ components:
         - createdAt
         - updatedAt
         - tariffGroupProducts
+        - tariffCellCustomers
     ProductTranslation:
       type: object
       properties:
@@ -921,7 +950,6 @@ components:
             $ref: "#/components/schemas/Order"
       required:
         - id
-        - supplierId
         - name
         - createdAt
         - updatedAt
@@ -1218,6 +1246,10 @@ components:
           $ref: "#/components/schemas/Customer"
         customerId:
           type: string
+        product:
+          $ref: "#/components/schemas/Product"
+        productId:
+          type: string
         price:
           type: integer
           format: int32
@@ -1337,6 +1369,7 @@ components:
         - OFFER
         - ORDER
         - RENEWAL
+        - INVOICE
     TaskType:
       type: string
       enum:

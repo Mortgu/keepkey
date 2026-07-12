@@ -1,20 +1,17 @@
-import {TaskStatus} from "@prisma/client";
 import {PipelineStage} from "../pipeline.js";
 import {OfferPipelineContext} from "./context.js";
 import {
   convertAction,
+  createDisplayNameAction,
   fetchOfferAction,
   formatFetchedDataAction,
   generateAction,
-  postProcessingAction,
-  prepareAction,
-  writeAction
+  postProcessingAction
 } from "./actions.js";
 
 /* fetching everything need from the database */
 const fetchingStage: PipelineStage<OfferPipelineContext> = {
     name: "fetch",
-    status: TaskStatus.RUNNING,
     run: fetchOfferAction,
 }
 
@@ -30,12 +27,6 @@ const postProcessingStage: PipelineStage<OfferPipelineContext> = {
     run: postProcessingAction,
 }
 
-/* Creates the output directory, ... */
-const prepareStage: PipelineStage<OfferPipelineContext> = {
-    name: "prepare",
-    run: prepareAction,
-}
-
 const generateStage: PipelineStage<OfferPipelineContext> = {
     name: "generate",
     run: generateAction
@@ -46,17 +37,16 @@ const convertStage: PipelineStage<OfferPipelineContext> = {
     run: convertAction
 }
 
-const writeStage: PipelineStage<OfferPipelineContext> = {
-    name: "write",
-    run: writeAction,
+const metadataStage: PipelineStage<OfferPipelineContext> = {
+    name: "metadata",
+    run: createDisplayNameAction,
 }
 
 export const offerStages: PipelineStage<OfferPipelineContext>[] = [
     fetchingStage,
     formattingStage,
     postProcessingStage,
-    prepareStage,
     generateStage,
     convertStage,
-    writeStage
+    metadataStage
 ];

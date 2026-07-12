@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 
 const TARIFF_SNAPSHOT_INCLUDE = {
@@ -22,12 +23,15 @@ interface PriceCalculatorProps {
     duration: number;
     quantity: number;
     customerId?: string;
+    freeMonths?: number;
 }
 
 interface SelectPriceParams {
+    productId?: string;
     duration: number;
     quantity: number;
     customerId?: string;
+    freeMonths?: number;
 }
 
 /** Minimal tariff shape required by {@link selectPrice}. */
@@ -39,7 +43,7 @@ export interface TariffForPricing {
         rowId: string;
         columnId: string;
         default_cells: Array<{ price: number }>;
-        customer_cells: Array<{ customerId: string; price: number }>;
+        customer_cells: Array<{ customerId: string; price: number; productId: string | null }>;
     }>;
 }
 
@@ -52,7 +56,7 @@ export type PriceFailureReason =
     | 'INVALID_INPUT';
 
 export type PriceResult =
-    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number } }
+    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number; freeMonths: number; effectiveDuration: number } }
     | { ok: false; reason: PriceFailureReason };
 
 export class PriceError extends Error {
@@ -106,11 +110,15 @@ export function resolveCell(
 
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
-    { duration, quantity, customerId }: SelectPriceParams,
+    { productId, duration, quantity, customerId, freeMonths = 0 }: SelectPriceParams,
 ): PriceResult {
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
     if (!Number.isInteger(quantity) || quantity <= 0) {
+        return { ok: false, reason: 'INVALID_INPUT' };
+    }
+
+    if (!Number.isInteger(freeMonths) || freeMonths < 0 || freeMonths > duration) {
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
@@ -125,19 +133,24 @@ export function selectPrice(
     let unitPrice = defaultCell.price;
 
     if (customerId !== undefined && customerId !== '') {
-        const override = cell.customer_cells.find(cc => cc.customerId === customerId);
+        const overrides = cell.customer_cells.filter(cc => cc.customerId === customerId);
+        const productSpecific = overrides.find(cc => cc.productId === productId);
+        const groupWide = overrides.find(cc => cc.productId === null);
+        const override = productSpecific ?? groupWide;
         if (override) unitPrice = override.price;
     }
 
+    const effectiveDuration = duration - freeMonths;
+
     return {
         ok: true,
-        price: unitPrice * quantity * duration,
-        breakdown: { unitPrice, quantity, duration },
+        price: unitPrice * quantity * effectiveDuration,
+        breakdown: { unitPrice, quantity, duration, freeMonths, effectiveDuration },
     };
 }
 
-export async function snapshotTariff(productId: string, contractId: string) {
-    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+export async function snapshotTariff(productId: string, contractId: string, tx: Prisma.TransactionClient = prisma) {
+    const groupProduct = await tx.tariffGroupProduct.findUnique({
         where: { productId },
     });
 
@@ -145,18 +158,18 @@ export async function snapshotTariff(productId: string, contractId: string) {
 
     const { tariffGroupId } = groupProduct;
 
-    const tariff = await prisma.tariff.findUnique({
+    const tariff = await tx.tariff.findUnique({
         where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
         include: TARIFF_SNAPSHOT_INCLUDE,
     });
 
     if (!tariff) return;
 
-    const versionCount = await prisma.tariffHistory.count({
+    const versionCount = await tx.tariffHistory.count({
         where: { productId, contractId },
     });
 
-    await prisma.tariffHistory.create({
+    await tx.tariffHistory.create({
         data: {
             productId,
             contractId,
@@ -201,14 +214,14 @@ export async function loadTariffForPricing(productId: string, contractId: string
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
-    const { productId, contractId, duration, quantity, customerId } = props;
+    const { productId, contractId, duration, quantity, customerId, freeMonths } = props;
 
     try {
         const tariff = await loadTariffForPricing(productId, contractId);
 
         if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-        return selectPrice(tariff, { duration, quantity, customerId });
+        return selectPrice(tariff, { productId, duration, quantity, customerId, freeMonths });
     } catch (error) {
         throw error;
     }
