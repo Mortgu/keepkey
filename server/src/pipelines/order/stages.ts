@@ -2,9 +2,6 @@ import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
 import {converting, fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
 import {pickTranslation} from "../../utils/i18n.js";
-import fs from "fs/promises";
-import env from "../../lib/env.js";
-import path from "path";
 
 const loadOrderData: PipelineStage<OrderPipelineContext> = {
     name: "fetch",
@@ -37,13 +34,6 @@ const postprocess: PipelineStage<OrderPipelineContext> = {
 };
 
 
-const prepare: PipelineStage<OrderPipelineContext> = {
-    name: "prepare",
-    run: async () => {
-        await fs.mkdir(env.OUTPUT_DIR, {recursive: true});
-    },
-};
-
 const generate: PipelineStage<OrderPipelineContext> = {
     name: "generate",
     run: async (context) => {
@@ -59,16 +49,16 @@ const convert: PipelineStage<OrderPipelineContext> = {
 };
 
 
-const write: PipelineStage<OrderPipelineContext> = {
-    name: "write",
+const metadata: PipelineStage<OrderPipelineContext> = {
+    name: "metadata",
     run: async (context) => {
-        const offer = context?.fetchedData?.order;
+        const order = context.fetchedData?.order;
 
-        if (!offer) {
-            throw new Error("Offer is null!");
+        if (!order) {
+            throw new PipelineStageError("Failed to create document display name: order data is empty.");
         }
 
-        const {orderId, customer, orderPositions} = offer;
+        const {orderId, customer, orderPositions} = order;
         const {companyName} = customer;
 
         const workloads = orderPositions
@@ -77,16 +67,6 @@ const write: PipelineStage<OrderPipelineContext> = {
 
         const baseName = `${orderId}_BE_${companyName.replaceAll(" ", "").trim()}_Keepit-${workloads}`;
         context.displayName = `${baseName}_v${context.version}`;
-
-        const docxPath = path.join(env.OUTPUT_DIR, `${context.documentId}.docx`);
-        const pdfPath = path.join(env.OUTPUT_DIR, `${context.documentId}.pdf`);
-
-        await Promise.all([
-            fs.writeFile(docxPath, context.docxBuffer!),
-            fs.writeFile(pdfPath, context.pdfBuffer!),
-        ]);
-
-        context.path = docxPath;
     },
 };
 
@@ -95,8 +75,7 @@ export const orderStages: PipelineStage<OrderPipelineContext>[] = [
     loadOrderData,
     preprocess,
     postprocess,
-    prepare,
     generate,
     convert,
-    write,
+    metadata,
 ];

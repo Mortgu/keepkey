@@ -9,17 +9,12 @@ export class PipelineStageError extends Error {
 }
 
 export interface PipelineContext {
-  taskId: string;
-  documentId: string;
   version: number;
 
   docxBuffer: Buffer | null;
   pdfBuffer: Buffer | null;
 
   displayName: string | null;
-
-  /** Filesystem path of the generated document that should be persisted/served. */
-  path?: string;
 }
 
 export type PipelineStage<T> = {

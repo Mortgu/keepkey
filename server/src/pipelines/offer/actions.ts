@@ -1,13 +1,11 @@
 import Docxtemplater from "docxtemplater";
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import fs from "fs/promises";
-import path from "path";
 import PizZip from "pizzip";
 
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
-import env from "../../lib/env.js";
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "../../middlewares/logger.js";
 import { offerSchema } from "../../schemas/templates/offer-template-schema.js";
@@ -239,10 +237,6 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
     ) as unknown as OfferTemplate;
 }
 
-export const prepareAction = async (context: OfferPipelineContext) => {
-    await fs.mkdir(env.OUTPUT_DIR, { recursive: true });
-}
-
 /* Drift detection: compare template tags against the offer schema. */
 const flattenTags = (tags: Record<string, unknown>, prefix = ""): string[] => {
     const out: string[] = [];
@@ -325,16 +319,11 @@ export async function convertAction(context: OfferPipelineContext) {
     });
 }
 
-export async function writeAction(context: OfferPipelineContext) {
-    const { fetchedData, documentId, version, docxBuffer, pdfBuffer } = context;
+export async function createDisplayNameAction(context: OfferPipelineContext) {
+    const { fetchedData, version } = context;
 
-    if (!fetchedData || !documentId || version === null || !docxBuffer || !pdfBuffer) {
-        throw new PipelineStageError(
-            `
-        Something went wrong! Failed to write to disk!
-        fetchedData=${!!fetchedData}, documentId=${!!documentId}, version=${!!version}, docxBuffer=${!!docxBuffer}, pdfBuffer=${!!pdfBuffer}
-      `
-        );
+    if (!fetchedData || version === null) {
+        throw new PipelineStageError("Failed to create document display name.");
     }
 
     const { quoteId, customer, offerPositions, language } = fetchedData.offer;
@@ -345,16 +334,4 @@ export async function writeAction(context: OfferPipelineContext) {
         .join("+");
 
     context.displayName = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
-
-    const docxPath = path.join(env.OUTPUT_DIR, `${documentId}.docx`);
-    const pdfPath = path.join(env.OUTPUT_DIR, `${documentId}.pdf`);
-
-    await Promise.all([
-        fs.writeFile(docxPath, docxBuffer!),
-        fs.writeFile(pdfPath, pdfBuffer!),
-    ]);
-
-    // Expose the canonical document path (docx matches the document's format)
-    // so the worker can persist it for downloads.
-    context.path = docxPath;
 }

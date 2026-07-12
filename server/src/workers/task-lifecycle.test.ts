@@ -4,7 +4,7 @@ import type { TaskJobData } from "./task-queue.js";
 
 const mocks = vi.hoisted(() => ({
     transaction: vi.fn(),
-    taskUpdate: vi.fn(),
+    taskUpdateMany: vi.fn(),
     offerDocumentUpdateMany: vi.fn(),
     orderDocumentUpdateMany: vi.fn(),
     loggerError: vi.fn(),
@@ -14,7 +14,7 @@ const mocks = vi.hoisted(() => ({
 vi.mock("../lib/prismaClient.js", () => ({
     prisma: {
         $transaction: mocks.transaction,
-        task: { update: mocks.taskUpdate },
+        task: { updateMany: mocks.taskUpdateMany },
         offerDocument: { updateMany: mocks.offerDocumentUpdateMany },
         orderDocument: { updateMany: mocks.orderDocumentUpdateMany },
     },
@@ -39,41 +39,75 @@ const createJob = (attemptsMade: number, finishedOn?: number) => ({
 describe("task lifecycle", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        mocks.transaction.mockResolvedValue([]);
+        mocks.taskUpdateMany.mockResolvedValue({ count: 1 });
+        mocks.offerDocumentUpdateMany.mockResolvedValue({ count: 1 });
+        mocks.orderDocumentUpdateMany.mockResolvedValue({ count: 1 });
+        mocks.transaction.mockImplementation(async (input) => {
+            if (typeof input !== "function") return [];
+            return input({
+                task: { updateMany: mocks.taskUpdateMany },
+                offerDocument: { updateMany: mocks.offerDocumentUpdateMany },
+                orderDocument: { updateMany: mocks.orderDocumentUpdateMany },
+            });
+        });
     });
 
     it("setzt Task und Dokument beim Start atomar in Bearbeitung", async () => {
-        await markTaskRunning("task-1");
+        await expect(markTaskRunning("task-1", "run-1")).resolves.toBe(true);
 
-        expect(mocks.taskUpdate).toHaveBeenCalledWith({
-            where: { id: "task-1" },
-            data: { status: "RUNNING", error: null },
+        expect(mocks.taskUpdateMany).toHaveBeenCalledWith({
+            where: {
+                id: "task-1",
+                status: { in: ["PENDING", "RUNNING", "FAILED"] },
+            },
+            data: {
+                status: "RUNNING",
+                error: null,
+                runToken: "run-1",
+            },
         });
         expect(mocks.offerDocumentUpdateMany).toHaveBeenCalledWith({
-            where: { taskId: "task-1" },
+            where: {
+                taskId: "task-1",
+                status: { in: ["PENDING", "PROCESSING", "FAILED"] },
+                OR: [{ pdfId: null }, { docxId: null }],
+            },
             data: { status: "PROCESSING", error: null },
         });
         expect(mocks.orderDocumentUpdateMany).toHaveBeenCalledWith({
-            where: { taskId: "task-1" },
+            where: {
+                taskId: "task-1",
+                status: { in: ["PENDING", "PROCESSING", "FAILED"] },
+                OR: [{ pdfId: null }, { docxId: null }],
+            },
             data: { status: "PROCESSING", error: null },
         });
         expect(mocks.transaction).toHaveBeenCalledOnce();
     });
 
     it("setzt einen erfolgreichen Task auf COMPLETED und entfernt alte Fehler", async () => {
-        await markTaskCompleted("task-1");
+        await markTaskCompleted("task-1", "run-1");
 
-        expect(mocks.taskUpdate).toHaveBeenCalledWith({
-            where: { id: "task-1" },
-            data: { status: "COMPLETED", error: null },
+        expect(mocks.taskUpdateMany).toHaveBeenCalledWith({
+            where: { id: "task-1", status: "RUNNING", runToken: "run-1" },
+            data: { status: "COMPLETED", error: null, runToken: null },
         });
+    });
+
+    it("beansprucht einen bereits abgeschlossenen Task nicht erneut", async () => {
+        mocks.taskUpdateMany.mockResolvedValueOnce({ count: 0 });
+
+        await expect(markTaskRunning("task-1", "run-1")).resolves.toBe(false);
+
+        expect(mocks.offerDocumentUpdateMany).not.toHaveBeenCalled();
+        expect(mocks.orderDocumentUpdateMany).not.toHaveBeenCalled();
     });
 
     it.each([1, 2])("persistiert nach Versuch %i noch keinen Fehler", async (attemptsMade) => {
         await handleTaskFailure(createJob(attemptsMade), new Error("temporary"));
 
         expect(mocks.transaction).not.toHaveBeenCalled();
-        expect(mocks.taskUpdate).not.toHaveBeenCalled();
+        expect(mocks.taskUpdateMany).not.toHaveBeenCalled();
         expect(mocks.loggerWarn).toHaveBeenCalledWith(
             expect.stringContaining(`attempt ${attemptsMade}/3 failed and will be retried`),
         );
@@ -82,16 +116,28 @@ describe("task lifecycle", () => {
     it("persistiert nur einen terminalen Fehler atomar", async () => {
         await handleTaskFailure(createJob(1, Date.now()), new Error("terminal"));
 
-        expect(mocks.taskUpdate).toHaveBeenCalledWith({
-            where: { id: "task-1" },
-            data: { status: "FAILED", error: "terminal" },
+        expect(mocks.taskUpdateMany).toHaveBeenCalledWith({
+            where: {
+                id: "task-1",
+                status: { in: ["RUNNING", "FAILED"] },
+                runToken: null,
+            },
+            data: { status: "FAILED", error: "terminal", runToken: null },
         });
         expect(mocks.offerDocumentUpdateMany).toHaveBeenCalledWith({
-            where: { taskId: "task-1" },
+            where: {
+                taskId: "task-1",
+                status: { in: ["PENDING", "PROCESSING", "FAILED"] },
+                OR: [{ pdfId: null }, { docxId: null }],
+            },
             data: { status: "FAILED", error: "terminal" },
         });
         expect(mocks.orderDocumentUpdateMany).toHaveBeenCalledWith({
-            where: { taskId: "task-1" },
+            where: {
+                taskId: "task-1",
+                status: { in: ["PENDING", "PROCESSING", "FAILED"] },
+                OR: [{ pdfId: null }, { docxId: null }],
+            },
             data: { status: "FAILED", error: "terminal" },
         });
         expect(mocks.transaction).toHaveBeenCalledOnce();
