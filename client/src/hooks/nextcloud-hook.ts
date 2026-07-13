@@ -1,11 +1,14 @@
-import {useQuery} from "@tanstack/react-query";
+import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
 import {
+    deleteTemplateAction,
     findFilesByIdAction,
     type FindFilesByIdResult,
     findOfferFilesByIdAction,
     findOrderFilesByIdAction,
     getCloudDirectoryAction,
-    getNextcloudStatusAction
+    getNextcloudStatusAction,
+    getTemplatesAction,
+    uploadTemplateAction
 } from "@/data/nextcloud";
 import type {CloudFile} from "@/types/cloud.ts";
 
@@ -45,6 +48,49 @@ export const useGetCloudDirectory = (path: string, options?: { enabled?: boolean
         staleTime: 30_000,
     })
 }
+
+export const useGetTemplates = (options?: { enabled?: boolean }) => {
+    return useQuery<Array<CloudFile>>({
+        queryKey: ["cloud", "templates"],
+        queryFn: getTemplatesAction,
+        enabled: options?.enabled ?? true,
+        staleTime: 30_000,
+    });
+};
+
+export const useUploadTemplate = () => {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({file}: { file: File }) => uploadTemplateAction(file),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: ["cloud", "templates"],
+        }),
+    });
+
+    return {
+        uploadTemplate: mutation.mutateAsync,
+        isUploadingTemplate: mutation.isPending,
+        errorUploadingTemplate: mutation.error,
+    };
+};
+
+export const useDeleteTemplate = () => {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({basename}: { basename: string }) => deleteTemplateAction(basename),
+        onSuccess: () => queryClient.invalidateQueries({
+            queryKey: ["cloud", "templates"],
+        }),
+    });
+
+    return {
+        deleteTemplate: mutation.mutateAsync,
+        isDeletingTemplate: mutation.isPending,
+        errorDeletingTemplate: mutation.error,
+    };
+};
 
 export const useFindOfferFilesById = (id: string | undefined, options?: { enabled?: boolean }) => {
     return useQuery<FindFilesByIdResult>({

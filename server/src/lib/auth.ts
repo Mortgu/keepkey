@@ -23,6 +23,12 @@ export const auth = betterAuth({
         enabled: true,
     },
     user: {
+        // Users werden ohne Verification-Mailer angelegt (emailVerified=false),
+        // daher greift changeEmail direkt; bei verifizierten Usern verlangt
+        // better-auth zusätzlich einen sendChangeEmailVerification-Mailer.
+        changeEmail: {
+            enabled: true,
+        },
         additionalFields: {
             salutation: {
                 type: "string",

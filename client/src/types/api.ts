@@ -79,8 +79,11 @@ export interface components {
             format: components["schemas"]["DocumentFormat"];
             /** Format: int32 */
             size?: number;
+            sha256?: string;
             /** Format: date-time */
             uploadedAt?: string;
+            remotePath?: string;
+            remoteEtag?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
