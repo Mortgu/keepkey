@@ -55,7 +55,7 @@ export async function getSessionUser(userId: string) {
 /* ========== Mutations ========== */
 
 export async function createUser(input: CreateUserInput & { password: string; salutation: string }) {
-    const { email, password, firstName, lastName, salutation, name, role } = input;
+    const { email, password, firstName, lastName, salutation, phone, name, role } = input;
 
     try {
         const createdUser = await auth.api.signUpEmail({
@@ -66,8 +66,16 @@ export async function createUser(input: CreateUserInput & { password: string; sa
                 firstName,
                 lastName,
                 salutation,
+                phone: phone || undefined,
             },
         });
+
+        if (role) {
+            await prisma.user.update({
+                where: { id: createdUser.user.id },
+                data: { role },
+            });
+        }
 
         return createdUser;
     } catch (exception: any) {

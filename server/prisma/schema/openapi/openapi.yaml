@@ -690,6 +690,45 @@ components:
         - taskId
         - createdAt
         - updatedAt
+    Passkey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        publicKey:
+          type: string
+        userId:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+        credentialID:
+          type: string
+        counter:
+          type: integer
+          format: int32
+        deviceType:
+          type: string
+        backedUp:
+          type: boolean
+        transports:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        aaguid:
+          type: string
+      required:
+        - id
+        - publicKey
+        - userId
+        - user
+        - credentialID
+        - counter
+        - deviceType
+        - backedUp
+        - createdAt
     Product:
       type: object
       properties:
@@ -785,6 +824,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Account"
+        passkeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/Passkey"
         role:
           type: string
         banned:
@@ -822,6 +865,7 @@ components:
         - updatedAt
         - sessions
         - accounts
+        - passkeys
         - offers
         - orders
         - offerRevisions

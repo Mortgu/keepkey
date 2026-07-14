@@ -26,6 +26,7 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
+  passkeys      Passkey[]
 
   role           String?
   banned         Boolean?        @default(false)

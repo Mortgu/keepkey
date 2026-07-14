@@ -12,7 +12,7 @@
     "prebuild": "npm run generate:types"
   },
   "dependencies": {
-    "@better-auth/mongo-adapter": "^1.5.5",
+    "@better-auth/passkey": "^1.6.23",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-devtools": "^0.10.0",
     "@tanstack/react-form": "^1.33.0",

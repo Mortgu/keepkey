@@ -1,6 +1,7 @@
 import {betterAuth} from "better-auth";
 import {prismaAdapter} from "better-auth/adapters/prisma";
 import {admin as adminPlugin} from "better-auth/plugins";
+import {passkey} from "@better-auth/passkey";
 
 import {ac, admin, employee} from "../permissions/access.js";
 import env from "./env.js";
@@ -56,5 +57,6 @@ export const auth = betterAuth({
                 user: employee,
             },
         }),
+        passkey(),
     ],
 });

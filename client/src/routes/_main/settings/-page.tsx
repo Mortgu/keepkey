@@ -1,5 +1,6 @@
 import { PageWidth } from "@/components";
 import EmailForm from "@/routes/_main/settings/-components/email-form.tsx";
+import PasskeyForm from "@/routes/_main/settings/-components/passkey-form.tsx";
 import PasswordForm from "@/routes/_main/settings/-components/password-form.tsx";
 import ProfileForm from "@/routes/_main/settings/-components/profile-form.tsx";
 import TemplateList from "@/routes/_main/settings/-components/template-list.tsx";
@@ -16,6 +17,8 @@ export default function SettingsPage() {
                     <EmailForm />
                     <PasswordForm />
                 </div>
+
+                <PasskeyForm />
 
                 <TemplateList />
             </div>
