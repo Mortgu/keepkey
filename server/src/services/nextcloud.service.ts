@@ -1,4 +1,6 @@
+import { FileStat } from "webdav";
 import {
+    downloadDocumentStream,
     findFilesById,
     getNextCloudClient,
     getNextcloudInitError,
@@ -91,4 +93,66 @@ export async function getOfferFileById(id: string) {
 
 export async function getOrderFileById(id: string) {
     return findFilesById(id, ORDER_DIRECTORIES);
+}
+
+/* ========== Templates ========== */
+
+const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+
+function assertTemplateFilename(filename: string) {
+    if (!filename || filename.includes("/") || filename.includes("\\") || filename.includes("..")) {
+        throw new AppException("Ungültiger Dateiname!", 400, "INVALID_FILENAME");
+    }
+    if (!filename.toLowerCase().endsWith(".docx")) {
+        throw new AppException("Nur .docx-Dateien sind erlaubt!", 400, "INVALID_FILENAME");
+    }
+}
+
+function templatePath(filename: string) {
+    return `${env.NEXTCLOUD_TEMPLATES_PATH}/${filename}`;
+}
+
+export async function getTemplates() {
+    const client = getNextCloudClient();
+    const files = (await client.getDirectoryContents(env.NEXTCLOUD_TEMPLATES_PATH)) as FileStat[];
+    return files.filter((file) => file.type === "file");
+}
+
+export async function uploadTemplate(filename: string, content: Buffer) {
+    assertTemplateFilename(filename);
+
+    if (!Buffer.isBuffer(content) || content.length === 0) {
+        throw new AppException("Bad request!", 400, "EMPTY_FILE");
+    }
+
+    const client = getNextCloudClient();
+    const created = await client.putFileContents(templatePath(filename), content, { overwrite: false });
+
+    if (!created) {
+        throw new AppException("Vorlage existiert bereits!", 409, "TEMPLATE_EXISTS");
+    }
+}
+
+export async function deleteTemplate(filename: string) {
+    assertTemplateFilename(filename);
+
+    const client = getNextCloudClient();
+    try {
+        await client.deleteFile(templatePath(filename));
+    } catch (exception: any) {
+        if (exception?.status === 404 || exception?.response?.status === 404) {
+            throw new AppException("Vorlage nicht gefunden!", 404, "TEMPLATE_NOT_FOUND");
+        }
+        throw exception;
+    }
+}
+
+export async function downloadTemplate(filename: string) {
+    assertTemplateFilename(filename);
+
+    return {
+        stream: await downloadDocumentStream(templatePath(filename)),
+        downloadName: filename,
+        contentType: DOCX_MIME,
+    };
 }

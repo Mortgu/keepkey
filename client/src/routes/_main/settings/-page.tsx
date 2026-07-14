@@ -1,28 +1,23 @@
-import { useGetCloudDirectory } from "@/hooks/nextcloud-hook.ts";
 import { PageWidth } from "@/components";
+import EmailForm from "@/routes/_main/settings/-components/email-form.tsx";
+import PasswordForm from "@/routes/_main/settings/-components/password-form.tsx";
+import ProfileForm from "@/routes/_main/settings/-components/profile-form.tsx";
 import TemplateList from "@/routes/_main/settings/-components/template-list.tsx";
-import { useEffect } from "react";
-import { toast } from "react-toastify";
 
 export default function SettingsPage() {
-    const { data: templates, isPending, error } = useGetCloudDirectory("/Templates");
-
-    if (isPending) {
-        return (
-            <p></p>
-        )
-    }
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error.message);
-        }
-    }, [error]);
-
     return (
         <PageWidth>
             <div className='grid gap-4'>
-                <TemplateList templates={templates ?? []} />
+                <h1 className="text-2xl font-semibold">Einstellungen</h1>
+
+                <ProfileForm />
+
+                <div className="grid md:grid-cols-2 gap-4 items-start">
+                    <EmailForm />
+                    <PasswordForm />
+                </div>
+
+                <TemplateList />
             </div>
         </PageWidth>
     )

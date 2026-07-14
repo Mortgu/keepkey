@@ -17,7 +17,7 @@ export default function ProductItem({ product }: { product: Product }) {
   return (
     <>
       <div className="bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3">
+        <div className="flex items-center justify-between px-4 py-3 gap-4">
           <div>
             <div className="text-md text-gray-900">
               {name}

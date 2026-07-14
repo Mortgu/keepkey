@@ -1,4 +1,4 @@
-import {api} from "@/lib/api-client";
+import {api, BASE_URL} from "@/lib/api-client";
 import type {CloudFile} from "@/types/cloud.ts";
 
 export type NextcloudStatus = {
@@ -30,6 +30,26 @@ export const findOfferFilesByIdAction = (id: string) =>
 
 export const findOrderFilesByIdAction = (id: string) =>
     api<FindFilesByIdResult>(`/api/cloud/order/${id}`, {method: "GET"});
+
+export const getTemplatesAction = () =>
+    api<Array<CloudFile>>("/api/cloud/templates", {method: "GET"});
+
+export const uploadTemplateAction = (file: File) => {
+    const urlParams = new URLSearchParams();
+    urlParams.set("filename", file.name);
+
+    return api(`/api/cloud/templates?${urlParams.toString()}`, {
+        method: "POST",
+        body: file,
+        headers: {"Content-Type": file.type || "application/octet-stream"},
+    });
+};
+
+export const deleteTemplateAction = (basename: string) =>
+    api(`/api/cloud/templates/${encodeURIComponent(basename)}`, {method: "DELETE"});
+
+export const templateDownloadUrl = (basename: string) =>
+    `${BASE_URL}/api/cloud/templates/${encodeURIComponent(basename)}/download`;
 
 export const getCloudDirectoryAction = (path: string) => {
     const urlParams = new URLSearchParams();
