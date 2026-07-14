@@ -10,7 +10,6 @@ import type { Passkey } from "@better-auth/passkey";
 import { Button, Input } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
 import { getFormError } from "@/lib/utils.ts";
-import SettingsCard from "@/routes/_main/settings/-components/settings-card.tsx";
 
 const passkeyNameSchema = z.object({
     name: z.string().min(1, "Pflichtfeld"),
@@ -82,17 +81,12 @@ export default function PasskeyForm() {
     };
 
     return (
-        <SettingsCard title="Passkeys">
+        <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
             <form onSubmit={handleAddSubmit} className="grid gap-4">
-                <p className="text-sm text-gray-500">
-                    Registriere einen Passkey (TouchID, Gesichtserkennung, Sicherheitsschlüssel),
-                    um dich künftig ohne Passwort anzumelden.
-                </p>
-
-                <div className="flex items-end gap-2">
+                <div className="flex items-center gap-2">
                     <addForm.Field name="name" children={(field) => (
                         <div className="flex-1 grid gap-2">
-                            <Input id={field.name} label="Bezeichnung" size="sm"
+                            <Input id={field.name} size="sm"
                                 placeholder="z. B. MacBook Touch ID"
                                 error={getFormError(field.state.meta.errors)}
                                 value={field.state.value}
@@ -105,7 +99,7 @@ export default function PasskeyForm() {
                     <addForm.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <Button type="submit" size="sm" icon={<KeyRound size={15} />}
+                            <Button type="submit" size="xs" icon={<KeyRound size={15} />}
                                 disabled={!canSubmit || isSubmitting || adding}
                                 loading={isSubmitting || adding}>
                                 Hinzufügen
@@ -116,10 +110,6 @@ export default function PasskeyForm() {
             </form>
 
             <div className="grid gap-2">
-                <div className="flex items-center justify-between">
-                    <h2 className="text-sm font-medium text-gray-700">Registrierte Passkeys</h2>
-                </div>
-
                 {isLoading ? (
                     <div className="flex items-center gap-2 text-sm text-gray-500">
                         <Loader className="animate-spin" size={15} />
@@ -143,7 +133,7 @@ export default function PasskeyForm() {
                     </ul>
                 )}
             </div>
-        </SettingsCard>
+        </div>
     );
 }
 
@@ -187,10 +177,10 @@ function PasskeyRow({ passkey, editing, onStartEdit, onCancelEdit, onRename, onD
                         if (e.key === "Escape") { onCancelEdit(); }
                     }}
                 />
-                <Button size="sm" onClick={handleSave} loading={saving} disabled={!name.trim()}>
+                <Button size="xs" onClick={handleSave} loading={saving} disabled={!name.trim()}>
                     Speichern
                 </Button>
-                <Button size="sm" variant="ghost" onClick={onCancelEdit} disabled={saving}>
+                <Button size="xs" variant="ghost" onClick={onCancelEdit} disabled={saving}>
                     Abbrechen
                 </Button>
             </li>
@@ -203,10 +193,10 @@ function PasskeyRow({ passkey, editing, onStartEdit, onCancelEdit, onRename, onD
                 <KeyRound size={15} className="text-gray-400 shrink-0" />
                 <span className="text-sm truncate">{label}</span>
             </div>
-            <div className="flex items-center gap-1">
-                <Button size="xs" variant="secondary" icon={<Pencil size={14} />} iconOnly
+            <div className="flex items-center gap-2">
+                <Button size="xs" variant="secondary" icon={<Pencil size={13} />} iconOnly
                     aria-label="Umbenennen" onClick={onStartEdit} />
-                <Button size="xs" variant="secondary" icon={<Trash2 size={14} />} iconOnly
+                <Button size="xs" variant="secondary" icon={<Trash2 size={13} />} iconOnly
                     aria-label="Entfernen" onClick={handleDelete} loading={deleting} />
             </div>
         </li>

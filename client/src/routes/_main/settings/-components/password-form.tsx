@@ -1,12 +1,11 @@
 import type React from "react";
-import {useForm} from "@tanstack/react-form";
-import {toast} from "react-toastify";
-import {z} from "zod";
+import { useForm } from "@tanstack/react-form";
+import { toast } from "react-toastify";
+import { z } from "zod";
 
-import {Button, Input} from "@/components";
-import {authClient} from "@/lib/auth-client.ts";
-import {getFormError} from "@/lib/utils.ts";
-import SettingsCard from "@/routes/_main/settings/-components/settings-card.tsx";
+import { Button, Input } from "@/components";
+import { authClient } from "@/lib/auth-client.ts";
+import { getFormError } from "@/lib/utils.ts";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Pflichtfeld"),
@@ -27,8 +26,8 @@ export default function PasswordForm() {
         validators: {
             onChange: passwordSchema,
         },
-        onSubmit: async ({value, formApi}) => {
-            const {error} = await authClient.changePassword({
+        onSubmit: async ({ value, formApi }) => {
+            const { error } = await authClient.changePassword({
                 currentPassword: value.currentPassword,
                 newPassword: value.newPassword,
                 revokeOtherSessions: true,
@@ -51,49 +50,49 @@ export default function PasswordForm() {
     };
 
     return (
-        <SettingsCard title="Passwort ändern">
+        <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
             <form onSubmit={handleSubmit} className="grid gap-4">
                 <passwordForm.Field name="currentPassword" children={(field) => (
                     <Input id={field.name} label="Aktuelles Passwort" size="sm" type="password"
-                           autoComplete="current-password"
-                           error={getFormError(field.state.meta.errors)}
-                           value={field.state.value}
-                           onChange={(e) => field.handleChange(e.target.value)}
-                           onBlur={field.handleBlur}
+                        autoComplete="current-password"
+                        error={getFormError(field.state.meta.errors)}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
                     />
-                )}/>
+                )} />
 
                 <passwordForm.Field name="newPassword" children={(field) => (
                     <Input id={field.name} label="Neues Passwort" size="sm" type="password"
-                           autoComplete="new-password"
-                           error={getFormError(field.state.meta.errors)}
-                           value={field.state.value}
-                           onChange={(e) => field.handleChange(e.target.value)}
-                           onBlur={field.handleBlur}
+                        autoComplete="new-password"
+                        error={getFormError(field.state.meta.errors)}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
                     />
-                )}/>
+                )} />
 
                 <passwordForm.Field name="confirmPassword" children={(field) => (
                     <Input id={field.name} label="Neues Passwort wiederholen" size="sm" type="password"
-                           autoComplete="new-password"
-                           error={getFormError(field.state.meta.errors)}
-                           value={field.state.value}
-                           onChange={(e) => field.handleChange(e.target.value)}
-                           onBlur={field.handleBlur}
+                        autoComplete="new-password"
+                        error={getFormError(field.state.meta.errors)}
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
                     />
-                )}/>
+                )} />
 
                 <div className="flex justify-end">
                     <passwordForm.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
-                            <Button size="sm" disabled={!canSubmit} loading={isSubmitting}>
+                            <Button size="xs" disabled={!canSubmit} loading={isSubmitting}>
                                 Speichern
                             </Button>
                         )}
                     />
                 </div>
             </form>
-        </SettingsCard>
+        </div>
     )
 }
