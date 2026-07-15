@@ -76,7 +76,7 @@ describe("document generation service", () => {
         }));
         mocks.transaction.mockImplementation(async (callback) => callback({
             $queryRaw: mocks.queryRaw,
-            document: { create: mocks.documentCreate },
+            documentArtifact: { create: mocks.documentCreate },
             offer: { findUniqueOrThrow: mocks.offerFindUnique },
             order: { findUniqueOrThrow: mocks.orderFindUnique },
             offerDocument: { updateMany: mocks.offerDocumentUpdateMany },
@@ -98,8 +98,9 @@ describe("document generation service", () => {
             offerId: "offer-1",
             version: 2,
             status,
-            pdfId: status === "GENERATED" ? "pdf-1" : null,
-            docxId: status === "GENERATED" ? "docx-1" : null,
+            artifacts: status === "GENERATED"
+                ? [{ format: "PDF" }, { format: "DOCX" }]
+                : [],
         }));
         mocks.offerDocumentUpdateMany.mockImplementation(() => {
             status = "GENERATED";
@@ -134,8 +135,6 @@ describe("document generation service", () => {
         expect(mocks.offerDocumentUpdateMany).toHaveBeenLastCalledWith({
             where: { id: "document-1", deletedAt: null, status: "PROCESSING" },
             data: {
-                pdfId: "pdf-1",
-                docxId: "docx-1",
                 status: "GENERATED",
                 displayName: "generated-document",
                 error: null,
@@ -150,8 +149,7 @@ describe("document generation service", () => {
             orderId: "order-1",
             version: 3,
             status: "PROCESSING",
-            pdfId: null,
-            docxId: null,
+            artifacts: [],
         });
 
         await generateOrderDocument("task-1");
@@ -171,8 +169,6 @@ describe("document generation service", () => {
         expect(mocks.orderDocumentUpdateMany).toHaveBeenLastCalledWith({
             where: { id: "document-1", deletedAt: null, status: "PROCESSING" },
             data: {
-                pdfId: "pdf-1",
-                docxId: "docx-1",
                 status: "GENERATED",
                 displayName: "generated-document",
                 error: null,
@@ -198,14 +194,12 @@ describe("document generation service", () => {
         mocks.offerDocumentFindFirst.mockResolvedValue({
             id: "offer-document-1",
             status: "UPLOADED",
-            pdfId: "pdf-1",
-            docxId: "docx-1",
+            artifacts: [{ format: "PDF" }, { format: "DOCX" }],
         });
         mocks.orderDocumentFindFirst.mockResolvedValue({
             id: "order-document-1",
             status: "GENERATED",
-            pdfId: "pdf-2",
-            docxId: "docx-2",
+            artifacts: [{ format: "PDF" }, { format: "DOCX" }],
         });
 
         await generateOfferDocument("offer-task");
@@ -222,8 +216,7 @@ describe("document generation service", () => {
             offerId: "offer-1",
             version: 1,
             status: "PROCESSING",
-            pdfId: null,
-            docxId: null,
+            artifacts: [],
         });
         mocks.transaction.mockRejectedValue(new Error("transaction failed"));
 
@@ -238,13 +231,14 @@ describe("document generation service", () => {
             offerId: "offer-1",
             version: 1,
             status: "PROCESSING",
-            pdfId: null,
-            docxId: null,
+            artifacts: [],
         });
         mocks.transaction.mockRejectedValue(new Error("connection lost after commit"));
         mocks.offerDocumentFindUnique.mockResolvedValue({
-            pdf: { objectKey: files.pdf.objectKey },
-            docx: { objectKey: files.docx.objectKey },
+            artifacts: [
+                { objectKey: files.pdf.objectKey, format: "PDF" },
+                { objectKey: files.docx.objectKey, format: "DOCX" },
+            ],
         });
 
         await expect(generateOfferDocument("task-1")).resolves.toBeUndefined();
@@ -258,8 +252,7 @@ describe("document generation service", () => {
             orderId: "order-1",
             version: 1,
             status: "FAILED",
-            pdfId: "pdf-1",
-            docxId: null,
+            artifacts: [{ format: "PDF" }],
         });
 
         await expect(generateOrderDocument("task-1")).rejects.toThrow(
@@ -276,8 +269,7 @@ describe("document generation service", () => {
             sourceVersion: 3,
             offer: { version: 4 },
             status: "PROCESSING",
-            pdfId: null,
-            docxId: null,
+            artifacts: [],
         });
 
         await expect(generateOfferDocument("task-1")).rejects.toThrow(

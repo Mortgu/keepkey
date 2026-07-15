@@ -1,5 +1,5 @@
 import { api } from "@/lib/api-client";
-import type { ContactPerson, CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Document, Offer, OfferRevision, Task, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
+import type { ContactPerson, CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferRevision, Task, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from '@/types';
 
 
 
@@ -17,11 +17,6 @@ export const createOfferAction = (offer: CreateOfferInput, positions: Array<Crea
 export const deleteOfferAction = (id: string) =>
     api<void>(`/api/offers/${id}`, { method: "DELETE" });
 
-export const deleteOfferDocumentAction = (offerId: string, documentId: string) =>
-    api<void>(`/api/offers/${offerId}/documents/${documentId}`, {
-        method: "DELETE"
-    });
-
 export const updateOfferAction = (
     id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatRates: Array<UpdateOfferFlatrateInput>,
 ) => api<Offer>(`/api/offers/${id}`, {
@@ -33,22 +28,5 @@ export const updateOfferAction = (
 export const getOfferRevisionsAction = (offerId: string) =>
     api<Array<OfferRevision>>(`/api/offers/${offerId}/revisions`, { method: "GET" });
 
-export const renameDocumentAction = (document_id: string, displayName: string) =>
-    api<Document>(`/api/documents/${document_id}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            displayName
-        })
-    });
-
-export const uploadAction = (offerId: string, documentId: string) =>
-    api<void>(`/api/offers/${offerId}/upload/${documentId}`, {
-        method: 'POST',
-    })
-
 export const getTaskByIdAction = (taskId: string) =>
     api<Task>(`/api/tasks/${taskId}`, { method: 'GET' });
-
-export const generateOfferDocumentAction = (offerId: string) =>
-    api<{ taskId: string }>(`/api/offers/${offerId}/document`, { method: 'POST' });

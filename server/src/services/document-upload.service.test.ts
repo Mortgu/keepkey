@@ -48,7 +48,7 @@ vi.mock("../middlewares/logger.js", () => ({
 
 import { AppException } from "../lib/exceptions.js";
 import { RemoteDocumentConflictError, sha256Document } from "../lib/nextcloud-document-store.js";
-import { uploadOfferDocument, uploadOrderDocument } from "./document-upload.service.js";
+import { uploadGeneratedDocument } from "./document-upload.service.js";
 
 describe("document upload service", () => {
     let offerDocument: any;
@@ -61,9 +61,10 @@ describe("document upload service", () => {
         mocks.getDocumentArtifact.mockImplementation((objectKey: string) => Promise.resolve(
             objectKey.endsWith(".pdf") ? pdf : docx,
         ));
-        const artifacts = {
-            pdf: {
+        const artifacts = [
+            {
                 id: "pdf-1",
+                format: "PDF",
                 objectKey: "generated/offers/offer-document-1/generation-1.pdf",
                 size: pdf.length,
                 sha256: sha256Document(pdf),
@@ -71,8 +72,9 @@ describe("document upload service", () => {
                 remotePath: null,
                 remoteEtag: null,
             },
-            docx: {
+            {
                 id: "docx-1",
+                format: "DOCX",
                 objectKey: "generated/offers/offer-document-1/generation-1.docx",
                 size: docx.length,
                 sha256: sha256Document(docx),
@@ -80,34 +82,34 @@ describe("document upload service", () => {
                 remotePath: null,
                 remoteEtag: null,
             },
-        };
+        ];
         offerDocument = {
             id: "offer-document-1",
             status: "GENERATED",
             displayName: "Q-1_AG_Customer",
             updatedAt: new Date(),
-            ...artifacts,
+            artifacts,
         };
         orderDocument = {
             id: "order-document-1",
             status: "GENERATED",
             displayName: "O-1_BE_Customer",
             updatedAt: new Date(),
-            ...artifacts,
+            artifacts,
         };
 
         mocks.offerFindFirst.mockResolvedValue(offerDocument);
-        mocks.offerFindUnique.mockResolvedValue(offerDocument);
+        mocks.offerFindUnique.mockResolvedValue({ ...offerDocument, status: "UPLOADING" });
         mocks.offerUpdateMany.mockResolvedValue({ count: 1 });
         mocks.orderFindFirst.mockResolvedValue(orderDocument);
-        mocks.orderFindUnique.mockResolvedValue(orderDocument);
+        mocks.orderFindUnique.mockResolvedValue({ ...orderDocument, status: "UPLOADING" });
         mocks.orderUpdateMany.mockResolvedValue({ count: 1 });
         mocks.finalOfferUpdateMany.mockResolvedValue({ count: 1 });
         mocks.finalOrderUpdateMany.mockResolvedValue({ count: 1 });
         mocks.transaction.mockImplementation(async (callback) => callback({
             offerDocument: { updateMany: mocks.finalOfferUpdateMany },
             orderDocument: { updateMany: mocks.finalOrderUpdateMany },
-            document: { update: mocks.documentUpdate },
+            documentArtifact: { update: mocks.documentUpdate },
         }));
         mocks.uploadDocumentArtifact.mockImplementation((filename: string, directory: string, content: Buffer, sha256: string) => Promise.resolve({
             remotePath: `${directory}/${filename}`,
@@ -119,14 +121,14 @@ describe("document upload service", () => {
     });
 
     it("beansprucht, verifiziert und finalisiert einen Offer-Upload", async () => {
-        const result = await uploadOfferDocument("offer-1", offerDocument.id);
+        const result = await uploadGeneratedDocument("offer", offerDocument.id);
 
         expect(mocks.offerUpdateMany).toHaveBeenCalledWith({
             where: {
                 id: offerDocument.id,
                 deletedAt: null,
                 OR: [
-                    { status: { in: ["GENERATED", "FAILED"] }, uploadToken: null },
+                    { status: "GENERATED", uploadToken: null },
                     { status: "UPLOADING", updatedAt: { lt: expect.any(Date) } },
                 ],
             },
@@ -148,11 +150,42 @@ describe("document upload service", () => {
     });
 
     it("verwendet denselben Upload-Ablauf für Order-Dokumente", async () => {
-        await uploadOrderDocument("order-1", orderDocument.id);
+        await uploadGeneratedDocument("order", orderDocument.id);
 
         expect(mocks.orderUpdateMany).toHaveBeenCalledOnce();
         expect(mocks.finalOrderUpdateMany).toHaveBeenCalledOnce();
         expect(mocks.uploadDocumentArtifact).toHaveBeenCalledTimes(2);
+    });
+
+    it("rejects failed generations without claiming an upload lease", async () => {
+        mocks.offerFindFirst.mockResolvedValue({
+            ...offerDocument,
+            status: "FAILED",
+            artifacts: [],
+        });
+
+        await expect(uploadGeneratedDocument("offer", offerDocument.id)).rejects.toMatchObject({
+            statusCode: 409,
+            code: "DOCUMENTS_NOT_GENERATED",
+        });
+        expect(mocks.offerUpdateMany).not.toHaveBeenCalled();
+    });
+
+    it("verwendet nach dem Claim den aktuellen Anzeigenamen", async () => {
+        mocks.offerFindUnique.mockResolvedValue({
+            ...offerDocument,
+            status: "UPLOADING",
+            displayName: "Q-1_AG_Renamed",
+        });
+
+        await uploadGeneratedDocument("offer", offerDocument.id);
+
+        expect(mocks.uploadDocumentArtifact).toHaveBeenCalledWith(
+            "Q-1_AG_Renamed.pdf",
+            expect.any(String),
+            expect.any(Buffer),
+            expect.any(String),
+        );
     });
 
     it("setzt einen Hashkonflikt auf GENERATED zurück und behält S3-Objekte", async () => {
@@ -160,7 +193,7 @@ describe("document upload service", () => {
             new RemoteDocumentConflictError("/pdf/conflict.pdf", "expected", "actual"),
         );
 
-        const error = await uploadOfferDocument("offer-1", offerDocument.id).catch((value) => value);
+        const error = await uploadGeneratedDocument("offer", offerDocument.id).catch((value: unknown) => value);
 
         expect(error).toBeInstanceOf(AppException);
         expect(error).toMatchObject({ statusCode: 409, code: "REMOTE_DOCUMENT_CONFLICT" });
@@ -184,7 +217,7 @@ describe("document upload service", () => {
         mocks.offerUpdateMany.mockResolvedValueOnce({ count: 0 });
         mocks.offerFindUnique.mockResolvedValue({ ...offerDocument, status: "UPLOADING" });
 
-        await expect(uploadOfferDocument("offer-1", offerDocument.id)).rejects.toMatchObject({
+        await expect(uploadGeneratedDocument("offer", offerDocument.id)).rejects.toMatchObject({
             statusCode: 409,
             code: "DOCUMENT_UPLOAD_IN_PROGRESS",
         });
@@ -196,11 +229,14 @@ describe("document upload service", () => {
         mocks.offerFindFirst.mockResolvedValue({
             ...offerDocument,
             status: "UPLOADED",
-            pdf: { ...offerDocument.pdf, remotePath: "/pdf/existing.pdf", uploadedAt },
-            docx: { ...offerDocument.docx, remotePath: "/docx/existing.docx", uploadedAt },
+            artifacts: offerDocument.artifacts.map((artifact: any) => ({
+                ...artifact,
+                remotePath: artifact.format === "PDF" ? "/pdf/existing.pdf" : "/docx/existing.docx",
+                uploadedAt,
+            })),
         });
 
-        const result = await uploadOfferDocument("offer-1", offerDocument.id);
+        const result = await uploadGeneratedDocument("offer", offerDocument.id);
 
         expect(result.pdf.remotePath).toBe("/pdf/existing.pdf");
         expect(mocks.offerUpdateMany).not.toHaveBeenCalled();
@@ -210,7 +246,7 @@ describe("document upload service", () => {
     it("behält S3-Objekte bei einem DB-Fehler nach Remote-Erfolg", async () => {
         mocks.transaction.mockRejectedValue(new Error("database unavailable"));
 
-        await expect(uploadOfferDocument("offer-1", offerDocument.id)).rejects.toMatchObject({
+        await expect(uploadGeneratedDocument("offer", offerDocument.id)).rejects.toMatchObject({
             code: "DOCUMENT_UPLOAD_FAILED",
         });
         expect(mocks.offerUpdateMany).toHaveBeenLastCalledWith(expect.objectContaining({
@@ -229,24 +265,24 @@ describe("document upload service", () => {
             size: content.length,
             sha256,
         }));
-        mocks.offerFindUnique.mockResolvedValue({
-            ...offerDocument,
-            status: "UPLOADED",
-            pdf: {
-                ...offerDocument.pdf,
-                remotePath: "/remote/Q-1_AG_Customer.pdf",
-                remoteEtag: "etag-Q-1_AG_Customer.pdf",
-                uploadedAt,
-            },
-            docx: {
-                ...offerDocument.docx,
-                remotePath: "/remote/Q-1_AG_Customer.docx",
-                remoteEtag: "etag-Q-1_AG_Customer.docx",
-                uploadedAt,
-            },
-        });
+        mocks.offerFindUnique
+            .mockResolvedValueOnce({ ...offerDocument, status: "UPLOADING" })
+            .mockResolvedValue({
+                ...offerDocument,
+                status: "UPLOADED",
+                artifacts: offerDocument.artifacts.map((artifact: any) => ({
+                    ...artifact,
+                    remotePath: artifact.format === "PDF"
+                        ? "/remote/Q-1_AG_Customer.pdf"
+                        : "/remote/Q-1_AG_Customer.docx",
+                    remoteEtag: artifact.format === "PDF"
+                        ? "etag-Q-1_AG_Customer.pdf"
+                        : "etag-Q-1_AG_Customer.docx",
+                    uploadedAt,
+                })),
+            });
 
-        await expect(uploadOfferDocument("offer-1", offerDocument.id)).resolves.toMatchObject({
+        await expect(uploadGeneratedDocument("offer", offerDocument.id)).resolves.toMatchObject({
             pdf: { remotePath: "/remote/Q-1_AG_Customer.pdf" },
             docx: { remotePath: "/remote/Q-1_AG_Customer.docx" },
         });

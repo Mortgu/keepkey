@@ -3,20 +3,17 @@ import { Router } from "express";
 import {
   createOffer,
   deleteOffer,
-  deleteOfferDocument,
-  downloadOfferDocument,
   enqueueGeneration,
   getOfferById,
   getOfferRevisions,
   getOffers,
   restoreOfferRevision,
   updateOffer,
-  uploadOfferDocument,
 } from "../controllers/offer.controller.js";
 
 import { notImplemented } from "../middlewares/not-implemented.js";
 import { validate } from "../middlewares/validate.js";
-import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, restoreOfferRevisionSchema, updateOfferDocumentSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
+import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, restoreOfferRevisionSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -72,18 +69,6 @@ router.get('/:id/documents', notImplemented);
 
 /* [POST] /api/offers/:id/documents */
 router.post('/:id/documents', enqueueGeneration);
-
-/* [POST] /api/offers/:id/documents/:documentId/upload */
-router.post('/:id/documents/:documentId/upload', uploadOfferDocument);
-
-/* [PATCH] /api/offers/:id/documents/:documentId */
-router.patch('/:id/documents/:documentId', validate(updateOfferDocumentSchema), notImplemented);
-
-/* [DELETE] /api/offers/:id/documents/:documentId */
-router.delete('/:id/documents/:documentId', deleteOfferDocument);
-
-/* [GET] /api/offers/:id/documents/:documentId/:format */
-router.get('/:id/documents/:documentId/:format', downloadOfferDocument);
 
 /* ========== Offer Revisions ========== */
 

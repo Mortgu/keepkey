@@ -13,7 +13,6 @@ Rules:
 ### Prisma and migrations
 - Creating a new migration after edeting the *.prisma files: "
     => `npx prisma migrate dev --name "---"`
-- Pushing the current schema files to the db without creating a migration: 
-    => `npx prisma db push`
 
-Always run `npx prisma generate` after migrating or pushing!
+Always use migrations. `prisma db push` is not supported because hand-written SQL constraints are part of the schema.
+Always run `npx prisma generate` after migrating!

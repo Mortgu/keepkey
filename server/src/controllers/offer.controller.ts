@@ -25,16 +25,6 @@ export const getNextQuoteId = async (request: Request, response: Response, next:
     return response.status(200).json(quoteId);
 };
 
-export const downloadOfferDocument = async (request: Request, response: Response) => {
-    const offerId = request.params.id as string;
-    const documentId = request.params.documentId as string;
-    const format = (request.params.format as string).toLowerCase();
-
-    const download = await offerService.downloadOfferDocument(offerId, documentId, format);
-
-    return response.redirect(302, download.url);
-};
-
 /* ========== DELETE ========== */
 
 export const deleteOffer = async (request: Request, response: Response) => {
@@ -44,15 +34,6 @@ export const deleteOffer = async (request: Request, response: Response) => {
         success: true,
         message: "Successfully deleted offer!",
     });
-};
-
-export const deleteOfferDocument = async (request: Request, response: Response) => {
-    await offerService.deleteOfferDocument(
-        request.params.id as string,
-        request.params.documentId as string,
-    );
-
-    return response.status(200).json({ success: true });
 };
 
 /* ========== UPDATE ========== */
@@ -91,12 +72,6 @@ export const createOfferFlatrates = async (request: Request, response: Response)
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const task = await offerService.enqueueGeneration(request.params.id as string);
     return response.status(200).json(task);
-};
-
-export const uploadOfferDocument = async (request: Request, response: Response) => {
-    const { id, documentId } = request.params;
-    const result = await offerService.uploadOfferDocument(id as string, documentId as string);
-    return response.status(200).json(result);
 };
 
 export const restoreOfferRevision = async (request: Request, response: Response) => {

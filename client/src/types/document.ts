@@ -1,14 +1,18 @@
 import type { components } from "./api";
 import type { Task } from "./task";
 
-export type Document = components["schemas"]["Document"];
+export type DocumentArtifact = components["schemas"]["DocumentArtifact"];
 export type DocumentStatus = components["schemas"]["DocumentStatus"];
-
-export type CreateDocumentInput = Omit<
-  Document,
-  "id" | "createdAt" | "offer" | "order"
+export type DocumentType = "offer" | "order";
+export type GeneratedDocument = Pick<
+  components["schemas"]["OfferDocument"],
+  "id" | "displayName" | "status" | "artifacts"
 >;
-export type UpdateDocumentInput = Partial<CreateDocumentInput>;
+
+export const findDocumentArtifact = (
+  artifacts: Array<DocumentArtifact>,
+  format: DocumentArtifact["format"],
+) => artifacts.find((artifact) => artifact.format === format);
 
 export type CreateTaskInput = Omit<
   Task,

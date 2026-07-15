@@ -3,13 +3,11 @@ import type {
     CreateOfferInput,
     CreateOfferPositionInput,
     Offer,
-    OfferDocument,
     OfferFilters,
     OfferPosition,
     OfferRevision,
     OffersPage,
     Task,
-    UpdateOfferDocumentInput,
     UpdateOfferFlatrateInput,
     UpdateOfferInput,
     UpdateOfferPositionInput
@@ -88,29 +86,6 @@ export const deleteOfferFlatrate = async (id: string, flatrateId: string) =>
         method: "DELETE"
     });
 
-
-/* Offer Document */
-export const createOfferDocument = async (id: string) =>
-    api<Task>(`/api/offers/${id}/document`, {
-        method: "POST"
-    });
-
-export const updateOfferDocument = async (id: string, documentId: string, input: UpdateOfferDocumentInput) =>
-    api<OfferDocument>(`/api/offers/${id}/documents/${documentId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input)
-    })
-
-export const deleteOfferDocument = async (id: string, documentId: string) =>
-    api<void>(`/api/offers/${id}/documents/${documentId}`, {
-        method: "DELETE"
-    });
-
-export const uploadOfferDocument = async (id: string, documentId: string) =>
-    api<void>(`/api/offers/${id}/documents/${documentId}/upload`, {
-        method: "POST"
-    });
 
 export const generateOfferDocument = async (id: string) =>
     api<Task>(`/api/offers/${id}/documents`, {

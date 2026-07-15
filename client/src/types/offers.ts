@@ -59,5 +59,3 @@ export type CreateOfferFlatrateInput = Pick<OfferFlatRate,
 >;
 
 export type UpdateOfferFlatrateInput = Partial<CreateOfferFlatrateInput>;
-
-export type UpdateOfferDocumentInput = Partial<Pick<OfferDocument, "displayName" | "isCurrent" | "version">>;

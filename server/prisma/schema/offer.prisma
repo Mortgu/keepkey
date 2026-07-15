@@ -121,11 +121,7 @@ model OfferDocument {
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
-  pdf   Document? @relation(name: "offerPdf", fields: [pdfId], references: [id], onDelete: Cascade)
-  pdfId String?   @unique
-
-  docx   Document? @relation(name: "offerDocx", fields: [docxId], references: [id], onDelete: Cascade)
-  docxId String?   @unique
+  artifacts DocumentArtifact[] @relation("OfferDocumentArtifacts")
 
   task   Task   @relation(fields: [taskId], references: [id])
   taskId String @unique

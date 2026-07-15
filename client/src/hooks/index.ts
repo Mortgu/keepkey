@@ -10,3 +10,4 @@ export * from './tariffs/tariff-hooks';
 export * from './user-hook';
 export * from './supplier-hook';
 export * from './use-dashboard-stats';
+export * from './document-hook';

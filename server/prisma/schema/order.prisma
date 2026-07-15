@@ -118,11 +118,7 @@ model OrderDocument {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
 
-  pdf   Document? @relation(name: "orderPdf", fields: [pdfId], references: [id], onDelete: Cascade)
-  pdfId String?   @unique
-
-  docx   Document? @relation(name: "orderDocx", fields: [docxId], references: [id], onDelete: Cascade)
-  docxId String?   @unique
+  artifacts DocumentArtifact[] @relation("OrderDocumentArtifacts")
 
   task   Task   @relation(fields: [taskId], references: [id])
   taskId String @unique

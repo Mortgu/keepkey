@@ -3,8 +3,6 @@ import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { getDocumentDownloadUrl } from "../lib/document-artifact-store.js";
-import { uploadOfferDocument as uploadOfferDocumentUseCase } from "./document-upload.service.js";
 import { requestOfferGeneration } from "./document-generation-request.service.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
@@ -46,13 +44,6 @@ export interface OfferListQuery {
     cursor?: unknown;
     limit?: unknown;
 }
-
-export type OfferDocumentDownload = { url: string };
-
-const MIME_TYPES: Record<string, string> = {
-    pdf: "application/pdf",
-    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-};
 
 /* ========== Helpers ========== */
 
@@ -222,8 +213,7 @@ export async function getOffers(query: OfferListQuery) {
             offerDocuments: {
                 where: { deletedAt: null },
                 include: {
-                    docx: true,
-                    pdf: true
+                    artifacts: true,
                 }
             },
             offerPositions: {
@@ -259,8 +249,7 @@ export async function getOfferById(id: string) {
                 where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
                 include: {
-                    pdf: true,
-                    docx: true,
+                    artifacts: true,
                     task: true,
                 },
             },
@@ -306,39 +295,6 @@ export async function getOfferRevisions(offerId: string) {
 export async function getNextQuoteId(): Promise<number> {
     const quoteId = 0; //await getLatestQuoteId();
     return quoteId + 1;
-}
-
-export async function downloadOfferDocument(offerId: string, documentId: string, format: string): Promise<OfferDocumentDownload> {
-    if (format !== "pdf" && format !== "docx") {
-        throw new AppException("Invalid format. Use 'pdf' or 'docx'.", 400, "INVALID_FORMAT");
-    }
-
-    const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId, deletedAt: null },
-        include: { pdf: true, docx: true },
-    });
-
-    if (!offerDoc) {
-        throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
-    }
-
-    if (!["GENERATED", "UPLOADING", "UPLOADED"].includes(offerDoc.status)) {
-        throw new AppException("Document not yet generated", 409, "DOCUMENT_NOT_GENERATED");
-    }
-
-    const file = format === "pdf" ? offerDoc.pdf : offerDoc.docx;
-    if (!file) {
-        throw new AppException("File not found", 404, "FILE_NOT_FOUND");
-    }
-
-    const contentType = MIME_TYPES[format]!;
-    return {
-        url: await getDocumentDownloadUrl(
-            file.objectKey,
-            `${offerDoc.displayName ?? offerDoc.id}.${format}`,
-            contentType,
-        ),
-    };
 }
 
 /* ========== Mutations ========== */
@@ -592,10 +548,6 @@ export async function enqueueGeneration(offerId: string) {
     ));
 }
 
-export async function uploadOfferDocument(offerId: string, documentId: string) {
-    return uploadOfferDocumentUseCase(offerId, documentId);
-}
-
 /* ========== Deletes ========== */
 
 export async function deleteOffer(id: string): Promise<void> {
@@ -615,30 +567,4 @@ export async function deleteOffer(id: string): Promise<void> {
         }
         await tx.offer.delete({ where: { id } });
     });
-}
-
-export async function deleteOfferDocument(offerId: string, documentId: string): Promise<void> {
-    const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId, deletedAt: null },
-    });
-
-    if (!offerDoc) {
-        throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
-    }
-
-    const deleted = await prisma.offerDocument.updateMany({
-        where: {
-            id: offerDoc.id,
-            deletedAt: null,
-            status: { notIn: ["PENDING", "PROCESSING", "UPLOADING"] },
-        },
-        data: { deletedAt: new Date(), isCurrent: false },
-    });
-    if (deleted.count !== 1) {
-        throw new AppException(
-            "A document cannot be deleted while processing.",
-            409,
-            "DOCUMENT_PROCESSING",
-        );
-    }
 }

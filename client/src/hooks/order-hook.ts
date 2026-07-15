@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { CreateOrderInput, UpdateOrderInput } from "@/data/orders";
-import { createOrderAction, deleteOrderAction, deleteOrderDocumentAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction, restoreOrderRevisionAction, updateOrderAction, uploadOrderDocumentAction } from "@/data/orders";
+import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction, restoreOrderRevisionAction, updateOrderAction } from "@/data/orders";
 
 export const useOrderHook = () => {
   const queryClient = useQueryClient();
@@ -51,18 +51,6 @@ export const useOrderHook = () => {
     },
   });
 
-  const uploadDocumentMutation = useMutation({
-    mutationFn: ({ orderId, documentId }: { orderId: string; documentId: string }) =>
-      uploadOrderDocumentAction(orderId, documentId),
-    onSuccess: invalidate,
-  });
-
-  const deleteDocumentMutation = useMutation({
-    mutationFn: ({ orderId, documentId }: { orderId: string; documentId: string }) =>
-      deleteOrderDocumentAction(orderId, documentId),
-    onSuccess: invalidate,
-  });
-
   return {
     orders,
     isPending,
@@ -90,12 +78,5 @@ export const useOrderHook = () => {
     restoringRevisionId: restoreMutation.variables?.revisionId,
     errorRestoringRevision: restoreMutation.error,
 
-    uploadDocument: uploadDocumentMutation.mutateAsync,
-    isUploadingDocument: uploadDocumentMutation.isPending,
-    errorUploadingDocument: uploadDocumentMutation.error,
-
-    deleteDocument: deleteDocumentMutation.mutateAsync,
-    isDeletingDocument: deleteDocumentMutation.isPending,
-    errorDeletingDocument: deleteDocumentMutation.error,
   };
 };
