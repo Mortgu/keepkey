@@ -31,6 +31,15 @@
   "offerModal": {
     "compare": "Vergleichen?"
   },
+  "offers": {
+    "toast": {
+      "deleteError": "Angebot konnte nicht gelöscht werden: {{message}}",
+      "documentUploadError": "Dokument konnte nicht hochgeladen werden: {{message}}",
+      "documentDeleteError": "Dokument konnte nicht gelöscht werden: {{message}}",
+      "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
+      "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}"
+    }
+  },
   "versionHistory": {
     "title": "Versionsverlauf",
     "offerSubtitle": "Frühere Angebotsversionen",
@@ -50,7 +59,10 @@
     "export": "Exportieren",
     "import": "Importieren",
     "loading": "Laden...",
-    "noResults": "Keine Ergebnisse"
+    "noResults": "Keine Ergebnisse",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorRetry": "Erneut versuchen",
+    "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten."
   },
   "dashboard": {
     "recentOffers": "Letzte Angebote",

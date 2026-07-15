@@ -7,3 +7,22 @@ Rules:
 - IF graphify-out/wiki/index.md EXISTS, navigate it instead of reading raw files
 - For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
+
+## Frontend conventions
+
+### Loading states
+- Use `<Skeleton/>` / `<ListSkeleton rows skeleton/>` / `<PageHeaderSkeleton/>` from `@/components` for loading states. Do NOT use hardcoded `"Laden..."` / `"Loading..."` strings.
+- For list pages: render `<ListSkeleton rows={6} skeleton={<...CardSkeleton/>} />` while `useQuery` returns `isPending`.
+
+### Error states
+- Show query errors via `<RouteError error={error}/>` from `@/components` (includes a Retry button that invalidates queries). Do NOT silently ignore `useQuery` `error`.
+- The root route (`__root.tsx`) declares a global `errorComponent` + `pendingComponent` as a safety net.
+
+### Toasts & i18n
+- Import `showToast` from `@/components` (NOT `toast` from `react-toastify` directly). `showToast.success/.error(key, { vars })` resolves i18n keys via `i18n.t` directly, so it works outside React (in mutations, callbacks, effects).
+- Never pass hardcoded German/English strings to toasts — always use i18n keys. Add new keys under a `<namespace>.toast.*` section in BOTH `client/locals/de/translations.json` and `client/locals/en/translations.json`.
+
+### QueryClient
+- `QueryClient` defaults live in `__root.tsx`: `staleTime: 30_000`, `gcTime: 5*60_000`, `retry: 1`, `refetchOnWindowFocus: false`, and a global `mutations.onError` safety net.
+- Manage query keys via `*Keys` factories (see `client/src/hooks/offers/offers-keys.ts` as the reference pattern). Do NOT use raw string-literal keys like `["offers"]`.
+

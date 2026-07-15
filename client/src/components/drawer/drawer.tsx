@@ -106,7 +106,7 @@ function Drawer({ open, onClose, children, wide, className }: DrawerProps) {
                 role="dialog"
                 aria-modal="true"
             >
-                <div className="flex items-start justify-between gap-3 px-[22px] py-[18px] border-b border-(--border) shrink-0">
+                <div className="flex items-center justify-between gap-3 px-[22px] py-[18px] border-b border-(--border) shrink-0">
                     <div>{header}</div>
                     <Button
                         className="shrink-0 -mt-1 -mr-1"

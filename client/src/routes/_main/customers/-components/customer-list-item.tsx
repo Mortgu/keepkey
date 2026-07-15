@@ -98,13 +98,16 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
                 <Drawer.Header eyebrow="" title="Kunden Einstellungen" subtitle="" />
                 <Drawer.Body>
                     <form id="customer-settings-form" onSubmit={handleSubmit}>
-                        <customerSettingsForm.Field name="salutation" children={(field) => (
-                            <Textarea id={field.name} size="sm" rows={5} label="Salutation"
-                                placeholder="Personalisierte Anrede"
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)} />
+                        <div>
 
-                        )} />
+                            <customerSettingsForm.Field name="salutation" children={(field) => (
+                                <Textarea id={field.name} size="sm" rows={5} label="Salutation"
+                                    placeholder="Personalisierte Anrede"
+                                    value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)} />
+
+                            )} />
+                        </div>
 
                     </form>
 

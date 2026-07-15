@@ -31,6 +31,15 @@
   "offerModal": {
     "compare": "Compare?"
   },
+  "offers": {
+    "toast": {
+      "deleteError": "Could not delete offer: {{message}}",
+      "documentUploadError": "Could not upload document: {{message}}",
+      "documentDeleteError": "Could not delete document: {{message}}",
+      "documentRenameError": "Could not rename document: {{message}}",
+      "restoreError": "Could not restore version: {{message}}"
+    }
+  },
   "versionHistory": {
     "title": "Version history",
     "offerSubtitle": "Previous offer versions",
@@ -50,7 +59,10 @@
     "export": "Export",
     "import": "Import",
     "loading": "Loading...",
-    "noResults": "No results"
+    "noResults": "No results",
+    "errorTitle": "Something went wrong",
+    "errorRetry": "Try again",
+    "errorGeneric": "An unexpected error occurred."
   },
   "dashboard": {
     "recentOffers": "Recent offers",
