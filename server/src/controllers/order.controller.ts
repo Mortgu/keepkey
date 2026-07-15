@@ -20,6 +20,11 @@ export const getOrderById = async (request: Request, response: Response) => {
     return response.status(200).json(order);
 };
 
+export const getOrderRevisions = async (request: Request, response: Response) => {
+    const revisions = await orderService.getOrderRevisions(request.params.orderId as string);
+    return response.status(200).json(revisions);
+};
+
 export const downloadOrderDocument = async (request: Request, response: Response) => {
     const orderId = request.params.orderId as string;
     const documentId = request.params.documentId as string;
@@ -66,6 +71,27 @@ export const uploadOrderDocument = async (request: Request, response: Response) 
     const { orderId, documentId } = request.params;
     const result = await orderService.uploadOrderDocument(orderId as string, documentId as string);
     return response.status(200).json(result);
+};
+
+export const restoreOrderRevision = async (request: Request, response: Response) => {
+    const order = await orderService.restoreOrderRevision(
+        request.params.orderId as string,
+        request.params.revisionId as string,
+        request.body.expectedVersion,
+        request.user!.id,
+    );
+    return response.status(200).json(order);
+};
+
+/* ========== PATCH ========== */
+
+export const updateOrder = async (request: Request, response: Response) => {
+    const order = await orderService.updateOrder(
+        request.params.orderId as string,
+        request.body,
+        request.user!.id,
+    );
+    return response.status(200).json(order);
 };
 
 /* ========== DELETE ========== */

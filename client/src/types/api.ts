@@ -131,6 +131,8 @@ export interface components {
             id: string;
             /** Format: int32 */
             version: number;
+            /** Format: int32 */
+            snapshotVersion: number;
             snapshot: Record<string, never>;
             offer: components["schemas"]["Offer"];
             offerId: string;
@@ -181,6 +183,8 @@ export interface components {
             displayName?: string;
             /** Format: int32 */
             version: number;
+            /** Format: int32 */
+            sourceVersion?: number;
             status: components["schemas"]["DocumentStatus"];
             isCurrent: boolean;
             error?: string;
@@ -222,13 +226,30 @@ export interface components {
             requestFrom?: string;
             /** Format: int32 */
             net_amount: number;
+            /** Format: int32 */
+            version: number;
             documents: components["schemas"]["OrderDocument"][];
             orderPositions: components["schemas"]["OrderPosition"][];
             flatRates: components["schemas"]["OrderFlatRate"][];
+            revisions: components["schemas"]["OrderRevision"][];
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        OrderRevision: {
+            id: string;
+            /** Format: int32 */
+            version: number;
+            /** Format: int32 */
+            snapshotVersion: number;
+            snapshot: Record<string, never>;
+            order: components["schemas"]["Order"];
+            orderId: string;
+            changedBy: components["schemas"]["User"];
+            changedById: string;
+            /** Format: date-time */
+            createdAt: string;
         };
         OrderPosition: {
             id: string;
@@ -264,6 +285,8 @@ export interface components {
             displayName?: string;
             /** Format: int32 */
             version: number;
+            /** Format: int32 */
+            sourceVersion?: number;
             status: components["schemas"]["DocumentStatus"];
             isCurrent: boolean;
             error?: string;
@@ -279,6 +302,22 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+        };
+        Passkey: {
+            id: string;
+            name?: string;
+            publicKey: string;
+            userId: string;
+            user: components["schemas"]["User"];
+            credentialID: string;
+            /** Format: int32 */
+            counter: number;
+            deviceType: string;
+            backedUp: boolean;
+            transports?: string;
+            /** Format: date-time */
+            createdAt: string;
+            aaguid?: string;
         };
         Product: {
             id: string;
@@ -316,6 +355,7 @@ export interface components {
             updatedAt: string;
             sessions: components["schemas"]["Session"][];
             accounts: components["schemas"]["Account"][];
+            passkeys: components["schemas"]["Passkey"][];
             role?: string;
             banned?: boolean;
             banReason?: string;
@@ -326,6 +366,7 @@ export interface components {
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
             offerRevisions: components["schemas"]["OfferRevision"][];
+            orderRevisions: components["schemas"]["OrderRevision"][];
         };
         Session: {
             id: string;

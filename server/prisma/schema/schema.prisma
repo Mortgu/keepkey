@@ -37,6 +37,7 @@ model User {
   offers         Offer[]
   orders         Order[]
   offerRevisions OfferRevision[]
+  orderRevisions OrderRevision[]
 
   @@map("user")
 }

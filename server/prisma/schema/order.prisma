@@ -16,10 +16,10 @@ model Order {
   offer   Offer  @relation(fields: [offerId], references: [id])
   offerId String @unique // One-to-one relation
 
-  orderId     String // Beleg-Nr.
+  orderId         String // Beleg-Nr.
   /// @openapi.ignore
-  documentVersion Int @default(0)
-  paymentTerm String @default("") // Zahlungsbedingung
+  documentVersion Int    @default(0)
+  paymentTerm     String @default("") // Zahlungsbedingung
 
   projectNumber      String? // Projekt-Nr.
   projectDescription String? // Projektbezug
@@ -31,14 +31,36 @@ model Order {
 
   net_amount Int
 
+  version Int @default(1)
+
   documents      OrderDocument[]
   orderPositions OrderPosition[]
   flatRates      OrderFlatRate[]
+  revisions      OrderRevision[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@map("order")
+}
+
+model OrderRevision {
+  id String @id @default(uuid())
+
+  version         Int
+  snapshotVersion Int  @default(1)
+  snapshot        Json
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String
+
+  changedBy   User   @relation(fields: [changedById], references: [id])
+  changedById String
+
+  createdAt DateTime @default(now())
+
+  @@unique([orderId, version])
+  @@map("order_revision")
 }
 
 model OrderPosition {
@@ -83,12 +105,13 @@ model OrderFlatRate {
 model OrderDocument {
   id String @id @default(cuid())
 
-  displayName String?
-  version     Int            @default(0)
-  status      DocumentStatus
-  isCurrent   Boolean        @default(false)
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
 
-  error String?
+  error       String?
   /// @openapi.ignore
   uploadToken String?
 

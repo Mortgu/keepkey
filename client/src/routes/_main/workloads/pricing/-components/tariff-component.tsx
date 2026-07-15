@@ -1,9 +1,8 @@
-import { Plus, Trash } from "lucide-react";
-import { useMemo, useState } from "react";
-import type { ChangeEvent } from "react";
+import { Plus } from "lucide-react";
+import { useMemo } from "react";
 import type { Tariff, TariffCell } from "@/types";
 import { useTariffGroupHook } from "@/hooks";
-import { Button, Input } from "@/components";
+import { Button } from "@/components";
 import TariffCellComponent from "./cell-component";
 import TariffColumnComponent from "./column-component";
 import TariffRowComponent from "./row-component";
@@ -18,58 +17,6 @@ function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
         map.set(`${cell.rowId}:${cell.columnId}`, cell);
     }
     return map;
-}
-
-function RowLabel({ groupId, tariffId, rowId, minQty, maxQty }: {
-    groupId: string;
-    tariffId: string;
-    rowId: string;
-    minQty: number;
-    maxQty: number | null;
-}) {
-    const { deleteRow, updateRow } = useTariffGroupHook();
-    const [editMin, setEditMin] = useState(false);
-    const [editMax, setEditMax] = useState(false);
-    const [min, setMin] = useState(minQty);
-    const [max, setMax] = useState(maxQty);
-
-    const handleMinBlur = async () => {
-        setEditMin(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max ?? 0 });
-    };
-
-    const handleMaxBlur = async () => {
-        setEditMax(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max ?? 0 });
-    };
-
-    const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const v = Number(e.target.value);
-        if (isNaN(v)) return;
-        setMin(v);
-    };
-
-    const handleMaxChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const v = Number(e.target.value);
-        if (isNaN(v)) return;
-        setMax(v);
-    };
-
-    return (
-        <div className="flex-1 min-w-fit w-full flex flex-wrap items-center px-3 py-1">
-            <div className="flex-1 flex items-center">
-                {!editMin ? <p onClick={() => setEditMin(true)}>{min}</p> : (
-                    <Input autoFocus size="xs" onBlur={handleMinBlur} value={min} onChange={handleMinChange} />
-                )}
-                -
-                {!editMax ? <p onClick={() => setEditMax(true)}>{max ?? "∞"}</p> : (
-                    <Input autoFocus size="xs" onBlur={handleMaxBlur} value={max ?? 0} onChange={handleMaxChange} />
-                )}
-            </div>
-            <Button variant="link" size="xs" icon={<Trash className="size-3" />} iconOnly
-                onClick={() => deleteRow({ groupId, tariffId, rowId })} />
-        </div>
-    );
 }
 
 export default function TariffComponent(props: Props) {

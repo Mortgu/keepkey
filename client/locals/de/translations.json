@@ -31,6 +31,19 @@
   "offerModal": {
     "compare": "Vergleichen?"
   },
+  "versionHistory": {
+    "title": "Versionsverlauf",
+    "offerSubtitle": "Frühere Angebotsversionen",
+    "orderSubtitle": "Frühere Bestellversionen",
+    "currentVersion": "Aktuelle Version: v{{version}}",
+    "empty": "Keine früheren Versionen vorhanden.",
+    "restore": "Diese Version wiederherstellen",
+    "restoreConfirm": "Version v{{version}} wiederherstellen? Vorhandene Dokumente werden als historisch markiert.",
+    "restoreSuccess": "Version wiederhergestellt. Bei Bedarf kann ein neues Dokument erstellt werden.",
+    "currentDocument": "Aktuell",
+    "historicalDocument": "Historisch",
+    "sourceVersion": "Geschäftsversion v{{version}}"
+  },
   "common": {
     "search": "Suchen",
     "filter": "Filtern",

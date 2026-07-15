@@ -5,9 +5,11 @@ const mocks = vi.hoisted(() => ({
     queryRaw: vi.fn(),
     taskCreate: vi.fn(),
     offerFindFirst: vi.fn(),
+    offerFindUnique: vi.fn(),
     offerUpdate: vi.fn(),
     offerCreate: vi.fn(),
     orderFindFirst: vi.fn(),
+    orderFindUnique: vi.fn(),
     orderUpdate: vi.fn(),
     orderCreate: vi.fn(),
     enqueueTask: vi.fn(),
@@ -47,13 +49,15 @@ describe("document generation request service", () => {
                 findFirst: mocks.offerFindFirst,
                 create: mocks.offerCreate,
             },
-            offer: { update: mocks.offerUpdate },
+            offer: { findUniqueOrThrow: mocks.offerFindUnique, update: mocks.offerUpdate },
             orderDocument: {
                 findFirst: mocks.orderFindFirst,
                 create: mocks.orderCreate,
             },
-            order: { update: mocks.orderUpdate },
+            order: { findUniqueOrThrow: mocks.orderFindUnique, update: mocks.orderUpdate },
         }));
+        mocks.offerFindUnique.mockResolvedValue({ version: 7 });
+        mocks.orderFindUnique.mockResolvedValue({ version: 4 });
     });
 
     it("serialisiert und erstellt genau die nächste Offer-Version", async () => {
@@ -72,6 +76,7 @@ describe("document generation request service", () => {
                 displayName: "offer-v3",
                 offerId: "offer-1",
                 version: 3,
+                sourceVersion: 7,
                 isCurrent: false,
                 status: "PENDING",
                 taskId: "task-1",
@@ -108,6 +113,7 @@ describe("document generation request service", () => {
             data: {
                 orderId: "order-1",
                 version: 5,
+                sourceVersion: 4,
                 isCurrent: false,
                 status: "PENDING",
                 taskId: "task-1",

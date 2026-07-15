@@ -4,6 +4,12 @@ export type Order = components["schemas"]["Order"];
 export type OrderPosition = components["schemas"]["OrderPosition"];
 export type OrderFlatRate = components["schemas"]["OrderFlatRate"];
 export type OrderDocument = components["schemas"]["OrderDocument"];
+export type OrderRevision = {
+    id: string;
+    version: number;
+    createdAt: string;
+    changedBy: { id: string; name: string };
+};
 
 export type CreateOrderInput = Omit<
     Order,

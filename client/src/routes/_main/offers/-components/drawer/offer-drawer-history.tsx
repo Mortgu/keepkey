@@ -1,10 +1,12 @@
-import { Button, Drawer } from "@/components";
-import { useDeleteOfferRevision } from "@/hooks/offers/offer-mutations";
-import { formatDate } from "@/lib/format";
-import type { Offer, OfferRevision } from "@/types";
-import { Trash } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import type { Offer, OfferRevision } from "@/types";
+import { Button, Drawer } from "@/components";
+import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
+import { offerQueries } from "@/hooks/offers/offer-queries";
+import { formatDate } from "@/lib/format";
 
 type Props = {
     open: boolean;
@@ -13,33 +15,59 @@ type Props = {
 }
 
 export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
+    const { t } = useTranslation();
+    const { data: revisions = [], isPending, error } = useQuery({
+        ...offerQueries.revisions(offer.id),
+        enabled: open,
+    });
     const {
-        deleteOfferRevision,
-        isDeletingRevision,
-        errorDeletingRevision
-    } = useDeleteOfferRevision();
+        restoreOfferRevision,
+        isRestoringRevision,
+        restoringRevisionId,
+        errorRestoringRevision,
+    } = useRestoreOfferRevision();
 
     useEffect(() => {
-        if (errorDeletingRevision) {
-            toast.error(errorDeletingRevision.message);
+        if (errorRestoringRevision) {
+            toast.error(errorRestoringRevision.message);
         }
-    }, [errorDeletingRevision]);
+    }, [errorRestoringRevision]);
+
+    const restore = async (revision: OfferRevision) => {
+        if (!confirm(t("versionHistory.restoreConfirm", { version: revision.version }))) return;
+        try {
+            await restoreOfferRevision({
+                offerId: offer.id,
+                revisionId: revision.id,
+                expectedVersion: offer.version,
+            });
+            toast.success(t("versionHistory.restoreSuccess"));
+        } catch {
+            // The mutation error is surfaced by the effect above.
+        }
+    };
 
     return (
         <Drawer open={open} onClose={onClose} wide>
-            <Drawer.Header title="History" subtitle="Vergangene Angebots versionen" />
+            <Drawer.Header title={t("versionHistory.title")} subtitle={t("versionHistory.offerSubtitle")} />
             <Drawer.Body>
-                {offer.revisions.length === 0 && (
+                <div className="mb-3 rounded-md border border-(--border) px-3 py-2 text-sm">
+                    {t("versionHistory.currentVersion", { version: offer.version })}
+                </div>
+
+                {isPending && <p className="text-sm text-(--text-secondary)">{t("common.loading")}</p>}
+                {error && <p className="text-sm text-(--error)">{error.message}</p>}
+                {!isPending && !error && revisions.length === 0 && (
                     <p className="text-sm text-(--text-secondary)">
-                        Keine früheren Versionen vorhanden.
+                        {t("versionHistory.empty")}
                     </p>
                 )}
 
-                {offer.revisions.map((revision: OfferRevision, index: number) => {
-                    const isLast = index === offer.revisions.length - 1;
+                {revisions.map((revision: OfferRevision, index: number) => {
+                    const isLast = index === revisions.length - 1;
 
                     return (
-                        <div key={index} className="flex relative gap-3.25 py-3.5 first:py-0 first:pb-3.5 border-b border-(--border) last:border-b-0">
+                        <div key={revision.id} className="flex relative gap-3.25 py-3.5 first:py-0 first:pb-3.5 border-b border-(--border) last:border-b-0">
                             {/* vertical-rail */}
                             <div className="flex flex-col items-center shrink-0 pt-0.75">
                                 {/* vertical-dot */}
@@ -64,19 +92,18 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                                     <div className="flex items-center text-[11px] text-(--fg-3) mt-0.5 gap-2">
                                         <span>{formatDate(revision.createdAt)}</span>
                                         <span>·</span>
-                                        <span>{revision.changedBy?.name || ""}</span>
+                                        <span>{revision.changedBy.name}</span>
                                     </div>
                                 </div>
 
                                 {/* actions */}
                                 <div className="flex gap-1.5 flex-wrap">
-                                    <Button size="xs" variant="secondary">
-                                        Restore this version
+                                    <Button size="xs" variant="secondary"
+                                        onClick={() => restore(revision)}
+                                        loading={isRestoringRevision && restoringRevisionId === revision.id}
+                                        disabled={isRestoringRevision}>
+                                        {t("versionHistory.restore")}
                                     </Button>
-
-                                    <Button size="xs" variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
-                                        onClick={() => deleteOfferRevision({ offerId: offer.id, revisionId: revision.id })}
-                                        loading={isDeletingRevision} disabled={errorDeletingRevision ? true : false || isDeletingRevision} />
                                 </div>
                             </div>
                         </div>

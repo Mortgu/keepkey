@@ -1,19 +1,21 @@
+import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
+import type { OfferDocument } from "@/types";
 import { Button } from "@/components";
 import { useDocumentTask } from "@/hooks";
 import { useDeleteOfferDocument, useOfferDocumentUpload } from "@/hooks/offers/offer-mutations";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
-import type { OfferDocument } from "@/types";
-import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
-import { useEffect } from "react";
-import { toast } from "react-toastify";
 
 type Props = {
     offerDocument: OfferDocument;
 }
 
 export default function OfferCardDocument({ offerDocument }: Props) {
+    const { t } = useTranslation();
     const { offerId, status, taskId } = offerDocument;
 
     useDocumentTask(taskId);
@@ -46,6 +48,10 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                         <p><span className="text-(--text-secondary)">pdf-size: </span> {formatBytesToKB(offerDocument.pdf?.size || 0)}</p>
                         <p><span className="text-(--text-secondary)">status: </span> {status}</p>
                         <p><span className="text-(--text-secondary)">created: </span> {formatDate(offerDocument.createdAt)}</p>
+                        {offerDocument.sourceVersion && <p>{t("versionHistory.sourceVersion", { version: offerDocument.sourceVersion })}</p>}
+                        <p className={offerDocument.isCurrent ? "text-green-700" : "text-(--text-secondary)"}>
+                            {offerDocument.isCurrent ? t("versionHistory.currentDocument") : t("versionHistory.historicalDocument")}
+                        </p>
                     </div>
                 </div>
 

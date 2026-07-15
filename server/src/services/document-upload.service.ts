@@ -125,15 +125,21 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
             fs.readFile(pdfLocalPath),
             fs.readFile(docxLocalPath),
         ]);
+
         const hashes = {
             pdf: config.document.pdf.sha256 ?? sha256Document(pdfContent),
             docx: config.document.docx.sha256 ?? sha256Document(docxContent),
         };
+
         const displayName = config.document.displayName ?? config.document.id;
+
         const uploads = await Promise.allSettled([
             uploadDocumentArtifact(`${displayName}.pdf`, config.pdfDirectory, pdfContent, hashes.pdf),
             uploadDocumentArtifact(`${displayName}.docx`, config.docxDirectory, docxContent, hashes.docx),
         ]);
+
+        console.log(uploads)
+
         const rejected = uploads.filter((entry): entry is PromiseRejectedResult => entry.status === "rejected");
         if (rejected.length > 0) {
             const conflict = rejected.find((entry) => entry.reason instanceof RemoteDocumentConflictError);
@@ -181,6 +187,8 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
         if (error instanceof RemoteDocumentConflictError) {
             throw new AppException(error.message, 409, "REMOTE_DOCUMENT_CONFLICT");
         }
+
+        logger.error(`Document upload failed: ${message}, ${error}`)
         throw new AppException(`Document upload failed: ${message}`, 500, "DOCUMENT_UPLOAD_FAILED");
     } finally {
         clearInterval(heartbeat);

@@ -50,4 +50,10 @@ export const createOfferSchema = z.object({
   flatrates: createOfferFlatratesSchema,
 });
 
-export const updateOfferSchema = createOfferSchema.partial();
+export const updateOfferSchema = createOfferSchema.extend({
+  expectedVersion: z.number().int().positive(),
+});
+
+export const restoreOfferRevisionSchema = z.object({
+  expectedVersion: z.number().int().positive(),
+});

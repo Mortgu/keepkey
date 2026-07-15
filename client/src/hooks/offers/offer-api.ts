@@ -1,5 +1,3 @@
-import { api } from "@/lib/api-client";
-import { formatQueryString } from "@/lib/utils";
 import type {
     CreateOfferFlatrateInput,
     CreateOfferInput,
@@ -16,6 +14,8 @@ import type {
     UpdateOfferInput,
     UpdateOfferPositionInput
 } from "@/types";
+import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 
 /* Offer */
 export const getOffers = async (filters: OfferFilters) =>
@@ -36,11 +36,11 @@ export const createOffer = (
         }),
     });
 
-export const updateOffer = async (id: string, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>) =>
+export const updateOffer = async (id: string, expectedVersion: number, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offer, positions, flatrates }),
+        body: JSON.stringify({ expectedVersion, offer, positions, flatrates }),
     });
 
 export const deleteOffer = async (id: string) =>
@@ -123,9 +123,11 @@ export const getOfferRevisions = async (id: string) =>
         method: "GET"
     });
 
-export const deleteOfferRevision = async (id: string, revisionId: string) =>
-    api<void>(`/api/offers/${id}/revisions/${revisionId}`, {
-        method: "DELETE"
+export const restoreOfferRevision = async (id: string, revisionId: string, expectedVersion: number) =>
+    api<Offer>(`/api/offers/${id}/revisions/${revisionId}/restore`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ expectedVersion }),
     });
 
 /* Offer Tasks */

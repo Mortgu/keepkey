@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { CreateOrderInput } from "@/data/orders";
-import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction } from "@/data/orders";
+import type { CreateOrderInput, UpdateOrderInput } from "@/data/orders";
+import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction, restoreOrderRevisionAction, updateOrderAction, uploadOrderDocumentAction } from "@/data/orders";
 
 export const useOrderHook = () => {
   const queryClient = useQueryClient();
@@ -33,6 +33,30 @@ export const useOrderHook = () => {
     onSuccess: invalidate,
   });
 
+  const updateMutation = useMutation({
+    mutationFn: ({ orderId, input }: { orderId: string; input: UpdateOrderInput }) =>
+      updateOrderAction(orderId, input),
+    onSuccess: invalidate,
+  });
+
+  const restoreMutation = useMutation({
+    mutationFn: ({ orderId, revisionId, expectedVersion }: {
+      orderId: string;
+      revisionId: string;
+      expectedVersion: number;
+    }) => restoreOrderRevisionAction(orderId, revisionId, expectedVersion),
+    onSuccess: (_, args) => {
+      invalidate();
+      queryClient.invalidateQueries({ queryKey: ["orders", args.orderId, "revisions"] });
+    },
+  });
+
+  const uploadDocumentMutation = useMutation({
+    mutationFn: ({ orderId, documentId }: { orderId: string; documentId: string }) =>
+      uploadOrderDocumentAction(orderId, documentId),
+    onSuccess: invalidate,
+  });
+
   return {
     orders,
     isPending,
@@ -50,5 +74,18 @@ export const useOrderHook = () => {
 
     generateDocument: generateDocumentMutation.mutate,
     isGeneratingDocument: generateDocumentMutation.isPending,
+
+    updateOrder: updateMutation.mutateAsync,
+    isUpdatingOrder: updateMutation.isPending,
+    errorUpdatingOrder: updateMutation.error,
+
+    restoreOrderRevision: restoreMutation.mutateAsync,
+    isRestoringRevision: restoreMutation.isPending,
+    restoringRevisionId: restoreMutation.variables?.revisionId,
+    errorRestoringRevision: restoreMutation.error,
+
+    uploadDocument: uploadDocumentMutation.mutateAsync,
+    isUploadingDocument: uploadDocumentMutation.isPending,
+    errorUploadingDocument: uploadDocumentMutation.error,
   };
 };

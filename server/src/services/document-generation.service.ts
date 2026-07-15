@@ -105,6 +105,7 @@ async function createArtifactDocuments(
 export async function generateOfferDocument(taskId: string): Promise<void> {
     const offerDocument = await prisma.offerDocument.findFirst({
         where: { taskId },
+        include: { offer: { select: { version: true } } },
     });
 
     if (!offerDocument) {
@@ -113,6 +114,9 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
 
     if (!assertDocumentCanBeGenerated(offerDocument, "OfferDocument")) {
         return;
+    }
+    if (offerDocument.sourceVersion != null && offerDocument.offer.version !== offerDocument.sourceVersion) {
+        throw new Error(`OfferDocument ${offerDocument.id} is stale and must be regenerated.`);
     }
 
     const context = await runPipeline<OfferPipelineContext>({
@@ -133,6 +137,14 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
 
     try {
         await prisma.$transaction(async (tx) => {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerDocument.offerId}`}))::text AS "lock"`;
+            const source = await tx.offer.findUniqueOrThrow({
+                where: { id: offerDocument.offerId },
+                select: { version: true },
+            });
+            if (offerDocument.sourceVersion != null && source.version !== offerDocument.sourceVersion) {
+                throw new Error(`OfferDocument ${offerDocument.id} became stale during generation.`);
+            }
             const { pdf, docx } = await createArtifactDocuments(tx, files);
             await tx.offerDocument.updateMany({
                 where: { offerId: offerDocument.offerId, isCurrent: true },
@@ -172,6 +184,7 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
 export async function generateOrderDocument(taskId: string): Promise<void> {
     const orderDocument = await prisma.orderDocument.findFirst({
         where: { taskId },
+        include: { order: { select: { version: true } } },
     });
 
     if (!orderDocument) {
@@ -180,6 +193,9 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
 
     if (!assertDocumentCanBeGenerated(orderDocument, "OrderDocument")) {
         return;
+    }
+    if (orderDocument.sourceVersion != null && orderDocument.order.version !== orderDocument.sourceVersion) {
+        throw new Error(`OrderDocument ${orderDocument.id} is stale and must be regenerated.`);
     }
 
     const context = await runPipeline<OrderPipelineContext>({
@@ -198,6 +214,14 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
 
     try {
         await prisma.$transaction(async (tx) => {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${orderDocument.orderId}`}))::text AS "lock"`;
+            const source = await tx.order.findUniqueOrThrow({
+                where: { id: orderDocument.orderId },
+                select: { version: true },
+            });
+            if (orderDocument.sourceVersion != null && source.version !== orderDocument.sourceVersion) {
+                throw new Error(`OrderDocument ${orderDocument.id} became stale during generation.`);
+            }
             const { pdf, docx } = await createArtifactDocuments(tx, files);
             await tx.orderDocument.updateMany({
                 where: { orderId: orderDocument.orderId, isCurrent: true },

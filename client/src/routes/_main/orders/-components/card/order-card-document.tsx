@@ -1,19 +1,28 @@
+import { Download, File, LoaderCircle, UploadCloud } from "lucide-react";
+import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import type { OrderDocument } from "@/types";
 import { Button } from "@/components";
+import { useDocumentTask, useOrderHook } from "@/hooks";
 import { BASE_URL } from "@/lib/api-client";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
-import type { OrderDocument } from "@/types";
-import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
-import { useEffect } from "react";
 
 type Props = {
     orderDocument: OrderDocument;
 }
 
 export default function OrderCardDocument({ orderDocument }: Props) {
-    const { id, orderId, status, taskId, displayName, version, pdf, docx, createdAt } = orderDocument;
+    const { id, orderId, status, taskId, displayName, version, pdf, createdAt } = orderDocument;
+    const { t } = useTranslation();
+    const { uploadDocument, isUploadingDocument, errorUploadingDocument } = useOrderHook();
 
-    useEffect(() => { }, []);
+    useDocumentTask(taskId);
+
+    useEffect(() => {
+        if (errorUploadingDocument) toast.error(errorUploadingDocument.message);
+    }, [errorUploadingDocument]);
 
     return (
         <div className="flex items-center justify-between py-3 border-b border-(--border) last:border-0">
@@ -24,6 +33,10 @@ export default function OrderCardDocument({ orderDocument }: Props) {
                         <p><span className="text-(--text-secondary)">size: </span> {formatBytesToKB(pdf?.size || 0)}</p>
                         <p><span className="text-(--text-secondary)">status: </span> {status}</p>
                         <p><span className="text-(--text-secondary)">created: </span> {formatDate(createdAt)}</p>
+                        {orderDocument.sourceVersion && <p>{t("versionHistory.sourceVersion", { version: orderDocument.sourceVersion })}</p>}
+                        <p className={orderDocument.isCurrent ? "text-green-700" : "text-(--text-secondary)"}>
+                            {orderDocument.isCurrent ? t("versionHistory.currentDocument") : t("versionHistory.historicalDocument")}
+                        </p>
                     </div>
                 </div>
 
@@ -47,18 +60,11 @@ export default function OrderCardDocument({ orderDocument }: Props) {
                 )}
 
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
-                    <>
-                        <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
-                            onClick={() => { }} loading={false}
-                            disabled={status === "UPLOADED"}
-                        />
-
-                        <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
-                            onClick={() => { }}
-                            loading={false}
-                            disabled={false}
-                        />
-                    </>
+                    <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
+                        onClick={() => uploadDocument({ orderId, documentId: id })}
+                        loading={isUploadingDocument}
+                        disabled={status === "UPLOADED" || isUploadingDocument}
+                    />
                 )}
 
                 {(status === "PENDING" || status === "PROCESSING") && (

@@ -9,10 +9,13 @@ const mocks = vi.hoisted(() => ({
     documentCreate: vi.fn(),
     offerDocumentUpdateMany: vi.fn(),
     orderDocumentUpdateMany: vi.fn(),
+    offerFindUnique: vi.fn(),
+    orderFindUnique: vi.fn(),
     runPipeline: vi.fn(),
     storeDocumentArtifacts: vi.fn(),
     removeDocumentArtifacts: vi.fn(),
     loggerError: vi.fn(),
+    queryRaw: vi.fn(),
 }));
 
 vi.mock("../lib/prismaClient.js", () => ({
@@ -76,7 +79,10 @@ describe("document generation service", () => {
             id: data.format === "PDF" ? "pdf-1" : "docx-1",
         }));
         mocks.transaction.mockImplementation(async (callback) => callback({
+            $queryRaw: mocks.queryRaw,
             document: { create: mocks.documentCreate },
+            offer: { findUniqueOrThrow: mocks.offerFindUnique },
+            order: { findUniqueOrThrow: mocks.orderFindUnique },
             offerDocument: { updateMany: mocks.offerDocumentUpdateMany },
             orderDocument: { updateMany: mocks.orderDocumentUpdateMany },
         }));
@@ -84,6 +90,9 @@ describe("document generation service", () => {
         mocks.orderDocumentUpdateMany.mockResolvedValue({ count: 1 });
         mocks.offerDocumentFindUnique.mockResolvedValue(null);
         mocks.orderDocumentFindUnique.mockResolvedValue(null);
+        mocks.offerFindUnique.mockResolvedValue({ version: 1 });
+        mocks.orderFindUnique.mockResolvedValue({ version: 1 });
+        mocks.queryRaw.mockResolvedValue([{ lock: null }]);
     });
 
     it("generiert ein Offer-Dokument nur einmal und finalisiert es atomar", async () => {
@@ -257,6 +266,24 @@ describe("document generation service", () => {
 
         await expect(generateOrderDocument("task-1")).rejects.toThrow(
             "OrderDocument document-1 has incomplete artifact links.",
+        );
+        expect(mocks.runPipeline).not.toHaveBeenCalled();
+    });
+
+    it("verwirft ein Dokument, dessen Geschäftsversion veraltet ist", async () => {
+        mocks.offerDocumentFindFirst.mockResolvedValue({
+            id: "document-1",
+            offerId: "offer-1",
+            version: 2,
+            sourceVersion: 3,
+            offer: { version: 4 },
+            status: "PROCESSING",
+            pdfId: null,
+            docxId: null,
+        });
+
+        await expect(generateOfferDocument("task-1")).rejects.toThrow(
+            "OfferDocument document-1 is stale and must be regenerated.",
         );
         expect(mocks.runPipeline).not.toHaveBeenCalled();
     });

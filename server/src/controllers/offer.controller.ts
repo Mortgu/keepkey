@@ -63,14 +63,6 @@ export const deleteOfferDocument = async (request: Request, response: Response) 
     return response.status(200).json({ success: true });
 };
 
-export const deleteOfferRevision = async (request: Request, response: Response) => {
-    await offerService.deleteOfferRevision(request.params.revisionId as string);
-
-    return response.status(200).json({
-        message: "Successfully deleted revision!",
-    });
-};
-
 /* ========== UPDATE ========== */
 
 export const updateOffer = async (request: Request, response: Response) => {
@@ -113,4 +105,14 @@ export const uploadOfferDocument = async (request: Request, response: Response) 
     const { id, documentId } = request.params;
     const result = await offerService.uploadOfferDocument(id as string, documentId as string);
     return response.status(200).json(result);
+};
+
+export const restoreOfferRevision = async (request: Request, response: Response) => {
+    const offer = await offerService.restoreOfferRevision(
+        request.params.id as string,
+        request.params.revisionId as string,
+        request.body.expectedVersion,
+        request.user!.id,
+    );
+    return response.status(200).json(offer);
 };
