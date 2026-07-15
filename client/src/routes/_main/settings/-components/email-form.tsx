@@ -1,0 +1,78 @@
+import type React from "react";
+import { useForm } from "@tanstack/react-form";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-toastify";
+import { z } from "zod";
+
+import { Button, Input } from "@/components";
+import { useAuth } from "@/context/auth.tsx";
+import { authClient } from "@/lib/auth-client.ts";
+import { getFormError } from "@/lib/utils.ts";
+
+const emailSchema = z.object({
+    newEmail: z.email("Ungültige E-Mail!"),
+});
+
+export default function EmailForm() {
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
+
+    const emailForm = useForm({
+        defaultValues: {
+            newEmail: "",
+        },
+        validators: {
+            onChange: emailSchema,
+        },
+        onSubmit: async ({ value, formApi }) => {
+            const { error } = await authClient.changeEmail({
+                newEmail: value.newEmail,
+            });
+
+            if (error) {
+                toast.error(error.message);
+                return;
+            }
+
+            await queryClient.invalidateQueries({ queryKey: ["session"] });
+            toast.success("E-Mail-Adresse geändert");
+            formApi.reset();
+        },
+    });
+
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        emailForm.handleSubmit();
+    };
+
+    return (
+        <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
+            <form onSubmit={handleSubmit} className="grid gap-4">
+                <div className="flex items-center justify-center gap-4">
+                    <Input label="Aktuelle E-Mail" size="sm" value={user?.email ?? ""} disabled />
+
+                    <emailForm.Field name="newEmail" children={(field) => (
+                        <Input id={field.name} label="Neue E-Mail-Adresse" size="sm"
+                            error={getFormError(field.state.meta.errors)}
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(e.target.value)}
+                            onBlur={field.handleBlur}
+                        />
+                    )} />
+                </div>
+
+                <div className="flex justify-end">
+                    <emailForm.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={([canSubmit, isSubmitting]) => (
+                            <Button size="xs" disabled={!canSubmit} loading={isSubmitting}>
+                                Speichern
+                            </Button>
+                        )}
+                    />
+                </div>
+            </form>
+        </div>
+    )
+}

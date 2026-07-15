@@ -2,22 +2,21 @@ import { Router } from "express";
 
 import {
   createOffer,
-  createOfferFlatrates,
-  createOfferPositions,
   deleteOffer,
   deleteOfferDocument,
-  deleteOfferRevision,
   downloadOfferDocument,
   enqueueGeneration,
+  getOfferById,
+  getOfferRevisions,
   getOffers,
+  restoreOfferRevision,
   updateOffer,
   uploadOfferDocument,
-  getOfferById
 } from "../controllers/offer.controller.js";
 
 import { notImplemented } from "../middlewares/not-implemented.js";
 import { validate } from "../middlewares/validate.js";
-import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, updateOfferDocumentSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
+import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, restoreOfferRevisionSchema, updateOfferDocumentSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
 
 const router = Router();
 
@@ -44,7 +43,7 @@ router.delete('/:id', deleteOffer);
 router.get('/:id/positions', notImplemented);
 
 /* [POST] /api/offers/:id/positions */
-router.post('/:id/positions', validate(createOfferPositionsSchema), createOfferPositions);
+router.post('/:id/positions', validate(createOfferPositionsSchema), notImplemented);
 
 /* [PATCH] /api/offers/:id/positions/:positionId */
 router.patch('/:id/positions/:positionId', validate(updateOfferPositionSchema), notImplemented);
@@ -58,7 +57,7 @@ router.delete('/:id/positions/:positionId', notImplemented);
 router.get('/:id/flatrates', notImplemented);
 
 /* [POST] /api/offers/:id/flatrates */
-router.post('/:id/flatrates', validate(createOfferFlatratesSchema), createOfferFlatrates);
+router.post('/:id/flatrates', validate(createOfferFlatratesSchema), notImplemented);
 
 /* [PATCH] /api/offers/:id/flatrates/:flatrateId */
 router.patch('/:id/flatrates/:flatrateId', validate(updateOfferFlatrateSchema), notImplemented);
@@ -89,10 +88,10 @@ router.get('/:id/documents/:documentId/:format', downloadOfferDocument);
 /* ========== Offer Revisions ========== */
 
 /* [GET] /api/offers/:id/revisions */
-router.get('/:id/revisions', notImplemented);
+router.get('/:id/revisions', getOfferRevisions);
 
-/* [DELETE] /api/offers/:id/revisions/:revisionId */
-router.delete('/:id/revisions/:revisionId', deleteOfferRevision);
+/* [POST] /api/offers/:id/revisions/:revisionId/restore */
+router.post('/:id/revisions/:revisionId/restore', validate(restoreOfferRevisionSchema), restoreOfferRevision);
 
 /* ========== Offer Tasks ========== */
 

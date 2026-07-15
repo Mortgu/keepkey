@@ -15,10 +15,10 @@ model Offer {
 
   language Language @default(DE)
 
-  quoteId     String // quoteId / voucherId
+  quoteId         String // quoteId / voucherId
   /// @openapi.ignore
-  documentVersion Int @default(0)
-  paymentTerm String
+  documentVersion Int    @default(0)
+  paymentTerm     String
 
   featureComparison Boolean @default(false)
 
@@ -46,8 +46,9 @@ model Offer {
 model OfferRevision {
   id String @id @default(uuid())
 
-  version  Int
-  snapshot Json
+  version         Int
+  snapshotVersion Int  @default(1)
+  snapshot        Json
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
@@ -57,6 +58,7 @@ model OfferRevision {
 
   createdAt DateTime @default(now())
 
+  @@unique([offerId, version])
   @@map("offer_revision")
 }
 
@@ -106,12 +108,13 @@ model OfferFlatRate {
 model OfferDocument {
   id String @id @default(cuid())
 
-  displayName String?
-  version     Int            @default(0)
-  status      DocumentStatus
-  isCurrent   Boolean        @default(false)
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
 
-  error String?
+  error       String?
   /// @openapi.ignore
   uploadToken String?
 
@@ -127,8 +130,9 @@ model OfferDocument {
   task   Task   @relation(fields: [taskId], references: [id])
   taskId String @unique
 
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
 
   @@unique([offerId, version])
   @@map("offer_document")

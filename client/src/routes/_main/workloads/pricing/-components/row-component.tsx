@@ -14,7 +14,6 @@ interface Props {
 export default function TariffRowComponent(props: Props) {
     const { groupId, tariffId, rowId, minQty, maxQty } = props;
 
-    const [edit, setEdit] = useState<boolean>(false);
     const [editMin, setEditMin] = useState(false);
     const [editMax, setEditMax] = useState(false);
     const [min, setMin] = useState(minQty);
@@ -47,7 +46,7 @@ export default function TariffRowComponent(props: Props) {
     return (
         <td className="border-b border-r border-(--border)">
             <div className="flex-1 min-w-fit w-full flex flex-wrap items-center px-3 py-1">
-                <div className="flex-1 flex items-center gap-3" onClick={() => setEdit(true)}>
+                <div className="flex-1 flex items-center gap-3">
                     <div className="relative max-w-fit box-border">
                         <p onClick={() => setEditMin(true)}>{min}</p>
                         {editMin && (

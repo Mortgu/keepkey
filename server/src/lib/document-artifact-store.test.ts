@@ -1,89 +1,119 @@
-import fs from "fs/promises";
-import os from "os";
-import path from "path";
 import { createHash } from "crypto";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { removeDocumentArtifacts, storeDocumentArtifacts } from "./document-artifact-store.js";
+import { DeleteObjectCommand, GetObjectCommand, HeadBucketCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
-describe("storeDocumentArtifacts", () => {
-    let outputDirectory: string;
+const mocks = vi.hoisted(() => ({ getSignedUrl: vi.fn() }));
 
-    beforeEach(async () => {
-        outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "keepit-artifacts-"));
+vi.mock("@aws-sdk/s3-request-presigner", () => ({ getSignedUrl: mocks.getSignedUrl }));
+
+import {
+    getDocumentDownloadUrl,
+    initDocumentArtifactStore,
+    removeDocumentArtifacts,
+    storeDocumentArtifacts,
+} from "./document-artifact-store.js";
+
+describe("document artifact store", () => {
+    const send = vi.spyOn(S3Client.prototype, "send");
+
+    beforeEach(() => {
+        send.mockReset();
+        send.mockResolvedValue({} as never);
+        mocks.getSignedUrl.mockReset();
+        mocks.getSignedUrl.mockResolvedValue("http://localhost:3900/signed-download");
     });
 
-    afterEach(async () => {
-        await fs.rm(outputDirectory, { recursive: true, force: true });
-    });
-
-    it("speichert DOCX und PDF unter deterministischen Pfaden", async () => {
+    it("stores DOCX and PDF under immutable object keys", async () => {
         const stored = await storeDocumentArtifacts(
+            "offers",
             "document-1",
             Buffer.from("docx-content"),
             Buffer.from("pdf-content"),
-            outputDirectory,
             "generation-1",
         );
 
         expect(stored.docx).toEqual({
-            filename: path.join(outputDirectory, "document-1-generation-1.docx"),
-            basename: "document-1-generation-1.docx",
-            path: outputDirectory,
+            objectKey: "generated/offers/document-1/generation-1.docx",
             size: 12,
             sha256: createHash("sha256").update("docx-content").digest("hex"),
         });
         expect(stored.pdf).toEqual({
-            filename: path.join(outputDirectory, "document-1-generation-1.pdf"),
-            basename: "document-1-generation-1.pdf",
-            path: outputDirectory,
+            objectKey: "generated/offers/document-1/generation-1.pdf",
             size: 11,
             sha256: createHash("sha256").update("pdf-content").digest("hex"),
         });
-        expect(await fs.readFile(stored.docx.filename, "utf8")).toBe("docx-content");
-        expect(await fs.readFile(stored.pdf.filename, "utf8")).toBe("pdf-content");
-    });
-
-    it("veröffentlicht parallele Versuche als unabhängige Artefaktpaare", async () => {
-        const [first, second] = await Promise.all([
-            storeDocumentArtifacts(
-                "document-1",
-                Buffer.from("first-docx"),
-                Buffer.from("first-pdf"),
-                outputDirectory,
-                "generation-1",
-            ),
-            storeDocumentArtifacts(
-                "document-1",
-                Buffer.from("second-docx"),
-                Buffer.from("second-pdf"),
-                outputDirectory,
-                "generation-2",
-            ),
-        ]);
-
-        expect(await fs.readFile(first.docx.filename, "utf8")).toBe("first-docx");
-        expect(await fs.readFile(first.pdf.filename, "utf8")).toBe("first-pdf");
-        expect(await fs.readFile(second.docx.filename, "utf8")).toBe("second-docx");
-        expect(await fs.readFile(second.pdf.filename, "utf8")).toBe("second-pdf");
-        expect((await fs.readdir(outputDirectory)).sort()).toEqual([
-            "document-1-generation-1.docx",
-            "document-1-generation-1.pdf",
-            "document-1-generation-2.docx",
-            "document-1-generation-2.pdf",
+        expect(send).toHaveBeenCalledTimes(2);
+        expect(send.mock.calls.map(([command]) => (command as PutObjectCommand).input.Key).sort()).toEqual([
+            stored.docx.objectKey,
+            stored.pdf.objectKey,
         ]);
     });
 
-    it("entfernt ein nicht finalisiertes Artefaktpaar", async () => {
-        const stored = await storeDocumentArtifacts(
+    it("removes both objects when publication fails", async () => {
+        send.mockImplementation(async (command) => {
+            if (command instanceof PutObjectCommand && command.input.Key?.endsWith(".pdf")) {
+                throw new Error("upload failed");
+            }
+            return {} as never;
+        });
+
+        await expect(storeDocumentArtifacts(
+            "orders",
             "document-1",
             Buffer.from("docx"),
             Buffer.from("pdf"),
-            outputDirectory,
+            "generation-1",
+        )).rejects.toThrow("One or more document artifact operations failed.");
+
+        const deleted = send.mock.calls
+            .map(([command]) => command)
+            .filter((command) => command instanceof DeleteObjectCommand)
+            .map((command) => (command as DeleteObjectCommand).input.Key)
+            .sort();
+        expect(deleted).toEqual([
+            "generated/orders/document-1/generation-1.docx",
+            "generated/orders/document-1/generation-1.pdf",
+        ]);
+    });
+
+    it("removes an unpublished artifact pair explicitly", async () => {
+        const stored = await storeDocumentArtifacts(
+            "offers",
+            "document-1",
+            Buffer.from("docx"),
+            Buffer.from("pdf"),
             "generation-1",
         );
+        send.mockClear();
 
         await removeDocumentArtifacts(stored);
 
-        expect(await fs.readdir(outputDirectory)).toEqual([]);
+        expect(send.mock.calls.every(([command]) => command instanceof DeleteObjectCommand)).toBe(true);
+        expect(send).toHaveBeenCalledTimes(2);
+    });
+
+    it("checks bucket access during startup", async () => {
+        await initDocumentArtifactStore();
+        expect(send).toHaveBeenCalledWith(expect.any(HeadBucketCommand));
+    });
+
+    it("creates a five-minute signed download URL with response headers", async () => {
+        await expect(getDocumentDownloadUrl(
+            "generated/offers/document-1/generation-1.pdf",
+            "Offer.pdf",
+            "application/pdf",
+        )).resolves.toBe("http://localhost:3900/signed-download");
+
+        expect(mocks.getSignedUrl).toHaveBeenCalledWith(
+            expect.any(S3Client),
+            expect.any(GetObjectCommand),
+            { expiresIn: 300 },
+        );
+        const command = mocks.getSignedUrl.mock.calls[0]![1] as GetObjectCommand;
+        expect(command.input).toMatchObject({
+            Key: "generated/offers/document-1/generation-1.pdf",
+            ResponseContentDisposition: 'attachment; filename="Offer.pdf"',
+            ResponseContentType: "application/pdf",
+        });
     });
 });

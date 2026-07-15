@@ -20,6 +20,11 @@ export const getOrderById = async (request: Request, response: Response) => {
     return response.status(200).json(order);
 };
 
+export const getOrderRevisions = async (request: Request, response: Response) => {
+    const revisions = await orderService.getOrderRevisions(request.params.orderId as string);
+    return response.status(200).json(revisions);
+};
+
 export const downloadOrderDocument = async (request: Request, response: Response) => {
     const orderId = request.params.orderId as string;
     const documentId = request.params.documentId as string;
@@ -27,15 +32,7 @@ export const downloadOrderDocument = async (request: Request, response: Response
 
     const download = await orderService.downloadOrderDocument(orderId, documentId, format);
 
-    response.setHeader("Content-Type", download.contentType);
-    response.setHeader("Content-Disposition", `attachment; filename="${download.downloadName}"`);
-
-    if (download.kind === "stream") {
-        download.stream.pipe(response);
-        return;
-    }
-
-    return response.download(download.filePath, download.downloadName);
+    return response.redirect(302, download.url);
 };
 
 /* ========== POST ========== */
@@ -68,9 +65,38 @@ export const uploadOrderDocument = async (request: Request, response: Response) 
     return response.status(200).json(result);
 };
 
+export const restoreOrderRevision = async (request: Request, response: Response) => {
+    const order = await orderService.restoreOrderRevision(
+        request.params.orderId as string,
+        request.params.revisionId as string,
+        request.body.expectedVersion,
+        request.user!.id,
+    );
+    return response.status(200).json(order);
+};
+
+/* ========== PATCH ========== */
+
+export const updateOrder = async (request: Request, response: Response) => {
+    const order = await orderService.updateOrder(
+        request.params.orderId as string,
+        request.body,
+        request.user!.id,
+    );
+    return response.status(200).json(order);
+};
+
 /* ========== DELETE ========== */
 
 export const deleteOrderById = async (request: Request, response: Response) => {
     await orderService.deleteOrderById(request.params.id as string);
     return response.status(200).json({ message: "Deletion successfully", success: true });
+};
+
+export const deleteOrderDocument = async (request: Request, response: Response) => {
+    await orderService.deleteOrderDocument(
+        request.params.orderId as string,
+        request.params.documentId as string,
+    );
+    return response.status(200).json({ success: true });
 };

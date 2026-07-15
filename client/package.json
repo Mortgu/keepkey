@@ -8,11 +8,12 @@
     "build": "npx tsc -b && vite build",
     "generate:types": "npx openapi-typescript ../server/prisma/schema/openapi/openapi.yaml -o src/types/api.ts",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview",
     "prebuild": "npm run generate:types"
   },
   "dependencies": {
-    "@better-auth/mongo-adapter": "^1.5.5",
+    "@better-auth/passkey": "^1.6.23",
     "@tailwindcss/vite": "^4.2.2",
     "@tanstack/react-devtools": "^0.10.0",
     "@tanstack/react-form": "^1.33.0",
@@ -58,6 +59,7 @@
     "openapi-typescript": "^7.13.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
-    "vite": "^8.0.0"
+    "vite": "^8.0.0",
+    "vitest": "^4.1.10"
   }
 }

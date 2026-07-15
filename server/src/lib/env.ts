@@ -9,7 +9,14 @@ const env = createEnv({
         BETTER_AUTH_URL: z.url(),
 
         TEMPLATES_DIR: z.string().min(1),
-        OUTPUT_DIR: z.string().min(1),
+
+        S3_ENDPOINT: z.url(),
+        S3_PUBLIC_ENDPOINT: z.url().optional(),
+        S3_REGION: z.string().min(1).default("auto"),
+        S3_BUCKET: z.string().min(1),
+        S3_ACCESS_KEY_ID: z.string().min(1),
+        S3_SECRET_ACCESS_KEY: z.string().min(1),
+        S3_FORCE_PATH_STYLE: z.string().default("true").transform((value) => value === "true"),
 
         DATABASE_URL: z.url(),
 
@@ -20,6 +27,8 @@ const env = createEnv({
         NEXTCLOUD_USER: z.string().optional(),
         NEXTCLOUD_PASSWORD: z.string().optional(),
         NEXTCLOUD_OFFER_PATH: z.string(),
+
+        NEXTCLOUD_TEMPLATES_PATH: z.string().default('/Templates'),
 
         NEXTCLOUD_OFFER_PDF_PATH: z.string().default('/'),
         NEXTCLOUD_OFFER_ORIGINAL_PATH: z.string().default('/'),

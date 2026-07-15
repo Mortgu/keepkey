@@ -37,7 +37,7 @@ interface OfferModalProps {
 }
 
 export default function OfferModal(props: OfferModalProps) {
-  const { closeFn, currentOffer, customers, suppliers, users, products, contracts } = props;
+  const { closeFn, currentOffer, customers, suppliers, users } = props;
 
   const state = useOfferFormState({
     closeFn,
@@ -290,7 +290,7 @@ export default function OfferModal(props: OfferModalProps) {
           </div>
 
           {/*
-          <WorkloadSection state={state} products={products} contracts={contracts} />
+          <WorkloadSection state={state} />
           */}
 
           <ProductModalSection

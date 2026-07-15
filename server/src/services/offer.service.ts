@@ -1,12 +1,9 @@
-import fs from "fs";
-import path from "path";
-import { Readable } from "stream";
 import z from "zod";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { downloadDocumentStream } from "../lib/nextcloud.js";
+import { getDocumentDownloadUrl } from "../lib/document-artifact-store.js";
 import { uploadOfferDocument as uploadOfferDocumentUseCase } from "./document-upload.service.js";
 import { requestOfferGeneration } from "./document-generation-request.service.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
@@ -20,6 +17,10 @@ import {
     createOfferSchema,
     updateOfferSchema,
 } from "../schemas/offer-schemas.js";
+import {
+    buildOfferRevisionSnapshot,
+    parseOfferRevisionSnapshot,
+} from "../schemas/revision-schemas.js";
 
 /* ========== Types ========== */
 
@@ -34,6 +35,7 @@ type PricedPosition = PositionInput & {
     eur_user_month: number;
     discount_cents: number;
 };
+type StoredPosition = Omit<PricedPosition, "optional"> & { optional?: boolean | null };
 type PricedFlatrate = FlatrateInput & { total_cents: number };
 
 export interface OfferListQuery {
@@ -45,9 +47,7 @@ export interface OfferListQuery {
     limit?: unknown;
 }
 
-export type OfferDocumentDownload =
-    | { kind: "stream"; stream: Readable; contentType: string; downloadName: string }
-    | { kind: "file"; filePath: string; contentType: string; downloadName: string };
+export type OfferDocumentDownload = { url: string };
 
 const MIME_TYPES: Record<string, string> = {
     pdf: "application/pdf",
@@ -160,7 +160,7 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
     });
 }
 
-async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
+async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: StoredPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
         data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents }) => ({
@@ -219,16 +219,8 @@ export async function getOffers(query: OfferListQuery) {
         include: {
             customer: { select: { id: true, companyName: true } },
             customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
-            revisions: {
-                orderBy: { version: "desc" },
-                select: {
-                    id: true,
-                    version: true,
-                    createdAt: true,
-                    changedBy: { select: { id: true, name: true } },
-                },
-            },
             offerDocuments: {
+                where: { deletedAt: null },
                 include: {
                     docx: true,
                     pdf: true
@@ -264,6 +256,7 @@ export async function getOfferById(id: string) {
         where: { id },
         include: {
             offerDocuments: {
+                where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
                 include: {
                     pdf: true,
@@ -293,10 +286,20 @@ export async function getOfferById(id: string) {
 }
 
 export async function getOfferRevisions(offerId: string) {
+    const exists = await prisma.offer.findUnique({ where: { id: offerId }, select: { id: true } });
+    if (!exists) {
+        throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
+    }
+
     return prisma.offerRevision.findMany({
         where: { offerId },
         orderBy: { version: "desc" },
-        select: { id: true, version: true, changedBy: true, createdAt: true },
+        select: {
+            id: true,
+            version: true,
+            createdAt: true,
+            changedBy: { select: { id: true, name: true } },
+        },
     });
 }
 
@@ -311,7 +314,7 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
     }
 
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId },
+        where: { offerId, id: documentId, deletedAt: null },
         include: { pdf: true, docx: true },
     });
 
@@ -319,7 +322,7 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
         throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
     }
 
-    if (offerDoc.status !== "GENERATED" && offerDoc.status !== "UPLOADED") {
+    if (!["GENERATED", "UPLOADING", "UPLOADED"].includes(offerDoc.status)) {
         throw new AppException("Document not yet generated", 409, "DOCUMENT_NOT_GENERATED");
     }
 
@@ -329,31 +332,13 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
     }
 
     const contentType = MIME_TYPES[format]!;
-    const downloadName = `${offerDoc.displayName ?? offerDoc.id}.${format}`;
-
-    if (offerDoc.status === "UPLOADED") {
-        try {
-            const stream = await downloadDocumentStream(file.remotePath ?? file.filename);
-            return { kind: "stream", stream, contentType, downloadName };
-        } catch (exception: any) {
-            if (exception instanceof AppException) throw exception;
-            throw new AppException(
-                "Failed to download from Nextcloud: " + exception.message,
-                500,
-                "NEXTCLOUD_DOWNLOAD_FAILED",
-            );
-        }
-    }
-
-    const filePath = path.join(file.path, file.basename);
-
-    try {
-        await fs.promises.access(filePath);
-    } catch {
-        throw new AppException("File not found on disk", 404, "FILE_NOT_FOUND_ON_DISK");
-    }
-
-    return { kind: "file", filePath, contentType, downloadName };
+    return {
+        url: await getDocumentDownloadUrl(
+            file.objectKey,
+            `${offerDoc.displayName ?? offerDoc.id}.${format}`,
+            contentType,
+        ),
+    };
 }
 
 /* ========== Mutations ========== */
@@ -391,13 +376,15 @@ export async function createOffer(input: CreateOfferInput) {
 }
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
-    const { positions: rawPositions = [], flatrates: rawFlatrates = [] } = input;
+    const { positions: rawPositions, flatrates: rawFlatrates, expectedVersion } = input;
     const { id: _, ...offerFields } = (input.offer ?? {}) as CreateOfferFieldsInput & { id?: string };
 
     const positions = await pricePositions(rawPositions, input.offer?.customerId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
     return prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
+
         const net_amount =
             positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
             flatrates.reduce((sum, f) => sum + f.total_cents, 0);
@@ -410,12 +397,23 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
             },
         });
 
+        if (current.version !== expectedVersion) {
+            throw new AppException(
+                "The offer was changed by another user. Reload it and try again.",
+                409,
+                "VERSION_CONFLICT",
+            );
+        }
+
+        const snapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
+
         await tx.offerRevision.create({
             data: {
                 offerId,
                 version: current.version,
                 changedById: actorId,
-                snapshot: current as any,
+                snapshotVersion: 1,
+                snapshot: snapshot as Prisma.InputJsonValue,
             },
         });
 
@@ -430,6 +428,93 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
         await replacePositions(tx, offerId, positions);
         await replaceFlatRates(tx, offerId, flatrates);
+        await tx.offerDocument.updateMany({
+            where: { offerId, isCurrent: true },
+            data: { isCurrent: false },
+        });
+
+        return offer;
+    });
+}
+
+export async function restoreOfferRevision(
+    offerId: string,
+    revisionId: string,
+    expectedVersion: number,
+    actorId: string,
+) {
+    return prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
+
+        const current = await tx.offer.findUnique({
+            where: { id: offerId },
+            include: { offerPositions: true, offerFlatRates: true },
+        });
+        if (!current) {
+            throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
+        }
+        if (current.version !== expectedVersion) {
+            throw new AppException(
+                "The offer was changed by another user. Reload it and try again.",
+                409,
+                "VERSION_CONFLICT",
+            );
+        }
+
+        const revision = await tx.offerRevision.findFirst({
+            where: { id: revisionId, offerId },
+            select: { snapshot: true, snapshotVersion: true },
+        });
+        if (!revision) {
+            throw new AppException("Offer revision not found!", 404, "OFFER_REVISION_NOT_FOUND");
+        }
+        if (revision.snapshotVersion !== 1) {
+            throw new AppException(
+                `Offer revision snapshot version ${revision.snapshotVersion} is not supported.`,
+                422,
+                "UNSUPPORTED_REVISION_SNAPSHOT_VERSION",
+            );
+        }
+
+        let restored;
+        try {
+            restored = parseOfferRevisionSnapshot(revision.snapshot);
+        } catch {
+            throw new AppException(
+                "The stored offer revision is invalid and cannot be restored.",
+                422,
+                "INVALID_REVISION_SNAPSHOT",
+            );
+        }
+
+        const currentSnapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
+        await tx.offerRevision.create({
+            data: {
+                offerId,
+                version: current.version,
+                changedById: actorId,
+                snapshotVersion: 1,
+                snapshot: currentSnapshot as Prisma.InputJsonValue,
+            },
+        });
+
+        const offer = await tx.offer.update({
+            where: { id: offerId },
+            data: {
+                ...restored.offer,
+                date: new Date(restored.offer.date),
+                validUntil: restored.offer.validUntil ? new Date(restored.offer.validUntil) : null,
+                requestFrom: restored.offer.requestFrom ? new Date(restored.offer.requestFrom) : null,
+                version: { increment: 1 },
+            },
+        });
+
+        await replacePositions(tx, offerId, restored.positions);
+        await replaceFlatRates(tx, offerId, restored.flatRates);
+        await tx.offerDocument.updateMany({
+            where: { offerId, isCurrent: true },
+            data: { isCurrent: false },
+        });
 
         return offer;
     });
@@ -518,31 +603,42 @@ export async function deleteOffer(id: string): Promise<void> {
         throw new AppException("Bad request. Missing id!", 400, "MISSING_ID");
     }
 
-    await prisma.offer.findUniqueOrThrow({ where: { id } });
-    await prisma.offer.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
+        await tx.offer.findUniqueOrThrow({ where: { id } });
+        if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
+            throw new AppException(
+                "Offers with document history cannot be deleted.",
+                409,
+                "OFFER_HAS_DOCUMENT_HISTORY",
+            );
+        }
+        await tx.offer.delete({ where: { id } });
+    });
 }
 
 export async function deleteOfferDocument(offerId: string, documentId: string): Promise<void> {
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId },
-        include: { pdf: true, docx: true },
+        where: { offerId, id: documentId, deletedAt: null },
     });
 
     if (!offerDoc) {
         throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
     }
 
-    for (const file of [offerDoc.pdf, offerDoc.docx]) {
-        if (file) {
-            await fs.promises.rm(path.join(file.path, file.basename), { force: true });
-        }
-    }
-
-    await prisma.offerDocument.delete({ where: { id: offerDoc.id } });
-}
-
-export async function deleteOfferRevision(revisionId: string): Promise<void> {
-    await prisma.offerRevision.delete({
-        where: { id: revisionId },
+    const deleted = await prisma.offerDocument.updateMany({
+        where: {
+            id: offerDoc.id,
+            deletedAt: null,
+            status: { notIn: ["PENDING", "PROCESSING", "UPLOADING"] },
+        },
+        data: { deletedAt: new Date(), isCurrent: false },
     });
+    if (deleted.count !== 1) {
+        throw new AppException(
+            "A document cannot be deleted while processing.",
+            409,
+            "DOCUMENT_PROCESSING",
+        );
+    }
 }

@@ -63,27 +63,27 @@ function asResult(path: string, stat: FileStat, sha256: string): RemoteDocumentA
     };
 }
 
-export async function uploadDocumentArtifact(
-    filename: string,
-    directory: string,
-    content: Buffer,
-    expectedSha256: string,
-): Promise<RemoteDocumentArtifact> {
+export async function uploadDocumentArtifact(filename: string, directory: string, content: Buffer, expectedSha256: string): Promise<RemoteDocumentArtifact> {
     const localSha256 = sha256Document(content);
+
     if (localSha256 !== expectedSha256) {
         throw new Error(`Local document ${filename} does not match its stored SHA-256 checksum.`);
     }
 
     const path = remotePath(directory, filename);
+
     const existing = await getRemoteFile(path);
+
     if (existing) {
         if (existing.stat.size !== content.length || existing.sha256 !== expectedSha256) {
             throw new RemoteDocumentConflictError(path, expectedSha256, existing.sha256);
         }
+
         return asResult(path, existing.stat, existing.sha256);
     }
 
     const client = getNextCloudClient();
+
     try {
         const created = await client.putFileContents(path, content, {
             overwrite: false,
@@ -92,6 +92,9 @@ export async function uploadDocumentArtifact(
                 "X-Hash": "sha256",
             },
         });
+
+        console.log(created);
+
         if (!created) {
             const raced = await getRemoteFile(path);
             if (!raced) throw new Error(`Nextcloud rejected the upload for ${path}.`);
@@ -101,6 +104,8 @@ export async function uploadDocumentArtifact(
             return asResult(path, raced.stat, raced.sha256);
         }
     } catch (uploadError) {
+        console.log(uploadError);
+
         const raced = await getRemoteFile(path);
         if (!raced) throw uploadError;
         if (raced.stat.size !== content.length || raced.sha256 !== expectedSha256) {

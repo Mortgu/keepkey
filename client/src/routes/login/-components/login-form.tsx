@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, KeyRound } from "lucide-react";
 import { z } from "zod";
 import { Route } from "../";
 
@@ -12,7 +12,36 @@ export function LoginFormComponent() {
     const [error, setError] = useState<string | undefined>(undefined);
     const [showPassword, setShowPassword] = useState(false);
     const [remember, setRemember] = useState(false);
+    const [passkeyLoading, setPasskeyLoading] = useState(false);
     const { redirect } = Route.useSearch();
+
+    useEffect(() => {
+        const supportsConditional =
+            typeof PublicKeyCredential !== "undefined" &&
+            typeof PublicKeyCredential.isConditionalMediationAvailable === "function";
+        if (!supportsConditional) return;
+
+        PublicKeyCredential.isConditionalMediationAvailable().then((available) => {
+            if (!available) return;
+            void authClient.signIn.passkey({ autoFill: true });
+        });
+    }, []);
+
+    const handlePasskeySignIn = async () => {
+        setPasskeyLoading(true);
+        setError(undefined);
+        const { error: err } = await authClient.signIn.passkey({
+            fetchOptions: {
+                onSuccess: () => {
+                    window.location.assign(redirect ? `${redirect}` : "/");
+                },
+            },
+        });
+        setPasskeyLoading(false);
+        if (err) {
+            setError(err.message ?? "Passkey-Anmeldung fehlgeschlagen");
+        }
+    };
 
     const form = useForm({
         defaultValues: {
@@ -131,6 +160,7 @@ export function LoginFormComponent() {
                                         onChange={(e) => field.handleChange(e.target.value)}
                                         onBlur={field.handleBlur}
                                         type="email"
+                                        autoComplete="username webauthn"
                                         placeholder="du@firma.de"
                                         className={
                                             field.state.meta.isTouched &&
@@ -166,6 +196,7 @@ export function LoginFormComponent() {
                                             onChange={(e) => field.handleChange(e.target.value)}
                                             onBlur={field.handleBlur}
                                             type={showPassword ? "text" : "password"}
+                                            autoComplete="current-password webauthn"
                                             placeholder="••••••••"
                                             className={`pr-10 ${field.state.meta.isTouched && field.state.meta.errors.length > 0 ? "border-red-400!" : ""}`}
                                         />
@@ -235,6 +266,25 @@ export function LoginFormComponent() {
                             )}
                         </form.Subscribe>
                     </form>
+
+                    {/* Divider */}
+                    <div className="flex items-center gap-3 my-1">
+                        <div className="h-px flex-1 bg-(--border)"/>
+                        <span className="text-xs text-gray-400">oder</span>
+                        <div className="h-px flex-1 bg-(--border)"/>
+                    </div>
+
+                    {/* Passkey sign-in */}
+                    <Button
+                        type="button"
+                        variant="secondary"
+                        icon={<KeyRound size={16}/>}
+                        loading={passkeyLoading}
+                        onClick={handlePasskeySignIn}
+                        className="w-full"
+                    >
+                        {!passkeyLoading && "Mit Passkey anmelden"}
+                    </Button>
                 </div>
             </div>
         </div>

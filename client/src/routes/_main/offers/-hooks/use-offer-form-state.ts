@@ -1,11 +1,11 @@
 import { useForm, useStore } from "@tanstack/react-form";
-import { offerFormSchema } from "../-schemas/offer-form-schema";
-import type { CreateOfferInput, Customer, Language, Offer, Supplier, User } from "@/types";
 import { useState } from "react";
-import { useLocale } from "@/hooks";
+import { offerFormSchema } from "../-schemas/offer-form-schema";
 import { useOfferProducts } from "./use-offer-product";
-import { useOfferManager } from "@/hooks/offers/offer-mutations";
 import { useQuoteIdCheck } from "./use-quote-check";
+import type { CreateOfferInput, Customer, Language, Offer, Supplier, User } from "@/types";
+import { useLocale } from "@/hooks";
+import { useOfferManager } from "@/hooks/offers/offer-mutations";
 
 interface Props {
     closeFn: () => void;
@@ -36,9 +36,9 @@ function getFormDefaults(currentOffer: Offer | undefined, sources: OfferFormDefa
     const { customers, suppliers, users, locale } = sources;
 
     return {
-        customerId: currentOffer?.customerId ?? customers[0]?.id ?? "",
-        contactPersonId: currentOffer?.contactPersonId ?? customers[0]?.contactPersons[0]?.id ?? "",
-        userId: currentOffer?.userId ?? users[0]?.id ?? "",
+        customerId: currentOffer ? currentOffer.customerId : customers[0]?.id ?? "",
+        contactPersonId: currentOffer ? currentOffer.contactPersonId : customers[0]?.contactPersons[0]?.id ?? "",
+        userId: currentOffer ? currentOffer.userId : users[0]?.id ?? "",
         quoteId: currentOffer?.quoteId ?? "",
         paymentTerm: currentOffer?.paymentTerm ?? "30 Tage",
         validUntil: currentOffer?.validUntil ?? null,
@@ -54,7 +54,8 @@ function getFormDefaults(currentOffer: Offer | undefined, sources: OfferFormDefa
 export default function useOfferFormState(props: Props) {
     const { closeFn, currentOffer, customers, suppliers, users } = props;
 
-    const [isEdit, setEdit] = useState<boolean>(currentOffer !== undefined);
+    const [isEdit] = useState<boolean>(currentOffer !== undefined);
+    const [expectedVersion] = useState(currentOffer?.version);
     const [submitException, setSubmitException] = useState<Error | undefined>(undefined);
 
     const locale = useLocale();
@@ -90,14 +91,18 @@ export default function useOfferFormState(props: Props) {
                 };
 
                 if (currentOffer) {
-                    await updateOffer({ offerId: currentOffer.id, ...payload });
+                    await updateOffer({
+                        offerId: currentOffer.id,
+                        expectedVersion: expectedVersion!,
+                        ...payload,
+                    });
                 } else {
                     await createOffer(payload);
                 }
 
                 closeFn();
-            } catch (exception: any) {
-                setSubmitException(exception as Error);
+            } catch (exception: unknown) {
+                setSubmitException(exception instanceof Error ? exception : new Error("Offer could not be saved."));
             }
         }
     });

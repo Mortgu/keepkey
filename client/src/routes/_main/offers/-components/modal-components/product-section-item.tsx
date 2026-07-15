@@ -46,7 +46,7 @@ export default function ProductSectionItem(props: Props) {
     return (
         <div className={styles({ edit })}>
 
-            <div className="flex items-center justify-between px-4 py-3 ">
+            <div className="flex items-center justify-between px-4 py-3 gap-4">
                 <div className="grid">
                     <p className="flex items-center gap-1 text-sm font-normal">
                         {offerProduct.quantity} <X className="size-3" />{" "}

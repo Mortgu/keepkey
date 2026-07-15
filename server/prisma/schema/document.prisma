@@ -15,16 +15,14 @@ enum DocumentFormat {
 model Document {
   id String @id @default(cuid())
 
-  filename String // generated/xdawdawd.pdf
-  basename String // xdawdawd.pdf
-  path     String // generated
-  format   DocumentFormat // PDF || DOCX
+  objectKey String         @unique
+  format    DocumentFormat
 
-  size Int?
+  size   Int?
   sha256 String?
 
   uploadedAt DateTime? @db.Timestamptz(6)
-  remotePath String? @unique
+  remotePath String?   @unique
   remoteEtag String?
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -36,6 +34,5 @@ model Document {
   orderPdfDocument  OrderDocument? @relation("orderPdf")
   orderDocxDocument OrderDocument? @relation("orderDocx")
 
-  @@unique([filename])
   @@map("document")
 }

@@ -191,11 +191,7 @@ components:
       properties:
         id:
           type: string
-        filename:
-          type: string
-        basename:
-          type: string
-        path:
+        objectKey:
           type: string
         format:
           $ref: "#/components/schemas/DocumentFormat"
@@ -227,9 +223,7 @@ components:
           $ref: "#/components/schemas/OrderDocument"
       required:
         - id
-        - filename
-        - basename
-        - path
+        - objectKey
         - format
         - createdAt
         - updatedAt
@@ -330,6 +324,9 @@ components:
         version:
           type: integer
           format: int32
+        snapshotVersion:
+          type: integer
+          format: int32
         snapshot:
           type: object
         offer:
@@ -346,6 +343,7 @@ components:
       required:
         - id
         - version
+        - snapshotVersion
         - snapshot
         - offer
         - offerId
@@ -448,6 +446,9 @@ components:
         version:
           type: integer
           format: int32
+        sourceVersion:
+          type: integer
+          format: int32
         status:
           $ref: "#/components/schemas/DocumentStatus"
         isCurrent:
@@ -474,6 +475,9 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
           type: string
           format: date-time
       required:
@@ -534,6 +538,9 @@ components:
         net_amount:
           type: integer
           format: int32
+        version:
+          type: integer
+          format: int32
         documents:
           type: array
           items:
@@ -546,6 +553,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OrderFlatRate"
+        revisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderRevision"
         createdAt:
           type: string
           format: date-time
@@ -566,11 +577,47 @@ components:
         - paymentTerm
         - date
         - net_amount
+        - version
         - documents
         - orderPositions
         - flatRates
+        - revisions
         - createdAt
         - updatedAt
+    OrderRevision:
+      type: object
+      properties:
+        id:
+          type: string
+        version:
+          type: integer
+          format: int32
+        snapshotVersion:
+          type: integer
+          format: int32
+        snapshot:
+          type: object
+        order:
+          $ref: "#/components/schemas/Order"
+        orderId:
+          type: string
+        changedBy:
+          $ref: "#/components/schemas/User"
+        changedById:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - version
+        - snapshotVersion
+        - snapshot
+        - order
+        - orderId
+        - changedBy
+        - changedById
+        - createdAt
     OrderPosition:
       type: object
       properties:
@@ -651,6 +698,9 @@ components:
         version:
           type: integer
           format: int32
+        sourceVersion:
+          type: integer
+          format: int32
         status:
           $ref: "#/components/schemas/DocumentStatus"
         isCurrent:
@@ -679,6 +729,9 @@ components:
         updatedAt:
           type: string
           format: date-time
+        deletedAt:
+          type: string
+          format: date-time
       required:
         - id
         - version
@@ -690,6 +743,45 @@ components:
         - taskId
         - createdAt
         - updatedAt
+    Passkey:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        publicKey:
+          type: string
+        userId:
+          type: string
+        user:
+          $ref: "#/components/schemas/User"
+        credentialID:
+          type: string
+        counter:
+          type: integer
+          format: int32
+        deviceType:
+          type: string
+        backedUp:
+          type: boolean
+        transports:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        aaguid:
+          type: string
+      required:
+        - id
+        - publicKey
+        - userId
+        - user
+        - credentialID
+        - counter
+        - deviceType
+        - backedUp
+        - createdAt
     Product:
       type: object
       properties:
@@ -785,6 +877,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/Account"
+        passkeys:
+          type: array
+          items:
+            $ref: "#/components/schemas/Passkey"
         role:
           type: string
         banned:
@@ -810,6 +906,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/OfferRevision"
+        orderRevisions:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderRevision"
       required:
         - id
         - name
@@ -822,9 +922,11 @@ components:
         - updatedAt
         - sessions
         - accounts
+        - passkeys
         - offers
         - orders
         - offerRevisions
+        - orderRevisions
     Session:
       type: object
       properties:

@@ -3,15 +3,19 @@ import {
   createOrder,
   createOrderTask,
   deleteOrderById,
+  deleteOrderDocument,
   downloadOrderDocument,
   generateOrderDocument,
   getAllOrders,
   getNextOrderNumber,
   getOrderById,
+  getOrderRevisions,
+  restoreOrderRevision,
+  updateOrder,
   uploadOrderDocument,
 } from "../controllers/index.js";
 import {validate} from "../middlewares/validate.js";
-import {createOrderSchema} from "../schemas/index.js";
+import {createOrderSchema, restoreOrderRevisionSchema, updateOrderSchema} from "../schemas/index.js";
 
 const router = Router();
 
@@ -21,13 +25,21 @@ router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", getOrderById);
 
+router.get("/:orderId/revisions", getOrderRevisions);
+
 router.get("/:orderId/documents/:documentId/:format", downloadOrderDocument);
 
 router.post('/:orderId/document', generateOrderDocument);
 
 router.post('/:orderId/documents/:documentId/upload', uploadOrderDocument);
 
+router.delete('/:orderId/documents/:documentId', deleteOrderDocument);
+
 router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
+
+router.post('/:orderId/revisions/:revisionId/restore', validate(restoreOrderRevisionSchema), restoreOrderRevision);
+
+router.patch('/:orderId', validate(updateOrderSchema), updateOrder);
 
 router.delete("/:id", deleteOrderById);
 

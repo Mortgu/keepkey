@@ -1,12 +1,16 @@
 import { createHash, randomUUID } from "crypto";
-import fs from "fs/promises";
-import path from "path";
+import {
+    DeleteObjectCommand,
+    GetObjectCommand,
+    HeadBucketCommand,
+    PutObjectCommand,
+    S3Client,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import env from "./env.js";
 
 export type StoredDocumentArtifact = {
-    filename: string;
-    basename: string;
-    path: string;
+    objectKey: string;
     size: number;
     sha256: string;
 };
@@ -16,7 +20,29 @@ export type StoredDocumentArtifacts = {
     docx: StoredDocumentArtifact;
 };
 
-async function settleFileOperations(operations: Promise<unknown>[]): Promise<void> {
+export type DocumentArtifactScope = "offers" | "orders";
+const DOWNLOAD_URL_TTL_SECONDS = 5 * 60;
+
+const credentials = {
+    accessKeyId: env.S3_ACCESS_KEY_ID,
+    secretAccessKey: env.S3_SECRET_ACCESS_KEY,
+};
+
+function createClient(endpoint: string): S3Client {
+    return new S3Client({
+        endpoint,
+        region: env.S3_REGION,
+        forcePathStyle: env.S3_FORCE_PATH_STYLE,
+        credentials,
+    });
+}
+
+const storageClient = createClient(env.S3_ENDPOINT);
+const downloadClient = env.S3_PUBLIC_ENDPOINT && env.S3_PUBLIC_ENDPOINT !== env.S3_ENDPOINT
+    ? createClient(env.S3_PUBLIC_ENDPOINT)
+    : storageClient;
+
+async function settleOperations(operations: Promise<unknown>[]): Promise<void> {
     const results = await Promise.allSettled(operations);
     const errors = results
         .filter((result): result is PromiseRejectedResult => result.status === "rejected")
@@ -28,67 +54,97 @@ async function settleFileOperations(operations: Promise<unknown>[]): Promise<voi
 }
 
 export async function storeDocumentArtifacts(
+    scope: DocumentArtifactScope,
     documentId: string,
     docxBuffer: Buffer,
     pdfBuffer: Buffer,
-    outputDirectory = env.OUTPUT_DIR,
     generationId: string = randomUUID(),
 ): Promise<StoredDocumentArtifacts> {
-    await fs.mkdir(outputDirectory, { recursive: true });
-
-    const docxBasename = `${documentId}-${generationId}.docx`;
-    const pdfBasename = `${documentId}-${generationId}.pdf`;
-    const docxFilename = path.join(outputDirectory, docxBasename);
-    const pdfFilename = path.join(outputDirectory, pdfBasename);
-    const temporaryDocx = `${docxFilename}.tmp`;
-    const temporaryPdf = `${pdfFilename}.tmp`;
+    const prefix = `generated/${scope}/${documentId}/${generationId}`;
+    const docx = artifact(`${prefix}.docx`, docxBuffer);
+    const pdf = artifact(`${prefix}.pdf`, pdfBuffer);
 
     try {
-        await settleFileOperations([
-            fs.writeFile(temporaryDocx, docxBuffer),
-            fs.writeFile(temporaryPdf, pdfBuffer),
-        ]);
-        await settleFileOperations([
-            fs.rename(temporaryDocx, docxFilename),
-            fs.rename(temporaryPdf, pdfFilename),
+        await settleOperations([
+            putArtifact(docx, docxBuffer, "application/vnd.openxmlformats-officedocument.wordprocessingml.document"),
+            putArtifact(pdf, pdfBuffer, "application/pdf"),
         ]);
     } catch (error) {
-        const cleanup = await Promise.allSettled([
-            fs.rm(temporaryDocx, { force: true }),
-            fs.rm(temporaryPdf, { force: true }),
-            fs.rm(docxFilename, { force: true }),
-            fs.rm(pdfFilename, { force: true }),
-        ]);
-        const cleanupErrors = cleanup
-            .filter((result): result is PromiseRejectedResult => result.status === "rejected")
-            .map((result) => result.reason);
-
-        throw cleanupErrors.length > 0
-            ? new AggregateError([error, ...cleanupErrors], "Publishing document artifacts failed and cleanup was incomplete.")
-            : error;
+        try {
+            await removeDocumentArtifacts({ docx, pdf });
+        } catch (cleanupError) {
+            throw new AggregateError(
+                [error, cleanupError],
+                "Publishing document artifacts failed and cleanup was incomplete.",
+            );
+        }
+        throw error;
     }
 
-    return {
-        pdf: {
-            filename: pdfFilename,
-            basename: pdfBasename,
-            path: outputDirectory,
-            size: pdfBuffer.length,
-            sha256: createHash("sha256").update(pdfBuffer).digest("hex"),
-        },
-        docx: {
-            filename: docxFilename,
-            basename: docxBasename,
-            path: outputDirectory,
-            size: docxBuffer.length,
-            sha256: createHash("sha256").update(docxBuffer).digest("hex"),
-        },
-    };
+    return { pdf, docx };
 }
 
 export async function removeDocumentArtifacts(files: StoredDocumentArtifacts): Promise<void> {
-    await settleFileOperations([
-        fs.rm(files.docx.filename, { force: true }),
-        fs.rm(files.pdf.filename, { force: true }),
+    await settleOperations([
+        deleteArtifact(files.docx.objectKey),
+        deleteArtifact(files.pdf.objectKey),
     ]);
+}
+
+export async function getDocumentArtifact(objectKey: string): Promise<Buffer> {
+    const response = await storageClient.send(new GetObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: objectKey,
+    }));
+
+    if (!response.Body) {
+        throw new Error(`Object ${objectKey} has no body.`);
+    }
+
+    return Buffer.from(await response.Body.transformToByteArray());
+}
+
+export async function getDocumentDownloadUrl(objectKey: string, downloadName: string, contentType: string): Promise<string> {
+    const safeName = downloadName.replace(/["\\\r\n]/g, "_");
+
+    return getSignedUrl(downloadClient, new GetObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: objectKey,
+        ResponseContentType: contentType,
+        ResponseContentDisposition: `attachment; filename="${safeName}"`,
+    }), { expiresIn: DOWNLOAD_URL_TTL_SECONDS });
+}
+
+export async function initDocumentArtifactStore(): Promise<void> {
+    await storageClient.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }));
+}
+
+function artifact(objectKey: string, content: Buffer): StoredDocumentArtifact {
+    return {
+        objectKey,
+        size: content.length,
+        sha256: createHash("sha256").update(content).digest("hex"),
+    };
+}
+
+async function putArtifact(
+    stored: StoredDocumentArtifact,
+    content: Buffer,
+    contentType: string,
+): Promise<void> {
+    await storageClient.send(new PutObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: stored.objectKey,
+        Body: content,
+        ContentLength: stored.size,
+        ContentType: contentType,
+        Metadata: { sha256: stored.sha256 },
+    }));
+}
+
+async function deleteArtifact(objectKey: string): Promise<void> {
+    await storageClient.send(new DeleteObjectCommand({
+        Bucket: env.S3_BUCKET,
+        Key: objectKey,
+    }));
 }

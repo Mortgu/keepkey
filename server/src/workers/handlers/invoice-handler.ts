@@ -1,9 +1,8 @@
 import { Task } from "@prisma/client";
-import { logger } from "better-auth";
-
 export default async function invoiceTaskHandler(task: Task): Promise<void> {
     if (!task) {
-        logger.error("called invoiceTaskHandler with undefined or nul task!")
-        return;
+        throw new Error("Invoice task handler was called without a task.");
     }
+
+    throw new Error(`Invoice generation is not implemented (task ${task.id}).`);
 }

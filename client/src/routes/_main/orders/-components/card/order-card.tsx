@@ -1,20 +1,24 @@
-import { Button, Collapsable } from "@/components";
-import { useOrderHook } from "@/hooks";
-import { formatDate } from "@/lib/format";
-import type { Order, OrderDocument } from "@/types";
-import { formatEur } from "@/utils/utils";
-import { Trash } from "lucide-react";
-import { useEffect } from "react";
+import { History, Pencil, Trash } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import OrderDrawerHistory from "../order-drawer-history";
+import OrderEditModal from "../order-edit-modal";
 import OrderCardDocument from "./order-card-document";
 import OrderCardFlatRate from "./order-card-flatrate";
 import OrderCardProduct from "./order-card-product";
+import type { Order, OrderDocument } from "@/types";
+import { formatEur } from "@/utils/utils";
+import { formatDate } from "@/lib/format";
+import { useOrderHook } from "@/hooks";
+import { Button, Collapsable } from "@/components";
 
 type Props = {
     order: Order;
 };
 
 export default function OrderCard({ order }: Props) {
+    const [historyOpen, setHistoryOpen] = useState(false);
+    const [editOpen, setEditOpen] = useState(false);
     const {
         customerContactPerson: ccp,
         orderId,
@@ -113,6 +117,22 @@ export default function OrderCard({ order }: Props) {
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
                     <Button
+                        size="xs"
+                        variant="secondary"
+                        onClick={() => setHistoryOpen(true)}
+                        icon={<History className="size-3" />}
+                        iconOnly
+                        title="Versionsverlauf"
+                    />
+                    <Button
+                        size="xs"
+                        variant="secondary"
+                        onClick={() => setEditOpen(true)}
+                        icon={<Pencil className="size-3" />}
+                        iconOnly
+                        title="Bestellung bearbeiten"
+                    />
+                    <Button
                         className="min-w-fit"
                         variant="primary"
                         size="sm"
@@ -135,6 +155,8 @@ export default function OrderCard({ order }: Props) {
                     />
                 </div>
             </div>
+            <OrderDrawerHistory open={historyOpen} onClose={() => setHistoryOpen(false)} order={order} />
+            {editOpen && <OrderEditModal order={order} onClose={() => setEditOpen(false)} />}
         </div>
     );
 }

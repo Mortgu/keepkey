@@ -52,7 +52,13 @@ describe("selectPrice", () => {
     expect(result).toEqual({
       ok: true,
       price: 600,
-      breakdown: { unitPrice: 10, quantity: 5, duration: 12 },
+      breakdown: {
+        unitPrice: 10,
+        quantity: 5,
+        duration: 12,
+        effectiveDuration: 12,
+        freeMonths: 0,
+      },
     });
   });
 
