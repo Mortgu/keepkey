@@ -32,15 +32,7 @@ export const downloadOfferDocument = async (request: Request, response: Response
 
     const download = await offerService.downloadOfferDocument(offerId, documentId, format);
 
-    response.setHeader("Content-Type", download.contentType);
-    response.setHeader("Content-Disposition", `attachment; filename="${download.downloadName}"`);
-
-    if (download.kind === "stream") {
-        download.stream.pipe(response);
-        return;
-    }
-
-    return response.download(download.filePath, download.downloadName);
+    return response.redirect(302, download.url);
 };
 
 /* ========== DELETE ========== */

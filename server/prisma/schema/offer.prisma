@@ -130,8 +130,9 @@ model OfferDocument {
   task   Task   @relation(fields: [taskId], references: [id])
   taskId String @unique
 
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
 
   @@unique([offerId, version])
   @@map("offer_document")

@@ -73,9 +73,7 @@ export interface components {
         };
         Document: {
             id: string;
-            filename: string;
-            basename: string;
-            path: string;
+            objectKey: string;
             format: components["schemas"]["DocumentFormat"];
             /** Format: int32 */
             size?: number;
@@ -200,6 +198,8 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** Format: date-time */
+            deletedAt?: string;
         };
         Order: {
             id: string;
@@ -302,6 +302,8 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            /** Format: date-time */
+            deletedAt?: string;
         };
         Passkey: {
             id: string;

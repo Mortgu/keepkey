@@ -15,6 +15,7 @@ import morganMiddleware from "./middlewares/morgan.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
 import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
+import { initDocumentArtifactStore } from "./lib/document-artifact-store.js";
 
 const app: Express = express();
 
@@ -45,6 +46,14 @@ app.get("{*path}", (req, res) => {
 
 // Global error handler
 app.use(exceptionHandler);
+
+try {
+    await initDocumentArtifactStore();
+    logger.info("[object-storage] Bucket access verified.");
+} catch (error) {
+    logger.error(`[object-storage] Bucket initialization failed: ${error}`);
+    throw error;
+}
 
 const taskWorker = registerTaskWorker();
 

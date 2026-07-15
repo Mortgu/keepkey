@@ -32,15 +32,7 @@ export const downloadOrderDocument = async (request: Request, response: Response
 
     const download = await orderService.downloadOrderDocument(orderId, documentId, format);
 
-    response.setHeader("Content-Type", download.contentType);
-    response.setHeader("Content-Disposition", `attachment; filename="${download.downloadName}"`);
-
-    if (download.kind === "stream") {
-        download.stream.pipe(response);
-        return;
-    }
-
-    return response.download(download.filePath, download.downloadName);
+    return response.redirect(302, download.url);
 };
 
 /* ========== POST ========== */
@@ -99,4 +91,12 @@ export const updateOrder = async (request: Request, response: Response) => {
 export const deleteOrderById = async (request: Request, response: Response) => {
     await orderService.deleteOrderById(request.params.id as string);
     return response.status(200).json({ message: "Deletion successfully", success: true });
+};
+
+export const deleteOrderDocument = async (request: Request, response: Response) => {
+    await orderService.deleteOrderDocument(
+        request.params.orderId as string,
+        request.params.documentId as string,
+    );
+    return response.status(200).json({ success: true });
 };

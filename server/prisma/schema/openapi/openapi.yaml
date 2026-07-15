@@ -191,11 +191,7 @@ components:
       properties:
         id:
           type: string
-        filename:
-          type: string
-        basename:
-          type: string
-        path:
+        objectKey:
           type: string
         format:
           $ref: "#/components/schemas/DocumentFormat"
@@ -227,9 +223,7 @@ components:
           $ref: "#/components/schemas/OrderDocument"
       required:
         - id
-        - filename
-        - basename
-        - path
+        - objectKey
         - format
         - createdAt
         - updatedAt
@@ -483,6 +477,9 @@ components:
         updatedAt:
           type: string
           format: date-time
+        deletedAt:
+          type: string
+          format: date-time
       required:
         - id
         - version
@@ -730,6 +727,9 @@ components:
           type: string
           format: date-time
         updatedAt:
+          type: string
+          format: date-time
+        deletedAt:
           type: string
           format: date-time
       required:

@@ -40,6 +40,9 @@ export const generateOrderDocumentAction = (orderId: string) =>
 export const uploadOrderDocumentAction = (orderId: string, documentId: string) =>
   api<void>(`/api/orders/${orderId}/documents/${documentId}/upload`, { method: "POST" });
 
+export const deleteOrderDocumentAction = (orderId: string, documentId: string) =>
+  api<void>(`/api/orders/${orderId}/documents/${documentId}`, { method: "DELETE" });
+
 export type UpdateOrderInput = {
   expectedVersion: number;
   order: {

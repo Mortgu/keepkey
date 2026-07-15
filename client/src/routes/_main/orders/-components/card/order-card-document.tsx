@@ -1,4 +1,4 @@
-import { Download, File, LoaderCircle, UploadCloud } from "lucide-react";
+import { Download, File, LoaderCircle, Trash, UploadCloud } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -16,13 +16,21 @@ type Props = {
 export default function OrderCardDocument({ orderDocument }: Props) {
     const { id, orderId, status, taskId, displayName, version, pdf, createdAt } = orderDocument;
     const { t } = useTranslation();
-    const { uploadDocument, isUploadingDocument, errorUploadingDocument } = useOrderHook();
+    const {
+        uploadDocument,
+        isUploadingDocument,
+        errorUploadingDocument,
+        deleteDocument,
+        isDeletingDocument,
+        errorDeletingDocument,
+    } = useOrderHook();
 
     useDocumentTask(taskId);
 
     useEffect(() => {
         if (errorUploadingDocument) toast.error(errorUploadingDocument.message);
-    }, [errorUploadingDocument]);
+        if (errorDeletingDocument) toast.error(errorDeletingDocument.message);
+    }, [errorDeletingDocument, errorUploadingDocument]);
 
     return (
         <div className="flex items-center justify-between py-3 border-b border-(--border) last:border-0">
@@ -57,6 +65,19 @@ export default function OrderCardDocument({ orderDocument }: Props) {
                             <Button variant="ghost" size="sm" icon={<File className="size-4" />} iconOnly title="DOCX herunterladen" />
                         </a>
                     </>
+                )}
+
+                {(status === "GENERATED" || status === "UPLOADED" || status === "FAILED") && (
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        icon={<Trash className="size-4" />}
+                        iconOnly
+                        title="Dokument löschen"
+                        onClick={() => deleteDocument({ orderId, documentId: id })}
+                        loading={isDeletingDocument}
+                        disabled={isDeletingDocument}
+                    />
                 )}
 
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (

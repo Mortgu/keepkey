@@ -51,16 +51,12 @@ import { generateOfferDocument, generateOrderDocument } from "./document-generat
 
 const files = {
     pdf: {
-        filename: "uploads/document-1.pdf",
-        basename: "document-1.pdf",
-        path: "uploads",
+        objectKey: "generated/offers/document-1/generation-1.pdf",
         size: 3,
         sha256: "pdf-hash",
     },
     docx: {
-        filename: "uploads/document-1.docx",
-        basename: "document-1.docx",
-        path: "uploads",
+        objectKey: "generated/offers/document-1/generation-1.docx",
         size: 4,
         sha256: "docx-hash",
     },
@@ -121,9 +117,11 @@ describe("document generation service", () => {
             displayName: null,
         }, ["offer-stage"]);
         expect(mocks.storeDocumentArtifacts).toHaveBeenCalledWith(
+            "offers",
             "document-1",
             Buffer.from("docx"),
             Buffer.from("pdf"),
+            "task-1",
         );
         expect(mocks.runPipeline).toHaveBeenCalledOnce();
         expect(mocks.storeDocumentArtifacts).toHaveBeenCalledOnce();
@@ -134,7 +132,7 @@ describe("document generation service", () => {
             data: { isCurrent: false },
         });
         expect(mocks.offerDocumentUpdateMany).toHaveBeenLastCalledWith({
-            where: { id: "document-1", status: "PROCESSING" },
+            where: { id: "document-1", deletedAt: null, status: "PROCESSING" },
             data: {
                 pdfId: "pdf-1",
                 docxId: "docx-1",
@@ -171,7 +169,7 @@ describe("document generation service", () => {
             data: { isCurrent: false },
         });
         expect(mocks.orderDocumentUpdateMany).toHaveBeenLastCalledWith({
-            where: { id: "document-1", status: "PROCESSING" },
+            where: { id: "document-1", deletedAt: null, status: "PROCESSING" },
             data: {
                 pdfId: "pdf-1",
                 docxId: "docx-1",
@@ -245,8 +243,8 @@ describe("document generation service", () => {
         });
         mocks.transaction.mockRejectedValue(new Error("connection lost after commit"));
         mocks.offerDocumentFindUnique.mockResolvedValue({
-            pdf: { filename: files.pdf.filename },
-            docx: { filename: files.docx.filename },
+            pdf: { objectKey: files.pdf.objectKey },
+            docx: { objectKey: files.docx.objectKey },
         });
 
         await expect(generateOfferDocument("task-1")).resolves.toBeUndefined();

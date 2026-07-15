@@ -1,11 +1,8 @@
-import fs from "fs";
-import path from "path";
-import { Readable } from "stream";
 import z from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { downloadDocumentStream } from "../lib/nextcloud.js";
+import { getDocumentDownloadUrl } from "../lib/document-artifact-store.js";
 import { uploadOrderDocument as uploadOrderDocumentUseCase } from "./document-upload.service.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
 import { toDate } from "../utils/utils.js";
@@ -20,9 +17,7 @@ import {
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
-export type OrderDocumentDownload =
-    | { kind: "stream"; stream: Readable; contentType: string; downloadName: string }
-    | { kind: "file"; filePath: string; contentType: string; downloadName: string };
+export type OrderDocumentDownload = { url: string };
 
 const MIME_TYPES: Record<string, string> = {
     pdf: "application/pdf",
@@ -37,6 +32,7 @@ export async function getAllOrders() {
             customer: true,
             customerContactPerson: true,
             documents: {
+                where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
                 include: {
                     pdf: true,
@@ -66,6 +62,7 @@ export async function getOrderById(orderId: string) {
             customer: true,
             customerContactPerson: true,
             documents: {
+                where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
                 include: {
                     pdf: true,
@@ -143,7 +140,7 @@ export async function downloadOrderDocument(
     }
 
     const orderDoc = await prisma.orderDocument.findFirst({
-        where: { orderId, id: documentId },
+        where: { orderId, id: documentId, deletedAt: null },
         include: { pdf: true, docx: true },
     });
 
@@ -151,7 +148,7 @@ export async function downloadOrderDocument(
         throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
     }
 
-    if (orderDoc.status !== "GENERATED" && orderDoc.status !== "UPLOADED") {
+    if (!["GENERATED", "UPLOADING", "UPLOADED"].includes(orderDoc.status)) {
         throw new AppException("Document not yet generated", 409, "DOCUMENT_NOT_GENERATED");
     }
 
@@ -161,31 +158,13 @@ export async function downloadOrderDocument(
     }
 
     const contentType = MIME_TYPES[format]!;
-    const downloadName = `${orderDoc.displayName ?? orderDoc.id}.${format}`;
-
-    if (orderDoc.status === "UPLOADED") {
-        try {
-            const stream = await downloadDocumentStream(file.remotePath ?? file.filename);
-            return { kind: "stream", stream, contentType, downloadName };
-        } catch (exception: any) {
-            if (exception instanceof AppException) throw exception;
-            throw new AppException(
-                "Failed to download from Nextcloud: " + exception.message,
-                500,
-                "NEXTCLOUD_DOWNLOAD_FAILED",
-            );
-        }
-    }
-
-    const filePath = path.join(file.path, file.basename);
-
-    try {
-        await fs.promises.access(filePath);
-    } catch {
-        throw new AppException("File not found on disk", 404, "FILE_NOT_FOUND_ON_DISK");
-    }
-
-    return { kind: "file", filePath, contentType, downloadName };
+    return {
+        url: await getDocumentDownloadUrl(
+            file.objectKey,
+            `${orderDoc.displayName ?? orderDoc.id}.${format}`,
+            contentType,
+        ),
+    };
 }
 
 /* ========== Mutations ========== */
@@ -445,7 +424,40 @@ export async function uploadOrderDocument(
 /* ========== Deletes ========== */
 
 export async function deleteOrderById(id: string): Promise<void> {
-    await prisma.order.delete({
-        where: { id },
+    await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-generation:${id}`}))::text AS "lock"`;
+        await tx.order.findUniqueOrThrow({ where: { id } });
+        if (await tx.orderDocument.count({ where: { orderId: id } }) > 0) {
+            throw new AppException(
+                "Orders with document history cannot be deleted.",
+                409,
+                "ORDER_HAS_DOCUMENT_HISTORY",
+            );
+        }
+        await tx.order.delete({ where: { id } });
     });
+}
+
+export async function deleteOrderDocument(orderId: string, documentId: string): Promise<void> {
+    const orderDocument = await prisma.orderDocument.findFirst({
+        where: { orderId, id: documentId, deletedAt: null },
+    });
+    if (!orderDocument) {
+        throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
+    }
+    const deleted = await prisma.orderDocument.updateMany({
+        where: {
+            id: orderDocument.id,
+            deletedAt: null,
+            status: { notIn: ["PENDING", "PROCESSING", "UPLOADING"] },
+        },
+        data: { deletedAt: new Date(), isCurrent: false },
+    });
+    if (deleted.count !== 1) {
+        throw new AppException(
+            "A document cannot be deleted while processing.",
+            409,
+            "DOCUMENT_PROCESSING",
+        );
+    }
 }

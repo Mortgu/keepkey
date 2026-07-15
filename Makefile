@@ -65,5 +65,5 @@ lint:
 # ── Cleanup ──
 
 clean:
-	rm -rf server/dist server/generated server/prisma/schema/openapi
+	rm -rf server/dist server/prisma/schema/openapi
 	rm -rf client/dist

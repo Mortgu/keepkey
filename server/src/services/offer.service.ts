@@ -1,12 +1,9 @@
-import fs from "fs";
-import path from "path";
-import { Readable } from "stream";
 import z from "zod";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import { downloadDocumentStream } from "../lib/nextcloud.js";
+import { getDocumentDownloadUrl } from "../lib/document-artifact-store.js";
 import { uploadOfferDocument as uploadOfferDocumentUseCase } from "./document-upload.service.js";
 import { requestOfferGeneration } from "./document-generation-request.service.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
@@ -50,9 +47,7 @@ export interface OfferListQuery {
     limit?: unknown;
 }
 
-export type OfferDocumentDownload =
-    | { kind: "stream"; stream: Readable; contentType: string; downloadName: string }
-    | { kind: "file"; filePath: string; contentType: string; downloadName: string };
+export type OfferDocumentDownload = { url: string };
 
 const MIME_TYPES: Record<string, string> = {
     pdf: "application/pdf",
@@ -225,6 +220,7 @@ export async function getOffers(query: OfferListQuery) {
             customer: { select: { id: true, companyName: true } },
             customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             offerDocuments: {
+                where: { deletedAt: null },
                 include: {
                     docx: true,
                     pdf: true
@@ -260,6 +256,7 @@ export async function getOfferById(id: string) {
         where: { id },
         include: {
             offerDocuments: {
+                where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
                 include: {
                     pdf: true,
@@ -317,7 +314,7 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
     }
 
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId },
+        where: { offerId, id: documentId, deletedAt: null },
         include: { pdf: true, docx: true },
     });
 
@@ -325,7 +322,7 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
         throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
     }
 
-    if (offerDoc.status !== "GENERATED" && offerDoc.status !== "UPLOADED") {
+    if (!["GENERATED", "UPLOADING", "UPLOADED"].includes(offerDoc.status)) {
         throw new AppException("Document not yet generated", 409, "DOCUMENT_NOT_GENERATED");
     }
 
@@ -335,31 +332,13 @@ export async function downloadOfferDocument(offerId: string, documentId: string,
     }
 
     const contentType = MIME_TYPES[format]!;
-    const downloadName = `${offerDoc.displayName ?? offerDoc.id}.${format}`;
-
-    if (offerDoc.status === "UPLOADED") {
-        try {
-            const stream = await downloadDocumentStream(file.remotePath ?? file.filename);
-            return { kind: "stream", stream, contentType, downloadName };
-        } catch (exception: any) {
-            if (exception instanceof AppException) throw exception;
-            throw new AppException(
-                "Failed to download from Nextcloud: " + exception.message,
-                500,
-                "NEXTCLOUD_DOWNLOAD_FAILED",
-            );
-        }
-    }
-
-    const filePath = path.join(file.path, file.basename);
-
-    try {
-        await fs.promises.access(filePath);
-    } catch {
-        throw new AppException("File not found on disk", 404, "FILE_NOT_FOUND_ON_DISK");
-    }
-
-    return { kind: "file", filePath, contentType, downloadName };
+    return {
+        url: await getDocumentDownloadUrl(
+            file.objectKey,
+            `${offerDoc.displayName ?? offerDoc.id}.${format}`,
+            contentType,
+        ),
+    };
 }
 
 /* ========== Mutations ========== */
@@ -624,25 +603,42 @@ export async function deleteOffer(id: string): Promise<void> {
         throw new AppException("Bad request. Missing id!", 400, "MISSING_ID");
     }
 
-    await prisma.offer.findUniqueOrThrow({ where: { id } });
-    await prisma.offer.delete({ where: { id } });
+    await prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
+        await tx.offer.findUniqueOrThrow({ where: { id } });
+        if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
+            throw new AppException(
+                "Offers with document history cannot be deleted.",
+                409,
+                "OFFER_HAS_DOCUMENT_HISTORY",
+            );
+        }
+        await tx.offer.delete({ where: { id } });
+    });
 }
 
 export async function deleteOfferDocument(offerId: string, documentId: string): Promise<void> {
     const offerDoc = await prisma.offerDocument.findFirst({
-        where: { offerId, id: documentId },
-        include: { pdf: true, docx: true },
+        where: { offerId, id: documentId, deletedAt: null },
     });
 
     if (!offerDoc) {
         throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
     }
 
-    for (const file of [offerDoc.pdf, offerDoc.docx]) {
-        if (file) {
-            await fs.promises.rm(path.join(file.path, file.basename), { force: true });
-        }
+    const deleted = await prisma.offerDocument.updateMany({
+        where: {
+            id: offerDoc.id,
+            deletedAt: null,
+            status: { notIn: ["PENDING", "PROCESSING", "UPLOADING"] },
+        },
+        data: { deletedAt: new Date(), isCurrent: false },
+    });
+    if (deleted.count !== 1) {
+        throw new AppException(
+            "A document cannot be deleted while processing.",
+            409,
+            "DOCUMENT_PROCESSING",
+        );
     }
-
-    await prisma.offerDocument.delete({ where: { id: offerDoc.id } });
 }

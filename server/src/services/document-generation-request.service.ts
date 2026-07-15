@@ -53,7 +53,7 @@ export function requestOfferGeneration(
             select: { version: true },
         })).version,
         findActive: (tx, sourceVersion) => tx.offerDocument.findFirst({
-            where: { offerId, sourceVersion, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.offer.update({
@@ -86,7 +86,7 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
             select: { version: true },
         })).version,
         findActive: (tx, sourceVersion) => tx.orderDocument.findFirst({
-            where: { orderId, sourceVersion, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.order.update({

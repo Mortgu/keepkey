@@ -3,6 +3,7 @@ import {
   createOrder,
   createOrderTask,
   deleteOrderById,
+  deleteOrderDocument,
   downloadOrderDocument,
   generateOrderDocument,
   getAllOrders,
@@ -31,6 +32,8 @@ router.get("/:orderId/documents/:documentId/:format", downloadOrderDocument);
 router.post('/:orderId/document', generateOrderDocument);
 
 router.post('/:orderId/documents/:documentId/upload', uploadOrderDocument);
+
+router.delete('/:orderId/documents/:documentId', deleteOrderDocument);
 
 router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
 

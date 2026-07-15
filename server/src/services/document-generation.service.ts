@@ -45,13 +45,13 @@ function assertDocumentCanBeGenerated(
 
 async function artifactsWereFinalized(
     files: StoredDocumentArtifacts,
-    linkedFiles: () => Promise<{ pdf: { filename: string } | null; docx: { filename: string } | null } | null>,
+    linkedFiles: () => Promise<{ pdf: { objectKey: string } | null; docx: { objectKey: string } | null } | null>,
 ): Promise<boolean> {
     try {
         const linked = await linkedFiles();
         if (
-            linked?.pdf?.filename === files.pdf.filename
-            && linked.docx?.filename === files.docx.filename
+            linked?.pdf?.objectKey === files.pdf.objectKey
+            && linked.docx?.objectKey === files.docx.objectKey
         ) {
             return true;
         }
@@ -104,7 +104,7 @@ async function createArtifactDocuments(
 
 export async function generateOfferDocument(taskId: string): Promise<void> {
     const offerDocument = await prisma.offerDocument.findFirst({
-        where: { taskId },
+        where: { taskId, deletedAt: null },
         include: { offer: { select: { version: true } } },
     });
 
@@ -130,9 +130,11 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
     const generated = getGeneratedDocument(context);
 
     const files = await storeDocumentArtifacts(
+        "offers",
         offerDocument.id,
         generated.docxBuffer,
         generated.pdfBuffer,
+        taskId,
     );
 
     try {
@@ -153,6 +155,7 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
             const finalized = await tx.offerDocument.updateMany({
                 where: {
                     id: offerDocument.id,
+                    deletedAt: null,
                     status: DocumentStatus.PROCESSING,
                 },
                 data: {
@@ -173,8 +176,8 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
         const finalized = await artifactsWereFinalized(files, () => prisma.offerDocument.findUnique({
             where: { id: offerDocument.id },
             select: {
-                pdf: { select: { filename: true } },
-                docx: { select: { filename: true } },
+                pdf: { select: { objectKey: true } },
+                docx: { select: { objectKey: true } },
             },
         }));
         if (!finalized) throw error;
@@ -183,7 +186,7 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
 
 export async function generateOrderDocument(taskId: string): Promise<void> {
     const orderDocument = await prisma.orderDocument.findFirst({
-        where: { taskId },
+        where: { taskId, deletedAt: null },
         include: { order: { select: { version: true } } },
     });
 
@@ -207,9 +210,11 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
     }, orderStages);
     const generated = getGeneratedDocument(context);
     const files = await storeDocumentArtifacts(
+        "orders",
         orderDocument.id,
         generated.docxBuffer,
         generated.pdfBuffer,
+        taskId,
     );
 
     try {
@@ -230,6 +235,7 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
             const finalized = await tx.orderDocument.updateMany({
                 where: {
                     id: orderDocument.id,
+                    deletedAt: null,
                     status: DocumentStatus.PROCESSING,
                 },
                 data: {
@@ -250,8 +256,8 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
         const finalized = await artifactsWereFinalized(files, () => prisma.orderDocument.findUnique({
             where: { id: orderDocument.id },
             select: {
-                pdf: { select: { filename: true } },
-                docx: { select: { filename: true } },
+                pdf: { select: { objectKey: true } },
+                docx: { select: { objectKey: true } },
             },
         }));
         if (!finalized) throw error;

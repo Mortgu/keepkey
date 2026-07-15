@@ -1,7 +1,4 @@
-import fs from "fs/promises";
-import os from "os";
-import path from "path";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
     offerFindFirst: vi.fn(),
@@ -15,6 +12,7 @@ const mocks = vi.hoisted(() => ({
     documentUpdate: vi.fn(),
     transaction: vi.fn(),
     uploadDocumentArtifact: vi.fn(),
+    getDocumentArtifact: vi.fn(),
     loggerError: vi.fn(),
     loggerWarn: vi.fn(),
 }));
@@ -40,6 +38,10 @@ vi.mock("../lib/nextcloud-document-store.js", async (importOriginal) => {
     return { ...actual, uploadDocumentArtifact: mocks.uploadDocumentArtifact };
 });
 
+vi.mock("../lib/document-artifact-store.js", () => ({
+    getDocumentArtifact: mocks.getDocumentArtifact,
+}));
+
 vi.mock("../middlewares/logger.js", () => ({
     default: { error: mocks.loggerError, warn: mocks.loggerWarn },
 }));
@@ -49,25 +51,20 @@ import { RemoteDocumentConflictError, sha256Document } from "../lib/nextcloud-do
 import { uploadOfferDocument, uploadOrderDocument } from "./document-upload.service.js";
 
 describe("document upload service", () => {
-    let outputDirectory: string;
     let offerDocument: any;
     let orderDocument: any;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         vi.clearAllMocks();
-        outputDirectory = await fs.mkdtemp(path.join(os.tmpdir(), "keepit-upload-"));
         const pdf = Buffer.from("pdf-content");
         const docx = Buffer.from("docx-content");
-        await Promise.all([
-            fs.writeFile(path.join(outputDirectory, "local.pdf"), pdf),
-            fs.writeFile(path.join(outputDirectory, "local.docx"), docx),
-        ]);
+        mocks.getDocumentArtifact.mockImplementation((objectKey: string) => Promise.resolve(
+            objectKey.endsWith(".pdf") ? pdf : docx,
+        ));
         const artifacts = {
             pdf: {
                 id: "pdf-1",
-                filename: path.join(outputDirectory, "local.pdf"),
-                basename: "local.pdf",
-                path: outputDirectory,
+                objectKey: "generated/offers/offer-document-1/generation-1.pdf",
                 size: pdf.length,
                 sha256: sha256Document(pdf),
                 uploadedAt: null,
@@ -76,9 +73,7 @@ describe("document upload service", () => {
             },
             docx: {
                 id: "docx-1",
-                filename: path.join(outputDirectory, "local.docx"),
-                basename: "local.docx",
-                path: outputDirectory,
+                objectKey: "generated/offers/offer-document-1/generation-1.docx",
                 size: docx.length,
                 sha256: sha256Document(docx),
                 uploadedAt: null,
@@ -123,16 +118,13 @@ describe("document upload service", () => {
         }));
     });
 
-    afterEach(async () => {
-        await fs.rm(outputDirectory, { recursive: true, force: true });
-    });
-
     it("beansprucht, verifiziert und finalisiert einen Offer-Upload", async () => {
         const result = await uploadOfferDocument("offer-1", offerDocument.id);
 
         expect(mocks.offerUpdateMany).toHaveBeenCalledWith({
             where: {
                 id: offerDocument.id,
+                deletedAt: null,
                 OR: [
                     { status: { in: ["GENERATED", "FAILED"] }, uploadToken: null },
                     { status: "UPLOADING", updatedAt: { lt: expect.any(Date) } },
@@ -144,6 +136,7 @@ describe("document upload service", () => {
         expect(mocks.finalOfferUpdateMany).toHaveBeenCalledWith({
             where: {
                 id: offerDocument.id,
+                deletedAt: null,
                 status: "UPLOADING",
                 uploadToken: expect.any(String),
             },
@@ -151,8 +144,7 @@ describe("document upload service", () => {
         });
         expect(mocks.documentUpdate).toHaveBeenCalledTimes(2);
         expect(result.pdf.remotePath).toContain("Q-1_AG_Customer.pdf");
-        await expect(fs.access(path.join(outputDirectory, "local.pdf"))).rejects.toThrow();
-        await expect(fs.access(path.join(outputDirectory, "local.docx"))).rejects.toThrow();
+        expect(mocks.getDocumentArtifact).toHaveBeenCalledTimes(2);
     });
 
     it("verwendet denselben Upload-Ablauf für Order-Dokumente", async () => {
@@ -163,7 +155,7 @@ describe("document upload service", () => {
         expect(mocks.uploadDocumentArtifact).toHaveBeenCalledTimes(2);
     });
 
-    it("setzt einen Hashkonflikt auf GENERATED zurück und behält lokale Dateien", async () => {
+    it("setzt einen Hashkonflikt auf GENERATED zurück und behält S3-Objekte", async () => {
         mocks.uploadDocumentArtifact.mockRejectedValueOnce(
             new RemoteDocumentConflictError("/pdf/conflict.pdf", "expected", "actual"),
         );
@@ -175,6 +167,7 @@ describe("document upload service", () => {
         expect(mocks.offerUpdateMany).toHaveBeenLastCalledWith({
             where: {
                 id: offerDocument.id,
+                deletedAt: null,
                 status: "UPLOADING",
                 uploadToken: expect.any(String),
             },
@@ -184,8 +177,7 @@ describe("document upload service", () => {
                 error: expect.stringContaining("different content"),
             },
         });
-        await expect(fs.access(path.join(outputDirectory, "local.pdf"))).resolves.toBeUndefined();
-        await expect(fs.access(path.join(outputDirectory, "local.docx"))).resolves.toBeUndefined();
+        expect(mocks.getDocumentArtifact).toHaveBeenCalledTimes(2);
     });
 
     it("weist einen parallelen aktiven Upload zurück", async () => {
@@ -215,7 +207,7 @@ describe("document upload service", () => {
         expect(mocks.uploadDocumentArtifact).not.toHaveBeenCalled();
     });
 
-    it("behält lokale Dateien bei einem DB-Fehler nach Remote-Erfolg", async () => {
+    it("behält S3-Objekte bei einem DB-Fehler nach Remote-Erfolg", async () => {
         mocks.transaction.mockRejectedValue(new Error("database unavailable"));
 
         await expect(uploadOfferDocument("offer-1", offerDocument.id)).rejects.toMatchObject({
@@ -224,8 +216,7 @@ describe("document upload service", () => {
         expect(mocks.offerUpdateMany).toHaveBeenLastCalledWith(expect.objectContaining({
             data: expect.objectContaining({ status: "GENERATED", uploadToken: null }),
         }));
-        await expect(fs.access(path.join(outputDirectory, "local.pdf"))).resolves.toBeUndefined();
-        await expect(fs.access(path.join(outputDirectory, "local.docx"))).resolves.toBeUndefined();
+        expect(mocks.getDocumentArtifact).toHaveBeenCalledTimes(2);
     });
 
     it("erkennt einen trotz Clientfehler erfolgreich commiteten Upload", async () => {
@@ -260,7 +251,6 @@ describe("document upload service", () => {
             docx: { remotePath: "/remote/Q-1_AG_Customer.docx" },
         });
         expect(mocks.offerUpdateMany).toHaveBeenCalledOnce();
-        await expect(fs.access(path.join(outputDirectory, "local.pdf"))).rejects.toThrow();
-        await expect(fs.access(path.join(outputDirectory, "local.docx"))).rejects.toThrow();
+        expect(mocks.getDocumentArtifact).toHaveBeenCalledTimes(2);
     });
 });

@@ -84,7 +84,7 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                         <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
                             onClick={() => deleteOfferDocument({ offerId: offerDocument.offerId, documentId: offerDocument.id })}
                             loading={isDeleting || !!errorDeleting}
-                            disabled={isDeleting || !!errorDeleting}
+                            disabled={status === "UPLOADING" || isDeleting || !!errorDeleting}
                         />
                     </>
                 )}
