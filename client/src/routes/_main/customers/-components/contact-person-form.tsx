@@ -3,7 +3,7 @@ import { useForm } from "@tanstack/react-form";
 import type { SyntheticEvent } from "react";
 
 import type { ContactPerson, CreateCustomerContactInput, } from "@/types";
-import { Button, Input } from "@/components";
+import { Button, Input, ModalDialog } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 const contactPersonSchema = z.object({
@@ -50,61 +50,62 @@ export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId,
     contactForm.handleSubmit();
   }
 
+  const isEditing = Boolean(currentContactPerson);
+
   return (
-    <div className="bg-(--subtle-50) w-full grid gap-3 border border-(--border) p-3 rounded-md">
-      <form onSubmit={handleSubmit} className="grid gap-4">
-        <div className="flex items-center gap-2">
-          <contactForm.Field name="salutation" children={(field) => (
-            <Input value={field.state.value} label="Anrede" className="bg-white"
-              error={getFormError(field.state.meta.errors)}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur} />
-          )} />
+    <ModalDialog onClose={cancelFn}>
+      <ModalDialog.Header>
+        <h1 className="text-lg">{isEditing ? "Kontaktperson bearbeiten" : "Kontaktperson hinzufügen"}</h1>
+      </ModalDialog.Header>
 
-          <contactForm.Field name="firstName" children={(field) => (
-            <Input value={field.state.value} label="Vorname" className="bg-white"
-              error={getFormError(field.state.meta.errors)}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )} />
+      <ModalDialog.Content>
+        <form id="contact-person-form" onSubmit={handleSubmit} className="grid gap-4">
+          <div className="flex items-center gap-2">
+            <contactForm.Field name="salutation" children={(field) => (
+              <Input value={field.state.value} label="Anrede" className="bg-white"
+                error={getFormError(field.state.meta.errors)}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur} />
+            )} />
 
-          <contactForm.Field name="lastName" children={(field) => (
-            <Input value={field.state.value} label="Nachname" className="bg-white"
-              error={getFormError(field.state.meta.errors)}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )} />
-        </div>
+            <contactForm.Field name="firstName" children={(field) => (
+              <Input value={field.state.value} label="Vorname" className="bg-white"
+                error={getFormError(field.state.meta.errors)}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+              />
+            )} />
 
-        <div className="flex gap-2">
-          <contactForm.Field name="email" children={(field) => (
-            <Input value={field?.state?.value || ''} label="E-Mail" className="bg-white"
-              error={getFormError(field.state.meta.errors)}
-              onChange={(e) => field.handleChange(e.target.value)}
-              onBlur={field.handleBlur}
-            />
-          )} />
-
-          <div className="flex gap-2 mt-auto">
-            <Button type="button" variant="secondary" size="sm" onClick={cancelFn}>
-              Abbrechen
-            </Button>
-
-            <contactForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <Button type="submit" size="sm" disabled={!canSubmit} loading={isSubmitting}>
-                  Speichern
-                </Button>
-              )} />
+            <contactForm.Field name="lastName" children={(field) => (
+              <Input value={field.state.value} label="Nachname" className="bg-white"
+                error={getFormError(field.state.meta.errors)}
+                onChange={(e) => field.handleChange(e.target.value)}
+                onBlur={field.handleBlur}
+              />
+            )} />
           </div>
-        </div>
-      </form>
 
-      <div className="w-fit flex items-center gap-2 ml-auto">
+          <contactForm.Field name="email" children={(field) => (
+            <Input value={field.state.value || ''} label="E-Mail" className="bg-white"
+              error={getFormError(field.state.meta.errors)}
+              onChange={(e) => field.handleChange(e.target.value)}
+              onBlur={field.handleBlur}
+            />
+          )} />
+        </form>
+      </ModalDialog.Content>
 
-      </div>
-    </div>
+      <ModalDialog.Footer>
+        <Button type="button" variant="secondary" size="sm" onClick={cancelFn}>
+          Abbrechen
+        </Button>
+        <contactForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button form="contact-person-form" type="submit" size="sm" disabled={!canSubmit} loading={isSubmitting}>
+              Speichern
+            </Button>
+          )} />
+      </ModalDialog.Footer>
+    </ModalDialog>
   );
 }
