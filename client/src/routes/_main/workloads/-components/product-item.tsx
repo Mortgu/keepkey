@@ -17,7 +17,7 @@ export default function ProductItem({ product }: { product: Product }) {
   return (
     <>
       <div className="bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 gap-4">
+        <div className="flex items-center justify-between px-4 py-3 gap-8">
           <div>
             <div className="text-md text-gray-900">
               {name}
@@ -28,14 +28,14 @@ export default function ProductItem({ product }: { product: Product }) {
           </div>
           <div className="flex items-center gap-2">
             <Button
-              variant="secondary"
+              variant="border"
               icon={<Pen className="size-3.5" />}
               iconOnly
               onClick={() => modal.open(product)}
               size="sm"
             />
             <Button
-              variant="secondary"
+              variant="border"
               loading={isDeletingProduct}
               icon={<Trash className="size-3.5" />}
               iconOnly

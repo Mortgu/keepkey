@@ -1,11 +1,11 @@
-import { useOrderHook } from "@/hooks";
-import { formatDate } from "@/lib/format";
-import { getFormErrors } from "@/lib/utils";
-import type { Offer } from "@/types";
 import { useForm } from "@tanstack/react-form";
 import { ArrowLeft, Search } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import type { Offer } from "@/types";
+import { getFormError } from "@/lib/utils";
+import { formatDate } from "@/lib/format";
+import { useOrderHook } from "@/hooks";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
@@ -122,7 +122,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
                 id={field.name}
                 label="Bestell-Nr."
                 value={field.state.value}
-                error={getFormErrors(field.state.meta.errors)}
+                error={getFormError(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />
@@ -134,7 +134,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
                 type="date"
                 label="Bestelldatum"
                 value={field.state.value}
-                error={getFormErrors(field.state.meta.errors)}
+                error={getFormError(field.state.meta.errors)}
                 onChange={(e) => field.handleChange(e.target.value)}
                 onBlur={field.handleBlur}
               />

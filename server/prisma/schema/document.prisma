@@ -12,7 +12,7 @@ enum DocumentFormat {
   DOCX
 }
 
-model Document {
+model DocumentArtifact {
   id String @id @default(cuid())
 
   objectKey String         @unique
@@ -25,14 +25,16 @@ model Document {
   remotePath String?   @unique
   remoteEtag String?
 
+  offerDocument   OfferDocument? @relation("OfferDocumentArtifacts", fields: [offerDocumentId], references: [id], onDelete: Cascade)
+  offerDocumentId String?
+
+  orderDocument   OrderDocument? @relation("OrderDocumentArtifacts", fields: [orderDocumentId], references: [id], onDelete: Cascade)
+  orderDocumentId String?
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  offerPdfDocument  OfferDocument? @relation("offerPdf")
-  offerDocxDocument OfferDocument? @relation("offerDocx")
-
-  orderPdfDocument  OrderDocument? @relation("orderPdf")
-  orderDocxDocument OrderDocument? @relation("orderDocx")
-
+  @@unique([offerDocumentId, format])
+  @@unique([orderDocumentId, format])
   @@map("document")
 }

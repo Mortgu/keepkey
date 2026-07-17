@@ -70,7 +70,7 @@ describe("task lifecycle", () => {
             where: {
                 taskId: "task-1",
                 status: { in: ["PENDING", "PROCESSING", "FAILED"] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: "PROCESSING", error: null },
         });
@@ -78,7 +78,7 @@ describe("task lifecycle", () => {
             where: {
                 taskId: "task-1",
                 status: { in: ["PENDING", "PROCESSING", "FAILED"] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: "PROCESSING", error: null },
         });
@@ -128,7 +128,7 @@ describe("task lifecycle", () => {
             where: {
                 taskId: "task-1",
                 status: { in: ["PENDING", "PROCESSING", "FAILED"] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: "FAILED", error: "terminal" },
         });
@@ -136,7 +136,7 @@ describe("task lifecycle", () => {
             where: {
                 taskId: "task-1",
                 status: { in: ["PENDING", "PROCESSING", "FAILED"] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: "FAILED", error: "terminal" },
         });

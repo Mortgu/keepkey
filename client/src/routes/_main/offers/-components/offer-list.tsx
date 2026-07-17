@@ -1,23 +1,23 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import useOfferFilters from "../-hooks/use-offer-filters";
+import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
 import OfferModal from "./offer-modal";
 
-import { Button, FilterChip, SearchBar } from "@/components";
+import type { Offer } from "@/types";
+import { Button, FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useContacts, useContracts, useCustomers, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
+import { useContacts, useContracts, useCustomers, useLocale, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
-import type { Offer } from "@/types";
-import useOfferFilters from "../-hooks/use-offer-filters";
-import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 
 export default function OfferList() {
   const { t } = useTranslation();
   const modal = useModal<Offer>();
 
   const filters = useOfferFilters();
-  const { items: offers } = useOffers(filters.params);
+  const { items: offers, isPending, error } = useOffers(filters.params);
 
   const { contacts } = useContacts();
   const { customers } = useCustomers();
@@ -26,7 +26,10 @@ export default function OfferList() {
   const { products } = useProductHook();
   const { contracts } = useContracts();
 
-  const { customerFilterOptions, contactPersonFilterOptions } = useOfferFilterOptions(customers, contacts);
+  const locale = useLocale();
+  const { customerFilterOptions, contactPersonFilterOptions, productFilterOptions } = useOfferFilterOptions(customers, contacts, products, locale);
+
+  if (error) return <RouteError error={error} />;
 
   return (
     <>
@@ -50,9 +53,9 @@ export default function OfferList() {
 
           <MultiDropdown
             label="Workload"
-            options={contactPersonFilterOptions}
-            values={filters.contactPersonFilter}
-            onChange={filters.setContactPersonFilter}
+            options={productFilterOptions}
+            values={filters.productFilter}
+            onChange={filters.setProductFilter}
           />
 
           <SearchBar
@@ -97,11 +100,27 @@ export default function OfferList() {
               />
             );
           })}
+
+          {filters.productFilter.map((id) => {
+            const option = productFilterOptions.find((i) => i.value === id);
+            if (!option) return null;
+            return (
+              <FilterChip
+                key={`product-${id}`}
+                label="Workload"
+                value={option.label}
+                onRemove={() => filters.removeProductFilter(id)}
+              />
+            );
+          })}
         </div>
       )}
 
       <div className="grid gap-2">
-        {offers?.map((offer) => (
+        {isPending && (
+          <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
+        )}
+        {offers.map((offer) => (
           <OfferCard key={offer.id} offer={offer} onEdit={(o) => modal.open(o)} />
         ))}
       </div>

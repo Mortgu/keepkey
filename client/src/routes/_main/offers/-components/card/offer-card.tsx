@@ -1,16 +1,15 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
-import { Button, Collapsable } from "@/components";
-import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { formatDate } from "@/lib/format";
-import type { Offer, OfferDocument } from "@/types";
-import { formatEur } from "@/utils/utils";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
+import type { Offer, OfferDocument } from "@/types";
+import { Button, Collapsable, showToast } from "@/components";
+import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -46,7 +45,8 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
     useEffect(() => {
         if (errorDeletingOffer) {
-            toast.error(`${errorDeletingOffer}`);
+            const message = errorDeletingOffer instanceof Error ? errorDeletingOffer.message : String(errorDeletingOffer);
+            showToast.error("offers.toast.deleteError", { vars: { message } });
         }
     }, [errorDeletingOffer]);
 

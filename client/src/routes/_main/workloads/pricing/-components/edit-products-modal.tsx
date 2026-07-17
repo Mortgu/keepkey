@@ -5,7 +5,7 @@ import type { DropdownOption } from "@/components/filters/multi-dropdown";
 import {
     Button,
     ModalDialog,
-    MultiDropdown,
+    MultiSelectList,
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
@@ -68,8 +68,7 @@ export default function EditProductsModal({
                     <form.Field name="products" children={(field) => (
                         <div className="grid gap-1">
                             <label className="text-sm text-gray-500">Produkte</label>
-                            <MultiDropdown
-                                label="Produkte auswählen"
+                            <MultiSelectList
                                 options={options}
                                 values={field.state.value}
                                 onChange={field.handleChange}

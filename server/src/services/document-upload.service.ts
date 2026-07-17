@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
-import { DocumentStatus, Prisma } from "@prisma/client";
+import { DocumentFormat, DocumentStatus, Prisma } from "@prisma/client";
 import env from "../lib/env.js";
 import { getDocumentArtifact } from "../lib/document-artifact-store.js";
+import { artifactPair } from "../lib/document-artifacts.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     RemoteDocumentArtifact,
@@ -11,9 +12,11 @@ import {
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
 import logger from "../middlewares/logger.js";
+import type { DocumentType } from "../schemas/document-schemas.js";
 
 type StoredDocumentArtifact = {
     id: string;
+    format: DocumentFormat;
     objectKey: string;
     size: number | null;
     sha256: string | null;
@@ -27,8 +30,7 @@ type UploadableDocument = {
     status: DocumentStatus;
     displayName: string | null;
     updatedAt: Date;
-    pdf: StoredDocumentArtifact | null;
-    docx: StoredDocumentArtifact | null;
+    artifacts: StoredDocumentArtifact[];
 };
 
 export type DocumentUploadResult = {
@@ -42,7 +44,12 @@ type UploadConfig = {
     docxDirectory: string;
     claim: (token: string, staleBefore: Date) => Promise<boolean>;
     reload: () => Promise<UploadableDocument | null>;
-    finalize: (token: string, result: DocumentUploadResult, hashes: { pdf: string; docx: string }) => Promise<boolean>;
+    finalize: (
+        document: UploadableDocument,
+        token: string,
+        result: DocumentUploadResult,
+        hashes: { pdf: string; docx: string },
+    ) => Promise<boolean>;
     release: (token: string, error: string) => Promise<void>;
     renew: (token: string) => Promise<void>;
 };
@@ -66,12 +73,13 @@ function completedArtifact(artifact: StoredDocumentArtifact): RemoteDocumentArti
 
 function completedResult(document: UploadableDocument): DocumentUploadResult | null {
     if (document.status !== DocumentStatus.UPLOADED) return null;
-    if (!document.pdf || !document.docx) {
+    const { pdf, docx } = artifactPair(document.artifacts);
+    if (!pdf || !docx) {
         throw new AppException("Uploaded document has incomplete artifact links.", 500, "INVALID_UPLOAD_METADATA");
     }
     return {
-        pdf: completedArtifact(document.pdf),
-        docx: completedArtifact(document.docx),
+        pdf: completedArtifact(pdf),
+        docx: completedArtifact(docx),
     };
 }
 
@@ -81,7 +89,8 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
         return alreadyUploaded;
     }
 
-    if (!config.document.pdf || !config.document.docx) {
+    const initialArtifacts = artifactPair(config.document.artifacts);
+    if (!initialArtifacts.pdf || !initialArtifacts.docx) {
         throw new AppException("Documents not yet generated!", 409, "DOCUMENTS_NOT_GENERATED");
     }
 
@@ -96,6 +105,23 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
         throw new AppException("Document upload is already in progress.", 409, "DOCUMENT_UPLOAD_IN_PROGRESS");
     }
 
+    let claimedDocument: UploadableDocument | null;
+    try {
+        claimedDocument = await config.reload();
+    } catch (error) {
+        await config.release(token, "Failed to reload claimed document.").catch((releaseError) => logger.error(releaseError));
+        throw error;
+    }
+    if (!claimedDocument || claimedDocument.status !== DocumentStatus.UPLOADING) {
+        await config.release(token, "Document upload lease was lost.").catch((releaseError) => logger.error(releaseError));
+        throw new AppException("Document upload lease was lost.", 409, "DOCUMENT_UPLOAD_LEASE_LOST");
+    }
+    const { pdf, docx } = artifactPair(claimedDocument.artifacts);
+    if (!pdf || !docx) {
+        await config.release(token, "Documents not yet generated.");
+        throw new AppException("Documents not yet generated!", 409, "DOCUMENTS_NOT_GENERATED");
+    }
+
     let uploadedResult: DocumentUploadResult | null = null;
     const heartbeat = setInterval(() => {
         void config.renew(token).catch((error) => logger.error(error));
@@ -104,16 +130,16 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
 
     try {
         const [pdfContent, docxContent] = await Promise.all([
-            getDocumentArtifact(config.document.pdf.objectKey),
-            getDocumentArtifact(config.document.docx.objectKey),
+            getDocumentArtifact(pdf.objectKey),
+            getDocumentArtifact(docx.objectKey),
         ]);
 
         const hashes = {
-            pdf: config.document.pdf.sha256 ?? sha256Document(pdfContent),
-            docx: config.document.docx.sha256 ?? sha256Document(docxContent),
+            pdf: pdf.sha256 ?? sha256Document(pdfContent),
+            docx: docx.sha256 ?? sha256Document(docxContent),
         };
 
-        const displayName = config.document.displayName ?? config.document.id;
+        const displayName = claimedDocument.displayName ?? claimedDocument.id;
 
         const uploads = await Promise.allSettled([
             uploadDocumentArtifact(`${displayName}.pdf`, config.pdfDirectory, pdfContent, hashes.pdf),
@@ -134,8 +160,8 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
             docx: uploads[1].value,
         };
 
-        if (!await config.finalize(token, uploadedResult, hashes)) {
-            throw new Error(`Document ${config.document.id} is no longer owned by this upload attempt.`);
+        if (!await config.finalize(claimedDocument, token, uploadedResult, hashes)) {
+            throw new Error(`Document ${claimedDocument.id} is no longer owned by this upload attempt.`);
         }
 
         return uploadedResult;
@@ -193,11 +219,13 @@ function artifactUpdates(result: DocumentUploadResult, hashes: { pdf: string; do
 
 async function finalizeOfferUpload(
     tx: Prisma.TransactionClient,
-    document: UploadableDocument & { pdf: StoredDocumentArtifact; docx: StoredDocumentArtifact },
+    document: UploadableDocument,
     token: string,
     result: DocumentUploadResult,
     hashes: { pdf: string; docx: string },
 ): Promise<boolean> {
+    const { pdf, docx } = artifactPair(document.artifacts);
+    if (!pdf || !docx) return false;
     const finalized = await tx.offerDocument.updateMany({
         where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
         data: { status: DocumentStatus.UPLOADED, uploadToken: null, error: null },
@@ -205,18 +233,20 @@ async function finalizeOfferUpload(
     if (finalized.count !== 1) return false;
 
     const updates = artifactUpdates(result, hashes);
-    await tx.document.update({ where: { id: document.pdf.id }, data: updates.pdf });
-    await tx.document.update({ where: { id: document.docx.id }, data: updates.docx });
+    await tx.documentArtifact.update({ where: { id: pdf.id }, data: updates.pdf });
+    await tx.documentArtifact.update({ where: { id: docx.id }, data: updates.docx });
     return true;
 }
 
 async function finalizeOrderUpload(
     tx: Prisma.TransactionClient,
-    document: UploadableDocument & { pdf: StoredDocumentArtifact; docx: StoredDocumentArtifact },
+    document: UploadableDocument,
     token: string,
     result: DocumentUploadResult,
     hashes: { pdf: string; docx: string },
 ): Promise<boolean> {
+    const { pdf, docx } = artifactPair(document.artifacts);
+    if (!pdf || !docx) return false;
     const finalized = await tx.orderDocument.updateMany({
         where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
         data: { status: DocumentStatus.UPLOADED, uploadToken: null, error: null },
@@ -224,25 +254,22 @@ async function finalizeOrderUpload(
     if (finalized.count !== 1) return false;
 
     const updates = artifactUpdates(result, hashes);
-    await tx.document.update({ where: { id: document.pdf.id }, data: updates.pdf });
-    await tx.document.update({ where: { id: document.docx.id }, data: updates.docx });
+    await tx.documentArtifact.update({ where: { id: pdf.id }, data: updates.pdf });
+    await tx.documentArtifact.update({ where: { id: docx.id }, data: updates.docx });
     return true;
 }
 
 const claimableUpload = (staleBefore: Date) => ({
     OR: [
-        { status: { in: [DocumentStatus.GENERATED, DocumentStatus.FAILED] }, uploadToken: null },
+        { status: DocumentStatus.GENERATED, uploadToken: null },
         { status: DocumentStatus.UPLOADING, updatedAt: { lt: staleBefore } },
     ],
 });
 
-export async function uploadOfferDocument(
-    offerId: string,
-    documentId: string,
-): Promise<DocumentUploadResult> {
+async function uploadOfferDocument(documentId: string): Promise<DocumentUploadResult> {
     const document = await prisma.offerDocument.findFirst({
-        where: { id: documentId, offerId, deletedAt: null },
-        include: { pdf: true, docx: true },
+        where: { id: documentId, deletedAt: null },
+        include: { artifacts: true },
     });
     if (!document) throw new AppException("Document not found.", 404, "DOCUMENT_NOT_FOUND");
 
@@ -256,10 +283,10 @@ export async function uploadOfferDocument(
         })).count === 1,
         reload: () => prisma.offerDocument.findUnique({
             where: { id: document.id },
-            include: { pdf: true, docx: true },
+            include: { artifacts: true },
         }),
-        finalize: (token, result, hashes) => prisma.$transaction((tx) =>
-            finalizeOfferUpload(tx, document as typeof document & { pdf: StoredDocumentArtifact; docx: StoredDocumentArtifact }, token, result, hashes)),
+        finalize: (claimedDocument, token, result, hashes) => prisma.$transaction((tx) =>
+            finalizeOfferUpload(tx, claimedDocument, token, result, hashes)),
         release: async (token, error) => {
             await prisma.offerDocument.updateMany({
                 where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
@@ -275,13 +302,10 @@ export async function uploadOfferDocument(
     });
 }
 
-export async function uploadOrderDocument(
-    orderId: string,
-    documentId: string,
-): Promise<DocumentUploadResult> {
+async function uploadOrderDocument(documentId: string): Promise<DocumentUploadResult> {
     const document = await prisma.orderDocument.findFirst({
-        where: { id: documentId, orderId, deletedAt: null },
-        include: { pdf: true, docx: true },
+        where: { id: documentId, deletedAt: null },
+        include: { artifacts: true },
     });
     if (!document) throw new AppException("Document not found.", 404, "DOCUMENT_NOT_FOUND");
 
@@ -295,10 +319,10 @@ export async function uploadOrderDocument(
         })).count === 1,
         reload: () => prisma.orderDocument.findUnique({
             where: { id: document.id },
-            include: { pdf: true, docx: true },
+            include: { artifacts: true },
         }),
-        finalize: (token, result, hashes) => prisma.$transaction((tx) =>
-            finalizeOrderUpload(tx, document as typeof document & { pdf: StoredDocumentArtifact; docx: StoredDocumentArtifact }, token, result, hashes)),
+        finalize: (claimedDocument, token, result, hashes) => prisma.$transaction((tx) =>
+            finalizeOrderUpload(tx, claimedDocument, token, result, hashes)),
         release: async (token, error) => {
             await prisma.orderDocument.updateMany({
                 where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
@@ -312,4 +336,13 @@ export async function uploadOrderDocument(
             });
         },
     });
+}
+
+export function uploadGeneratedDocument(
+    type: DocumentType,
+    documentId: string,
+): Promise<DocumentUploadResult> {
+    return type === "offer"
+        ? uploadOfferDocument(documentId)
+        : uploadOrderDocument(documentId);
 }

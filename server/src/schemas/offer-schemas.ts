@@ -38,12 +38,6 @@ export const createOfferPositionsSchema = z.array(createOfferPositionSchema);
 
 export const updateOfferPositionSchema = createOfferPositionSchema.partial();
 
-export const updateOfferDocumentSchema = z.object({
-  displayName: z.string().optional(),
-  isCurrent: z.boolean().optional(),
-  version: z.number().int().optional(),
-});
-
 export const createOfferSchema = z.object({
   offer: createOfferFieldsSchema,
   positions: createOfferPositionsSchema,

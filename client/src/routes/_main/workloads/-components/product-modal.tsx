@@ -8,13 +8,12 @@ import type {
   UpdateProductInput,
 } from "@/types";
 import {
-  Button,
   DEFAULT_LANGUAGE_OPTIONS,
-  Input,
-  ModalDialog,
+  FieldInput,
+  FieldTextarea,
+  FormModal,
   SegmentedLanguageToggle,
 } from "@/components";
-import { getFormError } from "@/lib/utils";
 
 interface ProductModalProps {
   onClose: () => void;
@@ -73,105 +72,37 @@ export default function ProductModal({
     },
   });
 
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    productForm.handleSubmit();
-  };
-
   return (
-    <ModalDialog onClose={onClose}>
-      <ModalDialog.Header>
+    <FormModal
+      form={productForm}
+      onClose={onClose}
+      formId="product-form"
+      title={
         <div className="flex items-center justify-between w-full mr-2">
           <h1 className="text-lg">
             {isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}
           </h1>
-
           <SegmentedLanguageToggle
             options={DEFAULT_LANGUAGE_OPTIONS}
             value={language}
             onChange={(lng) => setLanguage(lng)}
           />
         </div>
-      </ModalDialog.Header>
+      }
+    >
+      <productForm.Field name={`${language}.name`} children={(field) => (
+        <div className="grid gap-1">
+          <FieldInput field={field} label={`Produkt Name (${language})`} placeholder="Produkt Name" />
+        </div>
+      )} />
 
-      <ModalDialog.Content>
-        <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
-          <productForm.Field name={`${language}.name`} children={(field) => (
-            <div className="grid gap-1">
-              <Input
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                label={`Produkt Name (${language})`}
-                error={getFormError(field.state.meta.errors)}
-                placeholder="Produkt Name"
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </div>
-          )} />
+      <productForm.Field name={`${language}.description`} children={(field) => (
+        <FieldTextarea field={field} rows={5} label={`Produkt Beschreibung (${language})`} placeholder="Produkt Beschreibung" />
+      )} />
 
-          <productForm.Field
-            name={`${language}.description`}
-            children={(field) => (
-              <div className="grid gap-1">
-                <label htmlFor={field.name} className="text-sm text-gray-500">
-                  Produkt Beschreibung ({language})
-                </label>
-                <textarea
-                  rows={5}
-                  id={field.name}
-                  name={field.name}
-                  className="flex-1 outline-none border border-(--border) p-2 rounded-md"
-                  value={field.state.value}
-                  placeholder="Produkt Beschreibung"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          />
-
-          <productForm.Field
-            name={`${language}.table`}
-            children={(field) => (
-              <div className="grid gap-1">
-                <label htmlFor={field.name} className="text-sm text-gray-500">
-                  Tabelle Beschreibung ({language})
-                </label>
-                <textarea
-                  rows={5}
-                  id={field.name}
-                  name={field.name}
-                  className="flex-1 outline-none border border-(--border) p-2 rounded-md"
-                  value={field.state.value}
-                  placeholder="Tabellen Beschreibung"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          />
-        </form>
-      </ModalDialog.Content>
-
-      <ModalDialog.Footer>
-        <Button onClick={onClose} type="button" size="sm" variant="secondary">
-          Abbrechen
-        </Button>
-        <productForm.Subscribe
-          selector={(state) => [state.canSubmit, state.isSubmitting]}
-          children={([canSubmit, isSubmitting]) => (
-            <Button
-              form="product-form"
-              disabled={!canSubmit}
-              type="submit"
-              size="sm"
-              loading={isSubmitting}
-            >
-              Speichern
-            </Button>
-          )}
-        />
-      </ModalDialog.Footer>
-    </ModalDialog>
+      <productForm.Field name={`${language}.table`} children={(field) => (
+        <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
+      )} />
+    </FormModal>
   );
 }

@@ -71,7 +71,7 @@ export interface components {
             offers: components["schemas"]["Offer"][];
             orders: components["schemas"]["Order"][];
         };
-        Document: {
+        DocumentArtifact: {
             id: string;
             objectKey: string;
             format: components["schemas"]["DocumentFormat"];
@@ -82,14 +82,14 @@ export interface components {
             uploadedAt?: string;
             remotePath?: string;
             remoteEtag?: string;
+            offerDocument?: components["schemas"]["OfferDocument"];
+            offerDocumentId?: string;
+            orderDocument?: components["schemas"]["OrderDocument"];
+            orderDocumentId?: string;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
-            offerPdfDocument?: components["schemas"]["OfferDocument"];
-            offerDocxDocument?: components["schemas"]["OfferDocument"];
-            orderPdfDocument?: components["schemas"]["OrderDocument"];
-            orderDocxDocument?: components["schemas"]["OrderDocument"];
         };
         Offer: {
             id: string;
@@ -188,10 +188,7 @@ export interface components {
             error?: string;
             offer: components["schemas"]["Offer"];
             offerId: string;
-            pdf?: components["schemas"]["Document"];
-            pdfId?: string;
-            docx?: components["schemas"]["Document"];
-            docxId?: string;
+            artifacts: components["schemas"]["DocumentArtifact"][];
             task: components["schemas"]["Task"];
             taskId: string;
             /** Format: date-time */
@@ -292,10 +289,7 @@ export interface components {
             error?: string;
             order: components["schemas"]["Order"];
             orderId: string;
-            pdf?: components["schemas"]["Document"];
-            pdfId?: string;
-            docx?: components["schemas"]["Document"];
-            docxId?: string;
+            artifacts: components["schemas"]["DocumentArtifact"][];
             task: components["schemas"]["Task"];
             taskId: string;
             /** Format: date-time */

@@ -1,9 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "react-toastify";
 import type { Offer, OfferRevision } from "@/types";
-import { Button, Drawer } from "@/components";
+import { Button, Drawer, showToast } from "@/components";
 import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
 import { offerQueries } from "@/hooks/offers/offer-queries";
 import { formatDate } from "@/lib/format";
@@ -29,7 +28,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
 
     useEffect(() => {
         if (errorRestoringRevision) {
-            toast.error(errorRestoringRevision.message);
+            showToast.error("offers.toast.restoreError", { vars: { message: errorRestoringRevision.message } });
         }
     }, [errorRestoringRevision]);
 
@@ -41,7 +40,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                 revisionId: revision.id,
                 expectedVersion: offer.version,
             });
-            toast.success(t("versionHistory.restoreSuccess"));
+            showToast.success("versionHistory.restoreSuccess");
         } catch {
             // The mutation error is surfaced by the effect above.
         }
@@ -56,7 +55,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                 </div>
 
                 {isPending && <p className="text-sm text-(--text-secondary)">{t("common.loading")}</p>}
-                {error && <p className="text-sm text-(--error)">{error.message}</p>}
+                {error && <p className="text-sm text-(--destructive)">{error.message}</p>}
                 {!isPending && !error && revisions.length === 0 && (
                     <p className="text-sm text-(--text-secondary)">
                         {t("versionHistory.empty")}

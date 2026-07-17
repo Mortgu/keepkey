@@ -35,13 +35,7 @@ export const deleteOrderAction = (id: string) =>
   api<void>(`/api/orders/${id}`, { method: "DELETE" });
 
 export const generateOrderDocumentAction = (orderId: string) =>
-  api<{ taskId: string }>(`/api/orders/${orderId}/document`, { method: "POST" });
-
-export const uploadOrderDocumentAction = (orderId: string, documentId: string) =>
-  api<void>(`/api/orders/${orderId}/documents/${documentId}/upload`, { method: "POST" });
-
-export const deleteOrderDocumentAction = (orderId: string, documentId: string) =>
-  api<void>(`/api/orders/${orderId}/documents/${documentId}`, { method: "DELETE" });
+  api<{ taskId: string }>(`/api/orders/${orderId}/documents`, { method: "POST" });
 
 export type UpdateOrderInput = {
   expectedVersion: number;

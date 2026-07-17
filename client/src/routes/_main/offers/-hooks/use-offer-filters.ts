@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -7,17 +8,20 @@ const sortOptions = [
 
 
 export default function useOfferFilters() {
-    const [searchInput, setSearchInput] = useState("");
+    const urlSearch = useSearch({ strict: false });
+    const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter, setContactPersonFilter] = useState<Array<string>>([]);
+    const [productFilter, setProductFilter] = useState<Array<string>>([]);
 
     const params = useMemo(() => ({
         search: searchInput || undefined,
         companyIds: customerFilter.length > 0 ? customerFilter : undefined,
         contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
+        productIds: productFilter.length > 0 ? productFilter : undefined,
         sort,
-    }), [searchInput, customerFilter, contactPersonFilter, sort]);
+    }), [searchInput, customerFilter, contactPersonFilter, productFilter, sort]);
 
     const removeCustomerFilter = (id: string) =>
         setCustomerFilter((prev) => prev.filter((i) => i !== id));
@@ -25,7 +29,10 @@ export default function useOfferFilters() {
     const removeContactPersonFilter = (id: string) =>
         setContactPersonFilter((prev) => prev.filter((i) => i !== id));
 
-    const activeFilterCount = customerFilter.length + contactPersonFilter.length;
+    const removeProductFilter = (id: string) =>
+        setProductFilter((prev) => prev.filter((i) => i !== id));
+
+    const activeFilterCount = customerFilter.length + contactPersonFilter.length + productFilter.length;
 
     return {
         sortOptions,
@@ -39,6 +46,9 @@ export default function useOfferFilters() {
         contactPersonFilter,
         setContactPersonFilter,
         removeContactPersonFilter,
+        productFilter,
+        setProductFilter,
+        removeProductFilter,
         activeFilterCount,
         params,
     };

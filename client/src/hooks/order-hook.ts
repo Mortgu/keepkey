@@ -1,20 +1,21 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { orderKeys } from "./orders/order-keys";
 import type { CreateOrderInput, UpdateOrderInput } from "@/data/orders";
-import { createOrderAction, deleteOrderAction, deleteOrderDocumentAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction, restoreOrderRevisionAction, updateOrderAction, uploadOrderDocumentAction } from "@/data/orders";
+import { createOrderAction, deleteOrderAction, generateOrderDocumentAction, getNextOrderNumberAction, getOrdersAction, restoreOrderRevisionAction, updateOrderAction } from "@/data/orders";
 
 export const useOrderHook = () => {
   const queryClient = useQueryClient();
 
   const invalidate = () =>
-    queryClient.invalidateQueries({ queryKey: ["orders"] });
+    queryClient.invalidateQueries({ queryKey: orderKeys.all });
 
   const { data: orders = [], isPending, error } = useQuery({
-    queryKey: ["orders"],
+    queryKey: orderKeys.list(),
     queryFn: getOrdersAction,
   });
 
   const { data: nextOrderNumber } = useQuery({
-    queryKey: ["orders", "next-number"],
+    queryKey: orderKeys.nextNumber(),
     queryFn: getNextOrderNumberAction,
   });
 
@@ -47,20 +48,8 @@ export const useOrderHook = () => {
     }) => restoreOrderRevisionAction(orderId, revisionId, expectedVersion),
     onSuccess: (_, args) => {
       invalidate();
-      queryClient.invalidateQueries({ queryKey: ["orders", args.orderId, "revisions"] });
+      queryClient.invalidateQueries({ queryKey: orderKeys.revisions(args.orderId) });
     },
-  });
-
-  const uploadDocumentMutation = useMutation({
-    mutationFn: ({ orderId, documentId }: { orderId: string; documentId: string }) =>
-      uploadOrderDocumentAction(orderId, documentId),
-    onSuccess: invalidate,
-  });
-
-  const deleteDocumentMutation = useMutation({
-    mutationFn: ({ orderId, documentId }: { orderId: string; documentId: string }) =>
-      deleteOrderDocumentAction(orderId, documentId),
-    onSuccess: invalidate,
   });
 
   return {
@@ -90,12 +79,5 @@ export const useOrderHook = () => {
     restoringRevisionId: restoreMutation.variables?.revisionId,
     errorRestoringRevision: restoreMutation.error,
 
-    uploadDocument: uploadDocumentMutation.mutateAsync,
-    isUploadingDocument: uploadDocumentMutation.isPending,
-    errorUploadingDocument: uploadDocumentMutation.error,
-
-    deleteDocument: deleteDocumentMutation.mutateAsync,
-    isDeletingDocument: deleteDocumentMutation.isPending,
-    errorDeletingDocument: deleteDocumentMutation.error,
   };
 };

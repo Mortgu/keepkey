@@ -4,6 +4,7 @@ export interface OfferFilters {
     search?: string;
     companyIds?: Array<string>;
     contactPersonIds?: Array<string>;
+    productIds?: Array<string>;
     sort?: string;
     cursor?: string;
     limit?: number;
@@ -59,5 +60,3 @@ export type CreateOfferFlatrateInput = Pick<OfferFlatRate,
 >;
 
 export type UpdateOfferFlatrateInput = Partial<CreateOfferFlatrateInput>;
-
-export type UpdateOfferDocumentInput = Partial<Pick<OfferDocument, "displayName" | "isCurrent" | "version">>;

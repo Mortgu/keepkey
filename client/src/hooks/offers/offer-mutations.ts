@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferDocument, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition, uploadOfferDocument } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
@@ -213,26 +213,6 @@ export function useOfferManager(filters: OfferFilters = {}) {
     }
 }
 
-export function useOfferDocumentUpload() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ offerId, documentId }: {
-            offerId: string, documentId: string
-        }) => uploadOfferDocument(offerId, documentId),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
-        },
-    });
-
-    return {
-        uploadOfferDocument: mutation.mutateAsync,
-        isUploading: mutation.isPending,
-        errorUploading: mutation.error,
-    }
-}
-
 export function useGenerateOfferDocument() {
     const queryClient = useQueryClient();
 
@@ -250,26 +230,6 @@ export function useGenerateOfferDocument() {
         generateOfferDocument: mutation.mutateAsync,
         isGenerating: mutation.isPending,
         errorGenerating: mutation.error,
-    }
-}
-
-export function useDeleteOfferDocument() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ offerId, documentId }: {
-            offerId: string, documentId: string
-        }) => deleteOfferDocument(offerId, documentId),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
-        },
-    });
-
-    return {
-        deleteOfferDocument: mutation.mutateAsync,
-        isDeleting: mutation.isPending,
-        errorDeleting: mutation.error,
     }
 }
 

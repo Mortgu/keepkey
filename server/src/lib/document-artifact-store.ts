@@ -115,6 +115,15 @@ export async function getDocumentDownloadUrl(objectKey: string, downloadName: st
     }), { expiresIn: DOWNLOAD_URL_TTL_SECONDS });
 }
 
+export async function isS3Available(): Promise<boolean> {
+    try {
+        await storageClient.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }));
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export async function initDocumentArtifactStore(): Promise<void> {
     await storageClient.send(new HeadBucketCommand({ Bucket: env.S3_BUCKET }));
 }

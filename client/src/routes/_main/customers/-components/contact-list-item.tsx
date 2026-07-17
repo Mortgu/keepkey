@@ -1,9 +1,9 @@
-import { Pen, Trash } from "lucide-react";
-import { useState } from "react";
+import { Pen, Settings, Trash } from "lucide-react";
 import { tv } from "tailwind-variants";
 import ContactPersonForm from "./contact-person-form";
+import SalutationLineModal from "./salutation-line-modal";
 import type { ContactPerson } from "@/types";
-import { useDeleteCustomerContact, useUpdateCustomerContact } from "@/hooks";
+import { useDeleteCustomerContact, useModal, useUpdateCustomerContact } from "@/hooks";
 import { Button } from "@/components";
 
 type Props = {
@@ -12,16 +12,17 @@ type Props = {
 };
 
 export default function ContactListItem({ currentCustomerId, cp }: Props) {
-    const [isEditing, setEditing] = useState<boolean>(false);
+    const editModal = useModal<ContactPerson>();
+    const salutationModal = useModal<ContactPerson>();
 
     const { updateCustomerContact, isUpdatingCustomerContact } = useUpdateCustomerContact();
     const { deleteCustomerContact, isDeletingCustomerContact, errorDeletingCustomerContact } = useDeleteCustomerContact();
 
     const styles = tv({
         base: [
-            "flex items-center justify-between",
-            "bg-(--subtle-50) border border-(--border) rounded-md",
-            "px-3 py-2"
+            "w-full flex items-center justify-between",
+            "border-t border-(--border)",
+            "px-4 py-3"
         ],
         variants: {
             error: {
@@ -32,7 +33,7 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
     })
 
     return (
-        <div className="grid gap-2">
+        <div className="flex flex-col items-center">
             {errorDeletingCustomerContact && (
                 <p className="text-sm text-(--destructive)">{errorDeletingCustomerContact.message}</p>
             )}
@@ -44,8 +45,11 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
                 </div>
 
                 <div className="flex gap-2">
+                    <Button type="button" variant="secondary" size="sm" icon={<Settings className="size-3.5" />} iconOnly
+                        onClick={() => salutationModal.open(cp)} title="Anredezeile" />
+
                     <Button type="button" variant="secondary" size="sm" icon={<Pen className="size-3.5" />} iconOnly
-                        onClick={() => setEditing(true)} loading={isUpdatingCustomerContact} />
+                        onClick={() => editModal.open(cp)} loading={isUpdatingCustomerContact} />
 
                     <Button type="button" variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
                         loading={isDeletingCustomerContact}
@@ -55,12 +59,21 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
                 </div>
             </div>
 
-            {isEditing && (
-                <ContactPersonForm saveFn={(data) => {
-                    updateCustomerContact({ id: currentCustomerId, contactId: cp.id, input: data });
-                    setEditing(false);
-                }} cancelFn={() => setEditing(false)}
-                    currentCustomerId={currentCustomerId} currentContactPerson={cp} />
+            {editModal.isOpen && editModal.data && (
+                <ContactPersonForm
+                    key={editModal.key}
+                    saveFn={(data) => {
+                        updateCustomerContact({ id: currentCustomerId, contactId: cp.id, input: data });
+                        editModal.close();
+                    }}
+                    cancelFn={editModal.close}
+                    currentCustomerId={currentCustomerId}
+                    currentContactPerson={editModal.data} />
+            )}
+
+            {salutationModal.isOpen && salutationModal.data && (
+                <SalutationLineModal key={salutationModal.key}
+                    contactPerson={salutationModal.data} onClose={salutationModal.close} />
             )}
         </div>
     )

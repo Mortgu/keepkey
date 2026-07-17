@@ -44,7 +44,7 @@ export const useUserHook = () => {
     errorCreatingUser: createUserMutation.error,
 
     updateUser: updateUserMutation.mutate,
-    isUpdatingUser: updateUserMutation.isPaused,
+    isUpdatingUser: updateUserMutation.isPending,
     errorUpdatingUser: updateUserMutation.error,
 
     deleteUser: deleteUserMutation.mutate,

@@ -43,7 +43,7 @@ export default function PricingTableItem({ tariff }: Props) {
                     </div>
                 </div>
 
-                <div className="px-4 py-2 flex items-center gap-2">
+                <div className="px-2 py-2 flex items-center gap-2">
                     <Button size="sm" variant="secondary" icon={<UndoDot className="size-3.5" />} iconOnly
                         onClick={() => setDrawerOpen(true)} />
                     <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />} iconOnly

@@ -1,9 +1,7 @@
-import { QueryClient, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { customerKeys } from "./customer-keys";
 import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, updateCustomer, updateCustomerContact } from "./customer-api";
-import type { CreateCustomerContactInput, CreateCustomerInput, DocumentStatus, OffersPage, Order, UpdateCustomerContactInput } from "@/types";
-import { getTaskByIdAction } from "@/data/offer";
-import { useEffect } from "react";
+import type { CreateCustomerContactInput, CreateCustomerInput, UpdateCustomerContactInput } from "@/types";
 
 export function useCreateCustomer() {
     const queryClient = useQueryClient();
@@ -146,85 +144,3 @@ export function useCustomerContactHook() {
         ...deleteCustomerContactMutation,
     }
 }
-
-
-
-function updateOfferDocumentStatus(
-    queryClient: QueryClient,
-    taskId: string,
-    status: DocumentStatus,
-    error?: string,
-) {
-    queryClient.setQueriesData<OffersPage>({ queryKey: ["offers"] }, (page) => {
-        if (!page || !page.items?.length || !('offerDocuments' in page.items[0])) return page;
-        return {
-            ...page, items: page.items.map((offer) => ({
-                ...offer,
-                offerDocuments: offer.offerDocuments.map((doc) =>
-                    doc.taskId === taskId ? { ...doc, status, ...(error ? { error } : {}) } : doc
-                ),
-            }))
-        };
-    });
-}
-
-function updateOrderDocumentStatus(
-    queryClient: QueryClient,
-    taskId: string,
-    status: DocumentStatus,
-    error?: string,
-) {
-    queryClient.setQueriesData<Array<Order>>({ queryKey: ["orders"], exact: true }, (orders) => {
-        if (!Array.isArray(orders)) return orders;
-        return orders.map((order) => ({
-            ...order,
-            documents: order.documents.map((doc) =>
-                doc.taskId === taskId
-                    ? { ...doc, status, ...(error ? { error } : {}) }
-                    : doc
-            ),
-        }));
-    });
-}
-
-
-
-export const useDocumentTask = (taskId?: string) => {
-    const queryClient = useQueryClient();
-
-    const { data: task } = useQuery({
-        queryKey: ["task", taskId],
-        queryFn: () => getTaskByIdAction(taskId!),
-        refetchInterval: (query) => {
-            if (query.state.data?.status === "COMPLETED") {
-                return false;
-            }
-
-            if (query.state.data?.status === "FAILED") {
-                return false;
-            }
-
-            return 2000;
-        },
-
-        enabled: !!taskId,
-    });
-
-    useEffect(() => {
-        if (!task || !taskId) return;
-
-        if (task.status === "COMPLETED") {
-            updateOfferDocumentStatus(queryClient, taskId, "GENERATED");
-            updateOrderDocumentStatus(queryClient, taskId, "GENERATED");
-            queryClient.invalidateQueries({ queryKey: ["offers"] });
-            queryClient.invalidateQueries({ queryKey: ["orders"] });
-        }
-
-        if (task.status === "FAILED") {
-            updateOfferDocumentStatus(queryClient, taskId, "FAILED", task.error ?? undefined);
-            updateOrderDocumentStatus(queryClient, taskId, "FAILED", task.error ?? undefined);
-        }
-    }, [task?.status, taskId, queryClient]);
-
-    return { task };
-};

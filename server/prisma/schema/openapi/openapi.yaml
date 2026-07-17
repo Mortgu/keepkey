@@ -186,7 +186,7 @@ components:
         - updatedAt
         - offers
         - orders
-    Document:
+    DocumentArtifact:
       type: object
       properties:
         id:
@@ -207,20 +207,20 @@ components:
           type: string
         remoteEtag:
           type: string
+        offerDocument:
+          $ref: "#/components/schemas/OfferDocument"
+        offerDocumentId:
+          type: string
+        orderDocument:
+          $ref: "#/components/schemas/OrderDocument"
+        orderDocumentId:
+          type: string
         createdAt:
           type: string
           format: date-time
         updatedAt:
           type: string
           format: date-time
-        offerPdfDocument:
-          $ref: "#/components/schemas/OfferDocument"
-        offerDocxDocument:
-          $ref: "#/components/schemas/OfferDocument"
-        orderPdfDocument:
-          $ref: "#/components/schemas/OrderDocument"
-        orderDocxDocument:
-          $ref: "#/components/schemas/OrderDocument"
       required:
         - id
         - objectKey
@@ -459,14 +459,10 @@ components:
           $ref: "#/components/schemas/Offer"
         offerId:
           type: string
-        pdf:
-          $ref: "#/components/schemas/Document"
-        pdfId:
-          type: string
-        docx:
-          $ref: "#/components/schemas/Document"
-        docxId:
-          type: string
+        artifacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentArtifact"
         task:
           $ref: "#/components/schemas/Task"
         taskId:
@@ -487,6 +483,7 @@ components:
         - isCurrent
         - offer
         - offerId
+        - artifacts
         - task
         - taskId
         - createdAt
@@ -711,14 +708,10 @@ components:
           $ref: "#/components/schemas/Order"
         orderId:
           type: string
-        pdf:
-          $ref: "#/components/schemas/Document"
-        pdfId:
-          type: string
-        docx:
-          $ref: "#/components/schemas/Document"
-        docxId:
-          type: string
+        artifacts:
+          type: array
+          items:
+            $ref: "#/components/schemas/DocumentArtifact"
         task:
           $ref: "#/components/schemas/Task"
         taskId:
@@ -739,6 +732,7 @@ components:
         - isCurrent
         - order
         - orderId
+        - artifacts
         - task
         - taskId
         - createdAt

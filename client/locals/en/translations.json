@@ -31,6 +31,15 @@
   "offerModal": {
     "compare": "Compare?"
   },
+  "offers": {
+    "toast": {
+      "deleteError": "Could not delete offer: {{message}}",
+      "documentUploadError": "Could not upload document: {{message}}",
+      "documentDeleteError": "Could not delete document: {{message}}",
+      "documentRenameError": "Could not rename document: {{message}}",
+      "restoreError": "Could not restore version: {{message}}"
+    }
+  },
   "versionHistory": {
     "title": "Version history",
     "offerSubtitle": "Previous offer versions",
@@ -46,11 +55,15 @@
   },
   "common": {
     "search": "Search",
+    "clear": "Clear",
     "filter": "Filter",
     "export": "Export",
     "import": "Import",
     "loading": "Loading...",
-    "noResults": "No results"
+    "noResults": "No results",
+    "errorTitle": "Something went wrong",
+    "errorRetry": "Try again",
+    "errorGeneric": "An unexpected error occurred."
   },
   "dashboard": {
     "recentOffers": "Recent offers",
@@ -67,6 +80,36 @@
     "badge": {
       "reserved": "Reserved",
       "converted": "Ordered"
+    },
+    "status": {
+      "connected": "Connected",
+      "checking": "Checking connection…",
+      "failed": "Connection failed",
+      "notConfigured": "Not configured"
+    },
+    "retry": "Retry",
+    "search": {
+      "placeholder": "Search offers, orders, customers…",
+      "recent": "Recent searches",
+      "recentEmpty": "No searches yet.",
+      "empty": "No results for \"{{query}}\"",
+      "results": "{{count}} result(s)",
+      "hints": "↵ open · Esc to close",
+      "justNow": "just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}} day(s) ago",
+      "tabs": {
+        "all": "All",
+        "offers": "Offers",
+        "orders": "Orders",
+        "customers": "Customers"
+      },
+      "typeLabels": {
+        "offer": "Offer",
+        "order": "Order",
+        "customer": "Customer"
+      }
     }
   }
 }

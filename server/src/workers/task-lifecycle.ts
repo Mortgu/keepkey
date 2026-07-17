@@ -27,7 +27,7 @@ export async function markTaskRunning(
             where: {
                 taskId,
                 status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: DocumentStatus.PROCESSING, error: null },
         });
@@ -35,7 +35,7 @@ export async function markTaskRunning(
             where: {
                 taskId,
                 status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: DocumentStatus.PROCESSING, error: null },
         });
@@ -96,7 +96,7 @@ export async function handleTaskFailure(
             where: {
                 taskId,
                 status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: DocumentStatus.FAILED, error: error.message },
         });
@@ -104,7 +104,7 @@ export async function handleTaskFailure(
             where: {
                 taskId,
                 status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                OR: [{ pdfId: null }, { docxId: null }],
+                artifacts: { none: {} },
             },
             data: { status: DocumentStatus.FAILED, error: error.message },
         });

@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { EmployeePage } from "./-page";
+import EmployeeList from "./-components/employee-list";
+import { PageWidth } from "@/components";
 
 export const Route = createFileRoute("/_main/employees/")({
-  component: EmployeePage,
+    component: () => (
+        <PageWidth>
+            <EmployeeList />
+        </PageWidth>
+    ),
 });
