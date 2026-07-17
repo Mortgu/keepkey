@@ -10,6 +10,7 @@ import {
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { useTranslation } from "react-i18next";
 
 interface EditProductsModalProps {
     onClose: () => void;
@@ -30,6 +31,7 @@ export default function EditProductsModal({
     selectedProductIds,
     loading,
 }: EditProductsModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = products.map(p => ({
@@ -84,8 +86,8 @@ export default function EditProductsModal({
             </ModalDialog.Content>
 
             <ModalDialog.Footer>
-                <Button onClick={onClose} type="button" size="sm" variant="secondary">
-                    Abbrechen
+                <Button onClick={onClose} type="button" size="sm" variant="border">
+                    {t("button.cancel")}
                 </Button>
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -97,7 +99,7 @@ export default function EditProductsModal({
                             size="sm"
                             loading={loading ?? isSubmitting}
                         >
-                            Speichern
+                            {t("button.save")}
                         </Button>
                     )}
                 />

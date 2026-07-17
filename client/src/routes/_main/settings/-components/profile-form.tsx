@@ -7,6 +7,7 @@ import type { SyntheticEvent } from "react";
 import { Button, FieldInput } from "@/components";
 import { useAuth } from "@/context/auth.tsx";
 import { authClient } from "@/lib/auth-client.ts";
+import { useTranslation } from "react-i18next";
 
 const profileSchema = z.object({
     salutation: z.string().min(1, "Pflichtfeld"),
@@ -16,6 +17,7 @@ const profileSchema = z.object({
 });
 
 export default function ProfileForm() {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const queryClient = useQueryClient();
 
@@ -90,7 +92,7 @@ export default function ProfileForm() {
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
                     children={([canSubmit, isSubmitting]) => (
                         <Button form="profile-form" size="xs" disabled={!canSubmit} loading={isSubmitting}>
-                            Speichern
+                            {t("button.save")}
                         </Button>
                     )}
                 />

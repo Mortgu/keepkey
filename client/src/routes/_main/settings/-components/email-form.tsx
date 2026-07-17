@@ -7,12 +7,14 @@ import type { SyntheticEvent } from "react";
 import { Button, FieldInput, Input } from "@/components";
 import { useAuth } from "@/context/auth.tsx";
 import { authClient } from "@/lib/auth-client.ts";
+import { useTranslation } from "react-i18next";
 
 const emailSchema = z.object({
     newEmail: z.email("Ungültige E-Mail!"),
 });
 
 export default function EmailForm() {
+    const { t } = useTranslation();
     const { user } = useAuth();
     const queryClient = useQueryClient();
 
@@ -61,7 +63,7 @@ export default function EmailForm() {
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
                             <Button size="xs" disabled={!canSubmit} loading={isSubmitting}>
-                                Speichern
+                                {t("button.save")}
                             </Button>
                         )}
                     />

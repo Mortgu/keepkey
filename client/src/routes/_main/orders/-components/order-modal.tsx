@@ -9,6 +9,7 @@ import { useOrderHook } from "@/hooks";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
+import { useTranslation } from "react-i18next";
 
 interface OrderModalProps {
   onClose: () => void;
@@ -27,6 +28,7 @@ function toInputDate(date: Date): string {
 }
 
 export default function OrderModal({ onClose }: OrderModalProps) {
+  const { t } = useTranslation();
   const { items: offers } = useOffers();
   const { createOrder, nextOrderNumber } = useOrderHook();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
@@ -186,7 +188,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
           </>
         ) : (
           <Button onClick={onClose} type="button" size="sm" variant="secondary">
-            Abbrechen
+            {t("button.cancel")}
           </Button>
         )}
       </ModalDialog.Footer>

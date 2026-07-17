@@ -4,6 +4,7 @@ import type { FlatRate, GetOfferFlatrate } from "@/types";
 import { Button, Input, Select } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { useTranslation } from "react-i18next";
 
 interface Props {
   flatRates: Array<FlatRate>;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export default function OfferFlatRateForm({ flatRates, saveFn, cancelFn }: Props) {
+  const { t } = useTranslation();
   const locale = useLocale();
 
   const [flatRateId, setFlatRateId] = useState<string>(flatRates[0]?.id ?? "");
@@ -62,11 +64,11 @@ export default function OfferFlatRateForm({ flatRates, saveFn, cancelFn }: Props
 
       <div className="flex items-center justify-end gap-2">
         <div className="flex gap-2">
-          <Button type="button" variant="secondary" size="sm" onClick={cancelFn}>
-            Abbrechen
+          <Button type="button" variant="border" size="sm" onClick={cancelFn}>
+            {t("button.cancel")}
           </Button>
           <Button type="button" size="sm" onClick={handleSave} disabled={!selected}>
-            Hinzufügen
+            {t("button.save")}
           </Button>
         </div>
       </div>

@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components";
+import { useTranslation } from "react-i18next";
 
 interface ModalProps {
     onClose: () => void;
@@ -21,6 +22,7 @@ function Footer({ children }: { children: React.ReactNode }) {
 }
 
 function ModalDialog({ onClose, children }: ModalProps) {
+    const { t } = useTranslation();
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
@@ -58,11 +60,11 @@ function ModalDialog({ onClose, children }: ModalProps) {
                     className="flex items-center justify-end gap-2 py-3.5 px-5 border-t border-(--border) bg-(--subtle-50)">
                     {footer ?? (
                         <>
-                            <Button onClick={onClose} variant="secondary" size="sm">
-                                Abbrechen
+                            <Button onClick={onClose} variant="border" size="sm">
+                                {t("button.cancel")}
                             </Button>
                             <Button variant="primary" size="sm">
-                                Speichern
+                                {t("button.save")}
                             </Button>
                         </>
                     )}

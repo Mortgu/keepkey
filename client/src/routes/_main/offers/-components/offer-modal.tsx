@@ -23,6 +23,7 @@ import {
 } from "@/components";
 import useOfferFormState from "../-hooks/use-offer-form-state";
 import type { SyntheticEvent } from "react";
+import { useTranslation } from "react-i18next";
 
 interface OfferModalProps {
   closeFn: () => void;
@@ -39,6 +40,7 @@ interface OfferModalProps {
 export default function OfferModal(props: OfferModalProps) {
   const { closeFn, currentOffer, customers, suppliers, users } = props;
 
+  const { t } = useTranslation();
   const state = useOfferFormState({
     closeFn,
     currentOffer,
@@ -317,28 +319,15 @@ export default function OfferModal(props: OfferModalProps) {
             {error && `${error.message}`}
           </p>
           <div className="flex gap-2">
-            <Button
-              onClick={closeFn}
-              type="button"
-              size="sm"
-              variant="secondary"
-            >
-              Abbrechen
+            <Button variant="border" size="sm" type="button" onClick={closeFn}>
+              {t("button.cancel")}
             </Button>
-            <form.Subscribe
-              selector={(s) => [s.canSubmit, s.isSubmitting]}
-              children={([canSubmit, isSubmitting]) => (
-                <Button
-                  form="offer-form"
-                  disabled={!canSubmit}
-                  type="submit"
-                  size="sm"
-                >
-                  {isSubmitting && <Loader className="size-4 animate-spin" />}
-                  Speichern
-                </Button>
-              )}
-            />
+            <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+              <Button form="offer-form" disabled={!canSubmit} type="submit" size="sm">
+                {isSubmitting && <Loader className="size-4 animate-spin" />}
+                {t("button.save")}
+              </Button>
+            )} />
           </div>
         </div>
       </ModalDialog.Footer>

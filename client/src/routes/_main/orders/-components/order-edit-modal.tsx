@@ -14,6 +14,7 @@ import {
   useUserHook,
 } from "@/hooks";
 import { Button, Input, ModalDialog, Select, Textarea } from "@/components";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   order: Order;
@@ -27,6 +28,7 @@ const inputDate = (value?: string) => value?.slice(0, 10) ?? "";
 const optionLabel = (translations: Array<{ name: string }>) => translations[0]?.name ?? "-";
 
 export default function OrderEditModal({ order, onClose }: Props) {
+  const { t } = useTranslation();
   const [expectedVersion] = useState(order.version);
   const { updateOrder, isUpdatingOrder } = useOrderHook();
   const { customers } = useCustomers();
@@ -232,8 +234,8 @@ export default function OrderEditModal({ order, onClose }: Props) {
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button size="sm" variant="secondary" onClick={onClose}>Abbrechen</Button>
-        <Button size="sm" onClick={submit} loading={isUpdatingOrder} disabled={isUpdatingOrder}>Speichern</Button>
+        <Button size="sm" variant="border" onClick={onClose}>{t("button.cancel")}</Button>
+        <Button size="sm" onClick={submit} loading={isUpdatingOrder} disabled={isUpdatingOrder}>{t("button.save")}</Button>
       </ModalDialog.Footer>
     </ModalDialog>
   );
