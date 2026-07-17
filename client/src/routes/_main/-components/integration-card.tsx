@@ -54,7 +54,7 @@ export default function IntegrationCard({
 
     return (
         <div className="grid">
-            <div className="w-full flex items-start justify-between p-4">
+            <div className="w-full flex items-start justify-between px-4 pt-4 pb-2">
                 <div className="w-fit flex items-center justify-center gap-2">
                     <div className="grid">
                         <p className="text-lg">{name}</p>
@@ -88,11 +88,11 @@ export default function IntegrationCard({
             </div>
 
             {showMeta && (
-                <div className="w-full flex items-center gap-4 border-t border-(--border) px-4 py-2 font-light">
+                <div className="flex gap-x-4 flex-wrap items-start px-4 pb-4 font-light ">
                     {meta!.map((item) => (
                         <p
                             key={item.label}
-                            className="grid flex-1 min-w-fit text-sm text-gray-500"
+                            className="flex gap-1  min-w-fit text-sm text-gray-500"
                         >
                             <span className="text-gray-400">{item.label}:</span>{" "}
                             {item.value}
