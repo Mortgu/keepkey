@@ -55,6 +55,7 @@
   },
   "common": {
     "search": "Search",
+    "clear": "Clear",
     "filter": "Filter",
     "export": "Export",
     "import": "Import",
@@ -86,6 +87,29 @@
       "failed": "Connection failed",
       "notConfigured": "Not configured"
     },
-    "retry": "Retry"
+    "retry": "Retry",
+    "search": {
+      "placeholder": "Search offers, orders, customers…",
+      "recent": "Recent searches",
+      "recentEmpty": "No searches yet.",
+      "empty": "No results for \"{{query}}\"",
+      "results": "{{count}} result(s)",
+      "hints": "↵ open · Esc to close",
+      "justNow": "just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}} day(s) ago",
+      "tabs": {
+        "all": "All",
+        "offers": "Offers",
+        "orders": "Orders",
+        "customers": "Customers"
+      },
+      "typeLabels": {
+        "offer": "Offer",
+        "order": "Order",
+        "customer": "Customer"
+      }
+    }
   }
 }

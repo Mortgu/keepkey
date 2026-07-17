@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -7,7 +8,8 @@ const sortOptions = [
 
 
 export default function useOfferFilters() {
-    const [searchInput, setSearchInput] = useState("");
+    const urlSearch = useSearch({ strict: false });
+    const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter, setContactPersonFilter] = useState<Array<string>>([]);

@@ -1,9 +1,8 @@
-import { Plus } from "lucide-react";
-import { useState } from "react";
 import IntegrationCard from "./-components/integration-card";
-import type {IntegrationCardMeta, IntegrationStatus} from "./-components/integration-card";
+import GlobalSearch from "./-components/global-search";
+import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@/data/integrations";
-import { Button, PageWidth, RouteError, SearchBar } from "@/components";
+import { PageWidth, RouteError } from "@/components";
 import { useIntegrationStatus } from "@/hooks/use-integration-status";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
@@ -14,7 +13,6 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 }
 
 export default function DashboardPage() {
-    const [query, setQuery] = useState("");
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
     const renderCard = (
@@ -38,7 +36,7 @@ export default function DashboardPage() {
     return (
         <PageWidth variant="none">
             <div className="w-full border-b border-(--border) p-4">
-                <SearchBar value={query} onChange={setQuery} placeholder="Suchen..." />
+                <GlobalSearch />
             </div>
 
             {error ? (
@@ -51,7 +49,7 @@ export default function DashboardPage() {
                 </div>
             )}
 
-            <div className="grid">
+            {/* <div className="grid">
                 <div className="m-4 flex flex-wrap items-center gap-4">
                     <Button size="md">Button md</Button>
                     <Button size="md" icon={<Plus size={18} />}>Button md</Button>
@@ -99,7 +97,7 @@ export default function DashboardPage() {
 
 
                 </div>
-            </div>
+            </div>*/}
         </PageWidth>
     );
 }

@@ -1,14 +1,15 @@
-import { useCustomers, useModal, useOrderHook } from "@/hooks";
-import type { Customer, Order } from "@/types";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
+import { useSearch } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import OrderCard from "./card/order-card";
 import OrderModal from "./order-modal";
+import type { Customer, Order } from "@/types";
+import { useCustomers, useModal, useOrderHook } from "@/hooks";
 
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useTranslation } from "react-i18next";
 
 const sort_options = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -20,7 +21,8 @@ export default function OrderList() {
 
     const { t } = useTranslation();
 
-    const [searchInput, setSearchInput] = useState("");
+    const urlSearch = useSearch({ strict: false });
+    const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sort_options[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter] = useState<Array<string>>([]);

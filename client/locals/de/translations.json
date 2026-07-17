@@ -55,6 +55,7 @@
   },
   "common": {
     "search": "Suchen",
+    "clear": "Leeren",
     "filter": "Filtern",
     "export": "Exportieren",
     "import": "Importieren",
@@ -86,6 +87,29 @@
       "failed": "Verbindung fehlgeschlagen",
       "notConfigured": "Nicht konfiguriert"
     },
-    "retry": "Erneut prüfen"
+    "retry": "Erneut prüfen",
+    "search": {
+      "placeholder": "Angebote, Bestellungen, Kunden durchsuchen…",
+      "recent": "Zuletzt gesucht",
+      "recentEmpty": "Noch keine Suchen.",
+      "empty": "Keine Ergebnisse für „{{query}}“",
+      "results": "{{count}} Ergebnis(se)",
+      "hints": "↵ öffnen · Esc schließen",
+      "justNow": "gerade eben",
+      "minutesAgo": "vor {{count}} Min.",
+      "hoursAgo": "vor {{count}} Std.",
+      "daysAgo": "vor {{count}} Tag(en)",
+      "tabs": {
+        "all": "Alle",
+        "offers": "Angebote",
+        "orders": "Bestellungen",
+        "customers": "Kunden"
+      },
+      "typeLabels": {
+        "offer": "Angebot",
+        "order": "Bestellung",
+        "customer": "Kunde"
+      }
+    }
   }
 }
