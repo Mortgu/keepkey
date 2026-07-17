@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<!-- @dsCard group="Brand" name="Filter Sidebar" subtitle="Persistent right-hand filter panel for list pages — Geschäftsjahr, Kunde, Ansprechpartner, Produkt, Preis-Slider" viewport="1320x780" -->
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: #F7F8F7; color: #111A14; -webkit-font-smoothing: antialiased; }
+  input[type=range] { -webkit-appearance: none; appearance: none; background: transparent; pointer-events: none; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; pointer-events: auto; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2.5px solid #00683F; box-shadow: 0 1px 3px rgba(0,0,0,0.25); cursor: pointer; margin-top: -1px; }
+  input[type=range]::-moz-range-thumb { pointer-events: auto; width: 16px; height: 16px; border-radius: 50%; background: #fff; border: 2.5px solid #00683F; box-shadow: 0 1px 3px rgba(0,0,0,0.25); cursor: pointer; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+
+const T = {
+  green600:'#00683F', green700:'#005432', green50:'#E6F2EC', green100:'#D4EDE1',
+  neutral25:'#F7F8F7', neutral50:'#F0F4F1', neutral100:'#E0E4E1', neutral200:'#C4CFC8',
+  neutral300:'#8A9E93', neutral500:'#4B5C52', neutral900:'#111A14', white:'#FFFFFF',
+};
+
+const Ico = {
+  chevron: (o={}) => <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" style={{ transform: o.up ? 'rotate(180deg)' : 'none', transition:'transform 160ms' }}><polyline points="6 9 12 15 18 9"/></svg>,
+  filter: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>,
+  search: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+  x: (s=11) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+};
+
+const fmtEUR = n => n.toLocaleString('de-DE');
+
+/* ── Section wrapper: title, active-count badge, collapsible ────────── */
+const FilterSection = ({ title, count, children, defaultOpen=true }) => {
+  const [open, setOpen] = React.useState(defaultOpen);
+  return (
+    <div style={{ borderBottom: `1px solid ${T.neutral100}`, padding: '16px 0' }}>
+      <button onClick={() => setOpen(o => !o)} style={{
+        width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between',
+        background:'none', border:'none', cursor:'pointer', padding:0, fontFamily:'inherit',
+      }}>
+        <span style={{ display:'flex', alignItems:'center', gap:7 }}>
+          <span style={{ fontSize:12.5, fontWeight:600, color:T.neutral900 }}>{title}</span>
+          {count > 0 && (
+            <span style={{ fontSize:10.5, fontWeight:600, color:T.green600, background:T.green50, borderRadius:9999, padding:'1px 6px', minWidth:16, textAlign:'center' }}>{count}</span>
+          )}
+        </span>
+        <span style={{ color:T.neutral300, display:'flex' }}>{Ico.chevron({ up: open })}</span>
+      </button>
+      {open && <div style={{ marginTop:12 }}>{children}</div>}
+    </div>
+  );
+};
+
+/* ── Segmented pill row — e.g. Geschäftsjahr ─────────────────────────── */
+const PillRow = ({ options, value, onChange }) => (
+  <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+    {options.map(o => {
+      const on = o === value;
+      return (
+        <button key={o} onClick={() => onChange(o)} style={{
+          fontFamily:'inherit', fontSize:12.5, fontWeight:500, padding:'6px 12px', borderRadius:9999,
+          border:`1px solid ${on ? T.green600 : T.neutral100}`, cursor:'pointer',
+          background: on ? T.green50 : T.white, color: on ? T.green600 : T.neutral500,
+          transition:'all 120ms',
+        }}>{o}</button>
+      );
+    })}
+  </div>
+);
+
+/* ── Checkbox list, with optional inline search for long lists ──────── */
+const CheckList = ({ items, values, onChange, searchable, placeholder }) => {
+  const [q, setQ] = React.useState('');
+  const filtered = searchable ? items.filter(i => i.label.toLowerCase().includes(q.toLowerCase())) : items;
+  const toggle = v => onChange(values.includes(v) ? values.filter(x => x !== v) : [...values, v]);
+  return (
+    <div>
+      {searchable && (
+        <div style={{ position:'relative', marginBottom:10 }}>
+          <span style={{ position:'absolute', left:9, top:'50%', transform:'translateY(-50%)', color:T.neutral300, display:'flex' }}>{Ico.search}</span>
+          <input value={q} onChange={e => setQ(e.target.value)} placeholder={placeholder}
+            style={{ width:'100%', fontFamily:'inherit', fontSize:12.5, color:T.neutral900, background:T.neutral25, border:`1px solid ${T.neutral100}`, borderRadius:6, padding:'6px 10px 6px 28px', outline:'none' }}/>
+        </div>
+      )}
+      <div style={{ display:'flex', flexDirection:'column', gap:1, maxHeight:168, overflowY:'auto' }}>
+        {filtered.map(item => {
+          const checked = values.includes(item.value);
+          return (
+            <label key={item.value} style={{ display:'flex', alignItems:'center', gap:9, padding:'5px 2px', cursor:'pointer', borderRadius:5 }}
+              onMouseEnter={e => e.currentTarget.style.background = T.neutral25}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
+              <span style={{
+                width:15, height:15, borderRadius:4, flexShrink:0, display:'flex', alignItems:'center', justifyContent:'center',
+                background: checked ? T.green600 : T.white, border:`1.5px solid ${checked ? T.green600 : T.neutral200}`, transition:'all 120ms',
+              }}>{checked && <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>}</span>
+              <input type="checkbox" checked={checked} onChange={() => toggle(item.value)} style={{ display:'none' }}/>
+              <span style={{ flex:1, fontSize:13, color:T.neutral900 }}>{item.label}</span>
+              {item.n !== undefined && <span style={{ fontSize:11.5, color:T.neutral300, fontVariantNumeric:'tabular-nums' }}>{item.n}</span>}
+            </label>
+          );
+        })}
+        {filtered.length === 0 && <div style={{ fontSize:12.5, color:T.neutral300, padding:'6px 2px' }}>Keine Treffer</div>}
+      </div>
+    </div>
+  );
+};
+
+/* ── Dual-thumb price range slider ───────────────────────────────────── */
+const PriceRange = ({ min, max, value, onChange, step=500 }) => {
+  const [lo, hi] = value;
+  const pct = v => ((v - min) / (max - min)) * 100;
+  const setLo = v => onChange([Math.min(Number(v), hi - step), hi]);
+  const setHi = v => onChange([lo, Math.max(Number(v), lo + step)]);
+  return (
+    <div>
+      <div style={{ display:'flex', justifyContent:'space-between', marginBottom:10 }}>
+        <span style={{ fontSize:12.5, fontWeight:600, color:T.neutral900 }}>€ {fmtEUR(lo)}</span>
+        <span style={{ fontSize:12.5, color:T.neutral300 }}>–</span>
+        <span style={{ fontSize:12.5, fontWeight:600, color:T.neutral900 }}>€ {fmtEUR(hi)}{hi === max ? '+' : ''}</span>
+      </div>
+      <div style={{ position:'relative', height:16, display:'flex', alignItems:'center' }}>
+        <div style={{ position:'absolute', left:0, right:0, height:4, borderRadius:9999, background:T.neutral100 }}/>
+        <div style={{ position:'absolute', height:4, borderRadius:9999, background:T.green600, left:`${pct(lo)}%`, right:`${100 - pct(hi)}%` }}/>
+        <input type="range" min={min} max={max} step={step} value={lo} onChange={e => setLo(e.target.value)} style={{ position:'absolute', width:'100%', height:16 }}/>
+        <input type="range" min={min} max={max} step={step} value={hi} onChange={e => setHi(e.target.value)} style={{ position:'absolute', width:'100%', height:16 }}/>
+      </div>
+      <div style={{ display:'flex', justifyContent:'space-between', marginTop:6 }}>
+        <span style={{ fontSize:11, color:T.neutral300 }}>€ {fmtEUR(min)}</span>
+        <span style={{ fontSize:11, color:T.neutral300 }}>€ {fmtEUR(max)}+</span>
+      </div>
+    </div>
+  );
+};
+
+/* ── Active filter chip (summary row above list) ─────────────────────── */
+const Chip = ({ label, onRemove }) => (
+  <div style={{ display:'inline-flex', alignItems:'center', gap:5, padding:'4px 6px 4px 10px', background:T.green50, border:`1px solid ${T.green100}`, borderRadius:9999, fontSize:12, fontWeight:500, color:T.green600 }}>
+    {label}
+    <button onClick={onRemove} style={{ background:'none', border:'none', cursor:'pointer', color:T.green600, display:'flex', padding:2, borderRadius:'50%' }}>{Ico.x(10)}</button>
+  </div>
+);
+
+/* ══════════════════════════════════════════════════════════════════════
+   FilterSidebar — the component itself
+   ══════════════════════════════════════════════════════════════════════ */
+const FilterSidebar = ({ data, state, setState, onReset }) => {
+  const { years, customers, contacts, products } = data;
+  const activeCount =
+    (state.year !== 'Alle' ? 1 : 0) + state.customers.length + state.contacts.length + state.products.length +
+    ((state.price[0] !== data.priceMin || state.price[1] !== data.priceMax) ? 1 : 0);
+
+  return (
+    <aside style={{ width:288, flexShrink:0, borderLeft:`1px solid ${T.neutral100}`, background:T.white, display:'flex', flexDirection:'column', height:'100%' }}>
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'18px 20px 14px' }}>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <span style={{ color:T.green600, display:'flex' }}>{Ico.filter}</span>
+          <span style={{ fontSize:15, fontWeight:600, letterSpacing:'-0.01em' }}>Filter</span>
+          {activeCount > 0 && <span style={{ fontSize:11, fontWeight:600, color:'white', background:T.green600, borderRadius:9999, padding:'1px 7px' }}>{activeCount}</span>}
+        </div>
+        {activeCount > 0 && (
+          <button onClick={onReset} style={{ background:'none', border:'none', cursor:'pointer', fontSize:12, color:T.neutral300, fontFamily:'inherit' }}>Zurücksetzen</button>
+        )}
+      </div>
+
+      <div style={{ flex:1, overflowY:'auto', padding:'0 20px' }}>
+        <FilterSection title="Geschäftsjahr" count={state.year !== 'Alle' ? 1 : 0}>
+          <PillRow options={years} value={state.year} onChange={v => setState(s => ({ ...s, year: v }))}/>
+        </FilterSection>
+
+        <FilterSection title="Kunde" count={state.customers.length}>
+          <CheckList items={customers} values={state.customers} searchable placeholder="Kunde suchen…"
+            onChange={v => setState(s => ({ ...s, customers: v }))}/>
+        </FilterSection>
+
+        <FilterSection title="Ansprechpartner" count={state.contacts.length} defaultOpen={false}>
+          <CheckList items={contacts} values={state.contacts}
+            onChange={v => setState(s => ({ ...s, contacts: v }))}/>
+        </FilterSection>
+
+        <FilterSection title="Produkt" count={state.products.length}>
+          <CheckList items={products} values={state.products} searchable placeholder="Produkt suchen…"
+            onChange={v => setState(s => ({ ...s, products: v }))}/>
+        </FilterSection>
+
+        <FilterSection title="Preis" count={(state.price[0] !== data.priceMin || state.price[1] !== data.priceMax) ? 1 : 0}>
+          <PriceRange min={data.priceMin} max={data.priceMax} value={state.price} onChange={v => setState(s => ({ ...s, price: v }))}/>
+        </FilterSection>
+      </div>
+
+      <div style={{ padding:'14px 20px', borderTop:`1px solid ${T.neutral100}` }}>
+        <button style={{
+          width:'100%', fontFamily:'inherit', fontSize:13.5, fontWeight:600, color:'white',
+          background:T.green600, border:'none', borderRadius:6, padding:'10px 0', cursor:'pointer', transition:'background 130ms',
+        }}
+        onMouseEnter={e => e.currentTarget.style.background = T.green700}
+        onMouseLeave={e => e.currentTarget.style.background = T.green600}
+        >{activeCount > 0 ? `${activeCount} Filter anwenden` : 'Filter anwenden'}</button>
+      </div>
+    </aside>
+  );
+};
+
+/* ══════════════════════════════════════════════════════════════════════
+   Demo page — Angebote list with the sidebar attached
+   ══════════════════════════════════════════════════════════════════════ */
+const DATA = {
+  years: ['Alle', '2024', '2025', '2026'],
+  customers: [
+    { value:'musterfirma', label:'Musterfirma GmbH', n:12 },
+    { value:'nordwind', label:'Nordwind AG', n:7 },
+    { value:'blaupause', label:'Blaupause Systeme', n:5 },
+    { value:'rheinmetall', label:'Rheinbau Service', n:4 },
+    { value:'huber', label:'Huber & Söhne', n:3 },
+    { value:'delta', label:'Delta Logistik GmbH', n:2 },
+  ],
+  contacts: [
+    { value:'mmustermann', label:'Max Mustermann' },
+    { value:'lschmidt', label:'Laura Schmidt' },
+    { value:'jweidmann', label:'Jonas Weidmann' },
+    { value:'akrause', label:'Anna Krause' },
+  ],
+  products: [
+    { value:'m365', label:'Microsoft 365', n:18 },
+    { value:'entraid', label:'Entra ID', n:9 },
+    { value:'backup', label:'Backup & Recovery', n:14 },
+    { value:'defender', label:'Defender for Business', n:6 },
+    { value:'sharepoint', label:'SharePoint Migration', n:3 },
+  ],
+  priceMin: 0, priceMax: 100000,
+};
+
+const OFFERS = [
+  { id:'AG2026002', customer:'Musterfirma GmbH', contact:'Herr Max Mustermann', date:'15. Juli 2026', total:'60.372,00 €' },
+  { id:'AG2026001', customer:'Nordwind AG', contact:'Frau Laura Schmidt', date:'02. Juli 2026', total:'18.240,00 €' },
+  { id:'AG2025098', customer:'Blaupause Systeme', contact:'Herr Jonas Weidmann', date:'28. Juni 2026', total:'9.680,00 €' },
+];
+
+const App = () => {
+  const [state, setState] = React.useState({ year:'Alle', customers:[], contacts:[], products:[], price:[DATA.priceMin, DATA.priceMax] });
+  const reset = () => setState({ year:'Alle', customers:[], contacts:[], products:[], price:[DATA.priceMin, DATA.priceMax] });
+
+  const chips = [
+    state.year !== 'Alle' && { key:'year', label:`Geschäftsjahr: ${state.year}`, onRemove:() => setState(s => ({ ...s, year:'Alle' })) },
+    ...state.customers.map(v => ({ key:'c'+v, label:DATA.customers.find(c=>c.value===v).label, onRemove:() => setState(s => ({ ...s, customers:s.customers.filter(x=>x!==v) })) })),
+    ...state.contacts.map(v => ({ key:'p'+v, label:DATA.contacts.find(c=>c.value===v).label, onRemove:() => setState(s => ({ ...s, contacts:s.contacts.filter(x=>x!==v) })) })),
+    ...state.products.map(v => ({ key:'pr'+v, label:DATA.products.find(c=>c.value===v).label, onRemove:() => setState(s => ({ ...s, products:s.products.filter(x=>x!==v) })) })),
+    (state.price[0] !== DATA.priceMin || state.price[1] !== DATA.priceMax) && { key:'price', label:`€ ${fmtEUR(state.price[0])}–${fmtEUR(state.price[1])}`, onRemove:() => setState(s => ({ ...s, price:[DATA.priceMin, DATA.priceMax] })) },
+  ].filter(Boolean);
+
+  return (
+    <div style={{ display:'flex', height:'100vh', background:T.white }}>
+      <div style={{ flex:1, overflowY:'auto', padding:'28px 32px' }}>
+        <div style={{ display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:20 }}>
+          <h1 style={{ fontSize:22, fontWeight:600, letterSpacing:'-0.01em', margin:0 }}>Angebote</h1>
+          <span style={{ fontSize:13, color:T.neutral300 }}>{OFFERS.length} Ergebnisse</span>
+        </div>
+
+        {chips.length > 0 && (
+          <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:18 }}>
+            {chips.map(c => <Chip key={c.key} label={c.label} onRemove={c.onRemove}/>)}
+          </div>
+        )}
+
+        <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
+          {OFFERS.map(o => (
+            <div key={o.id} style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 4px', borderBottom:`1px solid ${T.neutral100}` }}>
+              <div>
+                <div style={{ fontSize:14.5, fontWeight:600 }}>{o.id} &nbsp; <span style={{ fontWeight:400, color:T.neutral500 }}>{o.customer}</span></div>
+                <div style={{ fontSize:12.5, color:T.neutral300, marginTop:3 }}>Kontakt: {o.contact} &nbsp;·&nbsp; Erstellt: {o.date}</div>
+              </div>
+              <div style={{ fontSize:15, fontWeight:600 }}>{o.total}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <FilterSidebar data={DATA} state={state} setState={setState} onReset={reset}/>
+    </div>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>

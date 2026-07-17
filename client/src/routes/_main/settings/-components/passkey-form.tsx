@@ -7,9 +7,8 @@ import { z } from "zod";
 import { getAuthenticatorName } from "@better-auth/passkey";
 import type { Passkey } from "@better-auth/passkey";
 
-import { Button, Input } from "@/components";
+import { Button, FieldInput, Input } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
-import { getFormError } from "@/lib/utils.ts";
 
 const passkeyNameSchema = z.object({
     name: z.string().min(1, "Pflichtfeld"),
@@ -86,13 +85,8 @@ export default function PasskeyForm() {
                 <div className="flex items-center gap-2">
                     <addForm.Field name="name" children={(field) => (
                         <div className="flex-1 grid gap-2">
-                            <Input id={field.name} size="sm"
-                                placeholder="z. B. MacBook Touch ID"
-                                error={getFormError(field.state.meta.errors)}
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur}
-                            />
+                            <FieldInput field={field} size="sm"
+                                placeholder="z. B. MacBook Touch ID" />
                         </div>
                     )} />
 

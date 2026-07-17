@@ -5,6 +5,9 @@ import {api} from "@/lib/api-client";
 export const getProductsAction = () =>
     api<Array<Product>>("/api/products", {method: "GET"});
 
+export const getProductAction = (id: string) =>
+    api<Product>(`/api/products/${id}`, {method: "GET"});
+
 export const createProductAction = (product: CreateProductInput) =>
     api<Product>("/api/products", {
         method: "POST",

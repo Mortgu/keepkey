@@ -8,7 +8,6 @@ export const offerQueries = {
         return queryOptions({
             queryKey: offerKeys.list(filters),
             queryFn: () => getOffers(filters),
-            staleTime: 30_000,
         });
     },
 

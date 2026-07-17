@@ -30,7 +30,7 @@ export default function PricingPage() {
     }
 
     return (
-        <PageWidth variant="constrained">
+        <PageWidth>
             <div className="grid gap-4">
                 {/* Page header */}
                 <div className="flex items-center justify-between">

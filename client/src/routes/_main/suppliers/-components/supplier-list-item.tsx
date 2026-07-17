@@ -1,9 +1,8 @@
-import { Pen, Trash } from "lucide-react";
 import { Fragment } from "react";
 import SupplierModal from "./supplier-modal";
 import type { Supplier } from "@/types";
 import { useModal, useSupplierHook } from "@/hooks";
-import { Badge, Button } from "@/components";
+import { Badge, ListItemRow } from "@/components";
 
 type Props = {
     supplier: Supplier;
@@ -22,7 +21,12 @@ export default function SupplierListItem({ supplier }: Props) {
 
     return (
         <Fragment>
-            <div className="flex items-center justify-between bg-white border border-(--border) rounded-md overflow-hidden px-4 py-3">
+            <ListItemRow
+                onEdit={() => modal.open(supplier)}
+                onDelete={handleDeleteSupplier}
+                editLabel="Zulieferer bearbeiten"
+                deleteLabel="Zulieferer löschen"
+            >
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
                         <p className="text-md">{supplier.name}</p>
@@ -31,17 +35,9 @@ export default function SupplierListItem({ supplier }: Props) {
                         )}
                     </div>
 
-                    <p className="text-sm text-(--text-secondary)">{supplier.offers?.length ?? 0} Angebot</p>
+                    <p className="text-sm text-(--text-secondary)">{supplier.offers.length} Angebot</p>
                 </div>
-
-                <div className="flex items-center gap-2">
-                    <Button variant="secondary" icon={<Pen className="size-3.5" />} iconOnly
-                        onClick={() => modal.open(supplier)} />
-
-                    <Button variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
-                        onClick={handleDeleteSupplier} />
-                </div>
-            </div>
+            </ListItemRow>
 
             {modal.isOpen && (
                 <SupplierModal key={modal.key} currentSupplier={modal.data ?? undefined} onClose={modal.close} />

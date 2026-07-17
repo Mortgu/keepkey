@@ -6,7 +6,7 @@ export function MainLayoutComponent() {
     return (
         <React.Fragment>
             <Navigation />
-            <div id="app" className="bg-white rounded-lg p-6 max-h-screen overflow-y-scroll">
+            <div id="app" className="">
                 <Outlet />
                 <ToastContainer />
             </div>

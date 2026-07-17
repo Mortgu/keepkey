@@ -1,7 +1,12 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
-import type {Product, UpdateProductInput} from "@/types";
-import {createProductAction, deleteProductAction, getProductsAction, updateProductAction,} from "@/data/products.ts";
-import {api} from "@/lib/api-client.ts";
+import type {UpdateProductInput} from "@/types";
+import {createProductAction, deleteProductAction, getProductAction, getProductsAction, updateProductAction,} from "@/data/products.ts";
+
+export const useProduct = (id: string) => useQuery({
+    queryKey: ["product", id],
+    queryFn: () => getProductAction(id),
+    enabled: Boolean(id),
+});
 
 export const useProductHook = () => {
     const queryClient = useQueryClient();
@@ -17,15 +22,6 @@ export const useProductHook = () => {
         queryKey: ["products"],
         queryFn: getProductsAction,
     });
-
-    const getProduct = (id: string) => {
-        return useQuery({
-            queryKey: ["product", id],
-            queryFn: () => api<Product>(`/api/products/${id}`, {
-                method: "GET"
-            }),
-        });
-    }
 
     const createMutation = useMutation({
         mutationFn: createProductAction,
@@ -47,8 +43,6 @@ export const useProductHook = () => {
         products,
         isPending,
         error,
-
-        getProduct,
 
         createProduct: createMutation.mutateAsync,
         isCreatingProduct: createMutation.isPending,

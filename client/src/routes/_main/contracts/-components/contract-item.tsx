@@ -1,5 +1,5 @@
 import { Pen, Trash } from "lucide-react";
-import { Fragment, useEffect } from "react";
+import { Fragment } from "react";
 import ContractModal from "./contract-modal";
 
 import type { Contract } from "@/types";
@@ -8,7 +8,6 @@ import { Button } from "@/components";
 import { useLocale, useModal } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { useDeleteContract } from "@/hooks/contracts/contract-mutations";
-import { toast } from "react-toastify";
 
 interface ContractListItemProps {
   contract: Contract;
@@ -21,13 +20,7 @@ export default function ContractListItem({ contract }: ContractListItemProps) {
   const name = localized(contract.translations, locale, "name");
   const features = localized(contract.translations, locale, "features") || [];
 
-  const { deleteContract, isDeletingContract, errorDeletingContract } = useDeleteContract();
-
-  useEffect(() => {
-    if (errorDeletingContract) {
-      toast.error(errorDeletingContract.message);
-    }
-  }, [errorDeletingContract]);
+  const { deleteContract, isDeletingContract } = useDeleteContract();
 
   return (
     <Fragment>

@@ -110,3 +110,8 @@ export const getOfferTasks = async (id: string) =>
     api<Array<Task>>(`/api/offers/${id}/tasks`, {
         method: "GET"
     });
+
+export const getTask = async (taskId: string) =>
+    api<Task>(`/api/tasks/${taskId}`, {
+        method: "GET"
+    });

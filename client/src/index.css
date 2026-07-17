@@ -77,8 +77,6 @@ body {
   grid-template-columns: auto 1fr;
 }
 
-#app {}
-
 li {
   list-style: disc;
 }

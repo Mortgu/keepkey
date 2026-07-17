@@ -1,11 +1,10 @@
-import type React from "react";
 import { useForm } from "@tanstack/react-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import type { SyntheticEvent } from "react";
 
-import { Button, Input } from "@/components";
+import { Button, FieldInput } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
-import { getFormError } from "@/lib/utils.ts";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Pflichtfeld"),
@@ -43,7 +42,7 @@ export default function PasswordForm() {
         },
     });
 
-    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         e.stopPropagation();
         passwordForm.handleSubmit();
@@ -53,33 +52,18 @@ export default function PasswordForm() {
         <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
             <form onSubmit={handleSubmit} className="grid gap-4">
                 <passwordForm.Field name="currentPassword" children={(field) => (
-                    <Input id={field.name} label="Aktuelles Passwort" size="sm" type="password"
-                        autoComplete="current-password"
-                        error={getFormError(field.state.meta.errors)}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                    />
+                    <FieldInput field={field} label="Aktuelles Passwort" size="sm" type="password"
+                        autoComplete="current-password" />
                 )} />
 
                 <passwordForm.Field name="newPassword" children={(field) => (
-                    <Input id={field.name} label="Neues Passwort" size="sm" type="password"
-                        autoComplete="new-password"
-                        error={getFormError(field.state.meta.errors)}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                    />
+                    <FieldInput field={field} label="Neues Passwort" size="sm" type="password"
+                        autoComplete="new-password" />
                 )} />
 
                 <passwordForm.Field name="confirmPassword" children={(field) => (
-                    <Input id={field.name} label="Neues Passwort wiederholen" size="sm" type="password"
-                        autoComplete="new-password"
-                        error={getFormError(field.state.meta.errors)}
-                        value={field.state.value}
-                        onChange={(e) => field.handleChange(e.target.value)}
-                        onBlur={field.handleBlur}
-                    />
+                    <FieldInput field={field} label="Neues Passwort wiederholen" size="sm" type="password"
+                        autoComplete="new-password" />
                 )} />
 
                 <div className="flex justify-end">

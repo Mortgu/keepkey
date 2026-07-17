@@ -1,11 +1,9 @@
-import { Loader, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ContractModal from "./contract-modal";
 import ContractListItem from "./contract-item";
 
-import type { Contract } from "@/types";
+import { ListPage } from "@/components";
 import { useModal } from "@/hooks";
-import { Button } from "@/components";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 export default function ContractList() {
@@ -15,38 +13,23 @@ export default function ContractList() {
 
     const modal = useModal();
 
-    if (isPending) {
-        return <Loader className="animate-spin" />;
-    }
-
-    if (error) {
-        return (
-            <div className="p-2 bg-red-200 border border-red-400 rounded-lg">
-                <p className="text-lg">Error</p>
-                <p>{error.message}</p>
-            </div>
-        );
-    }
-
     return (
-        <div>
-            <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-                    {t("section.contracts")} ({contracts.length})
-                </h1>
-                <Button onClick={() => modal.open()} size="sm">
-                    Create <Plus className="size-4" />
-                </Button>
-            </div>
-            <div className="grid gap-2">
-                {contracts.map((contract: Contract, index) => (
-                    <ContractListItem key={index} contract={contract} />
-                ))}
-            </div>
-
+        <ListPage
+            title={t("section.contracts")}
+            items={contracts}
+            isPending={isPending}
+            error={error}
+            showCount
+            keyOf={(c) => c.id}
+            createLabel={t("button.create")}
+            onCreate={() => modal.open()}
+            renderItem={(contract) => (
+                <ContractListItem contract={contract} />
+            )}
+        >
             {modal.isOpen && (
                 <ContractModal key={modal.key} onClose={modal.close} />
             )}
-        </div>
+        </ListPage>
     );
 }

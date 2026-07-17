@@ -9,7 +9,7 @@ import type { Offer } from "@/types";
 import { Button, FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useContacts, useContracts, useCustomers, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
+import { useContacts, useContracts, useCustomers, useLocale, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 
 export default function OfferList() {
@@ -26,7 +26,8 @@ export default function OfferList() {
   const { products } = useProductHook();
   const { contracts } = useContracts();
 
-  const { customerFilterOptions, contactPersonFilterOptions } = useOfferFilterOptions(customers, contacts);
+  const locale = useLocale();
+  const { customerFilterOptions, contactPersonFilterOptions, productFilterOptions } = useOfferFilterOptions(customers, contacts, products, locale);
 
   if (error) return <RouteError error={error} />;
 
@@ -52,9 +53,9 @@ export default function OfferList() {
 
           <MultiDropdown
             label="Workload"
-            options={contactPersonFilterOptions}
-            values={filters.contactPersonFilter}
-            onChange={filters.setContactPersonFilter}
+            options={productFilterOptions}
+            values={filters.productFilter}
+            onChange={filters.setProductFilter}
           />
 
           <SearchBar
@@ -96,6 +97,19 @@ export default function OfferList() {
                 label="Kontakt"
                 value={option.label}
                 onRemove={() => filters.removeContactPersonFilter(id)}
+              />
+            );
+          })}
+
+          {filters.productFilter.map((id) => {
+            const option = productFilterOptions.find((i) => i.value === id);
+            if (!option) return null;
+            return (
+              <FilterChip
+                key={`product-${id}`}
+                label="Workload"
+                value={option.label}
+                onRemove={() => filters.removeProductFilter(id)}
               />
             );
           })}

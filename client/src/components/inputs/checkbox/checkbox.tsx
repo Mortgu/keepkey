@@ -10,7 +10,7 @@ const checkboxSizes = {
 
 const styles = tv({
   base: [
-    "aspect-squere rounded-md border border-(--border) cursor-pointer accent-[var(--primary)]",
+    "aspect-square rounded-md border border-(--border) cursor-pointer accent-[var(--primary)]",
     "transition-all duration-200 outline-none",
     "disabled:opacity-50 disabled:cursor-not-allowed",
     "focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-1",

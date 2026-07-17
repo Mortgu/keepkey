@@ -21,7 +21,7 @@ type Props = {
 };
 
 const card = tv({
-    base: "flex items-center gap-4 border rounded-md px-4 py-3.5 bg-white",
+    base: "w-fit flex items-center gap-4 border rounded-md px-4 py-3.5 bg-white",
     variants: {
         status: {
             connected: "border-(--border)",
@@ -34,7 +34,7 @@ const card = tv({
 });
 
 const logo = tv({
-    base: "size-10 rounded-md flex items-center justify-center text-white shrink-0",
+    base: "size-10 rounded-md flex items-center justify-center text-white shrink-0 rounded-full ",
     variants: {
         status: {
             connected: "bg-[#0082C9]",
@@ -47,7 +47,7 @@ const logo = tv({
 });
 
 const pill = tv({
-    base: "inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full",
+    base: "w-fit inline-flex items-center gap-1.5 text-[11px] font-medium px-2 py-0.5 rounded-full",
     variants: {
         status: {
             connected: "bg-[#E6F2EC] text-[#00683F]",
@@ -98,8 +98,8 @@ export function IntegrationStatusCard({
             <div className={logo({ status })}>{icon}</div>
 
             <div className="flex flex-col gap-0.5 min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-sm font-semibold text-(--text-primary)">{name}</span>
+                <div className="grid items-center gap-1">
+                    <span className="text-md text-(--text-primary)">{name}</span>
                     <span className={pill({ status })}>
                         <span className={dot({ status })} />
                         {STATUS_LABELS[status]}

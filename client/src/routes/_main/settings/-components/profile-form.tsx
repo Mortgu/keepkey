@@ -1,13 +1,12 @@
-import type React from "react";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import type { SyntheticEvent } from "react";
 
-import { Button, Input } from "@/components";
+import { Button, FieldInput } from "@/components";
 import { useAuth } from "@/context/auth.tsx";
 import { authClient } from "@/lib/auth-client.ts";
-import { getFormError } from "@/lib/utils.ts";
 
 const profileSchema = z.object({
     salutation: z.string().min(1, "Pflichtfeld"),
@@ -49,7 +48,7 @@ export default function ProfileForm() {
         },
     });
 
-    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         e.stopPropagation();
         profileForm.handleSubmit();
@@ -62,45 +61,25 @@ export default function ProfileForm() {
                 <div className="flex items-center gap-4">
                     <profileForm.Field name="salutation" children={(field) => (
                         <div className="flex-1 grid gap-2">
-                            <Input id={field.name} label="Anrede" size="sm"
-                                error={getFormError(field.state.meta.errors)}
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur}
-                            />
+                            <FieldInput field={field} label="Anrede" size="sm" />
                         </div>
                     )} />
 
                     <profileForm.Field name="firstName" children={(field) => (
                         <div className="flex-2 grid gap-2">
-                            <Input id={field.name} label="Vorname" size="sm"
-                                error={getFormError(field.state.meta.errors)}
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur}
-                            />
+                            <FieldInput field={field} label="Vorname" size="sm" />
                         </div>
                     )} />
 
                     <profileForm.Field name="lastName" children={(field) => (
                         <div className="flex-2 grid gap-2">
-                            <Input id={field.name} label="Nachname" size="sm"
-                                error={getFormError(field.state.meta.errors)}
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur}
-                            />
+                            <FieldInput field={field} label="Nachname" size="sm" />
                         </div>
                     )} />
 
                     <profileForm.Field name="phone" children={(field) => (
                         <div className="flex-2 grid gap-2">
-                            <Input id={field.name} label="Telefonnummer" size="sm"
-                                error={getFormError(field.state.meta.errors)}
-                                value={field.state.value}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur}
-                            />
+                            <FieldInput field={field} label="Telefonnummer" size="sm" />
                         </div>
                     )} />
                 </div>

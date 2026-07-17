@@ -1,10 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from 'zod';
 import type { Supplier } from "@/types";
-import type { SyntheticEvent } from "react";
-import { Button, Input, ModalDialog } from "@/components";
+import { FieldInput, FormModal } from "@/components";
 import { useSupplierHook } from "@/hooks";
-import { getFormError } from '@/lib/utils';
 
 interface SupplierModalProps {
     onClose: () => void;
@@ -45,53 +43,30 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
         }
     });
 
-    const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        supplierForm.handleSubmit();
-    }
-
     return (
-        <ModalDialog onClose={onClose}>
-            <ModalDialog.Header>
-                <h1 className="text-lg">
-                    {isEdit ? "Zulieferer bearbeiten" : "Neuen Zulieferer anlegen"}
-                </h1>
-            </ModalDialog.Header>
-            <ModalDialog.Content>
-                <form id="supplier-form" onSubmit={handleSubmit}>
-                    <div className="flex items-center gap-2">
-                        <supplierForm.Field name="name" children={(field) => (
-                            <Input label="Name" value={field.state.value} error={getFormError(field.state.meta.errors)}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur} />
-                        )} />
-
-                        <supplierForm.Field name="supplierId" children={(field) => (
-                            <Input label="id" value={field.state.value} error={getFormError(field.state.meta.errors)}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                onBlur={field.handleBlur} />
-                        )} />
-                    </div>
-                </form>
-            </ModalDialog.Content>
-            <ModalDialog.Footer>
-                <div className="w-full flex items-center justify-between">
-                    <p className="text-sm text-(--destructive)">
-                        {(errorCreatingSupplier || errorUpdateingSupplier) && (
-                            errorCreatingSupplier?.message || errorUpdateingSupplier?.message
-                        )}
+        <FormModal
+            form={supplierForm}
+            onClose={onClose}
+            title={<h1 className="text-lg">{isEdit ? "Zulieferer bearbeiten" : "Neuen Zulieferer anlegen"}</h1>}
+            formId="supplier-form"
+            formClassName=""
+            error={
+                (errorCreatingSupplier || errorUpdateingSupplier) ? (
+                    <p className="text-sm text-(--destructive) mb-2">
+                        {errorCreatingSupplier?.message || errorUpdateingSupplier?.message}
                     </p>
-                    <div className="flex items-center gap-2">
-                        <Button type="button" variant="secondary" size="sm" onClick={onClose}>Abbrechen</Button>
-                        <supplierForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                            <Button form="supplier-form" size="sm" type="submit" disabled={!canSubmit} loading={isSubmitting}>
-                                Speichern
-                            </Button>
-                        )} />
-                    </div>
-                </div>
-            </ModalDialog.Footer>
-        </ModalDialog>
+                ) : null
+            }
+        >
+            <div className="flex items-center gap-2">
+                <supplierForm.Field name="name" children={(field) => (
+                    <FieldInput field={field} label="Name"/>
+                )} />
+
+                <supplierForm.Field name="supplierId" children={(field) => (
+                    <FieldInput field={field} label="id"/>
+                )} />
+            </div>
+        </FormModal>
     )
 }

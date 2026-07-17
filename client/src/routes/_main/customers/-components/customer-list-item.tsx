@@ -1,5 +1,5 @@
 import { Pen, Plus, Trash } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import ContactListItem from "./contact-list-item";
 import ContactPersonForm from "./contact-person-form";
@@ -9,7 +9,7 @@ import type { CreateCustomerContactInput, Customer } from "@/types";
 import { formatDate } from "@/lib/format";
 
 import { useCreateCustomerContact, useDeleteCustomer, useModal } from "@/hooks";
-import { Button, Collapsable, showToast } from "@/components";
+import { Button, Collapsable } from "@/components";
 
 interface CustomerListItemProps {
     customer: Customer;
@@ -18,17 +18,10 @@ interface CustomerListItemProps {
 export default function CustomerListItem({ customer }: CustomerListItemProps) {
     const editModal = useModal<Customer>();
 
-    const { deleteCustomer, isDeletingCustomer, errorDeletingCustomer } = useDeleteCustomer();
+    const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
     const { createCustomerContact } = useCreateCustomerContact();
 
     const [addContact, setAddContact] = useState<boolean>(false);
-
-    useEffect(() => {
-        if (errorDeletingCustomer) {
-            const message = errorDeletingCustomer instanceof Error ? errorDeletingCustomer.message : String(errorDeletingCustomer);
-            showToast.error("common.errorGeneric", { vars: { message } });
-        }
-    }, [errorDeletingCustomer]);
 
     const contactPersons = customer.contactPersons;
 

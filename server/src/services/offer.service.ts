@@ -40,6 +40,7 @@ export interface OfferListQuery {
     search?: unknown;
     companyIds?: unknown;
     contactPersonIds?: unknown;
+    productIds?: unknown;
     sort?: unknown;
     cursor?: unknown;
     limit?: unknown;
@@ -172,7 +173,7 @@ async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, f
 /* ========== Queries ========== */
 
 export async function getOffers(query: OfferListQuery) {
-    const { search, companyIds, contactPersonIds, sort, cursor } = query;
+    const { search, companyIds, contactPersonIds, productIds, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);
     const limit = Number.isFinite(limitRaw) && limitRaw > 0
@@ -183,6 +184,7 @@ export async function getOffers(query: OfferListQuery) {
         quoteId?: { contains: string };
         customerId?: { in: string[] };
         contactPersonId?: { in: string[] };
+        offerPositions?: { some: { productId: { in: string[] } } };
     } = {};
 
     if (search && typeof search === "string") {
@@ -197,6 +199,11 @@ export async function getOffers(query: OfferListQuery) {
     if (contactPersonIds) {
         const ids = Array.isArray(contactPersonIds) ? contactPersonIds : [contactPersonIds];
         where.contactPersonId = { in: ids as string[] };
+    }
+
+    if (productIds) {
+        const ids = Array.isArray(productIds) ? productIds : [productIds];
+        where.offerPositions = { some: { productId: { in: ids as string[] } } };
     }
 
     const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { offerKeys } from "./offers/offers-keys";
+import { orderKeys } from "./orders/order-keys";
 import type { DocumentType } from "@/types";
 import {
   deleteDocument,
@@ -15,7 +16,7 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
       queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
       queryClient.invalidateQueries({ queryKey: offerKeys.detail(parentId) });
     } else {
-      queryClient.invalidateQueries({ queryKey: ["orders"] });
+      queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
     }
   };
 

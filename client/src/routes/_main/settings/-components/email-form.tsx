@@ -1,13 +1,12 @@
-import type React from "react";
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import type { SyntheticEvent } from "react";
 
-import { Button, Input } from "@/components";
+import { Button, FieldInput, Input } from "@/components";
 import { useAuth } from "@/context/auth.tsx";
 import { authClient } from "@/lib/auth-client.ts";
-import { getFormError } from "@/lib/utils.ts";
 
 const emailSchema = z.object({
     newEmail: z.email("Ungültige E-Mail!"),
@@ -40,7 +39,7 @@ export default function EmailForm() {
         },
     });
 
-    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
         e.preventDefault();
         e.stopPropagation();
         emailForm.handleSubmit();
@@ -53,12 +52,7 @@ export default function EmailForm() {
                     <Input label="Aktuelle E-Mail" size="sm" value={user?.email ?? ""} disabled />
 
                     <emailForm.Field name="newEmail" children={(field) => (
-                        <Input id={field.name} label="Neue E-Mail-Adresse" size="sm"
-                            error={getFormError(field.state.meta.errors)}
-                            value={field.state.value}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
+                        <FieldInput field={field} label="Neue E-Mail-Adresse" size="sm" />
                     )} />
                 </div>
 

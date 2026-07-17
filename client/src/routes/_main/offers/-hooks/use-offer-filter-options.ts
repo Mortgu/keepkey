@@ -1,7 +1,13 @@
 import { useMemo } from "react";
-import type { ContactPerson, Customer } from "@/types";
+import type { ContactPerson, Customer, Language, Product } from "@/types";
+import { localized } from "@/lib/i18n-content";
 
-export function useOfferFilterOptions(customers: Array<Customer>, contacts: Array<ContactPerson>) {
+export function useOfferFilterOptions(
+    customers: Array<Customer>,
+    contacts: Array<ContactPerson>,
+    products: Array<Product>,
+    locale: Language,
+) {
     const customerFilterOptions = useMemo(
         () => customers.map((c) => ({ value: c.id, label: c.companyName })),
         [customers],
@@ -12,5 +18,10 @@ export function useOfferFilterOptions(customers: Array<Customer>, contacts: Arra
         [contacts],
     );
 
-    return { customerFilterOptions, contactPersonFilterOptions };
+    const productFilterOptions = useMemo(
+        () => products.map((p) => ({ value: p.id, label: localized(p.translations, locale, "name") })),
+        [products, locale],
+    );
+
+    return { customerFilterOptions, contactPersonFilterOptions, productFilterOptions };
 }

@@ -2,21 +2,24 @@ import { tv } from "tailwind-variants";
 import type { ReactNode } from "react";
 
 export interface PageWidthProps {
-    variant?: "full" | "constrained";
+    variant?: "none" | "full" | "default";
     className?: string;
     children: ReactNode;
 }
 
 const styles = tv({
-    base: "w-full m-auto h-full",
+    base: [
+        "bg-white max-h-screen overflow-y-scroll"
+    ],
     variants: {
         variant: {
-            full: "",
-            constrained: "max-w-(--viewport)",
+            none: "",
+            full: "w-full m-auto h-full p-6",
+            default: "w-full max-w-(--viewport) m-auto h-full p-6",
         },
     },
     defaultVariants: {
-        variant: "constrained",
+        variant: "default",
     },
 });
 

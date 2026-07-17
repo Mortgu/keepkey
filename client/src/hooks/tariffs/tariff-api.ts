@@ -143,7 +143,7 @@ export const getTariffPrice = (
         ...(customerId ? { customerId } : {}),
         ...(freeMonths ? { freeMonths: String(freeMonths) } : {}),
     });
-    return api<any>(`/api/tariffs/price?${params}`, { method: "GET" });
+    return api<TariffPriceResult>(`/api/tariffs/price?${params}`, { method: "GET" });
 };
 
 /* ───────────────────────────────

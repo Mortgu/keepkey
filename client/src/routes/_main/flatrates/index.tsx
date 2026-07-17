@@ -1,7 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router';
-import FlatratePage from './-page';
+import FlatRateList from './-components/flatrate-list';
+import { PageWidth } from '@/components';
 
 export const Route = createFileRoute('/_main/flatrates/')({
-    component: FlatratePage,
+    component: () => (
+        <PageWidth>
+            <FlatRateList />
+        </PageWidth>
+    ),
 });
-

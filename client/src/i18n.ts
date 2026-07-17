@@ -9,7 +9,7 @@ import translationDE from '../locals/de/translations.json';
 i18n.use(LanguageDetector).use(initReactI18next).init({
     fallbackLng: 'en',
     lowerCaseLng: true,
-    debug: true,
+    debug: import.meta.env.DEV,
     interpolation: {
         escapeValue: false,
     },

@@ -1,40 +1,33 @@
-import {Plus} from "lucide-react";
-
 import {useTranslation} from "react-i18next";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
-import type {Customer} from "@/types";
+import {ListPage} from "@/components";
 import {useCustomers, useModal} from "@/hooks";
-import {Button} from "@/components";
 
 export default function CustomerList() {
     const {t} = useTranslation();
 
     const modal = useModal();
-    const {customers} = useCustomers();
+    const {customers, isPending, error} = useCustomers();
 
     return (
-        <div>
-            <div className="mb-4 flex items-center justify-between">
-                <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-                    {t("section.customers")} ({customers.length})
-                </h1>
-
-                <Button size="sm" icon={<Plus className="size-4"/>} onClick={() => modal.open()}>
-                    {t("button.create")}
-                </Button>
-            </div>
-
-            <div className="grid gap-2">
-                {customers.map((customer: Customer, index: number) => (
-                    <CustomerListItem key={index} customer={customer}/>
-                ))}
-            </div>
-
+        <ListPage
+            title={t("section.customers")}
+            items={customers}
+            isPending={isPending}
+            error={error}
+            showCount
+            keyOf={(c) => c.id}
+            createLabel={t("button.create")}
+            onCreate={() => modal.open()}
+            renderItem={(customer) => (
+                <CustomerListItem customer={customer}/>
+            )}
+        >
             {modal.isOpen && (
                 <CustomerModal key={modal.key} onClose={modal.close}/>
             )}
-        </div>
+        </ListPage>
     );
 }

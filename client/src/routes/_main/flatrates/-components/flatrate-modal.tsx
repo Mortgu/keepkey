@@ -2,9 +2,8 @@ import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 import type { CreateFlatRateInput, FlatRateTranslationInput, Language, UpdateFlatRateInput } from "@/types";
-import { getFormErrors } from "@/lib/utils";
 
-import { Button, DEFAULT_LANGUAGE_OPTIONS, Input, ModalDialog, SegmentedLanguageToggle } from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS, FieldInput, FieldTextarea, FormModal, SegmentedLanguageToggle } from "@/components";
 
 interface FlatRateModalProps {
   onClose: () => void;
@@ -53,15 +52,12 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
     },
   });
 
-  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    form.handleSubmit();
-  };
-
   return (
-    <ModalDialog onClose={onClose}>
-      <ModalDialog.Header>
+    <FormModal
+      form={form}
+      onClose={onClose}
+      formId="flatrate-form"
+      title={
         <div className="flex items-center justify-between w-full mr-2">
           <h1 className="text-lg">
             {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
@@ -72,67 +68,33 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
             onChange={(lng) => setLanguage(lng)}
           />
         </div>
-      </ModalDialog.Header>
+      }
+    >
+      <form.Field name={`${language}.name`}>
+        {(field) => (
+          <div className="grid gap-1">
+            <FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
+          </div>
+        )}
+      </form.Field>
 
-      <ModalDialog.Content>
-        <form id="flatrate-form" onSubmit={handleSubmit} className="grid gap-4">
-          <form.Field name={`${language}.name`}>
-            {(field) => (
-              <div className="grid gap-1">
-                <Input id={field.name} name={field.name} value={field.state.value}
-                  label={`Name (${language})`}
-                  error={getFormErrors(field.state.meta.errors)}
-                  placeholder="Flatrate Name"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
-            )}
-          </form.Field>
+      <form.Field name={`${language}.table`}>
+        {(field) => (
+          <FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
+        )}
+      </form.Field>
 
-          <form.Field name={`${language}.table`}>
-            {(field) => (
-              <div className="grid gap-1">
-                <label htmlFor={field.name} className="text-sm text-gray-500">
-                  Tabelle ({language})
-                </label>
-                <textarea rows={4} id={field.name} name={field.name}
-                  value={field.state.value} placeholder="Tabellenbeschreibung"
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className="flex-1 outline-none border border-(--border) p-2 rounded-md"
-                />
-              </div>
-            )}
-          </form.Field>
-
-          <form.Field name="total_cents">
-            {(field) => (
-              <div className="grid gap-1">
-                <label htmlFor={field.name} className="text-sm text-gray-500">
-                  Preis (in Cent)
-                </label>
-                <input id={field.name} name={field.name} type="number" min={0}
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(parseInt(e.target.value))}
-                  className="flex-1 outline-none border border-(--border) p-2 rounded-md"
-                />
-              </div>
-            )}
-          </form.Field>
-        </form>
-      </ModalDialog.Content>
-
-      <ModalDialog.Footer>
-        <Button onClick={onClose} type="button" size="sm" variant="secondary">
-          Abbrechen
-        </Button>
-        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
-          {([canSubmit, isSubmitting]) => (
-            <Button form="flatrate-form" disabled={!canSubmit} type="submit" size="sm" loading={isSubmitting}>
-              Speichern
-            </Button>
-          )}
-        </form.Subscribe>
-      </ModalDialog.Footer>
-    </ModalDialog>
+      <form.Field name="total_cents">
+        {(field) => (
+          <FieldInput
+            field={field}
+            type="number"
+            min={0}
+            label="Preis (in Cent)"
+            onChange={(e, f) => f.handleChange(parseInt(e.target.value))}
+          />
+        )}
+      </form.Field>
+    </FormModal>
   );
 }

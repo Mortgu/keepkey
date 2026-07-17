@@ -4,6 +4,7 @@ export interface OfferFilters {
     search?: string;
     companyIds?: Array<string>;
     contactPersonIds?: Array<string>;
+    productIds?: Array<string>;
     sort?: string;
     cursor?: string;
     limit?: number;

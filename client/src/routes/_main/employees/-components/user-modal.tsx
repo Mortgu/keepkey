@@ -1,11 +1,9 @@
 import {z} from "zod";
 import {useForm} from "@tanstack/react-form";
-import type React from "react";
 
 import type {User} from "@/types";
 import {useUserHook} from "@/hooks";
-import {Button, Input, ModalDialog} from "@/components";
-import {getFormError} from "@/lib/utils";
+import {FieldInput, FormModal} from "@/components";
 
 interface UserModalProps {
     onClose: () => void;
@@ -41,11 +39,11 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
 
     const userForm = useForm({
         defaultValues: currentUser ? {
-            salutation: currentUser.salutation ?? "",
-            firstName: currentUser.firstName ?? "",
-            lastName: currentUser.lastName ?? "",
-            email: currentUser.email ?? "",
-            phone: currentUser.phone ?? "",
+            salutation: currentUser.salutation,
+            firstName: currentUser.firstName,
+            lastName: currentUser.lastName,
+            email: currentUser.email,
+            phone: currentUser.phone,
             password: "",
         } : emptyUser,
         validators: {
@@ -63,105 +61,53 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
         },
     });
 
-    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        userForm.handleSubmit();
-    };
-
     return (
-        <ModalDialog onClose={onClose}>
-            <ModalDialog.Header>
-                <h1 className="text-lg">
-                    {isEdit ? "Nutzer bearbeiten" : "Neuen Nutzer anlegen"}
-                </h1>
-            </ModalDialog.Header>
-
-            <ModalDialog.Content>
-                <form id="user-form" onSubmit={handleSubmit} className="grid gap-4">
-                    <div className="flex items-center gap-4">
-                        <userForm.Field name="salutation" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} label="Anrede" size="sm"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
-
-                        <userForm.Field name="firstName" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} size="sm" label="Vorname"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
-
-                        <userForm.Field name="lastName" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} size="sm" label="Nachname"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
+        <FormModal
+            form={userForm}
+            onClose={onClose}
+            title={<h1 className="text-lg">{isEdit ? "Nutzer bearbeiten" : "Neuen Nutzer anlegen"}</h1>}
+            formId="user-form"
+            size="xs"
+        >
+            <div className="flex items-center gap-4">
+                <userForm.Field name="salutation" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} label="Anrede" size="sm"/>
                     </div>
+                )}/>
 
-                    <div className="flex items-center gap-4">
-                        <userForm.Field name="email" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} label="E-Mail" size="sm"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
-
-                        <userForm.Field name="phone" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} label="Telefonnummer" size="sm"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
-
-                        <userForm.Field name="password" children={(field) => (
-                            <div className="flex-1 grid gap-2">
-                                <Input id={field.name} type="password" size="sm" label="Passwort"
-                                       error={getFormError(field.state.meta.errors)}
-                                       value={field.state.value}
-                                       onChange={(e) => field.handleChange(e.target.value)}
-                                       onBlur={field.handleBlur}
-                                />
-                            </div>
-                        )}/>
+                <userForm.Field name="firstName" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} size="sm" label="Vorname"/>
                     </div>
-                </form>
-            </ModalDialog.Content>
+                )}/>
 
-            <ModalDialog.Footer>
-                <Button variant="secondary" size="xs" onClick={onClose}>
-                    Abbrechen
-                </Button>
-                <userForm.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}
-                                    children={([canSubmit, isSubmitting]) => (
-                                        <Button form="user-form" size="xs" disabled={!canSubmit} loading={isSubmitting}>
-                                            Speichern
-                                        </Button>
-                                    )}/>
-            </ModalDialog.Footer>
-        </ModalDialog>
+                <userForm.Field name="lastName" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} size="sm" label="Nachname"/>
+                    </div>
+                )}/>
+            </div>
+
+            <div className="flex items-center gap-4">
+                <userForm.Field name="email" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} label="E-Mail" size="sm"/>
+                    </div>
+                )}/>
+
+                <userForm.Field name="phone" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} label="Telefonnummer" size="sm"/>
+                    </div>
+                )}/>
+
+                <userForm.Field name="password" children={(field) => (
+                    <div className="flex-1 grid gap-2">
+                        <FieldInput field={field} type="password" size="sm" label="Passwort"/>
+                    </div>
+                )}/>
+            </div>
+        </FormModal>
     );
 }

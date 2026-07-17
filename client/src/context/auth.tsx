@@ -1,4 +1,4 @@
-import {  createContext, useContext, useEffect } from "react";
+import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
@@ -26,7 +26,7 @@ export const useAuth = () => useContext(AuthContext);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
-  const { data: user = null, isLoading, refetch, error } = useQuery({
+  const { data: user = null, isLoading, refetch } = useQuery({
     queryKey: ["session"],
     queryFn: getSessionUser,
     retry: false,
@@ -36,12 +36,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await authClient.signOut();
     await navigate({ to: "/login" });
   };
-
-  useEffect(() => {
-    if (error) {
-      navigate({ to: "/login" });
-    }
-  }, [error]);
 
   if (isLoading) {
     return (
