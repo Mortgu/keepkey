@@ -1,31 +1,28 @@
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {useIntegrationStatus} from "./use-integration-status";
+import type {CloudFile} from "@/types/cloud.ts";
+import type {FindFilesByIdResult} from "@/data/nextcloud";
 import {
+    
     deleteTemplateAction,
     findFilesByIdAction,
-    type FindFilesByIdResult,
     findOfferFilesByIdAction,
     findOrderFilesByIdAction,
     getCloudDirectoryAction,
-    getNextcloudStatusAction,
     getTemplatesAction,
     uploadTemplateAction
 } from "@/data/nextcloud";
-import type {CloudFile} from "@/types/cloud.ts";
 
 export const useNextcloudStatus = () => {
-    const {data, isPending, refetch} = useQuery({
-        queryKey: ["nextcloud", "status"],
-        queryFn: getNextcloudStatusAction,
-        staleTime: 60_000,
-        refetchOnWindowFocus: false,
-    });
+    const {data, isPending, refetch} = useIntegrationStatus();
 
-    const connected = data?.message === "ok";
+    const entry = data?.nextcloud;
+    const connected = entry?.status === "connected";
 
     return {
         connected,
         status: connected ? "connected" : "not_configured" as const,
-        detail: !connected && !isPending ? data?.message : undefined,
+        detail: !connected && !isPending ? entry?.detail : undefined,
         isPending,
         refetch,
     };

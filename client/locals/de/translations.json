@@ -79,6 +79,13 @@
     "badge": {
       "reserved": "Reserviert",
       "converted": "Bestellt"
-    }
+    },
+    "status": {
+      "connected": "Verbunden",
+      "checking": "Verbindung wird geprüft…",
+      "failed": "Verbindung fehlgeschlagen",
+      "notConfigured": "Nicht konfiguriert"
+    },
+    "retry": "Erneut prüfen"
   }
 }

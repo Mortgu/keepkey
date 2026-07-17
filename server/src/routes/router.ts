@@ -7,6 +7,7 @@ import customerRouter from "./customer-router.js";
 import documentRouter from './document-router.js';
 import flatRatesRouter from "./flat-rate-router.js";
 import cloudRouter from './nextcloud-router.js';
+import integrationsRouter from './integrations-router.js';
 import offerRouter from "./offer-router.js";
 import orderRouter from "./order-router.js";
 import productRouter from "./product-router.js";
@@ -55,5 +56,8 @@ router.use('/documents', requireSession, documentRouter);
 
 /* /api/cloud */
 router.use('/cloud', requireSession, cloudRouter);
+
+/* /api/integrations */
+router.use('/integrations', requireSession, integrationsRouter);
 
 export default router;

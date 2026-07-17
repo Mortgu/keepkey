@@ -1,9 +1,39 @@
-import { Button, PageWidth, SearchBar } from "@/components";
-import { Plus, RotateCcw, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useState } from "react";
+import IntegrationCard from "./-components/integration-card";
+import type {IntegrationCardMeta, IntegrationStatus} from "./-components/integration-card";
+import type { IntegrationEntry } from "@/data/integrations";
+import { Button, PageWidth, RouteError, SearchBar } from "@/components";
+import { useIntegrationStatus } from "@/hooks/use-integration-status";
+
+const CHECKING_STATUS: IntegrationStatus = "checking";
+
+function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCardMeta> | undefined {
+    if (!meta) return undefined;
+    return Object.entries(meta).map(([label, value]) => ({ label, value }));
+}
 
 export default function DashboardPage() {
     const [query, setQuery] = useState("");
+    const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
+
+    const renderCard = (
+        name: string,
+        entry: IntegrationEntry | undefined,
+    ) => {
+        const status: IntegrationStatus = isPending || !entry
+            ? CHECKING_STATUS
+            : entry.status;
+        return (
+            <IntegrationCard
+                name={name}
+                status={status}
+                meta={toMeta(entry?.meta)}
+                onRetry={refetch}
+                isRetrying={isFetching}
+            />
+        );
+    };
 
     return (
         <PageWidth variant="none">
@@ -11,76 +41,15 @@ export default function DashboardPage() {
                 <SearchBar value={query} onChange={setQuery} placeholder="Suchen..." />
             </div>
 
-            <div className="grid grid-cols-3 border-b border-(--border)">
-                {/* NextCloud */}
-                <div className="grid border-r border-(--border)">
-                    <div className="w-full flex items-start justify-between  p-4">
-                        <div className="w-fit flex items-center justify-center gap-2">
-                            <div className="grid">
-                                <p className="text-lg">NextCloud</p>
-                                <p className="text-md font-light text-green-800">
-                                    Connected
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button variant="secondary" size="xs" icon={<RotateCcw size={14} />} iconOnly></Button>
-                            <Button variant="secondary" size="xs" icon={<Settings size={14} />} iconOnly></Button>
-                        </div>
-                    </div>
-                    <div className="w-full flex items-center  gap-4 border-t border-(--border) px-4 py-2 font-light">
-                        <p className="grid text-sm text-gray-500"><span className="text-gray-400">url:</span> http://localhost:8080</p>
-                    </div>
+            {error ? (
+                <RouteError error={error} onRetry={refetch} />
+            ) : (
+                <div className="grid grid-cols-3 border-b border-(--border) [&>*:not(:last-child)]:border-r [&>*:not(:last-child)]:border-(--border)">
+                    {renderCard("NextCloud", data?.nextcloud)}
+                    {renderCard("Redis", data?.redis)}
+                    {renderCard("S3 Storage", data?.s3)}
                 </div>
-
-                {/* Redis */}
-                <div className="grid border-r border-(--border)">
-                    <div className="w-full flex items-start justify-between  p-4">
-                        <div className="w-fit flex items-center justify-center gap-2">
-                            <div className="grid">
-                                <p className="text-lg">Redis</p>
-                                <p className="text-md font-light text-green-800">
-                                    Connected
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button variant="secondary" size="xs" icon={<RotateCcw size={14} />} iconOnly></Button>
-                            <Button variant="secondary" size="xs" icon={<Settings size={14} />} iconOnly></Button>
-                        </div>
-                    </div>
-                    <div className="w-full flex items-center  gap-4 border-t border-(--border) px-4 py-2 font-light">
-                        <p className="grid text-sm text-gray-500"><span className="text-gray-400">url:</span> http://localhost:8080</p>
-                    </div>
-                </div>
-
-                {/* Storage */}
-                <div className="grid border-r border-(--border)">
-                    <div className="w-full flex items-start justify-between  p-4">
-                        <div className="w-fit flex items-center justify-center gap-2">
-                            <div className="grid">
-                                <p className="text-lg">S3 Storage</p>
-                                <p className="text-md font-light text-green-800">
-                                    Connected
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="flex items-center gap-2">
-                            <Button variant="secondary" size="xs" icon={<RotateCcw size={14} />} iconOnly></Button>
-                            <Button variant="secondary" size="xs" icon={<Settings size={14} />} iconOnly></Button>
-                        </div>
-                    </div>
-                    <div className="w-full flex items-center gap-4 border-t border-(--border) px-4 py-2 font-light">
-                        <p className="grid flex-1 min-w-fit text-sm text-gray-500"><span className="text-gray-400">endpoint:</span> http://localhost:8080</p>
-                        <p className="grid flex-1 min-w-fit text-sm text-gray-500"><span className="text-gray-400">bucket:</span> keepit-dev</p>
-                        <p className="grid flex-1 min-w-fit text-sm text-gray-500"><span className="text-gray-400">capacity:</span> 2.0 T</p>
-                        <p className="grid flex-1 min-w-fit text-sm text-gray-500"><span className="text-gray-400">usage:</span> 6.0 MB</p>
-                    </div>
-                </div>
-            </div>
+            )}
 
             <div className="grid">
                 <div className="m-4 flex flex-wrap items-center gap-4">

@@ -79,6 +79,13 @@
     "badge": {
       "reserved": "Reserved",
       "converted": "Ordered"
-    }
+    },
+    "status": {
+      "connected": "Connected",
+      "checking": "Checking connection…",
+      "failed": "Connection failed",
+      "notConfigured": "Not configured"
+    },
+    "retry": "Retry"
   }
 }
