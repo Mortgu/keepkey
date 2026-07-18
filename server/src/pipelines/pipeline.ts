@@ -24,13 +24,13 @@ export type PipelineStage<T> = {
 
 export async function runPipeline<T>(ctx: T, stages: PipelineStage<T>[]): Promise<T> {
   for (const stage of stages) {
-    logger.info(`[pipeline] stage: ${stage.name}`);
+    logger.info('pipeline_stage', { stage: stage.name });
 
     try {
-      logger.info("[pipeline] running: " + stage.name);
+      logger.info('pipeline_running', { stage: stage.name });
       await stage.run(ctx);
     } catch (exception: any) {
-      logger.error(exception);
+      logger.error('pipeline_stage_failed', { stage: stage.name, error: (exception as Error).message });
       throw exception;
     }
   }

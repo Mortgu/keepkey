@@ -12,6 +12,7 @@ import path from "path";
 import env from "./lib/env.js";
 
 import morganMiddleware from "./middlewares/morgan.js";
+import { requestIdMiddleware } from "./middlewares/request-id.js";
 import logger from "./middlewares/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
 import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
@@ -19,7 +20,7 @@ import { initDocumentArtifactStore } from "./lib/document-artifact-store.js";
 
 const app: Express = express();
 
-// Logging
+app.use(requestIdMiddleware);
 app.use(morganMiddleware);
 
 app.use(
@@ -49,9 +50,9 @@ app.use(exceptionHandler);
 
 try {
     await initDocumentArtifactStore();
-    logger.info("[object-storage] Bucket access verified.");
+    logger.info('object_storage_ready');
 } catch (error) {
-    logger.error(`[object-storage] Bucket initialization failed: ${error}`);
+    logger.error('object_storage_init_failed', { error });
     throw error;
 }
 
@@ -66,9 +67,9 @@ process.on("SIGINT", shutdown);
 
 const nextcloudInitialized = await initNextcloud();
 if (!nextcloudInitialized) {
-    logger.warn(`[nextcloud] ${getNextcloudInitError()}. Upload functionality is disabled.`);
+    logger.warn('nextcloud_unavailable', { error: getNextcloudInitError() });
 }
 
 app.listen(env.PORT, () => {
-    logger.info(`Server is listening on port ${env.PORT}`);
+    logger.info('server_started', { port: env.PORT });
 });

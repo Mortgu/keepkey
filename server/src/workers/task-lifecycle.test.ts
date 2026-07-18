@@ -109,7 +109,13 @@ describe("task lifecycle", () => {
         expect(mocks.transaction).not.toHaveBeenCalled();
         expect(mocks.taskUpdateMany).not.toHaveBeenCalled();
         expect(mocks.loggerWarn).toHaveBeenCalledWith(
-            expect.stringContaining(`attempt ${attemptsMade}/3 failed and will be retried`),
+            'task_worker_failed_retry',
+            {
+                taskId: 'task-1',
+                attemptsMade,
+                maxAttempts: 3,
+                error: 'temporary',
+            },
         );
     });
 

@@ -215,8 +215,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {
             logger.error(exception)
-            logger.error(`[pipeline]: Formatted offer data failed schema validation: ${JSON.stringify(exception.issues)
-                }`);
+            logger.error('pipeline_offer_validation_failed', { issues: exception.issues });
         } else {
             logger.error(exception);
         }

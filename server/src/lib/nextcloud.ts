@@ -71,7 +71,7 @@ export async function findFilesById(
                 );
                 return { label: dir.label, matches };
             } catch (exception: any) {
-                logger.error(`[findFilesById] ${dir.label}: ${exception.message}`);
+                logger.error('nextcloud_find_files_error', { label: dir.label, error: exception.message });
                 return { label: dir.label, matches: [] as FileStat[] };
             }
         })
@@ -114,12 +114,12 @@ export async function initNextcloud(): Promise<boolean> {
         await testClient.getDirectoryContents("/");
         isNextcloudAvailable = true;
         nextcloudInitError = null;
-        logger.info("[nextcloud] connection established");
+        logger.info('nextcloud_connected');
         return true;
     } catch (exception: any) {
         isNextcloudAvailable = false;
         nextcloudInitError = `Nextcloud connection failed: ${exception.message}`;
-        logger.error(`[nextcloud] ${nextcloudInitError}`);
+        logger.error('nextcloud_connection_failed', { error: exception.message });
         return false;
     }
 }
@@ -159,7 +159,7 @@ export async function getFilesInDirectory(path: string): Promise<Array<string>> 
         const fileStats: Array<FileStat> = await client.getDirectoryContents(path);
         return fileStats.map(fs => fs.basename);
     } catch (exception: any) {
-        logger.error(`[getFilesInDirectory] ${exception.message}`);
+        logger.error('nextcloud_list_directory_error', { path, error: exception.message });
         return [];
     }
 }
@@ -169,7 +169,7 @@ export async function downloadDocumentStream(remotePath: string): Promise<Readab
     try {
         return client.createReadStream(remotePath);
     } catch (exception: any) {
-        logger.error(`[downloadDocumentStream] ${exception.message}`);
+        logger.error('nextcloud_download_error', { path: remotePath, error: exception.message });
         throw new AppException("Nextcloud download failed!", 503, "nextcloudDownloadFailed");
     }
 }

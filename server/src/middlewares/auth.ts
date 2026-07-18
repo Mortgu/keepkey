@@ -1,9 +1,8 @@
-import type {NextFunction, Request, Response} from "express";
-import {auth} from "../lib/auth.js";
-import {fromNodeHeaders} from "better-auth/node";
-import type {User} from "@prisma/client";
+import type { NextFunction, Request, Response } from "express";
+import { auth } from "../lib/auth.js";
+import { fromNodeHeaders } from "better-auth/node";
+import type { User } from "@prisma/client";
 
-// Extend Express Request to include settings
 declare global {
     namespace Express {
         interface Request {
@@ -12,11 +11,7 @@ declare global {
     }
 }
 
-export async function requireSession(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-) {
+export async function requireSession(req: Request, res: Response, next: NextFunction) {
     try {
         const session = await auth.api.getSession({
             headers: fromNodeHeaders(req.headers),

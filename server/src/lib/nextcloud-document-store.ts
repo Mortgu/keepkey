@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import type { FileStat } from "webdav";
 import { getNextCloudClient } from "./nextcloud.js";
+import logger from "../middlewares/logger.js";
 
 export type RemoteDocumentArtifact = {
     remotePath: string;
@@ -93,7 +94,7 @@ export async function uploadDocumentArtifact(filename: string, directory: string
             },
         });
 
-        console.log(created);
+        logger.debug('nextcloud_upload_result', { created, path });
 
         if (!created) {
             const raced = await getRemoteFile(path);
@@ -104,7 +105,7 @@ export async function uploadDocumentArtifact(filename: string, directory: string
             return asResult(path, raced.stat, raced.sha256);
         }
     } catch (uploadError) {
-        console.log(uploadError);
+        logger.warn('nextcloud_upload_error', { error: (uploadError as Error).message, path });
 
         const raced = await getRemoteFile(path);
         if (!raced) throw uploadError;

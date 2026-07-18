@@ -39,14 +39,14 @@ export default function registerTaskWorker() {
         });
 
         if (!task) {
-            logger.warn(`[task-worker] Task ${taskId} not found, skipping.`);
+            logger.warn('task_worker_skipped', { taskId });
             return;
         }
 
         const handler = handlers[task.target];
 
         if (!handler) {
-            logger.error(`[task-worker] Something went wrong! Handler for target ${task.target} is not defined!`)
+            logger.error('task_worker_no_handler', { taskId, target: task.target });
             return;
         }
 

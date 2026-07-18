@@ -26,6 +26,7 @@ const webDavErrorMap: Record<string, errorMapProps> = {
 export const exceptionHandler = (err: AppException, req: Request, res: Response, next: NextFunction) => {
     const statusCode = err.statusCode ?? 500;
     const isOperational = err.isOperational ?? false;
+    const log = (req as any).logger ?? logger;
 
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
         const mapped = prismaErrorMap[err.code];
@@ -42,8 +43,19 @@ export const exceptionHandler = (err: AppException, req: Request, res: Response,
     }
 
 
-    if (!isOperational) {
-        logger.error("UNHANDLED ERROR: ", err);
+    if (isOperational) {
+        log.warn('operational_error', {
+            code: err.code,
+            statusCode,
+            message: err.message,
+        });
+    } else {
+        log.error('unhandled_error', {
+            code: err.code,
+            statusCode,
+            message: err.message,
+            stack: err.stack,
+        });
     }
 
     res.status(statusCode).json({
