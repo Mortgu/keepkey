@@ -1,7 +1,6 @@
 import { createAuthClient } from "better-auth/react";
-import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
+import { inferAdditionalFields } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
-import { ac, admin, employee } from "./permissions.ts";
 import { BASE_URL } from "./api-client.ts";
 
 
@@ -26,13 +25,6 @@ export const authClient = createAuthClient({
           type: "string",
           required: false,
         },
-      },
-    }),
-    adminClient({
-      ac,
-      roles: {
-        admin,
-        user: employee,
       },
     }),
     passkeyClient(),

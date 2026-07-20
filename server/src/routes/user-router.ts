@@ -1,4 +1,4 @@
-import {Router} from "express";
+import { Router } from "express";
 import {
   createContactPersons,
   createUser,
@@ -7,27 +7,25 @@ import {
   getSessionUser,
   updateUserById,
 } from "../controllers/index.js";
-import {validate} from "../middlewares/validate.js";
-import {createContactPersonsSchema, createUserSchema, updateUserSchema,} from "../schemas/index.js";
-import {canCreateUsers, canDeleteUsers, canUpdateUsers, canViewUsers,} from "../permissions/user.js";
+import { validate } from "../middlewares/validate.js";
+import { createContactPersonsSchema, createUserSchema, updateUserSchema, } from "../schemas/index.js";
 
 const router = Router();
 
-
-router.get("/", canViewUsers, getAllUsers);
+router.get("/", getAllUsers);
 
 router.get("/session", getSessionUser);
 
-router.put("/:id", canUpdateUsers, validate(updateUserSchema), updateUserById);
+router.put("/:id", validate(updateUserSchema), updateUserById);
 
-router.post("/", canCreateUsers, validate(createUserSchema), createUser);
+router.post("/", validate(createUserSchema), createUser);
 
-router.delete("/:id", canDeleteUsers, deleteUser);
+router.delete("/:id", deleteUser);
 
 router.post(
-    "/me/contact-persons",
-    validate(createContactPersonsSchema),
-    createContactPersons,
+  "/me/contact-persons",
+  validate(createContactPersonsSchema),
+  createContactPersons,
 );
 
 export default router;
