@@ -11,7 +11,7 @@ import { offerStages } from "../pipelines/offer/stages.js";
 import { OrderPipelineContext } from "../pipelines/order/context.js";
 import { orderStages } from "../pipelines/order/stages.js";
 import { PipelineContext, PipelineStageError, runPipeline } from "../pipelines/pipeline.js";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 
 type GeneratedDocument = {
     displayName: string;

@@ -1,7 +1,7 @@
 import { createHash } from "crypto";
 import type { FileStat } from "webdav";
 import { getNextCloudClient } from "./nextcloud.js";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 
 export type RemoteDocumentArtifact = {
     remotePath: string;

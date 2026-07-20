@@ -1,5 +1,6 @@
 import morgan from 'morgan';
-import logger from './logger.js';
+
+import logger from '@/utils/logger.js';
 
 const morganMiddleware = morgan((tokens, req, res) => {
     const status = Number(tokens.status(req, res));
@@ -28,7 +29,7 @@ const morganMiddleware = morgan((tokens, req, res) => {
     logger.log(level, 'http_request', data);
 }, {
     // Override default stream — we handle logging ourselves above
-    stream: { write: () => {} },
+    stream: { write: () => { } },
 });
 
 export default morganMiddleware;

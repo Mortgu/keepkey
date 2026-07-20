@@ -1,4 +1,4 @@
-import express, {Router} from 'express';
+import express, { Router } from 'express';
 import {
     deleteTemplate,
     downloadTemplate,
@@ -10,7 +10,7 @@ import {
     getOrderFileById,
     getTemplates,
     uploadTemplate
-} from "../controllers/index.js";
+} from "@/controllers/index.js";
 
 const router = Router();
 

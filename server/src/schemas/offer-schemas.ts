@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 const createOfferFlatrateSchema = z.object({
   flatRateId: z.string().min(1), // flatRateId

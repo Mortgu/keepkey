@@ -6,17 +6,17 @@ import { auth } from "./lib/auth.js";
 import cors from "cors";
 
 import router from "./routes/router.js";
-import { exceptionHandler } from "./middlewares/exception-handler.js";
+import { exceptionHandler } from "./middlewares/exception.middleware.js";
 
 import path from "path";
 import env from "./lib/env.js";
 
-import morganMiddleware from "./middlewares/morgan.js";
-import { requestIdMiddleware } from "./middlewares/request-id.js";
-import logger from "./middlewares/logger.js";
+import morganMiddleware from "./middlewares/morgan.middleware.js";
+import { requestIdMiddleware } from "./middlewares/request.middleware.js";
 import registerTaskWorker from "./workers/task-worker.js";
 import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
 import { initDocumentArtifactStore } from "./lib/document-artifact-store.js";
+import logger from "./utils/logger.js";
 
 const app: Express = express();
 

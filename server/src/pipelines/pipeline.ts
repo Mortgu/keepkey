@@ -1,4 +1,4 @@
-import logger from "../middlewares/logger.js";
+import logger from '@/utils/logger.js';
 
 export class PipelineStageError extends Error {
   constructor(message: string, public readonly status?: number, public readonly cause?: unknown) {

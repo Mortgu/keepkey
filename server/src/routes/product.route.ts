@@ -5,9 +5,9 @@ import {
     getProduct,
     getProducts,
     updateProduct,
-} from "../controllers/product.controller.js";
-import { validate } from "../middlewares/validate.js";
-import { createProductSchema, updateProductSchema } from "../schemas/index.js";
+} from "@/controllers/product.controller.js";
+import { validate } from "@/middlewares/zod.middleware.js";
+import { createProductSchema, updateProductSchema } from "@/schemas/index.js";
 
 const router = Router();
 

@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { getAllContactPersons } from "../controllers/index.js";
+
+import { getAllContactPersons } from "@/controllers/index.js";
 
 const router = Router();
 

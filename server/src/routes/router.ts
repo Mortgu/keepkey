@@ -1,21 +1,22 @@
 import { Router } from "express";
-import { requireSession } from "../middlewares/auth.js";
 
-import contactPersonRouter from "./contact-person-router.js";
-import contractRouter from "./contract-router.js";
-import customerRouter from "./customer-router.js";
-import documentRouter from './document-router.js';
-import flatRatesRouter from "./flat-rate-router.js";
-import cloudRouter from './nextcloud-router.js';
-import integrationsRouter from './integrations-router.js';
-import offerRouter from "./offer-router.js";
-import orderRouter from "./order-router.js";
-import productRouter from "./product-router.js";
-import searchRouter from './search-router.js';
-import supplierRouter from "./supplier-router.js";
-import tariffRouter from './tariff-router.js';
-import taskRouter from "./task-router.js";
-import userRouter from "./user-router.js";
+import { requireSession } from "@/middlewares/auth.middleware.js";
+
+import contactPersonRouter from "./contact.route.js";
+import contractRouter from "./contract.route.js";
+import customerRouter from "./customer.route.js";
+import documentRouter from './document.route.js';
+import flatRatesRouter from "./flatrate.route.js";
+import cloudRouter from './nextcloud.route.js';
+import integrationsRouter from './integrations.route.js';
+import offerRouter from "./offer.route.js";
+import orderRouter from "./order.route.js";
+import productRouter from "./product.route.js";
+import searchRouter from './search.route.js';
+import supplierRouter from "./supplier.route.js";
+import tariffRouter from './tariff.route.js';
+import taskRouter from "./task.route.js";
+import userRouter from "./user.route.js";
 
 const router = Router();
 

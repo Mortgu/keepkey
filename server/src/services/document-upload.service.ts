@@ -11,7 +11,7 @@ import {
     uploadDocumentArtifact,
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 import type { DocumentType } from "../schemas/document-schemas.js";
 
 type StoredDocumentArtifact = {

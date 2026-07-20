@@ -1,5 +1,6 @@
-import {Router} from "express";
-import {getAllTasks, getTaskById} from "../controllers/index.js";
+import { Router } from "express";
+
+import { getAllTasks, getTaskById } from "@/controllers/index.js";
 
 const router = Router();
 

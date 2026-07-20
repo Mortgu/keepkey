@@ -6,9 +6,9 @@ import {
   getAllUsers,
   getSessionUser,
   updateUserById,
-} from "../controllers/index.js";
-import { validate } from "../middlewares/validate.js";
-import { createContactPersonsSchema, createUserSchema, updateUserSchema, } from "../schemas/index.js";
+} from "@/controllers/index.js";
+import { validate } from "@/middlewares/zod.middleware.js";
+import { createContactPersonsSchema, createUserSchema, updateUserSchema, } from "@/schemas/index.js";
 
 const router = Router();
 

@@ -4,12 +4,12 @@ import {
   deleteSupplier,
   getSuppliers,
   updateSupplier,
-} from "../controllers/index.js";
-import { validate } from "../middlewares/validate.js";
+} from "@/controllers/index.js";
+import { validate } from "@/middlewares/zod.middleware.js";
 import {
   createSupplierSchema,
   updateSupplierSchema,
-} from "../schemas/index.js";
+} from "@/schemas/index.js";
 
 const router = Router();
 

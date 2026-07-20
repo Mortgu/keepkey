@@ -1,9 +1,9 @@
 import { Task, TaskStatus, TaskTarget } from "@prisma/client";
 import { Job, Worker } from "bullmq";
 import env from "../lib/env.js";
-import { prisma } from "../lib/prismaClient.js";
+import { prisma } from "@/lib/prismaClient.js";
 import connection from "../lib/redis.js";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 import invoiceTaskHandler from "./handlers/invoice-handler.js";
 import offerTaskHandler from "./handlers/offer-handler.js";
 import orderTaskHandler from "./handlers/order-handler.js";

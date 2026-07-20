@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 const productTranslationSchema = z.object({
   language: z.enum(["DE", "EN"]),

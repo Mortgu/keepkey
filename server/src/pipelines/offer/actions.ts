@@ -6,15 +6,15 @@ import PizZip from "pizzip";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
-import { prisma } from "../../lib/prismaClient.js";
-import logger from "../../middlewares/logger.js";
-import { offerSchema } from "../../schemas/templates/offer-template-schema.js";
-import { pickTranslation } from "../../utils/i18n.js";
+import { prisma } from "@/lib/prismaClient.js";
+import logger from "@/utils/logger.js";
+import { offerSchema } from "@/schemas/templates/offer-template-schema.js";
+import { pickTranslation } from "@/utils/i18n.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
-import { OfferTemplate, OfferTemplateGroup, OfferTemplateItem, offerTemplateSchema } from "../../schemas/templates/offer.template.schema.js";
-import { formatCentsToEur, formatDate } from "../../utils/utils.js";
+import { OfferTemplate, OfferTemplateGroup, OfferTemplateItem, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
+import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {

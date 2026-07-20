@@ -1,7 +1,7 @@
 import { DocumentStatus, TaskStatus } from "@prisma/client";
 import type { Job } from "bullmq";
-import { prisma } from "../lib/prismaClient.js";
-import logger from "../middlewares/logger.js";
+import { prisma } from "@/lib/prismaClient.js";
+import logger from "@/utils/logger.js";
 import type { TaskJobData } from "./task-queue.js";
 
 export async function markTaskRunning(

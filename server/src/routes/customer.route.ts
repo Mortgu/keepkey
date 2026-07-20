@@ -9,14 +9,14 @@ import {
     getCustomers,
     updateCustomer,
     updateCustomerContact
-} from "../controllers/index.js";
-import { validate } from "../middlewares/validate.js";
+} from "@/controllers/index.js";
+import { validate } from "@/middlewares/zod.middleware.js";
 import {
     createCustomerContactSchema,
     createCustomerSchema,
     updateCustomerContactSchema,
     updateCustomerSchema
-} from "../schemas/customer-schemas.js";
+} from "@/schemas/customer-schemas.js";
 
 const router = Router();
 

@@ -4,13 +4,13 @@ import {
     downloadDocument,
     renameDocument,
     uploadDocument,
-} from "../controllers/index.js";
-import { validate, validateParams } from "../middlewares/validate.js";
+} from "@/controllers/index.js";
+import { validate, validateParams } from "@/middlewares/zod.middleware.js";
 import {
     documentArtifactParamsSchema,
     documentParamsSchema,
     renameDocumentSchema,
-} from "../schemas/document-schemas.js";
+} from "@/schemas/document-schemas.js";
 
 const router = Router();
 

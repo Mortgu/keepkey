@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 const contractTranslationSchema = z.object({
   language: z.enum(["DE", "EN"]),

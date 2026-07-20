@@ -1,7 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
-import { auth } from "../lib/auth.js";
 import { fromNodeHeaders } from "better-auth/node";
 import type { User } from "@prisma/client";
+
+import { auth } from "@/lib/auth.js";
 
 declare global {
     namespace Express {

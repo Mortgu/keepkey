@@ -5,12 +5,12 @@ import {
   getFlatRate,
   getFlatRates,
   updateFlatRate,
-} from "../controllers/index.js";
-import { validate } from "../middlewares/validate.js";
+} from "@/controllers/index.js";
+import { validate } from "@/middlewares/zod.middleware.js";
 import {
   createFlatRateSchema,
   updateFlatRateSchema,
-} from "../schemas/index.js";
+} from "@/schemas/index.js";
 
 const router = Router();
 

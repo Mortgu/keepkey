@@ -1,4 +1,5 @@
-import {Redis as IORedis} from "ioredis";
+import { Redis as IORedis } from "ioredis";
+
 import env from "./env.js";
 
 const REDIS_URL = env.REDIS_URL ?? "redis://localhost:6379";

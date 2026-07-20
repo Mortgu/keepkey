@@ -1,5 +1,5 @@
 import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
 import { AppException } from "./exceptions.js";
 import { prisma } from "./prismaClient.js";

@@ -9,11 +9,19 @@ import {
   getOffers,
   restoreOfferRevision,
   updateOffer,
-} from "../controllers/offer.controller.js";
+} from "@/controllers/offer.controller.js";
 
-import { notImplemented } from "../middlewares/not-implemented.js";
-import { validate } from "../middlewares/validate.js";
-import { createOfferFlatratesSchema, createOfferPositionsSchema, createOfferSchema, restoreOfferRevisionSchema, updateOfferFlatrateSchema, updateOfferPositionSchema, updateOfferSchema } from "../schemas/index.js";
+import { notImplemented } from "@/utils/not-implemented.js";
+import { validate } from "@/middlewares/zod.middleware.js";
+import {
+  createOfferFlatratesSchema,
+  createOfferPositionsSchema,
+  createOfferSchema,
+  restoreOfferRevisionSchema,
+  updateOfferFlatrateSchema,
+  updateOfferPositionSchema,
+  updateOfferSchema
+} from "@/schemas/index.js";
 
 const router = Router();
 
