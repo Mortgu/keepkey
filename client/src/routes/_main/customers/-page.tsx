@@ -1,9 +1,10 @@
 import { Button, PageWidth, SearchBar, SortDropdown } from "@/components";
-import CustomerList from "./-components/customer-list";
+import { useModal } from "@/hooks";
 import { Plus } from "lucide-react";
 import { useState } from "react";
-import { useModal } from "@/hooks";
 import { useTranslation } from "react-i18next";
+import CustomerList from "./-components/customer-list";
+import CustomerModal from "./-components/customer-modal";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -27,7 +28,7 @@ export default function CustomerPage({ }) {
                 <h1 className="text-lg font-semibold">{t("section.customers")}</h1>
                 <div className="flex items-center gap-1 text-sm font-light text-(--text-secondary)">
                     <a>dashboard</a>
-                    <p>></p>
+                    <p>{">"}</p>
                     <a>customers</a>
                 </div>
             </div>
@@ -46,6 +47,10 @@ export default function CustomerPage({ }) {
             </div>
 
             <CustomerList />
+
+            {modal.isOpen && (
+                <CustomerModal key={modal.key} onClose={modal.close} />
+            )}
         </PageWidth>
     )
 }

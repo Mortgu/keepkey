@@ -1,5 +1,4 @@
 import CustomerListItem from "./customer-list-item";
-import CustomerModal from "./customer-modal";
 
 import { ListSkeleton, PageWidth, RouteError, Skeleton } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
@@ -39,9 +38,7 @@ export default function CustomerList() {
                 ))}
             </div>
 
-            {modal.isOpen && (
-                <CustomerModal key={modal.key} onClose={modal.close} />
-            )}
+
         </PageWidth>
     );
 }
