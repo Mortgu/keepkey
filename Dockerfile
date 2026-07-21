@@ -10,7 +10,7 @@ RUN cd client && npm install
 
 COPY . .
 RUN cd client && npm run generate:types && VITE_API_BASE_URL="" npx vite build
-RUN cd server && npx tsc --project tsconfig.json && npx tsc --project tsconfig.seed.json && npm prune --production
+RUN cd server && npx tsc --project tsconfig.json && npx tsc-alias --project tsconfig.json && npx tsc --project tsconfig.seed.json && npx tsc-alias --project tsconfig.seed.json && npm prune --production
 
 
 FROM node:22-slim
