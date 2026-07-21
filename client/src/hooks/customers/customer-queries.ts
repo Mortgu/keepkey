@@ -7,7 +7,7 @@ export const customerQueries = {
     list: (filters: CustomerFilters = {}) => {
         return queryOptions({
             queryKey: customerKeys.list(filters),
-            queryFn: () => getCustomers(),
+            queryFn: () => getCustomers(filters),
             staleTime: 30_000,
         });
     },

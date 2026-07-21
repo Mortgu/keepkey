@@ -4,6 +4,7 @@ import CustomerPage from "./-page";
 
 const customerSearchSchema = z.object({
     search: z.string().optional(),
+    sort: z.string().optional(),
 });
 
 export const Route = createFileRoute("/_main/customers/")({

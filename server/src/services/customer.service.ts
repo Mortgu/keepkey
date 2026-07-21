@@ -17,8 +17,36 @@ export type UpdateCustomerContactInput = z.infer<typeof updateCustomerContactSch
 
 /* ========== Queries ========== */
 
-export async function getCustomers() {
+export async function getCustomers(params?: {
+    search?: string;
+    sort?: string;
+}) {
+    const where: Prisma.CustomerWhereInput = {};
+
+    if (params?.search) {
+        const search = params.search.trim();
+        where.OR = [
+            { companyName: { contains: search, mode: "insensitive" } },
+            { customerId: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+            { phone: { contains: search, mode: "insensitive" } },
+            { contactPersons: { some: { firstName: { contains: search, mode: "insensitive" } } } },
+            { contactPersons: { some: { lastName: { contains: search, mode: "insensitive" } } } },
+        ];
+    }
+
+    let orderBy: Prisma.CustomerOrderByWithRelationInput = { createdAt: "desc" };
+    if (params?.sort) {
+        const [field, direction] = params.sort.split(":") as [string, Prisma.SortOrder | undefined];
+        const dir = direction ?? "desc";
+        if (field === "companyName" || field === "createdAt" || field === "customerId") {
+            orderBy = { [field]: dir as Prisma.SortOrder };
+        }
+    }
+
     return prisma.customer.findMany({
+        where,
+        orderBy,
         include: {
             contactPersons: true,
             orders: true,
