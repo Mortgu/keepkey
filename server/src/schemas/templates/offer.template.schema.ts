@@ -12,7 +12,7 @@ const offerTemplateProductItemSchema = z.object({
     optional: z.boolean().nullish().transform(v => (v === undefined ? null : v)),
     discount: z.object({
         free_months: z.number().int(),
-        valid_until: z.string(),
+        valid_until: z.string().nullish().transform(v => (v === undefined ? null : v)),
         total: z.string(),
     }).nullish().transform(v => (v === undefined ? null : v)),
 });
@@ -65,20 +65,22 @@ export const offerTemplateSchema = z.object({
         email: z.string().nullish().transform(v => (v === undefined ? null : v)),
     }),
 
-    products: z.object({
-        names: z.string(),
-        grouped: z.array(offerTemplateProductGroupSchema),
-        items: z.array(offerTemplateProductItemSchema),
-        total: z.string(),
-    }),
+    product_names: z.string(),
 
-    flatrates: z.array(
-        z.object({
+    products: z.array(offerTemplateProductItemSchema),
+
+    groups: z.array(offerTemplateProductGroupSchema),
+
+    tables: z.array(z.object({
+        products: z.string(),
+        items: z.array(offerTemplateProductItemSchema),
+        flatrates: z.array(z.object({
             name: z.string(),
             content: z.string().nullish().transform(v => (v === undefined ? null : v)),
             total: z.string()
-        })
-    )
+        })),
+        total: z.string(),
+    })),
 });
 
 export type OfferTemplate = z.infer<typeof offerTemplateSchema>;

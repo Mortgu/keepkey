@@ -3,15 +3,22 @@ import type {
     CreateCustomerContactInput,
     CreateCustomerInput,
     Customer,
+    CustomerFilters,
     UpdateCustomerContactInput,
     UpdateCustomerInput
 } from "@/types";
 import { api } from "@/lib/api-client";
 
-export const getCustomers = () =>
-    api<Array<Customer>>(`/api/customers`, {
+export const getCustomers = (filters: CustomerFilters = {}) => {
+    const params = new URLSearchParams();
+    if (filters.search) params.set("search", filters.search);
+    if (filters.sort) params.set("sort", filters.sort);
+
+    const qs = params.toString();
+    return api<Array<Customer>>(`/api/customers${qs ? `?${qs}` : ""}`, {
         method: "GET",
     });
+};
 
 export const getContacts = () =>
     api<Array<ContactPerson>>(`/api/contact-persons`, {

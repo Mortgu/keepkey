@@ -1,12 +1,13 @@
 import { Pen, Trash } from "lucide-react";
 import type { FlatRate, UpdateFlatRateInput } from "@/types";
-import { useFlatRateHook, useLocale, useModal } from "@/hooks";
+import { useUpdateFlatRate, useDeleteFlatRate, useLocale, useModal } from "@/hooks";
 import { Button } from "@/components";
 import { localized } from "@/lib/i18n-content";
 import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateItem({ item }: { item: FlatRate }) {
-  const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useFlatRateHook();
+  const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
+  const { isUpdatingFlatRate } = useUpdateFlatRate();
   const modal = useModal<FlatRate>();
   const locale = useLocale();
 

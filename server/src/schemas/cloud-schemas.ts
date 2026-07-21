@@ -1,4 +1,4 @@
-import {z} from 'zod';
+import z from "zod";
 
 const CloudFile = z.object({
     filename: z.string(),

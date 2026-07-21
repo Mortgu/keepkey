@@ -1,5 +1,5 @@
 import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
-import logger from "../middlewares/logger.js";
+import logger from "@/utils/logger.js";
 import { taskQueue, taskQueueKey } from "../workers/task-queue.js";
 import { AppException } from "./exceptions.js";
 import { prisma } from "./prismaClient.js";
@@ -38,7 +38,7 @@ export async function enqueueTask(
       job = await taskQueue.add(taskQueueKey, { taskId }, { jobId: taskId });
     }
   } catch (exception: any) {
-    logger.error(`[enqueueTask] failed to enqueue task ${taskId}: ${exception.message}`);
+    logger.error('enqueue_task_failed', { taskId, error: exception.message });
 
     if (markFailedOnError) {
       try {
@@ -57,7 +57,7 @@ export async function enqueueTask(
           }),
         ]);
       } catch (dbException: any) {
-        logger.error(`[enqueueTask] failed to persist FAILED state for task ${taskId}: ${dbException.message}`);
+        logger.error('enqueue_task_persist_failed', { taskId, error: dbException.message });
       }
     }
 
@@ -74,6 +74,6 @@ export async function enqueueTask(
     where: { id: taskId },
     data: { jobId: job.id },
   }).catch((exception: any) => {
-    logger.warn(`[enqueueTask] failed to persist jobId for task ${taskId}: ${exception.message}`);
+    logger.warn('enqueue_task_jobid_persist_failed', { taskId, error: exception.message });
   });
 }

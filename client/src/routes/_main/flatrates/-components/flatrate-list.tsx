@@ -3,12 +3,12 @@ import FlatRateItem from "./flatrate-item";
 import FlatRateModal from "./flatrate-modal";
 
 import { ListPage } from "@/components";
-import { useFlatRateHook, useModal } from "@/hooks";
+import { useFlatRateManager, useModal } from "@/hooks";
 
 export default function FlatRateList() {
   const { t } = useTranslation();
   const modal = useModal();
-  const { flatRates, isPending, error, createFlatRate } = useFlatRateHook();
+  const { flatRates, isPending, error, createFlatRate } = useFlatRateManager();
 
   return (
     <ListPage

@@ -5,11 +5,12 @@ import type { DropdownOption } from "@/components/filters/multi-dropdown";
 import {
     Button,
     ModalDialog,
-    MultiDropdown,
+    MultiSelectList,
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { useTranslation } from "react-i18next";
 
 interface TariffGroupModalProps {
     onClose: () => void;
@@ -30,6 +31,7 @@ export default function TariffGroupModal({
     excludeProductIds,
     loading,
 }: TariffGroupModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = products
@@ -70,8 +72,7 @@ export default function TariffGroupModal({
                     <form.Field name="products" children={(field) => (
                         <div className="grid gap-1">
                             <label className="text-sm text-gray-500">Produkte</label>
-                            <MultiDropdown
-                                label="Produkte auswählen"
+                            <MultiSelectList
                                 options={options}
                                 values={field.state.value}
                                 onChange={field.handleChange}
@@ -92,8 +93,8 @@ export default function TariffGroupModal({
             </ModalDialog.Content>
 
             <ModalDialog.Footer>
-                <Button onClick={onClose} type="button" size="sm" variant="secondary">
-                    Abbrechen
+                <Button onClick={onClose} type="button" size="sm" variant="border">
+                    {t("button.cancel")}
                 </Button>
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -105,7 +106,7 @@ export default function TariffGroupModal({
                             size="sm"
                             loading={loading ?? isSubmitting}
                         >
-                            Speichern
+                            {t("button.save")}
                         </Button>
                     )}
                 />

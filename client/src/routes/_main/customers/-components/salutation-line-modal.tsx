@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import type { ContactPerson } from "@/types";
 import { Button, ModalDialog, Textarea } from "@/components";
+import { useTranslation } from "react-i18next";
 
 interface SalutationLineModalProps {
     onClose: () => void;
@@ -8,6 +9,8 @@ interface SalutationLineModalProps {
 }
 
 export default function SalutationLineModal({ onClose, contactPerson }: SalutationLineModalProps) {
+    const { t } = useTranslation();
+
     const form = useForm({
         defaultValues: {
             salutationLine: "",
@@ -51,23 +54,14 @@ export default function SalutationLineModal({ onClose, contactPerson }: Salutati
             </ModalDialog.Content>
 
             <ModalDialog.Footer>
-                <Button onClick={onClose} type="button" size="sm" variant="secondary">
-                    Abbrechen
+                <Button onClick={onClose} type="button" size="sm" variant="border">
+                    {t("button.cancel")}
                 </Button>
-                <form.Subscribe
-                    selector={(state) => [state.canSubmit, state.isSubmitting]}
-                    children={([canSubmit, isSubmitting]) => (
-                        <Button
-                            form="salutation-line-form"
-                            type="submit"
-                            size="sm"
-                            disabled={!canSubmit}
-                            loading={isSubmitting}
-                        >
-                            Speichern
-                        </Button>
-                    )}
-                />
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                    <Button type="submit" form="salutation-line-form" size="sm" disabled={!canSubmit} loading={isSubmitting}>
+                        {t("button.save")}
+                    </Button>
+                )} />
             </ModalDialog.Footer>
         </ModalDialog>
     );

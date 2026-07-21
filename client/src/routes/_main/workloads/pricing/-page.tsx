@@ -4,12 +4,12 @@ import { toast } from "react-toastify";
 import { useEffect, useMemo } from "react";
 import PricingTable from "./-components/pricing-table";
 import TariffGroupModal from "./-components/tariff-group-modal";
-import { useModal, useProductHook, useTariffGroupHook } from "@/hooks";
+import { useModal, useProducts, useTariffGroupHook } from "@/hooks";
 import { Button, PageWidth } from "@/components";
 
 export default function PricingPage() {
     const { groups, isPending, error, createTariffGroup, createTariffGroupPending } = useTariffGroupHook();
-    const { products } = useProductHook();
+    const { products } = useProducts();
     const modal = useModal();
 
     useEffect(() => {

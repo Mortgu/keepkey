@@ -4,11 +4,13 @@ import { Download, Plus, RotateCcw, Trash } from "lucide-react";
 
 import type { CloudFile } from "@/types/cloud.ts";
 import { Badge, Button, ModalDialog } from "@/components";
-import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud-hook.ts";
-import { templateDownloadUrl } from "@/data/nextcloud";
+import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud/nextcloud-hooks";
+import { templateDownloadUrl } from "@/hooks/nextcloud/nextcloud-api";
 import { formatBytesToKB } from "@/lib/utils";
+import { useTranslation } from "react-i18next";
 
 export default function TemplateList() {
+    const { t } = useTranslation();
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [templateToDelete, setTemplateToDelete] = useState<CloudFile | null>(null);
 
@@ -120,11 +122,11 @@ export default function TemplateList() {
                         <p>Möchten Sie die Vorlage „{templateToDelete.basename}" wirklich löschen?</p>
                     </ModalDialog.Content>
                     <ModalDialog.Footer>
-                        <Button onClick={() => setTemplateToDelete(null)} variant="secondary" size="sm">
-                            Abbrechen
+                        <Button onClick={() => setTemplateToDelete(null)} variant="border" size="sm">
+                            {t("button.cancel")}
                         </Button>
                         <Button size="sm" danger loading={isDeletingTemplate} onClick={handleDelete}>
-                            Löschen
+                            {t("button.delete")}
                         </Button>
                     </ModalDialog.Footer>
                 </ModalDialog>

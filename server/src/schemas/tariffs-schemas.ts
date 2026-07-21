@@ -1,4 +1,4 @@
-import {z} from "zod";
+import z from "zod";
 
 export const createTariffGroupSchema = z.object({
     products: z.array(z.string().min(1)).min(1),

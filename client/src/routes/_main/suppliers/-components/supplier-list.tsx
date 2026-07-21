@@ -2,13 +2,13 @@ import {useTranslation} from "react-i18next";
 import SupplierListItem from "./supplier-list-item";
 import SupplierModal from "./supplier-modal";
 import {ListPage} from "@/components";
-import {useModal, useSupplierHook} from "@/hooks";
+import {useModal, useSuppliers} from "@/hooks";
 
 export default function SupplierList() {
     const {t} = useTranslation();
 
     const modal = useModal();
-    const {suppliers, isPending, error} = useSupplierHook();
+    const {suppliers, isPending, error} = useSuppliers();
 
     return (
         <ListPage

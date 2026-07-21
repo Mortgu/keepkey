@@ -9,11 +9,11 @@ export interface PageWidthProps {
 
 const styles = tv({
     base: [
-        "bg-white max-h-screen overflow-y-scroll"
+        "bg-white max-h-screen h-screen overflow-y-scroll"
     ],
     variants: {
         variant: {
-            none: "",
+            none: "w-full",
             full: "w-full m-auto h-full p-6",
             default: "w-full max-w-(--viewport) m-auto h-full p-6",
         },

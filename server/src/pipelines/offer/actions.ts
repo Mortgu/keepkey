@@ -3,18 +3,18 @@ import InspectModule from "docxtemplater/js/inspect-module.js";
 import fs from "fs/promises";
 import PizZip from "pizzip";
 
+import { prisma } from "@/lib/prismaClient.js";
+import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
+import { pickTranslation } from "@/utils/i18n.js";
+import logger from "@/utils/logger.js";
+import { calculatePrice } from "@/utils/products.js";
+import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
-import { prisma } from "../../lib/prismaClient.js";
-import logger from "../../middlewares/logger.js";
-import { offerSchema } from "../../schemas/templates/offer-template-schema.js";
-import { pickTranslation } from "../../utils/i18n.js";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
-import { OfferTemplate, OfferTemplateGroup, OfferTemplateItem, offerTemplateSchema } from "../../schemas/templates/offer.template.schema.js";
-import { formatCentsToEur, formatDate } from "../../utils/utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
@@ -66,97 +66,169 @@ export const fetchOfferAction = async (context: OfferPipelineContext) => {
 /* Helper function */
 export const formatOfferData = async (fetchedData: OfferFetchData): Promise<OfferTemplate> => {
     const { offer, contracts } = fetchedData;
-    const { customer, customerContactPerson: cp, user: employee, offerPositions, offerFlatRates, language } = offer;
-    let total = 0;
+    const language = offer.language;
+    const customerId = offer.customerId;
 
-    const product_items: Array<OfferTemplateItem> = offerPositions.flatMap(offerPosition => {
-        const translation = pickTranslation(offerPosition.product.translations, language);
-        const contract_translation = pickTranslation(offerPosition.contract.translations, language);
-
-        if (!translation || !contract_translation) {
-            throw new PipelineStageError("Translations not found!")
-        }
-
-        const product_name = `${offerPosition.optional ? `(optional)\n` : ''}Keepit - ${contract_translation.name} Backup für ${translation.name}`;
-
-        total = total + offerPosition.total_cents - offerPosition.discount_cents;
-
-        const item: OfferTemplateItem = {
-            name: product_name,
-            description: translation.description,
-            content: translation.table,
-            quantity: String(offerPosition.quantity),
-            eur_user_month: formatCentsToEur(offerPosition.eur_user_month),
-            duration: String(offerPosition.duration_months),
-            total: formatCentsToEur(offerPosition.total_cents),
-            contract: contract_translation.name,
-            optional: offerPosition.optional ? true : null,
-            discount: null,
-        }
-
-        if (offerPosition.free_months > 0) {
-            item.discount = {
-                free_months: offerPosition.free_months,
-                valid_until: formatDate(offer.validUntil) ?? "",
-                total: formatCentsToEur(-offerPosition.discount_cents),
-            }
-        }
-
-        return [item];
-    });
-
-    const groups = Object.values(Object.groupBy(offerPositions, (p) =>
-        `${p.contract}_${p.duration_months}`));
-
-    const product_groups: Array<OfferTemplateGroup> = groups.flatMap(group => {
-        const positions = group?.map(position => {
-            const product = pickTranslation(position.product.translations, language);
-            const contract = pickTranslation(position.contract.translations, language);
-
-            return { ...position, product, contract };
-        });
-
-        const months_translation = pickTranslation([
-            { language: "DE", text: "Monate" },
-            { language: "EN", text: "Months" }
-        ], language)?.text;
-
-        const item: OfferTemplateGroup = {
-            names: positions?.map(p => p.product?.name).join(" & ") ?? "",
-            contract: positions![0].contract?.name ?? "",
-            features: positions![0].contract?.features ?? [],
-            _duration: positions![0].duration_months,
-            duration: `${positions![0].duration_months} ${months_translation}`,
-        }
-
-        if (offer.featureComparison) {
-            return contracts.map(contract => ({
-                names: positions?.map(p => p.product?.name).join(" & ") ?? "",
-                contract: pickTranslation(contract.translations, language)?.name ?? "",
-                features: pickTranslation(contract.translations, language)?.features ?? [],
-                _duration: positions![0].duration_months,
-                duration: `${positions![0].duration_months} ${months_translation}`,
-            }))
-        }
-
-        return [item];
-    });
-
-    const flatrates = offerFlatRates.map(position => {
-        const translation = pickTranslation(position.flatRate.translations, language);
-
-        if (!translation) {
-            throw new PipelineStageError("Translations not found!")
-        }
-
-        total = total + position.total_cents;
+    const products = offer.offerPositions.map(pos => {
+        const productT = pickTranslation(pos.product.translations, language)!;
+        const contractT = pickTranslation(pos.contract.translations, language)!;
+        const discountTotal = pos.free_months * pos.eur_user_month * pos.quantity;
 
         return {
-            name: translation.name,
-            content: translation.table,
-            total: formatCentsToEur(position.total_cents),
-        }
+            name: productT.name,
+            description: productT.description ?? "",
+            content: productT.table ?? "",
+            quantity: String(pos.quantity),
+            eur_user_month: formatCentsToEur(pos.eur_user_month),
+            duration: `${pos.duration_months} Monate`,
+            total: formatCentsToEur(pos.total_cents),
+            contract: contractT.name,
+            optional: pos.optional ?? false,
+            discount: {
+                free_months: pos.free_months,
+                valid_until: formatDate(offer.validUntil),
+                total: formatCentsToEur(discountTotal),
+            },
+        };
     });
+
+    const groupMap = new Map<string, typeof offer.offerPositions>();
+    for (const pos of offer.offerPositions) {
+        const key = `${pos.contractId}_${pos.duration_months}`;
+        if (!groupMap.has(key)) groupMap.set(key, []);
+        groupMap.get(key)!.push(pos);
+    }
+
+    const originalContractIds = new Set(offer.offerPositions.map(p => p.contractId));
+    const otherContracts = contracts.filter(c => !originalContractIds.has(c.id));
+
+    const groups: OfferTemplate["groups"] = [];
+
+    for (const [, positions] of groupMap) {
+        const firstPos = positions[0];
+        const contractT = pickTranslation(firstPos.contract.translations, language)!;
+        const productNames = positions
+            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+            .join(" & ");
+
+        groups.push({
+            names: productNames,
+            contract: contractT.name,
+            features: contractT.features,
+            _duration: firstPos.duration_months,
+            duration: `${firstPos.duration_months} Monate`,
+        });
+
+        if (offer.featureComparison) {
+            for (const otherContract of otherContracts) {
+                const otherContractT = pickTranslation(otherContract.translations, language)!;
+                groups.push({
+                    names: productNames,
+                    contract: otherContractT.name,
+                    features: otherContractT.features,
+                    _duration: firstPos.duration_months,
+                    duration: `${firstPos.duration_months} Monate`,
+                });
+            }
+        }
+    }
+
+    const flatrates = offer.offerFlatRates.map(fr => {
+        const frT = pickTranslation(fr.flatRate.translations, language)!;
+        return {
+            name: frT.name,
+            content: frT.table,
+            total: formatCentsToEur(fr.total_cents),
+        };
+    });
+    const flatratesTotal = offer.offerFlatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
+
+    const tables: OfferTemplate["tables"] = [];
+
+    const buildTableForContract = async (
+        contractId: string,
+        productNames: string,
+        positions: typeof offer.offerPositions,
+    ) => {
+        const items: OfferTemplate["products"] = [];
+        let itemsTotalCents = 0;
+
+        for (const pos of positions) {
+            const productT = pickTranslation(pos.product.translations, language)!;
+            const contractT = pickTranslation(
+                contracts.find(c => c.id === contractId)!.translations,
+                language,
+            )!;
+
+            const priceResult = await calculatePrice({
+                productId: pos.productId,
+                contractId,
+                duration: pos.duration_months,
+                quantity: pos.quantity,
+                customerId,
+                freeMonths: pos.free_months,
+            });
+
+            const totalCents = priceResult.ok ? priceResult.price : 0;
+            const unitPrice = priceResult.ok ? priceResult.breakdown.unitPrice : 0;
+            const discountCents = pos.free_months * unitPrice * pos.quantity;
+
+            itemsTotalCents += totalCents;
+
+            items.push({
+                name: productT.name,
+                description: productT.description ?? "",
+                content: productT.table ?? "",
+                quantity: String(pos.quantity),
+                eur_user_month: formatCentsToEur(unitPrice),
+                duration: String(pos.duration_months),
+                total: formatCentsToEur(totalCents),
+                contract: contractT.name,
+                optional: pos.optional ?? false,
+                discount: {
+                    free_months: pos.free_months,
+                    valid_until: formatDate(offer.validUntil),
+                    total: formatCentsToEur(discountCents),
+                },
+            });
+        }
+
+        const tableTotalCents = itemsTotalCents + flatratesTotal;
+
+        return {
+            products: productNames,
+            items,
+            flatrates,
+            total: formatCentsToEur(tableTotalCents),
+        };
+    };
+
+    for (const [, positions] of groupMap) {
+        const firstPos = positions[0];
+        const productNames = positions
+            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+            .join(" & ");
+
+        tables.push(
+            await buildTableForContract(firstPos.contractId, productNames, positions),
+        );
+
+        if (offer.featureComparison) {
+            for (const otherContract of otherContracts) {
+                tables.push(
+                    await buildTableForContract(otherContract.id, productNames, positions),
+                );
+            }
+        }
+    }
+
+    const cp = offer.customerContactPerson;
+    const customer = offer.customer;
+    const employee = offer.user;
+
+    const productNames = offer.offerPositions
+        .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+        .join(" & ");
 
     return {
         quoteId: offer.quoteId,
@@ -164,7 +236,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         paymentTerm: offer.paymentTerm,
         validUntil: formatDate(offer.validUntil),
         requestFrom: formatDate(offer.requestFrom),
-        supplierId: offer.supplierId,
+        supplierId: offer.supplierId ?? null,
         compare: offer.featureComparison,
 
         customer: {
@@ -173,12 +245,10 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             street: customer.street,
             zip: customer.zip,
             city: customer.city,
-
-            fullName: `${cp.salutation} ${cp.firstName} ${cp.lastName}`,
+            fullName: `${cp.salutation ?? ""} ${cp.firstName} ${cp.lastName}`.trim(),
             salutation: cp.salutation,
             firstName: cp.firstName,
             lastName: cp.lastName,
-
             phone: customer.phone,
             email: cp.email,
         },
@@ -188,19 +258,15 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             salutation: employee.salutation,
             firstName: employee.firstName,
             lastName: employee.lastName,
-            phone: employee.phone,
+            phone: employee.phone ?? "",
             email: employee.email,
         },
 
-        products: {
-            names: offerPositions.map(position => pickTranslation(position.product.translations, language)?.name).join(" & "),
-            grouped: product_groups,
-            items: product_items,
-            total: formatCentsToEur(total),
-        },
-
-        flatrates: flatrates
-    }
+        product_names: productNames,
+        products,
+        groups,
+        tables,
+    };
 }
 
 /* Stage function */
@@ -215,8 +281,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {
             logger.error(exception)
-            logger.error(`[pipeline]: Formatted offer data failed schema validation: ${JSON.stringify(exception.issues)
-                }`);
+            logger.error('pipeline_offer_validation_failed', { issues: exception.issues });
         } else {
             logger.error(exception);
         }
@@ -290,7 +355,8 @@ export async function generateAction(context: OfferPipelineContext) {
 
     const tags = iModule.getAllTags();
     const templatePaths = flattenTags(tags as Record<string, unknown>);
-    const schemaPaths = flattenSchema(offerSchema);
+
+    const schemaPaths = flattenSchema(offerTemplateSchema);
     const uncovered = templatePaths.filter((t) => !schemaPaths.includes(t));
     if (uncovered.length > 0) {
         logger.warn(

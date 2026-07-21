@@ -1,4 +1,4 @@
-import { z } from "zod";
+import z from "zod";
 
 export const documentTypeSchema = z.enum(["offer", "order"]);
 export const documentFormatSchema = z.enum(["pdf", "docx"]);

@@ -57,6 +57,8 @@
     "search": "Search",
     "clear": "Clear",
     "filter": "Filter",
+    "country": "Country",
+    "language": "Language",
     "export": "Export",
     "import": "Import",
     "loading": "Loading...",

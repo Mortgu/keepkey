@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button, Input, ModalDialog } from "@/components";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   initialValue: string;
@@ -9,6 +10,7 @@ type Props = {
 };
 
 export function DocumentRenameModal({ initialValue, isPending, onClose, onSubmit }: Props) {
+  const { t } = useTranslation();
   const [displayName, setDisplayName] = useState(initialValue);
   const value = displayName.trim();
 
@@ -42,11 +44,11 @@ export function DocumentRenameModal({ initialValue, isPending, onClose, onSubmit
         />
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button variant="secondary" size="sm" onClick={onClose} disabled={isPending}>
-          Abbrechen
+        <Button variant="border" size="sm" onClick={onClose} disabled={isPending}>
+          {t("button.cancel")}
         </Button>
         <Button size="sm" onClick={submit} loading={isPending} disabled={!value || isPending}>
-          Speichern
+          {t("button.save")}
         </Button>
       </ModalDialog.Footer>
     </ModalDialog>

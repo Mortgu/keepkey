@@ -2,18 +2,19 @@ import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import type { Order } from "@/types";
-import type { UpdateOrderInput } from "@/data/orders";
+import type { UpdateOrderInput } from "@/hooks/orders/order-api";
 import {
   useContracts,
   useCustomerContacts,
   useCustomers,
-  useFlatRateHook,
-  useOrderHook,
-  useProductHook,
-  useSupplierHook,
-  useUserHook,
+  useFlatRates,
+  useOrderManager,
+  useProducts,
+  useSuppliers,
+  useUsers,
 } from "@/hooks";
 import { Button, Input, ModalDialog, Select, Textarea } from "@/components";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   order: Order;
@@ -27,14 +28,15 @@ const inputDate = (value?: string) => value?.slice(0, 10) ?? "";
 const optionLabel = (translations: Array<{ name: string }>) => translations[0]?.name ?? "-";
 
 export default function OrderEditModal({ order, onClose }: Props) {
+  const { t } = useTranslation();
   const [expectedVersion] = useState(order.version);
-  const { updateOrder, isUpdatingOrder } = useOrderHook();
+  const { updateOrder, isUpdatingOrder } = useOrderManager();
   const { customers } = useCustomers();
-  const { suppliers } = useSupplierHook();
-  const { users } = useUserHook();
-  const { products } = useProductHook();
+  const { suppliers } = useSuppliers();
+  const { users } = useUsers();
+  const { products } = useProducts();
   const { contracts } = useContracts();
-  const { flatRates: availableFlatRates } = useFlatRateHook();
+  const { flatRates: availableFlatRates } = useFlatRates();
 
   const [fields, setFields] = useState({
     supplierId: order.supplierId ?? "",
@@ -232,8 +234,8 @@ export default function OrderEditModal({ order, onClose }: Props) {
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <Button size="sm" variant="secondary" onClick={onClose}>Abbrechen</Button>
-        <Button size="sm" onClick={submit} loading={isUpdatingOrder} disabled={isUpdatingOrder}>Speichern</Button>
+        <Button size="sm" variant="border" onClick={onClose}>{t("button.cancel")}</Button>
+        <Button size="sm" onClick={submit} loading={isUpdatingOrder} disabled={isUpdatingOrder}>{t("button.save")}</Button>
       </ModalDialog.Footer>
     </ModalDialog>
   );

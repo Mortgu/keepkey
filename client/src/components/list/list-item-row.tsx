@@ -29,7 +29,8 @@ export function ListItemRow({
             <div className="flex items-center gap-2">
                 {onEdit && (
                     <Button
-                        variant="secondary"
+                        size="sm"
+                        variant="border"
                         icon={<Pen className="size-3.5" />}
                         iconOnly
                         aria-label={editLabel}
@@ -38,7 +39,8 @@ export function ListItemRow({
                 )}
                 {onDelete && (
                     <Button
-                        variant="secondary"
+                        size="sm"
+                        variant="border"
                         icon={<Trash className="size-3.5" />}
                         iconOnly
                         aria-label={deleteLabel}

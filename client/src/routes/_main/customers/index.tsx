@@ -1,17 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import CustomerList from "./-components/customer-list";
-import { PageWidth } from "@/components";
+import CustomerPage from "./-page";
 
 const customerSearchSchema = z.object({
     search: z.string().optional(),
+    sort: z.string().optional(),
 });
 
 export const Route = createFileRoute("/_main/customers/")({
     validateSearch: customerSearchSchema,
-    component: () => (
-        <PageWidth>
-            <CustomerList />
-        </PageWidth>
-    ),
+    component: CustomerPage
 });

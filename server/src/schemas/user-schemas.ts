@@ -1,4 +1,5 @@
-import { z } from "zod";
+import z from "zod";
+
 import { contactPersonSchema } from "./customer-schemas.js";
 
 export const createUserSchema = z.object({

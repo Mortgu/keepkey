@@ -10,6 +10,7 @@ import {
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { useTranslation } from "react-i18next";
 
 interface AddContractsModalProps {
     onClose: () => void;
@@ -30,6 +31,7 @@ export default function AddContractsModal({
     excludeContractIds,
     loading,
 }: AddContractsModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = contracts
@@ -91,8 +93,8 @@ export default function AddContractsModal({
             </ModalDialog.Content>
 
             <ModalDialog.Footer>
-                <Button onClick={onClose} type="button" size="sm" variant="secondary">
-                    Abbrechen
+                <Button onClick={onClose} type="button" size="sm" variant="border">
+                    {t("button.cancel")}
                 </Button>
                 <form.Subscribe
                     selector={(state) => [state.canSubmit, state.isSubmitting]}
@@ -104,7 +106,7 @@ export default function AddContractsModal({
                             size="sm"
                             loading={loading ?? isSubmitting}
                         >
-                            Hinzufügen
+                            {t("button.save")}
                         </Button>
                     )}
                 />

@@ -55,9 +55,10 @@ const navItems = [
 
 export function SettingsSidebar() {
     return (
-        <>
+        <div className="p-3  border-r border-(--border)">
+
             {/* Desktop sidebar */}
-            <aside className="hidden md:flex flex-col gap-1 w-48 shrink-0 pr-2">
+            <aside className="w-64 hidden md:flex flex-col gap-1 shrink-0">
                 {navItems.map((item) => (
                     <SettingsSidebarLink
                         key={item.to}
@@ -81,6 +82,6 @@ export function SettingsSidebar() {
                     />
                 ))}
             </nav>
-        </>
+        </div>
     );
 }

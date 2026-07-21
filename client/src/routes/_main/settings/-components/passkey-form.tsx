@@ -9,6 +9,7 @@ import type { Passkey } from "@better-auth/passkey";
 
 import { Button, FieldInput, Input } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
+import { useTranslation } from "react-i18next";
 
 const passkeyNameSchema = z.object({
     name: z.string().min(1, "Pflichtfeld"),
@@ -141,6 +142,7 @@ type PasskeyRowProps = {
 };
 
 function PasskeyRow({ passkey, editing, onStartEdit, onCancelEdit, onRename, onDelete }: PasskeyRowProps) {
+    const { t } = useTranslation();
     const [name, setName] = useState(passkey.name ?? "");
     const [saving, setSaving] = useState(false);
     const [deleting, setDeleting] = useState(false);
@@ -172,10 +174,10 @@ function PasskeyRow({ passkey, editing, onStartEdit, onCancelEdit, onRename, onD
                     }}
                 />
                 <Button size="xs" onClick={handleSave} loading={saving} disabled={!name.trim()}>
-                    Speichern
+                    {t("button.save")}
                 </Button>
-                <Button size="xs" variant="ghost" onClick={onCancelEdit} disabled={saving}>
-                    Abbrechen
+                <Button size="xs" variant="border" onClick={onCancelEdit} disabled={saving}>
+                    {t("button.cancel")}
                 </Button>
             </li>
         );

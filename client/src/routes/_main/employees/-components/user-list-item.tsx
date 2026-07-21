@@ -3,7 +3,7 @@ import UserModal from "./user-modal";
 
 import type { User } from "@/types";
 import { formatDate } from "@/lib/format";
-import { useModal, useUserHook } from "@/hooks";
+import { useModal, useDeleteUser } from "@/hooks";
 import { ListItemRow } from "@/components";
 
 interface UserListItemProps {
@@ -13,7 +13,7 @@ interface UserListItemProps {
 export default function UserListItem({ user }: UserListItemProps) {
   const modal = useModal<User>();
 
-  const { deleteUser, isDeletingUser } = useUserHook();
+  const { deleteUser, isDeletingUser } = useDeleteUser();
 
   return (
     <Fragment>

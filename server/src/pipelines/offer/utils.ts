@@ -57,7 +57,9 @@ export const customParser = function (tag: string): ParserResult {
 
     return {
         get: (scope: any, context: DXT.ParserContext) => {
-            return expr.get(scope, context);
+            const value = expr.get(scope, context);
+            if (value === undefined || value === null) return "";
+            return value;
         },
     };
 };

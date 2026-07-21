@@ -1,7 +1,7 @@
 import { DocumentStatus, TaskStatus } from "@prisma/client";
 import type { Job } from "bullmq";
-import { prisma } from "../lib/prismaClient.js";
-import logger from "../middlewares/logger.js";
+import { prisma } from "@/lib/prismaClient.js";
+import logger from "@/utils/logger.js";
 import type { TaskJobData } from "./task-queue.js";
 
 export async function markTaskRunning(
@@ -67,16 +67,19 @@ export async function handleTaskFailure(
     error: Error,
 ): Promise<void> {
     if (!job) {
-        logger.error("[task-worker] Failed job is missing.");
+        logger.error('task_worker', { error: 'missing_job' });
         return;
     }
 
     const { taskId } = job.data;
 
     if (job.finishedOn === undefined) {
-        logger.warn(
-            `[task-worker] Task ${taskId} attempt ${job.attemptsMade}/${job.opts.attempts ?? 1} failed and will be retried: ${error.message}`,
-        );
+        logger.warn('task_worker_failed_retry', {
+            taskId,
+            attemptsMade: job.attemptsMade,
+            maxAttempts: job.opts.attempts ?? 1,
+            error: error.message,
+        });
         return;
     }
 

@@ -5,6 +5,7 @@ import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
+import { useTranslation } from "react-i18next";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Pflichtfeld"),
@@ -16,6 +17,7 @@ const passwordSchema = z.object({
 });
 
 export default function PasswordForm() {
+    const { t } = useTranslation();
     const passwordForm = useForm({
         defaultValues: {
             currentPassword: "",
@@ -71,7 +73,7 @@ export default function PasswordForm() {
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (
                             <Button size="xs" disabled={!canSubmit} loading={isSubmitting}>
-                                Speichern
+                                {t("button.save")}
                             </Button>
                         )}
                     />

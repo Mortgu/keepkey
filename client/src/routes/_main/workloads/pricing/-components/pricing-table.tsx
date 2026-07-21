@@ -6,7 +6,7 @@ import AddContractsModal from "./add-contracts-modal";
 import EditProductsModal from "./edit-products-modal";
 import type { TariffGroup } from "@/types";
 import { Button } from "@/components";
-import { useContracts, useLocale, useModal, useProductHook } from "@/hooks";
+import { useContracts, useLocale, useModal, useProducts } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatDate } from "@/lib/format";
 import { useCreateTariff, useDeleteTariffGroup, useUpdateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
@@ -21,7 +21,7 @@ export default function PricingTable({ group }: Props) {
     const { deleteTariffGroup, deleteTariffGroupPending, deleteTariffGroupError } = useDeleteTariffGroup();
     const { createTariff, createTariffPending, createTariffError } = useCreateTariff();
     const { updateTariffGroup, updateTariffGroupPending, updateTariffGroupError } = useUpdateTariffGroup();
-    const { products } = useProductHook();
+    const { products } = useProducts();
     const { contracts } = useContracts();
     const modal = useModal();
     const editModal = useModal();

@@ -4,11 +4,12 @@ import { Pen } from "lucide-react";
 import type { OfferPosition } from "@/types";
 import type { TariffPriceResult } from "@/hooks/tariffs/tariff-api";
 import { Button, Checkbox, Input, Select } from "@/components";
-import { useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
+import { useLocale, useProducts, useTariffDurationsHook } from "@/hooks";
 import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { localized } from "@/lib/i18n-content";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 import { formatEur } from "@/utils/utils";
+import { useTranslation } from "react-i18next";
 
 export type OfferProductInput = Omit<OfferPosition,
   "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
@@ -28,7 +29,8 @@ interface Props {
 const eurToCents = (eur: number): number => Math.round(eur * 100);
 
 export default function OfferProductForm({ currentProduct, customerId, onPersistOverride, onSave, onCancel }: Props) {
-  const { products } = useProductHook();
+  const { t } = useTranslation();
+  const { products } = useProducts();
   const { contracts } = useContracts();
 
   const locale = useLocale();
@@ -225,11 +227,11 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
         <Checkbox label="Optional?" onChange={() => setOptional(!optional)} checked={optional} />
 
         <div className="flex gap-2">
-          <Button type="button" variant="secondary" size="sm" onClick={onCancel}>
-            Abbrechen
+          <Button type="button" variant="border" size="sm" onClick={onCancel}>
+            {t("button.cancel")}
           </Button>
           <Button type="button" size="sm" onClick={handleSave}>
-            Hinzufügen
+            {t("button.save")}
           </Button>
         </div>
       </div>

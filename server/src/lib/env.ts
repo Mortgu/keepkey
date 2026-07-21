@@ -22,6 +22,7 @@ const env = createEnv({
 
         PORT: z.coerce.number(),
         NODE_ENV: z.enum(["development", "production", "test"]),
+        LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error"]).default("info"),
 
         NEXTCLOUD_URL: z.string().url().optional(),
         NEXTCLOUD_USER: z.string().optional(),

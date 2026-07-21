@@ -4,12 +4,12 @@ import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 
 import type { User } from "@/types";
-import { useModal, useUserHook } from "@/hooks";
+import { useModal, useUsers } from "@/hooks";
 import { ListPage, SearchBar } from "@/components";
 
 export default function EmployeeList() {
   const { t } = useTranslation();
-  const { users, isPending, error } = useUserHook();
+  const { users, isPending, error } = useUsers();
   const modal = useModal<User>();
 
   const [searchInput, setSearchInput] = useState<string>("");

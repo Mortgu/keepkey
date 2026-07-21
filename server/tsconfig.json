@@ -11,6 +11,14 @@
     "declaration": false,
     "declarationMap": false,
     "sourceMap": true,
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@@/*": [
+        "./*"
+      ]
+    }
   },
   "include": [
     "src"

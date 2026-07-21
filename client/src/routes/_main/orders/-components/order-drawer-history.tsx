@@ -1,11 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import type { Order, OrderRevision } from "@/types";
 import { Button, Drawer } from "@/components";
-import { getOrderRevisionsAction } from "@/data/orders";
-import { useOrderHook } from "@/hooks";
+import { useOrderRevisions, useRestoreOrderRevision } from "@/hooks";
 import { formatDate } from "@/lib/format";
 
 type Props = {
@@ -16,17 +14,13 @@ type Props = {
 
 export default function OrderDrawerHistory({ open, onClose, order }: Props) {
   const { t } = useTranslation();
-  const { data: revisions = [], isPending, error } = useQuery({
-    queryKey: ["orders", order.id, "revisions"],
-    queryFn: () => getOrderRevisionsAction(order.id),
-    enabled: open,
-  });
+  const { data: revisions = [], isPending, error } = useOrderRevisions(order.id);
   const {
     restoreOrderRevision,
     isRestoringRevision,
     restoringRevisionId,
     errorRestoringRevision,
-  } = useOrderHook();
+  } = useRestoreOrderRevision();
 
   useEffect(() => {
     if (errorRestoringRevision) toast.error(errorRestoringRevision.message);
