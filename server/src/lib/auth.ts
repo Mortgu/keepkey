@@ -1,6 +1,6 @@
+import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
-import { passkey } from "@better-auth/passkey";
 
 import env from "./env.js";
 import { prisma } from "./prismaClient.js";
@@ -13,6 +13,9 @@ export const auth = betterAuth({
             secure: true,
             httpOnly: true,
             sameSite: "none",
+        },
+        ipAddress: {
+            ipAddressHeaders: ["x-forwarded-for", "x-real-ip"],
         },
     },
     database: prismaAdapter(prisma, {

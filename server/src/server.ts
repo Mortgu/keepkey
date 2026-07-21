@@ -1,26 +1,29 @@
 import "dotenv/config";
 
-import express, { type Express } from "express";
 import { toNodeHandler } from "better-auth/node";
-import { auth } from "./lib/auth.js";
 import cors from "cors";
+import express, { type Express } from "express";
+import { auth } from "./lib/auth.js";
 
-import router from "./routes/router.js";
 import { exceptionHandler } from "./middlewares/exception.middleware.js";
+import router from "./routes/router.js";
 
 import path from "path";
 import env from "./lib/env.js";
 
+import { initDocumentArtifactStore } from "./lib/document-artifact-store.js";
+import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
 import morganMiddleware from "./middlewares/morgan.middleware.js";
 import { requestIdMiddleware } from "./middlewares/request.middleware.js";
-import registerTaskWorker from "./workers/task-worker.js";
-import { getNextcloudInitError, initNextcloud } from "./lib/nextcloud.js";
-import { initDocumentArtifactStore } from "./lib/document-artifact-store.js";
 import logger from "./utils/logger.js";
+import registerTaskWorker from "./workers/task-worker.js";
 
 const app: Express = express();
 
+app.set('trust proxy', true);
+
 app.use(requestIdMiddleware);
+
 app.use(morganMiddleware);
 
 app.use(
