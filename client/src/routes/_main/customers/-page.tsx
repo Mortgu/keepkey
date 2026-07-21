@@ -24,7 +24,7 @@ export default function CustomerPage({ }) {
     return (
         <PageWidth variant="none">
 
-            <div className="p-4 border-b border-(--border)">
+            <div className="p-4 border-b border-(--border) ">
                 <h1 className="text-lg font-semibold">{t("section.customers")}</h1>
                 <div className="flex items-center gap-1 text-sm font-light text-(--text-secondary)">
                     <a>dashboard</a>

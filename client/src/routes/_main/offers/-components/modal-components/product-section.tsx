@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import OfferProductForm from "./offer-product-form";
 import ProductSectionItem from "./product-section-item";
 import type { OfferProductInput } from "./offer-product-form";
-import { useProductHook } from "@/hooks";
+import { useProducts } from "@/hooks";
 import { Button, Checkbox } from "@/components";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 
@@ -35,7 +35,7 @@ export default function ProductModalSection({
     const [showForm, setShowForm] = useState<boolean>(false);
     const { t } = useTranslation();
 
-    const { products } = useProductHook();
+    const { products } = useProducts();
     const { contracts } = useContracts();
 
     const productMap = useMemo(

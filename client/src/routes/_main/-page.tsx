@@ -3,7 +3,7 @@ import GlobalSearch from "./-components/global-search";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@/data/integrations";
 import { PageWidth, RouteError } from "@/components";
-import { useIntegrationStatus } from "@/hooks/use-integration-status";
+import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
 import StatCard from "./-components/stat-card";
 import { useTranslation } from "react-i18next";

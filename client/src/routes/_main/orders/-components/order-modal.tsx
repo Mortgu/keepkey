@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Offer } from "@/types";
 import { getFormError } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
-import { useOrderHook } from "@/hooks";
+import { useCreateOrder, useNextOrderNumber } from "@/hooks";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
@@ -30,7 +30,8 @@ function toInputDate(date: Date): string {
 export default function OrderModal({ onClose }: OrderModalProps) {
   const { t } = useTranslation();
   const { items: offers } = useOffers();
-  const { createOrder, nextOrderNumber } = useOrderHook();
+  const { createOrder } = useCreateOrder();
+  const { nextOrderNumber } = useNextOrderNumber();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
   const form = useForm({

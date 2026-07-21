@@ -4,8 +4,8 @@ import { Download, Plus, RotateCcw, Trash } from "lucide-react";
 
 import type { CloudFile } from "@/types/cloud.ts";
 import { Badge, Button, ModalDialog } from "@/components";
-import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud-hook.ts";
-import { templateDownloadUrl } from "@/data/nextcloud";
+import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud/nextcloud-hooks";
+import { templateDownloadUrl } from "@/hooks/nextcloud/nextcloud-api";
 import { formatBytesToKB } from "@/lib/utils";
 import { useTranslation } from "react-i18next";
 

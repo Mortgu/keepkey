@@ -2,7 +2,7 @@ import {z} from "zod";
 import {useForm} from "@tanstack/react-form";
 
 import type {User} from "@/types";
-import {useUserHook} from "@/hooks";
+import {useUserManager} from "@/hooks";
 import {FieldInput, FormModal} from "@/components";
 
 interface UserModalProps {
@@ -35,7 +35,7 @@ const emptyUser = {
 export default function UserModal({onClose, currentUser}: UserModalProps) {
     const isEdit = currentUser !== null;
 
-    const {updateUser, createUser} = useUserHook();
+    const {updateUser, createUser} = useUserManager();
 
     const userForm = useForm({
         defaultValues: currentUser ? {

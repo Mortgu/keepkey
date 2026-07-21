@@ -3,7 +3,7 @@ import { LoaderCircle, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import ProductList from './-components/product-list';
 import { Button, PageWidth, SearchBar } from "@/components";
-import { useLocale, useModal, useProductHook } from "@/hooks";
+import { useLocale, useModal, useProductManager } from "@/hooks";
 import ProductModal from "@/routes/_main/workloads/-components/product-modal.tsx";
 import { localized } from "@/lib/i18n-content";
 
@@ -14,7 +14,7 @@ export default function ProductPage() {
         isPending,
 
         createProduct,
-    } = useProductHook();
+    } = useProductManager();
 
     const modal = useModal();
     const locale = useLocale();

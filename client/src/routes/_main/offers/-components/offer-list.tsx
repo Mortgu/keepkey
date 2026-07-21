@@ -9,7 +9,7 @@ import type { Offer } from "@/types";
 import { Button, FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useContacts, useContracts, useCustomers, useLocale, useModal, useProductHook, useSupplierHook, useUserHook } from "@/hooks";
+import { useContacts, useContracts, useCustomers, useLocale, useModal, useProducts, useSuppliers, useUsers } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 
 export default function OfferList() {
@@ -21,9 +21,9 @@ export default function OfferList() {
 
   const { contacts } = useContacts();
   const { customers } = useCustomers();
-  const { suppliers } = useSupplierHook();
-  const { users } = useUserHook();
-  const { products } = useProductHook();
+  const { suppliers } = useSuppliers();
+  const { users } = useUsers();
+  const { products } = useProducts();
   const { contracts } = useContracts();
 
   const locale = useLocale();

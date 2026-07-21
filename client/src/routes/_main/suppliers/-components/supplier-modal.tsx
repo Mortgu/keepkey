@@ -2,7 +2,7 @@ import { useForm } from "@tanstack/react-form";
 import { z } from 'zod';
 import type { Supplier } from "@/types";
 import { FieldInput, FormModal } from "@/components";
-import { useSupplierHook } from "@/hooks";
+import { useSupplierManager } from "@/hooks";
 
 interface SupplierModalProps {
     onClose: () => void;
@@ -21,8 +21,8 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
         createSupplier,
         errorCreatingSupplier,
         updateSupplier,
-        errorUpdateingSupplier,
-    } = useSupplierHook();
+        errorUpdatingSupplier,
+    } = useSupplierManager();
 
     const supplierForm = useForm({
         defaultValues: {
@@ -37,7 +37,7 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
             if (isEdit) updateSupplier({ id: currentSupplier.id, supplier: value })
             else createSupplier(value);
 
-            if (!errorCreatingSupplier && !errorUpdateingSupplier) {
+            if (!errorCreatingSupplier && !errorUpdatingSupplier) {
                 onClose();
             }
         }
@@ -51,9 +51,9 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
             formId="supplier-form"
             formClassName=""
             error={
-                (errorCreatingSupplier || errorUpdateingSupplier) ? (
+                (errorCreatingSupplier || errorUpdatingSupplier) ? (
                     <p className="text-sm text-(--destructive) mb-2">
-                        {errorCreatingSupplier?.message || errorUpdateingSupplier?.message}
+                        {errorCreatingSupplier?.message || errorUpdatingSupplier?.message}
                     </p>
                 ) : null
             }

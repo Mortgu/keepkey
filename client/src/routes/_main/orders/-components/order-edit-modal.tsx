@@ -2,16 +2,16 @@ import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import type { Order } from "@/types";
-import type { UpdateOrderInput } from "@/data/orders";
+import type { UpdateOrderInput } from "@/hooks/orders/order-api";
 import {
   useContracts,
   useCustomerContacts,
   useCustomers,
-  useFlatRateHook,
-  useOrderHook,
-  useProductHook,
-  useSupplierHook,
-  useUserHook,
+  useFlatRates,
+  useOrderManager,
+  useProducts,
+  useSuppliers,
+  useUsers,
 } from "@/hooks";
 import { Button, Input, ModalDialog, Select, Textarea } from "@/components";
 import { useTranslation } from "react-i18next";
@@ -30,13 +30,13 @@ const optionLabel = (translations: Array<{ name: string }>) => translations[0]?.
 export default function OrderEditModal({ order, onClose }: Props) {
   const { t } = useTranslation();
   const [expectedVersion] = useState(order.version);
-  const { updateOrder, isUpdatingOrder } = useOrderHook();
+  const { updateOrder, isUpdatingOrder } = useOrderManager();
   const { customers } = useCustomers();
-  const { suppliers } = useSupplierHook();
-  const { users } = useUserHook();
-  const { products } = useProductHook();
+  const { suppliers } = useSuppliers();
+  const { users } = useUsers();
+  const { products } = useProducts();
   const { contracts } = useContracts();
-  const { flatRates: availableFlatRates } = useFlatRateHook();
+  const { flatRates: availableFlatRates } = useFlatRates();
 
   const [fields, setFields] = useState({
     supplierId: order.supplierId ?? "",

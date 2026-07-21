@@ -1,16 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import type {IntegrationStatusResponse} from "@/data/integrations";
-import {  getIntegrationStatusAction } from "@/data/integrations";
+import type { IntegrationStatusResponse } from "@/data/integrations";
+import { getIntegrationStatus } from "./integration-api";
+import { integrationKeys } from "./integration-keys";
 
-export const integrationKeys = {
-    all: ["integrations"] as const,
-    status: () => [...integrationKeys.all, "status"] as const,
-};
-
-export const useIntegrationStatus = () => {
+export function useIntegrationStatus() {
     const query = useQuery<IntegrationStatusResponse>({
         queryKey: integrationKeys.status(),
-        queryFn: getIntegrationStatusAction,
+        queryFn: getIntegrationStatus,
         staleTime: 30_000,
         refetchOnWindowFocus: false,
     });
@@ -22,4 +18,4 @@ export const useIntegrationStatus = () => {
         error: query.error,
         refetch: query.refetch,
     };
-};
+}

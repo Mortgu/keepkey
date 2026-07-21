@@ -3,11 +3,12 @@ import { Pen, Trash } from "lucide-react";
 import ProductModal from "./product-modal";
 import type { Product } from "@/types";
 import { Button } from "@/components";
-import { useLocale, useModal, useProductHook } from "@/hooks";
+import { useLocale, useModal, useDeleteProduct, useUpdateProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 export default function ProductItem({ product }: { product: Product }) {
-  const { deleteProduct, updateProduct, isDeletingProduct } = useProductHook();
+  const { deleteProduct, isDeletingProduct } = useDeleteProduct();
+  const { updateProduct } = useUpdateProduct();
   const modal = useModal<Product>();
   const locale = useLocale();
 

@@ -1,5 +1,5 @@
 import { Button } from "@/components";
-import { useFlatRateHook, useLocale } from "@/hooks";
+import { useFlatRates, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 import { Plus, Trash, X } from "lucide-react";
@@ -15,7 +15,7 @@ type Props = {
 
 export default function FlatRateModalSection({ offerFlatRates, onAdd, onRemove }: Props) {
     const [showForm, setShowForm] = useState(false);
-    const { flatRates } = useFlatRateHook();
+    const { flatRates } = useFlatRates();
     const locale = useLocale();
 
     return (

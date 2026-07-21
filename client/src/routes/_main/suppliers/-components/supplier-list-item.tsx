@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import SupplierModal from "./supplier-modal";
 import type { Supplier } from "@/types";
-import { useModal, useSupplierHook } from "@/hooks";
+import { useModal, useDeleteSupplier } from "@/hooks";
 import { Badge, Button } from "@/components";
 import { Pen, Trash } from "lucide-react";
 
@@ -12,7 +12,7 @@ type Props = {
 export default function SupplierListItem({ supplier }: Props) {
     const modal = useModal<Supplier>();
 
-    const { deleteSupplier, isDeletingSupplier } = useSupplierHook();
+    const { deleteSupplier, isDeletingSupplier } = useDeleteSupplier();
 
     const handleDeleteSupplier = () => {
         if (confirm("Bist du dir sicher?")) {

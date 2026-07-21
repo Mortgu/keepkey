@@ -9,7 +9,7 @@ import OrderCardProduct from "./order-card-product";
 import type { Order, OrderDocument } from "@/types";
 import { formatEur } from "@/utils/utils";
 import { formatDate } from "@/lib/format";
-import { useOrderHook } from "@/hooks";
+import { useDeleteOrder, useGenerateOrderDocument } from "@/hooks";
 import { Button, Collapsable } from "@/components";
 
 type Props = {
@@ -30,9 +30,12 @@ export default function OrderCard({ order }: Props) {
     const {
         deleteOrder,
         errorDeletingOrder,
+    } = useDeleteOrder();
+
+    const {
         generateDocument,
         isGeneratingDocument,
-    } = useOrderHook();
+    } = useGenerateOrderDocument();
 
     useEffect(() => {
         if (errorDeletingOrder) {

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
-import { useOffers } from "./offers/offer-hooks";
-import { useOrderHook } from "./order-hook";
+import { useOffers } from "@/hooks/offers/offer-hooks";
+import { useOrders } from "@/hooks/orders/order-hooks";
 
 export type DashboardStats = {
     offers: {
@@ -13,9 +13,9 @@ export type DashboardStats = {
     },
 };
 
-export const useDashboardStats = () => {
+export function useDashboardStats() {
     const { items: offers } = useOffers();
-    const { orders, isPending: ordersPending } = useOrderHook();
+    const { orders, isPending: ordersPending } = useOrders();
 
     const stats = useMemo<DashboardStats>(() => {
         const openOffers = offers.filter((offer) => !offer.orders);
@@ -28,10 +28,7 @@ export const useDashboardStats = () => {
         const orderVolumeCents = orders.reduce(
             (sum, order) => sum + order.net_amount,
             0,
-        )
-
-        const conversionRate =
-            offers.length > 0 ? orders.length / offers.length : 0;
+        );
 
         return {
             offers: {
@@ -46,4 +43,4 @@ export const useDashboardStats = () => {
     }, [offers, orders]);
 
     return { stats, isPending: ordersPending };
-};
+}

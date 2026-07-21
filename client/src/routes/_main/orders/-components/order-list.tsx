@@ -5,7 +5,7 @@ import { useTranslation } from "react-i18next";
 import OrderCard from "./card/order-card";
 import OrderModal from "./order-modal";
 import type { Customer, Order } from "@/types";
-import { useCustomers, useModal, useOrderHook } from "@/hooks";
+import { useCustomers, useModal, useOrders } from "@/hooks";
 
 import { Button, FilterChip, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
@@ -27,7 +27,7 @@ export default function OrderList() {
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter] = useState<Array<string>>([]);
 
-    const { orders } = useOrderHook();
+    const { orders } = useOrders();
     const { customers } = useCustomers();
 
     const customerFilterOptions = useMemo(() =>

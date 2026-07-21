@@ -4,7 +4,7 @@ import { Pen } from "lucide-react";
 import type { OfferPosition } from "@/types";
 import type { TariffPriceResult } from "@/hooks/tariffs/tariff-api";
 import { Button, Checkbox, Input, Select } from "@/components";
-import { useLocale, useProductHook, useTariffDurationsHook } from "@/hooks";
+import { useLocale, useProducts, useTariffDurationsHook } from "@/hooks";
 import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { localized } from "@/lib/i18n-content";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
@@ -30,7 +30,7 @@ const eurToCents = (eur: number): number => Math.round(eur * 100);
 
 export default function OfferProductForm({ currentProduct, customerId, onPersistOverride, onSave, onCancel }: Props) {
   const { t } = useTranslation();
-  const { products } = useProductHook();
+  const { products } = useProducts();
   const { contracts } = useContracts();
 
   const locale = useLocale();
