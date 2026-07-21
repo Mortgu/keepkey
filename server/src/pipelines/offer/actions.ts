@@ -8,7 +8,8 @@ import { offerSchema } from "@/schemas/templates/offer-template-schema.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import logger from "@/utils/logger.js";
-import { formatCentsToEur } from "@/utils/utils.js";
+import { calculatePrice } from "@/utils/products.js";
+import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
@@ -65,199 +66,203 @@ export const fetchOfferAction = async (context: OfferPipelineContext) => {
 
 /* Helper function */
 export const formatOfferData = async (fetchedData: OfferFetchData): Promise<OfferTemplate> => {
+    const { offer, contracts } = fetchedData;
+    const language = offer.language;
+    const customerId = offer.customerId;
+
+    const products = offer.offerPositions.map(pos => {
+        const productT = pickTranslation(pos.product.translations, language)!;
+        const contractT = pickTranslation(pos.contract.translations, language)!;
+        const discountTotal = pos.free_months * pos.eur_user_month * pos.quantity;
+
+        return {
+            name: productT.name,
+            description: productT.description ?? "",
+            content: productT.table ?? "",
+            quantity: String(pos.quantity),
+            eur_user_month: formatCentsToEur(pos.eur_user_month),
+            duration: `${pos.duration_months} Monate`,
+            total: formatCentsToEur(pos.total_cents),
+            contract: contractT.name,
+            optional: pos.optional ?? false,
+            discount: {
+                free_months: pos.free_months,
+                valid_until: formatDate(offer.validUntil),
+                total: formatCentsToEur(discountTotal),
+            },
+        };
+    });
+
+    const groupMap = new Map<string, typeof offer.offerPositions>();
+    for (const pos of offer.offerPositions) {
+        const key = `${pos.contractId}_${pos.duration_months}`;
+        if (!groupMap.has(key)) groupMap.set(key, []);
+        groupMap.get(key)!.push(pos);
+    }
+
+    const originalContractIds = new Set(offer.offerPositions.map(p => p.contractId));
+    const otherContracts = contracts.filter(c => !originalContractIds.has(c.id));
+
+    const groups: OfferTemplate["groups"] = [];
+
+    for (const [, positions] of groupMap) {
+        const firstPos = positions[0];
+        const contractT = pickTranslation(firstPos.contract.translations, language)!;
+        const productNames = positions
+            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+            .join(" & ");
+
+        groups.push({
+            names: productNames,
+            contract: contractT.name,
+            features: contractT.features,
+            _duration: firstPos.duration_months,
+            duration: `${firstPos.duration_months} Monate`,
+        });
+
+        if (offer.featureComparison) {
+            for (const otherContract of otherContracts) {
+                const otherContractT = pickTranslation(otherContract.translations, language)!;
+                groups.push({
+                    names: productNames,
+                    contract: otherContractT.name,
+                    features: otherContractT.features,
+                    _duration: firstPos.duration_months,
+                    duration: `${firstPos.duration_months} Monate`,
+                });
+            }
+        }
+    }
+
+    const flatrates = offer.offerFlatRates.map(fr => {
+        const frT = pickTranslation(fr.flatRate.translations, language)!;
+        return {
+            name: frT.name,
+            content: frT.table,
+            total: formatCentsToEur(fr.total_cents),
+        };
+    });
+    const flatratesTotal = offer.offerFlatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
+
+    const tables: OfferTemplate["tables"] = [];
+
+    const buildTableForContract = async (
+        contractId: string,
+        productNames: string,
+        positions: typeof offer.offerPositions,
+    ) => {
+        const items: OfferTemplate["products"] = [];
+        let itemsTotalCents = 0;
+
+        for (const pos of positions) {
+            const productT = pickTranslation(pos.product.translations, language)!;
+            const contractT = pickTranslation(
+                contracts.find(c => c.id === contractId)!.translations,
+                language,
+            )!;
+
+            const priceResult = await calculatePrice({
+                productId: pos.productId,
+                contractId,
+                duration: pos.duration_months,
+                quantity: pos.quantity,
+                customerId,
+                freeMonths: pos.free_months,
+            });
+
+            const totalCents = priceResult.ok ? priceResult.price : 0;
+            const unitPrice = priceResult.ok ? priceResult.breakdown.unitPrice : 0;
+            const discountCents = pos.free_months * unitPrice * pos.quantity;
+
+            itemsTotalCents += totalCents;
+
+            items.push({
+                name: productT.name,
+                description: productT.description ?? "",
+                content: productT.table ?? "",
+                quantity: String(pos.quantity),
+                eur_user_month: formatCentsToEur(unitPrice),
+                duration: String(pos.duration_months),
+                total: formatCentsToEur(totalCents),
+                contract: contractT.name,
+                optional: pos.optional ?? false,
+                discount: {
+                    free_months: pos.free_months,
+                    valid_until: formatDate(offer.validUntil),
+                    total: formatCentsToEur(discountCents),
+                },
+            });
+        }
+
+        const tableTotalCents = itemsTotalCents + flatratesTotal;
+
+        return {
+            products: productNames,
+            items,
+            flatrates,
+            total: formatCentsToEur(tableTotalCents),
+        };
+    };
+
+    for (const [, positions] of groupMap) {
+        const firstPos = positions[0];
+        const productNames = positions
+            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+            .join(" & ");
+
+        tables.push(
+            await buildTableForContract(firstPos.contractId, productNames, positions),
+        );
+
+        if (offer.featureComparison) {
+            for (const otherContract of otherContracts) {
+                tables.push(
+                    await buildTableForContract(otherContract.id, productNames, positions),
+                );
+            }
+        }
+    }
+
+    const cp = offer.customerContactPerson;
+    const customer = offer.customer;
+    const employee = offer.user;
+
     return {
-        quoteId: "offer.quoteId",
-        date: "formatDate(offer.date)",
-        paymentTerm: "offer.paymentTerm",
-        validUntil: "formatDate(offer.validUntil)",
-        requestFrom: "formatDate(offer.requestFrom)",
-        supplierId: "offer.supplierId",
-        compare: true,
+        quoteId: offer.quoteId,
+        date: formatDate(offer.date),
+        paymentTerm: offer.paymentTerm,
+        validUntil: formatDate(offer.validUntil),
+        requestFrom: formatDate(offer.requestFrom),
+        supplierId: offer.supplierId ?? null,
+        compare: offer.featureComparison,
 
         customer: {
-            id: "customer.customerId",
-            companyName: "customer.companyName",
-            street: "customer.street",
-            zip: "customer.zip",
-            city: "customer.city",
-
-            fullName: "`${cp.salutation} ${cp.firstName} ${cp.lastName}`",
-            salutation: "cp.salutation",
-            firstName: "cp.firstName",
-            lastName: "cp.lastName",
-
-            phone: "customer.phone",
-            email: "cp.email",
+            id: customer.customerId,
+            companyName: customer.companyName,
+            street: customer.street,
+            zip: customer.zip,
+            city: customer.city,
+            fullName: `${cp.salutation ?? ""} ${cp.firstName} ${cp.lastName}`.trim(),
+            salutation: cp.salutation,
+            firstName: cp.firstName,
+            lastName: cp.lastName,
+            phone: customer.phone,
+            email: cp.email,
         },
 
         employee: {
-            fullName: "`${employee.salutation} ${employee.firstName} ${employee.lastName}`",
-            salutation: "employee.salutation",
-            firstName: "employee.firstName",
-            lastName: "employee.lastName",
-            phone: "employee.phone",
-            email: "employee.email",
+            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            salutation: employee.salutation,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            phone: employee.phone ?? "",
+            email: employee.email,
         },
 
-        products: [
-            {
-                name: "Microsoft 365",
-                description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                quantity: "2600",
-                eur_user_month: formatCentsToEur(168),
-                duration: "12 Monate",
-                total: formatCentsToEur(5241600),
-                contract: "Enterprise Unlimited",
-                optional: false,
-                discount: {
-                    free_months: 3,
-                    valid_until: null,
-                    total: formatCentsToEur(-1310400)
-                }
-            },
-            {
-                name: "EntraID Advanced",
-                description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                quantity: "2600",
-                eur_user_month: formatCentsToEur(168),
-                duration: "12 Monate",
-                total: formatCentsToEur(5241600),
-                contract: "Enterprise Unlimited",
-                optional: false,
-                discount: {
-                    free_months: 3,
-                    valid_until: null,
-                    total: formatCentsToEur(-1310400)
-                }
-            }
-        ],
-
-        groups: [
-            // Orginal Eingabe mit contract = "Enterprise Unlimited"
-            {
-                names: "Microsoft 365 & Entra ID Advanced",
-                contract: "Enterprise Unlimited",
-                features: [
-                    "Datenaufbewahrung / max. Retention: unlimitiert (>99 Jahre)",
-                    "API-Unterstützung für Integration von Drittanbietern",
-                    "Individuelles RBAC (individuelle Anpassung von Rollen & Rechten)",
-                    "24*7 Support über Telefon, Chat & eMail",
-                    "Persönlicher Customer Success Manager"
-                ],
-                _duration: 12,
-                duration: "12 Monate",
-            },
-            // Nur wenn compare=true => Gleiche Konfiguration nur anderer contract
-            {
-                names: "Microsoft 365 & Entra ID Advanced",
-                contract: "Business Essentials",
-                features: [
-                    "Datenaufbewahrung / max. Retention: 1 Jahr",
-                    "9*5 Support (Business Hours) über Chat & eMail",
-                ],
-                _duration: 12,
-                duration: "12 Monate",
-            }
-        ],
-
-        tables: [
-            // Tabelle mit Orginal Eingaben (Contract = "Enterprise Unlimited")
-            // und den korrekten Preisen für product+contract+duration+quantity
-            {
-                products: "Microsoft 365 & Entra ID Advanced",
-                items: [
-                    {
-                        name: "Microsoft 365",
-                        description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                        content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                        quantity: "2600",
-                        eur_user_month: formatCentsToEur(168),
-                        duration: "12",
-                        total: formatCentsToEur(5241600),
-                        contract: "Enterprise Unlimited",
-                        optional: false,
-                        discount: {
-                            free_months: 3,
-                            valid_until: null,
-                            total: formatCentsToEur(-1310400)
-                        }
-                    },
-                    {
-                        name: "EntraID Advanced",
-                        description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                        content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                        quantity: "2600",
-                        eur_user_month: formatCentsToEur(90),
-                        duration: "12",
-                        total: formatCentsToEur(2808000),
-                        contract: "Enterprise Unlimited",
-                        optional: false,
-                        discount: {
-                            free_months: 3,
-                            valid_until: null,
-                            total: formatCentsToEur(-702000)
-                        }
-                    }
-                ],
-                flatrates: [
-                    {
-                        name: "Einrichtung",
-                        content: "...",
-                        total: formatCentsToEur(30000),
-                    }
-                ],
-                total: formatCentsToEur(6067200),
-            },
-            // Tabelle für wenn compare=true mit dem anderen Vertrag und den anderen Preisen
-            {
-                products: "Microsoft 365 & Entra ID Advanced",
-                items: [
-                    {
-                        name: "Microsoft 365",
-                        description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                        content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                        quantity: "2600",
-                        eur_user_month: formatCentsToEur(144),
-                        duration: "12",
-                        total: formatCentsToEur(4492800),
-                        contract: "Business Essentials",
-                        optional: false,
-                        discount: {
-                            free_months: 3,
-                            valid_until: null,
-                            total: formatCentsToEur(-1123200)
-                        }
-                    },
-                    {
-                        name: "EntraID Advanced",
-                        description: "Der Keepit Backup Service beinhaltet in jedem Fall sämtliche Kosten und Aufwände für Backup & Recovery der kompletten Microsoft M365 Umgebung. Dies umschließt alle Komponenten (Exchange, Teams, OneDrive, SharePoint, Teams-Chats).",
-                        content: `Sicherung von „Microsoft 365" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`,
-                        quantity: "2600",
-                        eur_user_month: formatCentsToEur(74),
-                        duration: "12",
-                        total: formatCentsToEur(2308800),
-                        contract: "Business Essentials",
-                        optional: false,
-                        discount: {
-                            free_months: 3,
-                            valid_until: null,
-                            total: formatCentsToEur(-577200)
-                        }
-                    }
-                ],
-                flatrates: [
-                    {
-                        name: "Einrichtung",
-                        content: "...",
-                        total: formatCentsToEur(30000),
-                    }
-                ],
-                total: formatCentsToEur(5131200),
-            },
-        ],
-    }
+        products,
+        groups,
+        tables,
+    };
 }
 
 /* Stage function */
@@ -291,6 +296,8 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
         formatedData as Record<string, unknown>,
         formatedData as Record<string, unknown>,
     ) as unknown as OfferTemplate;
+
+    console.dir(context, { depth: null })
 }
 
 /* Drift detection: compare template tags against the offer schema. */
