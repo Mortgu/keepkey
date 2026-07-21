@@ -4,7 +4,6 @@ import fs from "fs/promises";
 import PizZip from "pizzip";
 
 import { prisma } from "@/lib/prismaClient.js";
-import { offerSchema } from "@/schemas/templates/offer-template-schema.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import logger from "@/utils/logger.js";
@@ -227,6 +226,10 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const customer = offer.customer;
     const employee = offer.user;
 
+    const productNames = offer.offerPositions
+        .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+        .join(" & ");
+
     return {
         quoteId: offer.quoteId,
         date: formatDate(offer.date),
@@ -259,6 +262,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             email: employee.email,
         },
 
+        product_names: productNames,
         products,
         groups,
         tables,
@@ -296,8 +300,6 @@ export const postProcessingAction = async (context: OfferPipelineContext) => {
         formatedData as Record<string, unknown>,
         formatedData as Record<string, unknown>,
     ) as unknown as OfferTemplate;
-
-    console.dir(context, { depth: null })
 }
 
 /* Drift detection: compare template tags against the offer schema. */
@@ -353,7 +355,8 @@ export async function generateAction(context: OfferPipelineContext) {
 
     const tags = iModule.getAllTags();
     const templatePaths = flattenTags(tags as Record<string, unknown>);
-    const schemaPaths = flattenSchema(offerSchema);
+
+    const schemaPaths = flattenSchema(offerTemplateSchema);
     const uncovered = templatePaths.filter((t) => !schemaPaths.includes(t));
     if (uncovered.length > 0) {
         logger.warn(

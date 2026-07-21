@@ -1,14 +1,31 @@
 import './index.css';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 
-// Import the generated route tree
 import { routeTree } from './routeTree.gen'
 import {authClient} from "@/lib/auth-client.ts";
+import { showToast } from "@/components/toast/toast";
 
-// Create a new router instance
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 30_000,
+            gcTime: 5 * 60_000,
+            retry: 1,
+            refetchOnWindowFocus: false,
+        },
+        mutations: {
+            onError: (error) => {
+                const message = error instanceof Error ? error.message : undefined;
+                showToast.error("common.errorGeneric", { message });
+            },
+        },
+    },
+});
+
 const router = createRouter({
   routeTree,
   context: {
@@ -16,20 +33,20 @@ const router = createRouter({
   }
 })
 
-// Register the router instance for type safety
 declare module '@tanstack/react-router' {
   interface Register {
     router: typeof router
   }
 }
 
-// Render the app
 const rootElement = document.getElementById('root')!
 if (!rootElement.innerHTML) {
   const root = ReactDOM.createRoot(rootElement)
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+      </QueryClientProvider>
     </StrictMode>,
   )
 }

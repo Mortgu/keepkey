@@ -65,6 +65,8 @@ export const offerTemplateSchema = z.object({
         email: z.string().nullish().transform(v => (v === undefined ? null : v)),
     }),
 
+    product_names: z.string(),
+
     products: z.array(offerTemplateProductItemSchema),
 
     groups: z.array(offerTemplateProductGroupSchema),
