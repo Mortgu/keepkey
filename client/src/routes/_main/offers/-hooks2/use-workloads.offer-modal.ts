@@ -1,7 +1,7 @@
 import type { Offer } from "@/types";
 import { useState } from "react";
 import type { OfferProductInput } from "../-components/modal-components/offer-product-form";
-import useOfferPricing from "../-hooks/use-offer-pricing";
+import useOfferPricing from "../-hooks/mutations/pricing.mutations";
 
 interface Props {
     currentOffer?: Offer;

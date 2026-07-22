@@ -30,7 +30,19 @@
   },
   "offerModal": {
     "compare": "Compare?",
-    "add_workload": "add Workload"
+    "add_workload": "add Workload",
+    "quantity": "Quantity",
+    "free_months": "Free months",
+    "unit_price": "Unit price",
+    "customer": "Customer",
+    "employee": "Our Employee",
+    "contact": "Your Contact",
+    "quoteId": "Quote id",
+    "supplierId": "Supplier",
+    "paymentTerm": "Payment term",
+    "validUntil": "Valid until",
+    "requestFrom": "Angebot vom",
+    "language": "Sprache"
   },
   "offers": {
     "toast": {
@@ -66,7 +78,8 @@
     "noResults": "No results",
     "errorTitle": "Something went wrong",
     "errorRetry": "Try again",
-    "errorGeneric": "An unexpected error occurred."
+    "errorGeneric": "An unexpected error occurred.",
+    "months": "months"
   },
   "dashboard": {
     "recentOffers": "Recent offers",

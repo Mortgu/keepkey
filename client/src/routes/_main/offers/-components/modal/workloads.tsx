@@ -3,8 +3,11 @@ import type { Offer } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import useCompareOfferModal from "../../-hooks2/use-compare.offer-modal";
-import OfferProductForm from "../modal-components/offer-product-form";
+import WorkloadFormOfferModal from "./workload-form";
+import useOfferModal from "../../-hooks2/use-offer.offer-modal";
+import useWorkloadOfferModal from "../../-hooks2/use-workloads.offer-modal";
+import { useLocale } from "@/hooks";
+import WorkloadItemOfferModal from "./workload-item";
 
 interface Props {
     customerId: string;
@@ -13,6 +16,7 @@ interface Props {
 
 export default function WorkloadOfferModalSection({ customerId, currentOffer }: Props) {
     const { t } = useTranslation();
+    const locale = useLocale();
 
     const {
         compare,
@@ -20,9 +24,11 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
         compareOptions,
         toCompare,
         setToCompare
-    } = useCompareOfferModal({ currentOffer: currentOffer });
+    } = useOfferModal({ currentOffer });
 
-    const [addWorkload, setAddWorkload] = useState<boolean>(false);
+    const { offerPositions, addWorkload } = useWorkloadOfferModal({ currentOffer, customerId });
+
+    const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 
 
     return (
@@ -39,7 +45,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
                     <Checkbox label={t("offerModal.compare")} checked={compare} onChange={(e) => setCompare(e.target.checked)} />
 
                     <Button type="button" variant="link" size="fit_sm"
-                        onClick={() => setAddWorkload(true)} disabled={addWorkload}>
+                        onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
                         <Plus size={14} /> {t("offerModal.add_workload")}
                     </Button>
 
@@ -55,16 +61,27 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
                 />
             )}
 
-            {addWorkload && (
-                <div className="grid bg-(--subtle-50) border-b border-r border-l border-(--border) rounded-md">
-                    <OfferProductForm
-                        customerId={customerId}
-                        onSave={(data) => console.log(data)}
-                        onCancel={() => setAddWorkload(false)}
+            {offerPositions.length === 0 && !showWorkloadForm && (
+                <p className="text-sm text-gray-500 text-center py-4">
+                    Noch kein Produkt hinzugefügt
+                </p>
+            )}
+
+            {showWorkloadForm && (
+                <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
+                    <WorkloadFormOfferModal
+                        cancelFn={() => setShowWorkloadForm(false)}
+                        saveFn={(v) => addWorkload(v)}
                     />
                 </div>
             )}
 
+            {offerPositions.map(workload => (
+                <WorkloadItemOfferModal
+                    customerId={customerId}
+                    workload={workload}
+                />
+            ))}
 
         </div>
     )

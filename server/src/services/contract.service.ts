@@ -24,6 +24,15 @@ export async function getAllContracts() {
     });
 }
 
+export async function getContract(contractId: string) {
+    return prisma.contract.findUnique({
+        where: { id: contractId },
+        include: {
+            translations: true
+        }
+    });
+}
+
 /* ========== Mutations ========== */
 
 export async function createContract(input: CreateContractInput) {

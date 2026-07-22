@@ -1,9 +1,9 @@
 import { getTariffPrice, upsertCustomerPrice } from "@/hooks/tariffs/tariff-api";
 import { useMutation } from "@tanstack/react-query";
-import type { OfferProductInput } from "../-components/modal-components/offer-product-form";
+import type { OfferProductInput } from "../../-components/modal-components/offer-product-form";
 
 export default function useOfferPricing(customerId: string) {
-    const { mutateAsync: fetchPrice } = useMutation({
+    const { mutateAsync: fetchPrice, isPending, error } = useMutation({
         mutationKey: ["price"],
         mutationFn: (args: {
             productId: string;
@@ -37,6 +37,7 @@ export default function useOfferPricing(customerId: string) {
             customerId,
             freeMonths: data.free_months,
         });
+
         return { ...data, total_cents: fetched.price };
     };
 
@@ -56,5 +57,12 @@ export default function useOfferPricing(customerId: string) {
         return result.price;
     };
 
-    return { resolvePrice, persistCustomerOverride, fetchPrice };
+    return {
+        fetchPrice,
+        isPending: isPending,
+        error: error,
+
+        resolvePrice,
+        persistCustomerOverride
+    };
 }

@@ -10,6 +10,12 @@ export const getAllContracts = async (request: Request, response: Response) => {
     return response.status(200).json(contracts);
 };
 
+export const getContract = async (request: Request, response: Response) => {
+    const contractId = request.params.id as string;
+    const contract = await contractService.getContract(contractId);
+    return response.status(200).json(contract);
+};
+
 /* ========== POST ========== */
 
 export const createContract = async (request: Request, response: Response) => {

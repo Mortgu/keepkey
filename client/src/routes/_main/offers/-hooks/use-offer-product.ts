@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { GetOfferFlatrate, Offer, OfferFlatRate, OfferPosition } from "@/types";
 import type { OfferProductInput } from "../-components/modal-components/offer-product-form";
-import useOfferPricing from "./use-offer-pricing";
+import useOfferPricing from "./mutations/pricing.mutations";
 
 const toOfferProductInput = (pos: OfferPosition): OfferProductInput => ({
     productId: pos.productId,

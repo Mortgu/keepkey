@@ -10,6 +10,9 @@ export const getContracts = () =>
         method: "GET"
     });
 
+export const getContract = (id: string) =>
+    api<Contract>(`/api/contracts/${id}`, { method: "GET" });
+
 export const createContract = (input: CreateContractInput) =>
     api<Contract>("/api/contracts", {
         method: "POST",

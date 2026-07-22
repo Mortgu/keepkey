@@ -19,7 +19,7 @@ export const getProduct = async (request: Request, response: Response) => {
     const productId = request.params.id as string;
     const product = await productService.getProduct(productId);
 
-    return product;
+    return response.status(200).json(product);
 }
 
 /*

@@ -30,7 +30,19 @@
   },
   "offerModal": {
     "compare": "Vergleichen?",
-    "add_workload": "Workload hinzufügen"
+    "add_workload": "Workload hinzufügen",
+    "quantity": "Menge",
+    "free_months": "Freimonate",
+    "unit_price": "Stückpreis",
+    "customer": "Kunde",
+    "employee": "Unser Ansprechpartner",
+    "contact": "Ihr Ansprechpartner",
+    "quoteId": "Angebotsnummer",
+    "supplierId": "Lieferant",
+    "paymentTerm": "Zahlungsbedingung",
+    "validUntil": "Gültig bis",
+    "requestFrom": "Angebot vom",
+    "language": "Sprache"
   },
   "offers": {
     "toast": {
@@ -66,7 +78,8 @@
     "noResults": "Keine Ergebnisse",
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorRetry": "Erneut versuchen",
-    "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten."
+    "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten.",
+    "months": "Monate"
   },
   "dashboard": {
     "recentOffers": "Letzte Angebote",
