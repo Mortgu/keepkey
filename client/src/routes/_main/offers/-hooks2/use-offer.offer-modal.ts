@@ -64,7 +64,23 @@ export default function useOfferModal({ currentOffer }: Props) {
             validUntil: validUntil,
             requestFrom: requestFrom,
             language: language,
-            offerPositions: currentOffer?.offerPositions ?? [],
+
+            offerPositions: currentOffer?.offerPositions.map(op => ({
+                productId: op.productId,
+                contractId: op.contractId,
+                duration_months: op.duration_months,
+                free_months: op.free_months,
+                quantity: op.quantity,
+                optional: op.optional ?? false,
+                total_cents: op.total_cents,
+                eur_user_month: op.eur_user_month,
+                discount_cents: op.discount_cents,
+            })) ?? [],
+
+            flatrates: currentOffer?.offerFlatRates.map(of => ({
+                flatRateId: of.flatRateId,
+                quantity: of.quantity,
+            })) ?? [],
         }
     }
 }

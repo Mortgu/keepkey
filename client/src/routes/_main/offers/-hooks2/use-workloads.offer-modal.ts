@@ -21,7 +21,6 @@ export default function useWorkloadOfferModal({ currentOffer, customerId, form }
     }
 
     const updateWorkload = async (index: number, workload: OfferProductInput) => {
-        console.log("updateWorkload:", index, workload);
         const price = await resolvePrice(workload);
         form.setFieldValue("offerPositions", offerPositions.map((p, i) => (i === index ? price : p)));
     }

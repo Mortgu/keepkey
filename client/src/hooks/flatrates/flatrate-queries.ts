@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getFlatRates } from "./flatrate-api";
+import { getFlatrate, getFlatRates } from "./flatrate-api";
 import { flatRateKeys } from "./flatrate-keys";
 
 export const flatRateQueries = {
@@ -7,4 +7,10 @@ export const flatRateQueries = {
         queryKey: flatRateKeys.list(),
         queryFn: getFlatRates,
     }),
+
+    detail: (id: string) => queryOptions({
+        queryKey: flatRateKeys.detail(id),
+        queryFn: () => getFlatrate(id),
+        enabled: Boolean(id),
+    })
 };

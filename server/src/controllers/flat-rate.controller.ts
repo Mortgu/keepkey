@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 import * as flatRateService from "../services/flat-rate.service.js";
 
@@ -6,6 +6,12 @@ import * as flatRateService from "../services/flat-rate.service.js";
 
 export const getFlatRates = async (request: Request, response: Response) => {
     const result = await flatRateService.getFlatRates();
+    return response.status(200).json(result);
+};
+
+export const getFlatrate = async (request: Request, response: Response) => {
+    const flatrateId = request.params.id as string;
+    const result = await flatRateService.getFlatrate(flatrateId);
     return response.status(200).json(result);
 };
 

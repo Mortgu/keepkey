@@ -4,6 +4,9 @@ import { api } from "@/lib/api-client";
 export const getFlatRates = () =>
     api<Array<FlatRate>>("/api/flatrates", { method: "GET" });
 
+export const getFlatrate = (id: string) =>
+    api<FlatRate>(`/api/flatrates/${id}`, { method: 'GET' });
+
 export const createFlatRate = (flatRate: CreateFlatRateInput) =>
     api<FlatRate>("/api/flatrates", {
         method: "POST",

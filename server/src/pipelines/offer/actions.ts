@@ -195,8 +195,6 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
         const tableTotalCents = itemsTotalCents + flatratesTotal;
 
-        console.log(items[0].contract);
-
         return {
             products: productNames,
             contract: items[0].contract,

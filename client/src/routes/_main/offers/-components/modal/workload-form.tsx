@@ -4,7 +4,11 @@ import { localized } from "@/lib/i18n-content";
 import { Pen } from "lucide-react";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferProductInput } from "../modal-components/offer-product-form";
+import type { OfferPosition } from "@/types";
+
+export type OfferProductInput = Omit<OfferPosition,
+    "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
+>;
 
 interface Props {
     currentWorkload?: OfferProductInput;

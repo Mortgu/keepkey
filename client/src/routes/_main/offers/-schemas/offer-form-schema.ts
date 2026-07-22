@@ -21,6 +21,11 @@ const offerPositionSchema = z.object({
     }).optional(),
 });
 
+const offerFlatratesSchema = z.object({
+    flatRateId: z.string(),
+    quantity: z.number().int()
+});
+
 export const offerFormSchema = z.object({
     customerId: z.string().min(1, "Required!"),
     contactPersonId: z.string().min(1, "Required!"),
@@ -34,7 +39,8 @@ export const offerFormSchema = z.object({
     validUntil: z.string().datetime().nullable(),
     requestFrom: z.string().datetime().nullable(),
 
-    offerPositions: z.array(offerPositionSchema).min(1).default([]),
+    offerPositions: z.array(offerPositionSchema).min(1),
+    flatrates: z.array(offerFlatratesSchema).min(1)
 });
 
 export type offerFormValues = z.infer<typeof offerFormSchema>;

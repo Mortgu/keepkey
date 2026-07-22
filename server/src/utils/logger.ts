@@ -27,11 +27,11 @@ const logger = winston.createLogger({
             maxsize: 10 * 1024 * 1024,
             maxFiles: 5,
         }),
-        new winston.transports.File({
+        /*new winston.transports.File({
             filename: 'logs/combined.log',
             maxsize: 10 * 1024 * 1024,
             maxFiles: 5,
-        }),
+        }),*/
     ],
 });
 

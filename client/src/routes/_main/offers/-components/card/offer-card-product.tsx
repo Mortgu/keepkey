@@ -11,8 +11,6 @@ type Props = {
 export default function OfferCardProduct({ position }: Props) {
     const { product, contract, quantity, duration_months, total_cents } = position;
 
-    console.log(position)
-
     const locale = useLocale();
 
     return (

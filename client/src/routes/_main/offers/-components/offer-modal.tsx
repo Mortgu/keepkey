@@ -67,6 +67,7 @@ export default function OfferModal(props: OfferModalProps) {
           />
 
           <FlatrateOfferModalSection
+            currentOffer={currentOffer}
             form={form}
           />
 

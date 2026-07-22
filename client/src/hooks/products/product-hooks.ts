@@ -15,7 +15,6 @@ export function useProduct(id: string) {
 }
 
 export function usePrice(customerId: string, workload: OfferProductInput) {
-    console.log("hook: ", customerId, workload)
     const { data, isPending, error } = useQuery(productQueries.price(customerId, workload));
     return { price: data, isPending, error };
 }

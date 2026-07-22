@@ -20,6 +20,13 @@ export async function getFlatRates() {
     });
 }
 
+export async function getFlatrate(id: string) {
+    return prisma.flatRate.findUnique({
+        where: { id },
+        include: { translations: true },
+    });
+}
+
 export async function getFlatRateById(id: string) {
     const flatrate = await prisma.flatRate.findUnique({
         where: { id },
@@ -56,14 +63,14 @@ export async function updateFlatRate(id: string, input: UpdateFlatRateInput) {
             ...(total_cents !== undefined ? { total_cents } : {}),
             ...(Array.isArray(translations)
                 ? {
-                      translations: {
-                          upsert: translations.map((t) => ({
-                              where: { flatRateId_language: { flatRateId: id, language: t.language } },
-                              create: { language: t.language, name: t.name, table: t.table },
-                              update: { name: t.name, table: t.table },
-                          })),
-                      },
-                  }
+                    translations: {
+                        upsert: translations.map((t) => ({
+                            where: { flatRateId_language: { flatRateId: id, language: t.language } },
+                            create: { language: t.language, name: t.name, table: t.table },
+                            update: { name: t.name, table: t.table },
+                        })),
+                    },
+                }
                 : {}),
         },
         include: { translations: true },
