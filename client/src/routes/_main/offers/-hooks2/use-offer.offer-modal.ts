@@ -33,7 +33,7 @@ export default function useOfferModal({ currentOffer }: Props) {
 
     const [quoteId, setQuoteId] = useState<string>(currentOffer?.quoteId || "");
 
-    const [paymentTerm, setPaymentTerm] = useState<string | null>(currentOffer?.paymentTerm || "30 Tage");
+    const [paymentTerm, setPaymentTerm] = useState<string>(currentOffer?.paymentTerm || "30 Tage");
     const [validUntil, setValidUntil] = useState<string | null>(currentOffer?.validUntil || null);
     const [requestFrom, setRequestFrom] = useState<string | null>(currentOffer?.requestFrom || null);
 

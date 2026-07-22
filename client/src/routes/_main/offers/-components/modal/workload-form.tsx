@@ -1,10 +1,10 @@
 import { Button, Checkbox, Input, Select } from "@/components";
-import type { OfferProductInput } from "../modal-components/offer-product-form";
-import { useEffect, useState, type SyntheticEvent } from "react";
 import { useContracts, useLocale, useProducts, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { useTranslation } from "react-i18next";
 import { Pen } from "lucide-react";
+import { useEffect, useState, type SyntheticEvent } from "react";
+import { useTranslation } from "react-i18next";
+import type { OfferProductInput } from "../modal-components/offer-product-form";
 
 interface Props {
     currentWorkload?: OfferProductInput;
@@ -49,7 +49,7 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
             eur_user_month: 0,
             total_cents: 0,
             discount_cents: 0,
-            free_months: 0
+            free_months: freeMonths
         });
 
         cancelFn()

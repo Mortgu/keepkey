@@ -1,12 +1,12 @@
 import { Button, Checkbox, MultiSelectList } from "@/components";
+import { useLocale } from "@/hooks";
 import type { Offer } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import WorkloadFormOfferModal from "./workload-form";
 import useOfferModal from "../../-hooks2/use-offer.offer-modal";
 import useWorkloadOfferModal from "../../-hooks2/use-workloads.offer-modal";
-import { useLocale } from "@/hooks";
+import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
 
 interface Props {
@@ -26,7 +26,12 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
         setToCompare
     } = useOfferModal({ currentOffer });
 
-    const { offerPositions, addWorkload } = useWorkloadOfferModal({ currentOffer, customerId });
+    const {
+        offerPositions,
+        addWorkload,
+        updateWorkload,
+        deleteWorkload,
+    } = useWorkloadOfferModal({ currentOffer, customerId });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 
@@ -76,8 +81,10 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
                 </div>
             )}
 
-            {offerPositions.map(workload => (
+            {offerPositions.map((workload, index) => (
                 <WorkloadItemOfferModal
+                    updateFn={(workload) => updateWorkload(index, workload)}
+                    deleteFn={() => deleteWorkload(index)}
                     customerId={customerId}
                     workload={workload}
                 />

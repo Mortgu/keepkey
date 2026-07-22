@@ -1,36 +1,21 @@
-import type { Language, Offer } from "@/types";
-import { useForm } from "@tanstack/react-form";
-import { type ChangeEvent, type SyntheticEvent } from "react";
-import { useCustomers, useSuppliers, useUsers } from "@/hooks";
 import { Input, Select } from "@/components";
-import { useTranslation } from "react-i18next";
-import useOfferModal from "../../-hooks2/use-offer.offer-modal";
-import { offerFormSchema } from "../../-schemas/offer-form-schema";
+import { useCustomers, useSuppliers, useUsers } from "@/hooks";
 import { getFormError } from "@/lib/utils";
+import type { Language } from "@/types";
+import { type ChangeEvent, type SyntheticEvent } from "react";
+import { useTranslation } from "react-i18next";
+import type { OfferFormApi } from "../../-hooks/use-offer-form";
 
 interface Props {
-    currentOffer?: Offer;
+    form: OfferFormApi;
 }
 
-export default function FormOfferModal({ currentOffer }: Props) {
+export default function FormOfferModal({ form }: Props) {
     const { t } = useTranslation();
 
     const { customers } = useCustomers();
     const { users } = useUsers();
     const { suppliers } = useSuppliers();
-
-    const { defaultValues } = useOfferModal({ currentOffer });
-
-    const form = useForm({
-        defaultValues: defaultValues,
-        validators: {
-            onMount: offerFormSchema,
-            onChange: offerFormSchema
-        },
-        onSubmit: async ({ value }) => {
-            console.log(value);
-        }
-    });
 
     const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -45,11 +30,10 @@ export default function FormOfferModal({ currentOffer }: Props) {
 
         form.setFieldValue("contactPersonId", customer?.contactPersons[0]?.id || "");
 
-        if (!currentOffer && customer?.language) {
+        if (customer?.language) {
             form.setFieldValue("language", customer.language);
         }
     }
-
 
     return (
         <form id="offer-modal-form" onSubmit={handleSubmit}>
@@ -78,7 +62,8 @@ export default function FormOfferModal({ currentOffer }: Props) {
                             const contacts = customer?.contactPersons || [];
 
                             return (
-                                <Select label={t("offerModal.contact")} value={field.state.value} onChange={(e) => field.handleChange(e.target.value)}
+                                <Select label={t("offerModal.contact")} value={field.state.value}
+                                    onChange={(e) => field.handleChange(e.target.value)}
                                     error={getFormError(field.state.meta.errors)}>
                                     {contacts.map(contact => (
                                         <option key={contact.id} value={contact.id}>

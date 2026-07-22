@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
-import { Pen } from "lucide-react";
-import type { OfferPosition } from "@/types";
-import type { TariffPriceResult } from "@/hooks/tariffs/tariff-api";
 import { Button, Checkbox, Input, Select } from "@/components";
 import { useLocale, useProducts, useTariffDurationsHook } from "@/hooks";
+import { useContracts } from "@/hooks/contracts/contract-hooks";
+import type { TariffPriceResult } from "@/hooks/tariffs/tariff-api";
 import { getTariffPrice } from "@/hooks/tariffs/tariff-api";
 import { localized } from "@/lib/i18n-content";
-import { useContracts } from "@/hooks/contracts/contract-hooks";
+import type { OfferPosition } from "@/types";
 import { formatEur } from "@/utils/utils";
+import { Pen } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export type OfferProductInput = Omit<OfferPosition,
@@ -138,7 +138,7 @@ export default function OfferProductForm({ currentProduct, customerId, onPersist
     : formatEur(unitPriceCents);
 
   return (
-    <div className="w-full grid gap-3 border-t border-(--border) py-4 px-4">
+    <div className="w-full grid gap-3 py-4 px-4">
       <div className="flex items-end gap-3">
 
         <div className="flex-2 grid gap-1">

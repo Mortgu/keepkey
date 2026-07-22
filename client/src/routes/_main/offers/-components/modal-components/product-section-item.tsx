@@ -1,13 +1,13 @@
-import { useState } from "react";
-import { tv } from "tailwind-variants";
-import { Pen, Trash, X } from "lucide-react";
-import OfferProductForm from "./offer-product-form";
-import type { Contract, Product } from "@/types";
-import type { OfferProductInput } from "./offer-product-form";
+import { Button } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { Button } from "@/components";
+import type { Contract, Product } from "@/types";
 import { formatEur } from "@/utils/utils";
+import { Pen, Trash, X } from "lucide-react";
+import { useState } from "react";
+import { tv } from "tailwind-variants";
+import type { OfferProductInput } from "./offer-product-form";
+import OfferProductForm from "./offer-product-form";
 
 type OfferProduct = Product & OfferProductInput;
 
@@ -68,11 +68,11 @@ export default function ProductSectionItem(props: Props) {
 
                     {/* Actions */}
                     <div className="flex gap-2">
-                        <Button variant="secondary" type="button" size="xs" disabled={edit}
-                            icon={<Pen className="size-3" />} iconOnly onClick={() => setEdit(true)} />
+                        <Button variant="border" type="button" size="sm" disabled={edit}
+                            icon={<Pen size={14} />} iconOnly onClick={() => setEdit(true)} />
 
-                        <Button variant="secondary" type="button" size="xs"
-                            icon={<Trash className="size-3" />} iconOnly onClick={onRemove} />
+                        <Button variant="border" type="button" size="sm"
+                            icon={<Trash size={14} />} iconOnly onClick={onRemove} />
                     </div>
                 </div>
 

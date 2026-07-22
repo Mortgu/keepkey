@@ -20,6 +20,7 @@ export default function useWorkloadOfferModal({ currentOffer, customerId }: Prop
     }
 
     const updateWorkload = async (index: number, workload: OfferProductInput) => {
+        console.log("updateWorkload:", index, workload);
         const price = await resolvePrice(workload);
         setOfferPositions((prev) => prev.map((p, i) => (i === index ? price : p)));
     }
