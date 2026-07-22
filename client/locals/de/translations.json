@@ -31,6 +31,7 @@
   "offerModal": {
     "compare": "Vergleichen?",
     "add_workload": "Workload hinzufügen",
+    "add_flatrate": "Flatrate hinzufügen",
     "quantity": "Menge",
     "free_months": "Freimonate",
     "unit_price": "Stückpreis",

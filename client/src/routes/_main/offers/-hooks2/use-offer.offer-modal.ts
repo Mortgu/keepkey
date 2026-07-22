@@ -64,6 +64,7 @@ export default function useOfferModal({ currentOffer }: Props) {
             validUntil: validUntil,
             requestFrom: requestFrom,
             language: language,
+            offerPositions: currentOffer?.offerPositions ?? [],
         }
     }
 }

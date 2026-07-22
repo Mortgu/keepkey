@@ -4,6 +4,7 @@ import type { Offer } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { OfferFormApi } from "../../-hooks/use-offer-form";
 import useOfferModal from "../../-hooks2/use-offer.offer-modal";
 import useWorkloadOfferModal from "../../-hooks2/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
@@ -12,9 +13,10 @@ import WorkloadItemOfferModal from "./workload-item";
 interface Props {
     customerId: string;
     currentOffer?: Offer;
+    form: OfferFormApi;
 }
 
-export default function WorkloadOfferModalSection({ customerId, currentOffer }: Props) {
+export default function WorkloadOfferModalSection({ customerId, currentOffer, form }: Props) {
     const { t } = useTranslation();
     const locale = useLocale();
 
@@ -31,7 +33,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer }: 
         addWorkload,
         updateWorkload,
         deleteWorkload,
-    } = useWorkloadOfferModal({ currentOffer, customerId });
+    } = useWorkloadOfferModal({ currentOffer, customerId, form });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 

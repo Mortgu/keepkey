@@ -31,6 +31,7 @@
   "offerModal": {
     "compare": "Compare?",
     "add_workload": "add Workload",
+    "add_flatrate": "add Flatrate",
     "quantity": "Quantity",
     "free_months": "Free months",
     "unit_price": "Unit price",

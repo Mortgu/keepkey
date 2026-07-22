@@ -15,6 +15,7 @@ import type {
 import { useTranslation } from "react-i18next";
 import useOfferForm from "../-hooks/use-offer-form";
 import useOfferFormState from "../-hooks/use-offer-form-state";
+import FlatrateOfferModalSection from "./modal/flatrates";
 import FormOfferModal from "./modal/offer-form";
 import WorkloadOfferModalSection from "./modal/workloads";
 
@@ -62,6 +63,11 @@ export default function OfferModal(props: OfferModalProps) {
           <WorkloadOfferModalSection
             customerId={customerId}
             currentOffer={currentOffer}
+            form={form}
+          />
+
+          <FlatrateOfferModalSection
+            form={form}
           />
 
         </div>

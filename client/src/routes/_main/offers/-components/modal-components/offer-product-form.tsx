@@ -15,6 +15,8 @@ export type OfferProductInput = Omit<OfferPosition,
   "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
 >;
 
+
+
 interface Props {
   onSave: (data: OfferProductInput) => void;
   onCancel: () => void;

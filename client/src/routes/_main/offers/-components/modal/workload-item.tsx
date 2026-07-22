@@ -55,13 +55,14 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
                     <div className="flex items-center gap-8">
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Total</p>
-                            {pricePending && <LoaderCircle size={14} />}
+                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
                             {!pricePending && <p className="text-sm font-semibold">{formatEur(price?.price || 0)}</p>}
                         </div>
 
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Price per unit</p>
-                            <p className="text-sm font-semibold">{formatEur(price?.breakdown.unitPrice || 0)}</p>
+                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(price?.breakdown.unitPrice || 0)}</p>}
                         </div>
                     </div>
 
