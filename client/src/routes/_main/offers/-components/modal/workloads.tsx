@@ -9,6 +9,7 @@ import useOfferModal from "../../-hooks2/use-offer.offer-modal";
 import useWorkloadOfferModal from "../../-hooks2/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
+import { useStore } from "@tanstack/react-form";
 
 interface Props {
     customerId: string;
@@ -20,12 +21,14 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
     const { t } = useTranslation();
     const locale = useLocale();
 
+    const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
+    const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
+
+    const toCompare = useStore(form.store, (s) => s.values.toCompare);
+    const setToCompare = (vals: Array<string>) => form.setFieldValue("toCompare", vals);
+
     const {
-        compare,
-        setCompare,
         compareOptions,
-        toCompare,
-        setToCompare
     } = useOfferModal({ currentOffer });
 
     const {
@@ -49,7 +52,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
                 {/* Header actions */}
                 <div className="flex items-center gap-4">
 
-                    <Checkbox label={t("offerModal.compare")} checked={compare} onChange={(e) => setCompare(e.target.checked)} />
+                    <Checkbox label={t("offerModal.compare")} checked={featureComparison} onChange={(e) => setFeatureComparison(e.target.checked)} />
 
                     <Button type="button" variant="link" size="fit_sm"
                         onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
@@ -60,7 +63,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
             </div>
 
-            {compare && (
+            {featureComparison && (
                 <MultiSelectList
                     options={compareOptions}
                     onChange={(c) => setToCompare(c)}

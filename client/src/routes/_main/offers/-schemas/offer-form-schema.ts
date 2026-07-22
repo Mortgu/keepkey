@@ -39,6 +39,9 @@ export const offerFormSchema = z.object({
     validUntil: z.string().datetime().nullable(),
     requestFrom: z.string().datetime().nullable(),
 
+    featureComparison: z.boolean(),
+    toCompare: z.array(z.string()),
+
     offerPositions: z.array(offerPositionSchema).min(1),
     flatrates: z.array(offerFlatratesSchema).min(1)
 });

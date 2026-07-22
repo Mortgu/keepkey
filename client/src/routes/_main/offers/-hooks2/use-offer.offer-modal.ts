@@ -65,6 +65,9 @@ export default function useOfferModal({ currentOffer }: Props) {
             requestFrom: requestFrom,
             language: language,
 
+            featureComparison: compare,
+            toCompare: toCompare,
+
             offerPositions: currentOffer?.offerPositions.map(op => ({
                 productId: op.productId,
                 contractId: op.contractId,
