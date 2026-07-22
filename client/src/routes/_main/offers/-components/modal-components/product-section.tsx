@@ -1,12 +1,13 @@
+import { Button, Checkbox, MultiSelectList, type DropdownOption } from "@/components";
+import { useLocale, useProducts } from "@/hooks";
+import { useContracts } from "@/hooks/contracts/contract-hooks";
+import { localized } from "@/lib/i18n-content";
 import { Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type { OfferProductInput } from "./offer-product-form";
 import OfferProductForm from "./offer-product-form";
 import ProductSectionItem from "./product-section-item";
-import type { OfferProductInput } from "./offer-product-form";
-import { useProducts } from "@/hooks";
-import { Button, Checkbox } from "@/components";
-import { useContracts } from "@/hooks/contracts/contract-hooks";
 
 type Props = {
     offerProducts: Array<OfferProductInput>;
@@ -34,6 +35,7 @@ export default function ProductModalSection({
 }: Props) {
     const [showForm, setShowForm] = useState<boolean>(false);
     const { t } = useTranslation();
+    const locale = useLocale();
 
     const { products } = useProducts();
     const { contracts } = useContracts();
@@ -46,6 +48,13 @@ export default function ProductModalSection({
         () => new Map(contracts.map((c) => [c.id, c])),
         [contracts],
     );
+
+    const compareOptions: Array<DropdownOption> = contracts.map(c => ({
+        value: c.id,
+        label: localized(c.translations, locale, "name") || c.id
+    }));
+
+    const [toCompareContracts, setToCompareContracts] = useState<Array<string>>([]);
 
     return (
         <div className="grid gap-4">
@@ -66,11 +75,21 @@ export default function ProductModalSection({
                     </Button>
                 </div>
 
-                <Checkbox
-                    label={t("offerModal.compare")}
-                    checked={featureComparison}
-                    onChange={(e) => onToggleFeatureComparison(e.target.checked)}
-                />
+                <div>
+                    <Checkbox
+                        label={t("offerModal.compare")}
+                        checked={featureComparison}
+                        onChange={(e) => onToggleFeatureComparison(e.target.checked)}
+                    />
+
+                    {featureComparison && (
+                        <MultiSelectList
+                            options={compareOptions}
+                            onChange={(c) => setToCompareContracts(c)}
+                            values={toCompareContracts}
+                        />
+                    )}
+                </div>
 
                 {offerProducts.length === 0 && !showForm && (
                     <p className="text-sm text-gray-500 text-center py-2">

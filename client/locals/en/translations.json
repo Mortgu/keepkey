@@ -29,7 +29,8 @@
     "orders": "Orders"
   },
   "offerModal": {
-    "compare": "Compare?"
+    "compare": "Compare?",
+    "add_workload": "add Workload"
   },
   "offers": {
     "toast": {

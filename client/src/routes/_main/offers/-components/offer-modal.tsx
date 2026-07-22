@@ -1,8 +1,17 @@
 import { Loader } from "lucide-react";
 
-import ProductModalSection from "./modal-components/product-section";
 import FlatRateModalSection from "./modal-components/flat-rate-section";
+import ProductModalSection from "./modal-components/product-section";
 
+import {
+  Button,
+  DEFAULT_LANGUAGE_OPTIONS,
+  Input,
+  ModalDialog,
+  SegmentedLanguageToggle,
+  Select,
+} from "@/components";
+import { getFormError } from "@/lib/utils";
 import type {
   ContactPerson,
   Contract,
@@ -12,18 +21,10 @@ import type {
   Supplier,
   User,
 } from "@/types";
-import { getFormError } from "@/lib/utils";
-import {
-  Button,
-  DEFAULT_LANGUAGE_OPTIONS,
-  Input,
-  ModalDialog,
-  SegmentedLanguageToggle,
-  Select,
-} from "@/components";
-import useOfferFormState from "../-hooks/use-offer-form-state";
 import type { SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
+import useOfferFormState from "../-hooks/use-offer-form-state";
+import WorkloadOfferModalSection from "./modal/workloads";
 
 interface OfferModalProps {
   closeFn: () => void;
@@ -291,9 +292,10 @@ export default function OfferModal(props: OfferModalProps) {
             />
           </div>
 
-          {/*
-          <WorkloadSection state={state} />
-          */}
+          <WorkloadOfferModalSection
+            customerId={state.customerId}
+            currentOffer={currentOffer}
+          />
 
           <ProductModalSection
             offerProducts={state.offerProducts}
