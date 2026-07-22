@@ -73,6 +73,8 @@ export const offerTemplateSchema = z.object({
 
     tables: z.array(z.object({
         products: z.string(),
+        contract: z.string(),
+        duration: z.string(), // Jahre
         items: z.array(offerTemplateProductItemSchema),
         flatrates: z.array(z.object({
             name: z.string(),
