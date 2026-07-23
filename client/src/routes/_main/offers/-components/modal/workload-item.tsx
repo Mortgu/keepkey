@@ -1,11 +1,12 @@
+import { LoaderCircle, Pen, Trash, X } from "lucide-react";
+import { useState } from "react";
+import useOfferPricing from "../../-hooks/mutations/pricing.mutations";
+import WorkloadFormOfferModal from "./workload-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useContract, useLocale, usePrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
-import { LoaderCircle, Pen, Trash, X } from "lucide-react";
-import { useState } from "react";
-import type { CreateOfferPositionInput } from "@keepit/schemas";
-import WorkloadFormOfferModal from "./workload-form";
 
 interface Props {
     customerId: string;
@@ -23,6 +24,7 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
     const { price, isPending: pricePending } = usePrice(customerId, workload);
+    const { persistCustomerOverride } = useOfferPricing(customerId);
 
     if (!product || !contract) {
         return (
@@ -89,6 +91,8 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
 
             {isEdit && (
                 <WorkloadFormOfferModal
+                    customerId={customerId}
+                    onPersistOverride={persistCustomerOverride}
                     currentWorkload={workload}
                     cancelFn={() => setEdit(false)}
                     saveFn={(v) => updateFn(v)}

@@ -27,7 +27,7 @@ export const NextCloudIcon = ({ width, height }: IconProps) => (
 )
 
 export const RedisIcon = ({ width, height }: IconProps) => (
-    <svg width={width} height={height} viewBox="0 0 73 73" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg width={width} height={height} viewBox="0 0 73 73" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
 
         <title>databases-and-servers/databases/redis</title>
         <desc>Created with Sketch.</desc>
@@ -80,7 +80,7 @@ export const RedisIcon = ({ width, height }: IconProps) => (
 )
 
 export const StorageIcon = ({ width, height }: IconProps) => (
-    <svg width={width} height={height} viewBox="0 0 73 73" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <svg width={width} height={height} viewBox="0 0 73 73" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink">
 
         <title>progressive-webapps/apis/storage</title>
         <desc>Created with Sketch.</desc>

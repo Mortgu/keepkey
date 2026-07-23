@@ -1,14 +1,14 @@
-import { Button, Checkbox, MultiSelectList } from "@/components";
-import type { Offer } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferFormApi } from "../../-hooks/use-offer-form";
+import { useStore } from "@tanstack/react-form";
 import useOfferModal from "../../-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "../../-hooks/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
-import { useStore } from "@tanstack/react-form";
+import type { OfferFormApi } from "../../-hooks/use-offer-form";
+import type { Offer } from "@/types";
+import { Button, Checkbox, MultiSelectList } from "@/components";
 
 interface Props {
     customerId: string;
@@ -34,6 +34,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
         addWorkload,
         updateWorkload,
         deleteWorkload,
+        persistCustomerOverride,
     } = useWorkloadOfferModal({ customerId, form });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
@@ -78,6 +79,8 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
             {showWorkloadForm && (
                 <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
                     <WorkloadFormOfferModal
+                        customerId={customerId}
+                        onPersistOverride={persistCustomerOverride}
                         cancelFn={() => setShowWorkloadForm(false)}
                         saveFn={(v) => addWorkload(v)}
                     />

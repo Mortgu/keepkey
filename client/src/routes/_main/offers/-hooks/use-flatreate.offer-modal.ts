@@ -1,14 +1,12 @@
-import type { Offer } from "@/types";
 import { useStore } from "@tanstack/react-form";
 import type { OfferFormApi } from "../-hooks/use-offer-form";
 import type { OfferFlatrateInput } from "../-components/modal/flatrate-form";
 
 interface Props {
-    currentOffer?: Offer;
     form: OfferFormApi;
 }
 
-export default function useFlatrateOfferModal({ currentOffer, form }: Props) {
+export default function useFlatrateOfferModal({ form }: Props) {
     const flatrates = useStore(form.store, (s) => s.values.flatrates);
 
     const addFlatrate = (flatrate: OfferFlatrateInput) => {

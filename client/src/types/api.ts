@@ -105,6 +105,7 @@ export interface components {
             quoteId: string;
             paymentTerm: string;
             featureComparison: boolean;
+            toCompare: string[];
             /** Format: date-time */
             date: string;
             /** Format: date-time */

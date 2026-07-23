@@ -1,5 +1,5 @@
 import { Button } from "@/components";
-import { useFlatRates, useLocale } from "@/hooks";
+import { useFlatRates } from "@/hooks";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { OfferFormApi } from "../../-hooks/use-offer-form";
@@ -16,14 +16,15 @@ interface Props {
 
 export default function FlatrateOfferModalSection({ currentOffer, form }: Props) {
     const { t } = useTranslation();
-    const locale = useLocale();
+
     const { flatRates } = useFlatRates();
+
     const {
         flatrates,
         addFlatrate,
         updateFlatrate,
         deleteFlatrate
-    } = useFlatrateOfferModal({ currentOffer, form });
+    } = useFlatrateOfferModal({ form });
 
     const [showFlatrateForm, setShowFlatrateForm] = useState<boolean>(false);
 

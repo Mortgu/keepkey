@@ -1,9 +1,11 @@
-import { getTariffPrice, upsertCustomerPrice } from "@/hooks/tariffs/tariff-api";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
-import type { OfferProductInput } from "../../-components/modal/workload-form";
+import { productKeys } from "@/hooks/products/product-keys";
+import { getTariffPrice, upsertCustomerPrice } from "@/hooks/tariffs/tariff-api";
 
 export default function useOfferPricing(customerId: string) {
+    const queryClient = useQueryClient();
+
     const { mutateAsync: fetchPrice, isPending, error } = useMutation({
         mutationKey: ["price"],
         mutationFn: (args: {
@@ -27,6 +29,7 @@ export default function useOfferPricing(customerId: string) {
             price: number;
             optional: boolean;
         }) => upsertCustomerPrice(args),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: productKeys.prices() }),
     });
 
     const resolvePrice = async (data: CreateOfferPositionInput): Promise<CreateOfferPositionInput> => {
@@ -43,7 +46,7 @@ export default function useOfferPricing(customerId: string) {
     };
 
     const persistCustomerOverride = async (
-        data: OfferProductInput,
+        data: CreateOfferPositionInput,
         unitPriceCents: number,
     ): Promise<number> => {
         const result = await persistOverride({
@@ -53,7 +56,7 @@ export default function useOfferPricing(customerId: string) {
             quantity: data.quantity,
             customerId,
             price: unitPriceCents,
-            optional: data.optional ?? false,
+            optional: data.optional,
         });
         return result.price;
     };

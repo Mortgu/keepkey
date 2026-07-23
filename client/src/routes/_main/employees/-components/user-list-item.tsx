@@ -19,7 +19,7 @@ export default function UserListItem({ user }: UserListItemProps) {
     <Fragment>
       <ListItemRow
         onEdit={() => modal.open(user)}
-        onDelete={() => deleteUser({ id: user.id })}
+        onDelete={() => deleteUser(user.id)}
         deleteLoading={isDeletingUser}
         editLabel="Nutzer bearbeiten"
         deleteLabel="Nutzer löschen"

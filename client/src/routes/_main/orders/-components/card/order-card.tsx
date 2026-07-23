@@ -33,7 +33,7 @@ export default function OrderCard({ order }: Props) {
     } = useDeleteOrder();
 
     const {
-        generateDocument,
+        generateOrderDocument,
         isGeneratingDocument,
     } = useGenerateOrderDocument();
 
@@ -141,7 +141,7 @@ export default function OrderCard({ order }: Props) {
                         size="sm"
                         loading={isGeneratingDocument}
                         disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({ orderId: order.id })}
+                        onClick={() => generateOrderDocument({ orderId: order.id })}
                     >
                         Dokument generieren
                     </Button>

@@ -6,8 +6,9 @@ import { localized } from "@/lib/i18n-content";
 import FlatRateModal from "./flatrate-modal";
 
 export default function FlatRateItem({ item }: { item: FlatRate }) {
-  const { updateFlatRate, deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
-  const { isUpdatingFlatRate } = useUpdateFlatRate();
+  const { deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
+  const { updateFlatRate } = useUpdateFlatRate();
+
   const modal = useModal<FlatRate>();
   const locale = useLocale();
 
@@ -45,7 +46,7 @@ export default function FlatRateItem({ item }: { item: FlatRate }) {
         <FlatRateModal
           key={modal.key}
           onClose={modal.close}
-          submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatrate: value })}
+          submitFn={(value: UpdateFlatRateInput) => updateFlatRate({ id: item.id, flatRate: value })}
           currentItem={{ total_cents: item.total_cents, translations: item.translations }}
         />
       )}

@@ -1,7 +1,7 @@
 import { useStore } from "@tanstack/react-form";
+import useOfferPricing from "../-hooks/mutations/pricing.mutations";
 import type { OfferFormApi } from "../-hooks/use-offer-form";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
-import useOfferPricing from "../-hooks/mutations/pricing.mutations";
 
 interface Props {
     customerId: string;
@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function useWorkloadOfferModal({ customerId, form }: Props) {
-    const { resolvePrice } = useOfferPricing(customerId);
+    const { resolvePrice, persistCustomerOverride } = useOfferPricing(customerId);
 
     const offerPositions = useStore(form.store, (s) => s.values.offerPositions);
 
@@ -33,5 +33,6 @@ export default function useWorkloadOfferModal({ customerId, form }: Props) {
         addWorkload,
         updateWorkload,
         deleteWorkload,
+        persistCustomerOverride,
     };
 }

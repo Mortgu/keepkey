@@ -1,18 +1,27 @@
-import { Button, Checkbox, Input, Select } from "@/components";
-import { useContracts, useLocale, useProducts, useTariffDurationsHook } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
 import { Pen } from "lucide-react";
-import { useEffect, useState, type SyntheticEvent } from "react";
+import {  useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type {SyntheticEvent} from "react";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
+import { Button, Checkbox, Input, Select } from "@/components";
+import { useContracts, useLocale, usePrice, useProducts, useTariffDurationsHook } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
+import { formatEur } from "@/utils/utils";
+
+const eurToCents = (eur: number): number => Math.round(eur * 100);
 
 interface Props {
+    customerId: string;
+    onPersistOverride?: (
+        data: CreateOfferPositionInput,
+        unitPriceCents: number,
+    ) => Promise<number>;
     currentWorkload?: CreateOfferPositionInput;
     cancelFn: () => void;
     saveFn: (values: CreateOfferPositionInput) => void;
 }
 
-export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, saveFn }: Props) {
+export default function WorkloadFormOfferModal({ customerId, onPersistOverride, currentWorkload, cancelFn, saveFn }: Props) {
     const locale = useLocale();
     const { t } = useTranslation();
     const { products } = useProducts();
@@ -23,7 +32,7 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
 
     const { durations } = useTariffDurationsHook(workload, contract);
 
-    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || durations[0]);
+    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || durations[0] || 0);
 
     const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 0);
 
@@ -31,29 +40,79 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
 
     const [optional, setOptional] = useState<boolean>(currentWorkload?.optional || false);
 
-    const [overrideUnitPrice, setOverrideUnitPrice] = useState<boolean>(false);
+    const [editingPrice, setEditingPrice] = useState<boolean>(false);
+    const [overrideEur, setOverrideEur] = useState<string>("");
+    const [error, setError] = useState<string>("");
 
     useEffect(() => {
-        setDuration(durations[0]);
+        setDuration(durations[0] || 0);
     }, [durations]);
 
-    const handleSave = (event: SyntheticEvent<HTMLButtonElement>) => {
+    const priceWorkload: CreateOfferPositionInput = {
+        productId: workload,
+        contractId: contract,
+        duration_months: duration,
+        quantity,
+        free_months: freeMonths,
+        optional,
+        total_cents: 0,
+        eur_user_month: 0,
+        discount_cents: 0,
+    };
+
+    const { price, isPending: pricePending } = usePrice(customerId, priceWorkload);
+    const unitPriceCents = price?.breakdown.unitPrice ?? 0;
+
+    const canOverride = Boolean(onPersistOverride && customerId);
+
+    const startEditPrice = () => {
+        setOverrideEur((unitPriceCents / 100).toString());
+        setEditingPrice(true);
+    };
+
+    const toggleEditPrice = () => {
+        if (editingPrice) {
+            setEditingPrice(false);
+        } else {
+            startEditPrice();
+        }
+    };
+
+    const handleSave = async (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
-        saveFn({
+        const data: CreateOfferPositionInput = {
             productId: workload,
             contractId: contract,
             duration_months: duration,
-            quantity: quantity,
-            optional: optional,
-            eur_user_month: 0,
+            quantity,
+            free_months: freeMonths,
+            optional,
             total_cents: 0,
+            eur_user_month: 0,
             discount_cents: 0,
-            free_months: freeMonths
-        });
+        };
 
-        cancelFn()
-    }
+        try {
+            if (editingPrice && onPersistOverride && customerId) {
+                const parsed = Number(overrideEur.replace(",", "."));
+                if (isNaN(parsed) || parsed < 0) {
+                    setError("Ungültiger Preis.");
+                    return;
+                }
+                await onPersistOverride(data, eurToCents(parsed));
+            }
+
+            saveFn(data);
+            cancelFn();
+        } catch (exception: unknown) {
+            setError(exception instanceof Error ? exception.message : "Preis konnte nicht gespeichert werden.");
+        }
+    };
+
+    const displayUnitPrice = editingPrice
+        ? overrideEur
+        : formatEur(unitPriceCents);
 
     return (
         <div className="w-full grid gap-3 p-4">
@@ -97,14 +156,19 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
             <div className="flex items-end gap-3">
                 <Input
                     label={t("offerModal.unit_price")}
-                    rightButton={{
+                    loading={pricePending}
+                    type={editingPrice ? "number" : "text"}
+                    step={editingPrice ? "0.01" : undefined}
+                    min={editingPrice ? "0" : undefined}
+                    value={displayUnitPrice}
+                    disabled={!editingPrice}
+                    onChange={(e) => setOverrideEur(e.target.value)}
+                    rightButton={canOverride ? {
                         icon: <Pen size={12} />,
                         variant: "border",
-                        onClick: () => setOverrideUnitPrice(true)
-                    }}
-                    value={currentWorkload?.eur_user_month || 0}
-                    disabled={!overrideUnitPrice}
-                    onBlur={() => setOverrideUnitPrice(!overrideUnitPrice)}
+                        type: "button",
+                        onClick: toggleEditPrice,
+                    } : undefined}
                 />
 
                 <Input label={t("offerModal.free_months")} value={freeMonths} onChange={(e) => {
@@ -113,6 +177,8 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
                     setFreeMonths(value);
                 }} />
             </div>
+
+            {error && <p className="text-sm text-red-400">{error}</p>}
 
             {/* Footer actions */}
             <div className="flex items-center justify-between border-t border-(--border) pt-4">

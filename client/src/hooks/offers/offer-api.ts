@@ -10,7 +10,7 @@ import type {
 } from "@/types";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
-import type { offerFormValues } from "@/routes/_main/offers/-schemas/offer-form-schema";
+import type { CreateOfferInput, UpdateOfferInput } from "@keepit/schemas";
 
 /* Offer */
 export const getOffers = async (filters: OfferFilters) =>
@@ -18,14 +18,14 @@ export const getOffers = async (filters: OfferFilters) =>
         method: "GET"
     });
 
-export const createOffer = (payload: offerFormValues) =>
+export const createOffer = (payload: CreateOfferInput) =>
     api<Offer>("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload }),
     });
 
-export const updateOffer = async (id: string, expectedVersion: number, payload: offerFormValues) =>
+export const updateOffer = async (id: string, expectedVersion: number, payload: UpdateOfferInput) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

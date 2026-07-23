@@ -14,7 +14,7 @@ type Props = {
 
 export default function OrderDrawerHistory({ open, onClose, order }: Props) {
   const { t } = useTranslation();
-  const { data: revisions = [], isPending, error } = useOrderRevisions(order.id);
+  const { revisions: revisions = [], isPending, error } = useOrderRevisions(order.id);
   const {
     restoreOrderRevision,
     isRestoringRevision,
