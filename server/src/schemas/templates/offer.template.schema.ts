@@ -71,6 +71,12 @@ export const offerTemplateSchema = z.object({
 
     groups: z.array(offerTemplateProductGroupSchema),
 
+    discounts: z.array(z.object({
+        title: z.string(),
+        description: z.string().nullish().transform(v => (v === undefined ? "" : v)),
+        total: z.string(),
+    })).default([]),
+
     tables: z.array(z.object({
         products: z.string(),
         contract: z.string(),

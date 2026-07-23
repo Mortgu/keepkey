@@ -50,6 +50,12 @@ export default function useOfferModal({ currentOffer }: Props) {
             flatRateId: of.flatRateId,
             quantity: of.quantity,
         })) ?? [],
+
+        discounts: currentOffer?.offerDiscounts.map(d => ({
+            title: d.title,
+            description: d.description,
+            amount_cents: d.amount_cents,
+        })) ?? [],
     };
 
     return {

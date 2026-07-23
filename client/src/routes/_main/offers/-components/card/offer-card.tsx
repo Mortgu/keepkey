@@ -10,6 +10,7 @@ import { Button, Collapsable, showToast } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import OfferCardDiscount from "./offer-card-discount";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -23,7 +24,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         offerPositions,
         offerFlatRates,
         customer,
+        offerDiscounts,
     } = offer;
+
+    console.log(offer);
 
     const {
         deleteOffer,
@@ -90,7 +94,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
 
                 <div className="flex flex-col items-end">
-                    <p className="text-md font-semibold">{formatEur(offer.net_amount)}</p>
+                    <p className="text-md font-mono font-medium">{formatEur(offer.net_amount)}</p>
                     <p className="text-(--text-secondary) font-light text-sm">
                         Gesamtpreis
                     </p>
@@ -107,6 +111,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
                     {offerFlatRates.map((flatrate, i) => (
                         <OfferCardFlatRate key={i} flatrate={flatrate} />
+                    ))}
+
+                    {offerDiscounts.map((discount, i) => (
+                        <OfferCardDiscount key={discount.id} discount={discount} />
                     ))}
                 </div>
             </Collapsable>

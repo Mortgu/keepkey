@@ -26,10 +26,7 @@ export default function OfferCardFlatRate({ flatrate }: Props) {
                 </div>
             </div>
             <div className="flex flex-col items-end">
-                <p className="text-md font-semibold">{formatEur(total_cents)}</p>
-                <p className="text-(--text-secondary) font-light text-sm">
-                    Gesamtpreis (netto)
-                </p>
+                <p className="text-md font-mono">{formatEur(total_cents)}</p>
             </div>
         </div>
     )

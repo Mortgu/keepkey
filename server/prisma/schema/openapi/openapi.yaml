@@ -299,6 +299,10 @@ components:
         updatedAt:
           type: string
           format: date-time
+        offerDiscounts:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferDiscount"
       required:
         - id
         - customer
@@ -321,6 +325,7 @@ components:
         - version
         - createdAt
         - updatedAt
+        - offerDiscounts
     OfferRevision:
       type: object
       properties:
@@ -491,6 +496,36 @@ components:
         - artifacts
         - task
         - taskId
+        - createdAt
+        - updatedAt
+    OfferDiscount:
+      type: object
+      properties:
+        id:
+          type: string
+        offer:
+          $ref: "#/components/schemas/Offer"
+        offerId:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+        amount_cents:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - offer
+        - offerId
+        - title
+        - amount_cents
         - createdAt
         - updatedAt
     Order:

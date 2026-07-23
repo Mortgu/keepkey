@@ -23,6 +23,14 @@ export const createOfferFlatrateSchema = z.object({
 
 export type CreateOfferFlatrateInput = z.infer<typeof createOfferFlatrateSchema>;
 
+export const createOfferDiscountSchema = z.object({
+    title: z.string().min(1),
+    description: z.string().optional(),
+    amount_cents: z.number().int().nonnegative(),
+});
+
+export type CreateOfferDiscountInput = z.infer<typeof createOfferDiscountSchema>;
+
 export const createOfferSchema = z.object({
     customerId: z.string().nonempty("Required!"),
     contactPersonId: z.string().nonempty("Required!"),
@@ -41,6 +49,8 @@ export const createOfferSchema = z.object({
 
     offerPositions: z.array(createOfferPositionSchema).min(1),
     flatrates: z.array(createOfferFlatrateSchema),
+
+    discounts: z.array(createOfferDiscountSchema).default([]),
 });
 
 export type CreateOfferInput = z.infer<typeof createOfferSchema>;

@@ -36,6 +36,7 @@ export const fetchOfferData = async (offerId: string) => {
                         flatRate: { include: { translations: true } },
                     },
                 },
+                offerDiscounts: true,
             }
         }),
 
@@ -143,6 +144,13 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     });
     const flatratesTotal = offer.offerFlatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
 
+    const discounts = offer.offerDiscounts.map(d => ({
+        title: d.title,
+        description: d.description ?? "",
+        total: formatCentsToEur(d.amount_cents),
+    }));
+    const discountsTotal = offer.offerDiscounts.reduce((sum, d) => sum + d.amount_cents, 0);
+
     const tables: OfferTemplate["tables"] = [];
 
     const buildTableForContract = async (
@@ -193,7 +201,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             });
         }
 
-        const tableTotalCents = itemsTotalCents + flatratesTotal;
+        const tableTotalCents = itemsTotalCents + flatratesTotal - discountsTotal;
 
         return {
             products: productNames,
@@ -268,6 +276,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         products,
         groups,
         tables,
+        discounts,
     };
 }
 

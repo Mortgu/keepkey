@@ -17,6 +17,7 @@ export interface OffersPage {
 
 export type Offer = components["schemas"]["Offer"];
 export type OfferPosition = components["schemas"]["OfferPosition"];
+export type OfferDiscount = components["schemas"]["OfferDiscount"];
 export type OfferFlatRate = components["schemas"]["OfferFlatRate"];
 export type OfferRevision = {
     id: string;

@@ -38,8 +38,9 @@ model Offer {
 
   version Int @default(1)
 
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  createdAt      DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime        @updatedAt @db.Timestamptz(6)
+  offerDiscounts OfferDiscount[]
 
   @@map("offer")
 }
@@ -133,4 +134,21 @@ model OfferDocument {
 
   @@unique([offerId, version])
   @@map("offer_document")
+}
+
+model OfferDiscount {
+  id String @id @default(cuid())
+
+  offer   Offer  @relation(fields: [offerId], references: [id])
+  offerId String
+
+  title       String
+  description String?
+
+  amount_cents Int
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("offer_discount")
 }

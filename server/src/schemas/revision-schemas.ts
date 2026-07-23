@@ -48,10 +48,17 @@ const offerFlatRate = z.object({
   total_cents: z.number().int(),
 });
 
+const offerDiscount = z.object({
+  title: z.string(),
+  description: z.string().nullable().default(null),
+  amount_cents: z.number().int(),
+});
+
 export const offerRevisionSnapshotSchema = z.object({
   offer: offerFields,
   positions: z.array(offerPosition),
   flatRates: z.array(offerFlatRate),
+  discounts: z.array(offerDiscount).default([]),
 });
 
 const orderFields = z.object({
@@ -99,6 +106,7 @@ export function buildOfferRevisionSnapshot(value: Record<string, unknown>): Offe
     offer: value,
     positions: value.offerPositions,
     flatRates: value.offerFlatRates,
+    discounts: value.offerDiscounts,
   });
 }
 

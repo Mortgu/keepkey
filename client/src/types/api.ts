@@ -125,6 +125,7 @@ export interface components {
             createdAt: string;
             /** Format: date-time */
             updatedAt: string;
+            offerDiscounts: components["schemas"]["OfferDiscount"][];
         };
         OfferRevision: {
             id: string;
@@ -198,6 +199,19 @@ export interface components {
             updatedAt: string;
             /** Format: date-time */
             deletedAt?: string;
+        };
+        OfferDiscount: {
+            id: string;
+            offer: components["schemas"]["Offer"];
+            offerId: string;
+            title: string;
+            description?: string;
+            /** Format: int32 */
+            amount_cents: number;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            updatedAt: string;
         };
         Order: {
             id: string;
