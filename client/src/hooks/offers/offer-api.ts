@@ -29,7 +29,7 @@ export const updateOffer = async (id: string, expectedVersion: number, payload: 
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ expectedVersion, payload }),
+        body: JSON.stringify({ offerId: id, expectedVersion, ...payload }),
     });
 
 export const deleteOffer = async (id: string) =>

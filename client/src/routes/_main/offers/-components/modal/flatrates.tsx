@@ -4,17 +4,15 @@ import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { OfferFormApi } from "../../-hooks/use-offer-form";
 import useFlatrateOfferModal from "../../-hooks/use-flatreate.offer-modal";
-import type { Offer } from "@/types";
 import { useState } from "react";
 import FlatrateItemOfferModal from "./flatrate-item";
 import FlatrateFormOfferModal from "./flatrate-form";
 
 interface Props {
-    currentOffer?: Offer;
     form: OfferFormApi;
 }
 
-export default function FlatrateOfferModalSection({ currentOffer, form }: Props) {
+export default function FlatrateOfferModalSection({ form }: Props) {
     const { t } = useTranslation();
 
     const { flatRates } = useFlatRates();

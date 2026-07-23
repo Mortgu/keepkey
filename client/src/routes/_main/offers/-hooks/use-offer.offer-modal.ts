@@ -17,16 +17,16 @@ export default function useOfferModal({ currentOffer }: Props) {
     const { contracts } = useContracts();
 
     const [customer, setCustomer] = useState<string>(
-        currentOffer?.customer.id || customers[0].id || "");
+        currentOffer?.customerId || customers[0].id || "");
 
     const [contact, setContact] = useState<string>(
         currentOffer?.customerContactPerson.id || customers[0]?.contactPersons[0].id || "");
 
     const [employee, setEmployee] = useState<string>(
-        currentOffer?.user?.id || users[0]?.id || "");
+        currentOffer?.userId || users[0]?.id || "");
 
     const [supplier, setSupplier] = useState<string | null>(
-        currentOffer?.supplier?.id || suppliers[0]?.id || "");
+        currentOffer?.supplierId || suppliers[0]?.id || "");
 
     const [language, setLanguage] = useState<Language>(
         currentOffer?.language || "DE");

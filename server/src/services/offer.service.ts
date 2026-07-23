@@ -209,6 +209,8 @@ export async function getOffers(query: OfferListQuery) {
         skip: cursor ? 1 : 0,
         cursor: cursor && typeof cursor === "string" ? { id: cursor } : undefined,
         include: {
+            user: true,
+            supplier: true,
             customer: { select: { id: true, companyName: true } },
             customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             offerDocuments: {
@@ -246,6 +248,10 @@ export async function getOfferById(id: string) {
     const offer = await prisma.offer.findFirst({
         where: { id },
         include: {
+            user: true,
+            supplier: true,
+            customer: true,
+            customerContactPerson: true,
             offerDocuments: {
                 where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
@@ -343,6 +349,8 @@ export async function createOffer(input: CreateOfferInput) {
 }
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
+    console.log(offerId, input, actorId);
+
     const { offerPositions: rawPositions, flatrates: rawFlatrates, expectedVersion } = input;
 
     const positions = await pricePositions(rawPositions, input.customerId);
@@ -404,6 +412,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
         await replacePositions(tx, offerId, positions);
         await replaceFlatRates(tx, offerId, flatrates);
+
         await tx.offerDocument.updateMany({
             where: { offerId, isCurrent: true },
             data: { isCurrent: false },

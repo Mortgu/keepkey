@@ -57,10 +57,7 @@ export default function OfferModal(props: OfferModalProps) {
             form={form}
           />
 
-          <FlatrateOfferModalSection
-            currentOffer={currentOffer}
-            form={form}
-          />
+          <FlatrateOfferModalSection form={form} />
 
         </div>
       </ModalDialog.Content>
