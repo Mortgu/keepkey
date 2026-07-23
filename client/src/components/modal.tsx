@@ -46,7 +46,7 @@ function ModalDialog({ onClose, children }: ModalProps) {
 
                     <Button className="w-9.5 h-9.5"
                         onClick={onClose}
-                        variant="secondary"
+                        variant="border"
                         size="xs"
                         icon={<X className="size-4" />}
                         iconOnly

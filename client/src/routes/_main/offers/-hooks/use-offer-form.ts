@@ -1,17 +1,17 @@
 import type { Offer } from "@/types";
 import { useForm, useStore } from "@tanstack/react-form";
-import useOfferModal from "../-hooks2/use-offer.offer-modal";
-import { offerFormSchema } from "../-schemas/offer-form-schema";
+import useOfferModal from "../-hooks/use-offer.offer-modal";
 import { useOfferManager } from "@/hooks";
 import { useState } from "react";
 
+import { createOfferSchema } from '@keepit/schemas';
+
 interface Props {
     currentOffer?: Offer;
+    closeFn: () => void;
 }
 
-
-
-export default function useOfferForm({ currentOffer }: Props) {
+export default function useOfferForm({ currentOffer, closeFn }: Props) {
     const { defaultValues } = useOfferModal({ currentOffer });
     const { createOffer, updateOffer } = useOfferManager();
 
@@ -20,8 +20,8 @@ export default function useOfferForm({ currentOffer }: Props) {
     const form = useForm({
         defaultValues: defaultValues,
         validators: {
-            onMount: offerFormSchema,
-            onChange: offerFormSchema
+            onMount: createOfferSchema,
+            onChange: createOfferSchema
         },
         onSubmit: async ({ value }) => {
             if (currentOffer) {
@@ -31,8 +31,10 @@ export default function useOfferForm({ currentOffer }: Props) {
                     payload: value,
                 });
             } else {
-                await createOffer({ payload: value });
+                await createOffer(value);
             }
+
+            closeFn();
         },
     });
 

@@ -1,6 +1,7 @@
 import { getTariffPrice, upsertCustomerPrice } from "@/hooks/tariffs/tariff-api";
 import { useMutation } from "@tanstack/react-query";
-import type { OfferProductInput } from "../../-components/modal-components/offer-product-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
+import type { OfferProductInput } from "../../-components/modal/workload-form";
 
 export default function useOfferPricing(customerId: string) {
     const { mutateAsync: fetchPrice, isPending, error } = useMutation({
@@ -28,7 +29,7 @@ export default function useOfferPricing(customerId: string) {
         }) => upsertCustomerPrice(args),
     });
 
-    const resolvePrice = async (data: OfferProductInput): Promise<OfferProductInput> => {
+    const resolvePrice = async (data: CreateOfferPositionInput): Promise<CreateOfferPositionInput> => {
         const fetched = await fetchPrice({
             productId: data.productId,
             contractId: data.contractId,

@@ -4,16 +4,12 @@ import { localized } from "@/lib/i18n-content";
 import { Pen } from "lucide-react";
 import { useEffect, useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferPosition } from "@/types";
-
-export type OfferProductInput = Omit<OfferPosition,
-    "id" | "createdAt" | "updatedAt" | "offer" | "product" | "contract" | "offerId"
->;
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 
 interface Props {
-    currentWorkload?: OfferProductInput;
+    currentWorkload?: CreateOfferPositionInput;
     cancelFn: () => void;
-    saveFn: (values: OfferProductInput) => void;
+    saveFn: (values: CreateOfferPositionInput) => void;
 }
 
 export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, saveFn }: Props) {
@@ -106,6 +102,7 @@ export default function WorkloadFormOfferModal({ currentWorkload, cancelFn, save
                         variant: "border",
                         onClick: () => setOverrideUnitPrice(true)
                     }}
+                    value={currentWorkload?.eur_user_month || 0}
                     disabled={!overrideUnitPrice}
                     onBlur={() => setOverrideUnitPrice(!overrideUnitPrice)}
                 />

@@ -14,14 +14,18 @@ import {
 import { notImplemented } from "@/utils/not-implemented.js";
 import { validate } from "@/middlewares/zod.middleware.js";
 import {
-  createOfferFlatratesSchema,
-  createOfferPositionsSchema,
-  createOfferSchema,
   restoreOfferRevisionSchema,
   updateOfferFlatrateSchema,
   updateOfferPositionSchema,
-  updateOfferSchema
 } from "@/schemas/index.js";
+
+import {
+  createOfferSchema,
+  updateOfferSchema,
+
+  createOfferPositionSchema,
+  createOfferFlatrateSchema,
+} from '@keepit/schemas';
 
 const router = Router();
 
@@ -48,7 +52,7 @@ router.delete('/:id', deleteOffer);
 router.get('/:id/positions', notImplemented);
 
 /* [POST] /api/offers/:id/positions */
-router.post('/:id/positions', validate(createOfferPositionsSchema), notImplemented);
+router.post('/:id/positions', validate(createOfferPositionSchema), notImplemented);
 
 /* [PATCH] /api/offers/:id/positions/:positionId */
 router.patch('/:id/positions/:positionId', validate(updateOfferPositionSchema), notImplemented);
@@ -62,7 +66,7 @@ router.delete('/:id/positions/:positionId', notImplemented);
 router.get('/:id/flatrates', notImplemented);
 
 /* [POST] /api/offers/:id/flatrates */
-router.post('/:id/flatrates', validate(createOfferFlatratesSchema), notImplemented);
+router.post('/:id/flatrates', validate(createOfferFlatrateSchema), notImplemented);
 
 /* [PATCH] /api/offers/:id/flatrates/:flatrateId */
 router.patch('/:id/flatrates/:flatrateId', validate(updateOfferFlatrateSchema), notImplemented);

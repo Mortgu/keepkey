@@ -1,4 +1,3 @@
-import z from "zod";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
@@ -8,13 +7,14 @@ import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
 import { calculatePrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
+
 import {
-    createOfferFieldsSchema,
-    createOfferFlatratesSchema,
-    createOfferPositionsSchema,
-    createOfferSchema,
-    updateOfferSchema,
-} from "../schemas/offer-schemas.js";
+    CreateOfferInput,
+    CreateOfferPositionInput,
+    CreateOfferFlatrateInput,
+    UpdateOfferInput
+} from '@keepit/schemas';
+
 import {
     buildOfferRevisionSnapshot,
     parseOfferRevisionSnapshot,
@@ -22,19 +22,13 @@ import {
 
 /* ========== Types ========== */
 
-export type CreateOfferInput = z.infer<typeof createOfferSchema>;
-export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
-export type CreateOfferFieldsInput = z.infer<typeof createOfferFieldsSchema>;
-export type PositionInput = z.infer<typeof createOfferPositionsSchema>[number];
-export type FlatrateInput = z.infer<typeof createOfferFlatratesSchema>[number];
-
-type PricedPosition = PositionInput & {
+type PricedPosition = CreateOfferPositionInput & {
     total_cents: number;
     eur_user_month: number;
     discount_cents: number;
 };
 type StoredPosition = Omit<PricedPosition, "optional"> & { optional?: boolean | null };
-type PricedFlatrate = FlatrateInput & { total_cents: number };
+type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
 
 export interface OfferListQuery {
     search?: unknown;
@@ -49,7 +43,7 @@ export interface OfferListQuery {
 /* ========== Helpers ========== */
 
 /** Berechnet total_cents für jede Position über den Tarif (wirft AppException, wenn kein Preis ermittelbar). */
-async function pricePositions(positions: PositionInput[], customerId?: string): Promise<PricedPosition[]> {
+async function pricePositions(positions: CreateOfferPositionInput[], customerId?: string): Promise<PricedPosition[]> {
     const priced: PricedPosition[] = [];
 
     for (const position of positions) {
@@ -99,7 +93,7 @@ async function getFlatRateCentsById(flatRateIds: string[]): Promise<Map<string, 
 }
 
 /** Berechnet total_cents (= rate * quantity) für jede Flatrate. */
-async function priceFlatrates(flatrates: FlatrateInput[]): Promise<PricedFlatrate[]> {
+async function priceFlatrates(flatrates: CreateOfferFlatrateInput[]): Promise<PricedFlatrate[]> {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return flatrates.map((flatrate) => {
@@ -317,8 +311,18 @@ export async function createOffer(input: CreateOfferInput) {
 
         const offer = await tx.offer.create({
             data: {
-                ...mapOfferData(input),
-                net_amount,
+                customerId: input.customerId,
+                contactPersonId: input.contactPersonId,
+                userId: input.userId,
+                quoteId: input.quoteId,
+                language: input.language,
+                supplierId: input.supplierId,
+                paymentTerm: input.paymentTerm,
+                validUntil: input.validUntil,
+                requestFrom: input.requestFrom,
+                featureComparison: input.featureComparison,
+                toCompare: input.toCompare,
+                net_amount: net_amount,
             },
         });
 
@@ -339,10 +343,9 @@ export async function createOffer(input: CreateOfferInput) {
 }
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
-    const { positions: rawPositions, flatrates: rawFlatrates, expectedVersion } = input;
-    const { id: _, ...offerFields } = (input.offer ?? {}) as CreateOfferFieldsInput & { id?: string };
+    const { offerPositions: rawPositions, flatrates: rawFlatrates, expectedVersion } = input;
 
-    const positions = await pricePositions(rawPositions, input.offer?.customerId);
+    const positions = await pricePositions(rawPositions, input.customerId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
     return prisma.$transaction(async (tx) => {
@@ -383,7 +386,17 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         const [offer] = await tx.offer.updateManyAndReturn({
             where: { id: offerId },
             data: {
-                ...mapOfferData(offerFields),
+                customerId: input.customerId,
+                contactPersonId: input.contactPersonId,
+                userId: input.userId,
+                quoteId: input.quoteId,
+                language: input.language,
+                supplierId: input.supplierId,
+                paymentTerm: input.paymentTerm,
+                validUntil: input.validUntil,
+                requestFrom: input.requestFrom,
+                featureComparison: input.featureComparison,
+                toCompare: input.toCompare,
                 net_amount,
                 version: { increment: 1 },
             },
@@ -483,7 +496,7 @@ export async function restoreOfferRevision(
     });
 }
 
-export async function createOfferPositions(offerId: string, positions: PositionInput[]) {
+export async function createOfferPositions(offerId: string, positions: CreateOfferPositionInput[]) {
     const priced = await pricePositions(positions);
 
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -499,7 +512,7 @@ export async function createOfferPositions(offerId: string, positions: PositionI
 
 }
 
-export async function createOfferFlatrates(offerId: string, flatrates: FlatrateInput[]) {
+export async function createOfferFlatrates(offerId: string, flatrates: CreateOfferFlatrateInput[]) {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return prisma.$transaction(async (tx) => {

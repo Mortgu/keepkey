@@ -2,14 +2,26 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
-import type { CreateOfferFlatrateInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferPositionInput } from "@/types";
-import type { offerFormValues } from "@/routes/_main/offers/-schemas/offer-form-schema";
+import type {
+    CreateOfferFlatrateInput,
+    CreateOfferPositionInput,
+    Offer,
+    OfferFilters,
+    OffersPage,
+    UpdateOfferFlatrateInput,
+    UpdateOfferPositionInput
+} from "@/types";
+
+import type {
+    CreateOfferInput,
+    UpdateOfferInput
+} from '@keepit/schemas';
 
 export function useCreateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ payload }: { payload: offerFormValues }) => createOffer(payload),
+        mutationFn: (input: CreateOfferInput) => createOffer(input),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
@@ -27,7 +39,7 @@ export function useUpdateOffer() {
 
     const mutation = useMutation({
         mutationFn: ({ offerId, expectedVersion, payload }: {
-            offerId: string, expectedVersion: number, payload: offerFormValues,
+            offerId: string, expectedVersion: number, payload: UpdateOfferInput,
         }) => updateOffer(offerId, expectedVersion, payload),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });

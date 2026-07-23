@@ -1,12 +1,11 @@
 import { Button, Checkbox, MultiSelectList } from "@/components";
-import { useLocale } from "@/hooks";
 import type { Offer } from "@/types";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { OfferFormApi } from "../../-hooks/use-offer-form";
-import useOfferModal from "../../-hooks2/use-offer.offer-modal";
-import useWorkloadOfferModal from "../../-hooks2/use-workloads.offer-modal";
+import useOfferModal from "../../-hooks/use-offer.offer-modal";
+import useWorkloadOfferModal from "../../-hooks/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
 import { useStore } from "@tanstack/react-form";
@@ -19,7 +18,6 @@ interface Props {
 
 export default function WorkloadOfferModalSection({ customerId, currentOffer, form }: Props) {
     const { t } = useTranslation();
-    const locale = useLocale();
 
     const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
     const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
@@ -36,7 +34,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
         addWorkload,
         updateWorkload,
         deleteWorkload,
-    } = useWorkloadOfferModal({ currentOffer, customerId, form });
+    } = useWorkloadOfferModal({ customerId, form });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 

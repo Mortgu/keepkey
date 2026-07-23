@@ -1,4 +1,4 @@
-import type { OfferProductInput } from "@/routes/_main/offers/-components/modal-components/offer-product-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { productQueries } from "./product-queries";
 
@@ -14,7 +14,7 @@ export function useProduct(id: string) {
     return { product: data, isPending, error };
 }
 
-export function usePrice(customerId: string, workload: OfferProductInput) {
+export function usePrice(customerId: string, workload: CreateOfferPositionInput) {
     const { data, isPending, error } = useQuery(productQueries.price(customerId, workload));
     return { price: data, isPending, error };
 }

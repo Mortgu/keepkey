@@ -40,7 +40,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         if (confirm("Angebot löschen")) {
             deleteOffer({ id: offer.id });
         }
-
     };
 
     useEffect(() => {

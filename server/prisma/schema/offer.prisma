@@ -20,7 +20,8 @@ model Offer {
   documentVersion Int    @default(0)
   paymentTerm     String
 
-  featureComparison Boolean @default(false)
+  featureComparison Boolean  @default(false)
+  toCompare         String[]
 
   date        DateTime  @default(now())
   validUntil  DateTime?

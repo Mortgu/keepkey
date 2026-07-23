@@ -50,31 +50,6 @@ export const createOfferPositionsSchema = z.array(createOfferPositionSchema);
 
 export const updateOfferPositionSchema = createOfferPositionSchema.partial();
 
-export const createOfferSchema = z.object({
-  customerId: z.string().min(1, "Required!"),
-  contactPersonId: z.string().min(1, "Required!"),
-  userId: z.string().min(1, "Required!"),
-  quoteId: z.string().min(1, "Required!"),
-  language: z.enum(["EN", "DE"]),
-
-  supplierId: z.string().nullable(),
-  paymentTerm: z.string(),
-
-  validUntil: z.string().datetime().nullable(),
-  requestFrom: z.string().datetime().nullable(),
-
-  featureComparison: z.boolean(),
-  toCompare: z.array(z.string()),
-
-  offerPositions: z.array(createOfferPositionSchema).min(1),
-  flatrates: z.array(createOfferFlatrateSchema).min(1)
-});
-
-export const updateOfferSchema = createOfferSchema.extend({
-  offerId: z.string(),
-  expectedVersion: z.number().int().positive(),
-});
-
 export const restoreOfferRevisionSchema = z.object({
   expectedVersion: z.number().int().positive(),
 });

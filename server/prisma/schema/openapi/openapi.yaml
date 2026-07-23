@@ -256,6 +256,10 @@ components:
           type: string
         featureComparison:
           type: boolean
+        toCompare:
+          type: array
+          items:
+            type: string
         date:
           type: string
           format: date-time
@@ -307,6 +311,7 @@ components:
         - quoteId
         - paymentTerm
         - featureComparison
+        - toCompare
         - date
         - offerFlatRates
         - offerPositions

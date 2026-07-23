@@ -1,4 +1,4 @@
-import type { OfferProductInput } from "@/routes/_main/offers/-components/modal-components/offer-product-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { queryOptions } from "@tanstack/react-query";
 import { getTariffPrice } from "../tariffs/tariff-api";
 import { getProduct, getProducts } from "./product-api";
@@ -16,7 +16,7 @@ export const productQueries = {
         enabled: Boolean(id),
     }),
 
-    price: (customerId: string, workload: OfferProductInput) => queryOptions({
+    price: (customerId: string, workload: CreateOfferPositionInput) => queryOptions({
         queryKey: productKeys.price({
             customerId,
             productId: workload.productId,

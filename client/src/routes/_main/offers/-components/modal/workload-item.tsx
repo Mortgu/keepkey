@@ -4,14 +4,14 @@ import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 import { LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
-import type { OfferProductInput } from "../modal-components/offer-product-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import WorkloadFormOfferModal from "./workload-form";
 
 interface Props {
     customerId: string;
-    workload: OfferProductInput;
+    workload: CreateOfferPositionInput;
 
-    updateFn: (workload: OfferProductInput) => void;
+    updateFn: (workload: CreateOfferPositionInput) => void;
     deleteFn: () => void;
 }
 

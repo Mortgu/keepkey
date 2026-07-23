@@ -9,6 +9,7 @@ server/dist
 server/generated
 server/prisma/schema/openapi
 client/dist
+shared/dist
 
 # Docker
 dev

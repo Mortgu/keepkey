@@ -14,14 +14,12 @@ import type {
 } from "@/types";
 import { useTranslation } from "react-i18next";
 import useOfferForm from "../-hooks/use-offer-form";
-import useOfferFormState from "../-hooks/use-offer-form-state";
 import FlatrateOfferModalSection from "./modal/flatrates";
 import FormOfferModal from "./modal/offer-form";
 import WorkloadOfferModalSection from "./modal/workloads";
 
 interface OfferModalProps {
   closeFn: () => void;
-
   currentOffer: Offer | undefined;
 
   customers: Array<Customer>;
@@ -33,18 +31,11 @@ interface OfferModalProps {
 
 export default function OfferModal(props: OfferModalProps) {
   const { closeFn, currentOffer, customers, suppliers, users } = props;
+  const isEdit = currentOffer !== undefined;
 
   const { t } = useTranslation();
-  const state = useOfferFormState({
-    closeFn,
-    currentOffer,
-    customers,
-    suppliers,
-    users
-  });
 
-  const { form, customerId } = useOfferForm({ currentOffer });
-  const { isEdit, error } = state;
+  const { form, customerId } = useOfferForm({ currentOffer, closeFn });
 
   return (
     <ModalDialog onClose={closeFn}>
@@ -74,11 +65,7 @@ export default function OfferModal(props: OfferModalProps) {
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <div className="w-full flex items-center justify-between">
-
-          <p className="text-(--destructive)">
-            {error && `${error.message}`}
-          </p>
+        <div className="w-full flex items-center justify-end">
 
           <div className="flex gap-2">
             <Button variant="border" size="sm" type="button" onClick={closeFn}>
