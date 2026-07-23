@@ -1,5 +1,5 @@
 import { Button } from "@/components";
-import { useLocale } from "@/hooks";
+import { useFlatRates, useLocale } from "@/hooks";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { OfferFormApi } from "../../-hooks/use-offer-form";
@@ -17,7 +17,7 @@ interface Props {
 export default function FlatrateOfferModalSection({ currentOffer, form }: Props) {
     const { t } = useTranslation();
     const locale = useLocale();
-
+    const { flatRates } = useFlatRates();
     const {
         flatrates,
         addFlatrate,
@@ -26,7 +26,6 @@ export default function FlatrateOfferModalSection({ currentOffer, form }: Props)
     } = useFlatrateOfferModal({ currentOffer, form });
 
     const [showFlatrateForm, setShowFlatrateForm] = useState<boolean>(false);
-
 
     return (
         <div className="grid gap-4">

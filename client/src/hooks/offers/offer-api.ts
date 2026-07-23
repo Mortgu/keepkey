@@ -1,19 +1,16 @@
 import type {
-    CreateOfferFlatrateInput,
-    CreateOfferInput,
-    CreateOfferPositionInput,
+    CreateOfferFlatrateInput, CreateOfferPositionInput,
     Offer,
     OfferFilters,
     OfferPosition,
     OfferRevision,
     OffersPage,
     Task,
-    UpdateOfferFlatrateInput,
-    UpdateOfferInput,
-    UpdateOfferPositionInput
+    UpdateOfferFlatrateInput, UpdateOfferPositionInput
 } from "@/types";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
+import type { offerFormValues } from "@/routes/_main/offers/-schemas/offer-form-schema";
 
 /* Offer */
 export const getOffers = async (filters: OfferFilters) =>
@@ -21,24 +18,18 @@ export const getOffers = async (filters: OfferFilters) =>
         method: "GET"
     });
 
-export const createOffer = (
-    offer: CreateOfferInput,
-    positions: Array<CreateOfferPositionInput>,
-    flatrates: Array<CreateOfferFlatrateInput>
-) =>
+export const createOffer = (payload: offerFormValues) =>
     api<Offer>("/api/offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            offer, positions, flatrates
-        }),
+        body: JSON.stringify({ ...payload }),
     });
 
-export const updateOffer = async (id: string, expectedVersion: number, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>) =>
+export const updateOffer = async (id: string, expectedVersion: number, payload: offerFormValues) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ expectedVersion, offer, positions, flatrates }),
+        body: JSON.stringify({ expectedVersion, payload }),
     });
 
 export const deleteOffer = async (id: string) =>

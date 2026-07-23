@@ -26,12 +26,24 @@ export const createOfferFieldsSchema = z.object({
 })
 
 const createOfferPositionSchema = z.object({
-  productId: z.string().min(1),
-  contractId: z.string().min(1),
-  duration_months: z.number().int().positive(),
-  free_months: z.number().int().min(0).default(0),
-  quantity: z.number().int().positive(),
-  optional: z.boolean().optional(),
+  productId: z.string(),
+  contractId: z.string(),
+  duration_months: z.number(),
+  free_months: z.number(),
+  quantity: z.number(),
+  optional: z.boolean(),
+  total_cents: z.number(),
+  eur_user_month: z.number(),
+  discount_cents: z.number(),
+  price: z.number().optional(),
+  breakdown: z.object({
+    unitPrice: z.number(),
+    totalPrice: z.number(),
+    basePrice: z.number().optional(),
+    discountPercent: z.number().optional(),
+    discountAmount: z.number().optional(),
+    freeMonthsDiscount: z.number().optional(),
+  }).optional(),
 });
 
 export const createOfferPositionsSchema = z.array(createOfferPositionSchema);
@@ -39,12 +51,27 @@ export const createOfferPositionsSchema = z.array(createOfferPositionSchema);
 export const updateOfferPositionSchema = createOfferPositionSchema.partial();
 
 export const createOfferSchema = z.object({
-  offer: createOfferFieldsSchema,
-  positions: createOfferPositionsSchema,
-  flatrates: createOfferFlatratesSchema,
+  customerId: z.string().min(1, "Required!"),
+  contactPersonId: z.string().min(1, "Required!"),
+  userId: z.string().min(1, "Required!"),
+  quoteId: z.string().min(1, "Required!"),
+  language: z.enum(["EN", "DE"]),
+
+  supplierId: z.string().nullable(),
+  paymentTerm: z.string(),
+
+  validUntil: z.string().datetime().nullable(),
+  requestFrom: z.string().datetime().nullable(),
+
+  featureComparison: z.boolean(),
+  toCompare: z.array(z.string()),
+
+  offerPositions: z.array(createOfferPositionSchema).min(1),
+  flatrates: z.array(createOfferFlatrateSchema).min(1)
 });
 
 export const updateOfferSchema = createOfferSchema.extend({
+  offerId: z.string(),
   expectedVersion: z.number().int().positive(),
 });
 

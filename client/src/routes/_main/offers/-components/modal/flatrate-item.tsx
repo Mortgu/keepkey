@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { OfferFlatrateInput } from "./flatrate-form";
-import { useFlatrate, useLocale } from "@/hooks";
+import { useFlatRates, useLocale } from "@/hooks";
 import { Button } from "@/components";
 import { localized } from "@/lib/i18n-content";
 import { X, Pen, Trash } from "lucide-react";
@@ -16,7 +16,8 @@ interface Props {
 export default function FlatrateItemOfferModal({ flatrate, updateFn, deleteFn }: Props) {
     const locale = useLocale();
 
-    const { flatrate: fetchedFlatrate, isPending, error } = useFlatrate(flatrate.flatRateId);
+    const { flatRates } = useFlatRates();
+    const fetchedFlatrate = flatRates.find(fr => fr.id === flatrate.flatRateId);
 
     const [isEdit, setEdit] = useState<boolean>(false);
 
@@ -34,7 +35,7 @@ export default function FlatrateItemOfferModal({ flatrate, updateFn, deleteFn }:
                     {/* actions */}
                     <div className="flex items-center gap-2">
 
-                        <Button variant="border" type="button" size="sm" icon={
+                        <Button variant="border" type="button" size="sm" disabled={isEdit} icon={
                             <Pen size={14} />
                         } iconOnly onClick={() => setEdit(true)} />
 

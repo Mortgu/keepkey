@@ -307,7 +307,7 @@ export async function getNextQuoteId(): Promise<number> {
 /* ========== Mutations ========== */
 
 export async function createOffer(input: CreateOfferInput) {
-    const positions = await pricePositions(input.positions, input.offer.customerId);
+    const positions = await pricePositions(input.offerPositions, input.customerId);
     const flatrates = await priceFlatrates(input.flatrates);
 
     return prisma.$transaction(async (tx) => {
@@ -317,7 +317,7 @@ export async function createOffer(input: CreateOfferInput) {
 
         const offer = await tx.offer.create({
             data: {
-                ...mapOfferData(input.offer),
+                ...mapOfferData(input),
                 net_amount,
             },
         });

@@ -2,17 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
-import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
+import type { CreateOfferFlatrateInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferPositionInput } from "@/types";
+import type { offerFormValues } from "@/routes/_main/offers/-schemas/offer-form-schema";
 
 export function useCreateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offer, positions, flatrates }: {
-            offer: CreateOfferInput,
-            positions: Array<CreateOfferPositionInput>,
-            flatrates: Array<CreateOfferFlatrateInput>,
-        }) => createOffer(offer, positions, flatrates),
+        mutationFn: ({ payload }: { payload: offerFormValues }) => createOffer(payload),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
@@ -29,9 +26,9 @@ export function useUpdateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offerId, expectedVersion, offer, positions, flatrates }: {
-            offerId: string, expectedVersion: number, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>
-        }) => updateOffer(offerId, expectedVersion, offer, positions, flatrates),
+        mutationFn: ({ offerId, expectedVersion, payload }: {
+            offerId: string, expectedVersion: number, payload: offerFormValues,
+        }) => updateOffer(offerId, expectedVersion, payload),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
