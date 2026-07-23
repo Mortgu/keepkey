@@ -147,7 +147,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const discounts = offer.offerDiscounts.map(d => ({
         title: d.title,
         description: d.description ?? "",
-        total: formatCentsToEur(d.amount_cents),
+        total: formatCentsToEur(-d.amount_cents),
     }));
     const discountsTotal = offer.offerDiscounts.reduce((sum, d) => sum + d.amount_cents, 0);
 
@@ -190,13 +190,13 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                 quantity: String(pos.quantity),
                 eur_user_month: formatCentsToEur(unitPrice),
                 duration: String(pos.duration_months),
-                total: formatCentsToEur(totalCents),
+                total: formatCentsToEur(pos.total_cents),
                 contract: contractT.name,
                 optional: pos.optional ?? false,
                 discount: {
                     free_months: pos.free_months,
                     valid_until: formatDate(offer.validUntil),
-                    total: formatCentsToEur(discountCents),
+                    total: formatCentsToEur(-discountCents),
                 },
             });
         }
@@ -288,6 +288,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 
     try {
         const formated = await formatOfferData(context.fetchedData);
+        console.dir(formated, { depth: null });
         context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {
