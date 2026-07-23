@@ -2,8 +2,8 @@ import { Button } from "@/components";
 import { useFlatRates } from "@/hooks";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { OfferFormApi } from "../../-hooks/use-offer-form";
-import useFlatrateOfferModal from "../../-hooks/use-flatreate.offer-modal";
+import type { OfferFormApi } from "../../../-hooks/use-offer-form";
+import useFlatrateOfferModal from "../../../-hooks/use-flatreate.offer-modal";
 import { useState } from "react";
 import FlatrateItemOfferModal from "./flatrate-item";
 import FlatrateFormOfferModal from "./flatrate-form";
@@ -32,7 +32,7 @@ export default function FlatrateOfferModalSection({ form }: Props) {
 
             {/* Head */}
             <div className="flex items-center justify-between">
-                <p>Flatrates</p>
+                <p>{t("offerModal.flatrate_section")}</p>
 
                 {/* Header actions */}
                 <div className="flex items-center gap-4">

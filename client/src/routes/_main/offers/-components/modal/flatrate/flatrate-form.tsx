@@ -1,18 +1,14 @@
 import { Button, Input, Select } from "@/components";
 import { useFlatRates, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OfferFlatRate } from "@/types";
+import type { CreateOfferFlatrateInput } from "@keepit/schemas";
 import { useState, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 
-export type OfferFlatrateInput = Omit<OfferFlatRate,
-    "id" | "createdAt" | "updatedAt" | "offer" | "flatRate" | "total_cents" | "offerId"
->;
-
 interface Props {
-    currentFlatrate?: OfferFlatrateInput;
+    currentFlatrate?: CreateOfferFlatrateInput;
     cancelFn: () => void;
-    saveFn: (values: OfferFlatrateInput) => void;
+    saveFn: (values: CreateOfferFlatrateInput) => void;
 }
 
 export default function FlatrateFormOfferModal({ currentFlatrate, cancelFn, saveFn }: Props) {

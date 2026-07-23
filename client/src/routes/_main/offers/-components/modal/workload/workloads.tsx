@@ -2,11 +2,11 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@tanstack/react-form";
-import useOfferModal from "../../-hooks/use-offer.offer-modal";
-import useWorkloadOfferModal from "../../-hooks/use-workloads.offer-modal";
+import useOfferModal from "../../../-hooks/use-offer.offer-modal";
+import useWorkloadOfferModal from "../../../-hooks/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
-import type { OfferFormApi } from "../../-hooks/use-offer-form";
+import type { OfferFormApi } from "../../../-hooks/use-offer-form";
 import type { Offer } from "@/types";
 import { Button, Checkbox, MultiSelectList } from "@/components";
 
@@ -46,7 +46,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
             {/* Head */}
             <div className="flex items-center justify-between">
-                <p>Workloads</p>
+                <p>{t("offerModal.workload_section")}</p>
 
                 {/* Header actions */}
                 <div className="flex items-center gap-4">

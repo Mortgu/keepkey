@@ -14,9 +14,10 @@ import type {
 } from "@/types";
 import { useTranslation } from "react-i18next";
 import useOfferForm from "../-hooks/use-offer-form";
-import FlatrateOfferModalSection from "./modal/flatrates";
+import FlatrateOfferModalSection from "./modal/flatrate/flatrates";
 import FormOfferModal from "./modal/offer-form";
-import WorkloadOfferModalSection from "./modal/workloads";
+import WorkloadOfferModalSection from "./modal/workload/workloads";
+import DiscoundOfferModalSection from "./modal/discount/discounts";
 
 interface OfferModalProps {
   closeFn: () => void;
@@ -58,6 +59,8 @@ export default function OfferModal(props: OfferModalProps) {
           />
 
           <FlatrateOfferModalSection form={form} />
+
+          <DiscoundOfferModalSection form={form} />
 
         </div>
       </ModalDialog.Content>

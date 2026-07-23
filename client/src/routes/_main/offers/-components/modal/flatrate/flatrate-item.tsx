@@ -1,15 +1,14 @@
 import { useState } from "react";
-import type { OfferFlatrateInput } from "./flatrate-form";
 import { useFlatRates, useLocale } from "@/hooks";
 import { Button } from "@/components";
 import { localized } from "@/lib/i18n-content";
 import { X, Pen, Trash } from "lucide-react";
 import FlatrateFormOfferModal from "./flatrate-form";
+import type { CreateOfferFlatrateInput } from "@/types";
 
 interface Props {
-    flatrate: OfferFlatrateInput;
-
-    updateFn: (flatrate: OfferFlatrateInput) => void;
+    flatrate: CreateOfferFlatrateInput;
+    updateFn: (flatrate: CreateOfferFlatrateInput) => void;
     deleteFn: () => void;
 }
 

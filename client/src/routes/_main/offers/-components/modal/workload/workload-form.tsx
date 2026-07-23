@@ -1,7 +1,7 @@
 import { Pen } from "lucide-react";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type {SyntheticEvent} from "react";
+import type { SyntheticEvent } from "react";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { Button, Checkbox, Input, Select } from "@/components";
 import { useContracts, useLocale, usePrice, useProducts, useTariffDurationsHook } from "@/hooks";
@@ -34,7 +34,7 @@ export default function WorkloadFormOfferModal({ customerId, onPersistOverride, 
 
     const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || durations[0] || 0);
 
-    const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 0);
+    const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 1);
 
     const [freeMonths, setFreeMonths] = useState<number>(currentWorkload?.free_months || 0);
 

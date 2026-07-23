@@ -32,6 +32,7 @@
     "compare": "Vergleichen?",
     "add_workload": "Workload hinzufügen",
     "add_flatrate": "Flatrate hinzufügen",
+    "add_discount": "Rabatt hinzufügen",
     "quantity": "Menge",
     "free_months": "Freimonate",
     "unit_price": "Stückpreis",
@@ -43,7 +44,10 @@
     "paymentTerm": "Zahlungsbedingung",
     "validUntil": "Gültig bis",
     "requestFrom": "Angebot vom",
-    "language": "Sprache"
+    "language": "Sprache",
+    "workload_section": "Produkte",
+    "flatrate_section": "Flatrate",
+    "discound_section": "Rabatte"
   },
   "offers": {
     "toast": {

@@ -32,6 +32,7 @@
     "compare": "Compare?",
     "add_workload": "add Workload",
     "add_flatrate": "add Flatrate",
+    "add_discount": "add Discound",
     "quantity": "Quantity",
     "free_months": "Free months",
     "unit_price": "Unit price",
@@ -43,7 +44,10 @@
     "paymentTerm": "Payment term",
     "validUntil": "Valid until",
     "requestFrom": "Angebot vom",
-    "language": "Sprache"
+    "language": "Sprache",
+    "workload_section": "Workloads",
+    "flatrate_section": "Flatrates",
+    "discound_section": "Discounts"
   },
   "offers": {
     "toast": {

@@ -1,6 +1,6 @@
 import { useStore } from "@tanstack/react-form";
 import type { OfferFormApi } from "../-hooks/use-offer-form";
-import type { OfferFlatrateInput } from "../-components/modal/flatrate-form";
+import type { CreateOfferFlatrateInput } from "@keepit/schemas";
 
 interface Props {
     form: OfferFormApi;
@@ -9,14 +9,14 @@ interface Props {
 export default function useFlatrateOfferModal({ form }: Props) {
     const flatrates = useStore(form.store, (s) => s.values.flatrates);
 
-    const addFlatrate = (flatrate: OfferFlatrateInput) => {
+    const addFlatrate = (flatrate: CreateOfferFlatrateInput) => {
         form.setFieldValue("flatrates", [...flatrates, {
             flatRateId: flatrate.flatRateId,
             quantity: flatrate.quantity
         }]);
     }
 
-    const updateFlatrate = (index: number, flatrate: OfferFlatrateInput) => {
+    const updateFlatrate = (index: number, flatrate: CreateOfferFlatrateInput) => {
         form.setFieldValue("flatrates", flatrates.map((p, i) => (i === index ? flatrate : p)));
     }
 
