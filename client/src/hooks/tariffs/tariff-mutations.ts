@@ -1,5 +1,5 @@
-import {useMutation, useQueryClient} from "@tanstack/react-query";
-import {tariffKeys} from "./tariff-keys";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { tariffKeys } from "./tariff-keys";
 import {
     createTariff,
     createTariffColumn,
@@ -18,14 +18,14 @@ import type {
     CreateTariffGroupInput,
     CreateTariffInput,
     UpdateTariffGroupInput,
-} from "@/types";
+} from "@keepit/schemas";
 
 const invalidateLists = (queryClient: ReturnType<typeof useQueryClient>) => {
-    queryClient.invalidateQueries({queryKey: tariffKeys.lists()});
+    queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
 };
 
 const invalidateAll = (queryClient: ReturnType<typeof useQueryClient>) => {
-    queryClient.invalidateQueries({queryKey: tariffKeys.all});
+    queryClient.invalidateQueries({ queryKey: tariffKeys.all });
 };
 
 /* ───────────────────────────────
@@ -51,7 +51,7 @@ export function useUpdateTariffGroup() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({id, input}: { id: string, input: UpdateTariffGroupInput }) =>
+        mutationFn: ({ id, input }: { id: string, input: UpdateTariffGroupInput }) =>
             updateTariffGroup(id, input),
         onSuccess: () => invalidateAll(queryClient),
     });
@@ -67,7 +67,7 @@ export function useDeleteTariffGroup() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({id}: { id: string }) => deleteTariffGroup(id),
+        mutationFn: ({ id }: { id: string }) => deleteTariffGroup(id),
         onSuccess: () => invalidateAll(queryClient),
     });
 
@@ -86,7 +86,7 @@ export function useCreateTariff() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, input}: { groupId: string, input: CreateTariffInput }) =>
+        mutationFn: ({ groupId, input }: { groupId: string, input: CreateTariffInput }) =>
             createTariff(groupId, input),
         onSuccess: () => invalidateAll(queryClient),
     });
@@ -102,7 +102,7 @@ export function useDeleteTariff() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId}: { groupId: string, tariffId: string }) =>
+        mutationFn: ({ groupId, tariffId }: { groupId: string, tariffId: string }) =>
             deleteTariff(groupId, tariffId),
         onSuccess: () => invalidateAll(queryClient),
     });
@@ -122,7 +122,7 @@ export function useCreateTariffColumn() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, duration}: { groupId: string, tariffId: string, duration: number }) =>
+        mutationFn: ({ groupId, tariffId, duration }: { groupId: string, tariffId: string, duration: number }) =>
             createTariffColumn(groupId, tariffId, duration),
         onSuccess: () => invalidateLists(queryClient),
     });
@@ -138,7 +138,7 @@ export function useDeleteTariffColumn() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, columnId}: { groupId: string, tariffId: string, columnId: string }) =>
+        mutationFn: ({ groupId, tariffId, columnId }: { groupId: string, tariffId: string, columnId: string }) =>
             deleteTariffColumn(groupId, tariffId, columnId),
         onSuccess: () => invalidateLists(queryClient),
     });
@@ -154,7 +154,7 @@ export function useUpdateTariffColumn() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, columnId, duration}: {
+        mutationFn: ({ groupId, tariffId, columnId, duration }: {
             groupId: string, tariffId: string, columnId: string, duration: number
         }) => updateTariffColumn(groupId, tariffId, columnId, duration),
         onSuccess: () => invalidateLists(queryClient),
@@ -175,7 +175,7 @@ export function useCreateTariffRow() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, min_qty, max_qty}: {
+        mutationFn: ({ groupId, tariffId, min_qty, max_qty }: {
             groupId: string, tariffId: string, min_qty: number, max_qty: number
         }) => createTariffRow(groupId, tariffId, min_qty, max_qty),
         onSuccess: () => invalidateLists(queryClient),
@@ -192,7 +192,7 @@ export function useDeleteTariffRow() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, rowId}: { groupId: string, tariffId: string, rowId: string }) =>
+        mutationFn: ({ groupId, tariffId, rowId }: { groupId: string, tariffId: string, rowId: string }) =>
             deleteTariffRow(groupId, tariffId, rowId),
         onSuccess: () => invalidateLists(queryClient),
     });
@@ -208,7 +208,7 @@ export function useUpdateTariffRow() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, rowId, min_qty, max_qty}: {
+        mutationFn: ({ groupId, tariffId, rowId, min_qty, max_qty }: {
             groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number
         }) => updateTariffRow(groupId, tariffId, rowId, min_qty, max_qty),
         onSuccess: () => invalidateLists(queryClient),
@@ -229,7 +229,7 @@ export function useUpdateTariffCell() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({groupId, tariffId, cellId, default_price, customer_price}: {
+        mutationFn: ({ groupId, tariffId, cellId, default_price, customer_price }: {
             groupId: string, tariffId: string, cellId: string, default_price?: number, customer_price?: number
         }) => updateTariffCell(groupId, tariffId, cellId, default_price, customer_price),
         onSuccess: () => invalidateLists(queryClient),

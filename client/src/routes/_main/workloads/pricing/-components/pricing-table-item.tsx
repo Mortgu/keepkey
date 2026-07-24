@@ -1,7 +1,7 @@
 import { ChevronDown, Plus, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
 import TariffComponent from "./tariff-component";
-import type { Tariff } from "@keepit/schemas";
+import type { TariffBase } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
@@ -10,7 +10,7 @@ import { useCreateTariff } from "@/hooks/tariffs/tariff-mutations";
 import { toast } from "react-toastify";
 
 type Props = {
-    tariff: Tariff;
+    tariff: TariffBase;
 }
 
 export default function PricingTableItem({ tariff }: Props) {
