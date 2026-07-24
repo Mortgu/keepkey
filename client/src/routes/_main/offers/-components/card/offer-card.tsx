@@ -27,8 +27,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         offerDiscounts,
     } = offer;
 
-    console.log(offer);
-
     const {
         deleteOffer,
         isDeletingOffer,

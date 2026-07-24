@@ -74,7 +74,7 @@ export function SortDropdown({ value, onChange, options, className, size = "sm" 
       </Button>
 
       {open && (
-        <div className="absolute top-[calc(100%+4px)] right-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[220px] overflow-hidden py-1">
+        <div className="w-full absolute top-[calc(100%+4px)] right-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[220px] overflow-hidden py-1">
           {options.map(o => (
             <div
               key={o.value}

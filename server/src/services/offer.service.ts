@@ -380,8 +380,6 @@ export async function createOffer(input: CreateOfferInput) {
 }
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
-    console.log(offerId, input, actorId);
-
     const { offerPositions: rawPositions, flatrates: rawFlatrates, discounts, expectedVersion } = input;
 
     const positions = await pricePositions(rawPositions, input.customerId);

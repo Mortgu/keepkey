@@ -13,9 +13,9 @@ function updateOfferDocumentStatus(
     error?: string,
 ) {
     queryClient.setQueriesData<OffersPage>({ queryKey: offerKeys.all }, (page) => {
-        if (!page || !page.items.length || !('offerDocuments' in page.items[0])) return page;
+        if (!page || !page?.items?.length || !('offerDocuments' in page?.items[0])) return page;
         return {
-            ...page, items: page.items.map((offer) => ({
+            ...page, items: page?.items?.map((offer) => ({
                 ...offer,
                 offerDocuments: offer.offerDocuments.map((doc) =>
                     doc.taskId === taskId ? { ...doc, status, ...(error ? { error } : {}) } : doc
