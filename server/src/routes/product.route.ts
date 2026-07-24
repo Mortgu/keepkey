@@ -7,7 +7,11 @@ import {
     updateProduct,
 } from "@/controllers/product.controller.js";
 import { validate } from "@/middlewares/zod.middleware.js";
-import { createProductSchema, updateProductSchema } from "@/schemas/index.js";
+
+import {
+    createProductSchema,
+    updateProductSchema
+} from '@keepit/schemas';
 
 const router = Router();
 

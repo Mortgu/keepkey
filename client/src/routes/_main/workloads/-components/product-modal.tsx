@@ -1,12 +1,7 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import type {
-  CreateProductInput,
-  Language,
-  ProductTranslationInput,
-  UpdateProductInput,
-} from "@/types";
+
 import {
   DEFAULT_LANGUAGE_OPTIONS,
   FieldInput,
@@ -14,6 +9,14 @@ import {
   FormModal,
   SegmentedLanguageToggle,
 } from "@/components";
+
+import type {
+  CreateProductInput,
+  UpdateProductInput,
+
+  ProductTranslationInput,
+  Language
+} from '@keepit/schemas';
 
 interface ProductModalProps {
   onClose: () => void;
@@ -36,7 +39,7 @@ function seedLang(
   translations: UpdateProductInput["translations"],
   lang: Language,
 ) {
-  const t = translations?.find((x) => x.language === lang);
+  const t = translations?.find((x: ProductTranslationInput) => x.language === lang);
   return {
     name: t?.name ?? "",
     description: t?.description ?? "",

@@ -1,14 +1,16 @@
 import { api } from "@/lib/api-client";
+
 import type {
-    CreateTariffGroupInput,
-    CreateTariffInput,
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffHistory,
     TariffRow,
+    TariffHistory,
+
+    CreateTariffGroupInput,
+    CreateTariffInput,
     UpdateTariffGroupInput,
-} from "@/types";
+} from '@keepit/schemas';
 
 /* ───────────────────────────────
    TariffGroup

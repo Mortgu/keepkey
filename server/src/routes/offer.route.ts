@@ -13,18 +13,18 @@ import {
 
 import { notImplemented } from "@/utils/not-implemented.js";
 import { validate } from "@/middlewares/zod.middleware.js";
-import {
-  restoreOfferRevisionSchema,
-  updateOfferFlatrateSchema,
-  updateOfferPositionSchema,
-} from "@/schemas/index.js";
 
 import {
   createOfferSchema,
   updateOfferSchema,
 
   createOfferPositionSchema,
+  updateOfferPositionSchema,
+
   createOfferFlatrateSchema,
+  updateOfferFlatrateSchema,
+
+  restoreOfferRevisionSchema
 } from '@keepit/schemas';
 
 const router = Router();

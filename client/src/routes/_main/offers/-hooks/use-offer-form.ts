@@ -1,10 +1,12 @@
-import type { Offer } from "@/types";
 import { useForm, useStore } from "@tanstack/react-form";
 import useOfferModal from "../-hooks/use-offer.offer-modal";
 import { useOfferManager } from "@/hooks";
 import { useState } from "react";
 
-import { createOfferSchema } from '@keepit/schemas';
+import {
+    type Offer,
+    createOfferSchema
+} from '@keepit/schemas';
 
 interface Props {
     currentOffer?: Offer;
@@ -42,7 +44,6 @@ export default function useOfferForm({ currentOffer, closeFn }: Props) {
 
     return {
         form,
-
         customerId
     }
 }

@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 
 import * as productService from "../services/product.service.js";
+import { productListSchema, productSchema } from "@keepit/schemas";
 
 /*
  * Get Workload
@@ -8,7 +9,7 @@ import * as productService from "../services/product.service.js";
  */
 export const getProducts = async (request: Request, response: Response) => {
     const products = await productService.getProducts();
-    return response.status(200).json(products);
+    return response.status(200).json(productListSchema.parse(products));
 }
 
 /*
@@ -19,7 +20,7 @@ export const getProduct = async (request: Request, response: Response) => {
     const productId = request.params.id as string;
     const product = await productService.getProduct(productId);
 
-    return response.status(200).json(product);
+    return response.status(200).json(productSchema.parse(product));
 }
 
 /*

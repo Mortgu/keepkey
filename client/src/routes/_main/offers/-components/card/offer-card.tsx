@@ -6,11 +6,15 @@ import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
-import type { Offer, OfferDocument } from "@/types";
 import { Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+
+import type {
+    Offer,
+    OfferDocument,
+} from '@keepit/schemas';
 
 type OfferListItemProps = {
     offer: Offer;
@@ -22,9 +26,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         customerContactPerson: ccp,
         quoteId,
         offerPositions,
-        offerFlatRates,
+        flatrates,
         customer,
-        offerDiscounts,
+        discounts,
     } = offer;
 
     const {

@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { auth } from "../lib/auth.js";
 import { AppException } from "../lib/exceptions.js";

@@ -1,4 +1,4 @@
-import type { Language } from "@/types";
+import type { Language } from "@keepit/schemas";
 import type { components } from "@/types/api";
 
 type Currency = components["schemas"]["Currency"];

@@ -1,32 +1,22 @@
-import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 
-import type { User } from "@/types";
 import { useUserManager } from "@/hooks";
 import { FieldInput, FormModal } from "@/components";
+
+import {
+    type User,
+    createUserSchema,
+} from '@keepit/schemas';
 
 interface UserModalProps {
     onClose: () => void;
     currentUser: User | null;
 }
 
-const createUserSchema = z.object({
-    salutation: z.string().min(1, "Pflichtfeld"),
-    firstName: z.string().min(1, "Pflichtfeld"),
-    lastName: z.string().min(1, "Pflichtfeld"),
-    email: z.string().email("Ungültige E-Mail"),
-    phone: z.string().min(1, "Ungültige Telefonnummer"),
-    password: z.string().min(8, "Pflichtfeld (8)"),
-});
-
-const editUserSchema = createUserSchema.extend({
-    password: z.string().refine((val) => val === "" || val.length >= 8, "Mind. 8 Zeichen"),
-});
-
 const emptyUser = {
-    salutation: "",
     firstName: "",
     lastName: "",
+    salutation: "",
     email: "",
     phone: "",
     password: "",
@@ -38,24 +28,23 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
     const { updateUser, createUser } = useUserManager();
 
     const userForm = useForm({
-        defaultValues: currentUser ? {
-            salutation: currentUser.salutation,
+        defaultValues: isEdit ? {
             firstName: currentUser.firstName,
             lastName: currentUser.lastName,
+            salutation: currentUser.salutation,
             email: currentUser.email,
-            phone: currentUser.phone,
+            phone: currentUser.phone || "",
             password: "",
         } : emptyUser,
         validators: {
-            onChange: isEdit ? editUserSchema : createUserSchema,
-            onMount: isEdit ? editUserSchema : createUserSchema,
+            onChange: createUserSchema,
+            onMount: createUserSchema,
         },
         onSubmit: async ({ value }) => {
-            const name = `${value.firstName} ${value.lastName}`;
             if (isEdit) {
-                updateUser({ id: currentUser.id, body: { ...value, name } });
+                updateUser({ id: currentUser.id, body: value });
             } else {
-                await createUser({ ...value, name });
+                await createUser({ ...value });
             }
             onClose();
         },

@@ -1,8 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from 'zod';
-import type { Supplier } from "@/types";
 import { FieldInput, FormModal } from "@/components";
 import { useSupplierManager } from "@/hooks";
+import type { Supplier } from "@keepit/schemas";
 
 interface SupplierModalProps {
     onClose: () => void;
@@ -60,11 +60,11 @@ export default function SupplierModal({ onClose, currentSupplier }: SupplierModa
         >
             <div className="flex items-center gap-2">
                 <supplierForm.Field name="name" children={(field) => (
-                    <FieldInput field={field} label="Name"/>
+                    <FieldInput field={field} label="Name" />
                 )} />
 
                 <supplierForm.Field name="supplierId" children={(field) => (
-                    <FieldInput field={field} label="id"/>
+                    <FieldInput field={field} label="id" />
                 )} />
             </div>
         </FormModal>

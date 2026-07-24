@@ -7,8 +7,9 @@ import useWorkloadOfferModal from "../../../-hooks/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
 import type { OfferFormApi } from "../../../-hooks/use-offer-form";
-import type { Offer } from "@/types";
 import { Button, Checkbox, MultiSelectList } from "@/components";
+
+import type { Offer } from '@keepit/schemas';
 
 interface Props {
     customerId: string;

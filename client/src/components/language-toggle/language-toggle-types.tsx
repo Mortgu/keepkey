@@ -1,4 +1,4 @@
-import type { Language } from "@/types";
+import type { Language } from "@keepit/schemas";
 import type { ComponentSize } from "@/components/size";
 
 export interface LanguageOption {

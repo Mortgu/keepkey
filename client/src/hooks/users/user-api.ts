@@ -1,5 +1,10 @@
-import type { CreateUserInput, UpdateUserInput, User } from "@/types";
 import { api } from "@/lib/api-client";
+
+import type {
+    User,
+    CreateUserInput,
+    UpdateUserInput,
+} from '@keepit/schemas';
 
 export const getSessionUser = () =>
     api<User>("/api/users/session", { method: "GET" });

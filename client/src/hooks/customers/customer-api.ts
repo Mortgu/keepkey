@@ -1,13 +1,17 @@
-import type {
-    ContactPerson,
-    CreateCustomerContactInput,
-    CreateCustomerInput,
-    Customer,
-    CustomerFilters,
-    UpdateCustomerContactInput,
-    UpdateCustomerInput
-} from "@/types";
 import { api } from "@/lib/api-client";
+
+import type {
+    Contact,
+    ContactList,
+    CreateContactInput,
+    UpdateContactInput,
+
+    Customer,
+    CreateCustomerInput,
+    UpdateCustomerInput,
+    CustomerFilters
+} from '@keepit/schemas';
+
 
 export const getCustomers = (filters: CustomerFilters = {}) => {
     const params = new URLSearchParams();
@@ -21,7 +25,7 @@ export const getCustomers = (filters: CustomerFilters = {}) => {
 };
 
 export const getContacts = () =>
-    api<Array<ContactPerson>>(`/api/contact-persons`, {
+    api<ContactList>(`/api/contact-persons`, {
         method: "GET",
     });
 
@@ -49,15 +53,15 @@ export const deleteCustomer = (id: string) =>
         method: "DELETE",
     });
 
-export const createCustomerContact = (id: string, input: CreateCustomerContactInput) =>
-    api<ContactPerson>(`/api/customers/${id}/contacts`, {
+export const createCustomerContact = (id: string, input: CreateContactInput) =>
+    api<Contact>(`/api/customers/${id}/contacts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
-export const updateCustomerContact = (id: string, contactId: string, input: UpdateCustomerContactInput) =>
-    api<ContactPerson>(`/api/customers/${id}/contacts/${contactId}`, {
+export const updateCustomerContact = (id: string, contactId: string, input: UpdateContactInput) =>
+    api<Contact>(`/api/customers/${id}/contacts/${contactId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),

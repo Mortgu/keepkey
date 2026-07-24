@@ -1,19 +1,28 @@
 import type {
-    CreateOfferFlatrateInput, CreateOfferPositionInput,
-    Offer,
-    OfferFilters,
-    OfferPosition,
-    OfferRevision,
-    OffersPage,
     Task,
-    UpdateOfferFlatrateInput, UpdateOfferPositionInput
 } from "@/types";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
-import type { CreateOfferInput, UpdateOfferInput } from "@keepit/schemas";
+
+import type {
+    Offer,
+    OffersPage,
+    OfferPosition,
+    OfferRevision,
+
+    CreateOfferInput,
+    UpdateOfferInput,
+
+    CreateOfferPositionInput,
+    UpdateOfferPositionInput,
+
+    CreateOfferFlatrateInput,
+    UpdateOfferFlatrateInput,
+    OfferFilterInput,
+} from "@keepit/schemas";
 
 /* Offer */
-export const getOffers = async (filters: OfferFilters) =>
+export const getOffers = async (filters: OfferFilterInput) =>
     api<OffersPage>(`/api/offers?${formatQueryString(filters)}`, {
         method: "GET"
     });

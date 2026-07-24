@@ -1,7 +1,11 @@
 import type { DropdownOption } from "@/components";
 import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { Offer } from "@/types";
+
+import type {
+    CreateOfferInput,
+    Offer
+} from '@keepit/schemas';
 
 interface Props {
     currentOffer?: Offer;
@@ -20,7 +24,7 @@ export default function useOfferModal({ currentOffer }: Props) {
         label: localized(contract.translations, locale, "name") || contract.id
     }));
 
-    const defaultValues = {
+    const defaultValues: CreateOfferInput = {
         customerId: currentOffer?.customerId || customers[0]?.id || "",
         contactPersonId: currentOffer?.contactPersonId || customers[0]?.contactPersons[0]?.id || "",
         userId: currentOffer?.userId || users[0]?.id || "",
@@ -46,12 +50,12 @@ export default function useOfferModal({ currentOffer }: Props) {
             discount_cents: op.discount_cents,
         })) ?? [],
 
-        flatrates: currentOffer?.offerFlatRates.map(of => ({
+        flatrates: currentOffer?.flatrates.map(of => ({
             flatRateId: of.flatRateId,
             quantity: of.quantity,
         })) ?? [],
 
-        discounts: currentOffer?.offerDiscounts.map(d => ({
+        discounts: currentOffer?.discounts.map(d => ({
             title: d.title,
             description: d.description,
             amount_cents: d.amount_cents,

@@ -4,7 +4,10 @@ import { Button } from "@/components";
 import { localized } from "@/lib/i18n-content";
 import { X, Pen, Trash } from "lucide-react";
 import FlatrateFormOfferModal from "./flatrate-form";
-import type { CreateOfferFlatrateInput } from "@/types";
+
+import type {
+    CreateOfferFlatrateInput
+} from '@keepit/schemas';
 
 interface Props {
     flatrate: CreateOfferFlatrateInput;

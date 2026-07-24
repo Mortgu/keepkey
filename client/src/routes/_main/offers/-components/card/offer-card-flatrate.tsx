@@ -1,10 +1,10 @@
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OfferFlatRate } from "@/types";
+import type { OfferFlatrate } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 
 type Props = {
-    flatrate: OfferFlatRate;
+    flatrate: OfferFlatrate;
 }
 
 export default function OfferCardFlatRate({ flatrate }: Props) {

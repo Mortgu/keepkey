@@ -1,4 +1,4 @@
-import type { CustomerFilters } from "@/types";
+import type { CustomerFilters } from "@keepit/schemas";
 
 export const customerKeys = {
     all: ["customers"] as const,

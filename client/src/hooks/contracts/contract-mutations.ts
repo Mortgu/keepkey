@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { CreateContractInput } from '@/types';
+import type { CreateContractInput } from '@keepit/schemas';
 import { createContract, deleteContract, updateContract } from "./contract-api";
 import { contractKeys } from "./contract-keys";
 

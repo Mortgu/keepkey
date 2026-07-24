@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 
 const offerTemplateProductItemSchema = z.object({
     name: z.string().optional().transform(v => (v === undefined ? "" : v)),

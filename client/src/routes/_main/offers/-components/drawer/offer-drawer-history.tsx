@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import type { Offer, OfferRevision } from "@/types";
+import type { Offer, OfferRevision } from "@keepit/schemas";
 import { Button, Drawer, showToast } from "@/components";
 import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
 import { offerQueries } from "@/hooks/offers/offer-queries";

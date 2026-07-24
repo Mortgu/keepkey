@@ -3,7 +3,7 @@ import type {
     Contract,
     CreateContractInput,
     UpdateContractInput
-} from "@/types";
+} from "@keepit/schemas";
 
 export const getContracts = () =>
     api<Array<Contract>>("/api/contracts", {

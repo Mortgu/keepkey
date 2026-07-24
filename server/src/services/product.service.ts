@@ -1,24 +1,27 @@
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
-import { CreateProductInput, UpdateProductInput } from "../schemas/product-schemas.js";
 
-export async function getProducts() {
+import type {
+    CreateProductInput,
+    UpdateProductInput,
+
+    Product,
+    ProductList
+} from '@keepit/schemas';
+
+export async function getProducts(): Promise<ProductList> {
     const products = await prisma.product.findMany({
         orderBy: { createdAt: "asc" },
-        include: {
-            translations: true,
-        },
+        include: { translations: true },
     });
 
     return products;
 }
 
-export async function getProduct(productId: string) {
+export async function getProduct(productId: string): Promise<Product> {
     const product = await prisma.product.findUnique({
         where: { id: productId },
-        include: {
-            translations: true,
-        },
+        include: { translations: true },
     });
 
     if (!product) {
@@ -28,7 +31,7 @@ export async function getProduct(productId: string) {
     return product;
 }
 
-export async function createProduct(input: CreateProductInput) {
+export async function createProduct(input: CreateProductInput): Promise<Product> {
     const { translations } = input;
 
     const product = await prisma.product.create({
@@ -37,15 +40,13 @@ export async function createProduct(input: CreateProductInput) {
                 create: translations
             }
         },
-        include: {
-            translations: true,
-        }
+        include: { translations: true }
     });
 
     return product;
 }
 
-export async function updateProduct(productId: string, input: UpdateProductInput) {
+export async function updateProduct(productId: string, input: UpdateProductInput): Promise<Product> {
     const { translations } = input;
 
     const result = await prisma.product.update({
@@ -54,7 +55,7 @@ export async function updateProduct(productId: string, input: UpdateProductInput
             ...(Array.isArray(translations)
                 ? {
                     translations: {
-                        upsert: translations.map((t: { language: "DE" | "EN"; name: string; description?: string; table?: string }) => ({
+                        upsert: translations.map((t: { language: "DE" | "EN"; name: string; description?: string | null; table?: string | null }) => ({
                             where: { productId_language: { productId: productId, language: t.language } },
                             create: { language: t.language, name: t.name, description: t.description, table: t.table },
                             update: { name: t.name, description: t.description, table: t.table },

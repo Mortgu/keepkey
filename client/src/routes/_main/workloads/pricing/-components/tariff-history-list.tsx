@@ -1,6 +1,5 @@
 import { useTariffHistoryHook } from "@/hooks";
 import { formatDate } from "@/lib/format";
-import type { TariffHistory } from "@/types";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
 
@@ -18,7 +17,7 @@ export function TariffHistoryList({ productId, contractId }: Props) {
 
     return (
         <div className="grid gap-1">
-            {history.map((entry: TariffHistory) => (
+            {history.map((entry) => (
                 <div key={entry.id} className="border border-(--border) rounded-md">
                     <button
                         className="w-full flex items-center justify-between px-3 py-2 hover:bg-(--page-bg) text-left"

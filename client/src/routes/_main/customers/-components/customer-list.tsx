@@ -9,7 +9,7 @@ import { Button, FilterChip, PageWidth, RouteError, SearchBar } from "@/componen
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
 import { useCustomers, useModal } from "@/hooks";
-import type { Customer } from "@/types";
+import type { Customer } from "@keepit/schemas";
 
 const countryFilterOptions = [
     { value: "Deutschland", label: "Deutschland" },

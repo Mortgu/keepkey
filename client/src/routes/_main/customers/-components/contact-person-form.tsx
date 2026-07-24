@@ -1,7 +1,10 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 
-import type { ContactPerson, CreateCustomerContactInput, } from "@/types";
+import type {
+  Contact,
+  CreateContactInput
+} from "@keepit/schemas";
 import { FieldInput, FormModal } from "@/components";
 
 const contactPersonSchema = z.object({
@@ -12,11 +15,11 @@ const contactPersonSchema = z.object({
 });
 
 interface Props {
-  saveFn: (data: CreateCustomerContactInput) => void;
+  saveFn: (data: CreateContactInput) => void;
   cancelFn: () => void;
 
   currentCustomerId: string;
-  currentContactPerson?: ContactPerson | null;
+  currentContactPerson?: Contact | null;
 }
 
 export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId, currentContactPerson }: Props) {

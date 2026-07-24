@@ -1,7 +1,7 @@
 import { ChevronDown, Plus, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
 import TariffComponent from "./tariff-component";
-import type { Tariff } from "@/types";
+import type { Tariff } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";

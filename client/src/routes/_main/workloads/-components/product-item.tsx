@@ -1,12 +1,16 @@
 import { Pen, Trash } from "lucide-react";
 
 import ProductModal from "./product-modal";
-import type { Product } from "@/types";
+import type { Product } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useLocale, useModal, useDeleteProduct, useUpdateProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
-export default function ProductItem({ product }: { product: Product }) {
+interface Props {
+  product: Product;
+}
+
+export default function ProductItem({ product }: Props) {
   const { deleteProduct, isDeletingProduct } = useDeleteProduct();
   const { updateProduct } = useUpdateProduct();
   const modal = useModal<Product>();

@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
-import type { Tariff, TariffCell } from "@/types";
+import type { Tariff, TariffCell } from "@keepit/schemas";
 import { useTariffGroupHook } from "@/hooks";
 import { Button } from "@/components";
 import TariffCellComponent from "./cell-component";
@@ -19,14 +19,13 @@ function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
     return map;
 }
 
-export default function TariffComponent(props: Props) {
-    const { tariff } = props;
+export default function TariffComponent({ tariff }: Props) {
     const { createColumn, createRow } = useTariffGroupHook();
 
     const groupId = tariff.tariffGroupId;
+    const cells = tariff.cells;
 
-
-    const cellMap = useMemo(() => buildCellMap(tariff.cells), [tariff.cells]);
+    const cellMap = useMemo(() => buildCellMap(cells), [cells]);
 
     return (
         <div className="border-b border-(--border)">

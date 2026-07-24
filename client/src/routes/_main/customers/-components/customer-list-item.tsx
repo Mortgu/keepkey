@@ -5,7 +5,10 @@ import ContactListItem from "./contact-list-item";
 import ContactPersonForm from "./contact-person-form";
 import CustomerModal from "./customer-modal";
 
-import type { CreateCustomerContactInput, Customer } from "@/types";
+import type {
+    CreateContactInput,
+    Customer
+} from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
 
 import { useCreateCustomerContact, useDeleteCustomer, useModal } from "@/hooks";
@@ -62,7 +65,7 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
 
                     {addContact && (
                         <ContactPersonForm
-                            saveFn={(data: CreateCustomerContactInput) => {
+                            saveFn={(data: CreateContactInput) => {
                                 createCustomerContact({
                                     id: customer.id,
                                     input: {

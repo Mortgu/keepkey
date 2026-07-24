@@ -2,15 +2,18 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
-import type {
-    CreateOfferFlatrateInput,
-    CreateOfferPositionInput, OfferFilters, UpdateOfferFlatrateInput,
-    UpdateOfferPositionInput
-} from "@/types";
 
 import type {
     CreateOfferInput,
-    UpdateOfferInput
+    UpdateOfferInput,
+
+    CreateOfferPositionInput,
+    UpdateOfferPositionInput,
+
+    CreateOfferFlatrateInput,
+    UpdateOfferFlatrateInput,
+
+    OfferFilterInput,
 } from '@keepit/schemas';
 
 export function useCreateOffer() {
@@ -184,7 +187,7 @@ export function useDeleteOfferFlatrate() {
     }
 }
 
-export function useOfferManager(filters: OfferFilters = {}) {
+export function useOfferManager(filters: OfferFilterInput = { limit: 50 }) {
     const offerQuery = useOffers(filters);
 
     const createOfferMutation = useCreateOffer();
