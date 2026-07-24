@@ -1,16 +1,16 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
+import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from "@/types";
-import { Button, Collapsable, showToast } from "@/components";
+import { Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import OfferCardDiscount from "./offer-card-discount";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -30,7 +30,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
     const {
         deleteOffer,
         isDeletingOffer,
-        errorDeletingOffer
     } = useDeleteOffer();
 
 
@@ -43,13 +42,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             deleteOffer({ id: offer.id });
         }
     };
-
-    useEffect(() => {
-        if (errorDeletingOffer) {
-            const message = errorDeletingOffer instanceof Error ? errorDeletingOffer.message : String(errorDeletingOffer);
-            showToast.error("offers.toast.deleteError", { vars: { message } });
-        }
-    }, [errorDeletingOffer]);
 
     return (
         <div className="border border-(--border) rounded-md">
@@ -111,7 +103,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         <OfferCardFlatRate key={i} flatrate={flatrate} />
                     ))}
 
-                    {offerDiscounts.map((discount, i) => (
+                    {offerDiscounts.map((discount) => (
                         <OfferCardDiscount key={discount.id} discount={discount} />
                     ))}
                 </div>

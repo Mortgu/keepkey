@@ -126,10 +126,10 @@ export async function initNextcloud(): Promise<boolean> {
 
 export function getNextCloudClient(): WebDAVClient {
     if (!isNextcloudConfigured()) {
-        throw new AppException("Nextcloud is not configured!", 503, "nextcloudNotConfigured");
+        throw new AppException("Nextcloud is not configured!", 503, "NEXTCLOUD_NOT_CONFIGURED");
     }
     if (!isNextcloudAvailable) {
-        throw new AppException("Nextcloud is not available!", 503, "nextcloudUnavailable");
+        throw new AppException("Nextcloud is not available!", 503, "NEXTCLOUD_UNAVAILABLE");
     }
     if (!client) {
         client = createClient(`${env.NEXTCLOUD_URL}/remote.php/dav/files/${env.NEXTCLOUD_USER}/`, {
@@ -142,7 +142,7 @@ export function getNextCloudClient(): WebDAVClient {
 
 export async function fileExists(filePath: string): Promise<boolean> {
     if (!isNextcloudAvailable) {
-        throw new AppException("Nextcloud is not available!", 503, "nextcloudUnavailable");
+        throw new AppException("Nextcloud is not available!", 503, "NEXTCLOUD_UNAVAILABLE");
     }
     try {
         await getNextCloudClient().stat(filePath);
@@ -170,6 +170,6 @@ export async function downloadDocumentStream(remotePath: string): Promise<Readab
         return client.createReadStream(remotePath);
     } catch (exception: any) {
         logger.error('nextcloud_download_error', { path: remotePath, error: exception.message });
-        throw new AppException("Nextcloud download failed!", 503, "nextcloudDownloadFailed");
+        throw new AppException("Nextcloud download failed!", 503, "NEXTCLOUD_DOWNLOAD_FAILED");
     }
 }

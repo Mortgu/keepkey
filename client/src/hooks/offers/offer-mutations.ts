@@ -4,11 +4,7 @@ import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 import type {
     CreateOfferFlatrateInput,
-    CreateOfferPositionInput,
-    Offer,
-    OfferFilters,
-    OffersPage,
-    UpdateOfferFlatrateInput,
+    CreateOfferPositionInput, OfferFilters, UpdateOfferFlatrateInput,
     UpdateOfferPositionInput
 } from "@/types";
 
@@ -59,25 +55,6 @@ export function useDeleteOffer() {
 
     const mutation = useMutation({
         mutationFn: ({ id }: { id: string }) => deleteOffer(id),
-        onMutate: async ({ id }) => {
-            await queryClient.cancelQueries({ queryKey: offerKeys.lists() });
-
-            const previous = queryClient.getQueriesData<Array<Offer>>({
-                queryKey: offerKeys.lists(),
-            });
-
-            queryClient.setQueriesData<OffersPage>(
-                { queryKey: offerKeys.lists() },
-                (old) => old ? { ...old, items: old.items.filter((o) => o.id !== id) } : old,
-            );
-
-            return { previous };
-        },
-        onError: (_err, _vars, context) => {
-            context?.previous.forEach(([key, data]) => {
-                queryClient.setQueryData(key, data);
-            });
-        },
         onSettled: (_, __, { id }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(id) });
@@ -85,7 +62,7 @@ export function useDeleteOffer() {
     });
 
     return {
-        deleteOffer: mutation.mutateAsync,
+        deleteOffer: mutation.mutate,
         isDeletingOffer: mutation.isPending,
         errorDeletingOffer: mutation.error,
     }

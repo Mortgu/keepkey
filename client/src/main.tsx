@@ -7,6 +7,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 
 import { routeTree } from './routeTree.gen'
 import {authClient} from "@/lib/auth-client.ts";
+import { getErrorMessage } from "@/lib/errors";
 import { showToast } from "@/components/toast/toast";
 
 const queryClient = new QueryClient({
@@ -19,8 +20,7 @@ const queryClient = new QueryClient({
         },
         mutations: {
             onError: (error) => {
-                const message = error instanceof Error ? error.message : undefined;
-                showToast.error("common.errorGeneric", { message });
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
             },
         },
     },

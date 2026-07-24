@@ -2,10 +2,12 @@ export const BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 export class ApiError extends Error {
     status: number;
-    constructor(message: string, status: number) {
+    code: string;
+    constructor(message: string, status: number, code: string = "APP_ERROR") {
         super(message);
         this.name = "ApiError";
         this.status = status;
+        this.code = code;
     }
 }
 
@@ -40,9 +42,10 @@ export const api = async <T = unknown>(endpoint: string, options: RequestInit = 
     }
 
     if (!res.ok) {
-        const payload = json as { message?: unknown } | undefined;
+        const payload = json as { message?: unknown; code?: unknown } | undefined;
         const message = typeof payload?.message === "string" ? payload.message : "API error";
-        throw new ApiError(message, res.status);
+        const code = typeof payload?.code === "string" ? payload.code : "APP_ERROR";
+        throw new ApiError(message, res.status, code);
     }
 
     return json as T;

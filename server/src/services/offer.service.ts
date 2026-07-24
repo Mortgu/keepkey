@@ -615,13 +615,11 @@ export async function enqueueGeneration(offerId: string) {
 /* ========== Deletes ========== */
 
 export async function deleteOffer(id: string): Promise<void> {
-    if (!id) {
-        throw new AppException("Bad request. Missing id!", 400, "MISSING_ID");
-    }
-
     await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
+
         await tx.offer.findUniqueOrThrow({ where: { id } });
+
         if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
             throw new AppException(
                 "Offers with document history cannot be deleted.",
@@ -629,6 +627,7 @@ export async function deleteOffer(id: string): Promise<void> {
                 "OFFER_HAS_DOCUMENT_HISTORY",
             );
         }
+
         await tx.offer.delete({ where: { id } });
     });
 }
