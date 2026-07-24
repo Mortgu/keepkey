@@ -1,18 +1,175 @@
 import { z } from 'zod';
+import { productSchema } from './product.schema.js';
+import { contractSchema } from './contract.schema.js';
+import { flatrateSchema } from './flatrate.schema.js';
+import { documentStatusSchema, documentArtifactSchema } from './document.schema.js';
 
-export const createOrderSchema = z.object({
+/* OrderPosition */
+export const orderPositionSchema = z.object({
+    id: z.string(),
+    orderId: z.string(),
 
+    productId: z.string(),
+    contractId: z.string(),
+
+    product: productSchema,
+    contract: contractSchema,
+
+    duration_months: z.number().int(),
+    quantity: z.number().int(),
+    optional: z.boolean().optional(),
+
+    total_cents: z.number().int(),
+
+    createdAt: z.string(),
 });
-export type CreateOrderSchema = z.infer<typeof createOrderSchema>;
+export type OrderPosition = z.infer<typeof orderPositionSchema>;
 
-export const updateOrderSchema = createOrderSchema.partial();
+/* OrderFlatRate */
+export const orderFlatRateSchema = z.object({
+    id: z.string(),
+    orderId: z.string(),
+
+    flatRateId: z.string(),
+    flatRate: flatrateSchema,
+
+    quantity: z.number().int(),
+    total_cents: z.number().int(),
+});
+export type OrderFlatRate = z.infer<typeof orderFlatRateSchema>;
+
+/* OrderDocument */
+export const orderDocumentSchema = z.object({
+    id: z.string(),
+    displayName: z.string().optional(),
+
+    version: z.number(),
+    sourceVersion: z.number().optional(),
+
+    status: documentStatusSchema,
+    isCurrent: z.boolean(),
+    error: z.string().optional(),
+
+    orderId: z.string(),
+    taskId: z.string(),
+    artifacts: z.array(documentArtifactSchema),
+
+    createdAt: z.string(),
+    updatedAt: z.string(),
+    deletedAt: z.string().optional(),
+});
+export type OrderDocument = z.infer<typeof orderDocumentSchema>;
+
+/* OrderRevision */
+export const orderRevisionSchema = z.object({
+    id: z.string(),
+    version: z.number().int(),
+
+    createdAt: z.string(),
+    changedBy: z.object({
+        id: z.string(),
+        name: z.string(),
+    }),
+});
+export type OrderRevision = z.infer<typeof orderRevisionSchema>;
+
+/* Order (create) */
+export const createOrderSchema = z.object({
+    id: z.string().min(1),
+    orderId: z.string().min(1, "Bestell-Nr. erforderlich"),
+    date: z.string().optional(),
+    projectNumber: z.string().optional(),
+    projectDescription: z.string().optional(),
+    orderDetails: z.string().optional(),
+});
+export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+
+/* Order (update) */
+const orderFieldsSchema = z.object({
+    supplierId: z.string().nullable(),
+    customerId: z.string().min(1),
+    contactPersonId: z.string().min(1),
+    employeeId: z.string().min(1),
+    orderId: z.string().min(1),
+    paymentTerm: z.string(),
+    projectNumber: z.string().nullable(),
+    projectDescription: z.string().nullable(),
+    orderDetails: z.string().nullable(),
+    date: z.string(),
+    validUntil: z.string().nullable(),
+    requestFrom: z.string().nullable(),
+});
+
+const orderPositionInputSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration_months: z.number().int().positive(),
+    quantity: z.number().int().positive(),
+    optional: z.boolean().nullable(),
+    total_cents: z.number().int().min(0),
+});
+
+const orderFlatRateInputSchema = z.object({
+    flatRateId: z.string().min(1),
+    quantity: z.number().int().positive(),
+    total_cents: z.number().int().min(0),
+});
+
+export const updateOrderSchema = z.object({
+    expectedVersion: z.number().int().positive(),
+    order: orderFieldsSchema,
+    positions: z.array(orderPositionInputSchema),
+    flatRates: z.array(orderFlatRateInputSchema),
+});
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
-export const orderSchema = createOrderSchema.extend({
+/* Restore Order Revision */
+export const restoreOrderRevisionSchema = z.object({
+    expectedVersion: z.number().int().positive(),
+});
+
+/* Order (entity) */
+export const orderSchema = z.object({
     id: z.string(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    supplierId: z.string().nullable().optional(),
+    customerId: z.string(),
+    contactPersonId: z.string(),
+    employeeId: z.string(),
+
+    offerId: z.string(),
+    orderId: z.string(),
+
+    paymentTerm: z.string(),
+    projectNumber: z.string().optional(),
+    projectDescription: z.string().optional(),
+    orderDetails: z.string().optional(),
+
+    date: z.string(),
+    validUntil: z.string().optional(),
+    requestFrom: z.string().optional(),
+
+    net_amount: z.number().int(),
+    version: z.number().int(),
+
+    customer: z.object({
+        id: z.string(),
+        companyName: z.string(),
+    }),
+
+    customerContactPerson: z.object({
+        id: z.string(),
+        salutation: z.string(),
+        firstName: z.string(),
+        lastName: z.string(),
+    }),
+
+    documents: z.array(orderDocumentSchema),
+    orderPositions: z.array(orderPositionSchema),
+    flatRates: z.array(orderFlatRateSchema),
+
+    createdAt: z.string(),
+    updatedAt: z.string(),
 });
 export type Order = z.infer<typeof orderSchema>;
 

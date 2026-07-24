@@ -26,9 +26,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         customerContactPerson: ccp,
         quoteId,
         offerPositions,
-        flatrates,
+        offerFlatRates,
         customer,
-        discounts,
+        offerDiscounts,
     } = offer;
 
     const {

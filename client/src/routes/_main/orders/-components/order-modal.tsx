@@ -50,7 +50,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
     onSubmit: async ({ value }) => {
       if (!selectedOffer) return;
       await createOrder({
-        offerId: selectedOffer.id,
+        id: selectedOffer.id,
         orderId: value.orderId,
         date: value.date,
         projectNumber: value.projectNumber || undefined,

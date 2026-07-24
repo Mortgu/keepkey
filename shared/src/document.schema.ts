@@ -3,6 +3,11 @@ import { z } from 'zod';
 export const documentFormatSchema = z.enum(["PDF", "DOCX"]);
 export type DocumentFormat = z.infer<typeof documentFormatSchema>;
 
+export const documentStatusSchema = z.enum([
+    "PENDING", "PROCESSING", "GENERATED", "UPLOADING", "UPLOADED", "FAILED"
+]);
+export type DocumentStatus = z.infer<typeof documentStatusSchema>;
+
 export const documentArtifactSchema = z.object({
     id: z.string(),
     objectKey: z.string(),

@@ -5,7 +5,7 @@ import { customerSchema } from "./customer.schema.js";
 import { contractSchema } from "./contract.schema.js";
 import { productSchema } from "./product.schema.js";
 import { flatrateSchema } from "./flatrate.schema.js";
-import { documentArtifactSchema } from "./document.schema.js";
+import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
 
 /* OfferPosition */
 export const createOfferPositionSchema = z.object({
@@ -76,11 +76,6 @@ export type CreateOfferDocumentInput = z.infer<typeof createOfferDocumentSchema>
 export const updateOfferDocumentSchema = createOfferDocumentSchema.partial();
 export type UpdateOfferDocumentInput = z.infer<typeof updateOfferDocumentSchema>;
 
-export const offerDocumentStatusSchema = z.enum([
-    "PENDING", "PROCESSING", "GENERATED", "UPLOADING", "UPLOADED", "FAILED"
-]);
-export type OfferDocumentStatus = z.infer<typeof offerDocumentStatusSchema>;
-
 export const offerDocumentSchema = createOfferDocumentSchema.extend({
     id: z.string(),
     displayName: z.string().optional(),
@@ -88,7 +83,7 @@ export const offerDocumentSchema = createOfferDocumentSchema.extend({
     version: z.number(),
 
     sourceVersion: z.number().optional(),
-    status: offerDocumentStatusSchema,
+    status: documentStatusSchema,
     isCurrent: z.boolean(),
     error: z.string().optional(),
 
@@ -139,17 +134,36 @@ export type CreateOfferInput = z.infer<typeof createOfferSchema>;
 export const updateOfferSchema = createOfferSchema.partial();
 export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
 
-export const offerSchema = createOfferSchema.extend({
+export const offerSchema = z.object({
     id: z.string(),
-    user: userSchema,
 
-    date: z.date(),
-    version: z.number().int().positive(),
+    customerId: z.string(),
+    contactPersonId: z.string(),
+    userId: z.string(),
+    supplierId: z.string().nullable().optional(),
 
-    customerContactPerson: contactSchema,
-    customer: customerSchema,
+    quoteId: z.string(),
+    paymentTerm: z.string(),
+    validUntil: z.string().nullable().optional(),
+    requestFrom: z.string().nullable().optional(),
+    language: z.enum(["EN", "DE"]),
+
+    featureComparison: z.boolean(),
+    toCompare: z.array(z.string()),
+
+    offerPositions: z.array(offerPositionSchema),
+    offerFlatRates: z.array(offerFlatrateSchema),
+    offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
     offerDocuments: z.array(offerDocumentSchema),
 
+    user: userSchema,
+    customer: customerSchema,
+    customerContactPerson: contactSchema,
+
+    net_amount: z.number().int(),
+    version: z.number().int().positive(),
+
+    date: z.date(),
     createdAt: z.date(),
     updatedAt: z.date(),
 });
@@ -160,7 +174,6 @@ export type OfferList = z.infer<typeof offerListSchema>;
 
 export const offerDiscountSchema = z.object({
     id: z.string(),
-    offer: offerSchema,
     offerId: z.string(),
 
     title: z.string(),
