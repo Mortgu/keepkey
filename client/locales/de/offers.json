@@ -1,0 +1,32 @@
+{
+  "offerModal": {
+    "compare": "Vergleichen?",
+    "add_workload": "Workload hinzufügen",
+    "add_flatrate": "Flatrate hinzufügen",
+    "add_discount": "Rabatt hinzufügen",
+    "quantity": "Menge",
+    "free_months": "Freimonate",
+    "unit_price": "Stückpreis",
+    "customer": "Kunde",
+    "employee": "Unser Ansprechpartner",
+    "contact": "Ihr Ansprechpartner",
+    "quoteId": "Angebotsnummer",
+    "supplierId": "Lieferant",
+    "paymentTerm": "Zahlungsbedingung",
+    "validUntil": "Gültig bis",
+    "requestFrom": "Angebot vom",
+    "language": "Sprache",
+    "workload_section": "Produkte",
+    "flatrate_section": "Flatrate",
+    "discound_section": "Rabatte"
+  },
+  "offers": {
+    "toast": {
+      "deleteError": "Angebot konnte nicht gelöscht werden: {{message}}",
+      "documentUploadError": "Dokument konnte nicht hochgeladen werden: {{message}}",
+      "documentDeleteError": "Dokument konnte nicht gelöscht werden: {{message}}",
+      "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
+      "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}"
+    }
+  }
+}

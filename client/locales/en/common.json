@@ -1,0 +1,46 @@
+{
+  "button": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close"
+  },
+  "nav": {
+    "catalog": "Catalog",
+    "overview": "Overview",
+    "sales": "Sales",
+    "management": "Management",
+    "settings": "Settings"
+  },
+  "section": {
+    "workloads": "Workloads",
+    "workload_pricing": "Pricing",
+    "workload_text": "Text blocks",
+    "pricing": "Pricing",
+    "flatRates": "Flat Rates",
+    "suppliers": "Suppliers",
+    "contracts": "Contracts",
+    "customers": "Customers",
+    "employees": "Employees",
+    "offers": "Offers",
+    "invoices": "Invoices",
+    "orders": "Orders"
+  },
+  "common": {
+    "search": "Search",
+    "clear": "Clear",
+    "filter": "Filter",
+    "country": "Country",
+    "language": "Language",
+    "export": "Export",
+    "import": "Import",
+    "loading": "Loading...",
+    "noResults": "No results",
+    "errorTitle": "Something went wrong",
+    "errorRetry": "Try again",
+    "errorGeneric": "An unexpected error occurred.",
+    "months": "months"
+  }
+}

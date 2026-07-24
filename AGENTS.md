@@ -20,7 +20,9 @@ Rules:
 
 ### Toasts & i18n
 - Import `showToast` from `@/components` (NOT `toast` from `react-toastify` directly). `showToast.success/.error(key, { vars })` resolves i18n keys via `i18n.t` directly, so it works outside React (in mutations, callbacks, effects).
-- Never pass hardcoded German/English strings to toasts — always use i18n keys. Add new keys under a `<namespace>.toast.*` section in BOTH `client/locals/de/translations.json` and `client/locals/en/translations.json`.
+- Never pass hardcoded German/English strings to toasts — always use i18n keys. Add new keys under the appropriate domain namespace in BOTH `client/locales/de/<namespace>.json` and `client/locales/en/<namespace>.json`.
+- Translation files are split by domain: `common.json` (button, nav, section, common), `offers.json` (offerModal, offers.toast), `versionHistory.json`, `dashboard.json`, `errors.json` (AppException codes).
+- Server error codes from `AppException.code` are mapped via `errors.json` — use `t("ERROR_CODE")` on the client to display user-facing messages.
 
 ### QueryClient
 - `QueryClient` defaults live in `__root.tsx`: `staleTime: 30_000`, `gcTime: 5*60_000`, `retry: 1`, `refetchOnWindowFocus: false`, and a global `mutations.onError` safety net.

@@ -1,0 +1,32 @@
+{
+  "offerModal": {
+    "compare": "Compare?",
+    "add_workload": "add Workload",
+    "add_flatrate": "add Flatrate",
+    "add_discount": "add Discound",
+    "quantity": "Quantity",
+    "free_months": "Free months",
+    "unit_price": "Unit price",
+    "customer": "Customer",
+    "employee": "Our Employee",
+    "contact": "Your Contact",
+    "quoteId": "Quote id",
+    "supplierId": "Supplier",
+    "paymentTerm": "Payment term",
+    "validUntil": "Valid until",
+    "requestFrom": "Angebot vom",
+    "language": "Sprache",
+    "workload_section": "Workloads",
+    "flatrate_section": "Flatrates",
+    "discound_section": "Discounts"
+  },
+  "offers": {
+    "toast": {
+      "deleteError": "Could not delete offer: {{message}}",
+      "documentUploadError": "Could not upload document: {{message}}",
+      "documentDeleteError": "Could not delete document: {{message}}",
+      "documentRenameError": "Could not rename document: {{message}}",
+      "restoreError": "Could not restore version: {{message}}"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "recentOffers": "Recent offers",
+    "recentOrders": "Recent orders",
+    "integrations": "Integrations",
+    "viewAll": "View all",
+    "noActivity": "No activity yet.",
+    "stats": {
+      "offerVolume": "Open offer volume",
+      "openOffers": "Open offers",
+      "orders": "Orders",
+      "conversion": "Conversion rate"
+    },
+    "badge": {
+      "reserved": "Reserved",
+      "converted": "Ordered"
+    },
+    "status": {
+      "connected": "Connected",
+      "checking": "Checking connection\u2026",
+      "failed": "Connection failed",
+      "notConfigured": "Not configured"
+    },
+    "retry": "Retry",
+    "search": {
+      "placeholder": "Search offers, orders, customers\u2026",
+      "recent": "Recent searches",
+      "recentEmpty": "No searches yet.",
+      "empty": "No results for \"{{query}}\"",
+      "results": "{{count}} result(s)",
+      "hints": "\u21b5 open \u00b7 Esc to close",
+      "justNow": "just now",
+      "minutesAgo": "{{count}} min ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}} day(s) ago",
+      "tabs": {
+        "all": "All",
+        "offers": "Offers",
+        "orders": "Orders",
+        "customers": "Customers"
+      },
+      "typeLabels": {
+        "offer": "Offer",
+        "order": "Order",
+        "customer": "Customer"
+      }
+    }
+  }
+}
