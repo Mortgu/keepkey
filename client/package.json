@@ -6,11 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "npx tsc -b && vite build",
-    "generate:types": "npx openapi-typescript ../server/prisma/schema/openapi/openapi.yaml -o src/types/api.ts",
     "lint": "eslint .",
     "test": "vitest run",
-    "preview": "vite preview",
-    "prebuild": "npm run generate:types"
+    "preview": "vite preview"
   },
   "dependencies": {
     "@better-auth/passkey": "^1.6.23",
@@ -55,7 +53,6 @@
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
-    "openapi-typescript": "^7.13.0",
     "typescript": "~5.9.3",
     "typescript-eslint": "^8.56.1",
     "vite": "^8.0.0",

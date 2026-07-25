@@ -5,6 +5,7 @@ export * from "./task.schema.js";
 export * from "./offer.schema.js";
 export * from "./order.schema.js";
 export * from "./language.schema.js";
+export * from "./currency.schema.js";
 export * from "./product.schema.js";
 export * from "./flatrate.schema.js";
 export * from "./user.schema.js";

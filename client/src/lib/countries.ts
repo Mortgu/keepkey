@@ -1,7 +1,4 @@
-import type { Language } from "@keepit/schemas";
-import type { components } from "@/types/api";
-
-type Currency = components["schemas"]["Currency"];
+import type { Currency, Language } from "@keepit/schemas";
 
 export interface CountryConfig {
   code: string;
