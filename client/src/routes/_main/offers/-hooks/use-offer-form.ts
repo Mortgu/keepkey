@@ -29,8 +29,7 @@ export default function useOfferForm({ currentOffer, closeFn }: Props) {
             if (currentOffer) {
                 await updateOffer({
                     offerId: currentOffer.id,
-                    expectedVersion: expectedVersion!,
-                    payload: value,
+                    input: { ...value, expectedVersion: expectedVersion! },
                 });
             } else {
                 await createOffer(value);

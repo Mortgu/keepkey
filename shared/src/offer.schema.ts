@@ -28,6 +28,7 @@ export type UpdateOfferPositionInput = z.infer<typeof updateOfferPositionSchema>
 
 export const offerPositionSchema = createOfferPositionSchema.extend({
     id: z.string(),
+    offerId: z.string(),
 
     contract: contractSchema,
     product: productSchema,
@@ -49,12 +50,10 @@ export type UpdateOfferFlatrateInput = z.infer<typeof updateOfferFlatrateSchema>
 
 export const offerFlatrateSchema = createOfferFlatrateSchema.extend({
     id: z.string(),
+    offerId: z.string(),
 
     total_cents: z.number().int().positive(),
     flatRate: flatrateSchema,
-
-    createdAt: z.date(),
-    updatedAt: z.date(),
 });
 export type OfferFlatrate = z.infer<typeof offerFlatrateSchema>;
 
@@ -131,7 +130,9 @@ export const createOfferSchema = z.object({
 });
 export type CreateOfferInput = z.infer<typeof createOfferSchema>;
 
-export const updateOfferSchema = createOfferSchema.partial();
+export const updateOfferSchema = createOfferSchema.extend({
+    expectedVersion: z.number().int().positive(),
+});
 export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
 
 export const offerSchema = z.object({

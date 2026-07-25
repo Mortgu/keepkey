@@ -37,9 +37,9 @@ export function useUpdateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offerId, expectedVersion, payload }: {
-            offerId: string, expectedVersion: number, payload: UpdateOfferInput,
-        }) => updateOffer(offerId, expectedVersion, payload),
+        mutationFn: ({ offerId, input }: {
+            offerId: string, input: UpdateOfferInput,
+        }) => updateOffer(offerId, input),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });

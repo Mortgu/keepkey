@@ -34,11 +34,11 @@ export const createOffer = (payload: CreateOfferInput) =>
         body: JSON.stringify({ ...payload }),
     });
 
-export const updateOffer = async (id: string, expectedVersion: number, payload: UpdateOfferInput) =>
+export const updateOffer = (id: string, input: UpdateOfferInput) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId: id, expectedVersion, ...payload }),
+        body: JSON.stringify(input),
     });
 
 export const deleteOffer = async (id: string) =>
