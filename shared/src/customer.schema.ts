@@ -15,7 +15,7 @@ export const createCustomerSchema = z.object({
     language: z.string(),
     country: z.string(),
     currency: z.string(),
-    taxRate: z.string(),
+    taxRate: z.number(),
 
     salutation: z.string().optional(),
 });

@@ -35,7 +35,7 @@ const productScheme = z.object({
   EN: langFields,
 });
 
-function seedLang(translations: UpdateProductInput["translations"], lang: Language) {
+function seedLang(translations: Array<ProductTranslationInput> | undefined, lang: Language) {
   const t = translations?.find((x: ProductTranslationInput) => x.language === lang);
   return {
     name: t?.name ?? "",

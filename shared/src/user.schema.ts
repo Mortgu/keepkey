@@ -5,7 +5,7 @@ export const createUserSchema = z.object({
     lastName: z.string(),
     salutation: z.string(),
     email: z.string(),
-    phone: z.string().optional(),
+    phone: z.string(),
     password: z.string(),
 });
 export type CreateUserInput = z.infer<typeof createUserSchema>;
@@ -20,7 +20,7 @@ export const userSchema = z.object({
     lastName: z.string(),
     salutation: z.string(),
     email: z.string(),
-    phone: z.string().optional(),
+    phone: z.string(),
 
     createdAt: z.date(),
     updatedAt: z.date(),

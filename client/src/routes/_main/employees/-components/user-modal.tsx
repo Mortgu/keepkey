@@ -33,7 +33,7 @@ export default function UserModal({ onClose, currentUser }: UserModalProps) {
             lastName: currentUser.lastName,
             salutation: currentUser.salutation,
             email: currentUser.email,
-            phone: currentUser.phone || "",
+            phone: currentUser.phone ?? "",
             password: "",
         } : emptyUser,
         validators: {

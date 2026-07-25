@@ -35,7 +35,7 @@ const flatRateSchema = z.object({
   EN: langFields,
 });
 
-function seedLang(translations: CreateFlatrateTranslationInput, lang: Language) {
+function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefined, lang: Language) {
   const t = translations?.find((x) => x.language === lang);
   return { name: t?.name ?? "", table: t?.table ?? "" };
 }
