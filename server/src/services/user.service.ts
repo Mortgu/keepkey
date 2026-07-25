@@ -3,20 +3,19 @@ import { prisma } from "../lib/prismaClient.js";
 import { auth } from "../lib/auth.js";
 import { AppException } from "../lib/exceptions.js";
 import {
-    createUserSchema,
-    updateUserSchema,
-    createContactPersonsSchema,
-} from "../schemas/user-schemas.js";
+    type CreateContactInput,
+    type CreateUserInput,
+    type UpdateUserInput,
+    userSchema,
+    userListSchema,
+} from "@keepit/schemas";
 
-/* ========== Types ========== */
-
-export type CreateUserInput = z.infer<typeof createUserSchema>;
-export type UpdateUserInput = z.infer<typeof updateUserSchema>;
-export type CreateContactPersonsInput = z.infer<typeof createContactPersonsSchema>;
+type User = z.input<typeof userSchema>;
+type UserList = z.input<typeof userListSchema>;
 
 /* ========== Queries ========== */
 
-export async function getAllUsers() {
+export async function getAllUsers(): Promise<UserList> {
     return prisma.user.findMany({
         include: {
             orders: true,
@@ -26,8 +25,8 @@ export async function getAllUsers() {
     });
 }
 
-export async function getUserById(id: string) {
-    return prisma.user.findUnique({
+export async function getUserById(id: string): Promise<User> {
+    const user = await prisma.user.findUnique({
         where: { id },
         include: {
             orders: true,
@@ -38,6 +37,12 @@ export async function getUserById(id: string) {
             },
         },
     });
+
+    if (!user) {
+        throw new AppException("User not found!", 404, "USER_NOT_FOUND");
+    }
+
+    return user;
 }
 
 export async function getSessionUser(userId: string) {
@@ -54,28 +59,21 @@ export async function getSessionUser(userId: string) {
 
 /* ========== Mutations ========== */
 
-export async function createUser(input: CreateUserInput & { password: string; salutation: string }) {
-    const { email, password, firstName, lastName, salutation, phone, name, role } = input;
+export async function createUser(input: CreateUserInput) {
+    const { email, password, firstName, lastName, salutation, phone } = input;
 
     try {
         const createdUser = await auth.api.signUpEmail({
             body: {
                 email,
                 password,
-                name: name ?? `${firstName} ${lastName}`,
+                name: `${firstName} ${lastName}`,
                 firstName,
                 lastName,
                 salutation,
                 phone: phone || undefined,
             },
         });
-
-        if (role) {
-            await prisma.user.update({
-                where: { id: createdUser.user.id },
-                data: { role },
-            });
-        }
 
         return createdUser;
     } catch (exception: any) {
@@ -93,34 +91,23 @@ export async function updateUser(id: string, input: UpdateUserInput) {
     }
 
     const {
-        name,
         salutation,
         firstName,
         lastName,
         phone,
         email,
-        role,
-        banned,
-        banReason,
-        banExpires,
-        image,
     } = input;
 
     try {
         const user = await prisma.user.update({
             where: { id },
             data: {
-                name,
+                name: `${firstName} ${lastName}`,
                 salutation,
                 firstName,
                 lastName,
                 phone,
                 email,
-                role,
-                banned,
-                banReason,
-                banExpires,
-                image,
             },
         });
 
@@ -134,7 +121,7 @@ export async function updateUser(id: string, input: UpdateUserInput) {
     }
 }
 
-export async function createContactPersons(userId: string, persons: CreateContactPersonsInput) {
+export async function createContactPersons(userId: string, persons: Array<CreateContactInput>) {
     return prisma.$transaction(async (tx) => {
         const customer = await tx.customer.findUnique({
             where: { id: userId },
@@ -145,9 +132,11 @@ export async function createContactPersons(userId: string, persons: CreateContac
         }
 
         const created = await tx.contactPerson.createMany({
-            data: persons.map((p) => ({ ...p, customerId: customer.id })),
+            data: persons.map(person => ({
+                ...person,
+                customerId: customer.id
+            })),
         });
-
         return created;
     });
 }

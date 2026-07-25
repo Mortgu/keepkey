@@ -21,10 +21,12 @@ export const userSchema = z.object({
     lastName: z.string(),
     salutation: z.string(),
     email: z.string(),
-    phone: z.string(),
+    phone: z.string().nullable(),
 
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
 });
-
 export type User = z.infer<typeof userSchema>;
+
+export const userListSchema = z.array(userSchema);
+export type UserList = z.infer<typeof userListSchema>;
