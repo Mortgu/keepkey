@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isoDateTime } from './common.js';
 import { offerListSchema } from './offer.schema.js';
 
 export const createSupplierSchema = z.object({
@@ -15,7 +16,7 @@ export const supplierSchema = createSupplierSchema.extend({
 
     offers: offerListSchema,
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type Supplier = z.infer<typeof supplierSchema>;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isoDateTime } from './common.js';
 import { contactListSchema } from './contact.schema.js';
 import { orderListSchema } from './order.schema.js';
 
@@ -30,8 +31,8 @@ export const customerSchema = createCustomerSchema.extend({
     contactPersons: contactListSchema,
     orders: orderListSchema,
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type Customer = z.infer<typeof customerSchema>;
 

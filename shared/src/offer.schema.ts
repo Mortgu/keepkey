@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoDateTime } from './common.js';
 import { userSchema } from "./user.schema.js";
 import { contactSchema } from "./contact.schema.js";
 import { customerSchema } from "./customer.schema.js";
@@ -33,8 +34,8 @@ export const offerPositionSchema = createOfferPositionSchema.extend({
     contract: contractSchema,
     product: productSchema,
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type OfferPosition = z.infer<typeof offerPositionSchema>;
 
@@ -90,8 +91,8 @@ export const offerDocumentSchema = createOfferDocumentSchema.extend({
     artifacts: z.array(documentArtifactSchema),
     taskId: z.string(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type OfferDocument = z.infer<typeof offerDocumentSchema>;
 
@@ -164,9 +165,9 @@ export const offerSchema = z.object({
     net_amount: z.number().int(),
     version: z.number().int().positive(),
 
-    date: z.date(),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    date: isoDateTime,
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type Offer = z.infer<typeof offerSchema>;
 
@@ -182,8 +183,8 @@ export const offerDiscountSchema = z.object({
 
     amount_cents: z.number().int(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 

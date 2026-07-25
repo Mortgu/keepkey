@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isoDateTime } from './common.js';
 import { languageSchema } from './language.schema.js';
 
 export const contractTranslationSchema = z.object({
@@ -20,7 +21,7 @@ export type UpdateContractInput = z.infer<typeof updateContractSchema>;
 export const contractSchema = createContractSchema.extend({
     id: z.string(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type Contract = z.infer<typeof contractSchema>;

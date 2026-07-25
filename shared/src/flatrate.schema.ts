@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoDateTime } from './common.js';
 import { languageSchema } from "./language.schema.js";
 
 export const flatrateTranslationSchema = z.object({
@@ -26,8 +27,8 @@ export const flatrateSchema = z.object({
     total_cents: z.number().int(),
     translations: z.array(flatrateTranslationSchema),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 
 export type Flatrate = z.infer<typeof flatrateSchema>;

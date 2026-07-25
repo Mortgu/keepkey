@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isoDateTime } from './common.js';
 
 export const createContactSchema = z.object({
     customerId: z.string(),
@@ -15,8 +16,8 @@ export type UpdateContactInput = z.infer<typeof updateContactSchema>;
 export const contactSchema = createContactSchema.extend({
     id: z.string(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 export type Contact = z.infer<typeof contactSchema>;
 

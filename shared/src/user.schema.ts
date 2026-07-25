@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoDateTime } from './common.js';
 
 export const createUserSchema = z.object({
     firstName: z.string(),
@@ -22,8 +23,8 @@ export const userSchema = z.object({
     email: z.string(),
     phone: z.string(),
 
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 
 export type User = z.infer<typeof userSchema>;

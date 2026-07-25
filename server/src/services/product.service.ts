@@ -5,9 +5,14 @@ import type {
     CreateProductInput,
     UpdateProductInput,
 
-    Product,
-    ProductList
+    productSchema,
+    productListSchema,
 } from '@keepit/schemas';
+import type { z } from 'zod';
+
+/* Server-seitige Sicht auf die Entity: Dates noch als Date, vor Serialisierung */
+type Product = z.input<typeof productSchema>;
+type ProductList = z.input<typeof productListSchema>;
 
 export async function getProducts(): Promise<ProductList> {
     const products = await prisma.product.findMany({

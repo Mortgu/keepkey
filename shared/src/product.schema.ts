@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { isoDateTime } from './common.js';
 import { languageSchema } from "./language.schema.js";
 
 export const productTranslationSchema = z.object({
@@ -25,8 +26,8 @@ export type UpdateProductInput = z.infer<typeof updateProductSchema>;
 export const productSchema = z.object({
     id: z.string(),
     translations: z.array(productTranslationSchema),
-    createdAt: z.date(),
-    updatedAt: z.date(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
 });
 
 export type Product = z.infer<typeof productSchema>;
