@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { DocumentType } from "@/types";
+import type { DocumentType } from "@keepit/schemas";
 import { deleteDocument, renameDocument, uploadDocument } from "./document-api";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";

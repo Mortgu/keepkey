@@ -1,7 +1,7 @@
 import { Fragment } from "react";
 import UserModal from "./user-modal";
 
-import type { User } from "@/types";
+import type { User } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
 import { useModal, useDeleteUser } from "@/hooks";
 import { ListItemRow } from "@/components";

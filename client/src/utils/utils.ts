@@ -1,4 +1,4 @@
-import type { TaskStatus } from "@/types";
+import type { TaskStatus } from "@keepit/schemas";
 
 export const formatEur = (cent: number): string => {
   cent = cent / 100;

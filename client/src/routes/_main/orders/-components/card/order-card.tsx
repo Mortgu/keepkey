@@ -6,7 +6,7 @@ import OrderEditModal from "../order-edit-modal";
 import OrderCardDocument from "./order-card-document";
 import OrderCardFlatRate from "./order-card-flatrate";
 import OrderCardProduct from "./order-card-product";
-import type { Order, OrderDocument } from "@/types";
+import type { Order, OrderDocument } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 import { formatDate } from "@/lib/format";
 import { useDeleteOrder, useGenerateOrderDocument } from "@/hooks";

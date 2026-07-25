@@ -1,4 +1,6 @@
 export * from "./cloud.js";
+export * from "./document.schema.js";
+export * from "./task.schema.js";
 export * from "./offer.schema.js";
 export * from "./order.schema.js";
 export * from "./language.schema.js";

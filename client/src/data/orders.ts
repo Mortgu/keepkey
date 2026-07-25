@@ -1,4 +1,4 @@
-import type { Order } from "@/types";
+import type { Order } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 
 export const restoreOrderRevisionAction = (

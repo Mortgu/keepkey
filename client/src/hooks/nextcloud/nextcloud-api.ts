@@ -1,4 +1,4 @@
-import type { CloudFile } from "@/types/cloud";
+import type { CloudFile } from "@keepit/schemas";
 import type { FindFilesByIdResult, NextcloudStatus } from "@/data/nextcloud";
 import { api, BASE_URL } from "@/lib/api-client";
 

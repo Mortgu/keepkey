@@ -1,4 +1,4 @@
-import type { DocumentType } from "@/types";
+import type { DocumentType } from "@keepit/schemas";
 import { BASE_URL } from "@/lib/api-client";
 
 export const documentDownloadUrl = (

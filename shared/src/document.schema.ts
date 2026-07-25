@@ -27,3 +27,19 @@ export const documentArtifactSchema = z.object({
     createdAt: z.string(),
 });
 export type DocumentArtifact = z.infer<typeof documentArtifactSchema>;
+
+export const documentTypeSchema = z.enum(["offer", "order"]);
+export type DocumentType = z.infer<typeof documentTypeSchema>;
+
+export const generatedDocumentSchema = z.object({
+    id: z.string(),
+    displayName: z.string().optional(),
+    status: documentStatusSchema,
+    artifacts: z.array(documentArtifactSchema),
+});
+export type GeneratedDocument = z.infer<typeof generatedDocumentSchema>;
+
+export const findDocumentArtifact = (
+    artifacts: Array<DocumentArtifact>,
+    format: DocumentFormat,
+) => artifacts.find((artifact) => artifact.format === format);
