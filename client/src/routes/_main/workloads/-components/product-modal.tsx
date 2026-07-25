@@ -35,10 +35,7 @@ const productScheme = z.object({
   EN: langFields,
 });
 
-function seedLang(
-  translations: UpdateProductInput["translations"],
-  lang: Language,
-) {
+function seedLang(translations: UpdateProductInput["translations"], lang: Language) {
   const t = translations?.find((x: ProductTranslationInput) => x.language === lang);
   return {
     name: t?.name ?? "",
@@ -47,19 +44,15 @@ function seedLang(
   };
 }
 
-export default function ProductModal({
-  onClose,
-  submitFn,
-  currentItem = null,
-}: ProductModalProps) {
+export default function ProductModal({ onClose, submitFn, currentItem = null }: ProductModalProps) {
   const isEdit = currentItem != null;
 
   const [language, setLanguage] = useState<Language>("DE");
 
   const productForm = useForm({
     defaultValues: {
-      DE: seedLang(currentItem?.translations, "DE"),
-      EN: seedLang(currentItem?.translations, "EN"),
+      DE: seedLang(currentItem?.translations ?? [], "DE"),
+      EN: seedLang(currentItem?.translations ?? [], "EN"),
     },
     validators: {
       onChange: productScheme,

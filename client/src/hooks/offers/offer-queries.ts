@@ -1,10 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getOfferRevisions, getOffers } from "./offer-api";
 import { offerKeys } from "./offers-keys";
-import type { OfferFilterInput } from "@keepit/schemas";
+import type { OfferFilterParams } from "@keepit/schemas";
 
 export const offerQueries = {
-    list: (filters: OfferFilterInput = { limit: 50 }) => {
+    list: (filters: OfferFilterParams = {}) => {
         return queryOptions({
             queryKey: offerKeys.list(filters),
             queryFn: () => getOffers(filters),

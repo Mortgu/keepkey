@@ -18,11 +18,11 @@ import type {
 
     CreateOfferFlatrateInput,
     UpdateOfferFlatrateInput,
-    OfferFilterInput,
+    OfferFilterParams,
 } from "@keepit/schemas";
 
 /* Offer */
-export const getOffers = async (filters: OfferFilterInput) =>
+export const getOffers = async (filters: OfferFilterParams) =>
     api<OffersPage>(`/api/offers?${formatQueryString(filters)}`, {
         method: "GET"
     });

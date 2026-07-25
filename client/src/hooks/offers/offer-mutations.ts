@@ -13,7 +13,7 @@ import type {
     CreateOfferFlatrateInput,
     UpdateOfferFlatrateInput,
 
-    OfferFilterInput,
+    OfferFilterParams,
 } from '@keepit/schemas';
 
 export function useCreateOffer() {
@@ -187,7 +187,7 @@ export function useDeleteOfferFlatrate() {
     }
 }
 
-export function useOfferManager(filters: OfferFilterInput = { limit: 50 }) {
+export function useOfferManager(filters: OfferFilterParams = {}) {
     const offerQuery = useOffers(filters);
 
     const createOfferMutation = useCreateOffer();

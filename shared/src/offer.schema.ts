@@ -200,7 +200,7 @@ export const offerFilterSchema = z.object({
     cursor: z.string().optional(),
     limit: z.number().int().positive().optional().default(50),
 });
-export type OfferFilterInput = z.infer<typeof offerFilterSchema>;
+export type OfferFilterParams = z.input<typeof offerFilterSchema>;
 
 export const offersPageSchema = z.object({
     items: z.array(offerSchema),
