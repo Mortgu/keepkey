@@ -1,13 +1,12 @@
-import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { z } from "zod";
 
 import type {
   CreateFlatrateInput,
   CreateFlatrateTranslationInput,
-  UpdateFlatrateInput,
-
-  Language
+  Language,
+  UpdateFlatrateInput
 } from '@keepit/schemas';
 
 import {
