@@ -124,7 +124,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </Collapsable>
 
-            <div className="flex items-center justify-between px-4 py-2 border-t border-(--border)">
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
 
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
@@ -161,6 +161,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
+                        danger
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
                         icon={<Trash className="size-3" />}

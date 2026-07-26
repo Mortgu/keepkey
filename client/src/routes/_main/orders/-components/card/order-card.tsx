@@ -119,6 +119,21 @@ export default function OrderCard({ order }: Props) {
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
+
+                    <Button
+                        className="min-w-fit"
+                        variant="primary"
+                        size="xs"
+                        loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument}
+                        onClick={() => generateOrderDocument({ orderId: order.id })}
+                    >
+                        Dokument generieren
+                    </Button>
+                </div>
+
+                {/* Actions right */}
+                <div className="flex items-center gap-2">
                     <Button
                         size="xs"
                         variant="secondary"
@@ -136,22 +151,9 @@ export default function OrderCard({ order }: Props) {
                         title="Bestellung bearbeiten"
                     />
                     <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="sm"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateOrderDocument({ orderId: order.id })}
-                    >
-                        Dokument generieren
-                    </Button>
-                </div>
-
-                {/* Actions right */}
-                <div className="flex items-center gap-2">
-                    <Button
                         size="xs"
                         variant="secondary"
+                        danger
                         onClick={handleDeleteOrder}
                         icon={<Trash className="size-3" />}
                         iconOnly
