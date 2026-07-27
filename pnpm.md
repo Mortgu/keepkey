@@ -49,14 +49,6 @@ pnpm --filter server exec prisma generate --schema prisma/schema
 
 Läuft automatisch im `server build`-Skript (`prebuild`) und im Dockerfile.
 
-## Client-Typen aus OpenAPI neu generieren
-
-```bash
-pnpm --filter client run generate:types    # openapi-typescript ../server/prisma/schema/openapi/openapi.yaml
-```
-
-Vorher `prisma generate` im Server ausführen, damit die `openapi.yaml` aktuell ist (Server-Build macht das automatisch vorweg).
-
 ## Build / Test / Lint über alle Workspaces
 
 ```bash

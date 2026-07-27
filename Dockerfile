@@ -15,7 +15,7 @@ RUN pnpm --filter server exec prisma generate --schema prisma/schema
 
 COPY . .
 RUN pnpm --filter @keepit/schemas build
-RUN pnpm --filter client run generate:types && VITE_API_BASE_URL="" pnpm --filter client exec vite build
+RUN VITE_API_BASE_URL="" pnpm --filter client exec vite build
 RUN pnpm --filter server exec tsc --project tsconfig.json && \
     pnpm --filter server exec tsc-alias --project tsconfig.json && \
     pnpm --filter server exec tsc --project tsconfig.seed.json && \

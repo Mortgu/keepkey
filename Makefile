@@ -1,4 +1,4 @@
-.PHONY: dev install build docker-build docker-up docker-down docker-logs docker-clean db-generate db-migrate db-seed db-reset db-studio generate-types lint clean
+.PHONY: dev install build docker-build docker-up docker-down docker-logs docker-clean db-generate db-migrate db-seed db-reset db-studio lint clean
 
 # ── Development ──
 
@@ -13,7 +13,7 @@ install:
 
 # ── Build ──
 
-build: generate-types
+build:
 	npm --prefix server run build
 	npm --prefix client run build
 
@@ -50,11 +50,6 @@ db-reset: db-migrate db-seed
 
 db-studio:
 	npx --prefix server prisma studio --schema prisma/schema
-
-# ── Code Generation ──
-
-generate-types:
-	npm --prefix client run generate:types
 
 # ── Linting ──
 
