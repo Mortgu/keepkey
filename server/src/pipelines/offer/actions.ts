@@ -87,7 +87,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             discount: {
                 free_months: pos.free_months,
                 valid_until: formatDate(offer.validUntil),
-                total: formatCentsToEur(discountTotal),
+                total: formatCentsToEur(-discountTotal),
             },
         };
     });
