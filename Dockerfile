@@ -22,7 +22,7 @@ RUN pnpm --filter server exec tsc --project tsconfig.json && \
     pnpm --filter server exec tsc-alias --project tsconfig.seed.json
 
 # Prune to production deps only (hoisted -> root node_modules)
-RUN pnpm install --frozen-lockfile --prod
+RUN pnpm install --frozen-lockfile --prod --config.confirmModulesPurge=false
 
 
 FROM node:22-slim
