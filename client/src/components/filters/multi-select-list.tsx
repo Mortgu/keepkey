@@ -1,3 +1,4 @@
+import { Check } from 'lucide-react';
 import type { DropdownOption } from './multi-dropdown';
 
 export interface MultiSelectListProps {
@@ -32,9 +33,7 @@ export function MultiSelectList({ options, values, onChange, className }: MultiS
                 checked ? 'bg-(--primary-600) border-(--primary-600)' : 'bg-white border-(--border-200)',
               ].join(' ')}>
                 {checked && (
-                  <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round">
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
+                  <Check size={12} className='text-white' />
                 )}
               </div>
               {o.dot && <span className="size-[7px] rounded-full shrink-0" style={{ background: o.dot }} />}

@@ -1,5 +1,11 @@
-import type { CreateProductInput, Product, UpdateProductInput } from "@/types";
 import { api } from "@/lib/api-client";
+
+import type {
+    CreateProductInput,
+    UpdateProductInput,
+
+    Product,
+} from "@keepit/schemas";
 
 export const getProducts = () =>
     api<Array<Product>>("/api/products", { method: "GET" });

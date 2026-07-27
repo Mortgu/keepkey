@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { Language } from "@/types";
+import type { Language } from "@keepit/schemas";
 
 /**
  * The active content language (DE/EN) derived from the i18next UI language.

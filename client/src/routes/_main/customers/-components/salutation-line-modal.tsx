@@ -1,11 +1,11 @@
 import { useForm } from "@tanstack/react-form";
-import type { ContactPerson } from "@/types";
+import type { Contact } from "@keepit/schemas";
 import { Button, ModalDialog, Textarea } from "@/components";
 import { useTranslation } from "react-i18next";
 
 interface SalutationLineModalProps {
     onClose: () => void;
-    contactPerson: ContactPerson;
+    contactPerson: Contact;
 }
 
 export default function SalutationLineModal({ onClose, contactPerson }: SalutationLineModalProps) {

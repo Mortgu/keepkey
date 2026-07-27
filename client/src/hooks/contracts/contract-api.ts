@@ -3,12 +3,15 @@ import type {
     Contract,
     CreateContractInput,
     UpdateContractInput
-} from "@/types";
+} from "@keepit/schemas";
 
 export const getContracts = () =>
     api<Array<Contract>>("/api/contracts", {
         method: "GET"
     });
+
+export const getContract = (id: string) =>
+    api<Contract>(`/api/contracts/${id}`, { method: "GET" });
 
 export const createContract = (input: CreateContractInput) =>
     api<Contract>("/api/contracts", {

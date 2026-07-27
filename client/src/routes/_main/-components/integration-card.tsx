@@ -33,10 +33,10 @@ const statusText = tv({
 });
 
 const STATUS_LABEL_KEYS: Record<IntegrationStatus, string> = {
-    connected: "Connected",
-    checking: "Checking",
-    failed: "Failed",
-    not_configured: "notConfigured",
+    connected: "dashboard.status.connected",
+    checking: "dashboard.status.checking",
+    failed: "dashboard.status.failed",
+    not_configured: "dashboard.status.notConfigured",
 };
 
 export default function IntegrationCard({

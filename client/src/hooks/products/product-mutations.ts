@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { UpdateProductInput } from "@/types";
+import type { UpdateProductInput } from "@keepit/schemas";
 import { createProduct, deleteProduct, updateProduct } from "./product-api";
 import { productKeys } from "./product-keys";
 import { useProducts } from "./product-hooks";

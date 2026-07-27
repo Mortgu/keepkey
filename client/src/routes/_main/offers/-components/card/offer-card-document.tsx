@@ -1,11 +1,11 @@
 import { Download, File, LoaderCircle, Pencil, Trash, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferDocument } from "@/types";
-import { findDocumentArtifact } from "@/types";
+import { type OfferDocument, findDocumentArtifact } from "@keepit/schemas";
 import { Button, DocumentRenameModal, showToast } from "@/components";
 import { useDocumentMutations, useDocumentTask } from "@/hooks";
 import { documentDownloadUrl } from "@/data/documents";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
 
@@ -35,9 +35,9 @@ export default function OfferCardDocument({ offerDocument }: Props) {
     } = useDocumentMutations("offer", offerId);
 
     useEffect(() => {
-        if (errorUploadingDocument) showToast.error("offers.toast.documentUploadError", { vars: { message: errorUploadingDocument.message } });
-        if (errorDeletingDocument) showToast.error("offers.toast.documentDeleteError", { vars: { message: errorDeletingDocument.message } });
-        if (errorRenamingDocument) showToast.error("offers.toast.documentRenameError", { vars: { message: errorRenamingDocument.message } });
+        if (errorUploadingDocument) showToast.error("offers.toast.documentUploadError", { vars: { message: getErrorMessage(errorUploadingDocument) } });
+        if (errorDeletingDocument) showToast.error("offers.toast.documentDeleteError", { vars: { message: getErrorMessage(errorDeletingDocument) } });
+        if (errorRenamingDocument) showToast.error("offers.toast.documentRenameError", { vars: { message: getErrorMessage(errorRenamingDocument) } });
     }, [errorDeletingDocument, errorRenamingDocument, errorUploadingDocument]);
 
     return (

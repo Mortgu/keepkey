@@ -2,18 +2,18 @@ import { Pen, Settings, Trash } from "lucide-react";
 import { tv } from "tailwind-variants";
 import ContactPersonForm from "./contact-person-form";
 import SalutationLineModal from "./salutation-line-modal";
-import type { ContactPerson } from "@/types";
+import type { Contact } from "@keepit/schemas";
 import { useDeleteCustomerContact, useModal, useUpdateCustomerContact } from "@/hooks";
 import { Button } from "@/components";
 
 type Props = {
     currentCustomerId: string;
-    cp: ContactPerson;
+    cp: Contact;
 };
 
 export default function ContactListItem({ currentCustomerId, cp }: Props) {
-    const editModal = useModal<ContactPerson>();
-    const salutationModal = useModal<ContactPerson>();
+    const editModal = useModal<Contact>();
+    const salutationModal = useModal<Contact>();
 
     const { updateCustomerContact, isUpdatingCustomerContact } = useUpdateCustomerContact();
     const { deleteCustomerContact, isDeletingCustomerContact, errorDeletingCustomerContact } = useDeleteCustomerContact();

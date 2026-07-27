@@ -1,5 +1,5 @@
 import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
-import type { TariffCell } from "@/types";
+import type { TariffCell } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 import { useState, type ChangeEvent } from "react";
 

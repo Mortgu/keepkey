@@ -1,15 +1,20 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
+import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
-import type { Offer, OfferDocument } from "@/types";
-import { Button, Collapsable, showToast } from "@/components";
+import { Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+
+import type {
+    Offer,
+    OfferDocument,
+} from '@keepit/schemas';
 
 type OfferListItemProps = {
     offer: Offer;
@@ -23,12 +28,12 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         offerPositions,
         offerFlatRates,
         customer,
+        offerDiscounts,
     } = offer;
 
     const {
         deleteOffer,
         isDeletingOffer,
-        errorDeletingOffer
     } = useDeleteOffer();
 
 
@@ -40,15 +45,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
         if (confirm("Angebot löschen")) {
             deleteOffer({ id: offer.id });
         }
-
     };
-
-    useEffect(() => {
-        if (errorDeletingOffer) {
-            const message = errorDeletingOffer instanceof Error ? errorDeletingOffer.message : String(errorDeletingOffer);
-            showToast.error("offers.toast.deleteError", { vars: { message } });
-        }
-    }, [errorDeletingOffer]);
 
     return (
         <div className="border border-(--border) rounded-md">
@@ -91,7 +88,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
 
                 <div className="flex flex-col items-end">
-                    <p className="text-md font-semibold">{formatEur(offer.net_amount)}</p>
+                    <p className="text-md font-mono font-medium">{formatEur(offer.net_amount)}</p>
                     <p className="text-(--text-secondary) font-light text-sm">
                         Gesamtpreis
                     </p>
@@ -109,6 +106,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     {offerFlatRates.map((flatrate, i) => (
                         <OfferCardFlatRate key={i} flatrate={flatrate} />
                     ))}
+
+                    {offerDiscounts.map((discount) => (
+                        <OfferCardDiscount key={discount.id} discount={discount} />
+                    ))}
                 </div>
             </Collapsable>
 
@@ -123,7 +124,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </Collapsable>
 
-            <div className="flex items-center justify-between px-4 py-2 border-t border-(--border)">
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
 
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
@@ -160,6 +161,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
+                        danger
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
                         icon={<Trash className="size-3" />}

@@ -1,10 +1,10 @@
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OfferFlatRate } from "@/types";
+import type { OfferFlatrate } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 
 type Props = {
-    flatrate: OfferFlatRate;
+    flatrate: OfferFlatrate;
 }
 
 export default function OfferCardFlatRate({ flatrate }: Props) {
@@ -26,10 +26,7 @@ export default function OfferCardFlatRate({ flatrate }: Props) {
                 </div>
             </div>
             <div className="flex flex-col items-end">
-                <p className="text-md font-semibold">{formatEur(total_cents)}</p>
-                <p className="text-(--text-secondary) font-light text-sm">
-                    Gesamtpreis (netto)
-                </p>
+                <p className="text-md font-mono">{formatEur(total_cents)}</p>
             </div>
         </div>
     )

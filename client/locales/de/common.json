@@ -1,0 +1,46 @@
+{
+  "button": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "create": "Erstellen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen"
+  },
+  "nav": {
+    "catalog": "Katalog",
+    "overview": "Übersicht",
+    "sales": "Vertrieb",
+    "management": "Verwaltung",
+    "settings": "Einstellungen"
+  },
+  "section": {
+    "workloads": "Workloads",
+    "workload_pricing": "Preistabelle",
+    "workload_text": "Textbausteine",
+    "pricing": "Preise",
+    "flatRates": "Pauschalen",
+    "suppliers": "Lieferanten",
+    "contracts": "Tarife",
+    "customers": "Kunden",
+    "employees": "Angestellte",
+    "offers": "Angebote",
+    "invoices": "Rechnungen",
+    "orders": "Bestellungen"
+  },
+  "common": {
+    "search": "Suchen",
+    "clear": "Leeren",
+    "filter": "Filtern",
+    "country": "Land",
+    "language": "Sprache",
+    "export": "Exportieren",
+    "import": "Importieren",
+    "loading": "Laden...",
+    "noResults": "Keine Ergebnisse",
+    "errorTitle": "Etwas ist schiefgelaufen",
+    "errorRetry": "Erneut versuchen",
+    "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten.",
+    "months": "Monate"
+  }
+}

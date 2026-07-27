@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import type { CloudFile } from "@/types/cloud";
+import type { CloudFile } from "@keepit/schemas";
 import type { FindFilesByIdResult } from "@/data/nextcloud";
 import { findFilesById, findOfferFilesById, findOrderFilesById, getCloudDirectory, getTemplates, getNextcloudStatus } from "./nextcloud-api";
 import { nextcloudKeys } from "./nextcloud-keys";

@@ -1,0 +1,15 @@
+{
+  "versionHistory": {
+    "title": "Version history",
+    "offerSubtitle": "Previous offer versions",
+    "orderSubtitle": "Previous order versions",
+    "currentVersion": "Current version: v{{version}}",
+    "empty": "No previous versions available.",
+    "restore": "Restore this version",
+    "restoreConfirm": "Restore version v{{version}}? Existing documents will become historical.",
+    "restoreSuccess": "Version restored. Generate a new document when ready.",
+    "currentDocument": "Current",
+    "historicalDocument": "Historical",
+    "sourceVersion": "Business version v{{version}}"
+  }
+}

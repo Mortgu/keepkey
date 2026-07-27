@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 
-import type { User } from "@/types";
+import type { User } from "@keepit/schemas";
 import { useModal, useUsers } from "@/hooks";
 import { ListPage, SearchBar } from "@/components";
 

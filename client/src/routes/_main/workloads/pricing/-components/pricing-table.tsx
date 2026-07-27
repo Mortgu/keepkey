@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import PricingTableItem from "./pricing-table-item";
 import AddContractsModal from "./add-contracts-modal";
 import EditProductsModal from "./edit-products-modal";
-import type { TariffGroup } from "@/types";
+import type { TariffGroup } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useContracts, useLocale, useModal, useProducts } from "@/hooks";
 import { localized } from "@/lib/i18n-content";

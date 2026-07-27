@@ -9,3 +9,8 @@ export function useContracts() {
         ...rest
     }
 }
+
+export function useContract(id: string) {
+    const { data, isPending, error } = useQuery(contractQueries.detail(id));
+    return { contract: data, isPending, error };
+}

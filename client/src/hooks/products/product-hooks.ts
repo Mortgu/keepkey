@@ -1,3 +1,4 @@
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { productQueries } from "./product-queries";
 
@@ -11,4 +12,9 @@ export function useProducts() {
 export function useProduct(id: string) {
     const { data, isPending, error } = useQuery(productQueries.detail(id));
     return { product: data, isPending, error };
+}
+
+export function usePrice(customerId: string, workload: CreateOfferPositionInput) {
+    const { data, isPending, error } = useQuery(productQueries.price(customerId, workload));
+    return { price: data, isPending, error };
 }

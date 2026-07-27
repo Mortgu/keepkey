@@ -1,8 +1,8 @@
+import { z } from "zod";
+
 import { useForm } from "@tanstack/react-form";
 import { ArrowLeft, Search } from "lucide-react";
 import { useState } from "react";
-import { z } from "zod";
-import type { Offer } from "@/types";
 import { getFormError } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { useCreateOrder, useNextOrderNumber } from "@/hooks";
@@ -10,6 +10,8 @@ import { useCreateOrder, useNextOrderNumber } from "@/hooks";
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 import { useTranslation } from "react-i18next";
+
+import type { Offer } from '@keepit/schemas';
 
 interface OrderModalProps {
   onClose: () => void;
@@ -48,7 +50,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
     onSubmit: async ({ value }) => {
       if (!selectedOffer) return;
       await createOrder({
-        offerId: selectedOffer.id,
+        id: selectedOffer.id,
         orderId: value.orderId,
         date: value.date,
         projectNumber: value.projectNumber || undefined,
@@ -90,7 +92,7 @@ export default function OrderModal({ onClose }: OrderModalProps) {
               onClick: () => { },
             }} />
 
-            {offers.map((offer: Offer) => (
+            {offers.map((offer) => (
               <div key={offer.id} className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
                 onClick={() => setSelectedOffer(offer)}>
                 <div className="grid">

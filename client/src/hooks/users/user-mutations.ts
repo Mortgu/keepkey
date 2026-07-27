@@ -1,8 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateUserInput, UpdateUserInput } from "@/types";
 import { createUser, deleteUser, updateUser } from "./user-api";
 import { userKeys } from "./user-keys";
 import { useUsers } from "./user-hooks";
+
+import type {
+    CreateUserInput,
+    UpdateUserInput,
+} from '@keepit/schemas';
 
 export function useCreateUser() {
     const queryClient = useQueryClient();

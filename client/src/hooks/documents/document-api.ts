@@ -1,4 +1,4 @@
-import type { DocumentType, GeneratedDocument } from "@/types";
+import type { DocumentType, GeneratedDocument } from "@keepit/schemas";
 import { api, BASE_URL } from "@/lib/api-client";
 
 export const renameDocument = (type: DocumentType, documentId: string, displayName: string) =>

@@ -1,6 +1,6 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
-import type { Customer } from "@/types";
+import type { Customer } from "@keepit/schemas";
 import { FieldInput, FieldSelect, FormModal, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {

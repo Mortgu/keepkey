@@ -2,14 +2,14 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import ContactPersonForm from "./contact-person-form";
 import ContactListItem from "./contact-list-item";
-import type { ContactPerson } from "@/types";
+import type { Contact } from "@keepit/schemas";
 import { Button, Input, ModalDialog } from "@/components";
 import { useCreateCustomerContact } from "@/hooks/customers/customer-mutations";
 
 type ContactPersonModalProps = {
     onClose: () => void;
     currentCustomerId: string;
-    currentContactPersons?: Array<ContactPerson>;
+    currentContactPersons?: Array<Contact>;
 };
 
 export default function ContactPersonModal({ onClose, currentCustomerId, currentContactPersons }: ContactPersonModalProps) {

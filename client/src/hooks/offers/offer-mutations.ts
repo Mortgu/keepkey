@@ -2,17 +2,25 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
-import type { CreateOfferFlatrateInput, CreateOfferInput, CreateOfferPositionInput, Offer, OfferFilters, OffersPage, UpdateOfferFlatrateInput, UpdateOfferInput, UpdateOfferPositionInput } from "@/types";
+
+import type {
+    CreateOfferInput,
+    UpdateOfferInput,
+
+    CreateOfferPositionInput,
+    UpdateOfferPositionInput,
+
+    CreateOfferFlatrateInput,
+    UpdateOfferFlatrateInput,
+
+    OfferFilterParams,
+} from '@keepit/schemas';
 
 export function useCreateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offer, positions, flatrates }: {
-            offer: CreateOfferInput,
-            positions: Array<CreateOfferPositionInput>,
-            flatrates: Array<CreateOfferFlatrateInput>,
-        }) => createOffer(offer, positions, flatrates),
+        mutationFn: (input: CreateOfferInput) => createOffer(input),
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
@@ -29,9 +37,9 @@ export function useUpdateOffer() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ offerId, expectedVersion, offer, positions, flatrates }: {
-            offerId: string, expectedVersion: number, offer: UpdateOfferInput, positions: Array<UpdateOfferPositionInput>, flatrates: Array<UpdateOfferFlatrateInput>
-        }) => updateOffer(offerId, expectedVersion, offer, positions, flatrates),
+        mutationFn: ({ offerId, input }: {
+            offerId: string, input: UpdateOfferInput,
+        }) => updateOffer(offerId, input),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
@@ -50,25 +58,6 @@ export function useDeleteOffer() {
 
     const mutation = useMutation({
         mutationFn: ({ id }: { id: string }) => deleteOffer(id),
-        onMutate: async ({ id }) => {
-            await queryClient.cancelQueries({ queryKey: offerKeys.lists() });
-
-            const previous = queryClient.getQueriesData<Array<Offer>>({
-                queryKey: offerKeys.lists(),
-            });
-
-            queryClient.setQueriesData<OffersPage>(
-                { queryKey: offerKeys.lists() },
-                (old) => old ? { ...old, items: old.items.filter((o) => o.id !== id) } : old,
-            );
-
-            return { previous };
-        },
-        onError: (_err, _vars, context) => {
-            context?.previous.forEach(([key, data]) => {
-                queryClient.setQueryData(key, data);
-            });
-        },
         onSettled: (_, __, { id }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(id) });
@@ -76,7 +65,7 @@ export function useDeleteOffer() {
     });
 
     return {
-        deleteOffer: mutation.mutateAsync,
+        deleteOffer: mutation.mutate,
         isDeletingOffer: mutation.isPending,
         errorDeletingOffer: mutation.error,
     }
@@ -198,7 +187,7 @@ export function useDeleteOfferFlatrate() {
     }
 }
 
-export function useOfferManager(filters: OfferFilters = {}) {
+export function useOfferManager(filters: OfferFilterParams = {}) {
     const offerQuery = useOffers(filters);
 
     const createOfferMutation = useCreateOffer();

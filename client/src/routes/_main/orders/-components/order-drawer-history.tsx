@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import type { Order, OrderRevision } from "@/types";
+import type { Order, OrderRevision } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
 import { useOrderRevisions, useRestoreOrderRevision } from "@/hooks";
 import { formatDate } from "@/lib/format";
@@ -14,7 +14,7 @@ type Props = {
 
 export default function OrderDrawerHistory({ open, onClose, order }: Props) {
   const { t } = useTranslation();
-  const { data: revisions = [], isPending, error } = useOrderRevisions(order.id);
+  const { revisions: revisions = [], isPending, error } = useOrderRevisions(order.id);
   const {
     restoreOrderRevision,
     isRestoringRevision,

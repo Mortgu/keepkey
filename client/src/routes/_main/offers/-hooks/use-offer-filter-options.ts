@@ -1,11 +1,17 @@
 import { useMemo } from "react";
-import type { ContactPerson, Customer, Language, Product } from "@/types";
 import { localized } from "@/lib/i18n-content";
 
+import type {
+    ContactList,
+    CustomerList,
+    ProductList,
+    Language
+} from "@keepit/schemas";
+
 export function useOfferFilterOptions(
-    customers: Array<Customer>,
-    contacts: Array<ContactPerson>,
-    products: Array<Product>,
+    customers: CustomerList,
+    contacts: ContactList,
+    products: ProductList,
     locale: Language,
 ) {
     const customerFilterOptions = useMemo(

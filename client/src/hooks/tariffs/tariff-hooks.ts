@@ -1,5 +1,5 @@
-import {useQuery} from "@tanstack/react-query";
-import {tariffQueries} from "./tariff-queries";
+import { useQuery } from "@tanstack/react-query";
+import { tariffQueries } from "./tariff-queries";
 import {
     useCreateTariff,
     useCreateTariffColumn,
@@ -16,21 +16,20 @@ import {
 } from "./tariff-mutations";
 
 export function useTariffGroups() {
-    const {data: groups = [], isPending, error} = useQuery(tariffQueries.groups());
+    const { data: groups = [], isPending, error } = useQuery(tariffQueries.groups());
 
-    return {groups, isPending, error};
+    return { groups, isPending, error };
 }
 
 export function useTariffHistoryHook(productId: string, contractId: string) {
-    const {data: history = [], isPending, error} = useQuery(tariffQueries.history(productId, contractId));
-
-    return {history, isPending, error};
+    const { data: history = [], isPending, error } = useQuery(tariffQueries.history(productId, contractId));
+    return { history, isPending, error };
 }
 
 export function useTariffDurationsHook(productId: string, contractId: string) {
-    const {data: durations = [], isPending, error} = useQuery(tariffQueries.durations(productId, contractId));
+    const { data: durations = [], isPending, error } = useQuery(tariffQueries.durations(productId, contractId));
 
-    return {durations, isPending, error};
+    return { durations, isPending, error };
 }
 
 export function useTariffGroupHook() {

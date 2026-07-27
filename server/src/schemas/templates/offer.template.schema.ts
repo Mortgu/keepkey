@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 
 const offerTemplateProductItemSchema = z.object({
     name: z.string().optional().transform(v => (v === undefined ? "" : v)),
@@ -71,8 +71,16 @@ export const offerTemplateSchema = z.object({
 
     groups: z.array(offerTemplateProductGroupSchema),
 
+    discounts: z.array(z.object({
+        title: z.string(),
+        description: z.string().nullish().transform(v => (v === undefined ? "" : v)),
+        total: z.string(),
+    })).default([]),
+
     tables: z.array(z.object({
         products: z.string(),
+        contract: z.string(),
+        duration: z.string(), // Jahre
         items: z.array(offerTemplateProductItemSchema),
         flatrates: z.array(z.object({
             name: z.string(),

@@ -1,14 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateFlatRateInput, UpdateFlatRateInput } from "@/types";
 import { createFlatRate, deleteFlatRate, updateFlatRate } from "./flatrate-api";
 import { flatRateKeys } from "./flatrate-keys";
 import { useFlatRates } from "./flatrate-hooks";
+
+import type {
+    CreateFlatrateInput,
+    UpdateFlatrateInput,
+} from "@keepit/schemas";
 
 export function useCreateFlatRate() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: (flatRate: CreateFlatRateInput) => createFlatRate(flatRate),
+        mutationFn: (flatRate: CreateFlatrateInput) => createFlatRate(flatRate),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: flatRateKeys.lists() }),
     });
 
@@ -23,7 +27,7 @@ export function useUpdateFlatRate() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ id, flatRate }: { id: string; flatRate: Partial<UpdateFlatRateInput> }) =>
+        mutationFn: ({ id, flatRate }: { id: string; flatRate: Partial<UpdateFlatrateInput> }) =>
             updateFlatRate(id, flatRate),
         onSuccess: () => queryClient.invalidateQueries({ queryKey: flatRateKeys.lists() }),
     });
