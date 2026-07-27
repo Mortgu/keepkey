@@ -1,0 +1,19 @@
+model Invoice {
+    id String @id @default(cuid())
+
+    invoiceId   String // Rechnungs-Nr.
+    date        DateTime @default(now()) // Datum
+    paymentTerm String
+    projectId   String // Projekt-Nr.
+
+    customer   Customer @relation(fields: [customerId], references: [id])
+    customerId String
+
+    supplier   Supplier @relation(fields: [supplierId], references: [id])
+    supplierId String
+
+    order   Order  @relation(fields: [orderId], references: [id])
+    orderId String
+
+    @@map("invoice")
+}

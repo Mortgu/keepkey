@@ -16,7 +16,8 @@ model Order {
   offer   Offer  @relation(fields: [offerId], references: [id])
   offerId String @unique // One-to-one relation
 
-  orderId         String // Beleg-Nr.
+  orderId String // Beleg-Nr.
+
   /// @openapi.ignore
   documentVersion Int    @default(0)
   paymentTerm     String @default("") // Zahlungsbedingung
@@ -37,6 +38,7 @@ model Order {
   orderPositions OrderPosition[]
   flatRates      OrderFlatRate[]
   revisions      OrderRevision[]
+  invoices       Invoice[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

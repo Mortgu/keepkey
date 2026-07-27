@@ -148,14 +148,6 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             phone: employee.phone || "",
             email: employee.email || "",
         },
-
-        products: {
-            names: orderPositions.map((p) => p.product.name).join(" & "),
-            grouped: grouped,
-            items: [...products],
-        },
-
-        flatRates: orderFlatRates,
     };
 }
 

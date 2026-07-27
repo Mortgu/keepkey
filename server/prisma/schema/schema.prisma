@@ -95,8 +95,9 @@ model Supplier {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  offers Offer[]
-  orders Order[]
+  offers   Offer[]
+  orders   Order[]
+  invoices Invoice[]
 
   @@map("supplier")
 }

@@ -17,7 +17,8 @@ const sort_options = [
 ];
 
 export default function OrderList() {
-    const modal = useModal();
+    const editModal = useModal();
+
 
     const { t } = useTranslation();
 
@@ -56,7 +57,7 @@ export default function OrderList() {
                         onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
                 </div>
                 <div className="flex items-center gap-2">
-                    <Button onClick={() => modal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
+                    <Button onClick={() => editModal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
                 </div>
             </div>
 
@@ -79,9 +80,11 @@ export default function OrderList() {
                 ))}
             </div>
 
-            {modal.isOpen && (
-                <OrderModal key={modal.key} onClose={modal.close} />
+            {editModal.isOpen && (
+                <OrderModal key={editModal.key} onClose={editModal.close} />
             )}
+
+
         </>
     )
 }
