@@ -3,11 +3,6 @@ generator client {
   engineType = "binary"
 }
 
-generator openapi {
-  provider = "prisma-openapi"
-  output   = "./openapi"
-}
-
 datasource db {
   provider = "postgresql"
 }

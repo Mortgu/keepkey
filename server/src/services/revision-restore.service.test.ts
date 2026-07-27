@@ -11,6 +11,8 @@ const mocks = vi.hoisted(() => ({
   offerPositionCreateMany: vi.fn(),
   offerFlatRateDeleteMany: vi.fn(),
   offerFlatRateCreateMany: vi.fn(),
+  offerDiscountDeleteMany: vi.fn(),
+  offerDiscountCreateMany: vi.fn(),
   offerDocumentUpdateMany: vi.fn(),
 }));
 
@@ -49,6 +51,7 @@ const current = {
     discount_cents: 400,
   }],
   offerFlatRates: [],
+  offerDiscounts: [],
 };
 
 const restoredSnapshot = {
@@ -78,6 +81,7 @@ const restoredSnapshot = {
     discount_cents: 75,
   }],
   flatRates: [],
+  discounts: [],
 };
 
 describe("offer revision restore", () => {
@@ -97,6 +101,10 @@ describe("offer revision restore", () => {
       offerFlatRate: {
         deleteMany: mocks.offerFlatRateDeleteMany,
         createMany: mocks.offerFlatRateCreateMany,
+      },
+      offerDiscount: {
+        deleteMany: mocks.offerDiscountDeleteMany,
+        createMany: mocks.offerDiscountCreateMany,
       },
       offerDocument: { updateMany: mocks.offerDocumentUpdateMany },
     }));

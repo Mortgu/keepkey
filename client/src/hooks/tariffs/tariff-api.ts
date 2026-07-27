@@ -1,14 +1,16 @@
+import { api } from "@/lib/api-client";
+
 import type {
-    CreateTariffGroupInput,
-    CreateTariffInput,
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffHistory,
     TariffRow,
+    TariffHistory,
+
+    CreateTariffGroupInput,
+    CreateTariffInput,
     UpdateTariffGroupInput,
-} from "@/types";
-import { api } from "@/lib/api-client";
+} from '@keepit/schemas';
 
 /* ───────────────────────────────
    TariffGroup
@@ -143,6 +145,7 @@ export const getTariffPrice = (
         ...(customerId ? { customerId } : {}),
         ...(freeMonths ? { freeMonths: String(freeMonths) } : {}),
     });
+
     return api<TariffPriceResult>(`/api/tariffs/price?${params}`, { method: "GET" });
 };
 

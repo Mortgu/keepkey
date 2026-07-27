@@ -1,14 +1,26 @@
-import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import type { CreateFlatRateInput, FlatRateTranslationInput, Language, UpdateFlatRateInput } from "@/types";
+import { z } from "zod";
 
-import { DEFAULT_LANGUAGE_OPTIONS, FieldInput, FieldTextarea, FormModal, SegmentedLanguageToggle } from "@/components";
+import type {
+  CreateFlatrateInput,
+  CreateFlatrateTranslationInput,
+  Language,
+  UpdateFlatrateInput
+} from '@keepit/schemas';
+
+import {
+  DEFAULT_LANGUAGE_OPTIONS,
+  FieldInput,
+  FieldTextarea,
+  FormModal,
+  SegmentedLanguageToggle
+} from "@/components";
 
 interface FlatRateModalProps {
   onClose: () => void;
-  submitFn: (value: CreateFlatRateInput) => void;
-  currentItem?: UpdateFlatRateInput | null;
+  submitFn: (value: CreateFlatrateInput) => void;
+  currentItem?: UpdateFlatrateInput | null;
 }
 
 const langFields = z.object({
@@ -22,7 +34,7 @@ const flatRateSchema = z.object({
   EN: langFields,
 });
 
-function seedLang(translations: UpdateFlatRateInput["translations"], lang: Language) {
+function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefined, lang: Language) {
   const t = translations?.find((x) => x.language === lang);
   return { name: t?.name ?? "", table: t?.table ?? "" };
 }
@@ -43,7 +55,7 @@ export default function FlatRateModal({ onClose, submitFn, currentItem = null }:
       onMount: flatRateSchema,
     },
     onSubmit: ({ value }) => {
-      const translations: Array<FlatRateTranslationInput> = [
+      const translations: Array<CreateFlatrateTranslationInput> = [
         { language: "DE", ...value.DE },
         { language: "EN", ...value.EN },
       ];

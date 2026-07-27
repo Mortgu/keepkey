@@ -1,7 +1,7 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import type { Order } from "@/types";
+import type { Order } from "@keepit/schemas";
 import type { UpdateOrderInput } from "@/hooks/orders/order-api";
 import {
   useContracts,

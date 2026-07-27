@@ -2,11 +2,24 @@ import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import {
+  Button,
+  DEFAULT_LANGUAGE_OPTIONS,
+  FieldInput,
+  FieldTextarea,
+  FormModal,
+  Input,
+  SegmentedLanguageToggle
+} from "@/components";
+import {
+  useContractManager
+} from "@/hooks/contracts/contract-mutations";
+
 import type {
-  Contract, ContractTranslationInput, Language
-} from "@/types";
-import { Button, DEFAULT_LANGUAGE_OPTIONS, FieldInput, FieldTextarea, FormModal, Input, SegmentedLanguageToggle } from "@/components";
-import { useContractManager } from "@/hooks/contracts/contract-mutations";
+  Contract,
+  ContractTranslationInput,
+  Language
+} from "@keepit/schemas";
 
 interface ContractModalProps {
   onClose: () => void;

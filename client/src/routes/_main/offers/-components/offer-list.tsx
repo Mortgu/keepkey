@@ -5,7 +5,8 @@ import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
 import OfferModal from "./offer-modal";
 
-import type { Offer } from "@/types";
+import type { Offer } from "@keepit/schemas";
+
 import { Button, FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";

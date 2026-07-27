@@ -4,7 +4,7 @@ import { useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import OrderCard from "./card/order-card";
 import OrderModal from "./order-modal";
-import type { Customer, Order } from "@/types";
+import type { Customer, Order } from "@keepit/schemas";
 import { useCustomers, useModal, useOrders } from "@/hooks";
 
 import { Button, FilterChip, SearchBar } from "@/components";

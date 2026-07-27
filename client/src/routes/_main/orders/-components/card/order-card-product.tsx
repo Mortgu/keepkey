@@ -1,7 +1,7 @@
 import { Badge } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OrderPosition } from "@/types"
+import type { OrderPosition } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 
 type Props = {

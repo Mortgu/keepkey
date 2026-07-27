@@ -1,12 +1,19 @@
-import { Pen, Trash } from "lucide-react";
+import { ExternalLink, Pen, Trash } from "lucide-react";
 
-import ProductModal from "./product-modal";
-import type { Product } from "@/types";
 import { Button } from "@/components";
-import { useLocale, useModal, useDeleteProduct, useUpdateProduct } from "@/hooks";
+import { useDeleteProduct, useLocale, useModal, useUpdateProduct } from "@/hooks";
+import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
+import type { Product } from "@keepit/schemas";
+import { useTranslation } from "react-i18next";
+import ProductModal from "./product-modal";
 
-export default function ProductItem({ product }: { product: Product }) {
+interface Props {
+  product: Product;
+}
+
+export default function ProductItem({ product }: Props) {
+  const { t } = useTranslation();
   const { deleteProduct, isDeletingProduct } = useDeleteProduct();
   const { updateProduct } = useUpdateProduct();
   const modal = useModal<Product>();
@@ -17,35 +24,56 @@ export default function ProductItem({ product }: { product: Product }) {
 
   return (
     <>
-      <div className="bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
-        <div className="flex items-center justify-between px-4 py-3 gap-8">
+      <div className="border border-(--border) rounded-md overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center justify-between px-4 py-3 gap-8 bg-(--page-bg) border-b border-(--border)">
           <div>
-            <div className="text-md text-gray-900">
+            <p className="text-md text-gray-900">
               {name}
-            </div>
-            <p className="text-sm font-light text-gray-400 mt-0.5">
-              {description}
             </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="border"
-              icon={<Pen className="size-3.5" />}
-              iconOnly
-              onClick={() => modal.open(product)}
-              size="sm"
-            />
-            <Button
-              variant="border"
-              loading={isDeletingProduct}
-              icon={<Trash className="size-3.5" />}
-              iconOnly
-              onClick={() => deleteProduct(product.id)}
-              size="sm"
-            />
+            <p className="text-xs text-gray-400">
+              {formatDate(product.createdAt || "")}
+            </p>
           </div>
         </div>
 
+        <div className="px-4 py-2">
+
+          <p className="text-md font-light text-gray-800 mt-0.5">
+            {description}
+          </p>
+        </div>
+
+
+        <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+          {/* Actions left */}
+          <div className="flex items-center gap-2">
+            <Button variant="secondary" size="sm" icon={<ExternalLink size={15} />}>
+              {t("section.offers")}
+            </Button>
+            <Button variant="secondary" size="sm" icon={<ExternalLink size={15} />}>
+              {t("section.orders")}
+            </Button>
+          </div>
+          {/* Actions right */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              icon={<Pen className="size-3.5" />}
+              iconOnly
+              onClick={() => modal.open(product)}
+              size="xs"
+            />
+            <Button
+              variant="secondary"
+              loading={isDeletingProduct}
+              danger
+              icon={<Trash className="size-3.5" />}
+              iconOnly
+              onClick={() => deleteProduct(product.id)}
+              size="xs"
+            />
+          </div>
+        </div>
         {/*
        {configs.length > 0 && (
           <>

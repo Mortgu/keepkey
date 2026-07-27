@@ -1,7 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getContacts, getCustomer, getCustomers } from "./customer-api";
 import { customerKeys } from "./customer-keys";
-import type { CustomerFilters } from "@/types";
+
+import type { CustomerFilters } from "@keepit/schemas";
 
 export const customerQueries = {
     list: (filters: CustomerFilters = {}) => {

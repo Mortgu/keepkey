@@ -2,10 +2,11 @@ import { createContext, useContext } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Loader } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import type {ReactNode} from "react";
-import type { User } from "@/types";
+import type { ReactNode } from "react";
 import { getSessionUser } from "@/data/user.ts";
 import { authClient } from "@/lib/auth-client.ts";
+
+import type { User } from '@keepit/schemas';
 
 type AuthContextType = {
   user: User | null | undefined;

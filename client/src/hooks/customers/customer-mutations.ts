@@ -1,7 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { customerKeys } from "./customer-keys";
-import { createCustomer, createCustomerContact, deleteCustomer, deleteCustomerContact, updateCustomer, updateCustomerContact } from "./customer-api";
-import type { CreateCustomerContactInput, CreateCustomerInput, UpdateCustomerContactInput } from "@/types";
+import {
+    createCustomer,
+    createCustomerContact,
+    deleteCustomer,
+    deleteCustomerContact,
+    updateCustomer,
+    updateCustomerContact
+} from "./customer-api";
+
+import type {
+    CreateCustomerInput,
+    CreateContactInput,
+    UpdateContactInput
+} from '@keepit/schemas';
 
 export function useCreateCustomer() {
     const queryClient = useQueryClient();
@@ -79,7 +91,7 @@ export function useCreateCustomerContact() {
 
     const mutation = useMutation({
         mutationFn: ({ id, input }: {
-            id: string, input: CreateCustomerContactInput
+            id: string, input: CreateContactInput
         }) => createCustomerContact(id, input),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: customerKeys.lists() });
@@ -99,7 +111,7 @@ export function useUpdateCustomerContact() {
 
     const mutation = useMutation({
         mutationFn: ({ id, contactId, input }: {
-            id: string, contactId: string, input: UpdateCustomerContactInput
+            id: string, contactId: string, input: UpdateContactInput
         }) => updateCustomerContact(id, contactId, input),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: customerKeys.lists() });

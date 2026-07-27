@@ -1,10 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import type { Offer, OfferRevision } from "@/types";
+import type { Offer, OfferRevision } from "@keepit/schemas";
 import { Button, Drawer, showToast } from "@/components";
 import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
 import { offerQueries } from "@/hooks/offers/offer-queries";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 
 type Props = {
@@ -28,7 +29,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
 
     useEffect(() => {
         if (errorRestoringRevision) {
-            showToast.error("offers.toast.restoreError", { vars: { message: errorRestoringRevision.message } });
+            showToast.error("offers.toast.restoreError", { vars: { message: getErrorMessage(errorRestoringRevision) } });
         }
     }, [errorRestoringRevision]);
 

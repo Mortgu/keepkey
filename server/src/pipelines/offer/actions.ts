@@ -36,6 +36,7 @@ export const fetchOfferData = async (offerId: string) => {
                         flatRate: { include: { translations: true } },
                     },
                 },
+                offerDiscounts: true,
             }
         }),
 
@@ -143,6 +144,13 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     });
     const flatratesTotal = offer.offerFlatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
 
+    const discounts = offer.offerDiscounts.map(d => ({
+        title: d.title,
+        description: d.description ?? "",
+        total: formatCentsToEur(-d.amount_cents),
+    }));
+    const discountsTotal = offer.offerDiscounts.reduce((sum, d) => sum + d.amount_cents, 0);
+
     const tables: OfferTemplate["tables"] = [];
 
     const buildTableForContract = async (
@@ -182,21 +190,23 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                 quantity: String(pos.quantity),
                 eur_user_month: formatCentsToEur(unitPrice),
                 duration: String(pos.duration_months),
-                total: formatCentsToEur(totalCents),
+                total: formatCentsToEur(pos.total_cents),
                 contract: contractT.name,
                 optional: pos.optional ?? false,
                 discount: {
                     free_months: pos.free_months,
                     valid_until: formatDate(offer.validUntil),
-                    total: formatCentsToEur(discountCents),
+                    total: formatCentsToEur(-discountCents),
                 },
             });
         }
 
-        const tableTotalCents = itemsTotalCents + flatratesTotal;
+        const tableTotalCents = itemsTotalCents + flatratesTotal - discountsTotal;
 
         return {
             products: productNames,
+            contract: items[0].contract,
+            duration: `${items[0].duration} Monaten`,
             items,
             flatrates,
             total: formatCentsToEur(tableTotalCents),
@@ -266,6 +276,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         products,
         groups,
         tables,
+        discounts,
     };
 }
 
@@ -277,6 +288,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 
     try {
         const formated = await formatOfferData(context.fetchedData);
+        console.dir(formated, { depth: null });
         context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {

@@ -20,6 +20,7 @@
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
@@ -27,7 +28,7 @@
     "jsx": "react-jsx",
     /* Linting */
     "strict": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true,

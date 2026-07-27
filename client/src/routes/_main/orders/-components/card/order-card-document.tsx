@@ -2,8 +2,7 @@ import { Download, File, LoaderCircle, Pencil, Trash, UploadCloud } from "lucide
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import type { OrderDocument } from "@/types";
-import { findDocumentArtifact } from "@/types";
+import { type OrderDocument, findDocumentArtifact } from "@keepit/schemas";
 import { Button, DocumentRenameModal } from "@/components";
 import { useDocumentMutations, useDocumentTask } from "@/hooks";
 import { documentDownloadUrl } from "@/data/documents";
@@ -90,7 +89,7 @@ export default function OrderCardDocument({ orderDocument }: Props) {
                 )}
 
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
-                        <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
+                    <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
                         onClick={() => uploadDocument(id)}
                         loading={isUploadingDocument}
                         disabled={status === "UPLOADED" || isUploadingDocument}

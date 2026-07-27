@@ -18,7 +18,9 @@ export function useDashboardStats() {
     const { orders, isPending: ordersPending } = useOrders();
 
     const stats = useMemo<DashboardStats>(() => {
-        const openOffers = offers.filter((offer) => !offer.orders);
+        const openOffers = offers.filter(
+            (offer) => !orders.some((order) => order.offerId === offer.id),
+        );
 
         const openOfferVolumeCents = openOffers.reduce(
             (sum, offer) => sum + offer.net_amount,

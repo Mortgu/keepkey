@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import type { Product } from "@/types";
+import type { Product } from "@keepit/schemas";
 import type { DropdownOption } from "@/components/filters/multi-dropdown";
 import {
     Button,

@@ -1,61 +1,50 @@
-import {z} from "zod";
-import {useForm} from "@tanstack/react-form";
+import { useForm } from "@tanstack/react-form";
 
-import type {User} from "@/types";
-import {useUserManager} from "@/hooks";
-import {FieldInput, FormModal} from "@/components";
+import { useUserManager } from "@/hooks";
+import { FieldInput, FormModal } from "@/components";
+
+import {
+    type User,
+    createUserSchema,
+} from '@keepit/schemas';
 
 interface UserModalProps {
     onClose: () => void;
     currentUser: User | null;
 }
 
-const createUserSchema = z.object({
-    salutation: z.string().min(1, "Pflichtfeld"),
-    firstName: z.string().min(1, "Pflichtfeld"),
-    lastName: z.string().min(1, "Pflichtfeld"),
-    email: z.string().email("Ungültige E-Mail"),
-    phone: z.string().min(1, "Ungültige Telefonnummer"),
-    password: z.string().min(8, "Pflichtfeld (8)"),
-});
-
-const editUserSchema = createUserSchema.extend({
-    password: z.string().refine((val) => val === "" || val.length >= 8, "Mind. 8 Zeichen"),
-});
-
 const emptyUser = {
-    salutation: "",
     firstName: "",
     lastName: "",
+    salutation: "",
     email: "",
     phone: "",
     password: "",
 };
 
-export default function UserModal({onClose, currentUser}: UserModalProps) {
+export default function UserModal({ onClose, currentUser }: UserModalProps) {
     const isEdit = currentUser !== null;
 
-    const {updateUser, createUser} = useUserManager();
+    const { updateUser, createUser } = useUserManager();
 
     const userForm = useForm({
-        defaultValues: currentUser ? {
-            salutation: currentUser.salutation,
+        defaultValues: isEdit ? {
             firstName: currentUser.firstName,
             lastName: currentUser.lastName,
+            salutation: currentUser.salutation,
             email: currentUser.email,
-            phone: currentUser.phone,
+            phone: currentUser.phone ?? "",
             password: "",
         } : emptyUser,
         validators: {
-            onChange: isEdit ? editUserSchema : createUserSchema,
-            onMount: isEdit ? editUserSchema : createUserSchema,
+            onChange: createUserSchema,
+            onMount: createUserSchema,
         },
-        onSubmit: async ({value}) => {
-            const name = `${value.firstName} ${value.lastName}`;
+        onSubmit: async ({ value }) => {
             if (isEdit) {
-                updateUser({id: currentUser.id, body: {...value, name}});
+                updateUser({ id: currentUser.id, body: value });
             } else {
-                await createUser({body: {...value, name}});
+                await createUser({ ...value });
             }
             onClose();
         },
@@ -72,41 +61,41 @@ export default function UserModal({onClose, currentUser}: UserModalProps) {
             <div className="flex items-center gap-4">
                 <userForm.Field name="salutation" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="Anrede" size="sm"/>
+                        <FieldInput field={field} label="Anrede" size="sm" />
                     </div>
-                )}/>
+                )} />
 
                 <userForm.Field name="firstName" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} size="sm" label="Vorname"/>
+                        <FieldInput field={field} size="sm" label="Vorname" />
                     </div>
-                )}/>
+                )} />
 
                 <userForm.Field name="lastName" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} size="sm" label="Nachname"/>
+                        <FieldInput field={field} size="sm" label="Nachname" />
                     </div>
-                )}/>
+                )} />
             </div>
 
             <div className="flex items-center gap-4">
                 <userForm.Field name="email" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="E-Mail" size="sm"/>
+                        <FieldInput field={field} label="E-Mail" size="sm" />
                     </div>
-                )}/>
+                )} />
 
                 <userForm.Field name="phone" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="Telefonnummer" size="sm"/>
+                        <FieldInput field={field} label="Telefonnummer" size="sm" />
                     </div>
-                )}/>
+                )} />
 
                 <userForm.Field name="password" children={(field) => (
                     <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} type="password" size="sm" label="Passwort"/>
+                        <FieldInput field={field} type="password" size="sm" label="Passwort" />
                     </div>
-                )}/>
+                )} />
             </div>
         </FormModal>
     );

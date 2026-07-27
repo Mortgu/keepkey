@@ -1,6 +1,6 @@
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { OrderFlatRate } from "@/types"
+import type { OrderFlatRate } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 
 type Props = {

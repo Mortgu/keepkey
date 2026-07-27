@@ -1,0 +1,49 @@
+{
+  "dashboard": {
+    "recentOffers": "Letzte Angebote",
+    "recentOrders": "Letzte Bestellungen",
+    "integrations": "Integrationen",
+    "viewAll": "Alle ansehen",
+    "noActivity": "Noch keine Aktivit\u00e4t.",
+    "stats": {
+      "offerVolume": "Offenes Angebotsvolumen",
+      "openOffers": "Offene Angebote",
+      "orders": "Bestellungen",
+      "conversion": "Conversion-Rate"
+    },
+    "badge": {
+      "reserved": "Reserviert",
+      "converted": "Bestellt"
+    },
+    "status": {
+      "connected": "Verbunden",
+      "checking": "Verbindung wird gepr\u00fcft\u2026",
+      "failed": "Verbindung fehlgeschlagen",
+      "notConfigured": "Nicht konfiguriert"
+    },
+    "retry": "Erneut pr\u00fcfen",
+    "search": {
+      "placeholder": "Angebote, Bestellungen, Kunden durchsuchen\u2026",
+      "recent": "Zuletzt gesucht",
+      "recentEmpty": "Noch keine Suchen.",
+      "empty": "Keine Ergebnisse f\u00fcr \u201e{{query}}\u201c",
+      "results": "{{count}} Ergebnis(se)",
+      "hints": "\u21b5 \u00f6ffnen \u00b7 Esc schlie\u00dfen",
+      "justNow": "gerade eben",
+      "minutesAgo": "vor {{count}} Min.",
+      "hoursAgo": "vor {{count}} Std.",
+      "daysAgo": "vor {{count}} Tag(en)",
+      "tabs": {
+        "all": "Alle",
+        "offers": "Angebote",
+        "orders": "Bestellungen",
+        "customers": "Kunden"
+      },
+      "typeLabels": {
+        "offer": "Angebot",
+        "order": "Bestellung",
+        "customer": "Kunde"
+      }
+    }
+  }
+}

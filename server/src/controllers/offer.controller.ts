@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from "express";
-import { AppException } from "../lib/exceptions.js";
 
 import * as offerService from "../services/offer.service.js";
 
@@ -39,16 +38,9 @@ export const deleteOffer = async (request: Request, response: Response) => {
 /* ========== UPDATE ========== */
 
 export const updateOffer = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Bad request! Missing body!", 400, "MISSING_BODY");
-    }
+    const offerId = request.params.id as string;
 
-    const offer = await offerService.updateOffer(
-        request.params.id as string,
-        request.body,
-        request.user!.id,
-    );
-
+    const offer = await offerService.updateOffer(offerId, request.body, request.user!.id);
     return response.status(200).json(offer);
 };
 

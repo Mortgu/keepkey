@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createFlatRate,
   deleteFlatRate,
+  getFlatrate,
   getFlatRate,
   getFlatRates,
   updateFlatRate,
@@ -16,6 +17,9 @@ const router = Router();
 
 /* [GET] http://localhost:3000/api/flatrates */
 router.get("/", getFlatRates);
+
+/* [GET] http://localhost:3000/api/flatrates/:id */
+router.get("/:id", getFlatrate);
 
 /* [GET] http://localhost:3000/api/flatrates/:id */
 router.get("/:id", getFlatRate);

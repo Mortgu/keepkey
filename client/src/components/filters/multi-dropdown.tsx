@@ -38,7 +38,7 @@ export function MultiDropdown({ label, options, values, onChange, className, siz
   return (
     <div ref={ref} className={`w-fit relative select-none ${className ?? ''}`}>
       <Button
-        variant="secondary"
+        variant="border"
         type="button"
         size={size}
         onClick={() => setOpen(o => !o)}

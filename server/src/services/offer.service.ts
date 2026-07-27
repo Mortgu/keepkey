@@ -1,4 +1,3 @@
-import z from "zod";
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
@@ -8,13 +7,14 @@ import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
 import { calculatePrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
+
 import {
-    createOfferFieldsSchema,
-    createOfferFlatratesSchema,
-    createOfferPositionsSchema,
-    createOfferSchema,
-    updateOfferSchema,
-} from "../schemas/offer-schemas.js";
+    CreateOfferInput,
+    CreateOfferPositionInput,
+    CreateOfferFlatrateInput,
+    UpdateOfferInput
+} from '@keepit/schemas';
+
 import {
     buildOfferRevisionSnapshot,
     parseOfferRevisionSnapshot,
@@ -22,19 +22,18 @@ import {
 
 /* ========== Types ========== */
 
-export type CreateOfferInput = z.infer<typeof createOfferSchema>;
-export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
-export type CreateOfferFieldsInput = z.infer<typeof createOfferFieldsSchema>;
-export type PositionInput = z.infer<typeof createOfferPositionsSchema>[number];
-export type FlatrateInput = z.infer<typeof createOfferFlatratesSchema>[number];
-
-type PricedPosition = PositionInput & {
+type PricedPosition = CreateOfferPositionInput & {
     total_cents: number;
     eur_user_month: number;
     discount_cents: number;
 };
 type StoredPosition = Omit<PricedPosition, "optional"> & { optional?: boolean | null };
-type PricedFlatrate = FlatrateInput & { total_cents: number };
+type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
+type PricedDiscount = {
+    title: string;
+    description?: string | null;
+    amount_cents: number;
+};
 
 export interface OfferListQuery {
     search?: unknown;
@@ -49,7 +48,7 @@ export interface OfferListQuery {
 /* ========== Helpers ========== */
 
 /** Berechnet total_cents für jede Position über den Tarif (wirft AppException, wenn kein Preis ermittelbar). */
-async function pricePositions(positions: PositionInput[], customerId?: string): Promise<PricedPosition[]> {
+async function pricePositions(positions: CreateOfferPositionInput[], customerId?: string): Promise<PricedPosition[]> {
     const priced: PricedPosition[] = [];
 
     for (const position of positions) {
@@ -99,7 +98,7 @@ async function getFlatRateCentsById(flatRateIds: string[]): Promise<Map<string, 
 }
 
 /** Berechnet total_cents (= rate * quantity) für jede Flatrate. */
-async function priceFlatrates(flatrates: FlatrateInput[]): Promise<PricedFlatrate[]> {
+async function priceFlatrates(flatrates: CreateOfferFlatrateInput[]): Promise<PricedFlatrate[]> {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return flatrates.map((flatrate) => {
@@ -127,7 +126,7 @@ function mapOfferData<T extends { supplierId?: string | null; validUntil?: strin
 
 /** Summiert Positionen + Flatrates neu und schreibt net_amount am Offer. */
 async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    const [positionsSum, positionsDiscountSum, flatratesSum] = await Promise.all([
+    const [positionsSum, positionsDiscountSum, flatratesSum, discountsSum] = await Promise.all([
         tx.offerPosition.aggregate({
             where: { offerId },
             _sum: { total_cents: true },
@@ -140,14 +139,19 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
             where: { offerId },
             _sum: { total_cents: true },
         }),
+        tx.offerDiscount.aggregate({
+            where: { offerId },
+            _sum: { amount_cents: true },
+        }),
     ]);
 
     const positionsNet = (positionsSum._sum.total_cents ?? 0) - (positionsDiscountSum._sum.discount_cents ?? 0);
+    const discountsNet = discountsSum._sum.amount_cents ?? 0;
 
     await tx.offer.update({
         where: { id: offerId },
         data: {
-            net_amount: positionsNet + (flatratesSum._sum.total_cents ?? 0),
+            net_amount: positionsNet + (flatratesSum._sum.total_cents ?? 0) - discountsNet,
         },
     });
 }
@@ -168,6 +172,21 @@ async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, f
             offerId, flatRateId, quantity, total_cents,
         })),
     });
+}
+
+async function replaceDiscounts(tx: Prisma.TransactionClient, offerId: string, discounts: ReadonlyArray<PricedDiscount>) {
+    await tx.offerDiscount.deleteMany({ where: { offerId } });
+    if (discounts.length === 0) return;
+
+    await tx.offerDiscount.createMany({
+        data: discounts.map(({ title, description, amount_cents }) => ({
+            offerId, title, description: description ?? null, amount_cents,
+        })),
+    });
+}
+
+function sumDiscounts(discounts: ReadonlyArray<PricedDiscount>): number {
+    return discounts.reduce((sum, d) => sum + d.amount_cents, 0);
 }
 
 /* ========== Queries ========== */
@@ -215,6 +234,8 @@ export async function getOffers(query: OfferListQuery) {
         skip: cursor ? 1 : 0,
         cursor: cursor && typeof cursor === "string" ? { id: cursor } : undefined,
         include: {
+            user: true,
+            supplier: true,
             customer: { select: { id: true, companyName: true } },
             customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             offerDocuments: {
@@ -240,6 +261,7 @@ export async function getOffers(query: OfferListQuery) {
                     }
                 }
             },
+            offerDiscounts: true,
         },
     });
 
@@ -252,6 +274,10 @@ export async function getOfferById(id: string) {
     const offer = await prisma.offer.findFirst({
         where: { id },
         include: {
+            user: true,
+            supplier: true,
+            customer: true,
+            customerContactPerson: true,
             offerDocuments: {
                 where: { deletedAt: null },
                 orderBy: { version: "desc" as const },
@@ -270,7 +296,8 @@ export async function getOfferById(id: string) {
                     }
                 }
             },
-            offerFlatRates: true
+            offerFlatRates: true,
+            offerDiscounts: true,
         },
     });
 
@@ -307,18 +334,30 @@ export async function getNextQuoteId(): Promise<number> {
 /* ========== Mutations ========== */
 
 export async function createOffer(input: CreateOfferInput) {
-    const positions = await pricePositions(input.positions, input.offer.customerId);
+    const positions = await pricePositions(input.offerPositions, input.customerId);
     const flatrates = await priceFlatrates(input.flatrates);
+    const discounts = input.discounts;
 
     return prisma.$transaction(async (tx) => {
         const net_amount =
             positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-            flatrates.reduce((sum, f) => sum + f.total_cents, 0);
+            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+            sumDiscounts(discounts);
 
         const offer = await tx.offer.create({
             data: {
-                ...mapOfferData(input.offer),
-                net_amount,
+                customerId: input.customerId,
+                contactPersonId: input.contactPersonId,
+                userId: input.userId,
+                quoteId: input.quoteId,
+                language: input.language,
+                supplierId: input.supplierId,
+                paymentTerm: input.paymentTerm,
+                validUntil: input.validUntil,
+                requestFrom: input.requestFrom,
+                featureComparison: input.featureComparison,
+                toCompare: input.toCompare,
+                net_amount: net_amount,
             },
         });
 
@@ -334,15 +373,16 @@ export async function createOffer(input: CreateOfferInput) {
             })),
         });
 
+        await replaceDiscounts(tx, offer.id, discounts);
+
         return offer;
     });
 }
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
-    const { positions: rawPositions, flatrates: rawFlatrates, expectedVersion } = input;
-    const { id: _, ...offerFields } = (input.offer ?? {}) as CreateOfferFieldsInput & { id?: string };
+    const { offerPositions: rawPositions, flatrates: rawFlatrates, discounts, expectedVersion } = input;
 
-    const positions = await pricePositions(rawPositions, input.offer?.customerId);
+    const positions = await pricePositions(rawPositions, input.customerId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
     return prisma.$transaction(async (tx) => {
@@ -350,13 +390,15 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
         const net_amount =
             positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-            flatrates.reduce((sum, f) => sum + f.total_cents, 0);
+            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+            sumDiscounts(discounts);
 
         const current = await tx.offer.findFirstOrThrow({
             where: { id: offerId },
             include: {
                 offerPositions: true,
-                offerFlatRates: true
+                offerFlatRates: true,
+                offerDiscounts: true,
             },
         });
 
@@ -383,7 +425,17 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         const [offer] = await tx.offer.updateManyAndReturn({
             where: { id: offerId },
             data: {
-                ...mapOfferData(offerFields),
+                customerId: input.customerId,
+                contactPersonId: input.contactPersonId,
+                userId: input.userId,
+                quoteId: input.quoteId,
+                language: input.language,
+                supplierId: input.supplierId,
+                paymentTerm: input.paymentTerm,
+                validUntil: input.validUntil,
+                requestFrom: input.requestFrom,
+                featureComparison: input.featureComparison,
+                toCompare: input.toCompare,
                 net_amount,
                 version: { increment: 1 },
             },
@@ -391,6 +443,8 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
         await replacePositions(tx, offerId, positions);
         await replaceFlatRates(tx, offerId, flatrates);
+        await replaceDiscounts(tx, offerId, discounts);
+
         await tx.offerDocument.updateMany({
             where: { offerId, isCurrent: true },
             data: { isCurrent: false },
@@ -411,7 +465,7 @@ export async function restoreOfferRevision(
 
         const current = await tx.offer.findUnique({
             where: { id: offerId },
-            include: { offerPositions: true, offerFlatRates: true },
+            include: { offerPositions: true, offerFlatRates: true, offerDiscounts: true },
         });
         if (!current) {
             throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
@@ -440,6 +494,7 @@ export async function restoreOfferRevision(
         }
 
         let restored;
+
         try {
             restored = parseOfferRevisionSnapshot(revision.snapshot);
         } catch {
@@ -474,6 +529,8 @@ export async function restoreOfferRevision(
 
         await replacePositions(tx, offerId, restored.positions);
         await replaceFlatRates(tx, offerId, restored.flatRates);
+        await replaceDiscounts(tx, offerId, restored.discounts);
+
         await tx.offerDocument.updateMany({
             where: { offerId, isCurrent: true },
             data: { isCurrent: false },
@@ -483,7 +540,7 @@ export async function restoreOfferRevision(
     });
 }
 
-export async function createOfferPositions(offerId: string, positions: PositionInput[]) {
+export async function createOfferPositions(offerId: string, positions: CreateOfferPositionInput[]) {
     const priced = await pricePositions(positions);
 
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
@@ -499,7 +556,7 @@ export async function createOfferPositions(offerId: string, positions: PositionI
 
 }
 
-export async function createOfferFlatrates(offerId: string, flatrates: FlatrateInput[]) {
+export async function createOfferFlatrates(offerId: string, flatrates: CreateOfferFlatrateInput[]) {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return prisma.$transaction(async (tx) => {
@@ -558,13 +615,11 @@ export async function enqueueGeneration(offerId: string) {
 /* ========== Deletes ========== */
 
 export async function deleteOffer(id: string): Promise<void> {
-    if (!id) {
-        throw new AppException("Bad request. Missing id!", 400, "MISSING_ID");
-    }
-
     await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
+
         await tx.offer.findUniqueOrThrow({ where: { id } });
+
         if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
             throw new AppException(
                 "Offers with document history cannot be deleted.",
@@ -572,6 +627,7 @@ export async function deleteOffer(id: string): Promise<void> {
                 "OFFER_HAS_DOCUMENT_HISTORY",
             );
         }
+
         await tx.offer.delete({ where: { id } });
     });
 }

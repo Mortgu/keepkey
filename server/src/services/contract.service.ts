@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
@@ -20,6 +20,15 @@ export async function getAllContracts() {
         },
         orderBy: {
             createdAt: "desc"
+        }
+    });
+}
+
+export async function getContract(contractId: string) {
+    return prisma.contract.findUnique({
+        where: { id: contractId },
+        include: {
+            translations: true
         }
     });
 }

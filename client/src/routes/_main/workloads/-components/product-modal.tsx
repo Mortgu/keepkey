@@ -1,12 +1,7 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
-import type {
-  CreateProductInput,
-  Language,
-  ProductTranslationInput,
-  UpdateProductInput,
-} from "@/types";
+
 import {
   DEFAULT_LANGUAGE_OPTIONS,
   FieldInput,
@@ -14,6 +9,14 @@ import {
   FormModal,
   SegmentedLanguageToggle,
 } from "@/components";
+
+import type {
+  CreateProductInput,
+  UpdateProductInput,
+
+  ProductTranslationInput,
+  Language
+} from '@keepit/schemas';
 
 interface ProductModalProps {
   onClose: () => void;
@@ -32,11 +35,8 @@ const productScheme = z.object({
   EN: langFields,
 });
 
-function seedLang(
-  translations: UpdateProductInput["translations"],
-  lang: Language,
-) {
-  const t = translations?.find((x) => x.language === lang);
+function seedLang(translations: Array<ProductTranslationInput> | undefined, lang: Language) {
+  const t = translations?.find((x: ProductTranslationInput) => x.language === lang);
   return {
     name: t?.name ?? "",
     description: t?.description ?? "",
@@ -44,19 +44,15 @@ function seedLang(
   };
 }
 
-export default function ProductModal({
-  onClose,
-  submitFn,
-  currentItem = null,
-}: ProductModalProps) {
+export default function ProductModal({ onClose, submitFn, currentItem = null }: ProductModalProps) {
   const isEdit = currentItem != null;
 
   const [language, setLanguage] = useState<Language>("DE");
 
   const productForm = useForm({
     defaultValues: {
-      DE: seedLang(currentItem?.translations, "DE"),
-      EN: seedLang(currentItem?.translations, "EN"),
+      DE: seedLang(currentItem?.translations ?? [], "DE"),
+      EN: seedLang(currentItem?.translations ?? [], "EN"),
     },
     validators: {
       onChange: productScheme,

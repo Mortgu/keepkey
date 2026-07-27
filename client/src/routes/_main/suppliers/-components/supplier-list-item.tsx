@@ -1,6 +1,6 @@
 import { Fragment } from "react";
 import SupplierModal from "./supplier-modal";
-import type { Supplier } from "@/types";
+import type { Supplier } from "@keepit/schemas";
 import { useModal, useDeleteSupplier } from "@/hooks";
 import { Badge, Button } from "@/components";
 import { Pen, Trash } from "lucide-react";

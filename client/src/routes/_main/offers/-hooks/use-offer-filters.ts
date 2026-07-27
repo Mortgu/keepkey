@@ -21,6 +21,7 @@ export default function useOfferFilters() {
         contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
         productIds: productFilter.length > 0 ? productFilter : undefined,
         sort,
+        limit: 50,
     }), [searchInput, customerFilter, contactPersonFilter, productFilter, sort]);
 
     const removeCustomerFilter = (id: string) =>

@@ -97,7 +97,7 @@ export async function downloadDocument(
 ): Promise<{ url: string }> {
     const document = await requireGeneratedDocument(type, id);
     if (!DOWNLOADABLE_STATUSES.has(document.status)) {
-        throw new AppException("Document not yet generated", 409, "DOCUMENT_NOT_GENERATED");
+        throw new AppException("Document not yet generated", 409, "DOCUMENTS_NOT_GENERATED");
     }
 
     const artifactFormat = format === "pdf" ? DocumentFormat.PDF : DocumentFormat.DOCX;

@@ -1,4 +1,4 @@
-import z from "zod";
+import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
@@ -16,6 +16,13 @@ export type UpdateFlatRateInput = z.infer<typeof updateFlatRateSchema>;
 export async function getFlatRates() {
     return prisma.flatRate.findMany({
         orderBy: { id: "asc" },
+        include: { translations: true },
+    });
+}
+
+export async function getFlatrate(id: string) {
+    return prisma.flatRate.findUnique({
+        where: { id },
         include: { translations: true },
     });
 }
@@ -56,14 +63,14 @@ export async function updateFlatRate(id: string, input: UpdateFlatRateInput) {
             ...(total_cents !== undefined ? { total_cents } : {}),
             ...(Array.isArray(translations)
                 ? {
-                      translations: {
-                          upsert: translations.map((t) => ({
-                              where: { flatRateId_language: { flatRateId: id, language: t.language } },
-                              create: { language: t.language, name: t.name, table: t.table },
-                              update: { name: t.name, table: t.table },
-                          })),
-                      },
-                  }
+                    translations: {
+                        upsert: translations.map((t) => ({
+                            where: { flatRateId_language: { flatRateId: id, language: t.language } },
+                            create: { language: t.language, name: t.name, table: t.table },
+                            update: { name: t.name, table: t.table },
+                        })),
+                    },
+                }
                 : {}),
         },
         include: { translations: true },

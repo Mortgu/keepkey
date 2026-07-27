@@ -20,8 +20,6 @@ export default function DashboardPage() {
     const { stats } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
-    console.log(stats)
-
     const renderCard = (
         name: string,
         entry: IntegrationEntry | undefined,

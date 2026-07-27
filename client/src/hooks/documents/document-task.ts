@@ -1,10 +1,14 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 import type { QueryClient } from "@tanstack/react-query";
-import type { DocumentStatus, OffersPage, Order } from "@/types";
+import type { DocumentStatus, Order } from "@keepit/schemas";
 import { getTask } from "@/hooks/offers/offer-api";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
+
+import type {
+    OffersPage
+} from '@keepit/schemas';
 
 function updateOfferDocumentStatus(
     queryClient: QueryClient,
@@ -13,9 +17,9 @@ function updateOfferDocumentStatus(
     error?: string,
 ) {
     queryClient.setQueriesData<OffersPage>({ queryKey: offerKeys.all }, (page) => {
-        if (!page || !page.items.length || !('offerDocuments' in page.items[0])) return page;
+        if (!page || !page?.items?.length || !('offerDocuments' in page?.items[0])) return page;
         return {
-            ...page, items: page.items.map((offer) => ({
+            ...page, items: page?.items?.map((offer) => ({
                 ...offer,
                 offerDocuments: offer.offerDocuments.map((doc) =>
                     doc.taskId === taskId ? { ...doc, status, ...(error ? { error } : {}) } : doc

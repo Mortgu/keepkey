@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { customerQueries } from "./customer-queries";
-import type { CustomerFilters } from "@/types";
+import type { CustomerFilters } from "@keepit/schemas";
 
 export function useCustomers(filters: CustomerFilters = {}) {
     const { data: customers = [], isPending, error } = useQuery(customerQueries.list(filters));

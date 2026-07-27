@@ -1,9 +1,11 @@
 import { Button, FilterChip, MultiDropdown, SearchBar, SortDropdown } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
-import type { Customer } from "@/types";
 import { Plus } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import type {
+    Customer
+} from "@keepit/schemas";
 
 const sort_options = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },

@@ -6,7 +6,7 @@ import OrderEditModal from "../order-edit-modal";
 import OrderCardDocument from "./order-card-document";
 import OrderCardFlatRate from "./order-card-flatrate";
 import OrderCardProduct from "./order-card-product";
-import type { Order, OrderDocument } from "@/types";
+import type { Order, OrderDocument } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 import { formatDate } from "@/lib/format";
 import { useDeleteOrder, useGenerateOrderDocument } from "@/hooks";
@@ -33,7 +33,7 @@ export default function OrderCard({ order }: Props) {
     } = useDeleteOrder();
 
     const {
-        generateDocument,
+        generateOrderDocument,
         isGeneratingDocument,
     } = useGenerateOrderDocument();
 
@@ -119,6 +119,21 @@ export default function OrderCard({ order }: Props) {
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
+
+                    <Button
+                        className="min-w-fit"
+                        variant="primary"
+                        size="xs"
+                        loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument}
+                        onClick={() => generateOrderDocument({ orderId: order.id })}
+                    >
+                        Dokument generieren
+                    </Button>
+                </div>
+
+                {/* Actions right */}
+                <div className="flex items-center gap-2">
                     <Button
                         size="xs"
                         variant="secondary"
@@ -136,22 +151,9 @@ export default function OrderCard({ order }: Props) {
                         title="Bestellung bearbeiten"
                     />
                     <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="sm"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
-                        onClick={() => generateDocument({ orderId: order.id })}
-                    >
-                        Dokument generieren
-                    </Button>
-                </div>
-
-                {/* Actions right */}
-                <div className="flex items-center gap-2">
-                    <Button
                         size="xs"
                         variant="secondary"
+                        danger
                         onClick={handleDeleteOrder}
                         icon={<Trash className="size-3" />}
                         iconOnly
