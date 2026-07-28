@@ -1,11 +1,11 @@
 import type { DropdownOption } from "@/components";
-import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
-
 import type {
     CreateOfferInput,
     Offer
 } from '@keepit/schemas';
+import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
+
 
 interface Props {
     currentOffer?: Offer;
@@ -36,7 +36,7 @@ export default function useOfferModal({ currentOffer }: Props) {
         language: currentOffer?.language || "DE",
 
         featureComparison: currentOffer?.featureComparison ?? false,
-        toCompare: currentOffer?.toCompare as string[] ?? [],
+        toCompare: currentOffer?.toCompare as Array<string> ?? [],
 
         offerPositions: currentOffer?.offerPositions.map(op => ({
             productId: op.productId,

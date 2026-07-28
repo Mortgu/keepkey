@@ -1,8 +1,8 @@
-import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { productQueries } from "./product-queries";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 
-const EMPTY_ARRAY: never[] = [];
+const EMPTY_ARRAY: Array<never> = [];
 
 export function useProducts() {
     const { data = EMPTY_ARRAY, isPending, error } = useQuery(productQueries.list());

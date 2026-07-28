@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
-import type { TariffBase, TariffCell } from "@keepit/schemas";
-import { useTariffGroupHook } from "@/hooks";
-import { Button } from "@/components";
 import TariffCellComponent from "./cell-component";
 import TariffColumnComponent from "./column-component";
 import TariffRowComponent from "./row-component";
+import type { TariffBase, TariffCell } from "@keepit/schemas";
+import { useTariffGroupHook } from "@/hooks";
+import { Button } from "@/components";
 
 type Props = {
     tariff: TariffBase;
@@ -55,7 +55,7 @@ export default function TariffComponent({ tariff }: Props) {
                         {tariff.rows.map(row => (
                             <tr key={row.id}>
                                 <TariffRowComponent groupId={groupId} tariffId={tariff.id} rowId={row.id}
-                                    minQty={row.min_quantity} maxQty={row.max_quantity ?? 0} />
+                                    minQty={row.min_quantity} maxQty={row.max_quantity} />
 
                                 {tariff.columns.map(column => {
                                     const cell = cellMap.get(`${row.id}:${column.id}`);

@@ -1,27 +1,28 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 
+import RenewalModal from "../modals/renewal/renewal-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
+import type { Offer, OfferDocument } from '@keepit/schemas';
 import { Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-
-import type {
-    Offer,
-    OfferDocument,
-} from '@keepit/schemas';
+import type { OfferFormTypes } from "../modals/offer/offer-form";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (offer: Offer) => void;
+    onEdit: (type: OfferFormTypes, offer: Offer) => void;
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const renewalModal = useModal<Offer>();
+
     const {
         customerContactPerson: ccp,
         quoteId,
@@ -138,6 +139,12 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     >
                         Dokument generieren
                     </Button>
+
+                    {/*<Button variant="border" type="button" size="xs"
+                        onClick={() => onEdit("renewal", offer)}>Renewal</Button>*/}
+
+                    <Button variant="border" type="button" size="xs"
+                        onClick={() => renewalModal.open(offer)}>Renewal</Button>
                 </div>
 
                 {/* Actions right */}
@@ -153,7 +160,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => onEdit(offer)}
+                        onClick={() => onEdit("edit", offer)}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
@@ -171,6 +178,14 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </div>
 
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
+
+            {renewalModal.isOpen && (
+                <RenewalModal
+                    key={renewalModal.key}
+                    offer={offer}
+                    onClose={renewalModal.close}
+                />
+            )}
         </div>
     );
 }

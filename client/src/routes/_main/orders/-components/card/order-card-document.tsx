@@ -2,7 +2,8 @@ import { Download, File, LoaderCircle, Pencil, Trash, UploadCloud } from "lucide
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-import { type OrderDocument, findDocumentArtifact } from "@keepit/schemas";
+import {  findDocumentArtifact } from "@keepit/schemas";
+import type {OrderDocument} from "@keepit/schemas";
 import { Button, DocumentRenameModal } from "@/components";
 import { useDocumentMutations, useDocumentTask } from "@/hooks";
 import { documentDownloadUrl } from "@/data/documents";

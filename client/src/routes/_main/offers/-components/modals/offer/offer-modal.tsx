@@ -1,24 +1,24 @@
 import { Loader } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
-import useOfferForm from "../-hooks/use-offer-form";
-import FlatrateOfferModalSection from "./modal/flatrate/flatrates";
-import FormOfferModal from "./modal/offer-form";
-import WorkloadOfferModalSection from "./modal/workload/workloads";
-import DiscountOfferModalSection from "./modal/discount/discounts";
-
-import {
-  Button, ModalDialog
-} from "@/components";
+import useOfferForm from "../../../-hooks/use-offer-form";
+import FormOfferModal from "./offer-form";
 
 import type {
+  Contract,
   Customer,
   Offer,
   Product,
-  User,
-  Contract,
   Supplier,
+  User,
 } from '@keepit/schemas';
+import {
+  Button, ModalDialog
+} from "@/components";
+import WorkloadOfferModalSection from "./workload/workloads";
+import FlatrateOfferModalSection from "./flatrate/flatrates";
+import DiscountOfferModalSection from "./discount/discounts";
+
 
 interface OfferModalProps {
   closeFn: () => void;
@@ -66,7 +66,10 @@ export default function OfferModal(props: OfferModalProps) {
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <div>
+
+          </div>
 
           <div className="flex gap-2">
             <Button variant="border" size="sm" type="button" onClick={closeFn}>
@@ -79,6 +82,7 @@ export default function OfferModal(props: OfferModalProps) {
                 {t("button.save")}
               </Button>
             )} />
+
 
           </div>
         </div>

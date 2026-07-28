@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { supplierQueries } from "./supplier-queries";
 
-const EMPTY_ARRAY: never[] = [];
+const EMPTY_ARRAY: Array<never> = [];
 
 export function useSuppliers() {
     const { data = EMPTY_ARRAY, isPending, error } = useQuery(supplierQueries.list());

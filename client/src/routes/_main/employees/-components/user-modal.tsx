@@ -1,12 +1,13 @@
 import { useForm } from "@tanstack/react-form";
 
+import {
+    
+    createUserSchema
+} from '@keepit/schemas';
+import type {User} from '@keepit/schemas';
 import { useUserManager } from "@/hooks";
 import { FieldInput, FormModal } from "@/components";
 
-import {
-    type User,
-    createUserSchema,
-} from '@keepit/schemas';
 
 interface UserModalProps {
     onClose: () => void;

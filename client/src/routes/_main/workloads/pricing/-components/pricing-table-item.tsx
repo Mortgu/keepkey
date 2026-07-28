@@ -1,5 +1,6 @@
 import { ChevronDown, Plus, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import TariffComponent from "./tariff-component";
 import type { TariffBase } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
@@ -7,7 +8,6 @@ import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 import { useCreateTariff } from "@/hooks/tariffs/tariff-mutations";
-import { toast } from "react-toastify";
 
 type Props = {
     tariff: TariffBase;

@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { localized } from "@/lib/i18n-content";
-
 import type {
     ContactList,
     CustomerList,
-    ProductList,
-    Language
+    Language,
+    ProductList
 } from "@keepit/schemas";
+import { localized } from "@/lib/i18n-content";
+
 
 export function useOfferFilterOptions(
     customers: CustomerList,

@@ -1,9 +1,10 @@
+import {  useState } from "react";
+import { useTranslation } from "react-i18next";
+import type {SyntheticEvent} from "react";
+import type { CreateOfferFlatrateInput } from "@keepit/schemas";
 import { Button, Input, Select } from "@/components";
 import { useFlatRates, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { CreateOfferFlatrateInput } from "@keepit/schemas";
-import { useState, type SyntheticEvent } from "react";
-import { useTranslation } from "react-i18next";
 
 interface Props {
     currentFlatrate?: CreateOfferFlatrateInput;

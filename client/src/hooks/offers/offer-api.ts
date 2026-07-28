@@ -1,25 +1,23 @@
 import type {
+    CreateOfferFlatrateInput,
+    CreateOfferInput,
+    CreateOfferPositionInput,
+    Offer,
+    OfferFilterParams,
+
+    OfferPosition,
+    OfferRevision,
+
+    OffersPage,
     Task,
+
+    UpdateOfferFlatrateInput,
+    UpdateOfferInput,
+    UpdateOfferPositionInput
 } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
 
-import type {
-    Offer,
-    OffersPage,
-    OfferPosition,
-    OfferRevision,
-
-    CreateOfferInput,
-    UpdateOfferInput,
-
-    CreateOfferPositionInput,
-    UpdateOfferPositionInput,
-
-    CreateOfferFlatrateInput,
-    UpdateOfferFlatrateInput,
-    OfferFilterParams,
-} from "@keepit/schemas";
 
 /* Offer */
 export const getOffers = async (filters: OfferFilterParams) =>
@@ -114,4 +112,11 @@ export const getOfferTasks = async (id: string) =>
 export const getTask = async (taskId: string) =>
     api<Task>(`/api/tasks/${taskId}`, {
         method: "GET"
+    });
+
+export const renewOffer = (offerId: string, input: CreateOfferInput) =>
+    api<Offer>(`/api/offers/${offerId}/renew`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
     });

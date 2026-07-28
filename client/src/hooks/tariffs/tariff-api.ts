@@ -1,16 +1,16 @@
-import { api } from "@/lib/api-client";
-
 import type {
+    CreateTariffGroupInput,
+    CreateTariffInput,
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffRow,
-    TariffHistory,
 
-    CreateTariffGroupInput,
-    CreateTariffInput,
+    TariffHistory,
+    TariffRow,
     UpdateTariffGroupInput,
 } from '@keepit/schemas';
+import { api } from "@/lib/api-client";
+
 
 /* ───────────────────────────────
    TariffGroup
@@ -89,7 +89,7 @@ export const updateTariffColumn = (groupId: string, tariffId: string, columnId: 
    Tariff Row
    ─────────────────────────────── */
 
-export const createTariffRow = (groupId: string, tariffId: string, min_quantity: number, max_quantity: number) =>
+export const createTariffRow = (groupId: string, tariffId: string, min_quantity: number, max_quantity: number | null) =>
     api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -101,7 +101,7 @@ export const deleteTariffRow = (groupId: string, tariffId: string, rowId: string
         method: "DELETE",
     });
 
-export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number) =>
+export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number | null) =>
     api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },

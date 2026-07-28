@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { PageWidth } from "@/components";
 import InvoiceList from "./-components/invoice-list";
+import { PageWidth } from "@/components";
 
 export function InvoicePage() {
     const { t } = useTranslation();

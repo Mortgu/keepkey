@@ -14,8 +14,8 @@ import {
 export type CreateTariffInput = { contractId: string };
 export type CreateTariffColumnInput = { duration: number };
 export type UpdateTariffColumnInput = { duration?: number };
-export type CreateTariffRowInput = { min_quantity: number; max_quantity: number };
-export type UpdateTariffRowInput = { min_qty?: number; max_qty?: number };
+export type CreateTariffRowInput = { min_quantity: number; max_quantity: number | null };
+export type UpdateTariffRowInput = { min_qty?: number; max_qty?: number | null };
 export type UpdateTariffCellInput = { default_price?: number; customer_price?: number; customerId?: string };
 export type CreateTariffGroupInput = { products: string[] };
 export type UpdateTariffGroupInput = { products?: string[] };

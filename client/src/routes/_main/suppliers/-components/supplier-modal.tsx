@@ -1,8 +1,8 @@
 import { useForm } from "@tanstack/react-form";
 import { z } from 'zod';
+import type { Supplier } from "@keepit/schemas";
 import { FieldInput, FormModal } from "@/components";
 import { useSupplierManager } from "@/hooks";
-import type { Supplier } from "@keepit/schemas";
 
 interface SupplierModalProps {
     onClose: () => void;

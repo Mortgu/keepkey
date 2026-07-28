@@ -631,3 +631,17 @@ export async function deleteOffer(id: string): Promise<void> {
         await tx.offer.delete({ where: { id } });
     });
 }
+
+/* ========== Renewal ========== */
+
+export async function renewOffer(sourceOfferId: string, input: CreateOfferInput) {
+    const source = await prisma.offer.findUnique({
+        where: { id: sourceOfferId },
+        select: { id: true },
+    });
+    if (!source) {
+        throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
+    }
+
+    return createOffer(input);
+}

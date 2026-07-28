@@ -170,6 +170,15 @@ describe("selectPrice", () => {
     const result = selectPrice(buildTariff(), { duration: 12, quantity: 0 });
     expect(result).toEqual({ ok: false, reason: "INVALID_INPUT" });
   });
+
+  it("behandelt max_quantity = 0 nicht als 'kein Limit' (nur null ist offen)", () => {
+    const tariff = buildTariff();
+    // rowLarge hat max_quantity = null → auf 0 setzen
+    tariff.rows[1].max_quantity = 0;
+    // quantity 15 kann nicht ≤ 0 sein → NO_ROW
+    const result = selectPrice(tariff, { duration: 12, quantity: 15 });
+    expect(result).toEqual({ ok: false, reason: "NO_ROW" });
+  });
 });
 
 describe("PriceError", () => {

@@ -3,7 +3,7 @@ import UserModal from "./user-modal";
 
 import type { User } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
-import { useModal, useDeleteUser } from "@/hooks";
+import { useDeleteUser, useModal } from "@/hooks";
 import { ListItemRow } from "@/components";
 
 interface UserListItemProps {

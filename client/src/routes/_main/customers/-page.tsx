@@ -1,6 +1,6 @@
-import { PageWidth } from "@/components";
 import { useTranslation } from "react-i18next";
 import { default as CustomerList } from "./-components/customer-list";
+import { PageWidth } from "@/components";
 
 export default function CustomerPage() {
     const { t } = useTranslation();

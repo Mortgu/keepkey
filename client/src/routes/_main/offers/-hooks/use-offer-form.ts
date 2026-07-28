@@ -1,12 +1,13 @@
 import { useForm, useStore } from "@tanstack/react-form";
-import useOfferModal from "../-hooks/use-offer.offer-modal";
-import { useOfferManager } from "@/hooks";
 import { useState } from "react";
-
 import {
-    type Offer,
+    
     createOfferSchema
 } from '@keepit/schemas';
+import useOfferModal from "../-hooks/use-offer.offer-modal";
+import type {Offer} from '@keepit/schemas';
+import { useOfferManager } from "@/hooks";
+
 
 interface Props {
     currentOffer?: Offer;

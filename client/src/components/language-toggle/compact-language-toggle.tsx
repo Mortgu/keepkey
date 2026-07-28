@@ -1,7 +1,7 @@
 import {Globe} from 'lucide-react';
 import type {LanguageToggleProps} from './language-toggle-types';
-import {cn} from '@/lib/utils';
 import type {ComponentSize} from '@/components/size';
+import {cn} from '@/lib/utils';
 
 const COMPACT_SIZE_STYLES: Record<ComponentSize, string> = {
   xs: 'px-2 py-[4px] text-xs',

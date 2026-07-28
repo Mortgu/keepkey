@@ -1,19 +1,19 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
 import type {
+    CreateOfferFlatrateInput,
     CreateOfferInput,
-    UpdateOfferInput,
 
     CreateOfferPositionInput,
-    UpdateOfferPositionInput,
-
-    CreateOfferFlatrateInput,
-    UpdateOfferFlatrateInput,
-
     OfferFilterParams,
+
+    UpdateOfferFlatrateInput,
+    UpdateOfferInput,
+
+    UpdateOfferPositionInput,
 } from '@keepit/schemas';
 
 export function useCreateOffer() {
@@ -242,4 +242,16 @@ export function useRestoreOfferRevision() {
         restoringRevisionId: mutation.variables?.revisionId,
         errorRestoringRevision: mutation.error,
     }
+}
+
+export function useRenewOffer() {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: ({ offerId, input }: { offerId: string; input: CreateOfferInput }) =>
+            renewOffer(offerId, input),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+        }
+    });
+    return { renewOffer: mutation.mutateAsync, isRenewing: mutation.isPending, errorRenewing: mutation.error };
 }

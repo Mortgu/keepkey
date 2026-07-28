@@ -2,12 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { Download, Plus, RotateCcw, Trash } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
 import type { CloudFile } from "@keepit/schemas";
 import { Badge, Button, ModalDialog } from "@/components";
 import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud/nextcloud-hooks";
 import { templateDownloadUrl } from "@/hooks/nextcloud/nextcloud-api";
 import { formatBytesToKB } from "@/lib/utils";
-import { useTranslation } from "react-i18next";
 
 export default function TemplateList() {
     const { t } = useTranslation();

@@ -18,7 +18,26 @@
     "language": "Sprache",
     "workload_section": "Produkte",
     "flatrate_section": "Flatrate",
-    "discound_section": "Rabatte"
+    "discount_section": "Rabatte"
+  },
+  "renewal": {
+    "title": "Verlängerung für {{orderId}}",
+    "period_section": "Periode",
+    "start_date": "Startdatum",
+    "valid_until": "Gültig bis",
+    "positions_section": "Positionen",
+    "flatrates_section": "Pauschalen",
+    "previous_quantity": "Vorige Menge",
+    "duration": "Laufzeit",
+    "quantity": "Menge",
+    "unit_price": "Stückpreis",
+    "free_months": "Freimonate",
+    "optional": "Optional?",
+    "total": "Gesamt",
+    "previous_period": "Vorperiode",
+    "months": "Monate",
+    "no_duration": "Keine Laufzeit konfiguriert",
+    "invalid_price": "Ungültiger Preis."
   },
   "offers": {
     "toast": {
@@ -26,7 +45,8 @@
       "documentUploadError": "Dokument konnte nicht hochgeladen werden: {{message}}",
       "documentDeleteError": "Dokument konnte nicht gelöscht werden: {{message}}",
       "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
-      "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}"
+      "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}",
+      "renewalStub": "Angebot-Generierung aus Verlängerung folgt in einem kommenden Schritt."
     }
   }
 }

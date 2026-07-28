@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { CreateSupplierInput, UpdateSupplierInput } from "@keepit/schemas";
 import { createSupplier, deleteSupplier, updateSupplier } from "./supplier-api";
 import { supplierKeys } from "./supplier-keys";
 import { useSuppliers } from "./supplier-hooks";
+import type { CreateSupplierInput, UpdateSupplierInput } from "@keepit/schemas";
 
 export function useCreateSupplier() {
     const queryClient = useQueryClient();

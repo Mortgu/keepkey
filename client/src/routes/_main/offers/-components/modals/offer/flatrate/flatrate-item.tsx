@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { useFlatRates, useLocale } from "@/hooks";
-import { Button } from "@/components";
-import { localized } from "@/lib/i18n-content";
-import { X, Pen, Trash } from "lucide-react";
+import { Pen, Trash, X } from "lucide-react";
 import FlatrateFormOfferModal from "./flatrate-form";
-
 import type {
     CreateOfferFlatrateInput
 } from '@keepit/schemas';
+import { useFlatRates, useLocale } from "@/hooks";
+import { Button } from "@/components";
+import { localized } from "@/lib/i18n-content";
+
 
 interface Props {
     flatrate: CreateOfferFlatrateInput;

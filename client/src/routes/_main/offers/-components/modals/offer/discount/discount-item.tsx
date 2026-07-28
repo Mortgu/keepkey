@@ -1,9 +1,9 @@
-import { Button } from "@/components";
-import type { CreateOfferDiscountInput } from "@keepit/schemas";
-import { formatEur } from "@/utils/utils";
 import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import DiscountFormOfferModal from "./discount-form";
+import type { CreateOfferDiscountInput } from "@keepit/schemas";
+import { formatEur } from "@/utils/utils";
+import { Button } from "@/components";
 
 interface Props {
     discount: CreateOfferDiscountInput;

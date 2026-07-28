@@ -22,12 +22,12 @@ export const updateTariffColumnSchema = z.object({
 
 export const createTariffRowSchema = z.object({
     min_quantity: z.number().int(),
-    max_quantity: z.number().int(),
+    max_quantity: z.number().int().nullable(),
 });
 
 export const updateTariffRowSchema = z.object({
     min_qty: z.number().int().optional(),
-    max_qty: z.number().int().optional(),
+    max_qty: z.number().int().nullable().optional(),
 });
 
 export const updateTariffCellSchema = z.object({

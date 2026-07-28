@@ -5,11 +5,11 @@ import { KeyRound, Loader, Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import { z } from "zod";
 import { getAuthenticatorName } from "@better-auth/passkey";
+import { useTranslation } from "react-i18next";
 import type { Passkey } from "@better-auth/passkey";
 
 import { Button, FieldInput, Input } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
-import { useTranslation } from "react-i18next";
 
 const passkeyNameSchema = z.object({
     name: z.string().min(1, "Pflichtfeld"),

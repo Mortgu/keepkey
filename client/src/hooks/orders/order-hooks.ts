@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { orderQueries } from "./order-queries";
 
-const EMPTY_ARRAY: never[] = [];
+const EMPTY_ARRAY: Array<never> = [];
 
 export function useOrders() {
     const { data = EMPTY_ARRAY, isPending, error } = useQuery(orderQueries.list());

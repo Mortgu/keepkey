@@ -1,15 +1,17 @@
-import { Input, Select } from "@/components";
-import { useCustomers, useSuppliers, useUsers } from "@/hooks";
-import { getFormError } from "@/lib/utils";
-import { type ChangeEvent, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferFormApi } from "../../-hooks/use-offer-form";
+import type { ChangeEvent, SyntheticEvent } from "react";
+import type { OfferFormApi } from "../../../-hooks/use-offer-form";
 
 import type { Language } from "@keepit/schemas";
+import { getFormError } from "@/lib/utils";
+import { useCustomers, useSuppliers, useUsers } from "@/hooks";
+import { Input, Select } from "@/components";
 
 interface Props {
     form: OfferFormApi;
 }
+
+export type OfferFormTypes = "create" | "edit" | "renewal";
 
 export default function FormOfferModal({ form }: Props) {
     const { t } = useTranslation();
@@ -49,7 +51,7 @@ export default function FormOfferModal({ form }: Props) {
                             field.handleChange(e.target.value)
                         }} error={getFormError(field.state.meta.errors)}>
                             {customers.map(customer => (
-                                <option id={customer.id} value={customer.id}>
+                                <option key={customer.id} id={customer.id} value={customer.id}>
                                     {customer.companyName}
                                 </option>
                             ))}

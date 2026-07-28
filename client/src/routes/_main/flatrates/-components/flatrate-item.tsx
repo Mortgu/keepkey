@@ -1,9 +1,9 @@
+import { Pen, Trash } from "lucide-react";
+import FlatRateModal from "./flatrate-modal";
+import type { Flatrate } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useDeleteFlatRate, useLocale, useModal, useUpdateFlatRate } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { Flatrate } from "@keepit/schemas";
-import { Pen, Trash } from "lucide-react";
-import FlatRateModal from "./flatrate-modal";
 
 
 export default function FlatRateItem({ item }: { item: Flatrate }) {

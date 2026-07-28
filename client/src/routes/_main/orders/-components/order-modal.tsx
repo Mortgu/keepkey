@@ -3,15 +3,15 @@ import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { ArrowLeft, Search } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import type { Offer } from '@keepit/schemas';
 import { getFormError } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 import { useCreateOrder, useNextOrderNumber } from "@/hooks";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
-import { useTranslation } from "react-i18next";
 
-import type { Offer } from '@keepit/schemas';
 
 interface OrderModalProps {
   onClose: () => void;

@@ -1,22 +1,23 @@
-import type { ReactNode } from "react";
 import { useState } from "react";
 import {
     ChevronDown,
     DollarSign,
+    Euro,
     FileText,
     Languages,
     LayoutGrid,
     LogOut,
-    Package,
-    Settings,
+    Package, Settings,
     ShoppingCart,
+    Text,
     Truck,
     UserCircle2,
-    Users,
+    Users
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { NavGroup, NavLink } from "./nav-link.js";
+import type { ReactNode } from "react";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
 import { useAuth } from "@/context/auth";
 
@@ -121,8 +122,10 @@ export function Navigation() {
                 <Section title={t("nav.catalog")} collapsible>
 
                     <NavGroup label={t("section.workloads")} icon={<Package size={ICON_SIZE} />} defaultOpen>
-                        <NavLink to="/workloads" label={t("section.workload_text")} indent />
-                        <NavLink to="/workloads/pricing" label={t("section.workload_pricing")} indent />
+                        <NavLink to="/workloads" label={t("section.workload_text")} indent
+                            icon={<Text size={ICON_SIZE} />} />
+                        <NavLink to="/workloads/pricing" label={t("section.workload_pricing")} indent
+                            icon={<Euro size={ICON_SIZE} />} />
                     </NavGroup>
 
                     <NavLink to="/flatrates" label={t("section.flatRates")} icon={<DollarSign size={ICON_SIZE} />} />

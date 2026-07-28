@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Button, Input, ModalDialog } from "@/components";
 import { useTranslation } from "react-i18next";
+import { Button, Input, ModalDialog } from "@/components";
 
 type Props = {
   initialValue: string;

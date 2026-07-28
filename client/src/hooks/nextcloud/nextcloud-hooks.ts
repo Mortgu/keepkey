@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { deleteTemplate, uploadTemplate } from "./nextcloud-api";
 import { nextcloudKeys } from "./nextcloud-keys";
 import { nextcloudQueries } from "./nextcloud-queries";
+import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 
 export function useNextcloudStatus() {
     const { data, isPending, refetch } = useIntegrationStatus();

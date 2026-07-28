@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import type { Contract } from "@keepit/schemas";
 import type { DropdownOption } from "@/components/filters/multi-dropdown";
 import {
@@ -10,7 +11,6 @@ import {
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { useTranslation } from "react-i18next";
 
 interface AddContractsModalProps {
     onClose: () => void;

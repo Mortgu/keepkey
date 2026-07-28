@@ -1,16 +1,16 @@
-import { api } from "@/lib/api-client";
-
 import type {
     Contact,
     ContactList,
     CreateContactInput,
-    UpdateContactInput,
+    CreateCustomerInput,
 
     Customer,
-    CreateCustomerInput,
-    UpdateCustomerInput,
-    CustomerFilters
+    CustomerFilters,
+    UpdateContactInput,
+    UpdateCustomerInput
 } from '@keepit/schemas';
+import { api } from "@/lib/api-client";
+
 
 
 export const getCustomers = (filters: CustomerFilters = {}) => {

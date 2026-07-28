@@ -2,14 +2,14 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@tanstack/react-form";
-import useOfferModal from "../../../-hooks/use-offer.offer-modal";
-import useWorkloadOfferModal from "../../../-hooks/use-workloads.offer-modal";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
-import type { OfferFormApi } from "../../../-hooks/use-offer-form";
-import { Button, Checkbox, MultiSelectList } from "@/components";
-
 import type { Offer } from '@keepit/schemas';
+import { Button, Checkbox, MultiSelectList } from "@/components";
+import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
+import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
+import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
+
 
 interface Props {
     customerId: string;
@@ -90,6 +90,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
             {offerPositions.map((workload, index) => (
                 <WorkloadItemOfferModal
+                    key={index}
                     updateFn={(workload) => updateWorkload(index, workload)}
                     deleteFn={() => deleteWorkload(index)}
                     customerId={customerId}

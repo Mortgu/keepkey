@@ -38,7 +38,8 @@ model Order {
   orderPositions OrderPosition[]
   flatRates      OrderFlatRate[]
   revisions      OrderRevision[]
-  invoices       Invoice[]
+
+  invoices Invoice[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

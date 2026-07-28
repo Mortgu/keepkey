@@ -1,8 +1,8 @@
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { LoaderCircle } from 'lucide-react';
-import type { ButtonComponentProps } from './button-types';
 import { SIZE_STYLES } from '../size';
+import type { ButtonComponentProps } from './button-types';
 
 const styles = tv({
     base: [

@@ -1,6 +1,6 @@
 import type {LanguageToggleProps} from './language-toggle-types';
-import {cn} from '@/lib/utils';
 import type {ComponentSize} from '@/components/size';
+import {cn} from '@/lib/utils';
 
 const UNDERLINE_SIZE_STYLES: Record<ComponentSize, string> = {
   xs: 'px-3 pt-1.5 pb-1 text-xs',

@@ -1,11 +1,11 @@
 import { useForm } from "@tanstack/react-form";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
-import { useTranslation } from "react-i18next";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Pflichtfeld"),
