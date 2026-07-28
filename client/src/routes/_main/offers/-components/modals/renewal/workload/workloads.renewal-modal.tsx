@@ -1,34 +1,38 @@
-import { t } from "i18next";
+import { useStore } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import WorkloadItemRenewalModal from "./workload-item.renewal-modal";
 import type { OfferPosition } from "@keepit/schemas";
-import { useLocale } from "@/hooks";
+import type { RenewalFormApi } from "../hook/use-renewal-form";
 
 interface Props {
+    form: RenewalFormApi;
     customerId: string;
     workloads: Array<OfferPosition>;
 }
 
-export default function WorkloadRenewalModal({ customerId, workloads }: Props) {
-    const locales = useLocale();
+export default function WorkloadRenewalModal({ form, customerId, workloads }: Props) {
+    const { t } = useTranslation();
+    const positions = useStore(form.store, (s) => s.values.positions);
 
     return (
         <div className="grid gap-4 my-4">
             <hr className="text-(--border)" />
 
-            {/* Workloads Head */}
             <div className="flex items-center justify-between">
                 <p>{t("offerModal.workload_section")}</p>
             </div>
 
-            {/* Workloads */}
             <div className="grid gap-2">
-                {workloads.map(workload => (
+                {positions.map((_, index) => (
                     <WorkloadItemRenewalModal
+                        key={index}
+                        form={form}
+                        index={index}
                         customerId={customerId}
-                        workload={workload}
+                        originalPosition={workloads[index]}
                     />
                 ))}
             </div>
         </div>
-    )
+    );
 }
