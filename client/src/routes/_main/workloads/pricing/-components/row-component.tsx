@@ -24,12 +24,12 @@ export default function TariffRowComponent(props: Props) {
 
     const handleMinBlur = async () => {
         setEditMin(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max ?? 0 });
+        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max });
     };
 
     const handleMaxBlur = async () => {
         setEditMax(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max ?? 0 });
+        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max });
     };
 
     const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -39,9 +39,11 @@ export default function TariffRowComponent(props: Props) {
     };
 
     const handleMaxChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const v = Number(e.target.value);
-        if (isNaN(v)) return;
-        setMax(v);
+        const v = e.target.value;
+        if (v === "") { setMax(null); return; }
+        const n = Number(v);
+        if (isNaN(n)) return;
+        setMax(n);
     };
 
     return (
@@ -57,9 +59,9 @@ export default function TariffRowComponent(props: Props) {
                     </div>
                     -
                     <div className="relative max-w-fit box-border">
-                        <p onClick={() => setEditMax(true)}>{max}</p>
+                        <p onClick={() => setEditMax(true)}>{max ?? "∞"}</p>
                         {editMax && (
-                            <input className="absolute inset-0 w-fit box-border" type="text" value={max ?? 0}
+                            <input className="absolute inset-0 w-fit box-border" type="text" value={max ?? ""}
                                 autoFocus onBlur={handleMaxBlur} onChange={handleMaxChange} />
                         )}
                     </div>

@@ -55,7 +55,7 @@ export default function TariffComponent({ tariff }: Props) {
                         {tariff.rows.map(row => (
                             <tr key={row.id}>
                                 <TariffRowComponent groupId={groupId} tariffId={tariff.id} rowId={row.id}
-                                    minQty={row.min_quantity} maxQty={row.max_quantity ?? 0} />
+                                    minQty={row.min_quantity} maxQty={row.max_quantity} />
 
                                 {tariff.columns.map(column => {
                                     const cell = cellMap.get(`${row.id}:${column.id}`);
