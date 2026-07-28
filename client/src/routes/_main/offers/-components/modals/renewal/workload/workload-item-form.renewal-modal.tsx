@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Pen } from "lucide-react";
+import { LoaderCircle } from "lucide-react";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import type { RenewalFormApi } from "../hook/use-renewal-form";
 import { Button, Input, Select } from "@/components";
@@ -13,8 +13,6 @@ interface Props {
     customerId: string;
     closeFn: () => void;
 }
-
-function eurToCents(eur: number): number { return Math.round(eur * 100); }
 
 export default function WorkloadItemFormRenwalModal({ form, index, customerId, closeFn }: Props) {
     const { t } = useTranslation();
@@ -31,9 +29,6 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
     const [quantity, setQuantity] = useState(position.quantity);
     const [freeMonths, setFreeMonths] = useState(position.free_months);
 
-    const [editingPrice, setEditingPrice] = useState(false);
-    const [overrideEur, setOverrideEur] = useState("");
-
     const priceWorkload: CreateOfferPositionInput = {
         productId: position.productId,
         contractId: position.contractId,
@@ -47,39 +42,16 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
     };
 
     const { price, isPending: pricePending } = usePrice(customerId, priceWorkload);
-    const autoUnitPriceCents = price?.breakdown.unitPrice ?? 0;
-    const autoTotalCents = price?.price ?? 0;
-
-    const resetOverride = () => {
-        if (editingPrice) setOverrideEur((autoUnitPriceCents / 100).toString());
-    };
-
-    const toggleEditPrice = () => {
-        if (editingPrice) {
-            setEditingPrice(false);
-            return;
-        }
-        setOverrideEur((autoUnitPriceCents / 100).toString());
-        setEditingPrice(true);
-    };
-
-    const displayUnitPrice = editingPrice ? overrideEur : formatEur(autoUnitPriceCents);
+    const totalCents = price?.price ?? 0;
+    const unitCents = price?.breakdown.unitPrice ?? 0;
 
     const save = () => {
-        const finalUnitPriceCents = editingPrice
-            ? (() => {
-                const parsed = Number(overrideEur.replace(",", "."));
-                return isNaN(parsed) ? 0 : eurToCents(parsed);
-            })()
-            : autoUnitPriceCents;
-        const finalTotalCents = finalUnitPriceCents * quantity * duration;
-
         form.setFieldValue(`positions[${index}]`, {
             ...position,
             duration_months: duration,
             quantity,
             free_months: freeMonths,
-            total_cents: finalTotalCents,
+            total_cents: totalCents,
         });
         closeFn();
     };
@@ -91,7 +63,7 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
                     <Select
                         label={t("renewal.duration")}
                         value={duration}
-                        onChange={(e) => { setDuration(Number(e.target.value)); resetOverride(); }}
+                        onChange={(e) => setDuration(Number(e.target.value))}
                         disabled={durations.length === 0}
                     >
                         {durations.length === 0 && (
@@ -107,26 +79,7 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
                         type="number"
                         min={1}
                         value={quantity}
-                        onChange={(e) => { setQuantity(Math.max(1, Number(e.target.value))); resetOverride(); }}
-                    />
-                </div>
-
-                <div className="flex items-center gap-4">
-                    <Input
-                        label={t("renewal.unit_price")}
-                        loading={pricePending}
-                        type={editingPrice ? "number" : "text"}
-                        step={editingPrice ? "0.01" : undefined}
-                        min={editingPrice ? "0" : undefined}
-                        value={displayUnitPrice}
-                        disabled={!editingPrice}
-                        onChange={(e) => setOverrideEur(e.target.value)}
-                        rightButton={{
-                            icon: <Pen size={12} />,
-                            variant: "border",
-                            type: "button",
-                            onClick: toggleEditPrice,
-                        }}
+                        onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
                     />
 
                     <Input
@@ -136,16 +89,24 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
                         value={freeMonths}
                         onChange={(e) => {
                             const num = Number(e.target.value);
-                            if (!isNaN(num)) { setFreeMonths(Math.max(0, num)); resetOverride(); }
+                            if (!isNaN(num)) setFreeMonths(Math.max(0, num));
                         }}
                     />
                 </div>
-
-                <div className="flex flex-col">
-                    <span className="text-xs text-gray-500">{t("renewal.total")}</span>
-                    <p className="text-md font-mono font-normal pt-1.5">
-                        {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(autoTotalCents)}
-                    </p>
+                <hr className="text-(--border)" />
+                <div className="flex items-center gap-8">
+                    <div className="flex flex-col">
+                        <span className="text-xs text-gray-500">{t("renewal.unit_price")}</span>
+                        <p className="text-md font-mono font-normal pt-1.5">
+                            {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
+                        </p>
+                    </div>
+                    <div className="flex flex-col">
+                        <span className="text-xs text-gray-500">{t("renewal.total")}</span>
+                        <p className="text-md font-mono font-normal pt-1.5">
+                            {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
+                        </p>
+                    </div>
                 </div>
             </div>
 
