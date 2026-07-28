@@ -29,7 +29,7 @@ export default function DiscountOfferModalSection({ form }: Props) {
 
             {/* Head */}
             <div className="flex items-center justify-between">
-                <p>{t("offerModal.discound_section")}</p>
+                <p>{t("offerModal.discount_section")}</p>
 
                 {/* Header actions */}
                 <div className="flex items-center gap-4">

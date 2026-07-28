@@ -18,7 +18,7 @@
     "language": "Sprache",
     "workload_section": "Produkte",
     "flatrate_section": "Flatrate",
-    "discound_section": "Rabatte"
+    "discount_section": "Rabatte"
   },
   "renewal": {
     "title": "Verlängerung für {{orderId}}",

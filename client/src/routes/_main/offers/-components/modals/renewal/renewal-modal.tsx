@@ -5,6 +5,7 @@ import WorkloadRenewalModal from "./workload/workloads.renewal-modal";
 import type { Offer } from "@keepit/schemas";
 import { Button, ModalDialog, showToast } from "@/components";
 import FlatratesRenewalModal from "./flatrate/flatrates.renewal-modal";
+import DiscountRenewalModal from "./discounts/discount.renewal-modal";
 
 interface Props {
     offer: Offer;
@@ -60,6 +61,8 @@ export default function RenewalModal({ offer, onClose }: Props) {
                         form={form}
                         originalFlatrates={offer.offerFlatRates}
                     />
+
+                    <DiscountRenewalModal form={form} originalDiscounts={offer.offerDiscounts} />
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
