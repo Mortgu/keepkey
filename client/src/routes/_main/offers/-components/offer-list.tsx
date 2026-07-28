@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import useOfferFilters from "../-hooks/use-offer-filters";
 import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
-import OfferModal from "./offer-modal";
+import OfferModal from "./modals/offer/offer-modal";
 
 import type { Offer } from "@keepit/schemas";
 
@@ -122,7 +122,7 @@ export default function OfferList() {
           <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
         )}
         {offers.map((offer) => (
-          <OfferCard key={offer.id} offer={offer} onEdit={(o) => modal.open(o)} />
+          <OfferCard key={offer.id} offer={offer} onEdit={(type, offer) => modal.open(offer)} />
         ))}
       </div>
 

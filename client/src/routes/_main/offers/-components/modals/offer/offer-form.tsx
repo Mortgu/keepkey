@@ -11,6 +11,8 @@ interface Props {
     form: OfferFormApi;
 }
 
+export type OfferFormTypes = "create" | "edit" | "renewal";
+
 export default function FormOfferModal({ form }: Props) {
     const { t } = useTranslation();
 

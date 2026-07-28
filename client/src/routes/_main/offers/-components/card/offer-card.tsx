@@ -13,10 +13,11 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import type { OfferFormTypes } from "../modals/offer/offer-form";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (offer: Offer) => void;
+    onEdit: (type: OfferFormTypes, offer: Offer) => void;
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
@@ -139,6 +140,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
+                    {/*<Button variant="border" type="button" size="xs"
+                        onClick={() => onEdit("renewal", offer)}>Renewal</Button>*/}
+
                     <Button variant="border" type="button" size="xs"
                         onClick={() => renewalModal.open(offer)}>Renewal</Button>
                 </div>
@@ -156,7 +160,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => onEdit(offer)}
+                        onClick={() => onEdit("edit", offer)}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />

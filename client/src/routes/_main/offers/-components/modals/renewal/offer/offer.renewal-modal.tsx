@@ -10,7 +10,7 @@ export default function OfferRenewalModal({ form }: Props) {
     const { t } = useTranslation();
 
     return (
-        <div className="flex items-end gap-4">
+        <div className="flex items-end gap-4 mt-4">
             <form.Field name="quoteId" children={(field) => (
                 <Input label="AG-Nummer" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
             )} />

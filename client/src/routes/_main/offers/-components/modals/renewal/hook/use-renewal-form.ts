@@ -34,6 +34,7 @@ const renewalPositionSchema = z.object({
 const renewalFlatrateSchema = z.object({
     flatRateId: z.string(),
     quantity: z.number().int().positive(),
+    total_cents: z.number().int(),
 });
 
 const renewalFormSchema = z.object({
@@ -69,6 +70,7 @@ export default function useRenewalForm({ offer, closeFn }: Props) {
             flatrates: offer.offerFlatRates.map((fr) => ({
                 flatRateId: fr.flatRateId,
                 quantity: fr.quantity,
+                total_cents: fr.total_cents,
             })),
         } satisfies RenewalFormValues,
         validators: {

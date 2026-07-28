@@ -1,8 +1,8 @@
 import { Loader } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
-import useOfferForm from "../-hooks/use-offer-form";
-import FormOfferModal from "./modals/offer/offer-form";
+import useOfferForm from "../../../-hooks/use-offer-form";
+import FormOfferModal from "./offer-form";
 
 import type {
   Contract,
@@ -15,9 +15,9 @@ import type {
 import {
   Button, ModalDialog
 } from "@/components";
-import WorkloadOfferModalSection from "./modals/offer/workload/workloads";
-import FlatrateOfferModalSection from "./modals/offer/flatrate/flatrates";
-import DiscountOfferModalSection from "./modals/offer/discount/discounts";
+import WorkloadOfferModalSection from "./workload/workloads";
+import FlatrateOfferModalSection from "./flatrate/flatrates";
+import DiscountOfferModalSection from "./discount/discounts";
 
 
 interface OfferModalProps {
@@ -66,7 +66,17 @@ export default function OfferModal(props: OfferModalProps) {
         </div>
       </ModalDialog.Content>
       <ModalDialog.Footer>
-        <div className="w-full flex items-center justify-end">
+        <div className="w-full flex items-center justify-between">
+          <div>
+            {isEdit && (
+              <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                <Button form="offer-modal-form" disabled={!canSubmit} variant="border" type="submit" size="sm">
+                  {isSubmitting && <Loader className="size-4 animate-spin" />}
+                  Renewal
+                </Button>
+              )} />
+            )}
+          </div>
 
           <div className="flex gap-2">
             <Button variant="border" size="sm" type="button" onClick={closeFn}>
@@ -79,6 +89,7 @@ export default function OfferModal(props: OfferModalProps) {
                 {t("button.save")}
               </Button>
             )} />
+
 
           </div>
         </div>

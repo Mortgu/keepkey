@@ -4,6 +4,7 @@ import OfferRenewalModal from "./offer/offer.renewal-modal";
 import WorkloadRenewalModal from "./workload/workloads.renewal-modal";
 import type { Offer } from "@keepit/schemas";
 import { Button, ModalDialog, showToast } from "@/components";
+import FlatratesRenewalModal from "./flatrate/flatrates.renewal-modal";
 
 interface Props {
     offer: Offer;
@@ -25,7 +26,19 @@ export default function RenewalModal({ offer, onClose }: Props) {
                 <h1 className="text-lg">{t("renewal.title", { orderId: offer.quoteId })}</h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
-                <form id="renewal-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="grid gap-4">
+                <form id="renewal-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="grid">
+                    <div className="flex items-center gap-4 bg-(--page-bg) p-4 rounded-md mb-4">
+                        <div className="flex flex-col gap-1">
+                            <p className="text-xs text-gray-400">Kunde:</p>
+                            <p>{offer.customer.companyName}</p>
+                        </div>
+                        <div className="flex flex-col gap-1">
+                            <p className="text-xs text-gray-400">Ansprechpartner:</p>
+                            <p>{offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}</p>
+                        </div>
+                    </div>
+                    <hr className="text-(--border)" />
+
                     <OfferRenewalModal form={form} />
 
                     <WorkloadRenewalModal
@@ -34,7 +47,10 @@ export default function RenewalModal({ offer, onClose }: Props) {
                         workloads={offer.offerPositions}
                     />
 
-
+                    <FlatratesRenewalModal
+                        form={form}
+                        originalFlatrates={offer.offerFlatRates}
+                    />
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
