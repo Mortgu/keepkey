@@ -1,5 +1,5 @@
 import { useStore } from "@tanstack/react-form";
-import { LoaderCircle, MoveRight, Pen, Trash } from "lucide-react";
+import { Check, LoaderCircle, MoveRight, Pen, Trash } from "lucide-react";
 import { Fragment, useState } from "react";
 import WorkloadItemFormRenwalModal from "./workload-item-form.renewal-modal";
 import type { CreateOfferPositionInput, OfferPosition } from "@keepit/schemas";
@@ -19,8 +19,9 @@ interface Props {
 export default function WorkloadItemRenewalModal({ form, index, customerId, originalPosition }: Props) {
     const locales = useLocale();
     const [edit, setEdit] = useState<boolean>(false);
+    const [deleted, setDeleted] = useState<boolean>(false);
 
-    const position = useStore(form.store, (s) => s.values.positions[index]);
+    const position = useStore(form.store, (s) => s.values.offerPositions[index]);
 
     const priceWorkload: CreateOfferPositionInput = {
         productId: position.productId,
@@ -106,7 +107,14 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                     <div className="flex items-center justify-between border-t border-(--border) p-2">
                         <div></div>
                         <div className="flex items-center gap-2">
-                            <Button type="button" size="xs" variant="secondary" icon={<Trash size={14} />} iconOnly danger />
+                            {!deleted && (
+                                <Button type="button" size="xs" variant="secondary" icon={<Trash size={14} />} iconOnly danger
+                                    onClick={() => setDeleted(true)} />
+                            )}
+                            {deleted && (
+                                <Button type="button" size="xs" variant="secondary" icon={<Check size={14} />} iconOnly
+                                    onClick={() => setDeleted(false)} />
+                            )}
                             <Button type="button" size="xs" variant="secondary" icon={<Pen size={14} />} iconOnly
                                 onClick={() => setEdit(true)} />
                         </div>

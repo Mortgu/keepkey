@@ -51,7 +51,7 @@ export default function FormOfferModal({ form }: Props) {
                             field.handleChange(e.target.value)
                         }} error={getFormError(field.state.meta.errors)}>
                             {customers.map(customer => (
-                                <option id={customer.id} value={customer.id}>
+                                <option key={customer.id} id={customer.id} value={customer.id}>
                                     {customer.companyName}
                                 </option>
                             ))}

@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import type { RenewalFormApi } from "../hook/use-renewal-form";
 import { Input } from "@/components";
+import { getFormError } from "@/lib/utils";
 
 interface Props {
     form: RenewalFormApi;
@@ -15,12 +16,32 @@ export default function OfferRenewalModal({ form }: Props) {
                 <Input label="AG-Nummer" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
             )} />
 
-            <form.Field name="startDate" children={(field) => (
-                <Input label={t("renewal.start_date")} type="date" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+            <form.Field name="requestFrom" children={(field) => (
+                <Input label={t("offerModal.requestFrom")} type="date" value={field.state.value?.split("T")[0] ?? ""}
+                    error={getFormError(field.state.meta.errors)}
+                    onBlur={field.handleBlur} onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) {
+                            field.handleChange(null);
+                            return;
+                        }
+                        field.handleChange(`${val}T00:00:00.000Z`);
+                    }}
+                />
             )} />
 
             <form.Field name="validUntil" children={(field) => (
-                <Input label={t("renewal.valid_until")} type="date" value={field.state.value} onChange={(e) => field.handleChange(e.target.value)} />
+                <Input label={t("offerModal.validUntil")} type="date" value={field.state.value?.split("T")[0] ?? ""}
+                    error={getFormError(field.state.meta.errors)}
+                    onBlur={field.handleBlur} onChange={(e) => {
+                        const val = e.target.value;
+                        if (!val) {
+                            field.handleChange(null);
+                            return;
+                        }
+                        field.handleChange(`${val}T00:00:00.000Z`);
+                    }}
+                />
             )} />
         </div>
     );

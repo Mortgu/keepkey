@@ -15,7 +15,8 @@ export default function RenewalModal({ offer, onClose }: Props) {
     const { t } = useTranslation();
     const { form } = useRenewalForm({ offer, closeFn: onClose });
 
-    const handleSubmit = () => {
+
+    const handleSubmit = async () => {
         form.handleSubmit();
         showToast.info("offers.toast.renewalStub");
     };
@@ -28,13 +29,21 @@ export default function RenewalModal({ offer, onClose }: Props) {
             <ModalDialog.Content>
                 <form id="renewal-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="grid">
                     <div className="flex items-center gap-4 bg-(--page-bg) p-4 rounded-md mb-4">
-                        <div className="flex flex-col gap-1">
+                        <div className="flex-1 flex flex-col gap-1">
                             <p className="text-xs text-gray-400">Kunde:</p>
                             <p>{offer.customer.companyName}</p>
                         </div>
-                        <div className="flex flex-col gap-1">
+                        <div className="flex-1 flex flex-col gap-1">
                             <p className="text-xs text-gray-400">Ansprechpartner:</p>
                             <p>{offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}</p>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-1">
+                            <p className="text-xs text-gray-400">Mitarbeiter:</p>
+                            <p>{offer.user.firstName} {offer.user.lastName}</p>
+                        </div>
+                        <div className="flex-1 flex flex-col gap-1">
+                            <p className="text-xs text-gray-400">Ursprüngliche Laufzeit</p>
+                            <p>{offer.requestFrom ?? "-"} bis {offer.validUntil ?? "-"}</p>
                         </div>
                     </div>
                     <hr className="text-(--border)" />

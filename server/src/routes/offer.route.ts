@@ -7,6 +7,7 @@ import {
   getOfferById,
   getOfferRevisions,
   getOffers,
+  renewOffer,
   restoreOfferRevision,
   updateOffer,
 } from "@/controllers/offer.controller.js";
@@ -45,6 +46,9 @@ router.patch('/:id', validate(updateOfferSchema), updateOffer);
 
 /* [DELETE] /api/offers/:id */
 router.delete('/:id', deleteOffer);
+
+/* [POST] /api/offers/:id/renew */
+router.post('/:id/renew', validate(createOfferSchema), renewOffer);
 
 /* ========== Offer Position ========== */
 

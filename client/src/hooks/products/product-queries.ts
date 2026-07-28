@@ -34,6 +34,7 @@ export const productQueries = {
             queryKey: productKeys.price(params),
             queryFn: () => getTariffPrice(params.productId, params.contractId, params.duration_months, params.quantity, params.customerId, params.free_months),
             enabled: Boolean(customerId) && isValid,
+            staleTime: 0,
         });
     }
 };

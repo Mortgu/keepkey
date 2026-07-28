@@ -68,14 +68,7 @@ export default function OfferModal(props: OfferModalProps) {
       <ModalDialog.Footer>
         <div className="w-full flex items-center justify-between">
           <div>
-            {isEdit && (
-              <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                <Button form="offer-modal-form" disabled={!canSubmit} variant="border" type="submit" size="sm">
-                  {isSubmitting && <Loader className="size-4 animate-spin" />}
-                  Renewal
-                </Button>
-              )} />
-            )}
+
           </div>
 
           <div className="flex gap-2">

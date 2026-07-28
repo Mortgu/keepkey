@@ -17,7 +17,7 @@ interface Props {
 export default function WorkloadItemFormRenwalModal({ form, index, customerId, closeFn }: Props) {
     const { t } = useTranslation();
 
-    const position = form.store.state.values.positions[index];
+    const position = form.store.state.values.offerPositions[index];
 
     const { durations } = useTariffDurationsHook(position.productId, position.contractId);
 
@@ -46,7 +46,7 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
     const unitCents = price?.breakdown.unitPrice ?? 0;
 
     const save = () => {
-        form.setFieldValue(`positions[${index}]`, {
+        form.setFieldValue(`offerPositions[${index}]`, {
             ...position,
             duration_months: duration,
             quantity,

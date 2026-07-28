@@ -75,3 +75,11 @@ export const restoreOfferRevision = async (request: Request, response: Response)
     );
     return response.status(200).json(offer);
 };
+
+export const renewOffer = async (request: Request, response: Response) => {
+    const offer = await offerService.renewOffer(
+        request.params.id as string,
+        request.body,
+    );
+    return response.status(200).json(offer);
+};

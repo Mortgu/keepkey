@@ -113,3 +113,10 @@ export const getTask = async (taskId: string) =>
     api<Task>(`/api/tasks/${taskId}`, {
         method: "GET"
     });
+
+export const renewOffer = (offerId: string, input: CreateOfferInput) =>
+    api<Offer>(`/api/offers/${offerId}/renew`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+    });

@@ -12,7 +12,7 @@ interface Props {
 
 export default function WorkloadRenewalModal({ form, customerId, workloads }: Props) {
     const { t } = useTranslation();
-    const positions = useStore(form.store, (s) => s.values.positions);
+    const positions = useStore(form.store, (s) => s.values.offerPositions);
 
     return (
         <div className="grid gap-4 my-4">
