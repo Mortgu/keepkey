@@ -106,8 +106,8 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                     <div className="flex items-center justify-between border-t border-(--border) p-2">
                         <div></div>
                         <div className="flex items-center gap-2">
-                            <Button size="xs" variant="secondary" icon={<Trash size={14} />} iconOnly danger />
-                            <Button size="xs" variant="secondary" icon={<Pen size={14} />} iconOnly
+                            <Button type="button" size="xs" variant="secondary" icon={<Trash size={14} />} iconOnly danger />
+                            <Button type="button" size="xs" variant="secondary" icon={<Pen size={14} />} iconOnly
                                 onClick={() => setEdit(true)} />
                         </div>
                     </div>

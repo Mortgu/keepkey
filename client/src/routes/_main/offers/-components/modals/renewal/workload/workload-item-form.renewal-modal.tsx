@@ -58,7 +58,7 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
 
     return (
         <div>
-            <div className="grid flex-wrap items-end gap-4 bg-(--subtle-50) border-t border-(--border) p-4">
+            <div className="grid flex-wrap items-end gap-4  border-t border-(--border) p-4">
                 <div className="flex items-center gap-4">
                     <Select
                         label={t("renewal.duration")}
@@ -94,33 +94,34 @@ export default function WorkloadItemFormRenwalModal({ form, index, customerId, c
                     />
                 </div>
                 <hr className="text-(--border)" />
-                <div className="flex items-center gap-8">
-                    <div className="flex flex-col">
-                        <span className="text-xs text-gray-500">{t("renewal.unit_price")}</span>
-                        <p className="text-md font-mono font-normal pt-1.5">
-                            {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
-                        </p>
+                <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-6">
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
+                            <p className="text-md font-mono font-normal">
+                                {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
+                            </p>
+                        </div>
+                        <div className="flex items-center justify-center gap-2">
+                            <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
+                            <p className="text-md font-mono font-normal">
+                                {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
+                            </p>
+                        </div>
                     </div>
-                    <div className="flex flex-col">
-                        <span className="text-xs text-gray-500">{t("renewal.total")}</span>
-                        <p className="text-md font-mono font-normal pt-1.5">
-                            {pricePending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
-                        </p>
+
+                    <div className="flex items-center gap-2">
+                        <Button size="xs" variant="border" onClick={closeFn}>
+                            {t("button.cancel")}
+                        </Button>
+                        <Button size="xs" variant="primary" onClick={save}>
+                            {t("button.save")}
+                        </Button>
                     </div>
                 </div>
+
             </div>
 
-            <div className="flex items-center justify-between border-t border-(--border) p-2">
-                <div></div>
-                <div className="flex items-center gap-2">
-                    <Button size="xs" variant="secondary" onClick={closeFn}>
-                        {t("button.cancel")}
-                    </Button>
-                    <Button size="xs" variant="primary" onClick={save}>
-                        {t("button.save")}
-                    </Button>
-                </div>
-            </div>
         </div>
     );
 }
