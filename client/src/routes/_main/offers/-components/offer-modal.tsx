@@ -2,23 +2,23 @@ import { Loader } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
 import useOfferForm from "../-hooks/use-offer-form";
-import FlatrateOfferModalSection from "./modal/flatrate/flatrates";
-import FormOfferModal from "./modal/offer-form";
-import WorkloadOfferModalSection from "./modal/workload/workloads";
-import DiscountOfferModalSection from "./modal/discount/discounts";
-
-import {
-  Button, ModalDialog
-} from "@/components";
+import FormOfferModal from "./modals/offer/offer-form";
 
 import type {
+  Contract,
   Customer,
   Offer,
   Product,
-  User,
-  Contract,
   Supplier,
+  User,
 } from '@keepit/schemas';
+import {
+  Button, ModalDialog
+} from "@/components";
+import WorkloadOfferModalSection from "./modals/offer/workload/workloads";
+import FlatrateOfferModalSection from "./modals/offer/flatrate/flatrates";
+import DiscountOfferModalSection from "./modals/offer/discount/discounts";
+
 
 interface OfferModalProps {
   closeFn: () => void;

@@ -1,7 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
-import { Button } from "@/components";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components";
 
 interface ModalProps {
     onClose: () => void;

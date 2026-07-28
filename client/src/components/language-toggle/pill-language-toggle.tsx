@@ -1,7 +1,7 @@
 import {Check} from 'lucide-react';
 import type {LanguageToggleProps} from './language-toggle-types';
-import {cn} from '@/lib/utils';
 import type {ComponentSize} from '@/components/size';
+import {cn} from '@/lib/utils';
 
 const PILL_SIZE_STYLES: Record<ComponentSize, string> = {
   xs: 'py-[4px] pr-3 pl-[10px] gap-[5px] text-xs',

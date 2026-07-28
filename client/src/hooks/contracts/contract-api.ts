@@ -1,9 +1,9 @@
-import { api } from "@/lib/api-client";
 import type {
     Contract,
     CreateContractInput,
     UpdateContractInput
 } from "@keepit/schemas";
+import { api } from "@/lib/api-client";
 
 export const getContracts = () =>
     api<Array<Contract>>("/api/contracts", {

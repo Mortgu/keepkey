@@ -1,4 +1,4 @@
-import type { Order, OrderRevision, CreateOrderInput, UpdateOrderInput } from "@keepit/schemas";
+import type { CreateOrderInput, Order, OrderRevision, UpdateOrderInput } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 
 export type { CreateOrderInput, UpdateOrderInput };

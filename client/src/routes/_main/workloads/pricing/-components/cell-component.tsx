@@ -1,7 +1,8 @@
-import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
+import {  useState } from "react";
+import type {ChangeEvent} from "react";
 import type { TariffCell } from "@keepit/schemas";
+import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
 import { formatEur } from "@/utils/utils";
-import { useState, type ChangeEvent } from "react";
 
 interface Props {
     groupId: string;

@@ -1,11 +1,11 @@
-import { Input, Select } from "@/components";
-import { useCustomers, useSuppliers, useUsers } from "@/hooks";
-import { getFormError } from "@/lib/utils";
-import { type ChangeEvent, type SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
-import type { OfferFormApi } from "../../-hooks/use-offer-form";
+import type { ChangeEvent, SyntheticEvent } from "react";
+import type { OfferFormApi } from "../../../-hooks/use-offer-form";
 
 import type { Language } from "@keepit/schemas";
+import { getFormError } from "@/lib/utils";
+import { useCustomers, useSuppliers, useUsers } from "@/hooks";
+import { Input, Select } from "@/components";
 
 interface Props {
     form: OfferFormApi;

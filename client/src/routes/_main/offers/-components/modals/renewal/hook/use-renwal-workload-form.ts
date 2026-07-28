@@ -1,6 +1,6 @@
-import type { OfferPosition } from "@keepit/schemas";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
+import type { OfferPosition } from "@keepit/schemas";
 
 interface Props {
     workload: OfferPosition;

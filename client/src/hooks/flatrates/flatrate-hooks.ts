@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { flatRateQueries } from "./flatrate-queries";
 
-const EMPTY_ARRAY: never[] = [];
+const EMPTY_ARRAY: Array<never> = [];
 
 export function useFlatRates() {
     const { data = EMPTY_ARRAY, isPending, error } = useQuery(flatRateQueries.list());

@@ -1,7 +1,7 @@
-import { useLocale } from "@/hooks";
-import type { OfferPosition } from "@keepit/schemas";
 import { t } from "i18next";
 import WorkloadItemRenewalModal from "./workload-item.renewal-modal";
+import type { OfferPosition } from "@keepit/schemas";
+import { useLocale } from "@/hooks";
 
 interface Props {
     customerId: string;

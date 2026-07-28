@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
-import type { CreateTariffGroupInput } from "@keepit/schemas";
+import { useTranslation } from "react-i18next";
+import type { CreateTariffGroupInput,
+    ProductList
+ } from "@keepit/schemas";
 import type { DropdownOption } from "@/components/filters/multi-dropdown";
 import {
     Button,
@@ -10,11 +13,7 @@ import {
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { useTranslation } from "react-i18next";
 
-import type {
-    ProductList
-} from '@keepit/schemas';
 
 interface TariffGroupModalProps {
     onClose: () => void;

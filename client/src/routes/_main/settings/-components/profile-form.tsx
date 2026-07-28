@@ -2,12 +2,12 @@ import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput } from "@/components";
 import { useAuth } from "@/context/auth.tsx";
 import { authClient } from "@/lib/auth-client.ts";
-import { useTranslation } from "react-i18next";
 
 const profileSchema = z.object({
     salutation: z.string().min(1, "Pflichtfeld"),

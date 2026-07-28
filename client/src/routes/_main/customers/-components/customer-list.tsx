@@ -5,11 +5,11 @@ import useCustomerFilters from "../-hooks/use-customer-filters";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
+import type { Customer } from "@keepit/schemas";
 import { Button, FilterChip, PageWidth, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
 import { useCustomers, useModal } from "@/hooks";
-import type { Customer } from "@keepit/schemas";
 
 const countryFilterOptions = [
     { value: "Deutschland", label: "Deutschland" },

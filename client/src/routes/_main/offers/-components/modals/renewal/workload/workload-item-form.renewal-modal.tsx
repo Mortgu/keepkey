@@ -1,20 +1,14 @@
-import { Input, Button } from "@/components";
-import { usePrice } from "@/hooks";
-import type { OfferPosition } from "@keepit/schemas";
-import type { SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
+import type { SyntheticEvent } from "react";
 import type { RenewalWorkloadFormApi } from "../hook/use-renwal-workload-form";
+import { Button, Input } from "@/components";
 
 interface Props {
-    customerId: string;
-    workload: OfferPosition;
     form: RenewalWorkloadFormApi;
 };
 
-export default function WorkloadItemFormRenwalModal({ customerId, workload, form }: Props) {
+export default function WorkloadItemFormRenwalModal({ form }: Props) {
     const { t } = useTranslation();
-
-    const { price, isPending: pricePending } = usePrice(customerId, workload);
 
     const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();

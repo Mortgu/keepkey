@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getFlatrate, getFlatRates } from "./flatrate-api";
+import { getFlatRates, getFlatrate } from "./flatrate-api";
 import { flatRateKeys } from "./flatrate-keys";
 
 export const flatRateQueries = {

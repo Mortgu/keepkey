@@ -1,5 +1,5 @@
-import { formatEur } from "@/utils/utils";
 import { Scroll } from "lucide-react";
+import { formatEur } from "@/utils/utils";
 
 interface Props {
     title: string;

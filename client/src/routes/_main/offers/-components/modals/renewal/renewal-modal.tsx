@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import type { Offer } from "@keepit/schemas";
-import { Button, ModalDialog, showToast } from "@/components";
 import WorkloadRenewalModal from "./workload/workloads.renewal-modal";
+import type { Offer } from "@keepit/schemas";
+import { Button, Input, ModalDialog, showToast } from "@/components";
 
 interface Props {
     offer: Offer;
@@ -42,6 +42,12 @@ export default function RenewalModal({ offer, onClose }: Props) {
             </ModalDialog.Header>
             <ModalDialog.Content>
 
+                <div className="flex items-center gap-4">
+                    <Input label="AG-Nummer" />
+                    <Input label="Angebot vom" type="date" />
+                    <Input label="Gültig bis" type="date" />
+                </div>
+
                 <WorkloadRenewalModal
                     customerId={offer.customerId}
                     workloads={offer.offerPositions}
@@ -57,7 +63,7 @@ export default function RenewalModal({ offer, onClose }: Props) {
                     </div>
 
                     {/* Flatrates */}
-                    {offer.offerFlatRates.map(flatrate => (
+                    {offer.offerFlatRates.map(_ => (
                         <div></div>
                     ))}
 

@@ -1,11 +1,11 @@
 import { Plus } from "lucide-react";
 import { useMemo } from "react";
-import type { TariffBase, TariffCell } from "@keepit/schemas";
-import { useTariffGroupHook } from "@/hooks";
-import { Button } from "@/components";
 import TariffCellComponent from "./cell-component";
 import TariffColumnComponent from "./column-component";
 import TariffRowComponent from "./row-component";
+import type { TariffBase, TariffCell } from "@keepit/schemas";
+import { useTariffGroupHook } from "@/hooks";
+import { Button } from "@/components";
 
 type Props = {
     tariff: TariffBase;

@@ -1,7 +1,8 @@
+import { Trash } from "lucide-react";
+import {  useState } from "react";
+import type {ChangeEvent} from "react";
 import { Button } from "@/components";
 import { useTariffGroupHook } from "@/hooks";
-import { Trash } from "lucide-react";
-import { useState, type ChangeEvent } from "react";
 
 interface Props {
     groupId: string;

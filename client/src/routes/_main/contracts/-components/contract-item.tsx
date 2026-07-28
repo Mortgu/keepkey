@@ -2,12 +2,12 @@ import { Pen, Trash } from "lucide-react";
 import { Fragment } from "react";
 import ContractModal from "./contract-modal";
 
+import type { Contract } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useLocale, useModal } from "@/hooks";
 import { useDeleteContract } from "@/hooks/contracts/contract-mutations";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
-import type { Contract } from "@keepit/schemas";
 
 interface ContractListItemProps {
   contract: Contract;

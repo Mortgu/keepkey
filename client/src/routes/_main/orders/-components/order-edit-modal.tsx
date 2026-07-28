@@ -1,6 +1,7 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 import type { Order } from "@keepit/schemas";
 import type { UpdateOrderInput } from "@/hooks/orders/order-api";
 import {
@@ -14,7 +15,6 @@ import {
   useUsers,
 } from "@/hooks";
 import { Button, Input, ModalDialog, Select, Textarea } from "@/components";
-import { useTranslation } from "react-i18next";
 
 type Props = {
   order: Order;

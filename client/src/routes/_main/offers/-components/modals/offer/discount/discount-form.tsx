@@ -1,7 +1,8 @@
-import { Button, Input, Textarea } from "@/components";
-import type { CreateOfferDiscountInput } from "@keepit/schemas";
-import { useState, type SyntheticEvent } from "react";
+import {  useState } from "react";
 import { useTranslation } from "react-i18next";
+import type {SyntheticEvent} from "react";
+import type { CreateOfferDiscountInput } from "@keepit/schemas";
+import { Button, Input, Textarea } from "@/components";
 
 const eurToCents = (eur: number): number => Math.round(eur * 100);
 

@@ -10,8 +10,8 @@ import {
 } from "./customer-api";
 
 import type {
-    CreateCustomerInput,
     CreateContactInput,
+    CreateCustomerInput,
     UpdateContactInput
 } from '@keepit/schemas';
 

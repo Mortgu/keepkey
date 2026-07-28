@@ -1,11 +1,11 @@
-import { Button } from "@/components";
-import type { OfferFormApi } from "../../../-hooks/use-offer-form";
-import useDiscountsOfferModal from "../../../-hooks/use-discounts.offer-modal";
 import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import DiscountFormOfferModal from "./discount-form";
 import DiscountItemOfferModal from "./discount-item";
+import { Button } from "@/components";
+import useDiscountsOfferModal from "@/routes/_main/offers/-hooks/use-discounts.offer-modal";
+import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
 
 interface Props {
     form: OfferFormApi;

@@ -1,9 +1,9 @@
 import { Fragment } from "react";
+import { Pen, Trash } from "lucide-react";
 import SupplierModal from "./supplier-modal";
 import type { Supplier } from "@keepit/schemas";
-import { useModal, useDeleteSupplier } from "@/hooks";
+import { useDeleteSupplier, useModal } from "@/hooks";
 import { Badge, Button } from "@/components";
-import { Pen, Trash } from "lucide-react";
 
 type Props = {
     supplier: Supplier;

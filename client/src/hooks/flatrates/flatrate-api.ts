@@ -1,11 +1,11 @@
-import { api } from "@/lib/api-client";
-
 import type {
     CreateFlatrateInput,
-    UpdateFlatrateInput,
+    Flatrate,
 
-    Flatrate
+    UpdateFlatrateInput
 } from '@keepit/schemas';
+import { api } from "@/lib/api-client";
+
 
 export const getFlatRates = () =>
     api<Array<Flatrate>>("/api/flatrates", { method: "GET" });

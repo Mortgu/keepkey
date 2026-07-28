@@ -4,16 +4,16 @@ import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
 import type {
+    CreateOfferFlatrateInput,
     CreateOfferInput,
-    UpdateOfferInput,
 
     CreateOfferPositionInput,
-    UpdateOfferPositionInput,
-
-    CreateOfferFlatrateInput,
-    UpdateOfferFlatrateInput,
-
     OfferFilterParams,
+
+    UpdateOfferFlatrateInput,
+    UpdateOfferInput,
+
+    UpdateOfferPositionInput,
 } from '@keepit/schemas';
 
 export function useCreateOffer() {

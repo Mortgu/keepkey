@@ -1,12 +1,12 @@
 import { ExternalLink, Pen, Trash } from "lucide-react";
 
+import { useTranslation } from "react-i18next";
+import ProductModal from "./product-modal";
+import type { Product } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useDeleteProduct, useLocale, useModal, useUpdateProduct } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
-import type { Product } from "@keepit/schemas";
-import { useTranslation } from "react-i18next";
-import ProductModal from "./product-modal";
 
 interface Props {
   product: Product;

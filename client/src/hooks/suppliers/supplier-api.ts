@@ -1,10 +1,10 @@
-import { api } from "@/lib/api-client";
-
 import type {
-    Supplier,
     CreateSupplierInput,
+    Supplier,
     UpdateSupplierInput,
 } from '@keepit/schemas';
+import { api } from "@/lib/api-client";
+
 
 export const getSuppliers = () =>
     api<Array<Supplier>>("/api/suppliers", { method: "GET" });

@@ -1,5 +1,5 @@
 import type { DocumentType, GeneratedDocument } from "@keepit/schemas";
-import { api, BASE_URL } from "@/lib/api-client";
+import { BASE_URL, api } from "@/lib/api-client";
 
 export const renameDocument = (type: DocumentType, documentId: string, displayName: string) =>
     api<GeneratedDocument>(`/api/documents/${type}/${documentId}`, {

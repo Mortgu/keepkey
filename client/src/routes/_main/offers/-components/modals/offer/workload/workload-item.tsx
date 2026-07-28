@@ -1,12 +1,12 @@
 import { LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
-import useOfferPricing from "../../../-hooks/mutations/pricing.mutations";
 import WorkloadFormOfferModal from "./workload-form";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useContract, useLocale, usePrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
+import useOfferPricing from "@/routes/_main/offers/-hooks/mutations/pricing.mutations";
 
 interface Props {
     customerId: string;

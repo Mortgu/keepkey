@@ -2,6 +2,11 @@ import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { z } from "zod";
+import type {
+  Contract,
+  ContractTranslationInput,
+  Language
+} from "@keepit/schemas";
 import {
   Button,
   DEFAULT_LANGUAGE_OPTIONS,
@@ -15,11 +20,6 @@ import {
   useContractManager
 } from "@/hooks/contracts/contract-mutations";
 
-import type {
-  Contract,
-  ContractTranslationInput,
-  Language
-} from "@keepit/schemas";
 
 interface ContractModalProps {
   onClose: () => void;

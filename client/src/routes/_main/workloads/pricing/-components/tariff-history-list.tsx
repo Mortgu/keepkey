@@ -1,8 +1,8 @@
-import { useTariffHistoryHook } from "@/hooks";
-import { formatDate } from "@/lib/format";
-import type { TariffBase } from "@keepit/schemas";
 import { ChevronRight } from "lucide-react";
 import { useState } from "react";
+import type { TariffBase } from "@keepit/schemas";
+import { useTariffHistoryHook } from "@/hooks";
+import { formatDate } from "@/lib/format";
 
 type Props = {
     productId: string;
