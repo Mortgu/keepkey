@@ -1,7 +1,7 @@
 import { LoaderCircle, Pen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { CreateOfferPositionInput, OrderPosition } from "@keepit/schemas";
+import type { CreateOfferPositionInput, OfferPosition } from "@keepit/schemas";
 import { Badge, Checkbox, Input, Select } from "@/components";
 import { useLocale, usePrice, useTariffDurationsHook } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
@@ -15,7 +15,7 @@ export interface RenewalPositionValue extends CreateOfferPositionInput {
 
 interface Props {
     customerId: string;
-    position: OrderPosition;
+    position: OfferPosition;
     value: RenewalPositionValue;
     onChange: (next: RenewalPositionValue) => void;
 }

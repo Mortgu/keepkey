@@ -20,13 +20,33 @@
     "flatrate_section": "Flatrates",
     "discound_section": "Discounts"
   },
+  "renewal": {
+    "title": "Renewal for {{orderId}}",
+    "period_section": "Period",
+    "start_date": "Start date",
+    "valid_until": "Valid until",
+    "positions_section": "Positions",
+    "flatrates_section": "Flat rates",
+    "previous_quantity": "Previous quantity",
+    "duration": "Duration",
+    "quantity": "Quantity",
+    "unit_price": "Unit price",
+    "free_months": "Free months",
+    "optional": "Optional?",
+    "total": "Total",
+    "previous_period": "Previous period",
+    "months": "months",
+    "no_duration": "No duration configured",
+    "invalid_price": "Invalid price."
+  },
   "offers": {
     "toast": {
-      "deleteError": "Could not delete offer: {{message}}",
-      "documentUploadError": "Could not upload document: {{message}}",
-      "documentDeleteError": "Could not delete document: {{message}}",
-      "documentRenameError": "Could not rename document: {{message}}",
-      "restoreError": "Could not restore version: {{message}}"
+      "deleteError": "Offer could not be deleted: {{message}}",
+      "documentUploadError": "Document could not be uploaded: {{message}}",
+      "documentDeleteError": "Document could not be deleted: {{message}}",
+      "documentRenameError": "Document could not be renamed: {{message}}",
+      "restoreError": "Version could not be restored: {{message}}",
+      "renewalStub": "Offer generation from renewal will follow in an upcoming step."
     }
   }
 }

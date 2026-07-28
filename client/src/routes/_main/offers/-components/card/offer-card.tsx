@@ -1,20 +1,18 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 
+import RenewalModal from "../modals/renewal/renewal-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
+import type { Offer, OfferDocument } from '@keepit/schemas';
 import { Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-
-import type {
-    Offer,
-    OfferDocument,
-} from '@keepit/schemas';
 
 type OfferListItemProps = {
     offer: Offer;
@@ -22,6 +20,8 @@ type OfferListItemProps = {
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const renewalModal = useModal<Offer>();
+
     const {
         customerContactPerson: ccp,
         quoteId,
@@ -138,6 +138,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     >
                         Dokument generieren
                     </Button>
+
+                    <Button variant="border" type="button" size="xs"
+                        onClick={() => renewalModal.open(offer)}>Renewal</Button>
                 </div>
 
                 {/* Actions right */}
@@ -171,6 +174,14 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </div>
 
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
+
+            {renewalModal.isOpen && (
+                <RenewalModal
+                    key={renewalModal.key}
+                    offer={offer}
+                    onClose={renewalModal.close}
+                />
+            )}
         </div>
     );
 }

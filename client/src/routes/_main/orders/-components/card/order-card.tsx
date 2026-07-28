@@ -3,14 +3,13 @@ import { Fragment, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import OrderDrawerHistory from "../order-drawer-history";
 import OrderEditModal from "../order-edit-modal";
-import RenewalModal from "../modals/renewal-modal";
 import OrderCardDocument from "./order-card-document";
 import OrderCardFlatRate from "./order-card-flatrate";
 import OrderCardProduct from "./order-card-product";
 import type { Order, OrderDocument } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 import { formatDate } from "@/lib/format";
-import { useDeleteOrder, useGenerateOrderDocument, useModal } from "@/hooks";
+import { useDeleteOrder, useGenerateOrderDocument } from "@/hooks";
 import { Button, Collapsable } from "@/components";
 
 type Props = {
@@ -18,8 +17,6 @@ type Props = {
 };
 
 export default function OrderCard({ order }: Props) {
-    const renewalModal = useModal<Order>();
-
     const [historyOpen, setHistoryOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
     const {
@@ -134,9 +131,6 @@ export default function OrderCard({ order }: Props) {
                         >
                             Dokument generieren
                         </Button>
-
-                        <Button variant="border" type="button" size="xs"
-                            onClick={() => renewalModal.open(order)}>Renewal</Button>
                     </div>
 
                     {/* Actions right */}
@@ -170,14 +164,6 @@ export default function OrderCard({ order }: Props) {
                 <OrderDrawerHistory open={historyOpen} onClose={() => setHistoryOpen(false)} order={order} />
                 {editOpen && <OrderEditModal order={order} onClose={() => setEditOpen(false)} />}
             </div>
-
-            {renewalModal.isOpen && (
-                <RenewalModal
-                    key={renewalModal.key}
-                    order={renewalModal.data}
-                    onClose={renewalModal.close}
-                />
-            )}
         </Fragment>
     );
 }
