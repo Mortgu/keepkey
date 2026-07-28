@@ -5,9 +5,10 @@ import { Button, Input } from "@/components";
 
 interface Props {
     form: RenewalWorkloadFormApi;
+    closeFn: () => void;
 };
 
-export default function WorkloadItemFormRenwalModal({ form }: Props) {
+export default function WorkloadItemFormRenwalModal({ form, closeFn }: Props) {
     const { t } = useTranslation();
 
     const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
@@ -40,7 +41,7 @@ export default function WorkloadItemFormRenwalModal({ form }: Props) {
             <div className="flex items-center justify-between border-t border-(--border) p-2">
                 <div></div>
                 <div className="flex items-center gap-2">
-                    <Button size="xs" variant="secondary">{t("button.cancel")}</Button>
+                    <Button size="xs" variant="secondary" onClick={() => closeFn()}>{t("button.cancel")}</Button>
                     <form.Subscribe
                         selector={(state) => [state.canSubmit, state.isSubmitting]}
                         children={([canSubmit, isSubmitting]) => (

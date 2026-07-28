@@ -89,7 +89,7 @@ export default function WorkloadItemRenewalModal({ customerId, workload }: Props
                 </div>
 
                 {edit && (
-                    <WorkloadItemFormRenwalModal form={form} />
+                    <WorkloadItemFormRenwalModal form={form} closeFn={() => setEdit(false)} />
                 )}
 
                 {!edit && (

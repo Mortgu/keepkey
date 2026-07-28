@@ -1,31 +1,13 @@
 import { useTranslation } from "react-i18next";
 import WorkloadRenewalModal from "./workload/workloads.renewal-modal";
 import type { Offer } from "@keepit/schemas";
-import { Button, Input, ModalDialog, showToast } from "@/components";
+import { Button, ModalDialog, showToast } from "@/components";
+import OfferRenewalModal from "./offer/offer.renewal-modal";
 
 interface Props {
     offer: Offer;
     onClose: () => void;
 }
-
-type FlatRateValue = {
-    key: string;
-    flatRateId: string;
-    quantity: number;
-    total_cents: number;
-};
-
-const inputDate = (value?: string) => value?.slice(0, 10) ?? "";
-
-const addMonths = (date: string, months: number): string => {
-    const d = new Date(date);
-    if (isNaN(d.getTime())) return "";
-    d.setMonth(d.getMonth() + months);
-    return d.toISOString().slice(0, 10);
-};
-
-const maxDuration = (durations: Array<number>): number =>
-    durations.reduce((a, b) => Math.max(a, b), 0);
 
 export default function RenewalModal({ offer, onClose }: Props) {
     const { t } = useTranslation();
@@ -42,11 +24,7 @@ export default function RenewalModal({ offer, onClose }: Props) {
             </ModalDialog.Header>
             <ModalDialog.Content>
 
-                <div className="flex items-center gap-4">
-                    <Input label="AG-Nummer" />
-                    <Input label="Angebot vom" type="date" />
-                    <Input label="Gültig bis" type="date" />
-                </div>
+                <OfferRenewalModal />
 
                 <WorkloadRenewalModal
                     customerId={offer.customerId}
@@ -82,6 +60,7 @@ export default function RenewalModal({ offer, onClose }: Props) {
                 <Button variant="primary" size="sm" onClick={handleSubmit}>
                     {t("button.save")}
                 </Button>
+
             </ModalDialog.Footer>
         </ModalDialog>
     );
