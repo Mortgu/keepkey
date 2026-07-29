@@ -139,6 +139,7 @@ export declare const supplierSchema: z.ZodObject<{
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>>;
+        renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         user: z.ZodObject<{
             id: z.ZodString;
             name: z.ZodString;

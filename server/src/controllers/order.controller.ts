@@ -6,7 +6,7 @@ import * as orderService from "../services/order.service.js";
 /* ========== GET ========== */
 
 export const getAllOrders = async (request: Request, response: Response) => {
-    const orders = await orderService.getAllOrders();
+    const orders = await orderService.getAllOrders(request.query);
     return response.status(200).json(orders);
 };
 

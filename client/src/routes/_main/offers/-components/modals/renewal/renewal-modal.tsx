@@ -2,10 +2,10 @@ import { useTranslation } from "react-i18next";
 import useRenewalForm from "./hook/use-renewal-form";
 import OfferRenewalModal from "./offer/offer.renewal-modal";
 import WorkloadRenewalModal from "./workload/workloads.renewal-modal";
-import type { Offer } from "@keepit/schemas";
-import { Button, ModalDialog, showToast } from "@/components";
 import FlatratesRenewalModal from "./flatrate/flatrates.renewal-modal";
 import DiscountRenewalModal from "./discounts/discount.renewal-modal";
+import type { Offer } from "@keepit/schemas";
+import { Button, ModalDialog } from "@/components";
 
 interface Props {
     offer: Offer;
@@ -16,10 +16,9 @@ export default function RenewalModal({ offer, onClose }: Props) {
     const { t } = useTranslation();
     const { form } = useRenewalForm({ offer, closeFn: onClose });
 
-
-    const handleSubmit = async () => {
-        form.handleSubmit();
-        showToast.info("offers.toast.renewalStub");
+    const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        await form.handleSubmit();
     };
 
     return (
@@ -28,7 +27,7 @@ export default function RenewalModal({ offer, onClose }: Props) {
                 <h1 className="text-lg">{t("renewal.title", { orderId: offer.quoteId })}</h1>
             </ModalDialog.Header>
             <ModalDialog.Content>
-                <form id="renewal-form" onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="grid">
+                <form id="renewal-form" onSubmit={handleSubmit} className="grid">
                     <div className="flex items-center gap-4 bg-(--page-bg) p-4 rounded-md mb-4">
                         <div className="flex-1 flex flex-col gap-1">
                             <p className="text-xs text-gray-400">Kunde:</p>

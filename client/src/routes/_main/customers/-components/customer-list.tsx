@@ -6,7 +6,7 @@ import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type { Customer } from "@keepit/schemas";
-import { Button, FilterChip, PageWidth, RouteError, SearchBar } from "@/components";
+import { Button, FilterChip, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
 import { useCustomers, useModal } from "@/hooks";
@@ -42,8 +42,8 @@ export default function CustomerList() {
     }, [customers, filters.countryFilter, filters.languageFilter]);
 
     return (
-        <PageWidth variant="none">
-            <div className="flex justify-between items-center gap-4 p-4 border-b border-(--border)">
+        <div className="grid gap-4">
+            <div className="flex items-center gap-3">
                 <SortDropdown
                     value={filters.sort}
                     onChange={filters.setSort}
@@ -76,7 +76,7 @@ export default function CustomerList() {
                 </Button>
             </div>
 
-            <PageWidth variant="full">
+            <div className="">
                 <div className="grid gap-4">
                     {filters.activeFilterCount > 0 && (
                         <div className="flex gap-2 w-fit flex-wrap">
@@ -126,7 +126,7 @@ export default function CustomerList() {
                 {modal.isOpen && (
                     <CustomerModal key={modal.key} onClose={modal.close} />
                 )}
-            </PageWidth>
-        </PageWidth>
+            </div>
+        </div>
     );
 }

@@ -12,10 +12,11 @@ import { useOfferManager } from "@/hooks";
 interface Props {
     currentOffer?: Offer;
     closeFn: () => void;
+    preselectedCustomerId?: string;
 }
 
-export default function useOfferForm({ currentOffer, closeFn }: Props) {
-    const { defaultValues } = useOfferModal({ currentOffer });
+export default function useOfferForm({ currentOffer, closeFn, preselectedCustomerId }: Props) {
+    const { defaultValues } = useOfferModal({ currentOffer, preselectedCustomerId });
     const { createOffer, updateOffer } = useOfferManager();
 
     const [expectedVersion] = useState(currentOffer?.version);

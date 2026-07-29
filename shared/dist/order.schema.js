@@ -134,4 +134,8 @@ export const orderSchema = z.object({
     updatedAt: z.string(),
 });
 export const orderListSchema = z.array(orderSchema);
+/* Order Filters */
+export const orderFilterSchema = z.object({
+    companyIds: z.array(z.string()).optional(),
+});
 //# sourceMappingURL=order.schema.js.map

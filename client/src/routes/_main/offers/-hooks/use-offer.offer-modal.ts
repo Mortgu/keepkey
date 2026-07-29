@@ -9,9 +9,10 @@ import { localized } from "@/lib/i18n-content";
 
 interface Props {
     currentOffer?: Offer;
+    preselectedCustomerId?: string;
 }
 
-export default function useOfferModal({ currentOffer }: Props) {
+export default function useOfferModal({ currentOffer, preselectedCustomerId }: Props) {
     const locale = useLocale();
 
     const { customers } = useCustomers();
@@ -24,9 +25,11 @@ export default function useOfferModal({ currentOffer }: Props) {
         label: localized(contract.translations, locale, "name") || contract.id
     }));
 
+    const preselected = customers.find(c => c.id === preselectedCustomerId);
+
     const defaultValues: CreateOfferInput = {
-        customerId: currentOffer?.customerId || customers[0]?.id || "",
-        contactPersonId: currentOffer?.contactPersonId || customers[0]?.contactPersons[0]?.id || "",
+        customerId: currentOffer?.customerId || preselected?.id || customers[0]?.id || "",
+        contactPersonId: currentOffer?.contactPersonId || preselected?.contactPersons[0]?.id || customers[0]?.contactPersons[0]?.id || "",
         userId: currentOffer?.userId || users[0]?.id || "",
         supplierId: currentOffer?.supplierId || suppliers[0]?.id || null,
         quoteId: currentOffer?.quoteId || "",
@@ -36,7 +39,7 @@ export default function useOfferModal({ currentOffer }: Props) {
         language: currentOffer?.language || "DE",
 
         featureComparison: currentOffer?.featureComparison ?? false,
-        toCompare: currentOffer?.toCompare as Array<string> ?? [],
+        toCompare: currentOffer?.toCompare ?? [],
 
         offerPositions: currentOffer?.offerPositions.map(op => ({
             productId: op.productId,
@@ -44,7 +47,7 @@ export default function useOfferModal({ currentOffer }: Props) {
             duration_months: op.duration_months,
             free_months: op.free_months,
             quantity: op.quantity,
-            optional: op.optional ?? false,
+            optional: op.optional,
             total_cents: op.total_cents,
             eur_user_month: op.eur_user_month,
             discount_cents: op.discount_cents,

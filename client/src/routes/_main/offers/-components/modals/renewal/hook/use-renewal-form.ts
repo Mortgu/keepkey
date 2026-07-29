@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
-import { createOfferSchema, type Offer } from "@keepit/schemas";
-import { useCreateOffer } from "@/hooks";
+import {  createOfferSchema } from "@keepit/schemas";
+import type {Offer} from "@keepit/schemas";
+import { useRenewOffer } from "@/hooks";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
 
 export default function useRenewalForm({ offer, closeFn }: Props) {
     const { defaultValues } = useOfferModal({ currentOffer: offer });
-    const { createOffer } = useCreateOffer();
+    const { renewOffer } = useRenewOffer();
 
     const form = useForm({
         defaultValues: defaultValues,
@@ -19,7 +20,7 @@ export default function useRenewalForm({ offer, closeFn }: Props) {
             onChange: createOfferSchema,
         },
         onSubmit: async ({ value }) => {
-            await createOffer(value);
+            await renewOffer({ offerId: offer.id, input: value });
             closeFn();
         },
     });

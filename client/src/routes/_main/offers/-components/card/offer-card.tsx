@@ -8,12 +8,12 @@ import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import { Button, Collapsable } from "@/components";
+import type { OfferFormTypes } from "../modals/offer/offer-form";
+import { Badge, Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import type { OfferFormTypes } from "../modals/offer/offer-form";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -56,7 +56,9 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         <div className="flex items-center gap-2 text-md">
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
-
+                            {offer.renewedFromOfferId && (
+                                <Badge variant="generated" size="xs">Verlängerung</Badge>
+                            )}
                         </div>
                     </div>
 
@@ -140,7 +142,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
-                    {/*<Button variant="border" type="button" size="xs"
+                    {/* <Button variant="border" type="button" size="xs"
                         onClick={() => onEdit("renewal", offer)}>Renewal</Button>*/}
 
                     <Button variant="border" type="button" size="xs"

@@ -1,10 +1,11 @@
-import type { CreateOrderInput, Order, OrderRevision, UpdateOrderInput } from "@keepit/schemas";
+import type { CreateOrderInput, Order, OrderFilterParams, OrderRevision, UpdateOrderInput } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 
 export type { CreateOrderInput, UpdateOrderInput };
 
-export const getOrders = () =>
-    api<Array<Order>>("/api/orders", { method: "GET" });
+export const getOrders = (filters: OrderFilterParams = {}) =>
+    api<Array<Order>>(`/api/orders?${formatQueryString(filters)}`, { method: "GET" });
 
 export const getNextOrderNumber = () =>
     api<{ orderId: string }>("/api/orders/next-number", { method: "GET" });

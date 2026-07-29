@@ -158,6 +158,8 @@ export const offerSchema = z.object({
     offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
     offerDocuments: z.array(offerDocumentSchema),
 
+    renewedFromOfferId: z.string().nullable().optional(),
+
     user: userSchema,
     customer: customerSchema,
     customerContactPerson: contactSchema,

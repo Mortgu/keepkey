@@ -175,3 +175,9 @@ export type Order = z.infer<typeof orderSchema>;
 
 export const orderListSchema = z.array(orderSchema);
 export type OrderList = z.infer<typeof orderListSchema>;
+
+/* Order Filters */
+export const orderFilterSchema = z.object({
+    companyIds: z.array(z.string()).optional(),
+});
+export type OrderFilterParams = z.input<typeof orderFilterSchema>;

@@ -34,6 +34,10 @@ model Offer {
 
   orders Order?
 
+  renewedFromOfferId String?
+  renewedFrom        Offer?  @relation("OfferRenewals", fields: [renewedFromOfferId], references: [id], onDelete: SetNull)
+  renewals           Offer[] @relation("OfferRenewals")
+
   net_amount Int
 
   version Int @default(1)

@@ -17,8 +17,20 @@ export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
 /* ========== Queries ========== */
 
-export async function getAllOrders() {
+export interface OrderListQuery {
+    companyIds?: unknown;
+}
+
+export async function getAllOrders(query: OrderListQuery = {}) {
+    const where: { customerId?: { in: string[] } } = {};
+
+    if (query.companyIds) {
+        const ids = Array.isArray(query.companyIds) ? query.companyIds : [query.companyIds];
+        where.customerId = { in: ids as string[] };
+    }
+
     return prisma.order.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
         include: {
             customer: true,
             customerContactPerson: true,

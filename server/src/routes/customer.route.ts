@@ -26,7 +26,7 @@ const router = Router();
 router.get('/', getCustomers);
 
 /* [GET] /api/customers/:id */
-router.get('/', getCustomer);
+router.get('/:id', getCustomer);
 
 /* [POST] /api/customers */
 router.post('/', validate(createCustomerSchema), createCustomer);

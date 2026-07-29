@@ -138,6 +138,7 @@ export function Navigation() {
                         to="/customers"
                         label={t("section.customers")}
                         icon={<Users size={ICON_SIZE} />}
+                        activeOptions={{ exact: false }}
                     />
                     <NavLink
                         to="/offers"

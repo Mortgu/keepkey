@@ -1,5 +1,6 @@
 import { Pen, Plus, Trash } from "lucide-react";
 import { useState } from "react";
+import { Link } from "@tanstack/react-router";
 
 import ContactListItem from "./contact-list-item";
 import ContactPersonForm from "./contact-person-form";
@@ -32,7 +33,9 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
         <div className="border border-(--border) rounded-md ">
             <div className="flex items-center justify-between px-4 py-3">
                 <div className="grid gap-0">
-                    <h1 className="text-md">{customer.companyName}</h1>
+                    <Link to="/customers/$customerId" params={{ customerId: customer.id }} className="hover:text-(--primary)">
+                        <h1 className="text-md">{customer.companyName}</h1>
+                    </Link>
                     <p className="text-sm text-gray-500">
                         {customer.customerId} · {formatDate(customer.createdAt || "")}
                     </p>

@@ -10,7 +10,7 @@ import type { Offer } from "@keepit/schemas";
 import { Button, FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
 import { MultiDropdown } from "@/components/filters/multi-dropdown";
 import { SortDropdown } from "@/components/filters/sort-dropdown";
-import { useContacts, useContracts, useCustomers, useLocale, useModal, useProducts, useSuppliers, useUsers } from "@/hooks";
+import { useContacts, useCustomers, useLocale, useModal, useProducts } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 
 export default function OfferList() {
@@ -22,10 +22,7 @@ export default function OfferList() {
 
   const { contacts } = useContacts();
   const { customers } = useCustomers();
-  const { suppliers } = useSuppliers();
-  const { users } = useUsers();
   const { products } = useProducts();
-  const { contracts } = useContracts();
 
   const locale = useLocale();
   const { customerFilterOptions, contactPersonFilterOptions, productFilterOptions } = useOfferFilterOptions(customers, contacts, products, locale);
@@ -131,11 +128,6 @@ export default function OfferList() {
           key={modal.key}
           closeFn={modal.close}
           currentOffer={modal.data ?? undefined}
-          customers={customers}
-          suppliers={suppliers}
-          users={users}
-          products={products}
-          contracts={contracts}
         />
       )}
     </>

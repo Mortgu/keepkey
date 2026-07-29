@@ -333,7 +333,7 @@ export async function getNextQuoteId(): Promise<number> {
 
 /* ========== Mutations ========== */
 
-export async function createOffer(input: CreateOfferInput) {
+export async function createOffer(input: CreateOfferInput, options?: { renewedFromOfferId?: string }) {
     const positions = await pricePositions(input.offerPositions, input.customerId);
     const flatrates = await priceFlatrates(input.flatrates);
     const discounts = input.discounts;
@@ -358,6 +358,7 @@ export async function createOffer(input: CreateOfferInput) {
                 featureComparison: input.featureComparison,
                 toCompare: input.toCompare,
                 net_amount: net_amount,
+                renewedFromOfferId: options?.renewedFromOfferId ?? null,
             },
         });
 
@@ -643,5 +644,5 @@ export async function renewOffer(sourceOfferId: string, input: CreateOfferInput)
         throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
     }
 
-    return createOffer(input);
+    return createOffer(input, { renewedFromOfferId: sourceOfferId });
 }
