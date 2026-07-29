@@ -384,9 +384,17 @@ export declare const offerSchema: z.ZodObject<{
         street: z.ZodOptional<z.ZodString>;
         city: z.ZodOptional<z.ZodString>;
         zip: z.ZodOptional<z.ZodString>;
-        language: z.ZodString;
+        language: z.ZodEnum<{
+            DE: "DE";
+            EN: "EN";
+        }>;
         country: z.ZodString;
-        currency: z.ZodString;
+        currency: z.ZodEnum<{
+            EUR: "EUR";
+            RAND: "RAND";
+            DOLLAR: "DOLLAR";
+            CHF: "CHF";
+        }>;
         taxRate: z.ZodNumber;
         salutation: z.ZodOptional<z.ZodString>;
         id: z.ZodString;
@@ -694,9 +702,17 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
         street: z.ZodOptional<z.ZodString>;
         city: z.ZodOptional<z.ZodString>;
         zip: z.ZodOptional<z.ZodString>;
-        language: z.ZodString;
+        language: z.ZodEnum<{
+            DE: "DE";
+            EN: "EN";
+        }>;
         country: z.ZodString;
-        currency: z.ZodString;
+        currency: z.ZodEnum<{
+            EUR: "EUR";
+            RAND: "RAND";
+            DOLLAR: "DOLLAR";
+            CHF: "CHF";
+        }>;
         taxRate: z.ZodNumber;
         salutation: z.ZodOptional<z.ZodString>;
         id: z.ZodString;
@@ -1028,9 +1044,17 @@ export declare const offersPageSchema: z.ZodObject<{
             street: z.ZodOptional<z.ZodString>;
             city: z.ZodOptional<z.ZodString>;
             zip: z.ZodOptional<z.ZodString>;
-            language: z.ZodString;
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
             country: z.ZodString;
-            currency: z.ZodString;
+            currency: z.ZodEnum<{
+                EUR: "EUR";
+                RAND: "RAND";
+                DOLLAR: "DOLLAR";
+                CHF: "CHF";
+            }>;
             taxRate: z.ZodNumber;
             salutation: z.ZodOptional<z.ZodString>;
             id: z.ZodString;

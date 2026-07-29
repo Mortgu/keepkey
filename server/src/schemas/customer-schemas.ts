@@ -9,7 +9,7 @@ export const contactPersonSchema = z.object({
 
 export const createCustomerSchema = z.object({
     companyName: z.string().min(1),
-    customerId: z.string().min(1),
+    customerId: z.string().nullish().transform((v) => (v === undefined || v === "" ? null : v)),
     email: z.email().optional(),
     invoiceEmail: z.email().optional(),
     street: z.string().optional(),
@@ -35,7 +35,7 @@ export const createCustomerContactSchema = z.object({
 
 export const updateCustomerSchema = z.object({
     companyName: z.string().min(1).optional(),
-    customerId: z.string().optional(),
+    customerId: z.string().nullish().transform((v) => (v === undefined || v === "" ? null : v)),
     email: z.email().optional(),
     invoiceEmail: z.email().optional(),
     street: z.string().optional(),

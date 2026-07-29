@@ -1,5 +1,5 @@
 import { useForm } from "@tanstack/react-form";
-import { z } from "zod";
+import { customerFormSchema } from "@keepit/schemas";
 import type { Customer } from "@keepit/schemas";
 import { FieldInput, FieldSelect, FormModal, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
@@ -15,27 +15,6 @@ interface CustomerModalProps {
   onClose: () => void;
   currentCustomer?: Customer | null;
 }
-
-const customerSchema = z.object({
-  customerId: z
-    .union([z.string(), z.undefined()])
-    .transform((val) => (val === undefined ? null : val)),
-  companyName: z.string().min(1, "min. 1 Zeichen!"),
-  email: z.email(),
-  invoiceEmail: z
-    .union([z.email(), z.undefined()])
-    .transform((val) => (val === undefined ? null : val)),
-
-  country: z.string(),
-  street: z.string(),
-  city: z.string(),
-  zip: z.string(),
-  phone: z.string(),
-
-  language: z.enum(["DE", "EN"]),
-  currency: z.enum(["EUR", "RAND", "DOLLAR", "CHF"]),
-  taxRate: z.number(),
-});
 
 export default function CustomerModal({
   onClose,
@@ -66,7 +45,7 @@ export default function CustomerModal({
       taxRate: currentCustomer?.taxRate ?? initialCountry.taxRate,
     },
     validators: {
-      onChange: customerSchema,
+      onChange: customerFormSchema,
     },
     onSubmit: async ({ value }) => {
       if (isEdit) {

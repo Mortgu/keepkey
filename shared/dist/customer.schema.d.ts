@@ -8,9 +8,17 @@ export declare const createCustomerSchema: z.ZodObject<{
     street: z.ZodOptional<z.ZodString>;
     city: z.ZodOptional<z.ZodString>;
     zip: z.ZodOptional<z.ZodString>;
-    language: z.ZodString;
+    language: z.ZodEnum<{
+        DE: "DE";
+        EN: "EN";
+    }>;
     country: z.ZodString;
-    currency: z.ZodString;
+    currency: z.ZodEnum<{
+        EUR: "EUR";
+        RAND: "RAND";
+        DOLLAR: "DOLLAR";
+        CHF: "CHF";
+    }>;
     taxRate: z.ZodNumber;
     salutation: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
@@ -24,13 +32,45 @@ export declare const updateCustomerSchema: z.ZodObject<{
     street: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     city: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     zip: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    language: z.ZodOptional<z.ZodString>;
+    language: z.ZodOptional<z.ZodEnum<{
+        DE: "DE";
+        EN: "EN";
+    }>>;
     country: z.ZodOptional<z.ZodString>;
-    currency: z.ZodOptional<z.ZodString>;
+    currency: z.ZodOptional<z.ZodEnum<{
+        EUR: "EUR";
+        RAND: "RAND";
+        DOLLAR: "DOLLAR";
+        CHF: "CHF";
+    }>>;
     taxRate: z.ZodOptional<z.ZodNumber>;
     salutation: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, z.core.$strip>;
 export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
+export declare const customerFormSchema: z.ZodObject<{
+    language: z.ZodEnum<{
+        DE: "DE";
+        EN: "EN";
+    }>;
+    country: z.ZodString;
+    currency: z.ZodEnum<{
+        EUR: "EUR";
+        RAND: "RAND";
+        DOLLAR: "DOLLAR";
+        CHF: "CHF";
+    }>;
+    taxRate: z.ZodNumber;
+    salutation: z.ZodOptional<z.ZodString>;
+    customerId: z.ZodUnion<readonly [z.ZodString, z.ZodUndefined]>;
+    companyName: z.ZodString;
+    email: z.ZodEmail;
+    invoiceEmail: z.ZodUnion<readonly [z.ZodEmail, z.ZodUndefined]>;
+    street: z.ZodString;
+    city: z.ZodString;
+    zip: z.ZodString;
+    phone: z.ZodString;
+}, z.core.$strip>;
+export type CustomerFormInput = z.infer<typeof customerFormSchema>;
 export declare const customerSchema: z.ZodObject<{
     customerId: z.ZodOptional<z.ZodString>;
     companyName: z.ZodString;
@@ -40,9 +80,17 @@ export declare const customerSchema: z.ZodObject<{
     street: z.ZodOptional<z.ZodString>;
     city: z.ZodOptional<z.ZodString>;
     zip: z.ZodOptional<z.ZodString>;
-    language: z.ZodString;
+    language: z.ZodEnum<{
+        DE: "DE";
+        EN: "EN";
+    }>;
     country: z.ZodString;
-    currency: z.ZodString;
+    currency: z.ZodEnum<{
+        EUR: "EUR";
+        RAND: "RAND";
+        DOLLAR: "DOLLAR";
+        CHF: "CHF";
+    }>;
     taxRate: z.ZodNumber;
     salutation: z.ZodOptional<z.ZodString>;
     id: z.ZodString;
@@ -197,9 +245,17 @@ export declare const customerListSchema: z.ZodArray<z.ZodObject<{
     street: z.ZodOptional<z.ZodString>;
     city: z.ZodOptional<z.ZodString>;
     zip: z.ZodOptional<z.ZodString>;
-    language: z.ZodString;
+    language: z.ZodEnum<{
+        DE: "DE";
+        EN: "EN";
+    }>;
     country: z.ZodString;
-    currency: z.ZodString;
+    currency: z.ZodEnum<{
+        EUR: "EUR";
+        RAND: "RAND";
+        DOLLAR: "DOLLAR";
+        CHF: "CHF";
+    }>;
     taxRate: z.ZodNumber;
     salutation: z.ZodOptional<z.ZodString>;
     id: z.ZodString;
