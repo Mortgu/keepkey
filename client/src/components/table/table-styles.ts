@@ -5,13 +5,13 @@ export const tableStyles = tv({
     slots: {
         wrap: "bg-white border border-(--border) rounded-md overflow-hidden",
         table: "w-full border-collapse",
-        th: "text-left p-0 border-b border-(--border) bg-(--subtle-50)",
+        th: "text-left py-1 border-b border-(--border) ",
         thButton:
             "flex items-center gap-1.5 w-full h-full px-4 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.04em] text-(--text-secondary) bg-transparent border-none cursor-pointer text-left transition-colors hover:text-(--text)",
-        thLabel: "flex-1",
+        thLabel: "flex-1 w-fit",
         thNoSort:
             "px-4 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.04em] text-(--text-secondary)",
-        sortIcons: "flex flex-col gap-px ml-1 shrink-0",
+        sortIcons: "flex h-4 w-4 flex-col gap-px ml-1 shrink-0",
         sortIcon: "size-2 text-(--border) transition-colors",
         row: "border-b border-(--border) last:border-b-0 cursor-pointer transition-colors hover:bg-(--subtle-50)",
         rowActive: "bg-[#E6F2EC] hover:bg-[#E6F2EC]",

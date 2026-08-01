@@ -1,9 +1,10 @@
 import { Download, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
-import CustomerTable from "./-components/customer-table";
 import type { FilterSectionConfig, FilterValue } from "@/components";
 import { Button, FilterSidebar, PageWidth, RouteError, SearchBar, Skeleton, createDefaultFilters } from "@/components";
 import { useCustomers } from "@/hooks/customers/customer-hooks";
+import { tableStyles } from "@/components/table/table-styles";
+import CustomerTable from "./-components/customer-table";
 
 const SIDEBAR_SECTIONS: Array<FilterSectionConfig> = [
     {
@@ -74,6 +75,8 @@ export default function CustomerPage() {
 
     const { customers, isPending, error } = useCustomers();
 
+    const ts = tableStyles();
+
     return (
         <PageWidth variant="none">
             <div className="flex h-full">
@@ -91,7 +94,8 @@ export default function CustomerPage() {
                                     {/* Export Button */}
                                     <Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>
                                     {/* Create Customer Button */}
-                                    <Button icon={<Plus size={14} />} variant="primary" size="sm">Kunde anlegen</Button>
+                                    <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
+                                    >Kunde anlegen</Button>
                                 </div>
                             </div>
 

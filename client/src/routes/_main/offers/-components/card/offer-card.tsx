@@ -49,7 +49,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
     };
 
     return (
-        <div className="border border-(--border) rounded-md">
+        <div className="bg-white border border-(--border) rounded-md">
             <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
@@ -99,7 +99,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </div>
 
             <Collapsable label="Produkte"
-                className="w-full bg-(--subtle-50) justify-between rounded-none"
+                className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
                     {offerPositions.map((position, i) => (
@@ -116,14 +116,22 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </Collapsable>
 
+            <hr className="text-(--border)" />
+
             <Collapsable
                 label="Dokumente"
-                className="w-full bg-(--subtle-50) justify-between rounded-none"
+                className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
                     {offer.offerDocuments.map((document: OfferDocument) => (
                         <OfferCardDocument key={document.id} offerDocument={document} />
                     ))}
+
+                    {offer.offerDocuments.length === 0 && (
+                        <div className="flex items-center justify-center py-4">
+                            <p className="text-sm text-gray-500">Noch keine Dokumente generiert!</p>
+                        </div>
+                    )}
                 </div>
             </Collapsable>
 
