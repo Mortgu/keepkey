@@ -20,3 +20,5 @@ export * from './toast';
 export * from './form';
 export * from './list';
 export * from './table';
+export * from './tabs/tabs';
+export type { TabsCommonProps, TabItem } from './tabs/tabs-types';

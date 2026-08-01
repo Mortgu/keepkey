@@ -1,11 +1,11 @@
-import type {LanguageToggleProps} from './language-toggle-types';
-import type {ComponentSize} from '@/components/size';
-import {cn} from '@/lib/utils';
+import type { LanguageToggleProps } from './language-toggle-types';
+import type { ComponentSize } from '@/components/size';
+import { cn } from '@/lib/utils';
 
 const UNDERLINE_SIZE_STYLES: Record<ComponentSize, string> = {
-  xs: 'px-3 pt-1.5 pb-1 text-xs',
-  sm: 'px-[14px] pt-2 pb-[10px] text-sm',
-  md: 'px-[18px] pt-2.5 pb-[12px] text-md',
+    xs: 'px-3 pt-1.5 pb-1 text-xs',
+    sm: 'px-[14px] pt-2 pb-[10px] text-sm',
+    md: 'px-[18px] pt-2.5 pb-[12px] text-md',
 };
 
 /**
@@ -13,13 +13,13 @@ const UNDERLINE_SIZE_STYLES: Record<ComponentSize, string> = {
  * Blends naturally into tabbed or settings-style layouts.
  */
 export const UnderlineLanguageToggle = ({
-                                            options,
-                                            value,
-                                            onChange,
-                                            className,
-                                            size = 'sm',
-                                            'aria-label': ariaLabel = 'Language',
-                                        }: LanguageToggleProps) => {
+    options,
+    value,
+    onChange,
+    className,
+    size = 'sm',
+    'aria-label': ariaLabel = 'Language',
+}: LanguageToggleProps) => {
     return (
         <div
             role="tablist"
