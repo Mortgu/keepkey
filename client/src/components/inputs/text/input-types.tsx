@@ -2,7 +2,7 @@ import type { InputHTMLAttributes, ReactNode } from "react";
 import type { ButtonComponentProps } from "@/components/button/button-types";
 import type { ComponentSize } from "@/components/size";
 
-export type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
+type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 
 export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
     variant?: "primary" | "secondary";

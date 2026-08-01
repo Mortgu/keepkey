@@ -107,7 +107,7 @@ export const NavLink = ((props: any) => {
 type NavButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
     NavItemContentProps & { indent?: boolean };
 
-export const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
+const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
     (
         {icon, label, badge, trailing, isActive, indent, className, ...props},
         ref,
