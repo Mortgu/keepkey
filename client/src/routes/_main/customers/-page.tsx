@@ -8,7 +8,7 @@ export default function CustomerPage() {
     return (
         <PageWidth className="h-fit grid gap-4">
             <div className="grid gap-4">
-                <h1 className="text-lg font-semibold">{t("section.customers")}</h1>
+                <h1 className="text-xl font-medium">{t("section.customers")}</h1>
             </div>
 
             <CustomerList />

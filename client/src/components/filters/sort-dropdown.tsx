@@ -74,13 +74,13 @@ export function SortDropdown({ value, onChange, options, className, size = "sm" 
       </Button>
 
       {open && (
-        <div className="w-full absolute top-[calc(100%+4px)] right-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[220px] overflow-hidden py-1">
+        <div className="w-full absolute top-[calc(100%+4px)] right-0 z-50 bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[220px] overflow-hidden py-1">
           {options.map(o => (
             <div
               key={o.value}
               onClick={() => { onChange(o.value); setOpen(false); }}
               className={[
-                'flex items-center gap-2 px-3 py-[7px] cursor-pointer text-sm text-(--text) transition-colors duration-[80ms]',
+                'flex items-center gap-2 px-3 py-[7px] cursor-pointer text-sm text-(--text) transition-colors duration-80',
                 o.value === value ? 'bg-(--primary-50) hover:bg-(--primary-50)' : 'hover:bg-(--page-bg)',
               ].join(' ')}
             >

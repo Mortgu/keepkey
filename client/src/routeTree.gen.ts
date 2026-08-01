@@ -15,6 +15,7 @@ import { Route as MainSettingsRouteRouteImport } from './routes/_main/settings/r
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
+import { Route as MainDemoTableIndexRouteImport } from './routes/_main/demo-table/index'
 import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
 import { Route as MainFlatratesIndexRouteImport } from './routes/_main/flatrates/index'
 import { Route as MainInvoicesIndexRouteImport } from './routes/_main/invoices/index'
@@ -57,6 +58,11 @@ const MainContractsIndexRoute = MainContractsIndexRouteImport.update({
 const MainCustomersIndexRoute = MainCustomersIndexRouteImport.update({
   id: '/customers/',
   path: '/customers/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainDemoTableIndexRoute = MainDemoTableIndexRouteImport.update({
+  id: '/demo-table/',
+  path: '/demo-table/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainEmployeesIndexRoute = MainEmployeesIndexRouteImport.update({
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/workloads/texts': typeof MainWorkloadsTextsRoute
   '/contracts/': typeof MainContractsIndexRoute
   '/customers/': typeof MainCustomersIndexRoute
+  '/demo-table/': typeof MainDemoTableIndexRoute
   '/employees/': typeof MainEmployeesIndexRoute
   '/flatrates/': typeof MainFlatratesIndexRoute
   '/invoices/': typeof MainInvoicesIndexRoute
@@ -162,6 +169,7 @@ export interface FileRoutesByTo {
   '/workloads/texts': typeof MainWorkloadsTextsRoute
   '/contracts': typeof MainContractsIndexRoute
   '/customers': typeof MainCustomersIndexRoute
+  '/demo-table': typeof MainDemoTableIndexRoute
   '/employees': typeof MainEmployeesIndexRoute
   '/flatrates': typeof MainFlatratesIndexRoute
   '/invoices': typeof MainInvoicesIndexRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_main/workloads/texts': typeof MainWorkloadsTextsRoute
   '/_main/contracts/': typeof MainContractsIndexRoute
   '/_main/customers/': typeof MainCustomersIndexRoute
+  '/_main/demo-table/': typeof MainDemoTableIndexRoute
   '/_main/employees/': typeof MainEmployeesIndexRoute
   '/_main/flatrates/': typeof MainFlatratesIndexRoute
   '/_main/invoices/': typeof MainInvoicesIndexRoute
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/workloads/texts'
     | '/contracts/'
     | '/customers/'
+    | '/demo-table/'
     | '/employees/'
     | '/flatrates/'
     | '/invoices/'
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/workloads/texts'
     | '/contracts'
     | '/customers'
+    | '/demo-table'
     | '/employees'
     | '/flatrates'
     | '/invoices'
@@ -250,6 +261,7 @@ export interface FileRouteTypes {
     | '/_main/workloads/texts'
     | '/_main/contracts/'
     | '/_main/customers/'
+    | '/_main/demo-table/'
     | '/_main/employees/'
     | '/_main/flatrates/'
     | '/_main/invoices/'
@@ -312,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/customers'
       fullPath: '/customers/'
       preLoaderRoute: typeof MainCustomersIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/demo-table/': {
+      id: '/_main/demo-table/'
+      path: '/demo-table'
+      fullPath: '/demo-table/'
+      preLoaderRoute: typeof MainDemoTableIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/employees/': {
@@ -438,6 +457,7 @@ interface MainRouteRouteChildren {
   MainWorkloadsTextsRoute: typeof MainWorkloadsTextsRoute
   MainContractsIndexRoute: typeof MainContractsIndexRoute
   MainCustomersIndexRoute: typeof MainCustomersIndexRoute
+  MainDemoTableIndexRoute: typeof MainDemoTableIndexRoute
   MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
   MainFlatratesIndexRoute: typeof MainFlatratesIndexRoute
   MainInvoicesIndexRoute: typeof MainInvoicesIndexRoute
@@ -455,6 +475,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainWorkloadsTextsRoute: MainWorkloadsTextsRoute,
   MainContractsIndexRoute: MainContractsIndexRoute,
   MainCustomersIndexRoute: MainCustomersIndexRoute,
+  MainDemoTableIndexRoute: MainDemoTableIndexRoute,
   MainEmployeesIndexRoute: MainEmployeesIndexRoute,
   MainFlatratesIndexRoute: MainFlatratesIndexRoute,
   MainInvoicesIndexRoute: MainInvoicesIndexRoute,

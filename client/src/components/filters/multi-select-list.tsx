@@ -15,8 +15,8 @@ export function MultiSelectList({ options, values, onChange, className }: MultiS
   const count = values.length;
 
   return (
-    <div className={`w-full border border-(--border) rounded-lg overflow-hidden ${className ?? ''}`}>
-      <div className="max-h-[240px] overflow-y-auto scrollbar">
+    <div className={`w-full border border-(--border) rounded-md overflow-hidden ${className ?? ''}`}>
+      <div className="max-h-60 overflow-y-auto scrollbar">
         {options.map(o => {
           const checked = values.includes(o.value);
           return (

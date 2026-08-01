@@ -1,7 +1,7 @@
-import {useEffect, useRef, useState} from 'react';
-import {Check} from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { Check } from 'lucide-react';
 import type { ComponentSize } from "@/components/size";
-import {Button} from "@/components";
+import { Button } from "@/components";
 
 export interface DropdownOption {
     value: string;
@@ -18,7 +18,7 @@ interface SingleDropdownProps {
     size?: ComponentSize;
 }
 
-export function SingleDropdown({label, options, value, onChange, className, size = "sm"}: SingleDropdownProps) {
+export function SingleDropdown({ label, options, value, onChange, className, size = "sm" }: SingleDropdownProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
 
@@ -37,17 +37,17 @@ export function SingleDropdown({label, options, value, onChange, className, size
             <Button variant="secondary" size={size} type="button" onClick={() => setOpen(o => !o)}>
                 <label className='text-(--fg-2) font-normal'>{label}:</label>
                 {selected?.dot && (
-                    <span className="size-1.75 rounded-full shrink-0" style={{background: selected.dot}}/>
+                    <span className="size-1.75 rounded-full shrink-0" style={{ background: selected.dot }} />
                 )}
                 <span className={`flex-1 text-left ${selected ? 'text-(--text)' : 'text-(--fg-3)'}`}>
-          {selected ? selected.label : label}
-        </span>
+                    {selected ? selected.label : label}
+                </span>
 
             </Button>
 
             {open && (
                 <div
-                    className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[180px] overflow-hidden py-1">
+                    className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[180px] overflow-hidden py-1">
                     {options.map(o => (
                         <div
                             key={o.value}
@@ -61,10 +61,10 @@ export function SingleDropdown({label, options, value, onChange, className, size
                             ].join(' ')}
                         >
                             {o.dot && (
-                                <span className="size-[7px] rounded-full shrink-0" style={{background: o.dot}}/>
+                                <span className="size-[7px] rounded-full shrink-0" style={{ background: o.dot }} />
                             )}
                             <span className="flex-1">{o.label}</span>
-                            {o.value === value && <Check className="size-3.5 text-(--primary-600)"/>}
+                            {o.value === value && <Check className="size-3.5 text-(--primary-600)" />}
                         </div>
                     ))}
                 </div>

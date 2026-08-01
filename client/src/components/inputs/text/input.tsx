@@ -6,7 +6,7 @@ import { Button } from "@/components/button/button";
 
 const styles = tv({
     base: [
-        "w-full rounded-lg border border-(--border) bg-white transition-all duration-150",
+        "w-full rounded-md border border-(--border) bg-white transition-all duration-150",
         "text-sm text-(--text) outline-none",
         "placeholder:text-(--text-secondary)",
         "focus:border-(--primary) focus:shadow-[0_0_0_3px_rgba(0,104,63,0.15)]",

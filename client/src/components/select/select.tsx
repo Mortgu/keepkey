@@ -5,7 +5,7 @@ import { SIZE_STYLES } from "@/components/size";
 
 const styles = tv({
     base: [
-        "w-full rounded-lg border border-(--border)",
+        "w-full rounded-md border border-(--border)",
         "transition-all duration-200",
         "px-3 text-base outline-none",
         "focus:bg-gray-100",

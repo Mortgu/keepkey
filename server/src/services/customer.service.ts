@@ -17,10 +17,7 @@ export type UpdateCustomerContactInput = z.infer<typeof updateCustomerContactSch
 
 /* ========== Queries ========== */
 
-export async function getCustomers(params?: {
-    search?: string;
-    sort?: string;
-}) {
+export async function getCustomers(params?: { search?: string; sort?: string; }) {
     const where: Prisma.CustomerWhereInput = {};
 
     if (params?.search) {
