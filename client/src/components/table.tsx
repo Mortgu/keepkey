@@ -113,12 +113,13 @@ export function DataTable<T>({
                                             onClick={() => handleHeaderClick(col)}
                                             aria-sort={dir === "none" ? "none" : dir === "asc" ? "ascending" : "descending"}
                                         >
-                                            {col.align !== "right" && <span className={s.thLabel()}>{col.header}</span>}
-                                            <span className={s.sortIcons()}>
-                                                <SortIcon arrow="up" className={sortIconClass(dir, "up")} />
-                                                <SortIcon arrow="down" className={sortIconClass(dir, "down")} />
-                                            </span>
-                                            {col.align === "right" && <span className={s.thLabel()}>{col.header}</span>}
+                                            <div className="flex w-fit">
+                                                <span className={s.thLabel()}>{col.header}</span>
+                                                <span className={s.sortIcons()}>
+                                                    <SortIcon arrow="up" className={sortIconClass(dir, "up")} />
+                                                    <SortIcon arrow="down" className={sortIconClass(dir, "down")} />
+                                                </span>
+                                            </div>
                                         </button>
                                     ) : (
                                         <span className={`${s.thNoSort()} ${alignClass(col.align)} block`}>

@@ -153,7 +153,7 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                 emptyLabel="Keine Kunden gefunden."
             />
 
-            <Drawer open={active !== null} onClose={() => setActiveId(null)}>
+            <Drawer open={active !== null} onClose={() => setActiveId(null)} wide>
                 {active && (
                     <>
                         <Drawer.Header
