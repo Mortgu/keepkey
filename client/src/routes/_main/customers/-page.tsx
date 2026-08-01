@@ -1,7 +1,9 @@
 import { Download, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
+import CustomerTable from "./-components/customer-table";
 import type { FilterSectionConfig, FilterValue } from "@/components";
-import { Button, FilterSidebar, Input, PageWidth, UnderlineTabs, createDefaultFilters } from "@/components";
+import { Button, FilterSidebar, PageWidth, RouteError, SearchBar, Skeleton, createDefaultFilters } from "@/components";
+import { useCustomers } from "@/hooks/customers/customer-hooks";
 
 const SIDEBAR_SECTIONS: Array<FilterSectionConfig> = [
     {
@@ -68,15 +70,16 @@ export default function CustomerPage() {
     const onFilterReset = () => setFilters(createDefaultFilters(SIDEBAR_SECTIONS));
     const onFilterApply = () => setSidebarOpen(false);
 
-    const [tab, setTab] = useState("active");
+    const [query, setQuery] = useState<string>("");
 
+    const { customers, isPending, error } = useCustomers();
 
     return (
         <PageWidth variant="none">
             <div className="flex h-full">
                 <div className="flex-1 grid grid-rows-[auto_1fr]">
                     <div className="flex-1 h-fit">
-                        <div className="grid gap-4 px-8 pt-6 border-b border-(--border)">
+                        <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
 
                             {/* Header */}
                             <div className="flex items-center justify-between">
@@ -92,22 +95,13 @@ export default function CustomerPage() {
                                 </div>
                             </div>
 
-                            <UnderlineTabs
-                                value={tab}
-                                onChange={setTab}
-                                tabs={[
-                                    { value: "active", label: "Aktiv", count: 12 },
-                                    { value: "draft", label: "Entwurf", count: 3 },
-                                    { value: "sent", label: "Versendet" },
-                                    { value: "archive", label: "Archiv" },
-                                ]}
-                            />
 
                         </div>
 
                         <div className="flex items-center justify-between gap-4 border-b border-(--border) p-4 px-8">
-                            <Input className="w-fit max-w-100" />
-
+                            <div className="flex items-center gap-2">
+                                <SearchBar value={query} onChange={setQuery} />
+                            </div>
                             <div className="flex items-center justify-center gap-4">
                                 <label className="min-w-fit text-sm text-gray-400">11 von 18</label>
                                 <Button
@@ -122,7 +116,35 @@ export default function CustomerPage() {
                         </div>
                     </div>
 
-                    <div className="bg-gray-100 h-full p-4">
+                    <div className="bg-gray-100 h-full px-8 py-4">
+                        {error ? (
+                            <RouteError error={error} />
+                        ) : isPending ? (
+                            <div className="bg-white border border-(--border) rounded-md overflow-hidden">
+                                <div className="flex items-center gap-6 px-4 py-2.5 border-b border-(--border) bg-(--subtle-50)">
+                                    <Skeleton className="h-3.5 w-24" />
+                                    <Skeleton className="h-3.5 w-32" />
+                                    <Skeleton className="h-3.5 w-20" />
+                                    <Skeleton className="h-3.5 w-20" />
+                                </div>
+                                {Array.from({ length: 8 }).map((_, i) => (
+                                    <div key={i} className="flex items-center gap-6 px-4 py-3.5 border-b border-(--border) last:border-b-0">
+                                        <div className="flex items-center gap-2.5 flex-1">
+                                            <Skeleton shape="circle" className="size-[30px] shrink-0" />
+                                            <div className="flex flex-col gap-1">
+                                                <Skeleton className="h-3.5 w-32" />
+                                                <Skeleton className="h-3 w-40" />
+                                            </div>
+                                        </div>
+                                        <Skeleton className="h-3.5 w-24" />
+                                        <Skeleton className="h-3.5 w-12" />
+                                        <Skeleton className="h-3.5 w-20" />
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <CustomerTable customers={customers} />
+                        )}
                     </div>
                 </div>
 

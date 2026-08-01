@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { alignClass, sortIconClass, tableStyles } from "./table-styles";
 import type { Column, DataTableProps, SortDir } from "./table-types";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 export function DataTable<T>({
     data,
@@ -85,8 +86,8 @@ export function DataTable<T>({
                                         >
                                             {col.align !== "right" && <span className={s.thLabel()}>{col.header}</span>}
                                             <span className={s.sortIcons()}>
-                                                <SortIcon arrow="up" className={sortIconClass(dir, "up")} />
-                                                <SortIcon arrow="down" className={sortIconClass(dir, "down")} />
+                                                <ChevronUp size={12} strokeWidth={3} className={sortIconClass(dir, "up")} />
+                                                <ChevronDown size={12} strokeWidth={3} className={sortIconClass(dir, "down")} />
                                             </span>
                                             {col.align === "right" && <span className={s.thLabel()}>{col.header}</span>}
                                         </button>

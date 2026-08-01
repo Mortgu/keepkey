@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { CheckboxComponentProps } from "./checkbox-types";
+import { Check } from "lucide-react";
 
 const checkboxSizes = {
   xs: "w-3 h-3",
@@ -10,21 +11,17 @@ const checkboxSizes = {
 
 const styles = tv({
   base: [
-    "aspect-square rounded-md border border-(--border) cursor-pointer accent-[var(--primary)]",
-    "transition-all duration-200 outline-none",
-    "disabled:opacity-50 disabled:cursor-not-allowed",
-    "focus:ring-2 focus:ring-[var(--primary)] focus:ring-offset-1",
+    "flex items-center justify-center w-4 h-4 aspect-square border border-(--border) rounded-sm",
+    "overflow-hidden"
   ],
   variants: {
-    size: checkboxSizes,
-    error: {
-      true: "border-red-500 focus:border-red-600",
-      false: "border-(--border) focus:border-[var(--primary)]",
-    },
+    checked: {
+      true: 'bg-black text-white border-black',
+      false: ''
+    }
   },
   defaultVariants: {
-    size: "sm",
-    error: false,
+    checked: false,
   },
 });
 
@@ -43,22 +40,17 @@ const labelStyles = tv({
 });
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxComponentProps>(
-  ({ className, label, error = false, size, ...rest }, ref) => {
+  ({ className, label, error = false, size, checked, onChange, ...rest }, ref) => {
     return (
-      <div className="flex items-center gap-2">
-        <input
-          ref={ref}
-          type="checkbox"
-          className={styles({ size, error, className })}
-          {...rest}
-        />
+      <div className="relative flex items-center justify-center gap-2 w-fit h-fit hover:bg-white hover:cursor-pointer transition-all ease-in">
+        <input type="checkbox" className="peer sr-only absolute w-full h-full hidden"  {...rest} ref={ref} />
+        <div className={styles({ checked })}>
+          {checked && (
+            <Check size={12} strokeWidth={3} />
+          )}
+        </div>
         {label && (
-          <label
-            htmlFor={rest.id}
-            className={labelStyles({ size })}
-          >
-            {label}
-          </label>
+          <label className="text-sm">{label}</label>
         )}
       </div>
     );

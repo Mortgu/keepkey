@@ -11,7 +11,7 @@ export const tableStyles = tv({
         thLabel: "flex-1",
         thNoSort:
             "px-4 py-2.5 text-[11.5px] font-semibold uppercase tracking-[0.04em] text-(--text-secondary)",
-        sortIcons: "flex flex-col gap-px ml-0.5 shrink-0",
+        sortIcons: "flex flex-col gap-px ml-1 shrink-0",
         sortIcon: "size-2 text-(--border) transition-colors",
         row: "border-b border-(--border) last:border-b-0 cursor-pointer transition-colors hover:bg-(--subtle-50)",
         rowActive: "bg-[#E6F2EC] hover:bg-[#E6F2EC]",
@@ -35,7 +35,7 @@ export function sortIconClass(dir: SortDir, arrow: "up" | "down") {
     const active =
         (arrow === "up" && dir === "asc") ||
         (arrow === "down" && dir === "desc");
-    return active ? "text-(--primary)" : "text-(--text)";
+    return active ? "text-(--primary-600)" : "text-(--text-secondary)";
 }
 
 export function alignClass(align: Align | undefined) {

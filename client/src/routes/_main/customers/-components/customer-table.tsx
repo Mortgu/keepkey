@@ -1,8 +1,9 @@
-import { DataTable, type Column } from "@/components";
+import { Button, DataTable, type Column } from "@/components";
 import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
 import type { Customer } from "@keepit/schemas";
 import { useNavigate } from "@tanstack/react-router";
-import { ChevronRight } from "lucide-react";
+import { EllipsisVertical } from "lucide-react";
 import { useState } from "react";
 
 interface Props {
@@ -14,7 +15,7 @@ interface TableFields {
     name: string;
     email: string;
     contacts: Array<string>;
-    orders: number;
+    orders: string;
     createdAt: string;
 }
 
@@ -40,7 +41,7 @@ export default function CustomerTable({ customers }: Props) {
         name: customer.companyName,
         email: customer.email ?? "",
         contacts: customer.contactPersons.map(contact => `${contact.firstName} ${contact.lastName}`),
-        orders: customer.orders.length,
+        orders: formatEur(customer.orders.reduce((sum, i) => sum + i.net_amount, 0)),
         createdAt: customer.createdAt,
     }));
 
@@ -82,11 +83,11 @@ export default function CustomerTable({ customers }: Props) {
         },
         {
             key: "orders",
-            header: "Bestellungen",
-            align: "left",
+            header: "Jahresumsatz",
+            align: "right",
             sortable: true,
             sortValue: (c) => c.orders,
-            render: (c) => c.orders,
+            render: (c) => c.orders
         },
         {
             key: "createdAt",
@@ -103,7 +104,7 @@ export default function CustomerTable({ customers }: Props) {
             width: "36px",
             render: () => (
                 <div className="flex justify-center">
-                    <ChevronRight className="size-4 text-(--border-200)" />
+                    <Button variant="ghost" icon={<EllipsisVertical className="size-4 text-(--border-200)" />} iconOnly size="xs" />
                 </div>
             ),
         },
@@ -115,11 +116,9 @@ export default function CustomerTable({ customers }: Props) {
             columns={COLUMNS}
             rowKey={(c) => c.id}
             initialSort={{ key: "date", dir: "desc" }}
-            onRowClick={(c) => navigate({
-                from: "/customers/",
-                to: "/customers/$customerId",
-                params: { customerId: c.id as string },
-            })}
+            onRowClick={() => {
+
+            }}
         />
 
     )
