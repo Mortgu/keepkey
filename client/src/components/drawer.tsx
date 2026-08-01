@@ -1,8 +1,8 @@
-import { useCallback, useEffect } from "react";
+import { Children, Fragment, isValidElement, useCallback, useEffect } from "react";
 import { XIcon } from "lucide-react";
 import { tv } from "tailwind-variants";
 import { Button } from "./button";
-import type { ReactNode } from "react";
+import type { ElementType, ReactNode } from "react";
 
 export interface DrawerProps {
     open: boolean;
@@ -67,6 +67,19 @@ const drawerStyles = tv({
     },
 });
 
+/**
+ * Flattens `<>…</>` wrappers so the slot lookup below still finds Drawer.Header
+ * / Body / Footer when a caller wraps them for conditional rendering. Also
+ * drops null / false entries, which `{cond && <Slot/>}` produces.
+ */
+function flattenFragments(children: ReactNode): Array<ReactNode> {
+    return Children.toArray(children).flatMap((child) =>
+        isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment
+            ? flattenFragments(child.props.children)
+            : child,
+    );
+}
+
 function DrawerHeader({ eyebrow, title, subtitle }: DrawerHeaderProps) {
     return (
         <>
@@ -114,10 +127,13 @@ function Drawer({ open, onClose, children, wide, className }: DrawerProps) {
         };
     }, [open, handleKeyDown]);
 
-    const childArray = Array.isArray(children) ? children : [children];
-    const header = childArray.find((c: any) => c?.type === DrawerHeader);
-    const body = childArray.find((c: any) => c?.type === DrawerBody);
-    const footer = childArray.find((c: any) => c?.type === DrawerFooter);
+    const childArray = flattenFragments(children);
+    const findSlot = (slot: ElementType) =>
+        childArray.find((c) => isValidElement(c) && c.type === slot);
+
+    const header = findSlot(DrawerHeader);
+    const body = findSlot(DrawerBody);
+    const footer = findSlot(DrawerFooter);
 
     return (
         <>

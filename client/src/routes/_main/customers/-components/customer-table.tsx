@@ -1,13 +1,16 @@
-import { Button, DataTable, type Column } from "@/components";
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import type { Customer } from "@keepit/schemas";
+import type { Column } from "@/components";
+import { ActionMenu, Button, DataTable, Drawer } from "@/components";
+import { useDeleteCustomer } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import type { Customer } from "@keepit/schemas";
-import { useNavigate } from "@tanstack/react-router";
-import { EllipsisVertical } from "lucide-react";
-import { useState } from "react";
 
 interface Props {
     customers: Array<Customer>;
+    onEdit: (customer: Customer) => void;
 }
 
 interface TableFields {
@@ -15,8 +18,9 @@ interface TableFields {
     name: string;
     email: string;
     contacts: Array<string>;
-    orders: string;
+    revenue: number;
     createdAt: string;
+    customer: Customer;
 }
 
 const initials = (name: string) =>
@@ -33,20 +37,26 @@ function Avatar({ name, size = 30 }: { name: string; size?: number }) {
     );
 }
 
-export default function CustomerTable({ customers }: Props) {
+export default function CustomerTable({ customers, onEdit }: Props) {
     const navigate = useNavigate();
+    const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
 
-    const CUSTOMERS: Array<TableFields> = customers.map(customer => ({
+    const [activeId, setActiveId] = useState<string | null>(null);
+
+    const rows: Array<TableFields> = customers.map((customer) => ({
         id: customer.id,
         name: customer.companyName,
         email: customer.email ?? "",
-        contacts: customer.contactPersons.map(contact => `${contact.firstName} ${contact.lastName}`),
-        orders: formatEur(customer.orders.reduce((sum, i) => sum + i.net_amount, 0)),
+        contacts: customer.contactPersons.map((contact) => `${contact.firstName} ${contact.lastName}`),
+        revenue: customer.orders.reduce((sum, i) => sum + i.net_amount, 0),
         createdAt: customer.createdAt,
+        customer,
     }));
 
-    const [activeId, setActiveId] = useState<string | null>(null);
-    const active = CUSTOMERS.find((c) => c.id === activeId) ?? null;
+    const active = rows.find((c) => c.id === activeId) ?? null;
+
+    const openDetail = (id: string) =>
+        navigate({ to: "/customers/$customerId", params: { customerId: id } });
 
     const COLUMNS: Array<Column<TableFields>> = [
         {
@@ -62,7 +72,7 @@ export default function CustomerTable({ customers }: Props) {
                         <span className="text-xs text-gray-400">{c.email}</span>
                     </div>
                 </div>
-            )
+            ),
         },
         {
             key: "ansprechpartner",
@@ -82,44 +92,171 @@ export default function CustomerTable({ customers }: Props) {
                 ),
         },
         {
-            key: "orders",
+            key: "revenue",
             header: "Jahresumsatz",
             align: "right",
             sortable: true,
-            sortValue: (c) => c.orders,
-            render: (c) => c.orders
+            sortValue: (c) => c.revenue,
+            render: (c) => formatEur(c.revenue),
         },
         {
             key: "createdAt",
             header: "Erstellt Am",
             align: "left",
             sortable: true,
-            sortValue: (c) => c.createdAt,
+            sortValue: (c) => new Date(c.createdAt),
             render: (c) => formatDate(c.createdAt),
         },
         {
-            key: "chevron",
+            key: "actions",
             header: "",
             sortable: false,
             width: "36px",
-            render: () => (
-                <div className="flex justify-center">
-                    <Button variant="ghost" icon={<EllipsisVertical className="size-4 text-(--border-200)" />} iconOnly size="xs" />
-                </div>
+            render: (c) => (
+                <ActionMenu
+                    label={`Aktionen für ${c.name}`}
+                    items={[
+                        {
+                            label: "Kunde öffnen",
+                            icon: <ExternalLink className="size-3.5" />,
+                            onSelect: () => openDetail(c.id),
+                        },
+                        {
+                            label: "Bearbeiten",
+                            icon: <Pencil className="size-3.5" />,
+                            onSelect: () => onEdit(c.customer),
+                        },
+                        {
+                            label: "Löschen",
+                            icon: <Trash2 className="size-3.5" />,
+                            danger: true,
+                            disabled: isDeletingCustomer,
+                            onSelect: () => deleteCustomer({ customerId: c.id }),
+                        },
+                    ]}
+                />
             ),
         },
     ];
 
+    console.log(active);
+
     return (
-        <DataTable
-            data={CUSTOMERS}
-            columns={COLUMNS}
-            rowKey={(c) => c.id}
-            initialSort={{ key: "date", dir: "desc" }}
-            onRowClick={() => {
+        <>
+            <DataTable
+                data={rows}
+                columns={COLUMNS}
+                rowKey={(c) => c.id}
+                initialSort={{ key: "createdAt", dir: "desc" }}
+                activeRowKey={activeId}
+                onRowClick={(c) => setActiveId(c.id)}
+                emptyLabel="Keine Kunden gefunden."
+            />
 
-            }}
-        />
+            <Drawer open={active !== null} onClose={() => setActiveId(null)}>
+                {active && (
+                    <>
+                        <Drawer.Header
+                            eyebrow="Kunde"
+                            title={active.name}
+                            subtitle={
+                                active.contacts.length
+                                    ? `${active.contacts.length} Ansprechpartner`
+                                    : "Keine Ansprechpartner hinterlegt"
+                            }
+                        />
+                        <Drawer.Body>
+                            <div className="flex flex-col gap-[18px]">
+                                <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2.5 items-baseline">
+                                    {active.customer.customerId && (
+                                        <>
+                                            <dt className="text-xs text-(--text-secondary)">Kunden-Nr.</dt>
+                                            <dd className="text-[13px] font-medium text-right font-mono">
+                                                {active.customer.customerId}
+                                            </dd>
+                                        </>
+                                    )}
+                                    <dt className="text-xs text-(--text-secondary)">E-Mail</dt>
+                                    <dd className="text-[13px] font-medium text-right">{active.email || "—"}</dd>
+                                    <dt className="text-xs text-(--text-secondary)">Telefon</dt>
+                                    <dd className="text-[13px] font-medium text-right">
+                                        {active.customer.phone || "—"}
+                                    </dd>
+                                    <dt className="text-xs text-(--text-secondary)">Adresse</dt>
+                                    <dd className="text-[13px] font-medium text-right">
+                                        {[active.customer.street, [active.customer.zip, active.customer.city].filter(Boolean).join(" ")]
+                                            .filter(Boolean)
+                                            .join(", ") || "—"}
+                                    </dd>
+                                    <dt className="text-xs text-(--text-secondary)">Land</dt>
+                                    <dd className="text-[13px] font-medium text-right">{active.customer.country}</dd>
+                                    <dt className="text-xs text-(--text-secondary)">Sprache</dt>
+                                    <dd className="text-[13px] font-medium text-right">{active.customer.language}</dd>
+                                    <dt className="text-xs text-(--text-secondary)">Bestellungen</dt>
+                                    <dd className="text-[13px] font-medium text-right">
+                                        {active.customer.orders.length}
+                                    </dd>
+                                    <dt className="text-xs text-(--text-secondary)">Jahresumsatz</dt>
+                                    <dd className="text-[13px] font-medium text-right">{formatEur(active.revenue)}</dd>
+                                    <dt className="text-xs text-(--text-secondary)">Erstellt</dt>
+                                    <dd className="text-[13px] font-medium text-right">
+                                        {formatDate(active.createdAt)}
+                                    </dd>
+                                </dl>
 
-    )
+                                <div className="h-px bg-(--border)" />
+
+                                <div>
+                                    <div className="text-[10px] font-semibold text-(--text-secondary) uppercase tracking-[0.06em] mb-2.5">
+                                        Ansprechpartner
+                                    </div>
+                                    <div className="flex flex-col gap-2.5">
+                                        {active.customer.contactPersons.length ? (
+                                            active.customer.contactPersons.map((p) => (
+                                                <div key={p.id} className="flex items-center gap-2.5">
+                                                    <Avatar name={`${p.firstName} ${p.lastName}`} size={26} />
+                                                    <div>
+                                                        <div className="text-[13.5px] font-normal">
+                                                            {p.firstName} {p.lastName}
+                                                        </div>
+                                                        <div className="text-xs text-(--text-secondary)">
+                                                            {p.email || "—"}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            ))
+                                        ) : (
+                                            <span className="text-[13px] text-(--text-secondary)">
+                                                Keine Ansprechpartner hinterlegt.
+                                            </span>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </Drawer.Body>
+                        <Drawer.Footer>
+                            <Button variant="ghost" size="sm" onClick={() => setActiveId(null)}>
+                                Schließen
+                            </Button>
+                            <span className="ml-auto" />
+                            <Button
+                                variant="border"
+                                size="sm"
+                                icon={<Pencil className="size-3.5" />}
+                                onClick={() => {
+                                    onEdit(active.customer);
+                                    setActiveId(null);
+                                }}
+                            >
+                                Bearbeiten
+                            </Button>
+                            <Button variant="primary" size="sm" onClick={() => openDetail(active.id)}>
+                                Kunde öffnen
+                            </Button>
+                        </Drawer.Footer>
+                    </>
+                )}
+            </Drawer>
+        </>
+    );
 }

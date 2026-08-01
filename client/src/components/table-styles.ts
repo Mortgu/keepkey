@@ -11,7 +11,7 @@ export type Align = "left" | "right";
 
 export const tableStyles = tv({
     slots: {
-        wrap: "bg-white border border-(--border) rounded-md overflow-hidden",
+        wrap: "bg-white border border-(--border) rounded-md ",
         table: "w-full border-collapse",
         th: "text-left py-1 border-b border-(--border) ",
         thButton:

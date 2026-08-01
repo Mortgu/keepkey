@@ -5,16 +5,10 @@ import type { InputHTMLAttributes } from "react";
 import type { ComponentSize } from "./tokens";
 
 export interface CheckboxComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
-    error?: boolean;
-    label?: string;
-    size?: ComponentSize;
+  error?: boolean;
+  label?: string;
+  size?: ComponentSize;
 }
-
-const checkboxSizes = {
-  xs: "w-3 h-3",
-  sm: "w-4 h-4",
-  md: "w-5 h-5",
-} as const;
 
 const styles = tv({
   base: [
@@ -57,7 +51,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxComponentProps>(
           )}
         </div>
         {label && (
-          <label className="text-sm">{label}</label>
+          <label className={labelStyles({ size })}>{label}</label>
         )}
       </div>
     );
