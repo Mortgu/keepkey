@@ -7,9 +7,7 @@ import OrderModal from "./order-modal";
 import type { Customer, Order } from "@keepit/schemas";
 import { useCustomers, useModal, useOrders } from "@/hooks";
 
-import { Button, FilterChip, SearchBar } from "@/components";
-import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { SortDropdown } from "@/components/filters/sort-dropdown";
+import { Button, FilterChip, MultiDropdown, SearchBar, SortDropdown } from "@/components";
 
 const sort_options = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },

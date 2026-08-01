@@ -1,6 +1,22 @@
 import { tv } from "tailwind-variants";
-import {  VARIANT_LABELS } from "./badge-types";
-import type {BadgeComponentProps} from "./badge-types";
+import type { HTMLAttributes } from "react";
+import type { ComponentSize } from "@/components/tokens";
+
+export interface BadgeComponentProps extends HTMLAttributes<HTMLSpanElement> {
+  variant?: "generated" | "pending" | "failed" | "processing" | "draft";
+  format?: "pdf" | "docx" | "html";
+  count?: number | string;
+  countVariant?: "success" | "error";
+  size?: ComponentSize;
+}
+
+const VARIANT_LABELS: Record<NonNullable<BadgeComponentProps["variant"]>, string> = {
+  generated: "Generated",
+  pending: "Pending",
+  failed: "Failed",
+  processing: "Processing",
+  draft: "Draft",
+};
 
 const badgeSizeStyles = {
   xs: "px-1.5 py-px text-[10px]",

@@ -1,8 +1,10 @@
 import type { ReactNode } from "react";
-import type { LanguageToggleProps } from "./language-toggle-types";
-import type { ComponentSize } from "@/components/size";
+import type { ComponentSize } from "./tokens";
+import type { LanguageToggleProps } from "./language-toggle-options";
 
 import { cn } from "@/lib/utils";
+
+export type { LanguageOption, LanguageToggleProps } from "./language-toggle-options";
 
 const SEGMENTED_SIZE_STYLES = {
   xs: {

@@ -6,9 +6,7 @@ import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type { Customer } from "@keepit/schemas";
-import { Button, FilterChip, RouteError, SearchBar } from "@/components";
-import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { SortDropdown } from "@/components/filters/sort-dropdown";
+import { Button, FilterChip, MultiDropdown, RouteError, SearchBar, SortDropdown } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 
 const countryFilterOptions = [

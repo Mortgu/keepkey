@@ -1,5 +1,13 @@
+/* ──────────────────────────────────────────────────────────────────────
+   DataTable styles + sort/align helpers. Kept out of table.tsx so that
+   module only exports React components — required by react-refresh.
+   ────────────────────────────────────────────────────────────────────── */
+
 import { tv } from "tailwind-variants";
-import type { Align, SortDir } from "./table-types";
+
+export type SortDir = "asc" | "desc" | "none";
+
+export type Align = "left" | "right";
 
 export const tableStyles = tv({
     slots: {

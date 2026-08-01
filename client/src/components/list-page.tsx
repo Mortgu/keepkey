@@ -1,4 +1,4 @@
-import { Fragment  } from "react";
+import { Fragment } from "react";
 import { Plus } from "lucide-react";
 import type {ReactNode} from "react";
 import { Button, ListSkeleton, RouteError, Skeleton } from "@/components";

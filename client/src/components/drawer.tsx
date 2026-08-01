@@ -1,8 +1,33 @@
 import { useCallback, useEffect } from "react";
 import { XIcon } from "lucide-react";
 import { tv } from "tailwind-variants";
-import type { DrawerBodyProps, DrawerFooterProps, DrawerHeaderProps, DrawerProps } from "./drawer-types";
-import { Button } from "@/components";
+import { Button } from "./button";
+import type { ReactNode } from "react";
+
+export interface DrawerProps {
+    open: boolean;
+    onClose: () => void;
+    children?: ReactNode;
+    wide?: boolean;
+    className?: string;
+}
+
+export interface DrawerHeaderProps {
+    eyebrow?: string;
+    title: string;
+    subtitle?: string;
+    className?: string;
+}
+
+export interface DrawerBodyProps {
+    children?: ReactNode;
+    className?: string;
+}
+
+export interface DrawerFooterProps {
+    children?: ReactNode;
+    className?: string;
+}
 
 const scrimStyles = tv({
     base: [

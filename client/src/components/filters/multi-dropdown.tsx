@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { Button } from '../button/button';
-import type { ComponentSize } from "@/components/size";
+import { Button } from '../button';
+import type { ComponentSize } from "@/components/tokens";
 
 export interface DropdownOption {
   value: string;

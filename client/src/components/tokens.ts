@@ -1,5 +1,7 @@
 export type ComponentSize = "xs" | "sm" | "md";
 
+export type ComponentVariant = "primary" | "secondary" | "border" | "ghost" | "link";
+
 export const SIZE_STYLES = {
   md: `px-4.5 h-[44px] text-[16px]`,
   sm: `px-4 h-[37.5px] text-[14px]`,

@@ -1,7 +1,16 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import type { CollapsableComponentProps } from "./collapsable-types";
-import { Button } from "@/components";
+import { Button } from "./button";
+import type { ReactNode } from "react";
+import type { ComponentSize } from "./tokens";
+
+export interface CollapsableComponentProps {
+    label: ReactNode;
+    children: ReactNode;
+    className?: string;
+    defaultOpen?: boolean;
+    size?: ComponentSize;
+}
 
 export function Collapsable({
   label,

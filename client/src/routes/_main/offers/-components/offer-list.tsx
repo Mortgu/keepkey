@@ -4,9 +4,7 @@ import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
 
 
-import { FilterChip, ListSkeleton, OfferCardSkeleton, RouteError, SearchBar } from "@/components";
-import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { SortDropdown } from "@/components/filters/sort-dropdown";
+import { FilterChip, ListSkeleton, MultiDropdown, OfferCardSkeleton, RouteError, SearchBar, SortDropdown } from "@/components";
 import { useContacts, useCustomers, useLocale, useModal, useProducts } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 import type { Offer } from "@keepit/schemas";

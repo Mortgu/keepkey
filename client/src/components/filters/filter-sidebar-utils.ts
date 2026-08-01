@@ -1,6 +1,6 @@
 /* ──────────────────────────────────────────────────────────────────────
-   FilterSidebar types + helpers (kept separate so the component module
-   only exports React components — required by react-refresh).
+   FilterSidebar types + helpers. Kept out of filter-sidebar.tsx so that
+   module only exports React components — required by react-refresh.
    ────────────────────────────────────────────────────────────────────── */
 
 export type FilterValue = string | Array<string> | [number, number];
@@ -66,7 +66,7 @@ export const DEFAULT_LABELS: FilterSidebarLabels = {
     noResults: "Keine Treffer",
 };
 
-export const formatEUR = (n: number) =>
+export const formatFilterAmount = (n: number) =>
     n.toLocaleString("de-DE", { maximumFractionDigits: 0 });
 
 export function createDefaultFilters(

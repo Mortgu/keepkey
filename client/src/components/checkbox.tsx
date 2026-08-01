@@ -1,7 +1,14 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import type { CheckboxComponentProps } from "./checkbox-types";
 import { Check } from "lucide-react";
+import type { InputHTMLAttributes } from "react";
+import type { ComponentSize } from "./tokens";
+
+export interface CheckboxComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
+    error?: boolean;
+    label?: string;
+    size?: ComponentSize;
+}
 
 const checkboxSizes = {
   xs: "w-3 h-3",

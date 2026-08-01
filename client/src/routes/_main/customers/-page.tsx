@@ -1,9 +1,8 @@
 import { Download, ListFilter, Plus } from "lucide-react";
 import { useState } from "react";
 import type { FilterSectionConfig, FilterValue } from "@/components";
-import { Button, FilterSidebar, PageWidth, RouteError, SearchBar, Skeleton, createDefaultFilters } from "@/components";
+import { Button, FilterSidebar, PageWidth, RouteError, SearchBar, Skeleton, createDefaultFilters, tableStyles } from "@/components";
 import { useCustomers } from "@/hooks/customers/customer-hooks";
-import { tableStyles } from "@/components/table/table-styles";
 import CustomerTable from "./-components/customer-table";
 
 const SIDEBAR_SECTIONS: Array<FilterSectionConfig> = [

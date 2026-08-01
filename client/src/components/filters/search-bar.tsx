@@ -1,6 +1,6 @@
 import { Search } from 'lucide-react';
-import { Input } from '../inputs';
-import type { ComponentSize } from "@/components/size";
+import { Input } from '../input';
+import type { ComponentSize } from "../tokens";
 
 interface SearchBarProps {
   value: string;

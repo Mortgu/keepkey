@@ -2,11 +2,12 @@ import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import type { Contract } from "@keepit/schemas";
-import type { DropdownOption } from "@/components/filters/multi-dropdown";
+import type {DropdownOption} from "@/components";
 import {
     Button,
+    
     ModalDialog,
-    MultiSelectList,
+    MultiSelectList
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";

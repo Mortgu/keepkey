@@ -1,8 +1,22 @@
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { LoaderCircle } from 'lucide-react';
-import { SIZE_STYLES } from '../size';
-import type { ButtonComponentProps } from './button-types';
+import { SIZE_STYLES } from './tokens';
+import type { ComponentSize, ComponentVariant } from './tokens';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+
+export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+    variant?: ComponentVariant;
+    size?: ComponentSize | 'fit_xs' | 'fit_sm' | 'fit_md';
+    active?: boolean;
+    danger?: boolean;
+    icon?: ReactNode;
+    iconPosition?: 'left' | 'right';
+    iconOnly?: boolean;
+    loading?: boolean;
+    children?: ReactNode;
+    focus?: boolean;
+}
 
 const styles = tv({
     base: [

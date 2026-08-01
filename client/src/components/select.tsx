@@ -1,7 +1,23 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import type { SelectComponentProps } from "./select-types";
-import { SIZE_STYLES } from "@/components/size";
+import { SIZE_STYLES } from "./tokens";
+import type { ComponentSize } from "./tokens";
+import type { ReactNode, SelectHTMLAttributes } from "react";
+
+export interface SelectOption {
+    value: string;
+    label: string;
+}
+
+export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> {
+    variant?: "primary";
+    size?: ComponentSize;
+    label?: string;
+    error?: string;
+    options?: Array<SelectOption>;
+    placeholder?: string;
+    children?: ReactNode;
+}
 
 const styles = tv({
     base: [

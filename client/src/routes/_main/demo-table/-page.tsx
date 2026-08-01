@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { ChevronRight } from "lucide-react";
-import type { Column } from "@/components/table";
-import { Badge, DataTable, PageWidth } from "@/components";
-import { Drawer } from "@/components/drawer";
+import type {Column} from "@/components";
+import { Badge,  DataTable, Drawer, PageWidth } from "@/components";
 import { formatDate } from "@/lib/format";
 
 interface Contact {

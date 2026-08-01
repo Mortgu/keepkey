@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
-import { NavGroup, NavLink } from "./nav-link.js";
+import { NavGroup, NavLink } from "./nav-link";
 import type { ReactNode } from "react";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
 import { useAuth } from "@/context/auth";

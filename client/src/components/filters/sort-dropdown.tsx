@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Check, ChevronDown } from 'lucide-react';
-import type { ComponentSize } from "@/components/size";
+import type { ComponentSize } from "@/components/tokens";
 import { Button } from "@/components";
 
 export interface SortOption {

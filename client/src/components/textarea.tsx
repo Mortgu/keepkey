@@ -1,44 +1,46 @@
-import { AlertCircle, AlertTriangle, Loader2 } from "lucide-react";
+import { AlertCircle, AlertTriangle } from "lucide-react";
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import type { InputComponentProps } from "./input-types";
-import { Button } from "@/components/button/button";
+import type { TextareaHTMLAttributes } from "react";
+import type { ComponentSize } from "./tokens";
+
+export interface TextareaComponentProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
+    size?: ComponentSize;
+
+    label?: string;
+
+    error?: string;
+    errorTooltip?: string;
+
+    warning?: string;
+    warningTooltip?: string;
+}
 
 const styles = tv({
     base: [
         "w-full rounded-md border border-(--border) bg-white transition-all duration-150",
-        "text-sm text-(--text) outline-none",
+        "text-sm text-(--text) outline-none resize-y min-h-[70px] leading-[1.5]",
         "placeholder:text-(--text-secondary)",
         "focus:border-(--primary) focus:shadow-[0_0_0_3px_rgba(0,104,63,0.15)]",
         "disabled:bg-(--subtle-50) disabled:text-(--text-secondary) disabled:cursor-not-allowed",
     ],
     variants: {
         input_size: {
-            xs: "h-[34px] px-3 text-xs font-light",
-            sm: "h-[38px] px-3 text-sm font-normal",
-            md: "h-[42px] px-3 text-md font-semibold",
+            xs: "px-3 py-2 text-xs font-light",
+            sm: "px-3 py-2 text-sm font-normal",
+            md: "px-3 py-2 text-md font-semibold",
         },
-        variant: {},
         state: {
             none: "",
             error: "border-(--destructive) focus:shadow-[0_0_0_3px_rgba(192,57,43,0.15)]",
             warning: "border-(--warning) focus:shadow-[0_0_0_3px_rgba(180,83,9,0.18)]",
         },
-        adornment: {
-            none: "",
-            icon: "pr-9",
-            button: "pr-11",
-        },
     },
     defaultVariants: {
         input_size: "sm",
         state: "none",
-        adornment: "none",
     },
 });
-
-const adornmentButtonClass =
-    "absolute right-1 top-1/2 -translate-y-1/2 h-[29px] w-[29px] rounded-md";
 
 function LabelBadge({
     kind,
@@ -86,31 +88,14 @@ function LabelBadge({
     );
 }
 
-export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
-    (
-        {
-            className,
-            variant: _variant,
-            size,
-            label,
-            error,
-            errorTooltip,
-            warning,
-            warningTooltip,
-            rightIcon,
-            rightButton,
-            loading,
-            ...rest
-        },
-        ref,
-    ) => {
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaComponentProps>(
+    ({ className, size, label, error, errorTooltip, warning, warningTooltip, ...rest }, ref) => {
         const state = error ? "error" : warning ? "warning" : "none";
-        const adornment = loading || rightButton ? (loading ? "icon" : "button") : rightIcon ? "icon" : "none";
 
         return (
             <div className="w-full">
                 {(label || error || warning) && (
-                    <div className="flex items-center gap-1.5 mb-1 justify-between">
+                    <div className="flex items-center gap-1.5 mb-1">
                         {label && (
                             <label className="text-sm font-medium text-(--text)">
                                 {label}
@@ -124,44 +109,14 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                         )}
                     </div>
                 )}
-                <div className="relative">
-                    <input
-                        ref={ref}
-                        className={styles({ input_size: size, state, adornment, className })}
-                        {...rest}
-                    />
-
-                    {loading && (
-                        <span
-                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--border-200)">
-                            <Loader2 size={16} className="animate-spin border-t-(--primary)" />
-                        </span>
-                    )}
-
-                    {!loading && rightButton && (() => {
-                        const { icon, className: btnClassName, type, ...btnRest } = rightButton;
-                        return (
-                            <Button
-                                size="xs"
-                                type={type ?? "button"}
-                                {...btnRest}
-                                icon={icon}
-                                iconOnly
-                                className={`${adornmentButtonClass} ${btnClassName ?? ""}`.trim()}
-                            />
-                        );
-                    })()}
-
-                    {!loading && !rightButton && rightIcon && (
-                        <span
-                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--text-secondary)">
-                            {rightIcon}
-                        </span>
-                    )}
-                </div>
+                <textarea
+                    ref={ref}
+                    className={styles({ input_size: size, state, className })}
+                    {...rest}
+                />
             </div>
         );
     },
 );
 
-Input.displayName = "Input";
+Textarea.displayName = "Textarea";
