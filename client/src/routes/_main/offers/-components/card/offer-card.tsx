@@ -2,7 +2,6 @@ import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 
 import RenewalModal from "../modals/renewal/renewal-modal";
-import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
@@ -14,6 +13,7 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import OfferDrawerHistory from "../drawer/offer-drawer-history";
 
 type OfferListItemProps = {
     offer: Offer;

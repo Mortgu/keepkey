@@ -54,7 +54,7 @@ const drawerStyles = tv({
     variants: {
         open: {
             true: "translate-x-0",
-            false: "translate-x-full",
+            false: "translate-x-full shadow-none",
         },
         wide: {
             true: "w-[540px]",

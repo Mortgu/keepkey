@@ -1,10 +1,16 @@
 import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
-import type { Customer } from "@keepit/schemas";
+import { ExternalLink, Pen, Pencil, Plus, Trash, Trash2 } from "lucide-react";
+import ContactPersonForm from "./contact-person-form";
+import type { Contact, Customer } from "@keepit/schemas";
 import type { Column } from "@/components";
 import { ActionMenu, Button, DataTable, Drawer } from "@/components";
-import { useDeleteCustomer } from "@/hooks";
+import {
+    useCreateCustomerContact,
+    useDeleteCustomer,
+    useDeleteCustomerContact,
+    useUpdateCustomerContact,
+} from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 
@@ -40,8 +46,15 @@ function Avatar({ name, size = 30 }: { name: string; size?: number }) {
 export default function CustomerTable({ customers, onEdit }: Props) {
     const navigate = useNavigate();
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
+    const { createCustomerContact } = useCreateCustomerContact();
+    const { updateCustomerContact } = useUpdateCustomerContact();
+    const { deleteCustomerContact, isDeletingCustomerContact } = useDeleteCustomerContact();
 
     const [activeId, setActiveId] = useState<string | null>(null);
+    const [contactsForId, setContactsForId] = useState<string | null>(null);
+    /* Kundennummer mitgeführt, damit das Formular offen bleiben kann, auch wenn
+     * der Drawer zwischenzeitlich schliesst. */
+    const [editContact, setEditContact] = useState<{ customerId: string; contact: Contact } | null>(null);
 
     const rows: Array<TableFields> = customers.map((customer) => ({
         id: customer.id,
@@ -53,6 +66,9 @@ export default function CustomerTable({ customers, onEdit }: Props) {
         customer,
     }));
 
+    /* Aus `rows` abgeleitet statt gespeichert: nach jeder Kontakt-Mutation
+     * invalidiert die Query die Liste, und der Drawer zeigt den neuen Stand
+     * ohne eigenes Zutun. */
     const active = rows.find((c) => c.id === activeId) ?? null;
 
     const openDetail = (id: string) =>
@@ -120,6 +136,13 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                             label: "Kunde öffnen",
                             icon: <ExternalLink className="size-3.5" />,
                             onSelect: () => openDetail(c.id),
+                        },
+                        {
+                            label: "Angebot erstellen",
+                            icon: <ExternalLink className="size-3.5" />,
+                            onSelect: () => {
+
+                            },
                         },
                         {
                             label: "Bearbeiten",
@@ -207,21 +230,58 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                                 <div className="h-px bg-(--border)" />
 
                                 <div>
-                                    <div className="text-[10px] font-semibold text-(--text-secondary) uppercase tracking-[0.06em] mb-2.5">
-                                        Ansprechpartner
+                                    <div className="flex items-center justify-between mb-2.5">
+                                        <div className="text-[10px] font-semibold text-(--text-secondary) uppercase tracking-[0.06em]">
+                                            Ansprechpartner
+                                        </div>
+                                        <Button
+                                            variant="border"
+                                            size="xs"
+                                            icon={<Plus className="size-3.5" />}
+                                            onClick={() => setContactsForId(active.id)}
+                                        >
+                                            Hinzufügen
+                                        </Button>
                                     </div>
                                     <div className="flex flex-col gap-2.5">
                                         {active.customer.contactPersons.length ? (
                                             active.customer.contactPersons.map((p) => (
-                                                <div key={p.id} className="flex items-center gap-2.5">
-                                                    <Avatar name={`${p.firstName} ${p.lastName}`} size={26} />
-                                                    <div>
-                                                        <div className="text-[13.5px] font-normal">
-                                                            {p.firstName} {p.lastName}
+                                                <div key={p.id} className="flex items-center justify-between px-4 py-3 gap-2.5 bg-(--page-bg) rounded-md border border-(--border)">
+                                                    <div className="flex items-center gap-2.5">
+                                                        <Avatar name={`${p.firstName} ${p.lastName}`} size={26} />
+                                                        <div>
+                                                            <div className="text-[13.5px] font-normal">
+                                                                {p.firstName} {p.lastName}
+                                                            </div>
+                                                            <div className="text-xs text-(--text-secondary)">
+                                                                {p.email || "—"}
+                                                            </div>
                                                         </div>
-                                                        <div className="text-xs text-(--text-secondary)">
-                                                            {p.email || "—"}
-                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex items-center gap-2">
+                                                        <Button
+                                                            icon={<Pen size={14} />}
+                                                            iconOnly
+                                                            size="xs"
+                                                            variant="border"
+                                                            title="Kontaktperson bearbeiten"
+                                                            onClick={() =>
+                                                                setEditContact({ customerId: active.id, contact: p })
+                                                            }
+                                                        />
+                                                        <Button
+                                                            icon={<Trash size={14} />}
+                                                            iconOnly
+                                                            size="xs"
+                                                            variant="border"
+                                                            title="Kontaktperson löschen"
+                                                            loading={isDeletingCustomerContact}
+                                                            onClick={() => {
+                                                                if (!confirm(`Kontaktperson "${p.firstName} ${p.lastName}" löschen?`)) return;
+                                                                deleteCustomerContact({ id: active.id, contactId: p.id });
+                                                            }}
+                                                        />
                                                     </div>
                                                 </div>
                                             ))
@@ -235,9 +295,6 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                             </div>
                         </Drawer.Body>
                         <Drawer.Footer>
-                            <Button variant="ghost" size="sm" onClick={() => setActiveId(null)}>
-                                Schließen
-                            </Button>
                             <span className="ml-auto" />
                             <Button
                                 variant="border"
@@ -257,6 +314,46 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                     </>
                 )}
             </Drawer>
+
+            {contactsForId && active && (
+                <ContactPersonForm
+                    saveFn={(data) => {
+                        createCustomerContact({
+                            id: active.id,
+                            input: {
+                                salutation: data.salutation,
+                                firstName: data.firstName,
+                                lastName: data.lastName,
+                                email: data.email || "",
+                                customerId: active.id,
+                            }
+                        })
+
+                        setContactsForId(null);
+                    }}
+                    cancelFn={() => setContactsForId(null)}
+                    currentCustomerId={contactsForId}
+                />
+            )}
+
+            {editContact && (
+                <ContactPersonForm
+                    key={editContact.contact.id}
+                    saveFn={(data) => {
+                        updateCustomerContact({
+                            id: editContact.customerId,
+                            contactId: editContact.contact.id,
+                            input: data,
+                        });
+                        setEditContact(null);
+                    }}
+                    cancelFn={() => setEditContact(null)}
+                    currentCustomerId={editContact.customerId}
+                    currentContactPerson={editContact.contact}
+                />
+            )}
+
+
         </>
     );
 }
