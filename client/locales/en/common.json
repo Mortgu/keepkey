@@ -5,7 +5,8 @@
     "create": "Create",
     "delete": "Delete",
     "edit": "Edit",
-    "close": "Close"
+    "close": "Close",
+    "export": "Export"
   },
   "nav": {
     "catalog": "Catalog",

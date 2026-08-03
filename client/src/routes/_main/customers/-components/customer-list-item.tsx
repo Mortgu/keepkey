@@ -1,36 +1,35 @@
-import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-
-import CustomerModal from "./customer-modal";
-
-import type {
-    Customer
-} from "@keepit/schemas";
+import type { Customer } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
+import { useDeleteCustomer } from "@/hooks";
+import { Button } from "@/components";
+import { Pen, Trash } from "lucide-react";
+import type { SyntheticEvent } from "react";
 
-import { useCreateCustomerContact, useDeleteCustomer, useModal } from "@/hooks";
-
-interface CustomerListItemProps {
+interface Props {
     customer: Customer;
+    onEdit: (customer: Customer) => void;
 }
 
-export default function CustomerListItem({ customer }: CustomerListItemProps) {
-    const editModal = useModal<Customer>();
+export default function CustomerListItem({ customer, onEdit }: Props) {
+    const {
+        deleteCustomer,
+        isDeletingCustomer
+    } = useDeleteCustomer();
 
-    const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
-    const { createCustomerContact } = useCreateCustomerContact();
-
-    const [addContact, setAddContact] = useState<boolean>(false);
-
-    const contactPersons = customer.contactPersons;
+    const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        if (confirm(`Möchten Sie den Kunden ${customer.companyName} wirklich löschen?`)) {
+            deleteCustomer({ customerId: customer.id });
+        }
+        return;
+    }
 
     return (
         <div className="border border-(--border) rounded-md overflow-hidden">
             <Link to="/customers/$customerId" params={{ customerId: customer.id }} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-(--page-bg)">
                 <div className="grid gap-1">
-                    <div className="hover:text-(--primary)">
-                        <h1 className="text-md">{customer.companyName}</h1>
-                    </div>
+                    <h1 className="text-md">{customer.companyName}</h1>
                     <p className="text-xs text-gray-500">
                         {formatDate(customer.createdAt || "")}
                     </p>
@@ -64,76 +63,33 @@ export default function CustomerListItem({ customer }: CustomerListItemProps) {
                 </div>
             </Link>
 
-            {/*<Collapsable label="Ansprechpartner" className="w-full bg-(--subtle-50) justify-between rounded-none">
-                <div className="grid">
-                    <div className="flex justify-end  mx-4 py-3">
-                        <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />}
-                            onClick={() => setAddContact(true)} disabled={addContact}>
-                            Kontaktperson hinzufügen
-                        </Button>
-                    </div>
 
-                    {addContact && (
-                        <ContactPersonForm
-                            saveFn={(data: CreateContactInput) => {
-                                createCustomerContact({
-                                    id: customer.id,
-                                    input: {
-                                        salutation: data.salutation,
-                                        firstName: data.firstName,
-                                        lastName: data.lastName,
-                                        email: data.email || "",
-                                        customerId: customer.id,
-                                    },
-                                });
-                                setAddContact(false);
-                            }}
-                            cancelFn={() => setAddContact(false)}
-                            currentCustomerId={customer.id}
-                        />
-                    )}
-
-
-
-                    {contactPersons.length === 0 && !addContact && (
-                        <p className="text-sm text-(--fg-3)">Keine Ansprechpartner.</p>
-                    )}
-
-                    {contactPersons.map((cp) => (
-                        <ContactListItem key={cp.id} cp={cp} currentCustomerId={customer.id} />
-                    ))}
-                </div>
-            </Collapsable>*/}
-
-            {editModal.isOpen && (
-                <CustomerModal key={editModal.key} currentCustomer={editModal.data} onClose={editModal.close} />
-            )}
-
-
-            {/*<div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
+                    <Button size="xs" variant="border">Angebot erstellen</Button>
+                    <Button size="xs" variant="border">Bestellung erstellen</Button>
+                    <Button size="xs" variant="border">Rechnung erstellen</Button>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <Button
-                        variant="secondary"
+                        variant="border"
                         size="xs"
-                        icon={<Pen className="size-3.5" />}
+                        icon={<Pen size={14} />}
                         iconOnly
-                        onClick={() => editModal.open(customer)}
+                        onClick={() => onEdit(customer)}
                     />
 
                     <Button
-                        variant="secondary"
+                        variant="border"
                         size="xs"
                         loading={isDeletingCustomer}
-                        icon={<Trash className="size-3.5" />}
+                        icon={<Trash size={14} />}
                         iconOnly
-                        onClick={() => deleteCustomer({ customerId: customer.id })}
-                        danger
+                        onClick={handleDeleteCustomer}
                     />
                 </div>
-            </div>*/}
+            </div>
         </div>
     );
 }

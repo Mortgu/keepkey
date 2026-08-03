@@ -6,7 +6,7 @@ import useDerivedPositionPrice from "../hook/use-derived-position-price";
 import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
 import type { OfferPosition } from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
-import { Button } from "@/components";
+import { Button, Checkbox } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
@@ -63,10 +63,15 @@ export default function WorkloadItemDerivedModal(props: Props) {
         <Fragment>
             <div className="border border-(--border) rounded-md overflow-hidden">
                 <div className="flex items-center justify-between bg-(--subtle-50) px-4 py-3">
-                    {/* Product name + contract */}
-                    <div className="grid">
-                        <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>
-                        <p className="font-normal text-sm text-gray-400">{localized(originalPosition.contract.translations, locales, "name")}</p>
+
+                    {/* Checkbox + Product name + contract */}
+                    <div className="flex items-center gap-4">
+                        <Checkbox />
+
+                        <div className="grid">
+                            <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>
+                            <p className="font-normal text-sm text-gray-400">{localized(originalPosition.contract.translations, locales, "name")}</p>
+                        </div>
                     </div>
 
                     <div className="relative divide-x divide-(--border) flex items-center">

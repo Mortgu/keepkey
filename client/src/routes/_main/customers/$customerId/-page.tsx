@@ -2,10 +2,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Route } from "./index";
 import type { Offer } from "@keepit/schemas";
-import { Button, FilterTabBar, PageWidth, RouteError } from "@/components";
+import { PageWidth, RouteError } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
-import { formatDate } from "@/lib/format";
-import { Plus } from "lucide-react";
+import CustomerDetailPageHeader from "./-components/header";
 
 const TABS = [
     { value: "offers", label: "Angebote" },
@@ -28,36 +27,8 @@ export default function CustomerDetailPage() {
     if (isPending || !customer) return <PageWidth><div className="p-4">Lädt…</div></PageWidth>;
 
     return (
-        <PageWidth>
-            <div className="grid gap-4">
-                <div className="flex items-center gap-4 bg-(--page-bg) rounded-md p-4">
-                    <div className="grid gap-1 ">
-                        <p className="text-lg ">{customer.companyName}</p>
-                        <p className="text-sm text-gray-400">{formatDate(customer.createdAt)}</p>
-                    </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                    <FilterTabBar
-                        tabs={TABS}
-                        value={tab}
-                        onChange={(value) => navigate({ to: "/customers/$customerId", params: { customerId }, search: { tab: value as "offers" | "orders" | "invoices" }, replace: true })}
-                    />
-
-                    <div className="flex items-center gap-2">
-                        {tab === "offers" && (
-                            <Button onClick={() => offerModal.open()} size="sm">
-                                {t("button.create")} <Plus className="size-4" />
-                            </Button>
-                        )}
-                        {tab === "orders" && (
-                            <Button onClick={() => orderModal.open()} size="sm">
-                                {t("button.create")} <Plus className="size-4" />
-                            </Button>
-                        )}
-                    </div>
-                </div>
-            </div>
+        <PageWidth variant="none">
+            <CustomerDetailPageHeader customer={customer} />
         </PageWidth>
     );
 }

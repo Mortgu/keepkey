@@ -28,7 +28,6 @@ export default function useOfferForm({ currentOffer, closeFn, preselectedCustome
             onChange: createOfferSchema
         },
         onSubmit: async ({ value }) => {
-            console.log(value);
             if (currentOffer) {
                 await updateOffer({
                     offerId: currentOffer.id,

@@ -145,6 +145,13 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                             },
                         },
                         {
+                            label: "Details",
+                            icon: <ExternalLink className="size-3.5" />,
+                            onSelect: () => {
+                                setActiveId(c.id)
+                            },
+                        },
+                        {
                             label: "Bearbeiten",
                             icon: <Pencil className="size-3.5" />,
                             onSelect: () => onEdit(c.customer),
@@ -162,8 +169,6 @@ export default function CustomerTable({ customers, onEdit }: Props) {
         },
     ];
 
-    console.log(active);
-
     return (
         <>
             <DataTable
@@ -172,7 +177,7 @@ export default function CustomerTable({ customers, onEdit }: Props) {
                 rowKey={(c) => c.id}
                 initialSort={{ key: "createdAt", dir: "desc" }}
                 activeRowKey={activeId}
-                onRowClick={(c) => setActiveId(c.id)}
+                onRowClick={(c) => openDetail(c.id)}
                 emptyLabel="Keine Kunden gefunden."
             />
 
