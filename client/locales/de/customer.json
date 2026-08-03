@@ -1,5 +1,6 @@
 {
     "customer": {
-        "create": "Kunden anlegen"
+        "create": "Kunden anlegen",
+        "edit": "Kunden bearbeiten"
     }
 }

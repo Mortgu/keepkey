@@ -1,20 +1,21 @@
-import { useTranslation } from "react-i18next";
-import useOfferFilters from "../-hooks/use-offer-filters";
 import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
+import OfferModal from "./modals/offer/offer-modal";
+import type { OfferFilters } from "../-hooks/use-offer-filters";
 
 
-import { FilterChip, ListSkeleton, MultiDropdown, OfferCardSkeleton, RouteError, SearchBar, SortDropdown } from "@/components";
+import type { Offer } from "@keepit/schemas";
+import { FilterChip, ListSkeleton, OfferCardSkeleton, RouteError } from "@/components";
 import { useContacts, useCustomers, useLocale, useModal, useProducts } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
-import type { Offer } from "@keepit/schemas";
-import OfferModal from "./modals/offer/offer-modal";
 
-export default function OfferList() {
-  const { t } = useTranslation();
+interface Props {
+  filters: OfferFilters;
+}
+
+export default function OfferList({ filters }: Props) {
   const modal = useModal<Offer>();
 
-  const filters = useOfferFilters();
   const { items: offers, isPending, error } = useOffers(filters.params);
 
   const { contacts } = useContacts();
@@ -27,48 +28,8 @@ export default function OfferList() {
   if (error) return <RouteError error={error} />;
 
   return (
-    <div className="bg-(--page-bg) grid grid-rows-[auto_1fr] h-full">
-
-      <div className="flex items-center justify-between gap-4 px-8 py-4 border-b border-(--border) bg-white">
-        <div className="flex items-center w-full gap-2">
-          <SortDropdown value={filters.sort} onChange={filters.setSort} options={filters.sortOptions} />
-
-
-
-          <MultiDropdown
-            label="Kunde"
-            options={customerFilterOptions}
-            values={filters.customerFilter}
-            onChange={filters.setCustomerFilter}
-          />
-
-          <MultiDropdown
-            label="Kontakt"
-            options={contactPersonFilterOptions}
-            values={filters.contactPersonFilter}
-            onChange={filters.setContactPersonFilter}
-          />
-
-          <MultiDropdown
-            label="Workload"
-            options={productFilterOptions}
-            values={filters.productFilter}
-            onChange={filters.setProductFilter}
-          />
-
-          <SearchBar
-            className="flex-1"
-            value={filters.searchInput}
-            onChange={filters.setSearchInput}
-            onSubmit={() => { }}
-            placeholder={t("common.search")}
-          />
-
-        </div>
-      </div>
-
-
-      <div className="grid gap-4 px-8 py-6 h-fit">
+    <div className="grid grid-rows-[auto_1fr] h-full">
+      <div className="grid gap-4 h-fit">
         {filters.activeFilterCount > 0 && (
           <div className="flex gap-2 w-fit flex-wrap">
             {filters.customerFilter.map((id) => {
@@ -117,7 +78,7 @@ export default function OfferList() {
             <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
           )}
           {offers.map((offer) => (
-            <OfferCard key={offer.id} offer={offer} onEdit={(_, offer) => modal.open(offer)} />
+            <OfferCard key={offer.id} offer={offer} onEdit={(_, o) => modal.open(o)} />
           ))}
         </div>
 

@@ -1,5 +1,6 @@
 {
     "customer": {
-        "create": "Create Customer"
+        "create": "Create Customer",
+        "edit": "Edit Customer"
     }
 }

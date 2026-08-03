@@ -1,15 +1,23 @@
 import { useTranslation } from "react-i18next";
 
-import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
 import OfferList from "./-components/offer-list";
-import { useModal } from "@/hooks";
-import type { Offer } from "@keepit/schemas";
 import OfferModal from "./-components/modals/offer/offer-modal";
+import useOfferFilters from "./-hooks/use-offer-filters";
+import OfferFilters from "./-components/offer-filters";
+import type { Offer } from "@keepit/schemas";
+import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
+import { Button, PageWidth } from "@/components";
 
 export function OfferPage() {
   const { t } = useTranslation();
   const modal = useModal<Offer>();
+
+  const filters = useOfferFilters();
+
+  const { contacts } = useContacts();
+  const { customers } = useCustomers();
+  const { products } = useProducts();
 
   return (
     <PageWidth variant="none">
@@ -23,7 +31,7 @@ export function OfferPage() {
           </div>
           <div className="flex items-center gap-4">
             {/* Export Button */}
-            {/*<Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>*/}
+            {/* <Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>*/}
             {/* Create Customer Button */}
             <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
               onClick={() => modal.open()}>Angebot erstellen</Button>
@@ -40,7 +48,20 @@ export function OfferPage() {
         />
       )}
 
-      <OfferList />
+      <div className="">
+        <div className="px-8 py-4 border-b border-(--border)">
+          <OfferFilters
+            filters={filters}
+            customers={customers}
+            contacts={contacts}
+            products={products}
+          />
+        </div>
+
+        <div className="px-8 py-6">
+          <OfferList filters={filters} />
+        </div>
+      </div>
     </PageWidth>
   );
 }

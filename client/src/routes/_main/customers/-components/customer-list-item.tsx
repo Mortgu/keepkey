@@ -1,17 +1,19 @@
 import { Link } from "@tanstack/react-router";
+import { Pen, Trash } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
+import type { SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
 import { useDeleteCustomer } from "@/hooks";
 import { Button } from "@/components";
-import { Pen, Trash } from "lucide-react";
-import type { SyntheticEvent } from "react";
 
 interface Props {
     customer: Customer;
     onEdit: (customer: Customer) => void;
+    onCreateOffer: () => void;
+    onCreateOrder: () => void;
 }
 
-export default function CustomerListItem({ customer, onEdit }: Props) {
+export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
     const {
         deleteCustomer,
         isDeletingCustomer
@@ -66,9 +68,8 @@ export default function CustomerListItem({ customer, onEdit }: Props) {
 
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
-                    <Button size="xs" variant="border">Angebot erstellen</Button>
-                    <Button size="xs" variant="border">Bestellung erstellen</Button>
-                    <Button size="xs" variant="border">Rechnung erstellen</Button>
+                    <Button size="xs" variant="border" onClick={onCreateOffer}>Angebot erstellen</Button>
+                    <Button size="xs" variant="border" onClick={onCreateOrder}>Bestellung erstellen</Button>
                 </div>
 
                 <div className="flex items-center gap-2">

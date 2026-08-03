@@ -1,12 +1,15 @@
 import { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import OfferModal from "../../offers/-components/modals/offer/offer-modal";
+import OrderModal from "../../orders/-components/order-modal";
+import { useCustomerActions } from "../-hooks/use-customer-actions";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type { Customer } from "@keepit/schemas";
+import type {CustomerFilters} from "../-page.hooks";
 import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
-import { type CustomerFilters } from "../-page.hooks";
 
 interface Props {
     filters: CustomerFilters;
@@ -16,6 +19,7 @@ interface Props {
 export default function CustomerList({ filters, onEdit }: Props) {
     const { t } = useTranslation();
     const modal = useModal<Customer>();
+    const { actions, activeCustomerId, modals } = useCustomerActions();
 
     const { customers, isPending, error } = useCustomers(filters.params);
 
@@ -49,12 +53,31 @@ export default function CustomerList({ filters, onEdit }: Props) {
                         key={customer.id}
                         customer={customer}
                         onEdit={onEdit}
+                        onCreateOffer={() => actions.createOffer(customer.id)}
+                        onCreateOrder={() => actions.createOrder(customer.id)}
                     />
                 ))}
             </div>
 
             {modal.isOpen && (
                 <CustomerModal key={modal.key} onClose={modal.close} />
+            )}
+
+            {modals.offerModal.isOpen && (
+                <OfferModal
+                    key={`offer-${activeCustomerId}`}
+                    closeFn={modals.offerModal.close}
+                    currentOffer={undefined}
+                    preselectedCustomerId={activeCustomerId ?? undefined}
+                />
+            )}
+
+            {modals.orderModal.isOpen && (
+                <OrderModal
+                    key={`order-${activeCustomerId}`}
+                    onClose={modals.orderModal.close}
+                    customerId={activeCustomerId ?? undefined}
+                />
             )}
         </Fragment>
     );

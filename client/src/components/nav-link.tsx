@@ -1,13 +1,13 @@
 import * as React from "react";
-import {tv} from "tailwind-variants";
-import {createLink} from "@tanstack/react-router";
+import { tv } from "tailwind-variants";
+import { createLink } from "@tanstack/react-router";
 
-import {ChevronDown} from "lucide-react";
-import type {LinkComponent} from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
+import type { LinkComponent } from "@tanstack/react-router";
 
 const itemStyles = tv({
     base: [
-        "flex items-center rounded-md text-sm font-normal text-(--text-inv) ",
+        "flex items-center rounded-md text-sm font-medium text-(--text-inv) ",
         "mx-2 px-3.5 py-2 gap-2.5",
         "transition-colors hover:bg-(--fg-2) ",
     ],
@@ -21,7 +21,7 @@ const itemStyles = tv({
             false: "",
         },
     },
-    defaultVariants: {indent: false, isActive: false},
+    defaultVariants: { indent: false, isActive: false },
 });
 
 const iconStyles = tv({
@@ -53,18 +53,18 @@ type NavItemContentProps = {
 };
 
 function NavItemContent({
-                            icon,
-                            label,
-                            badge,
-                            trailing,
-                            isActive,
-                        }: NavItemContentProps) {
+    icon,
+    label,
+    badge,
+    trailing,
+    isActive,
+}: NavItemContentProps) {
     return (
         <>
-            {icon && <span className={iconStyles({isActive})}>{icon}</span>}
+            {icon && <span className={iconStyles({ isActive })}>{icon}</span>}
             <span className="flex-1 truncate text-left">{label}</span>
             {badge !== undefined && (
-                <span className={badgeStyles({isActive})}>{badge}</span>
+                <span className={badgeStyles({ isActive })}>{badge}</span>
             )}
             {trailing}
         </>
@@ -79,12 +79,12 @@ type BasicLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
 };
 
 const BasicLinkComponent = React.forwardRef<HTMLAnchorElement, BasicLinkProps>(
-    ({className, indent, icon, label, badge, children, ...props}, ref) => {
+    ({ className, indent, icon, label, badge, children, ...props }, ref) => {
         const content = label ?? children;
 
         return (
-            <a ref={ref} className={itemStyles({indent, className})} {...props}>
-                <NavItemContent icon={icon} label={content} badge={badge}/>
+            <a ref={ref} className={itemStyles({ indent, className })} {...props}>
+                <NavItemContent icon={icon} label={content} badge={badge} />
             </a>
         );
     },
@@ -95,10 +95,10 @@ const CreatedLinkComponent = createLink(BasicLinkComponent);
 export const NavLink = ((props: any) => {
     return (
         <CreatedLinkComponent
-            activeOptions={{exact: true}}
+            activeOptions={{ exact: true }}
             {...props}
             activeProps={{
-                className: itemStyles({indent: props.indent, isActive: true}),
+                className: itemStyles({ indent: props.indent, isActive: true }),
             }}
         />
     );
@@ -109,14 +109,14 @@ type NavButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> &
 
 const NavButton = React.forwardRef<HTMLButtonElement, NavButtonProps>(
     (
-        {icon, label, badge, trailing, isActive, indent, className, ...props},
+        { icon, label, badge, trailing, isActive, indent, className, ...props },
         ref,
     ) => (
         <button
             type="button"
             ref={ref}
             {...props}
-            className={itemStyles({indent, isActive, className})}
+            className={itemStyles({ indent, isActive, className })}
         >
             <NavItemContent
                 label={label}
@@ -140,13 +140,13 @@ type NavGroupProps = {
 };
 
 export function NavGroup({
-                             icon,
-                             label,
-                             badge,
-                             defaultOpen = false,
-                             isActive,
-                             children,
-                         }: NavGroupProps) {
+    icon,
+    label,
+    badge,
+    defaultOpen = false,
+    isActive,
+    children,
+}: NavGroupProps) {
     const [open, setOpen] = React.useState(defaultOpen);
     return (
         <>
