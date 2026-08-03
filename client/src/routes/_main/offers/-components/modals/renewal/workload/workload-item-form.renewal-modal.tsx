@@ -6,6 +6,7 @@ import type { RenewalFormApi } from "../hook/use-renewal-form";
 import { Button, Input, Select } from "@/components";
 import { usePrice, useTariffDurationsHook } from "@/hooks";
 import { formatEur } from "@/utils/utils";
+import { useStore } from "@tanstack/react-form";
 
 interface Props {
     form: RenewalFormApi;
@@ -17,7 +18,8 @@ interface Props {
 export default function WorkloadItemFormRenwalModal({ form, index, customerId, closeFn }: Props) {
     const { t } = useTranslation();
 
-    const position = form.store.state.values.offerPositions[index];
+    const position = useStore(form.store, (s) => s.values.offerPositions[index]);
+    // form.store.state.values.offerPositions[index];
 
     const { durations } = useTariffDurationsHook(position.productId, position.contractId);
 

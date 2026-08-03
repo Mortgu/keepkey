@@ -47,12 +47,12 @@ export const updateOffer = async (request: Request, response: Response) => {
 /* ========== POST ========== */
 
 export const createOffer = async (request: Request, response: Response) => {
-    const offer = await offerService.createOffer(request.body);
+    const offer = await offerService.createOffer(request.body, { actorId: request.user!.id });
     return response.status(200).json(offer);
 };
 
 export const createOfferPositions = async (request: Request, response: Response) => {
-    const positions = await offerService.createOfferPositions(request.params.id as string, request.body);
+    const positions = await offerService.createOfferPositions(request.params.id as string, request.body, request.user!.id);
     return response.status(200).json(positions);
 };
 
@@ -80,6 +80,7 @@ export const renewOffer = async (request: Request, response: Response) => {
     const offer = await offerService.renewOffer(
         request.params.id as string,
         request.body,
+        request.user!.id,
     );
     return response.status(200).json(offer);
 };

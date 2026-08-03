@@ -30,7 +30,7 @@ export default function FlatrateItemFormRenewalModal({ form, index, closeFn }: P
             ...flatrate,
             flatRateId,
             quantity,
-            total_cents: totalCents,
+            /*total_cents: totalCents,*/
         });
         closeFn();
     };

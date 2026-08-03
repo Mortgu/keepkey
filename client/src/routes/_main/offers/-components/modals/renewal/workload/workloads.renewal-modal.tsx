@@ -12,6 +12,7 @@ interface Props {
 
 export default function WorkloadRenewalModal({ form, customerId, workloads }: Props) {
     const { t } = useTranslation();
+
     const positions = useStore(form.store, (s) => s.values.offerPositions);
 
     return (

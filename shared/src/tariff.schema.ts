@@ -43,20 +43,29 @@ export const tariffCellDefaultSchema = z.object({
 });
 export type TariffCellDefault = z.infer<typeof tariffCellDefaultSchema>;
 
-/* TariffCellCustomer */
-export const tariffCellCustomerSchema = z.object({
+/**
+ * TariffCustomerPrice — kundenspezifischer Stückpreis.
+ *
+ * Adressiert über die stabilen Koordinaten (duration, min_quantity) statt über
+ * eine cellId, damit Overrides strukturelle Umbauten und das Wiederherstellen
+ * einer Version überleben.
+ */
+export const tariffCustomerPriceSchema = z.object({
     id: z.string(),
-    cellId: z.string(),
+    tariffId: z.string(),
 
     customerId: z.string(),
     productId: z.string().nullable(),
+
+    duration: z.number().int(),
+    min_quantity: z.number().int(),
 
     price: z.number().int(),
 
     createdAt: z.string(),
     updatedAt: z.string(),
 });
-export type TariffCellCustomer = z.infer<typeof tariffCellCustomerSchema>;
+export type TariffCustomerPrice = z.infer<typeof tariffCustomerPriceSchema>;
 
 /* TariffCell */
 export const tariffCellSchema = z.object({
@@ -67,7 +76,6 @@ export const tariffCellSchema = z.object({
     columnId: z.string(),
 
     default_cells: z.array(tariffCellDefaultSchema),
-    customer_cells: z.array(tariffCellCustomerSchema),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -106,6 +114,7 @@ const tariffBaseSchema = z.object({
     rows: z.array(tariffRowSchema),
     columns: z.array(tariffColumnSchema),
     cells: z.array(tariffCellSchema),
+    customerPrices: z.array(tariffCustomerPriceSchema).default([]),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -141,7 +150,7 @@ export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
 /**
  * Base tariff shape — without `tariffGroup`.
- * Used by `TariffGroup.tariffs[]` and `TariffHistory.snapshot`.
+ * Used by `TariffGroup.tariffs[]`.
  */
 export type TariffBase = z.infer<typeof tariffBaseSchema>;
 
@@ -169,14 +178,52 @@ export const tariffGroupSchema = z.object({
 });
 export type TariffGroup = z.infer<typeof tariffGroupSchema>;
 
-export const tariffHistorySchema = z.object({
+/**
+ * Snapshot einer Preistabelle — koordinatenbasiert, damit er unabhängig von
+ * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
+ */
+export const tariffVersionSnapshotSchema = z.object({
+    columns: z.array(z.object({
+        duration: z.number().int(),
+    })),
+    rows: z.array(z.object({
+        min_quantity: z.number().int(),
+        max_quantity: z.number().int().nullable(),
+    })),
+    cells: z.array(z.object({
+        duration: z.number().int(),
+        min_quantity: z.number().int(),
+        /** null == Zelle existiert, hat aber keinen Default-Preis */
+        price: z.number().int().nullable(),
+    })),
+});
+export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
+
+export const tariffVersionReasonSchema = z.enum(["MANUAL", "OFFER", "RESTORE"]);
+export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
+
+/** Unveränderlicher Stand einer Preistabelle. */
+export const tariffVersionSchema = z.object({
     id: z.string(),
-    productId: z.string(),
-    contractId: z.string(),
+    tariffId: z.string(),
 
     version: z.number().int(),
-    snapshot: z.unknown(),
+    snapshotVersion: z.number().int(),
+
+    hash: z.string(),
+    snapshot: tariffVersionSnapshotSchema,
+    reason: tariffVersionReasonSchema,
+
+    createdBy: z.object({
+        id: z.string(),
+        name: z.string(),
+    }).nullable(),
+
+    /** Inhalt entspricht dem aktuellen Stand der Tabelle. */
+    isCurrent: z.boolean(),
+    /** Anzahl Angebotspositionen, die diese Version als Preisgrundlage pinnen. */
+    usageCount: z.number().int(),
 
     createdAt: z.string(),
 });
-export type TariffHistory = z.infer<typeof tariffHistorySchema>;
+export type TariffVersion = z.infer<typeof tariffVersionSchema>;

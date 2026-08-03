@@ -4,9 +4,8 @@ import type {
     Tariff,
     TariffCell,
     TariffGroup,
-
-    TariffHistory,
     TariffRow,
+    TariffVersion,
     UpdateTariffGroupInput,
 } from '@keepit/schemas';
 import { api } from "@/lib/api-client";
@@ -56,8 +55,15 @@ export const createTariff = (groupId: string, input: CreateTariffInput) =>
 export const deleteTariff = (groupId: string, tariffId: string) =>
     api<void>(`/api/tariffs/${groupId}/${tariffId}`, { method: "DELETE" });
 
-export const getTariffHistory = (productId: string, contractId: string) =>
-    api<Array<TariffHistory>>(`/api/tariffs/history/${productId}/${contractId}`, { method: "GET" });
+export const getTariffVersions = (groupId: string, tariffId: string) =>
+    api<Array<TariffVersion>>(`/api/tariffs/${groupId}/${tariffId}/versions`, { method: "GET" });
+
+/** Versiegelt den aktuellen Stand als unveränderliche Version. */
+export const sealTariffVersion = (groupId: string, tariffId: string) =>
+    api<TariffVersion>(`/api/tariffs/${groupId}/${tariffId}/versions`, { method: "POST" });
+
+export const restoreTariffVersion = (groupId: string, tariffId: string, versionId: string) =>
+    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/versions/${versionId}/restore`, { method: "POST" });
 
 export const getTariffDurations = (productId: string, contractId: string) =>
     api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });

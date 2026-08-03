@@ -13,8 +13,10 @@ import {
     getTariffDurations,
     getTariffGroup,
     getTariffGroups,
-    getTariffHistory,
     getTariffPrice,
+    getTariffVersions,
+    restoreTariffVersion,
+    sealTariffVersion,
     updateTariffCell,
     updateTariffColumn,
     updateTariffGroup,
@@ -51,9 +53,6 @@ router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustome
 /* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
 router.delete("/customer-price", deleteCustomerPrice);
 
-/* [GET] /api/tariffs/history/:productId/:contractId */
-router.get('/history/:productId/:contractId', getTariffHistory);
-
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);
 
@@ -74,6 +73,15 @@ router.get('/:id/:tariffId', getTariff);
 
 /* [DELETE] /api/tariffs/:id/:tariffId — Tariff löschen */
 router.delete('/:id/:tariffId', deleteTariff);
+
+/* [GET] /api/tariffs/:id/:tariffId/versions — Versionshistorie */
+router.get('/:id/:tariffId/versions', getTariffVersions);
+
+/* [POST] /api/tariffs/:id/:tariffId/versions — aktuellen Stand versiegeln */
+router.post('/:id/:tariffId/versions', sealTariffVersion);
+
+/* [POST] /api/tariffs/:id/:tariffId/versions/:versionId/restore */
+router.post('/:id/:tariffId/versions/:versionId/restore', restoreTariffVersion);
 
 /* [POST] /api/tariffs/:id/:tariffId/column */
 router.post('/:id/:tariffId/column', validate(createTariffColumnSchema), createTariffColumn);

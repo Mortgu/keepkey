@@ -1,4 +1,3 @@
-import { useStore } from "@tanstack/react-form";
 import { Check, LoaderCircle, MoveRight, Pen, Trash } from "lucide-react";
 import { Fragment, useState } from "react";
 import WorkloadItemFormRenwalModal from "./workload-item-form.renewal-modal";
@@ -21,7 +20,8 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
     const [edit, setEdit] = useState<boolean>(false);
     const [deleted, setDeleted] = useState<boolean>(false);
 
-    const position = useStore(form.store, (s) => s.values.offerPositions[index]);
+    const position = form.store.state.values.offerPositions[index];
+    //const position = useStore(form.store, (s) => s.values.offerPositions[index]);
 
     const priceWorkload: CreateOfferPositionInput = {
         productId: position.productId,
@@ -36,8 +36,9 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
     };
 
     const { price, isPending: pricePending } = usePrice(customerId, priceWorkload);
+
     const newTotalCents = price?.price ?? 0;
-    const priceChanged = originalPosition.total_cents !== newTotalCents;
+    const priceChanged = (originalPosition.total_cents - originalPosition.discount_cents) !== newTotalCents;
     const quantityChanged = originalPosition.quantity !== position.quantity;
     const durationChanged = originalPosition.duration_months !== position.duration_months;
 
@@ -80,7 +81,7 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                             <div className="flex items-center gap-2">
                                 {priceChanged && (
                                     <>
-                                        <span className="text-md font-mono font-normal line-through">{formatEur(originalPosition.total_cents)}</span>
+                                        <span className="text-md font-mono font-normal line-through">{formatEur((originalPosition.duration_months - originalPosition.free_months) * originalPosition.eur_user_month * originalPosition.quantity)}</span>
                                         <MoveRight size={14} className="text-gray-500" />
                                     </>
                                 )}

@@ -5,8 +5,12 @@ export const tariffKeys = {
     groups: () => [...tariffKeys.lists(), "groups"] as const,
     group: (id: string) => [...tariffKeys.groups(), id] as const,
 
-    history: (productId: string, contractId: string) =>
-        [...tariffKeys.all, "history", productId, contractId] as const,
+    /**
+     * Bewusst unterhalb von `all` und nicht von `lists()`: Strukturänderungen
+     * invalidieren `all`, damit die Versionsliste (isCurrent!) mitzieht.
+     */
+    allVersions: () => [...tariffKeys.all, "versions"] as const,
+    versions: (tariffId: string) => [...tariffKeys.allVersions(), tariffId] as const,
 
     durations: (productId: string, contractId: string) =>
         [...tariffKeys.all, "durations", productId, contractId] as const,

@@ -117,7 +117,7 @@ export default function OfferList() {
             <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
           )}
           {offers.map((offer) => (
-            <OfferCard key={offer.id} offer={offer} onEdit={(type, offer) => modal.open(offer)} />
+            <OfferCard key={offer.id} offer={offer} onEdit={(_, offer) => modal.open(offer)} />
           ))}
         </div>
 

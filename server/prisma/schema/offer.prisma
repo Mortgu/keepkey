@@ -80,6 +80,11 @@ model OfferPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
+  /// Eingefrorene Preisgrundlage dieser Position. Null bei Bestandspositionen,
+  /// die vor Einfuehrung der Tarif-Versionierung angelegt wurden.
+  tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
+  tariffVersionId String?
+
   duration_months Int
   free_months     Int @default(0)
   quantity        Int
