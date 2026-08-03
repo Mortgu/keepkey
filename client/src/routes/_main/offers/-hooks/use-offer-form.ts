@@ -1,11 +1,11 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
 import {
-    
+
     createOfferSchema
 } from '@keepit/schemas';
 import useOfferModal from "../-hooks/use-offer.offer-modal";
-import type {Offer} from '@keepit/schemas';
+import type { Offer } from '@keepit/schemas';
 import { useOfferManager } from "@/hooks";
 
 
@@ -28,6 +28,7 @@ export default function useOfferForm({ currentOffer, closeFn, preselectedCustome
             onChange: createOfferSchema
         },
         onSubmit: async ({ value }) => {
+            console.log(value);
             if (currentOffer) {
                 await updateOffer({
                     offerId: currentOffer.id,

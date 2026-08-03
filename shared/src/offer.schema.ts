@@ -61,9 +61,10 @@ export type OfferFlatrate = z.infer<typeof offerFlatrateSchema>;
 /* OfferDiscount */
 export const createOfferDiscountSchema = z.object({
     title: z.string().min(1),
-    description: z.string().optional(),
+    description: z.string().nullable(),
     amount_cents: z.number().int().nonnegative(),
 });
+
 export type CreateOfferDiscountInput = z.infer<typeof createOfferDiscountSchema>;
 
 export const updateOfferDiscountSchema = createOfferDiscountSchema.partial();
@@ -177,6 +178,20 @@ export const extensionPriceSchema = z.object({
 });
 export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
 
+export const offerDiscountSchema = z.object({
+    id: z.string(),
+    offerId: z.string(),
+
+    title: z.string(),
+    description: z.string().nullish().transform(v => (v === undefined) ? null : v),
+
+    amount_cents: z.number().int(),
+
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
+});
+export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
+
 export const offerSchema = z.object({
     id: z.string(),
 
@@ -196,7 +211,7 @@ export const offerSchema = z.object({
 
     offerPositions: z.array(offerPositionSchema),
     offerFlatRates: z.array(offerFlatrateSchema),
-    offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
+    offerDiscounts: z.array(offerDiscountSchema),
     offerDocuments: z.array(offerDocumentSchema),
 
     renewedFromOfferId: z.string().nullable().optional(),
@@ -217,20 +232,6 @@ export type Offer = z.infer<typeof offerSchema>;
 
 export const offerListSchema = z.array(offerSchema);
 export type OfferList = z.infer<typeof offerListSchema>;
-
-export const offerDiscountSchema = z.object({
-    id: z.string(),
-    offerId: z.string(),
-
-    title: z.string(),
-    description: z.string().optional(),
-
-    amount_cents: z.number().int(),
-
-    createdAt: isoDateTime,
-    updatedAt: isoDateTime,
-});
-export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 
 export const restoreOfferRevisionSchema = z.object({
     expectedVersion: z.number().int().positive(),

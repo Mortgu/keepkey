@@ -44,7 +44,7 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxComponentProps>(
   ({ className, label, error = false, size, checked, onChange, ...rest }, ref) => {
     return (
       <div className="relative flex items-center justify-center gap-2 w-fit h-fit hover:bg-white hover:cursor-pointer transition-all ease-in">
-        <input type="checkbox" className="peer sr-only absolute w-full h-full hidden"  {...rest} ref={ref} />
+        <input type="checkbox" className="absolute w-full h-full opacity-0"  {...rest} ref={ref} onChange={onChange} />
         <div className={styles({ checked })}>
           {checked && (
             <Check size={12} strokeWidth={3} />

@@ -44,7 +44,7 @@ export const offerFlatrateSchema = createOfferFlatrateSchema.extend({
 /* OfferDiscount */
 export const createOfferDiscountSchema = z.object({
     title: z.string().min(1),
-    description: z.string().optional(),
+    description: z.string().nullable(),
     amount_cents: z.number().int().nonnegative(),
 });
 export const updateOfferDiscountSchema = createOfferDiscountSchema.partial();
@@ -126,6 +126,15 @@ export const extensionPriceSchema = z.object({
      */
     fromSnapshot: z.boolean(),
 });
+export const offerDiscountSchema = z.object({
+    id: z.string(),
+    offerId: z.string(),
+    title: z.string(),
+    description: z.string().nullish().transform(v => (v === undefined) ? null : v),
+    amount_cents: z.number().int(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
+});
 export const offerSchema = z.object({
     id: z.string(),
     customerId: z.string(),
@@ -141,7 +150,7 @@ export const offerSchema = z.object({
     toCompare: z.array(z.string()),
     offerPositions: z.array(offerPositionSchema),
     offerFlatRates: z.array(offerFlatrateSchema),
-    offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
+    offerDiscounts: z.array(offerDiscountSchema),
     offerDocuments: z.array(offerDocumentSchema),
     renewedFromOfferId: z.string().nullable().optional(),
     derivationType: offerDerivationTypeSchema.nullable().optional(),
@@ -155,15 +164,6 @@ export const offerSchema = z.object({
     updatedAt: isoDateTime,
 });
 export const offerListSchema = z.array(offerSchema);
-export const offerDiscountSchema = z.object({
-    id: z.string(),
-    offerId: z.string(),
-    title: z.string(),
-    description: z.string().optional(),
-    amount_cents: z.number().int(),
-    createdAt: isoDateTime,
-    updatedAt: isoDateTime,
-});
 export const restoreOfferRevisionSchema = z.object({
     expectedVersion: z.number().int().positive(),
 });

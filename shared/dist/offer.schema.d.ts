@@ -101,13 +101,13 @@ export declare const offerFlatrateSchema: z.ZodObject<{
 export type OfferFlatrate = z.infer<typeof offerFlatrateSchema>;
 export declare const createOfferDiscountSchema: z.ZodObject<{
     title: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
+    description: z.ZodNullable<z.ZodString>;
     amount_cents: z.ZodNumber;
 }, z.core.$strip>;
 export type CreateOfferDiscountInput = z.infer<typeof createOfferDiscountSchema>;
 export declare const updateOfferDiscountSchema: z.ZodObject<{
     title: z.ZodOptional<z.ZodString>;
-    description: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    description: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     amount_cents: z.ZodOptional<z.ZodNumber>;
 }, z.core.$strip>;
 export type updateOfferDiscountInput = z.infer<typeof updateOfferDiscountSchema>;
@@ -195,7 +195,7 @@ export declare const createOfferSchema: z.ZodObject<{
     }, z.core.$strip>>;
     discounts: z.ZodArray<z.ZodObject<{
         title: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodString>;
         amount_cents: z.ZodNumber;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -232,7 +232,7 @@ export declare const updateOfferSchema: z.ZodObject<{
     }, z.core.$strip>>;
     discounts: z.ZodArray<z.ZodObject<{
         title: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodString>;
         amount_cents: z.ZodNumber;
     }, z.core.$strip>>;
     expectedVersion: z.ZodNumber;
@@ -265,7 +265,7 @@ export declare const extendOfferSchema: z.ZodObject<{
     }, z.core.$strip>>;
     discounts: z.ZodArray<z.ZodObject<{
         title: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
+        description: z.ZodNullable<z.ZodString>;
         amount_cents: z.ZodNumber;
     }, z.core.$strip>>;
 }, z.core.$strip>;
@@ -278,6 +278,16 @@ export declare const extensionPriceSchema: z.ZodObject<{
     fromSnapshot: z.ZodBoolean;
 }, z.core.$strip>;
 export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
+export declare const offerDiscountSchema: z.ZodObject<{
+    id: z.ZodString;
+    offerId: z.ZodString;
+    title: z.ZodString;
+    description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+    amount_cents: z.ZodNumber;
+    createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+}, z.core.$strip>;
+export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 export declare const offerSchema: z.ZodObject<{
     id: z.ZodString;
     customerId: z.ZodString;
@@ -358,15 +368,15 @@ export declare const offerSchema: z.ZodObject<{
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
     }, z.core.$strip>>;
-    offerDiscounts: z.ZodArray<z.ZodLazy<z.ZodObject<{
+    offerDiscounts: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         offerId: z.ZodString;
         title: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
+        description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
         amount_cents: z.ZodNumber;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-    }, z.core.$strip>>>;
+    }, z.core.$strip>>;
     offerDocuments: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         displayName: z.ZodOptional<z.ZodString>;
@@ -681,15 +691,15 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
     }, z.core.$strip>>;
-    offerDiscounts: z.ZodArray<z.ZodLazy<z.ZodObject<{
+    offerDiscounts: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         offerId: z.ZodString;
         title: z.ZodString;
-        description: z.ZodOptional<z.ZodString>;
+        description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
         amount_cents: z.ZodNumber;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-    }, z.core.$strip>>>;
+    }, z.core.$strip>>;
     offerDocuments: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         displayName: z.ZodOptional<z.ZodString>;
@@ -924,16 +934,6 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
     updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
 }, z.core.$strip>>;
 export type OfferList = z.infer<typeof offerListSchema>;
-export declare const offerDiscountSchema: z.ZodObject<{
-    id: z.ZodString;
-    offerId: z.ZodString;
-    title: z.ZodString;
-    description: z.ZodOptional<z.ZodString>;
-    amount_cents: z.ZodNumber;
-    createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-    updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-}, z.core.$strip>;
-export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 export declare const restoreOfferRevisionSchema: z.ZodObject<{
     expectedVersion: z.ZodNumber;
 }, z.core.$strip>;
@@ -1028,15 +1028,15 @@ export declare const offersPageSchema: z.ZodObject<{
                 updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             }, z.core.$strip>;
         }, z.core.$strip>>;
-        offerDiscounts: z.ZodArray<z.ZodLazy<z.ZodObject<{
+        offerDiscounts: z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             offerId: z.ZodString;
             title: z.ZodString;
-            description: z.ZodOptional<z.ZodString>;
+            description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
             amount_cents: z.ZodNumber;
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>>;
+        }, z.core.$strip>>;
         offerDocuments: z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             displayName: z.ZodOptional<z.ZodString>;

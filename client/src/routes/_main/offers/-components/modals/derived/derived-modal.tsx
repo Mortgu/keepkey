@@ -7,6 +7,7 @@ import DiscountDerivedModal from "./discounts/discount.derived-modal";
 import type { DerivedMode } from "./hook/use-derived-form";
 import type { Offer } from "@keepit/schemas";
 import { Button, ModalDialog } from "@/components";
+import { formatDate } from "@/lib/format";
 
 interface Props {
     offer: Offer;
@@ -52,7 +53,7 @@ export default function DerivedModal({ offer, mode, onClose }: Props) {
                         </div>
                         <div className="flex-1 flex flex-col gap-1">
                             <p className="text-xs text-gray-400">{t("derived.original_period")}</p>
-                            <p>{offer.requestFrom ?? "-"} bis {offer.validUntil ?? "-"}</p>
+                            <p>{offer.requestFrom ? formatDate(offer.requestFrom) : "-"} bis {offer.validUntil ? formatDate(offer.validUntil) : "-"}</p>
                         </div>
                     </div>
 

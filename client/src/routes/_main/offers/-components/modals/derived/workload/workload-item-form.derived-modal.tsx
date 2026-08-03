@@ -66,80 +66,75 @@ export default function WorkloadItemFormDerivedModal({
     };
 
     return (
-        <div>
-            <div className="grid flex-wrap items-end gap-4  border-t border-(--border) p-4">
-                <div className="flex items-center gap-4">
-                    {isExtension ? (
-                        <Input
-                            label={t("renewal.duration")}
-                            value={`${position.duration_months} ${t("renewal.months")}`}
-                            disabled
-                            readOnly
-                        />
-                    ) : (
-                        <Select
-                            label={t("renewal.duration")}
-                            value={duration}
-                            onChange={(e) => setDuration(Number(e.target.value))}
-                            disabled={durations.length === 0}
-                        >
-                            {durations.length === 0 && (
-                                <option value={0}>{t("renewal.no_duration")}</option>
-                            )}
-                            {durations.map((d) => (
-                                <option key={d} value={d}>{d} {t("renewal.months")}</option>
-                            ))}
-                        </Select>
-                    )}
-
+        <div className="grid flex-wrap items-end gap-4  border-t border-(--border) p-4">
+            <div className="flex items-center gap-4">
+                {isExtension ? (
                     <Input
-                        label={t("renewal.quantity")}
-                        type="number"
-                        min={1}
-                        value={quantity}
-                        onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                        label={t("renewal.duration")}
+                        value={`${position.duration_months} ${t("renewal.months")}`}
+                        disabled
+                        readOnly
                     />
+                ) : (
+                    <Select
+                        label={t("renewal.duration")}
+                        value={duration}
+                        onChange={(e) => setDuration(Number(e.target.value))}
+                        disabled={durations.length === 0}
+                    >
+                        {durations.length === 0 && (
+                            <option value={0}>{t("renewal.no_duration")}</option>
+                        )}
+                        {durations.map((d) => (
+                            <option key={d} value={d}>{d} {t("renewal.months")}</option>
+                        ))}
+                    </Select>
+                )}
 
-                    <Input
-                        label={t("renewal.free_months")}
-                        type="number"
-                        min={0}
-                        value={freeMonths}
-                        disabled={isExtension}
-                        readOnly={isExtension}
-                        onChange={(e) => {
-                            const num = Number(e.target.value);
-                            if (!isNaN(num)) setFreeMonths(Math.max(0, num));
-                        }}
-                    />
-                </div>
-                <hr className="text-(--border)" />
-                <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-6">
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
-                            <p className="text-md font-mono font-normal">
-                                {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
-                            </p>
-                        </div>
-                        <div className="flex items-center justify-center gap-2">
-                            <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
-                            <p className="text-md font-mono font-normal">
-                                {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
-                            </p>
-                        </div>
+                <Input
+                    label={t("renewal.quantity")}
+                    type="number"
+                    min={1}
+                    value={quantity}
+                    onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))}
+                />
+
+                <Input
+                    label={t("renewal.free_months")}
+                    type="number"
+                    min={0}
+                    value={freeMonths}
+                    onChange={(e) => {
+                        const num = Number(e.target.value);
+                        if (!isNaN(num)) setFreeMonths(Math.max(0, num));
+                    }}
+                />
+            </div>
+            <hr className="text-(--border)" />
+            <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-6">
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
+                        <p className="text-md font-mono font-normal">
+                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
+                        </p>
                     </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button size="xs" variant="border" onClick={closeFn}>
-                            {t("button.cancel")}
-                        </Button>
-                        <Button size="xs" variant="primary" onClick={save} disabled={isPending}>
-                            {t("button.save")}
-                        </Button>
+                    <div className="flex items-center justify-center gap-2">
+                        <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
+                        <p className="text-md font-mono font-normal">
+                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
+                        </p>
                     </div>
                 </div>
 
+                <div className="flex items-center gap-2">
+                    <Button size="xs" variant="border" onClick={closeFn}>
+                        {t("button.cancel")}
+                    </Button>
+                    <Button size="xs" variant="primary" onClick={save} disabled={isPending}>
+                        {t("button.save")}
+                    </Button>
+                </div>
             </div>
 
         </div>

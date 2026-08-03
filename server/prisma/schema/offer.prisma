@@ -98,10 +98,9 @@ model OfferPosition {
   tariffVersionId String?
 
   duration_months Int
-  free_months     Int @default(0)
+  free_months     Int     @default(0)
   quantity        Int
-
-  optional Boolean? @default(false)
+  optional        Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int

@@ -22,15 +22,22 @@ interface Props {
     onRemove?: () => void;
 }
 
-export default function WorkloadItemDerivedModal({
-    form, mode, offerId, index, customerId, originalPosition, onRemove,
-}: Props) {
+export default function WorkloadItemDerivedModal(props: Props) {
+    const {
+        form,
+        mode,
+        offerId,
+        index,
+        customerId,
+        originalPosition,
+        onRemove
+    } = props;
+
     const { t } = useTranslation();
     const locales = useLocale();
     const [edit, setEdit] = useState<boolean>(false);
 
-    // useStore statt form.store.state: Nur so rendert die Zeile neu, wenn die
-    // Menge im Unterformular geändert wird.
+    const offer = useStore(form.store, (s) => s.values);
     const position = useStore(form.store, (s) => s.values.offerPositions[index]);
 
     const isExtension = mode === "extension";
@@ -56,12 +63,15 @@ export default function WorkloadItemDerivedModal({
         <Fragment>
             <div className="border border-(--border) rounded-md overflow-hidden">
                 <div className="flex items-center justify-between bg-(--subtle-50) px-4 py-3">
+                    {/* Product name + contract */}
                     <div className="grid">
                         <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>
                         <p className="font-normal text-sm text-gray-400">{localized(originalPosition.contract.translations, locales, "name")}</p>
                     </div>
 
                     <div className="relative divide-x divide-(--border) flex items-center">
+
+                        {/* duration */}
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
                             <span className="text-xs text-gray-500">{t("renewal.duration")}</span>
                             <div className="flex items-center gap-2">
@@ -74,6 +84,8 @@ export default function WorkloadItemDerivedModal({
                                 <span className="text-md font-mono font-normal">{position.duration_months} Mo.</span>
                             </div>
                         </div>
+
+                        {/* quantity */}
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
                             <span className="text-xs text-gray-500">{t("renewal.quantity")}</span>
                             <div className="flex items-center gap-2">

@@ -93,15 +93,15 @@ export declare const supplierSchema: z.ZodObject<{
                 updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             }, z.core.$strip>;
         }, z.core.$strip>>;
-        offerDiscounts: z.ZodArray<z.ZodLazy<z.ZodObject<{
+        offerDiscounts: z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             offerId: z.ZodString;
             title: z.ZodString;
-            description: z.ZodOptional<z.ZodString>;
+            description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
             amount_cents: z.ZodNumber;
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>>;
+        }, z.core.$strip>>;
         offerDocuments: z.ZodArray<z.ZodObject<{
             id: z.ZodString;
             displayName: z.ZodOptional<z.ZodString>;
