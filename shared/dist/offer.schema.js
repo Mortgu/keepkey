@@ -115,17 +115,6 @@ export const extendOfferSchema = z.object({
     positions: z.array(extendOfferPositionSchema).min(1),
     discounts: z.array(createOfferDiscountSchema),
 });
-/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
-export const extensionPriceSchema = z.object({
-    eur_user_month: z.number().int(),
-    total_cents: z.number().int(),
-    discount_cents: z.number().int(),
-    /**
-     * false, wenn die Quellposition keine angepinnte Tarif-Version hat und
-     * flach mit ihrem gespeicherten Stückpreis gerechnet wurde.
-     */
-    fromSnapshot: z.boolean(),
-});
 export const offerDiscountSchema = z.object({
     id: z.string(),
     offerId: z.string(),

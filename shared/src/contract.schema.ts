@@ -15,7 +15,10 @@ export const createContractSchema = z.object({
 });
 export type CreateContractInput = z.infer<typeof createContractSchema>;
 
-export const updateContractSchema = createContractSchema.partial();
+export const updateContractSchema = z.object({
+    translations: z.array(contractTranslationSchema).optional(),
+});
+
 export type UpdateContractInput = z.infer<typeof updateContractSchema>;
 
 export const contractSchema = createContractSchema.extend({

@@ -2,10 +2,11 @@ import { useStore } from "@tanstack/react-form";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import useDerivedPositionPrice from "../hook/use-derived-position-price";
+import { coordinatesFrom } from "@keepit/schemas";
+import { priceSourceFor } from "../hook/use-derived-form";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
 import { Button, Input, Select } from "@/components";
-import { useTariffDurationsHook } from "@/hooks";
+import { usePositionPrice, useTariffDurationsHook } from "@/hooks";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
@@ -38,19 +39,16 @@ export default function WorkloadItemFormDerivedModal({
     const [quantity, setQuantity] = useState(position.quantity);
     const [freeMonths, setFreeMonths] = useState(position.free_months);
 
-    const { totalCents, unitCents, isPending } = useDerivedPositionPrice({
-        mode,
-        offerId,
-        customerId,
-        sourcePositionId,
-        position: {
+    const { totalCents, netCents, unitCents, discountCents, isLoading } = usePositionPrice({
+        source: priceSourceFor(mode),
+        coordinates: coordinatesFrom(customerId, {
             productId: position.productId,
             contractId: position.contractId,
             duration_months: duration,
             quantity,
             free_months: freeMonths,
-            optional: position.optional,
-        },
+        }),
+        pin: { offerId, positionId: sourcePositionId },
     });
 
     const save = () => {
@@ -59,7 +57,10 @@ export default function WorkloadItemFormDerivedModal({
             duration_months: duration,
             quantity,
             free_months: freeMonths,
+            // total_cents ist brutto, der Wert der Freimonate steht getrennt —
+            // so wird die Position auch gespeichert.
             total_cents: totalCents,
+            discount_cents: discountCents,
             eur_user_month: unitCents,
         });
         closeFn();
@@ -116,13 +117,13 @@ export default function WorkloadItemFormDerivedModal({
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
+                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalCents)}
+                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(netCents)}
                         </p>
                     </div>
                 </div>
@@ -131,7 +132,7 @@ export default function WorkloadItemFormDerivedModal({
                     <Button size="xs" variant="border" onClick={closeFn}>
                         {t("button.cancel")}
                     </Button>
-                    <Button size="xs" variant="primary" onClick={save} disabled={isPending}>
+                    <Button size="xs" variant="primary" onClick={save} disabled={isLoading}>
                         {t("button.save")}
                     </Button>
                 </div>

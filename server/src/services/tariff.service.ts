@@ -1,4 +1,5 @@
 import { Prisma, TariffVersionReason, type TariffVersion } from "@prisma/client";
+import { type PositionPrice } from "@keepit/schemas";
 
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
@@ -165,7 +166,7 @@ async function writeCustomerPrice(coordinates: CustomerPriceCoordinates, price: 
 async function recalculateAfterOverrideChange(
     params: { productId: string; contractId: string; duration: number; quantity: number; customerId: string },
     failureMessage: string,
-) {
+): Promise<PositionPrice> {
     const { productId, contractId, duration, quantity, customerId } = params;
 
     const result = await calculatePrice({ productId, contractId, duration, quantity, customerId, freeMonths: 0 });
@@ -174,9 +175,13 @@ async function recalculateAfterOverrideChange(
         throw new AppException(failureMessage, 500, result.reason);
     }
 
+    // Ein Override adressiert eine Tarif-Zelle, keine Angebotsposition — es gibt
+    // hier keine Freimonate, die abzuziehen wären.
     return {
-        price: result.price,
-        breakdown: result.breakdown,
+        eur_user_month: result.breakdown.unitPrice,
+        total_cents: result.price,
+        discount_cents: 0,
+        fromSnapshot: false,
     };
 }
 
@@ -422,6 +427,15 @@ export async function getTariffDurations(productId: string, contractId: string):
     return tariff.columns.map(c => c.duration);
 }
 
+/**
+ * Preis-Vorschau aus dem aktuell gültigen Tarif.
+ *
+ * `freeMonths` geht bewusst **nicht** in `calculatePrice` ein: `total_cents`
+ * soll brutto sein und der Wert der Freimonate getrennt in `discount_cents`
+ * stehen — dieselbe Aufteilung, in der eine Position später gespeichert wird
+ * (siehe `priceOfferPositions` in offer.service). Damit zeigt die Vorschau
+ * dieselben Zahlen wie das fertige Angebot.
+ */
 export async function getTariffPrice(
     productId: string,
     contractId: string,
@@ -429,14 +443,25 @@ export async function getTariffPrice(
     quantity: number,
     customerId?: string,
     freeMonths?: number
-) {
+): Promise<PositionPrice> {
+    const free_months = freeMonths ?? 0;
+
+    // Sonst nicht geprüft, weil selectPrice die Freimonate hier nicht sieht.
+    if (!Number.isInteger(free_months) || free_months < 0 || free_months > duration) {
+        throw new AppException(
+            "freeMonths muss eine Ganzzahl zwischen 0 und duration sein.",
+            400,
+            "INVALID_INPUT"
+        );
+    }
+
     const result = await calculatePrice({
         productId,
         contractId,
         duration,
         quantity,
         customerId,
-        freeMonths: freeMonths ?? 0,
+        freeMonths: 0,
     });
 
     if (!result.ok) {
@@ -453,9 +478,13 @@ export async function getTariffPrice(
         throw new AppException(message, status, result.reason);
     }
 
+    const eur_user_month = result.breakdown.unitPrice;
+
     return {
-        price: result.price,
-        breakdown: result.breakdown,
+        eur_user_month,
+        total_cents: result.price,
+        discount_cents: eur_user_month * quantity * free_months,
+        fromSnapshot: false,
     };
 }
 

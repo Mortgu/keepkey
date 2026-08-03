@@ -44,11 +44,7 @@ export const getTariffPrice = async (request: Request, response: Response) => {
         freeMonths ? Number(freeMonths) : undefined
     );
 
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };
 
 /* ========== POST ========== */
@@ -124,11 +120,7 @@ export const updateTariffCell = async (request: Request, response: Response) => 
 
 export const upsertCustomerPrice = async (request: Request, response: Response) => {
     const result = await tariffService.upsertCustomerPrice(request.body);
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };
 
 /* ========== DELETE ========== */
@@ -162,9 +154,5 @@ export const deleteCustomerPrice = async (request: Request, response: Response) 
         customerId: request.query.customerId as string,
     });
 
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };

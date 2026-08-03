@@ -270,14 +270,6 @@ export declare const extendOfferSchema: z.ZodObject<{
     }, z.core.$strip>>;
 }, z.core.$strip>;
 export type ExtendOfferInput = z.infer<typeof extendOfferSchema>;
-/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
-export declare const extensionPriceSchema: z.ZodObject<{
-    eur_user_month: z.ZodNumber;
-    total_cents: z.ZodNumber;
-    discount_cents: z.ZodNumber;
-    fromSnapshot: z.ZodBoolean;
-}, z.core.$strip>;
-export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
 export declare const offerDiscountSchema: z.ZodObject<{
     id: z.ZodString;
     offerId: z.ZodString;

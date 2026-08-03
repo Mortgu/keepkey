@@ -1,12 +1,12 @@
 import { LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
+import {  coordinatesFrom } from "@keepit/schemas";
 import WorkloadFormOfferModal from "./workload-form";
-import type { CreateOfferPositionInput } from "@keepit/schemas";
+import type {CreateOfferPositionInput} from "@keepit/schemas";
 import { Button } from "@/components";
-import { useContract, useLocale, usePrice, useProduct } from "@/hooks";
+import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
-import useOfferPricing from "@/routes/_main/offers/-hooks/mutations/pricing.mutations";
 
 interface Props {
     customerId: string;
@@ -23,8 +23,10 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
-    const { price, isPending: pricePending } = usePrice(customerId, workload);
-    const { persistCustomerOverride } = useOfferPricing(customerId);
+    const { totalCents, unitCents, isLoading: pricePending } = usePositionPrice({
+        source: "live",
+        coordinates: coordinatesFrom(customerId, workload),
+    });
 
     if (!product || !contract) {
         return (
@@ -58,13 +60,13 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Total</p>
                             {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(price?.price || 0)}</p>}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents)}</p>}
                         </div>
 
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Price per unit</p>
                             {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(price?.breakdown.unitPrice || 0)}</p>}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(unitCents)}</p>}
                         </div>
                     </div>
 
@@ -92,7 +94,6 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
             {isEdit && (
                 <WorkloadFormOfferModal
                     customerId={customerId}
-                    onPersistOverride={persistCustomerOverride}
                     currentWorkload={workload}
                     cancelFn={() => setEdit(false)}
                     saveFn={(v) => updateFn(v)}

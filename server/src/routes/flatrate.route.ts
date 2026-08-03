@@ -9,9 +9,9 @@ import {
 } from "@/controllers/index.js";
 import { validate } from "@/middlewares/zod.middleware.js";
 import {
-  createFlatRateSchema,
-  updateFlatRateSchema,
-} from "@/schemas/index.js";
+  createFlatrateSchema,
+  updateFlatrateSchema,
+} from "@keepit/schemas";
 
 const router = Router();
 
@@ -25,10 +25,10 @@ router.get("/:id", getFlatrate);
 router.get("/:id", getFlatRate);
 
 /* [POST] http://localhost:3000/api/flatrates */
-router.post("/", validate(createFlatRateSchema), createFlatRate);
+router.post("/", validate(createFlatrateSchema), createFlatRate);
 
 /* [PUT] http://localhost:3000/api/flatrates/:id */
-router.put("/:id", validate(updateFlatRateSchema), updateFlatRate);
+router.put("/:id", validate(updateFlatrateSchema), updateFlatRate);
 
 /* [DELETE] http://localhost:3000/api/flatrates/:id */
 router.delete("/:id", deleteFlatRate);

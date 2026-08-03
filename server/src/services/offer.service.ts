@@ -14,6 +14,7 @@ import {
     CreateOfferPositionInput,
     CreateOfferFlatrateInput,
     ExtendOfferInput,
+    PositionPrice,
     UpdateOfferInput
 } from '@keepit/schemas';
 
@@ -35,7 +36,6 @@ type PricedPosition = CreateOfferPositionInput & {
     /** Angepinnte, unveränderliche Preisgrundlage dieser Position. */
     tariffVersionId: string | null;
 };
-type StoredPosition = Omit<PricedPosition, "optional"> & { optional?: boolean | null };
 type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
 type PricedDiscount = {
     title: string;
@@ -194,7 +194,7 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
     });
 }
 
-async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: StoredPosition[]) {
+async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
         data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
@@ -856,7 +856,11 @@ async function loadSourcePosition(offerId: string, positionId: string) {
 }
 
 /** Preis-Vorschau für eine einzelne Erweiterungsposition (Anzeige im Modal). */
-export async function getExtensionPrice(offerId: string, positionId: string, quantity: number) {
+export async function getExtensionPrice(
+    offerId: string,
+    positionId: string,
+    quantity: number,
+): Promise<PositionPrice> {
     if (!Number.isInteger(quantity) || quantity <= 0) {
         throw new AppException("quantity muss eine positive Ganzzahl sein.", 400, "INVALID_INPUT");
     }
@@ -917,7 +921,7 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
             duration_months: sourcePosition.duration_months,
             free_months: sourcePosition.free_months,
             quantity: requested.quantity,
-            optional: sourcePosition.optional ?? false,
+            optional: sourcePosition.optional,
             total_cents: priced.total_cents,
             eur_user_month: priced.eur_user_month,
             discount_cents: priced.discount_cents,

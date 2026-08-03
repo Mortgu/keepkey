@@ -2,12 +2,13 @@ import { useStore } from "@tanstack/react-form";
 import { LoaderCircle, MoveRight, Pen, Trash, TriangleAlert } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
-import useDerivedPositionPrice from "../hook/use-derived-position-price";
+import {  coordinatesFrom, netCents } from "@keepit/schemas";
+import { priceSourceFor } from "../hook/use-derived-form";
 import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
-import type { OfferPosition } from "@keepit/schemas";
+import type {OfferPosition} from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
 import { Button, Checkbox } from "@/components";
-import { useLocale } from "@/hooks";
+import { useLocale, usePositionPrice } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
@@ -38,25 +39,21 @@ export default function WorkloadItemDerivedModal(props: Props) {
     const [edit, setEdit] = useState<boolean>(false);
     const [checked, setChecked] = useState<boolean>(true);
 
-    const offer = useStore(form.store, (s) => s.values);
     const position = useStore(form.store, (s) => s.values.offerPositions[index]);
 
     const isExtension = mode === "extension";
 
-    const { totalCents, isPending, fromSnapshot } = useDerivedPositionPrice({
-        mode,
-        offerId,
-        customerId,
-        sourcePositionId: originalPosition.id,
-        position,
+    const { netCents: newTotal, isLoading, hasPrice, fromSnapshot } = usePositionPrice({
+        source: priceSourceFor(mode),
+        coordinates: coordinatesFrom(customerId, position),
+        pin: { offerId, positionId: originalPosition.id },
     });
 
-    const originalTotal =
-        (originalPosition.duration_months - originalPosition.free_months)
-        * originalPosition.eur_user_month
-        * originalPosition.quantity;
+    // Beide Seiten netto, also nach Abzug der Freimonate — sonst meldet der
+    // Vergleich bei Freimonaten eine Preisänderung, die keine ist.
+    const originalTotal = netCents(originalPosition);
 
-    const priceChanged = originalTotal !== totalCents;
+    const priceChanged = originalTotal !== newTotal;
     const quantityChanged = originalPosition.quantity !== position.quantity;
     const durationChanged = originalPosition.duration_months !== position.duration_months;
 
@@ -113,17 +110,17 @@ export default function WorkloadItemDerivedModal(props: Props) {
                                         <MoveRight size={14} className="text-gray-500" />
                                     </>
                                 )}
-                                {isPending ? (
+                                {isLoading ? (
                                     <LoaderCircle size={14} className="animate-spin" />
                                 ) : (
-                                    <span className="text-md font-mono font-normal">{formatEur(totalCents)}</span>
+                                    <span className="text-md font-mono font-normal">{formatEur(newTotal)}</span>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {isExtension && !fromSnapshot && (
+                {isExtension && hasPrice && !fromSnapshot && (
                     <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2 text-sm text-gray-500">
                         <TriangleAlert size={14} />
                         <span>{t("licenseExtension.no_snapshot")}</span>

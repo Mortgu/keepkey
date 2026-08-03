@@ -165,19 +165,6 @@ export const extendOfferSchema = z.object({
 });
 export type ExtendOfferInput = z.infer<typeof extendOfferSchema>;
 
-/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
-export const extensionPriceSchema = z.object({
-    eur_user_month: z.number().int(),
-    total_cents: z.number().int(),
-    discount_cents: z.number().int(),
-    /**
-     * false, wenn die Quellposition keine angepinnte Tarif-Version hat und
-     * flach mit ihrem gespeicherten Stückpreis gerechnet wurde.
-     */
-    fromSnapshot: z.boolean(),
-});
-export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
-
 export const offerDiscountSchema = z.object({
     id: z.string(),
     offerId: z.string(),

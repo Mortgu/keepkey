@@ -1,15 +1,9 @@
-import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
-    createFlatRateSchema,
-    updateFlatRateSchema,
-} from "../schemas/flatrate-schemas.js";
-
-/* ========== Types ========== */
-
-export type CreateFlatRateInput = z.infer<typeof createFlatRateSchema>;
-export type UpdateFlatRateInput = z.infer<typeof updateFlatRateSchema>;
+    CreateFlatrateInput,
+    UpdateFlatrateInput
+} from "@keepit/schemas";
 
 /* ========== Queries ========== */
 
@@ -42,7 +36,7 @@ export async function getFlatRateById(id: string) {
 
 /* ========== Mutations ========== */
 
-export async function createFlatRate(input: CreateFlatRateInput) {
+export async function createFlatRate(input: CreateFlatrateInput) {
     const { total_cents, translations } = input;
 
     return prisma.flatRate.create({
@@ -54,7 +48,7 @@ export async function createFlatRate(input: CreateFlatRateInput) {
     });
 }
 
-export async function updateFlatRate(id: string, input: UpdateFlatRateInput) {
+export async function updateFlatRate(id: string, input: UpdateFlatrateInput) {
     const { total_cents, translations } = input;
 
     const flatrate = await prisma.flatRate.update({

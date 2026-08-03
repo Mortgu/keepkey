@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { createOfferSchema } from "@keepit/schemas";
 import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
+import type { PriceSource } from "@/hooks";
 import { useExtendOffer, useRenewOffer } from "@/hooks";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 
@@ -12,6 +13,16 @@ import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
  *   Nur die Menge darf abweichen; Flatrates und Rabatte entfallen.
  */
 export type DerivedMode = "renewal" | "extension";
+
+/**
+ * Woher der Preis einer Position dieses Angebotstyps kommt.
+ *
+ * Eine Verlängerung soll die aktuellen Konditionen zeigen, eine Erweiterung die
+ * von damals — deshalb liest letztere aus der Tarif-Version, die die
+ * Quellposition angepinnt hat.
+ */
+export const priceSourceFor = (mode: DerivedMode): PriceSource =>
+    mode === "extension" ? "pinned" : "live";
 
 interface Props {
     offer: Offer;

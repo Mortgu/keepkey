@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkloadItemDerivedModal from "./workload-item.derived-modal";
+import useWorkloadDerivedModal from "./use-workload.derived-modal";
 import type { OfferPosition } from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
-import useWorkloadDerivedModal from "./use-workload.derived-modal";
 
 interface Props {
     form: DerivedFormApi;

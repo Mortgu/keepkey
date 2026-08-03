@@ -10,7 +10,9 @@ export const contractTranslationSchema = z.object({
 export const createContractSchema = z.object({
     translations: z.array(contractTranslationSchema).min(1),
 });
-export const updateContractSchema = createContractSchema.partial();
+export const updateContractSchema = z.object({
+    translations: z.array(contractTranslationSchema).optional(),
+});
 export const contractSchema = createContractSchema.extend({
     id: z.string(),
     createdAt: isoDateTime,

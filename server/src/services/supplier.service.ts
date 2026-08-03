@@ -1,15 +1,10 @@
-import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
-    createSupplierSchema,
-    updateSupplierSchema,
-} from "../schemas/supplier-schemas.js";
+    CreateSupplierInput,
+    UpdateSupplierInput,
+} from "@keepit/schemas";
 
-/* ========== Types ========== */
-
-export type CreateSupplierInput = z.infer<typeof createSupplierSchema>;
-export type UpdateSupplierInput = z.infer<typeof updateSupplierSchema>;
 
 /* ========== Queries ========== */
 

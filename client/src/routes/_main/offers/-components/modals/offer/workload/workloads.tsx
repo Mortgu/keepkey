@@ -5,8 +5,8 @@ import { useStore } from "@tanstack/react-form";
 import WorkloadFormOfferModal from "./workload-form";
 import WorkloadItemOfferModal from "./workload-item";
 import type { Offer } from '@keepit/schemas';
-import { Button, Checkbox, MultiSelectList } from "@/components";
 import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
+import { Button, Checkbox, MultiSelectList } from "@/components";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
 
@@ -35,7 +35,6 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
         addWorkload,
         updateWorkload,
         deleteWorkload,
-        persistCustomerOverride,
     } = useWorkloadOfferModal({ customerId, form });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
@@ -81,7 +80,6 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
                 <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
                     <WorkloadFormOfferModal
                         customerId={customerId}
-                        onPersistOverride={persistCustomerOverride}
                         cancelFn={() => setShowWorkloadForm(false)}
                         saveFn={(v) => addWorkload(v)}
                     />
