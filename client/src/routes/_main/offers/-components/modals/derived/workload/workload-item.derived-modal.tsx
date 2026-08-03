@@ -1,44 +1,54 @@
-import { Check, LoaderCircle, MoveRight, Pen, Trash } from "lucide-react";
+import { useStore } from "@tanstack/react-form";
+import { LoaderCircle, MoveRight, Pen, Trash, TriangleAlert } from "lucide-react";
 import { Fragment, useState } from "react";
-import WorkloadItemFormRenwalModal from "./workload-item-form.renewal-modal";
-import type { CreateOfferPositionInput, OfferPosition } from "@keepit/schemas";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import { useTranslation } from "react-i18next";
+import useDerivedPositionPrice from "../hook/use-derived-position-price";
+import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
+import type { OfferPosition } from "@keepit/schemas";
+import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
 import { Button } from "@/components";
-import { useLocale, usePrice } from "@/hooks";
+import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
+    mode: DerivedMode;
+    offerId: string;
     index: number;
     customerId: string;
     originalPosition: OfferPosition;
+    /** Nicht gesetzt, wenn die Position nicht entfernt werden darf. */
+    onRemove?: () => void;
 }
 
-export default function WorkloadItemRenewalModal({ form, index, customerId, originalPosition }: Props) {
+export default function WorkloadItemDerivedModal({
+    form, mode, offerId, index, customerId, originalPosition, onRemove,
+}: Props) {
+    const { t } = useTranslation();
     const locales = useLocale();
     const [edit, setEdit] = useState<boolean>(false);
-    const [deleted, setDeleted] = useState<boolean>(false);
 
-    const position = form.store.state.values.offerPositions[index];
-    //const position = useStore(form.store, (s) => s.values.offerPositions[index]);
+    // useStore statt form.store.state: Nur so rendert die Zeile neu, wenn die
+    // Menge im Unterformular geändert wird.
+    const position = useStore(form.store, (s) => s.values.offerPositions[index]);
 
-    const priceWorkload: CreateOfferPositionInput = {
-        productId: position.productId,
-        contractId: position.contractId,
-        duration_months: position.duration_months,
-        quantity: position.quantity,
-        free_months: position.free_months,
-        optional: position.optional,
-        total_cents: 0,
-        eur_user_month: 0,
-        discount_cents: 0,
-    };
+    const isExtension = mode === "extension";
 
-    const { price, isPending: pricePending } = usePrice(customerId, priceWorkload);
+    const { totalCents, isPending, fromSnapshot } = useDerivedPositionPrice({
+        mode,
+        offerId,
+        customerId,
+        sourcePositionId: originalPosition.id,
+        position,
+    });
 
-    const newTotalCents = price?.price ?? 0;
-    const priceChanged = (originalPosition.total_cents - originalPosition.discount_cents) !== newTotalCents;
+    const originalTotal =
+        (originalPosition.duration_months - originalPosition.free_months)
+        * originalPosition.eur_user_month
+        * originalPosition.quantity;
+
+    const priceChanged = originalTotal !== totalCents;
     const quantityChanged = originalPosition.quantity !== position.quantity;
     const durationChanged = originalPosition.duration_months !== position.duration_months;
 
@@ -53,7 +63,7 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
 
                     <div className="relative divide-x divide-(--border) flex items-center">
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
-                            <span className="text-xs text-gray-500">Laufzeit</span>
+                            <span className="text-xs text-gray-500">{t("renewal.duration")}</span>
                             <div className="flex items-center gap-2">
                                 {durationChanged && (
                                     <>
@@ -65,7 +75,7 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                             </div>
                         </div>
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
-                            <span className="text-xs text-gray-500">Stück</span>
+                            <span className="text-xs text-gray-500">{t("renewal.quantity")}</span>
                             <div className="flex items-center gap-2">
                                 {quantityChanged && (
                                     <>
@@ -77,29 +87,39 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                             </div>
                         </div>
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
-                            <span className="text-xs text-gray-500">Total</span>
+                            <span className="text-xs text-gray-500">{t("renewal.total")}</span>
                             <div className="flex items-center gap-2">
                                 {priceChanged && (
                                     <>
-                                        <span className="text-md font-mono font-normal line-through">{formatEur((originalPosition.duration_months - originalPosition.free_months) * originalPosition.eur_user_month * originalPosition.quantity)}</span>
+                                        <span className="text-md font-mono font-normal line-through">{formatEur(originalTotal)}</span>
                                         <MoveRight size={14} className="text-gray-500" />
                                     </>
                                 )}
-                                {pricePending ? (
+                                {isPending ? (
                                     <LoaderCircle size={14} className="animate-spin" />
                                 ) : (
-                                    <span className="text-md font-mono font-normal">{formatEur(newTotalCents)}</span>
+                                    <span className="text-md font-mono font-normal">{formatEur(totalCents)}</span>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
 
+                {isExtension && !fromSnapshot && (
+                    <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2 text-sm text-gray-500">
+                        <TriangleAlert size={14} />
+                        <span>{t("licenseExtension.no_snapshot")}</span>
+                    </div>
+                )}
+
                 {edit && (
-                    <WorkloadItemFormRenwalModal
+                    <WorkloadItemFormDerivedModal
                         form={form}
+                        mode={mode}
+                        offerId={offerId}
                         index={index}
                         customerId={customerId}
+                        sourcePositionId={originalPosition.id}
                         closeFn={() => setEdit(false)}
                     />
                 )}
@@ -108,13 +128,11 @@ export default function WorkloadItemRenewalModal({ form, index, customerId, orig
                     <div className="flex items-center justify-between border-t border-(--border) p-2">
                         <div></div>
                         <div className="flex items-center gap-2">
-                            {!deleted && (
+                            {/* In einer Erweiterung steht der Positionsumfang fest —
+                                nur die Menge darf abweichen. */}
+                            {!isExtension && onRemove && (
                                 <Button type="button" size="xs" variant="secondary" icon={<Trash size={14} />} iconOnly danger
-                                    onClick={() => setDeleted(true)} />
-                            )}
-                            {deleted && (
-                                <Button type="button" size="xs" variant="secondary" icon={<Check size={14} />} iconOnly
-                                    onClick={() => setDeleted(false)} />
+                                    onClick={onRemove} />
                             )}
                             <Button type="button" size="xs" variant="secondary" icon={<Pen size={14} />} iconOnly
                                 onClick={() => setEdit(true)} />

@@ -1,21 +1,21 @@
 import { useStore } from "@tanstack/react-form";
 import { MoveRight, Pen, Trash } from "lucide-react";
 import { Fragment, useState } from "react";
-import FlatrateItemFormRenewalModal from "./flatrate-item-form.renewal-modal";
+import FlatrateItemFormDerivedModal from "./flatrate-item-form.derived-modal";
 import type { OfferFlatrate } from "@keepit/schemas";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import type { DerivedFormApi } from "../hook/use-derived-form";
 import { Button } from "@/components";
 import { useFlatRates, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
     index: number;
     originalFlatrate: OfferFlatrate;
 }
 
-export default function FlatrateItemRenewalModal({ form, index, originalFlatrate }: Props) {
+export default function FlatrateItemDerivedModal({ form, index, originalFlatrate }: Props) {
     const locales = useLocale();
     const [edit, setEdit] = useState<boolean>(false);
 
@@ -68,7 +68,7 @@ export default function FlatrateItemRenewalModal({ form, index, originalFlatrate
                 </div>
 
                 {edit && (
-                    <FlatrateItemFormRenewalModal
+                    <FlatrateItemFormDerivedModal
                         form={form}
                         index={index}
                         closeFn={() => setEdit(false)}

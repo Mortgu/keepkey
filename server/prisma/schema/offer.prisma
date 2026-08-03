@@ -1,3 +1,12 @@
+/// Art, auf die ein Angebot aus einem anderen abgeleitet wurde.
+/// `null` bedeutet: eigenstaendig erstellt.
+enum OfferDerivationType {
+  /// Verlaengerung — rechnet zum aktuellen Tarif neu
+  RENEWAL
+  /// Lizenzerweiterung — behaelt den Preis der Quellposition
+  LICENSE_EXTENSION
+}
+
 model Offer {
   id String @id @default(uuid())
 
@@ -34,9 +43,12 @@ model Offer {
 
   orders Order?
 
+  /// Quellangebot, aus dem dieses abgeleitet wurde — fuer Verlaengerung
+  /// und Lizenzerweiterung gleichermassen. `derivationType` unterscheidet beide.
   renewedFromOfferId String?
-  renewedFrom        Offer?  @relation("OfferRenewals", fields: [renewedFromOfferId], references: [id], onDelete: SetNull)
-  renewals           Offer[] @relation("OfferRenewals")
+  renewedFrom        Offer?               @relation("OfferRenewals", fields: [renewedFromOfferId], references: [id], onDelete: SetNull)
+  renewals           Offer[]              @relation("OfferRenewals")
+  derivationType     OfferDerivationType?
 
   net_amount Int
 

@@ -95,6 +95,37 @@ export const createOfferSchema = z.object({
 export const updateOfferSchema = createOfferSchema.extend({
     expectedVersion: z.number().int().positive(),
 });
+/* Lizenzerweiterung */
+export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
+/**
+ * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden
+ * Vertrags. Sie verweist auf die Positionen des Quellangebots statt sie zu
+ * beschreiben: Produkt, Vertrag und Laufzeit bleiben unverändert, nur die Menge
+ * darf abweichen. Preise stehen bewusst nicht im Body — sie werden serverseitig
+ * aus der angepinnten Tarif-Version aufgelöst.
+ */
+export const extendOfferPositionSchema = z.object({
+    sourcePositionId: z.string(),
+    quantity: z.number().int().positive(),
+});
+export const extendOfferSchema = z.object({
+    quoteId: z.string().trim().nonempty("Required!"),
+    validUntil: z.string().nullable(),
+    requestFrom: z.string().nullable(),
+    positions: z.array(extendOfferPositionSchema).min(1),
+    discounts: z.array(createOfferDiscountSchema),
+});
+/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
+export const extensionPriceSchema = z.object({
+    eur_user_month: z.number().int(),
+    total_cents: z.number().int(),
+    discount_cents: z.number().int(),
+    /**
+     * false, wenn die Quellposition keine angepinnte Tarif-Version hat und
+     * flach mit ihrem gespeicherten Stückpreis gerechnet wurde.
+     */
+    fromSnapshot: z.boolean(),
+});
 export const offerSchema = z.object({
     id: z.string(),
     customerId: z.string(),
@@ -113,6 +144,7 @@ export const offerSchema = z.object({
     offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
     offerDocuments: z.array(offerDocumentSchema),
     renewedFromOfferId: z.string().nullable().optional(),
+    derivationType: offerDerivationTypeSchema.nullable().optional(),
     user: userSchema,
     customer: customerSchema,
     customerContactPerson: contactSchema,

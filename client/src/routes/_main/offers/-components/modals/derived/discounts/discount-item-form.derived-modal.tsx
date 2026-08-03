@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import type { DiscountItemState } from "./discount.renewal-modal";
+import type { DiscountItemState } from "./discount.derived-modal";
 import { Button, Input, Textarea } from "@/components";
 import { formatEur } from "@/utils/utils";
 
@@ -12,7 +12,7 @@ interface Props {
     closeFn: () => void;
 }
 
-export default function DiscountItemFormRenwalModal({ item, saveFn, closeFn }: Props) {
+export default function DiscountItemFormDerivedModal({ item, saveFn, closeFn }: Props) {
     const { t } = useTranslation();
 
     const [title, setTitle] = useState(item.title);

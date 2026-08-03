@@ -1,18 +1,18 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import type { DerivedFormApi } from "../hook/use-derived-form";
 import { Button, Input, Select } from "@/components";
 import { useFlatRates, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
     index: number;
     closeFn: () => void;
 }
 
-export default function FlatrateItemFormRenewalModal({ form, index, closeFn }: Props) {
+export default function FlatrateItemFormDerivedModal({ form, index, closeFn }: Props) {
     const { t } = useTranslation();
     const locale = useLocale();
     const { flatRates: availableFlatRates } = useFlatRates();
@@ -30,7 +30,7 @@ export default function FlatrateItemFormRenewalModal({ form, index, closeFn }: P
             ...flatrate,
             flatRateId,
             quantity,
-            /*total_cents: totalCents,*/
+            /* total_cents: totalCents,*/
         });
         closeFn();
     };

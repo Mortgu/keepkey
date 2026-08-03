@@ -1,7 +1,9 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import RenewalModal from "../modals/renewal/renewal-modal";
+import DerivedModal from "../modals/derived/derived-modal";
+import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
@@ -13,7 +15,6 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import OfferDrawerHistory from "../drawer/offer-drawer-history";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -21,7 +22,10 @@ type OfferListItemProps = {
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const { t } = useTranslation();
+
     const renewalModal = useModal<Offer>();
+    const extensionModal = useModal<Offer>();
 
     const {
         customerContactPerson: ccp,
@@ -56,8 +60,11 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         <div className="flex items-center gap-2 text-md">
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
-                            {offer.renewedFromOfferId && (
-                                <Badge variant="generated" size="xs">Verlängerung</Badge>
+                            {offer.derivationType === "RENEWAL" && (
+                                <Badge variant="generated" size="xs">{t("derived.badge_renewal")}</Badge>
+                            )}
+                            {offer.derivationType === "LICENSE_EXTENSION" && (
+                                <Badge variant="processing" size="xs">{t("derived.badge_extension")}</Badge>
                             )}
                         </div>
                     </div>
@@ -150,11 +157,11 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
-                    {/* <Button variant="border" type="button" size="xs"
-                        onClick={() => onEdit("renewal", offer)}>Renewal</Button>*/}
+                    <Button variant="border" type="button" size="xs"
+                        onClick={() => renewalModal.open(offer)}>{t("derived.action_renewal")}</Button>
 
                     <Button variant="border" type="button" size="xs"
-                        onClick={() => renewalModal.open(offer)}>Renewal</Button>
+                        onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
                 </div>
 
                 {/* Actions right */}
@@ -190,10 +197,20 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {renewalModal.isOpen && (
-                <RenewalModal
-                    key={renewalModal.key}
+                <DerivedModal
+                    key={`renewal-${renewalModal.key}`}
+                    mode="renewal"
                     offer={offer}
                     onClose={renewalModal.close}
+                />
+            )}
+
+            {extensionModal.isOpen && (
+                <DerivedModal
+                    key={`extension-${extensionModal.key}`}
+                    mode="extension"
+                    offer={offer}
+                    onClose={extensionModal.close}
                 />
             )}
         </div>

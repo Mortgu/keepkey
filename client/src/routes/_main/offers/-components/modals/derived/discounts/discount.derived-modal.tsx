@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
-import DiscountItemRenewalModal from "./discount-item.renewal-modal";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import DiscountItemDerivedModal from "./discount-item.derived-modal";
+import type { DerivedFormApi } from "../hook/use-derived-form";
 import type { OfferDiscount } from "@keepit/schemas";
 
 export interface DiscountItemState {
@@ -12,11 +12,11 @@ export interface DiscountItemState {
 }
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
     originalDiscounts: Array<OfferDiscount>;
 }
 
-export default function DiscountRenewalModal({ form, originalDiscounts }: Props) {
+export default function DiscountDerivedModal({ form, originalDiscounts }: Props) {
     const { t } = useTranslation();
 
     const [items, setItems] = useState<Array<DiscountItemState>>(
@@ -65,7 +65,7 @@ export default function DiscountRenewalModal({ form, originalDiscounts }: Props)
 
             <div className="grid gap-2">
                 {originalDiscounts.map((originalDiscount, index) => (
-                    <DiscountItemRenewalModal
+                    <DiscountItemDerivedModal
                         key={index}
                         index={index}
                         originalDiscount={originalDiscount}

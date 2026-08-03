@@ -2,6 +2,8 @@ import type {
     CreateOfferFlatrateInput,
     CreateOfferInput,
     CreateOfferPositionInput,
+    ExtendOfferInput,
+    ExtensionPrice,
     Offer,
     OfferFilterParams,
 
@@ -120,3 +122,20 @@ export const renewOffer = (offerId: string, input: CreateOfferInput) =>
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
+
+export const extendOffer = (offerId: string, input: ExtendOfferInput) =>
+    api<Offer>(`/api/offers/${offerId}/extend`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+    });
+
+/**
+ * Preis einer Erweiterungsposition bei geänderter Menge — aufgelöst über die
+ * Tarif-Version, die die Quellposition angepinnt hat.
+ */
+export const getExtensionPrice = (offerId: string, positionId: string, quantity: number) =>
+    api<ExtensionPrice>(
+        `/api/offers/${offerId}/positions/${positionId}/extension-price?quantity=${quantity}`,
+        { method: "GET" },
+    );

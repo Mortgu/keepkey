@@ -1,15 +1,15 @@
 import { useStore } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
-import FlatrateItemRenewalModal from "./flatrate-item.renewal-modal";
+import FlatrateItemDerivedModal from "./flatrate-item.derived-modal";
 import type { OfferFlatrate } from "@keepit/schemas";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import type { DerivedFormApi } from "../hook/use-derived-form";
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
     originalFlatrates: Array<OfferFlatrate>;
 }
 
-export default function FlatratesRenewalModal({ form, originalFlatrates }: Props) {
+export default function FlatratesDerivedModal({ form, originalFlatrates }: Props) {
     const { t } = useTranslation();
     const flatrates = useStore(form.store, (s) => s.values.flatrates);
 
@@ -29,7 +29,7 @@ export default function FlatratesRenewalModal({ form, originalFlatrates }: Props
 
             <div className="grid gap-2">
                 {flatrates.map((_, index) => (
-                    <FlatrateItemRenewalModal
+                    <FlatrateItemDerivedModal
                         key={index}
                         form={form}
                         index={index}

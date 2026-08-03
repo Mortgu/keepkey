@@ -1,13 +1,13 @@
 import { useTranslation } from "react-i18next";
-import type { RenewalFormApi } from "../hook/use-renewal-form";
+import type { DerivedFormApi } from "../hook/use-derived-form";
 import { Input } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 interface Props {
-    form: RenewalFormApi;
+    form: DerivedFormApi;
 }
 
-export default function OfferRenewalModal({ form }: Props) {
+export default function OfferDerivedModal({ form }: Props) {
     const { t } = useTranslation();
 
     return (

@@ -13,3 +13,13 @@ export function useOffers(filters: OfferFilterParams = {}) {
 
     return { items: data.items, nextCursor: data.nextCursor, isPending, error }
 }
+
+/**
+ * Preis einer Erweiterungsposition bei geänderter Menge — aufgelöst über die
+ * eingefrorene Tarif-Version der Quellposition statt über den Live-Tarif.
+ */
+export function useExtensionPrice(offerId: string, positionId: string, quantity: number) {
+    const { data, isPending, error } = useQuery(offerQueries.extensionPrice(offerId, positionId, quantity));
+
+    return { price: data, isPending, error };
+}

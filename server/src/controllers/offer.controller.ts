@@ -84,3 +84,21 @@ export const renewOffer = async (request: Request, response: Response) => {
     );
     return response.status(200).json(offer);
 };
+
+export const extendOffer = async (request: Request, response: Response) => {
+    const offer = await offerService.extendOffer(
+        request.params.id as string,
+        request.body,
+        request.user!.id,
+    );
+    return response.status(200).json(offer);
+};
+
+export const getExtensionPrice = async (request: Request, response: Response) => {
+    const price = await offerService.getExtensionPrice(
+        request.params.offerId as string,
+        request.params.positionId as string,
+        Number(request.query.quantity),
+    );
+    return response.status(200).json(price);
+};

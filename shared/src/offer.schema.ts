@@ -136,6 +136,47 @@ export const updateOfferSchema = createOfferSchema.extend({
 });
 export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
 
+/* Lizenzerweiterung */
+
+export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
+export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
+
+/**
+ * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden
+ * Vertrags. Sie verweist auf die Positionen des Quellangebots statt sie zu
+ * beschreiben: Produkt, Vertrag und Laufzeit bleiben unverändert, nur die Menge
+ * darf abweichen. Preise stehen bewusst nicht im Body — sie werden serverseitig
+ * aus der angepinnten Tarif-Version aufgelöst.
+ */
+export const extendOfferPositionSchema = z.object({
+    sourcePositionId: z.string(),
+    quantity: z.number().int().positive(),
+});
+export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>;
+
+export const extendOfferSchema = z.object({
+    quoteId: z.string().trim().nonempty("Required!"),
+    validUntil: z.string().nullable(),
+    requestFrom: z.string().nullable(),
+
+    positions: z.array(extendOfferPositionSchema).min(1),
+    discounts: z.array(createOfferDiscountSchema),
+});
+export type ExtendOfferInput = z.infer<typeof extendOfferSchema>;
+
+/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
+export const extensionPriceSchema = z.object({
+    eur_user_month: z.number().int(),
+    total_cents: z.number().int(),
+    discount_cents: z.number().int(),
+    /**
+     * false, wenn die Quellposition keine angepinnte Tarif-Version hat und
+     * flach mit ihrem gespeicherten Stückpreis gerechnet wurde.
+     */
+    fromSnapshot: z.boolean(),
+});
+export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
+
 export const offerSchema = z.object({
     id: z.string(),
 
@@ -159,6 +200,7 @@ export const offerSchema = z.object({
     offerDocuments: z.array(offerDocumentSchema),
 
     renewedFromOfferId: z.string().nullable().optional(),
+    derivationType: offerDerivationTypeSchema.nullable().optional(),
 
     user: userSchema,
     customer: customerSchema,

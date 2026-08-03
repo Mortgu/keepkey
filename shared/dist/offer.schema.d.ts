@@ -238,6 +238,46 @@ export declare const updateOfferSchema: z.ZodObject<{
     expectedVersion: z.ZodNumber;
 }, z.core.$strip>;
 export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
+export declare const offerDerivationTypeSchema: z.ZodEnum<{
+    RENEWAL: "RENEWAL";
+    LICENSE_EXTENSION: "LICENSE_EXTENSION";
+}>;
+export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
+/**
+ * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden
+ * Vertrags. Sie verweist auf die Positionen des Quellangebots statt sie zu
+ * beschreiben: Produkt, Vertrag und Laufzeit bleiben unverändert, nur die Menge
+ * darf abweichen. Preise stehen bewusst nicht im Body — sie werden serverseitig
+ * aus der angepinnten Tarif-Version aufgelöst.
+ */
+export declare const extendOfferPositionSchema: z.ZodObject<{
+    sourcePositionId: z.ZodString;
+    quantity: z.ZodNumber;
+}, z.core.$strip>;
+export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>;
+export declare const extendOfferSchema: z.ZodObject<{
+    quoteId: z.ZodString;
+    validUntil: z.ZodNullable<z.ZodString>;
+    requestFrom: z.ZodNullable<z.ZodString>;
+    positions: z.ZodArray<z.ZodObject<{
+        sourcePositionId: z.ZodString;
+        quantity: z.ZodNumber;
+    }, z.core.$strip>>;
+    discounts: z.ZodArray<z.ZodObject<{
+        title: z.ZodString;
+        description: z.ZodOptional<z.ZodString>;
+        amount_cents: z.ZodNumber;
+    }, z.core.$strip>>;
+}, z.core.$strip>;
+export type ExtendOfferInput = z.infer<typeof extendOfferSchema>;
+/** Antwort der Preis-Vorschau für eine einzelne Erweiterungsposition. */
+export declare const extensionPriceSchema: z.ZodObject<{
+    eur_user_month: z.ZodNumber;
+    total_cents: z.ZodNumber;
+    discount_cents: z.ZodNumber;
+    fromSnapshot: z.ZodBoolean;
+}, z.core.$strip>;
+export type ExtensionPrice = z.infer<typeof extensionPriceSchema>;
 export declare const offerSchema: z.ZodObject<{
     id: z.ZodString;
     customerId: z.ZodString;
@@ -365,6 +405,10 @@ export declare const offerSchema: z.ZodObject<{
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>>;
     renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    derivationType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        RENEWAL: "RENEWAL";
+        LICENSE_EXTENSION: "LICENSE_EXTENSION";
+    }>>>;
     user: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
@@ -684,6 +728,10 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>>;
     renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    derivationType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+        RENEWAL: "RENEWAL";
+        LICENSE_EXTENSION: "LICENSE_EXTENSION";
+    }>>>;
     user: z.ZodObject<{
         id: z.ZodString;
         name: z.ZodString;
@@ -1027,6 +1075,10 @@ export declare const offersPageSchema: z.ZodObject<{
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>>;
         renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        derivationType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
+            RENEWAL: "RENEWAL";
+            LICENSE_EXTENSION: "LICENSE_EXTENSION";
+        }>>>;
         user: z.ZodObject<{
             id: z.ZodString;
             name: z.ZodString;

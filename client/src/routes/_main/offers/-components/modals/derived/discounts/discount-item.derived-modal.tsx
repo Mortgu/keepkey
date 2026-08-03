@@ -1,9 +1,9 @@
 import { Fragment } from "react/jsx-runtime";
 import { useState } from "react";
 import { Check, MoveRight, Pen, Trash } from "lucide-react";
-import DiscountItemFormRenwalModal from "./discount-item-form.renewal-modal";
+import DiscountItemFormDerivedModal from "./discount-item-form.derived-modal";
 import type { OfferDiscount } from "@keepit/schemas";
-import type { DiscountItemState } from "./discount.renewal-modal";
+import type { DiscountItemState } from "./discount.derived-modal";
 import { Button } from "@/components";
 import { formatEur } from "@/utils/utils";
 
@@ -15,7 +15,7 @@ interface Props {
     onToggleDelete: (index: number) => void;
 }
 
-export default function DiscountItemRenewalModal({ index, originalDiscount, item, onUpdate, onToggleDelete }: Props) {
+export default function DiscountItemDerivedModal({ index, originalDiscount, item, onUpdate, onToggleDelete }: Props) {
     const [edit, setEdit] = useState<boolean>(false);
 
     const amountChanged = originalDiscount.amount_cents !== item.amount_cents;
@@ -52,7 +52,7 @@ export default function DiscountItemRenewalModal({ index, originalDiscount, item
                 </div>
 
                 {edit && !item.deleted && (
-                    <DiscountItemFormRenwalModal
+                    <DiscountItemFormDerivedModal
                         item={item}
                         closeFn={() => setEdit(false)}
                         saveFn={(updated) => {
