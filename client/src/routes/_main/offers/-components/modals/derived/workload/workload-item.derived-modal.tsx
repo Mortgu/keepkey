@@ -36,6 +36,7 @@ export default function WorkloadItemDerivedModal(props: Props) {
     const { t } = useTranslation();
     const locales = useLocale();
     const [edit, setEdit] = useState<boolean>(false);
+    const [checked, setChecked] = useState<boolean>(true);
 
     const offer = useStore(form.store, (s) => s.values);
     const position = useStore(form.store, (s) => s.values.offerPositions[index]);
@@ -66,7 +67,7 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
                     {/* Checkbox + Product name + contract */}
                     <div className="flex items-center gap-4">
-                        <Checkbox />
+                        <Checkbox checked={checked} onChange={() => setChecked(!checked)} />
 
                         <div className="grid">
                             <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>

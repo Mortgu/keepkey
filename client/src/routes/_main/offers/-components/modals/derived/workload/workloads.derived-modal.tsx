@@ -1,9 +1,9 @@
-import { useStore } from "@tanstack/react-form";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import WorkloadItemDerivedModal from "./workload-item.derived-modal";
 import type { OfferPosition } from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
+import useWorkloadDerivedModal from "./use-workload.derived-modal";
 
 interface Props {
     form: DerivedFormApi;
@@ -16,13 +16,8 @@ interface Props {
 export default function WorkloadDerivedModal({ form, mode, offerId, customerId, workloads }: Props) {
     const { t } = useTranslation();
 
-    const positions = useStore(form.store, (s) => s.values.offerPositions);
+    const { positions } = useWorkloadDerivedModal({ form });
 
-    /**
-     * Die Quellpositionen werden per Index mit den Formularpositionen gepaart.
-     * Beim Entfernen müssen deshalb beide Listen im Gleichschritt schrumpfen —
-     * sonst zeigt jede nachfolgende Zeile die Vorher-Werte ihrer Nachbarin.
-     */
     const [sources, setSources] = useState<Array<OfferPosition>>(workloads);
 
     const handleRemove = (index: number) => {
