@@ -48,7 +48,7 @@ export default function TariffComponent({ tariff }: Props) {
         const last = sorted.at(-1);
 
         if (!last) {
-            await createRow({ groupId, tariffId: tariff.id, min_qty: 1, max_qty: null });
+            await createRow({ groupId, tariffId: tariff.id, min_quantity: 1, max_quantity: null });
             return;
         }
 
@@ -57,13 +57,13 @@ export default function TariffComponent({ tariff }: Props) {
 
             await updateRow({
                 groupId, tariffId: tariff.id, rowId: last.id,
-                min_qty: last.min_quantity, max_qty: boundary,
+                min_quantity: last.min_quantity, max_quantity: boundary,
             });
-            await createRow({ groupId, tariffId: tariff.id, min_qty: boundary + 1, max_qty: null });
+            await createRow({ groupId, tariffId: tariff.id, min_quantity: boundary + 1, max_quantity: null });
             return;
         }
 
-        await createRow({ groupId, tariffId: tariff.id, min_qty: last.max_quantity + 1, max_qty: null });
+        await createRow({ groupId, tariffId: tariff.id, min_quantity: last.max_quantity + 1, max_quantity: null });
     };
 
     return (

@@ -582,7 +582,29 @@ export async function updateTariffGroup(id: string, input: UpdateTariffGroupInpu
     });
 }
 
+/**
+ * Löscht eine Tarifgruppe samt ihrer Preistabellen.
+ *
+ * Die Versionsprüfung ist dieselbe wie in {@link deleteTariff} und hier nicht
+ * verzichtbar: das Löschen cascadet über die Gruppe auf ihre `Tariff`-Zeilen,
+ * an denen `TariffVersion` per `onDelete: Restrict` hängt. Ohne diese Prüfung
+ * käme der Fremdschlüsselfehler roh als 500 zurück statt als verständliche
+ * Meldung — und der Schutz der angepinnten Angebotspreise wäre eine
+ * Zufallseigenschaft der Datenbank statt einer Regel der Fachlogik.
+ */
 export async function deleteTariffGroup(id: string): Promise<void> {
+    const versionCount = await prisma.tariffVersion.count({
+        where: { tariff: { tariffGroupId: id } },
+    });
+
+    if (versionCount > 0) {
+        throw new AppException(
+            "Tarifgruppen mit Versionshistorie können nicht gelöscht werden.",
+            409,
+            "TARIFF_HAS_VERSIONS",
+        );
+    }
+
     await prisma.tariffGroup.delete({
         where: { id },
     });
@@ -855,7 +877,7 @@ export async function createTariffRow(tariffId: string, input: CreateTariffRowIn
 }
 
 export async function updateTariffRow(rowId: string, input: UpdateTariffRowInput) {
-    const { min_qty, max_qty } = input;
+    const { min_quantity, max_quantity } = input;
 
     return prisma.$transaction(async (tx) => {
         const current = await tx.tariffRow.findUnique({
@@ -868,8 +890,8 @@ export async function updateTariffRow(rowId: string, input: UpdateTariffRowInput
         }
 
         const next: QuantityRange = {
-            min_quantity: min_qty ?? current.min_quantity,
-            max_quantity: max_qty !== undefined ? max_qty : current.max_quantity,
+            min_quantity: min_quantity ?? current.min_quantity,
+            max_quantity: max_quantity !== undefined ? max_quantity : current.max_quantity,
         };
 
         assertQuantityRange(next);

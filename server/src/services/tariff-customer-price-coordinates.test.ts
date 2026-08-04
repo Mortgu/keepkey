@@ -55,7 +55,7 @@ describe("updateTariffRow", () => {
         tx.tariffRow.findMany.mockResolvedValue([current]);
         tx.tariffRow.update.mockResolvedValue({ ...current, min_quantity: 10 });
 
-        await updateTariffRow("row-1", { min_qty: 10 });
+        await updateTariffRow("row-1", { min_quantity: 10 });
 
         expect(tx.tariffCustomerPrice.updateMany).toHaveBeenCalledWith({
             where: { tariffId: "tariff-1", min_quantity: 11 },
@@ -69,7 +69,7 @@ describe("updateTariffRow", () => {
         tx.tariffRow.findMany.mockResolvedValue([current]);
         tx.tariffRow.update.mockResolvedValue({ ...current, max_quantity: 30 });
 
-        await updateTariffRow("row-1", { max_qty: 30 });
+        await updateTariffRow("row-1", { max_quantity: 30 });
 
         expect(tx.tariffCustomerPrice.updateMany).not.toHaveBeenCalled();
         expect(tx.tariffCustomerPrice.deleteMany).not.toHaveBeenCalled();
@@ -81,7 +81,7 @@ describe("updateTariffRow", () => {
         tx.tariffRow.findMany.mockResolvedValue([current]);
         tx.tariffRow.update.mockResolvedValue({ ...current, min_quantity: 10 });
 
-        await updateTariffRow("row-1", { min_qty: 10 });
+        await updateTariffRow("row-1", { min_quantity: 10 });
 
         // Ohne dieses Aufräumen bricht der Unique-Index beim Verschieben.
         expect(tx.tariffCustomerPrice.deleteMany).toHaveBeenCalledWith({

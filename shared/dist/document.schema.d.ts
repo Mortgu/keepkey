@@ -1,9 +1,22 @@
 import { z } from 'zod';
+/** Format eines gespeicherten Artefakts — so steht es in der Datenbank. */
 export declare const documentFormatSchema: z.ZodEnum<{
     PDF: "PDF";
     DOCX: "DOCX";
 }>;
 export type DocumentFormat = z.infer<typeof documentFormatSchema>;
+/**
+ * Dasselbe Format als Pfadsegment in der Download-URL.
+ *
+ * Getrennt vom {@link documentFormatSchema}, weil es in der URL
+ * kleingeschrieben ist. Beide Namen tragen den Unterschied, damit nicht das
+ * eine dort landet, wo das andere erwartet wird.
+ */
+export declare const documentFormatParamSchema: z.ZodEnum<{
+    pdf: "pdf";
+    docx: "docx";
+}>;
+export type DocumentFormatParam = z.infer<typeof documentFormatParamSchema>;
 export declare const documentStatusSchema: z.ZodEnum<{
     PENDING: "PENDING";
     PROCESSING: "PROCESSING";

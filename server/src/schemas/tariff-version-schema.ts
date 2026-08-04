@@ -1,32 +1,22 @@
 import { createHash } from "node:crypto";
 
-import { z } from "zod";
+import { tariffVersionSnapshotSchema, type TariffVersionSnapshot } from "@keepit/schemas";
 
 import type { TariffForPricing } from "../utils/products.js";
 
 /**
- * Snapshot einer Preistabelle. Bewusst koordinatenbasiert statt id-basiert:
- * Zellen werden über (duration, min_quantity) adressiert, nicht über cuids.
- * Dadurch ist der Snapshot zugleich wiederherstellbar, lesbar und stabil
- * hashbar — ein Restore erzeugt denselben Hash wie die Version, aus der er
- * stammt, obwohl alle Datenbank-Ids neu vergeben wurden.
+ * Die Form des Snapshots liegt in `@keepit/schemas` — sie beschreibt sowohl das
+ * Persistenzformat als auch die API-Antwort und darf deshalb nur einmal
+ * existieren. Hier bleibt nur, was serverseitig ist: bauen, hashen (`node:crypto`
+ * läuft nicht im Browser) und wieder zu einer bepreisbaren Form hydrieren.
+ *
+ * Bewusst koordinatenbasiert statt id-basiert: Zellen werden über
+ * (duration, min_quantity) adressiert, nicht über cuids. Dadurch ist der
+ * Snapshot zugleich wiederherstellbar, lesbar und stabil hashbar — ein Restore
+ * erzeugt denselben Hash wie die Version, aus der er stammt, obwohl alle
+ * Datenbank-Ids neu vergeben wurden.
  */
-export const tariffVersionSnapshotSchema = z.object({
-    columns: z.array(z.object({
-        duration: z.number().int().positive(),
-    })),
-    rows: z.array(z.object({
-        min_quantity: z.number().int().positive(),
-        max_quantity: z.number().int().positive().nullable(),
-    })),
-    cells: z.array(z.object({
-        duration: z.number().int().positive(),
-        min_quantity: z.number().int().positive(),
-        /** null == Zelle existiert, hat aber keinen Default-Preis */
-        price: z.number().int().nullable(),
-    })),
-});
-export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
+export type { TariffVersionSnapshot };
 
 /** Minimale Tarif-Form, die {@link buildTariffVersionSnapshot} benötigt. */
 export interface TariffForSnapshot {

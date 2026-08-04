@@ -1,5 +1,14 @@
 import { z } from 'zod';
+/** Format eines gespeicherten Artefakts — so steht es in der Datenbank. */
 export const documentFormatSchema = z.enum(["PDF", "DOCX"]);
+/**
+ * Dasselbe Format als Pfadsegment in der Download-URL.
+ *
+ * Getrennt vom {@link documentFormatSchema}, weil es in der URL
+ * kleingeschrieben ist. Beide Namen tragen den Unterschied, damit nicht das
+ * eine dort landet, wo das andere erwartet wird.
+ */
+export const documentFormatParamSchema = z.enum(["pdf", "docx"]);
 export const documentStatusSchema = z.enum([
     "PENDING", "PROCESSING", "GENERATED", "UPLOADING", "UPLOADED", "FAILED"
 ]);

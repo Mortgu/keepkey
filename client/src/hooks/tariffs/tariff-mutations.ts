@@ -223,9 +223,9 @@ export function useCreateTariffRow() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, min_qty, max_qty }: {
-            groupId: string, tariffId: string, min_qty: number, max_qty: number | null
-        }) => createTariffRow(groupId, tariffId, min_qty, max_qty),
+        mutationFn: ({ groupId, tariffId, min_quantity, max_quantity }: {
+            groupId: string, tariffId: string, min_quantity: number, max_quantity: number | null
+        }) => createTariffRow(groupId, tariffId, min_quantity, max_quantity),
         onSuccess: () => invalidateStructure(queryClient),
     });
 
@@ -256,9 +256,9 @@ export function useUpdateTariffRow() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, rowId, min_qty, max_qty }: {
-            groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number | null
-        }) => updateTariffRow(groupId, tariffId, rowId, min_qty, max_qty),
+        mutationFn: ({ groupId, tariffId, rowId, min_quantity, max_quantity }: {
+            groupId: string, tariffId: string, rowId: string, min_quantity: number, max_quantity: number | null
+        }) => updateTariffRow(groupId, tariffId, rowId, min_quantity, max_quantity),
         onSuccess: () => invalidateStructure(queryClient),
     });
 

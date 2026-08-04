@@ -150,13 +150,20 @@ export const createTariffSchema = z.object({
 });
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
+/**
+ * Die Laufzeit muss positiv sein — deckungsgleich mit
+ * {@link tariffVersionSnapshotSchema}. Ohne diese Schranke ließe sich eine
+ * Spalte mit Laufzeit 0 anlegen, an der anschließend jedes Versiegeln einer
+ * Version scheitert. Damit wäre die ganze Preistabelle blockiert, inklusive
+ * der Angebotserstellung.
+ */
 export const createTariffColumnSchema = z.object({
-    duration: z.int(),
+    duration: z.int().positive(),
 });
 export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
 
 export const updateTariffColumnSchema = z.object({
-    duration: z.int().optional(),
+    duration: z.int().positive().optional(),
 });
 export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
 
@@ -168,8 +175,8 @@ export const createTariffRowSchema = z.object({
 export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
 
 export const updateTariffRowSchema = z.object({
-    min_qty: z.int().optional(),
-    max_qty: z.int().nullable().optional(),
+    min_quantity: z.int().optional(),
+    max_quantity: z.int().nullable().optional(),
 });
 export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
 
@@ -212,12 +219,19 @@ export const upsertCustomerPriceSchema = z.object({
 });
 export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
 
-/** Kundenspezifischen Stückpreis entfernen. */
+/**
+ * Kundenspezifischen Stückpreis entfernen.
+ *
+ * Wird als Query-String übertragen, deshalb `coerce`: dort kommt alles als
+ * String an. Ohne diese Validierung landete ein `NaN` aus `Number(…)` in der
+ * Preislogik und lief dort als „keine passende Spalte" auf — mit einer
+ * Fehlermeldung, die auf die falsche Ursache zeigt.
+ */
 export const deleteCustomerPriceSchema = z.object({
     productId: z.string().min(1),
     contractId: z.string().min(1),
-    duration: z.int().positive(),
-    quantity: z.int().positive(),
+    duration: z.coerce.number().int().positive(),
+    quantity: z.coerce.number().int().positive(),
     customerId: z.string().min(1),
 });
 export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
@@ -255,18 +269,27 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
 /**
  * Snapshot einer Preistabelle — koordinatenbasiert, damit er unabhängig von
  * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
+ *
+ * **Die einzige Definition dieser Form.** Sie beschreibt zugleich, was der
+ * Server in `TariffVersion.snapshot` schreibt und liest, und was der Client in
+ * der API-Antwort bekommt. Solange beides von hier kommt, können die Schranken
+ * nicht auseinanderlaufen.
+ *
+ * Alle Koordinaten sind positiv: eine Laufzeit oder Mengenuntergrenze von 0
+ * ergibt fachlich keinen Sinn und würde beim Wiederherstellen eine Zeile bzw.
+ * Spalte erzeugen, die keine Preisabfrage mehr trifft.
  */
 export const tariffVersionSnapshotSchema = z.object({
     columns: z.array(createTariffColumnSchema),
     rows: z.array(z.object({
-        min_quantity: z.number().int(),
-        max_quantity: z.number().int().nullable(),
+        min_quantity: z.int().positive(),
+        max_quantity: z.int().positive().nullable(),
     })),
     cells: z.array(z.object({
-        duration: z.number().int(),
-        min_quantity: z.number().int(),
+        duration: z.int().positive(),
+        min_quantity: z.int().positive(),
         /** null == Zelle existiert, hat aber keinen Default-Preis */
-        price: z.number().int().nullable(),
+        price: z.int().nullable(),
     })),
 });
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;

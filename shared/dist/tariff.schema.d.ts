@@ -183,6 +183,13 @@ export declare const createTariffSchema: z.ZodObject<{
     contractId: z.ZodString;
 }, z.core.$strip>;
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
+/**
+ * Die Laufzeit muss positiv sein — deckungsgleich mit
+ * {@link tariffVersionSnapshotSchema}. Ohne diese Schranke ließe sich eine
+ * Spalte mit Laufzeit 0 anlegen, an der anschließend jedes Versiegeln einer
+ * Version scheitert. Damit wäre die ganze Preistabelle blockiert, inklusive
+ * der Angebotserstellung.
+ */
 export declare const createTariffColumnSchema: z.ZodObject<{
     duration: z.ZodInt;
 }, z.core.$strip>;
@@ -198,8 +205,8 @@ export declare const createTariffRowSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
 export declare const updateTariffRowSchema: z.ZodObject<{
-    min_qty: z.ZodOptional<z.ZodInt>;
-    max_qty: z.ZodOptional<z.ZodNullable<z.ZodInt>>;
+    min_quantity: z.ZodOptional<z.ZodInt>;
+    max_quantity: z.ZodOptional<z.ZodNullable<z.ZodInt>>;
 }, z.core.$strip>;
 export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
 /**
@@ -224,12 +231,19 @@ export declare const upsertCustomerPriceSchema: z.ZodObject<{
     price: z.ZodInt;
 }, z.core.$strip>;
 export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
-/** Kundenspezifischen Stückpreis entfernen. */
+/**
+ * Kundenspezifischen Stückpreis entfernen.
+ *
+ * Wird als Query-String übertragen, deshalb `coerce`: dort kommt alles als
+ * String an. Ohne diese Validierung landete ein `NaN` aus `Number(…)` in der
+ * Preislogik und lief dort als „keine passende Spalte" auf — mit einer
+ * Fehlermeldung, die auf die falsche Ursache zeigt.
+ */
 export declare const deleteCustomerPriceSchema: z.ZodObject<{
     productId: z.ZodString;
     contractId: z.ZodString;
-    duration: z.ZodInt;
-    quantity: z.ZodInt;
+    duration: z.ZodCoercedNumber<unknown>;
+    quantity: z.ZodCoercedNumber<unknown>;
     customerId: z.ZodString;
 }, z.core.$strip>;
 export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
@@ -431,19 +445,28 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
 /**
  * Snapshot einer Preistabelle — koordinatenbasiert, damit er unabhängig von
  * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
+ *
+ * **Die einzige Definition dieser Form.** Sie beschreibt zugleich, was der
+ * Server in `TariffVersion.snapshot` schreibt und liest, und was der Client in
+ * der API-Antwort bekommt. Solange beides von hier kommt, können die Schranken
+ * nicht auseinanderlaufen.
+ *
+ * Alle Koordinaten sind positiv: eine Laufzeit oder Mengenuntergrenze von 0
+ * ergibt fachlich keinen Sinn und würde beim Wiederherstellen eine Zeile bzw.
+ * Spalte erzeugen, die keine Preisabfrage mehr trifft.
  */
 export declare const tariffVersionSnapshotSchema: z.ZodObject<{
     columns: z.ZodArray<z.ZodObject<{
         duration: z.ZodInt;
     }, z.core.$strip>>;
     rows: z.ZodArray<z.ZodObject<{
-        min_quantity: z.ZodNumber;
-        max_quantity: z.ZodNullable<z.ZodNumber>;
+        min_quantity: z.ZodInt;
+        max_quantity: z.ZodNullable<z.ZodInt>;
     }, z.core.$strip>>;
     cells: z.ZodArray<z.ZodObject<{
-        duration: z.ZodNumber;
-        min_quantity: z.ZodNumber;
-        price: z.ZodNullable<z.ZodNumber>;
+        duration: z.ZodInt;
+        min_quantity: z.ZodInt;
+        price: z.ZodNullable<z.ZodInt>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
@@ -465,13 +488,13 @@ export declare const tariffVersionSchema: z.ZodObject<{
             duration: z.ZodInt;
         }, z.core.$strip>>;
         rows: z.ZodArray<z.ZodObject<{
-            min_quantity: z.ZodNumber;
-            max_quantity: z.ZodNullable<z.ZodNumber>;
+            min_quantity: z.ZodInt;
+            max_quantity: z.ZodNullable<z.ZodInt>;
         }, z.core.$strip>>;
         cells: z.ZodArray<z.ZodObject<{
-            duration: z.ZodNumber;
-            min_quantity: z.ZodNumber;
-            price: z.ZodNullable<z.ZodNumber>;
+            duration: z.ZodInt;
+            min_quantity: z.ZodInt;
+            price: z.ZodNullable<z.ZodInt>;
         }, z.core.$strip>>;
     }, z.core.$strip>;
     reason: z.ZodEnum<{

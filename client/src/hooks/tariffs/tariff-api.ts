@@ -107,11 +107,11 @@ export const deleteTariffRow = (groupId: string, tariffId: string, rowId: string
         method: "DELETE",
     });
 
-export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number | null) =>
+export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_quantity: number, max_quantity: number | null) =>
     api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ min_qty, max_qty }),
+        body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
 /* ───────────────────────────────

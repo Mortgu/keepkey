@@ -111,6 +111,13 @@ export function selectPrice(
 ): PriceResult {
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
+    // `duration` wählt nicht nur die Spalte, sie ist auch Multiplikator — ein
+    // NaN aus einem Query-Parameter lief hier bisher als NO_COLUMN auf und
+    // meldete damit die falsche Ursache.
+    if (!Number.isInteger(duration) || duration <= 0) {
+        return { ok: false, reason: 'INVALID_INPUT' };
+    }
+
     if (!Number.isInteger(quantity) || quantity <= 0) {
         return { ok: false, reason: 'INVALID_INPUT' };
     }

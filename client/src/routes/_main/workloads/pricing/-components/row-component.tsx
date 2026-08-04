@@ -1,6 +1,6 @@
 import { Trash } from "lucide-react";
-import {  useState } from "react";
-import type {ChangeEvent} from "react";
+import { useState } from "react";
+import type { ChangeEvent } from "react";
 import { Button } from "@/components";
 import { useTariffGroupHook } from "@/hooks";
 
@@ -24,12 +24,12 @@ export default function TariffRowComponent(props: Props) {
 
     const handleMinBlur = async () => {
         setEditMin(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max });
+        await updateRow({ groupId, tariffId, rowId, min_quantity: min, max_quantity: max });
     };
 
     const handleMaxBlur = async () => {
         setEditMax(false);
-        await updateRow({ groupId, tariffId, rowId, min_qty: min, max_qty: max });
+        await updateRow({ groupId, tariffId, rowId, min_quantity: min, max_quantity: max });
     };
 
     const handleMinChange = (e: ChangeEvent<HTMLInputElement>) => {

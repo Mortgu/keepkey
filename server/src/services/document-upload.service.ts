@@ -12,7 +12,7 @@ import {
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import type { DocumentType } from "../schemas/document-schemas.js";
+import type { DocumentType } from "@keepit/schemas";
 
 type StoredDocumentArtifact = {
     id: string;
