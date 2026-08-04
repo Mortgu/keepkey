@@ -73,10 +73,10 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
 
         // 5. Cells + Default-Preise
         const cells = [
-            { rowId: rowSmall.id, columnId: column12.id, price: 10 },
-            { rowId: rowSmall.id, columnId: column24.id, price: 9 },
-            { rowId: rowLarge.id, columnId: column12.id, price: 5 },
-            { rowId: rowLarge.id, columnId: column24.id, price: 4 },
+            { rowId: rowSmall.id, columnId: column12.id, duration: 12, min_quantity: 1,  price: 10 },
+            { rowId: rowSmall.id, columnId: column24.id, duration: 24, min_quantity: 1,  price: 9  },
+            { rowId: rowLarge.id, columnId: column12.id, duration: 12, min_quantity: 11, price: 5  },
+            { rowId: rowLarge.id, columnId: column24.id, duration: 24, min_quantity: 11, price: 4  },
         ];
 
         for (const cellData of cells) {
@@ -95,10 +95,13 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
             // 6. Kunden-spezifischer Override für den ersten Kunden
             const firstCustomer = customers[0];
             if (firstCustomer) {
-                await prisma.tariffCellCustomer.create({
+                await prisma.tariffCustomerPrice.create({
                     data: {
-                        cellId: cell.id,
+                        tariffId: tariff.id,
                         customerId: firstCustomer.id,
+                        productId: null,
+                        duration: cellData.duration,
+                        min_quantity: cellData.min_quantity,
                         price: Math.max(1, Math.floor(cellData.price * 0.8)),
                     },
                 });
