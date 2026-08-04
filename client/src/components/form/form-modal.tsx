@@ -62,7 +62,7 @@ export function FormModal({
                 </form>
             </ModalDialog.Content>
             <ModalDialog.Footer>
-                <Button type="button" variant="secondary" size={size} onClick={onClose}>
+                <Button type="button" variant="border" size={size} onClick={onClose}>
                     {cancelLabel}
                 </Button>
                 <form.Subscribe

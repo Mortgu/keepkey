@@ -462,8 +462,8 @@ export declare const tariffVersionSnapshotSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
 export declare const tariffVersionReasonSchema: z.ZodEnum<{
-    OFFER: "OFFER";
     MANUAL: "MANUAL";
+    OFFER: "OFFER";
     RESTORE: "RESTORE";
 }>;
 export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
@@ -489,8 +489,8 @@ export declare const tariffVersionSchema: z.ZodObject<{
         }, z.core.$strip>>;
     }, z.core.$strip>;
     reason: z.ZodEnum<{
-        OFFER: "OFFER";
         MANUAL: "MANUAL";
+        OFFER: "OFFER";
         RESTORE: "RESTORE";
     }>;
     createdBy: z.ZodNullable<z.ZodObject<{

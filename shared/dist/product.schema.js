@@ -20,4 +20,8 @@ export const productSchema = z.object({
     updatedAt: isoDateTime,
 });
 export const productListSchema = z.array(productSchema);
+export const workloadFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.string().optional(),
+});
 //# sourceMappingURL=product.schema.js.map

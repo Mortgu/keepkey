@@ -3,12 +3,16 @@ import type {
     Product,
 
     UpdateProductInput,
+    WorkloadFilterParams,
 } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 
 
-export const getProducts = () =>
-    api<Array<Product>>("/api/products", { method: "GET" });
+export const getProducts = async (filters: WorkloadFilterParams) =>
+    api<Array<Product>>(`/api/products?${formatQueryString(filters)}`, {
+        method: "GET"
+    });
 
 export const getProduct = (id: string) =>
     api<Product>(`/api/products/${id}`, { method: "GET" });

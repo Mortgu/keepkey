@@ -1,11 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
-import ContractList from './-components/contract-list'
-import { PageWidth } from '@/components'
+import { createFileRoute } from '@tanstack/react-router';
+import ContractPage from './-page';
 
 export const Route = createFileRoute('/_main/contracts/')({
-    component: () => (
-        <PageWidth>
-            <ContractList />
-        </PageWidth>
-    ),
+    component: ContractPage,
 });

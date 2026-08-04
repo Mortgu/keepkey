@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { LoaderCircle, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
-import ProductList from './-components/product-list';
-import { Button, PageWidth, SearchBar } from "@/components";
+import { Fragment, useMemo, useState } from "react";
+import { Button, PageWidth } from "@/components";
 import { useLocale, useModal, useProductManager } from "@/hooks";
-import ProductModal from "@/routes/_main/workloads/-components/product-modal.tsx";
 import { localized } from "@/lib/i18n-content";
+import ProductModal from "./-components/product-modal";
+import ProductList from "./-components/product-list";
 
 export default function ProductPage() {
     const { t } = useTranslation()
@@ -39,40 +39,44 @@ export default function ProductPage() {
     }
 
     return (
-        <PageWidth>
-            <div className="grid gap-4">
-                {/* Page header */}
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-medium">{t('section.workloads')}</h1>
-                </div>
-
-                {/* Page header actions */}
-                <div className="flex items-center justify-between gap-4">
-                    <div className="w-full flex items-center gap-4">
-                        <SearchBar value={searchQuery} onChange={setSearchQuery}
-                            onSubmit={() => {
-                            }} placeholder="Nach Produkt Namen suchen" />
-
-                        <div className="flex items-center gap-2">
-                            <Button onClick={() => modal.open()} size="sm">
-                                {t('button.create')} <Plus className="size-4" />
+        <Fragment>
+            <PageWidth variant="none">
+                {/* Header */}
+                <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
+                    <div className="flex items-center justify-between">
+                        <div className="flex-1 grid gap-1">
+                            <h1 className="font-medium text-xl">{t('section.workloads')}</h1>
+                            <p className="font-light text-sm text-gray-400">
+                                Zentrale Workload verwaltung
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            {/* <Button icon={<Download size={14} />} variant="border" size="sm">
+                        {t("button.export")}
+                    </Button>*/}
+                            <Button
+                                icon={<Plus size={14} strokeWidth={3} />}
+                                variant="primary"
+                                size="sm"
+                                onClick={() => modal.open()}
+                            >
+                                {t("button.create")}
                             </Button>
                         </div>
                     </div>
                 </div>
 
-                {/* body */}
-                <div className="grid gap-4">
-                    {isPending ? renderLoading() : (
-                        <ProductList products={filteredProducts} />
-                    )}
-                </div>
+                <ProductList />
+            </PageWidth>
 
-                {modal.isOpen && (
-                    <ProductModal key={modal.key} onClose={modal.close}
-                        submitFn={(value) => createProduct({ ...value })} />
-                )}
-            </div>
-        </PageWidth>
+            {modal.isOpen && (
+                <ProductModal
+                    key={modal.key}
+                    onClose={modal.close}
+                    submitFn={(value) => createProduct({ ...value })}
+                    currentItem={modal.data}
+                />
+            )}
+        </Fragment>
     )
 }

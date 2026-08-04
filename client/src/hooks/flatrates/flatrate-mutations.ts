@@ -33,7 +33,7 @@ export function useUpdateFlatRate() {
     });
 
     return {
-        updateFlatRate: mutation.mutate,
+        updateFlatRate: mutation.mutateAsync,
         isUpdatingFlatRate: mutation.isPending,
         errorUpdatingFlatRate: mutation.error,
     };

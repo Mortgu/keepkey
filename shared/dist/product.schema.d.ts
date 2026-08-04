@@ -63,4 +63,9 @@ export declare const productListSchema: z.ZodArray<z.ZodObject<{
     updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
 }, z.core.$strip>>;
 export type ProductList = z.infer<typeof productListSchema>;
+export declare const workloadFilterSchema: z.ZodObject<{
+    search: z.ZodOptional<z.ZodString>;
+    sort: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type WorkloadFilterParams = z.input<typeof workloadFilterSchema>;
 //# sourceMappingURL=product.schema.d.ts.map
