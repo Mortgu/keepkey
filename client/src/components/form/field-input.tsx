@@ -1,10 +1,10 @@
+import { Input } from "../input";
+import { Textarea } from "../textarea";
+import { Select } from "../select";
+import type { InputComponentProps } from "../input";
+import type { TextareaComponentProps } from "../textarea";
+import type { SelectComponentProps } from "../select";
 import type { ChangeEvent } from "react";
-import type { InputComponentProps } from "@/components/inputs/text/input-types";
-import type { TextareaComponentProps } from "@/components/inputs/text/textarea-types";
-import type { SelectComponentProps } from "@/components/select/select-types";
-import { Input } from "@/components/inputs/text/input";
-import { Textarea } from "@/components/inputs/text/textarea";
-import { Select } from "@/components/select/select";
 import { getFormError } from "@/lib/utils";
 
 /* ──────────────────────────────────────────────────────────────────────

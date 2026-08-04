@@ -15,6 +15,7 @@ import { useOffers } from "@/hooks/offers/offer-hooks";
 
 interface OrderModalProps {
   onClose: () => void;
+  customerId?: string;
 }
 
 const orderSchema = z.object({
@@ -29,9 +30,9 @@ function toInputDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
 
-export default function OrderModal({ onClose }: OrderModalProps) {
+export default function OrderModal({ onClose, customerId }: OrderModalProps) {
   const { t } = useTranslation();
-  const { items: offers } = useOffers();
+  const { items: offers } = useOffers(customerId ? { companyIds: [customerId] } : {});
   const { createOrder } = useCreateOrder();
   const { nextOrderNumber } = useNextOrderNumber();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);

@@ -39,6 +39,21 @@
     "no_duration": "Keine Laufzeit konfiguriert",
     "invalid_price": "Ungültiger Preis."
   },
+  "licenseExtension": {
+    "title": "Lizenzerweiterung für {{orderId}}",
+    "hint": "Zusätzliche Seats werden zu den Preisen des Ursprungsangebots berechnet. Produkt, Vertrag und Laufzeit bleiben unverändert.",
+    "no_snapshot": "Für diese Position existiert keine eingefrorene Preistabelle — gerechnet wird mit ihrem gespeicherten Stückpreis, ohne Mengenstaffel."
+  },
+  "derived": {
+    "customer": "Kunde:",
+    "contact": "Ansprechpartner:",
+    "employee": "Mitarbeiter:",
+    "original_period": "Ursprüngliche Laufzeit",
+    "action_renewal": "Verlängerung",
+    "action_extension": "Lizenzerweiterung",
+    "badge_renewal": "Verlängerung",
+    "badge_extension": "Lizenzerweiterung"
+  },
   "offers": {
     "toast": {
       "deleteError": "Angebot konnte nicht gelöscht werden: {{message}}",

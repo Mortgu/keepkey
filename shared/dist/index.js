@@ -14,4 +14,5 @@ export * from "./contract.schema.js";
 export * from "./contact.schema.js";
 export * from "./supplier.schema.js";
 export * from "./tariff.schema.js";
+export * from "./pricing.schema.js";
 //# sourceMappingURL=index.js.map

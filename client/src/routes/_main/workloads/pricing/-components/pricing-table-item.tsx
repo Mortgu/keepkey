@@ -1,13 +1,14 @@
-import { ChevronDown, Plus, UndoDot } from "lucide-react";
+import { BookmarkPlus, ChevronDown, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import TariffComponent from "./tariff-component";
+import { TariffVersionList } from "./tariff-version-list";
 import type { TariffBase } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
-import { useCreateTariff } from "@/hooks/tariffs/tariff-mutations";
+import { useSealTariffVersion } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
     tariff: TariffBase;
@@ -19,15 +20,21 @@ export default function PricingTableItem({ tariff }: Props) {
     const [open, setOpen] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
-    const { createTariff, createTariffPending, createTariffError } = useCreateTariff();
+    const { sealVersion, sealingVersion, errorSealingVersion } = useSealTariffVersion();
 
     const contract = tariff.contract;
 
     useEffect(() => {
-        if (createTariffError) {
-            toast.error(createTariffError.message);
+        if (errorSealingVersion) {
+            toast.error(errorSealingVersion.message);
         }
-    }, [createTariffError])
+    }, [errorSealingVersion])
+
+    const handleSeal = async () => {
+        const version = await sealVersion({ groupId: tariff.tariffGroupId, tariffId: tariff.id });
+        toast.success(`Version ${version.version} gespeichert.`);
+        setDrawerOpen(true);
+    };
 
     return (
         <div>
@@ -45,10 +52,12 @@ export default function PricingTableItem({ tariff }: Props) {
 
                 <div className="px-2 py-2 flex items-center gap-2">
                     <Button size="sm" variant="secondary" icon={<UndoDot className="size-3.5" />} iconOnly
+                        title="Versionshistorie"
                         onClick={() => setDrawerOpen(true)} />
-                    <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />} iconOnly
-                        onClick={() => createTariff({ groupId: tariff.tariffGroupId, input: { contractId: tariff.contractId } })}
-                        loading={createTariffPending} disabled={createTariffPending} />
+                    <Button size="sm" variant="secondary" icon={<BookmarkPlus className="size-3.5" />} iconOnly
+                        title="Aktuellen Stand als Version speichern"
+                        onClick={handleSeal}
+                        loading={sealingVersion} disabled={sealingVersion} />
                 </div>
             </div>
 
@@ -57,9 +66,12 @@ export default function PricingTableItem({ tariff }: Props) {
             )}
 
             <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header eyebrow="" title="History"
-                    subtitle="Vergangene Preistabellen" />
+                <Drawer.Header eyebrow={localized(contract.translations, locale, "name")} title="Versionen"
+                    subtitle="Frühere Stände dieser Preistabelle" />
                 <Drawer.Body>
+                    {drawerOpen && (
+                        <TariffVersionList groupId={tariff.tariffGroupId} tariffId={tariff.id} />
+                    )}
                 </Drawer.Body>
             </Drawer>
         </div>

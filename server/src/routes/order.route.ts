@@ -16,7 +16,7 @@ import {
   createOrderSchema,
   restoreOrderRevisionSchema,
   updateOrderSchema
-} from "@/schemas/index.js";
+} from "@keepit/schemas";
 
 const router = Router();
 

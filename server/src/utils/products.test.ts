@@ -8,6 +8,9 @@ import { selectPrice, PriceError, type TariffForPricing } from "./products.js";
  * `price` ist der Stückpreis pro Stück pro Zeiteinheit.
  * Gesamt = unitPrice * quantity * duration. `duration` selektiert die Spalte
  * und ist zusätzlich Multiplikator.
+ *
+ * Kunden-Overrides hängen an den Koordinaten (duration, min_quantity), nicht
+ * an einer cellId — der Override unten adressiert also rowSmall/col12.
  */
 function buildTariff(): TariffForPricing {
   return {
@@ -25,22 +28,22 @@ function buildTariff(): TariffForPricing {
         rowId: "rowSmall",
         columnId: "col12",
         default_cells: [{ price: 10 }],
-        customer_cells: [{ customerId: "vip", price: 8, productId: null }],
       },
       {
         id: "cell2",
         rowId: "rowSmall",
         columnId: "col24",
         default_cells: [{ price: 9 }],
-        customer_cells: [],
       },
       {
         id: "cell3",
         rowId: "rowLarge",
         columnId: "col12",
         default_cells: [{ price: 5 }],
-        customer_cells: [],
       },
+    ],
+    customerPrices: [
+      { customerId: "vip", productId: null, duration: 12, min_quantity: 1, price: 8 },
     ],
   };
 }

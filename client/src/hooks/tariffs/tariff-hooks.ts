@@ -21,9 +21,9 @@ export function useTariffGroups() {
     return { groups, isPending, error };
 }
 
-export function useTariffHistoryHook(productId: string, contractId: string) {
-    const { data: history = [], isPending, error } = useQuery(tariffQueries.history(productId, contractId));
-    return { history, isPending, error };
+export function useTariffVersionsHook(groupId: string, tariffId: string) {
+    const { data: versions = [], isPending, error } = useQuery(tariffQueries.versions(groupId, tariffId));
+    return { versions, isPending, error };
 }
 
 export function useTariffDurationsHook(productId: string, contractId: string) {

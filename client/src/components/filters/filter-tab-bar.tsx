@@ -1,4 +1,4 @@
-import type { ComponentSize } from "@/components/size";
+import type { ComponentSize } from "@/components/tokens";
 import { Button } from "@/components";
 
 interface TabOption {

@@ -12,11 +12,11 @@ import {
 } from "@/controllers/index.js";
 import { validate } from "@/middlewares/zod.middleware.js";
 import {
-    createCustomerContactSchema,
+    createContactSchema,
+    updateContactSchema,
     createCustomerSchema,
-    updateCustomerContactSchema,
     updateCustomerSchema
-} from "@/schemas/customer-schemas.js";
+} from "@keepit/schemas";
 
 const router = Router();
 
@@ -26,7 +26,7 @@ const router = Router();
 router.get('/', getCustomers);
 
 /* [GET] /api/customers/:id */
-router.get('/', getCustomer);
+router.get('/:id', getCustomer);
 
 /* [POST] /api/customers */
 router.post('/', validate(createCustomerSchema), createCustomer);
@@ -43,10 +43,10 @@ router.delete('/:id', deleteCustomer);
 router.get('/:id/contacts', getCustomerContacts);
 
 /* [POST] /api/customers/:id/contacts */
-router.post('/:id/contacts', validate(createCustomerContactSchema), createCustomerContact);
+router.post('/:id/contacts', validate(createContactSchema), createCustomerContact);
 
 /* [PATCH] /api/customers/:id/contacts/:contactId */
-router.patch('/:id/contacts/:contactId', validate(updateCustomerContactSchema), updateCustomerContact);
+router.patch('/:id/contacts/:contactId', validate(updateContactSchema), updateCustomerContact);
 
 /* [DELETE] /api/customers/:id/contacts/:contactId */
 router.delete('/:id/contacts/:contactId', deleteCustomerContact);

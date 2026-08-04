@@ -40,7 +40,7 @@ function ModalDialog({ onClose, children }: ModalProps) {
     return (
         <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
             <div
-                className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+                className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-md w-full max-w-4xl max-h-[90vh] flex flex-col">
                 <div className="flex items-center justify-between pt-5 px-5">
                     {header}
 

@@ -8,7 +8,7 @@ import {
     updateContract
 } from "@/controllers/index.js";
 import { validate } from "@/middlewares/zod.middleware.js";
-import { createContractSchema, updateContractSchema, } from "@/schemas/index.js";
+import { createContractSchema, updateContractSchema } from "@keepit/schemas";
 
 const router = Router();
 

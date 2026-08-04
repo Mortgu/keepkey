@@ -19,12 +19,9 @@ export const getTariff = async (request: Request, response: Response) => {
     return response.status(200).json(tariff);
 };
 
-export const getTariffHistory = async (request: Request, response: Response) => {
-    const history = await tariffService.getTariffHistory(
-        request.params.productId as string,
-        request.params.contractId as string
-    );
-    return response.status(200).json(history);
+export const getTariffVersions = async (request: Request, response: Response) => {
+    const versions = await tariffService.getTariffVersions(request.params.tariffId as string);
+    return response.status(200).json(versions);
 };
 
 export const getTariffDurations = async (request: Request, response: Response) => {
@@ -47,11 +44,7 @@ export const getTariffPrice = async (request: Request, response: Response) => {
         freeMonths ? Number(freeMonths) : undefined
     );
 
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };
 
 /* ========== POST ========== */
@@ -65,6 +58,24 @@ export const createTariff = async (request: Request, response: Response) => {
     const tariffGroupId = request.params.id as string;
     const tariff = await tariffService.createTariff(tariffGroupId, request.body);
     return response.status(201).json(tariff);
+};
+
+export const sealTariffVersion = async (request: Request, response: Response) => {
+    const version = await tariffService.sealTariffVersion(
+        request.params.tariffId as string,
+        "MANUAL",
+        request.user!.id,
+    );
+    return response.status(201).json(version);
+};
+
+export const restoreTariffVersion = async (request: Request, response: Response) => {
+    const tariff = await tariffService.restoreTariffVersion(
+        request.params.tariffId as string,
+        request.params.versionId as string,
+        request.user!.id,
+    );
+    return response.status(200).json(tariff);
 };
 
 export const createTariffColumn = async (request: Request, response: Response) => {
@@ -109,11 +120,7 @@ export const updateTariffCell = async (request: Request, response: Response) => 
 
 export const upsertCustomerPrice = async (request: Request, response: Response) => {
     const result = await tariffService.upsertCustomerPrice(request.body);
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };
 
 /* ========== DELETE ========== */
@@ -147,9 +154,5 @@ export const deleteCustomerPrice = async (request: Request, response: Response) 
         customerId: request.query.customerId as string,
     });
 
-    return response.status(200).json({
-        success: true,
-        price: result.price,
-        breakdown: result.breakdown,
-    });
+    return response.status(200).json(result);
 };

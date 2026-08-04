@@ -9,7 +9,7 @@ import { validate } from "@/middlewares/zod.middleware.js";
 import {
   createSupplierSchema,
   updateSupplierSchema,
-} from "@/schemas/index.js";
+} from "@keepit/schemas";
 
 const router = Router();
 

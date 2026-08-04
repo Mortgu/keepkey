@@ -1,26 +1,17 @@
-import { z } from "zod";
 import { Prisma, prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
-    createCustomerSchema,
-    updateCustomerSchema,
-    createCustomerContactSchema,
-    updateCustomerContactSchema,
-} from "../schemas/customer-schemas.js";
+    CreateCustomerInput,
+    UpdateCustomerInput,
 
-/* ========== Types ========== */
+    CreateContactInput,
+    UpdateContactInput,
+} from "@keepit/schemas";
 
-export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
-export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
-export type CreateCustomerContactInput = z.infer<typeof createCustomerContactSchema>;
-export type UpdateCustomerContactInput = z.infer<typeof updateCustomerContactSchema>;
 
 /* ========== Queries ========== */
 
-export async function getCustomers(params?: {
-    search?: string;
-    sort?: string;
-}) {
+export async function getCustomers(params?: { search?: string; sort?: string; }) {
     const where: Prisma.CustomerWhereInput = {};
 
     if (params?.search) {
@@ -81,62 +72,27 @@ export async function getCustomerContacts(customerId: string) {
 /* ========== Mutations ========== */
 
 export async function createCustomer(input: CreateCustomerInput) {
-    const { contactPersons, ...customerFields } = input;
-
-    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        const customer = await tx.customer.create({
-            data: customerFields,
-        });
-
-        if (contactPersons && contactPersons.length > 0) {
-            await tx.contactPerson.createMany({
-                data: contactPersons.map((p) => ({
-                    ...p,
-                    customerId: customer.id,
-                })),
-            });
-        }
-
-        return customer;
+    const customer = await prisma.customer.create({
+        data: input,
     });
+
+    return customer;
 }
 
 export async function updateCustomer(id: string, input: UpdateCustomerInput): Promise<void> {
-    const { contactPersons, ...customerFields } = input;
-
-    await prisma.$transaction(async (tx) => {
-        await tx.customer.update({
-            where: { id },
-            data: customerFields,
-        });
-
-        if (contactPersons !== undefined) {
-            await tx.contactPerson.deleteMany({
-                where: { customerId: id }
-            });
-
-            if (contactPersons.length > 0) {
-                await tx.contactPerson.createMany({
-                    data: contactPersons.map((p) => ({
-                        salutation: p.salutation,
-                        firstName: p.firstName,
-                        lastName: p.lastName,
-                        email: p.email,
-                        customerId: id,
-                    })),
-                });
-            }
-        }
+    await prisma.customer.update({
+        where: { id },
+        data: input,
     });
 }
 
-export async function createCustomerContact(customerId: string, input: CreateCustomerContactInput) {
+export async function createCustomerContact(customerId: string, input: CreateContactInput) {
     return prisma.contactPerson.create({
         data: { ...input, customerId }
     });
 }
 
-export async function updateCustomerContact(contactId: string, input: UpdateCustomerContactInput) {
+export async function updateCustomerContact(contactId: string, input: UpdateContactInput) {
     const contact = await prisma.contactPerson.update({
         where: { id: contactId },
         data: input

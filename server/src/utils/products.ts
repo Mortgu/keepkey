@@ -1,21 +1,4 @@
-import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
-
-const TARIFF_SNAPSHOT_INCLUDE = {
-    rows: {
-        orderBy: { order: 'asc' },
-    },
-    columns: {
-        orderBy: { order: 'asc' },
-    },
-    cells: {
-        orderBy: { createdAt: 'asc' },
-        include: {
-            default_cells: true,
-            customer_cells: true,
-        },
-    },
-} as const;
 
 interface PriceCalculatorProps {
     productId: string;
@@ -43,7 +26,17 @@ export interface TariffForPricing {
         rowId: string;
         columnId: string;
         default_cells: Array<{ price: number }>;
-        customer_cells: Array<{ customerId: string; price: number; productId: string | null }>;
+    }>;
+    /**
+     * Kundenspezifische Stückpreise, adressiert über die stabilen Koordinaten
+     * (duration, min_quantity) statt über eine cellId.
+     */
+    customerPrices: Array<{
+        customerId: string;
+        productId: string | null;
+        duration: number;
+        min_quantity: number;
+        price: number;
     }>;
 }
 
@@ -133,9 +126,13 @@ export function selectPrice(
     let unitPrice = defaultCell.price;
 
     if (customerId !== undefined && customerId !== '') {
-        const overrides = cell.customer_cells.filter(cc => cc.customerId === customerId);
-        const productSpecific = overrides.find(cc => cc.productId === productId);
-        const groupWide = overrides.find(cc => cc.productId === null);
+        const overrides = tariff.customerPrices.filter(cp =>
+            cp.customerId === customerId
+            && cp.duration === resolved.column.duration
+            && cp.min_quantity === resolved.row.min_quantity
+        );
+        const productSpecific = overrides.find(cp => cp.productId === productId);
+        const groupWide = overrides.find(cp => cp.productId === null);
         const override = productSpecific ?? groupWide;
         if (override) unitPrice = override.price;
     }
@@ -149,36 +146,6 @@ export function selectPrice(
     };
 }
 
-export async function snapshotTariff(productId: string, contractId: string, tx: Prisma.TransactionClient = prisma) {
-    const groupProduct = await tx.tariffGroupProduct.findUnique({
-        where: { productId },
-    });
-
-    if (!groupProduct) return;
-
-    const { tariffGroupId } = groupProduct;
-
-    const tariff = await tx.tariff.findUnique({
-        where: { tariffGroupId_contractId: { tariffGroupId, contractId } },
-        include: TARIFF_SNAPSHOT_INCLUDE,
-    });
-
-    if (!tariff) return;
-
-    const versionCount = await tx.tariffHistory.count({
-        where: { productId, contractId },
-    });
-
-    await tx.tariffHistory.create({
-        data: {
-            productId,
-            contractId,
-            version: versionCount + 1,
-            snapshot: tariff as object,
-        },
-    });
-}
-
 const CALCULATE_PRICE_INCLUDE = {
     rows: {
         orderBy: { order: 'asc' },
@@ -190,17 +157,20 @@ const CALCULATE_PRICE_INCLUDE = {
         orderBy: { createdAt: 'asc' },
         include: {
             default_cells: true,
-            customer_cells: true,
         },
     },
 } as const;
 
 /**
- * Loads the tariff (with default + customer cells) for a product/contract
- * combination, resolving the tariff group via {@link TariffGroupProduct}.
- * Returns `null` when no tariff is configured.
+ * Loads the tariff (with default prices and customer-specific overrides) for a
+ * product/contract combination, resolving the tariff group via
+ * {@link TariffGroupProduct}. Returns `null` when no tariff is configured.
+ *
+ * `customerId` narrows the loaded overrides to a single customer — pass it
+ * whenever the caller prices for a known customer, so foreign customers' prices
+ * never leave the database.
  */
-export async function loadTariffForPricing(productId: string, contractId: string) {
+export async function loadTariffForPricing(productId: string, contractId: string, customerId?: string) {
     const groupProduct = await prisma.tariffGroupProduct.findUnique({
         where: { productId },
     });
@@ -209,22 +179,21 @@ export async function loadTariffForPricing(productId: string, contractId: string
 
     return prisma.tariff.findUnique({
         where: { tariffGroupId_contractId: { tariffGroupId: groupProduct.tariffGroupId, contractId } },
-        include: CALCULATE_PRICE_INCLUDE,
+        include: {
+            ...CALCULATE_PRICE_INCLUDE,
+            customerPrices: customerId ? { where: { customerId } } : true,
+        },
     });
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
     const { productId, contractId, duration, quantity, customerId, freeMonths } = props;
 
-    try {
-        const tariff = await loadTariffForPricing(productId, contractId);
+    const tariff = await loadTariffForPricing(productId, contractId, customerId);
 
-        if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
+    if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-        return selectPrice(tariff, { productId, duration, quantity, customerId, freeMonths });
-    } catch (error) {
-        throw error;
-    }
+    return selectPrice(tariff, { productId, duration, quantity, customerId, freeMonths });
 }
 
 /**

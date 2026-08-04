@@ -19,13 +19,52 @@ function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
     return map;
 }
 
+/**
+ * Nächste freie Laufzeit. Feste Vorgaben würden mit einer bestehenden Spalte
+ * kollidieren, seit doppelte Laufzeiten abgelehnt werden.
+ */
+function nextDuration(columns: TariffBase["columns"]): number {
+    if (columns.length === 0) return 12;
+    return columns.reduce((max, column) => Math.max(max, column.duration), 0) + 12;
+}
+
 export default function TariffComponent({ tariff }: Props) {
-    const { createColumn, createRow } = useTariffGroupHook();
+    const { createColumn, createRow, updateRow } = useTariffGroupHook();
 
     const groupId = tariff.tariffGroupId;
     const cells = tariff.cells;
 
     const cellMap = useMemo(() => buildCellMap(cells), [cells]);
+
+    /**
+     * Hängt eine Mengenstaffel lückenlos hinten an.
+     *
+     * Ist die letzte Staffel nach oben offen, gibt es hinter ihr keinen Platz —
+     * sie wird deshalb zuerst begrenzt und die neue Staffel übernimmt den
+     * offenen Rest. So bleiben die Bereiche überschneidungsfrei.
+     */
+    const handleAddRow = async () => {
+        const sorted = [...tariff.rows].sort((a, b) => a.min_quantity - b.min_quantity);
+        const last = sorted.at(-1);
+
+        if (!last) {
+            await createRow({ groupId, tariffId: tariff.id, min_qty: 1, max_qty: null });
+            return;
+        }
+
+        if (last.max_quantity === null) {
+            const boundary = last.min_quantity + 9;
+
+            await updateRow({
+                groupId, tariffId: tariff.id, rowId: last.id,
+                min_qty: last.min_quantity, max_qty: boundary,
+            });
+            await createRow({ groupId, tariffId: tariff.id, min_qty: boundary + 1, max_qty: null });
+            return;
+        }
+
+        await createRow({ groupId, tariffId: tariff.id, min_qty: last.max_quantity + 1, max_qty: null });
+    };
 
     return (
         <div className="border-b border-(--border)">
@@ -42,7 +81,8 @@ export default function TariffComponent({ tariff }: Props) {
 
                             <th>
                                 <Button variant="ghost" size="xs"
-                                    onClick={() => createColumn({ groupId, tariffId: tariff.id, duration: 1 })}
+                                    title="Laufzeit hinzufügen"
+                                    onClick={() => createColumn({ groupId, tariffId: tariff.id, duration: nextDuration(tariff.columns) })}
                                     icon={<Plus className="size-4" />} iconOnly />
                             </th>
 
@@ -60,8 +100,13 @@ export default function TariffComponent({ tariff }: Props) {
                                 {tariff.columns.map(column => {
                                     const cell = cellMap.get(`${row.id}:${column.id}`);
 
+                                    // Zeile/Spalte existieren, aber es gibt keine Zelle dazu —
+                                    // als leeres Feld darstellen statt als Platzhaltertext.
                                     if (!cell) {
-                                        return <>NaC</>
+                                        return (
+                                            <td key={`${row.id}:${column.id}`}
+                                                className="border border-(--border) px-3 py-1 bg-(--page-bg)" />
+                                        );
                                     }
 
                                     return (
@@ -75,7 +120,8 @@ export default function TariffComponent({ tariff }: Props) {
                         <tr>
                             <td className=" border-b border-r border-(--border)">
                                 <Button variant="secondary" size="xs" className="w-full px-4 py-1 border-none rounded-none"
-                                    onClick={() => createRow({ groupId, tariffId: tariff.id, min_qty: 1, max_qty: 100 })}
+                                    title="Mengenstaffel hinzufügen"
+                                    onClick={handleAddRow}
                                     icon={<Plus className="size-4" />} iconOnly />
                             </td>
                         </tr>

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { Button } from '../button/button';
-import type { ComponentSize } from "@/components/size";
+import { Button } from '../button';
+import type { ComponentSize } from "@/components/tokens";
 
 export interface DropdownOption {
   value: string;
@@ -56,7 +56,7 @@ export function MultiDropdown({ label, options, values, onChange, className, siz
       </Button>
 
       {open && (
-        <div className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-lg shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[200px] overflow-hidden py-1">
+        <div className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.10)] min-w-[200px] overflow-hidden py-1">
           {options.map(o => {
             const checked = values.includes(o.value);
             return (

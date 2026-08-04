@@ -8,7 +8,11 @@ import {
   updateUserById,
 } from "@/controllers/index.js";
 import { validate } from "@/middlewares/zod.middleware.js";
-import { createContactPersonsSchema, createUserSchema, updateUserSchema, } from "@/schemas/index.js";
+import {
+  createContactSchema,
+  createUserSchema,
+  updateUserSchema,
+} from "@keepit/schemas";
 
 const router = Router();
 
@@ -24,7 +28,7 @@ router.delete("/:id", deleteUser);
 
 router.post(
   "/me/contact-persons",
-  validate(createContactPersonsSchema),
+  validate(createContactSchema),
   createContactPersons,
 );
 

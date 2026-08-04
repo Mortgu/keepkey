@@ -4,40 +4,28 @@ import { useTranslation } from "react-i18next";
 import useOfferForm from "../../../-hooks/use-offer-form";
 import FormOfferModal from "./offer-form";
 
-import type {
-  Contract,
-  Customer,
-  Offer,
-  Product,
-  Supplier,
-  User,
-} from '@keepit/schemas';
-import {
-  Button, ModalDialog
-} from "@/components";
 import WorkloadOfferModalSection from "./workload/workloads";
 import FlatrateOfferModalSection from "./flatrate/flatrates";
 import DiscountOfferModalSection from "./discount/discounts";
+import type { Offer } from '@keepit/schemas';
+import {
+  Button, ModalDialog
+} from "@/components";
 
 
 interface OfferModalProps {
   closeFn: () => void;
   currentOffer: Offer | undefined;
-
-  customers: Array<Customer>;
-  suppliers: Array<Supplier>;
-  users: Array<User>;
-  products: Array<Product>;
-  contracts: Array<Contract>;
+  preselectedCustomerId?: string;
 }
 
 export default function OfferModal(props: OfferModalProps) {
-  const { closeFn, currentOffer, customers, suppliers, users } = props;
+  const { closeFn, currentOffer, preselectedCustomerId } = props;
   const isEdit = currentOffer !== undefined;
 
   const { t } = useTranslation();
 
-  const { form, customerId } = useOfferForm({ currentOffer, closeFn });
+  const { form, customerId } = useOfferForm({ currentOffer, closeFn, preselectedCustomerId });
 
   return (
     <ModalDialog onClose={closeFn}>

@@ -1,3 +1,12 @@
+/// Art, auf die ein Angebot aus einem anderen abgeleitet wurde.
+/// `null` bedeutet: eigenstaendig erstellt.
+enum OfferDerivationType {
+  /// Verlaengerung — rechnet zum aktuellen Tarif neu
+  RENEWAL
+  /// Lizenzerweiterung — behaelt den Preis der Quellposition
+  LICENSE_EXTENSION
+}
+
 model Offer {
   id String @id @default(uuid())
 
@@ -33,6 +42,13 @@ model Offer {
   revisions      OfferRevision[]
 
   orders Order?
+
+  /// Quellangebot, aus dem dieses abgeleitet wurde — fuer Verlaengerung
+  /// und Lizenzerweiterung gleichermassen. `derivationType` unterscheidet beide.
+  renewedFromOfferId String?
+  renewedFrom        Offer?               @relation("OfferRenewals", fields: [renewedFromOfferId], references: [id], onDelete: SetNull)
+  renewals           Offer[]              @relation("OfferRenewals")
+  derivationType     OfferDerivationType?
 
   net_amount Int
 
@@ -76,11 +92,15 @@ model OfferPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration_months Int
-  free_months     Int @default(0)
-  quantity        Int
+  /// Eingefrorene Preisgrundlage dieser Position. Null bei Bestandspositionen,
+  /// die vor Einfuehrung der Tarif-Versionierung angelegt wurden.
+  tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
+  tariffVersionId String?
 
-  optional Boolean? @default(false)
+  duration_months Int
+  free_months     Int     @default(0)
+  quantity        Int
+  optional        Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int
