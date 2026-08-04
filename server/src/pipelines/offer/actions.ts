@@ -188,7 +188,6 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                     duration: pos.duration_months,
                     quantity: pos.quantity,
                     customerId,
-                    freeMonths: 0,
                 });
 
                 if (!result.ok) return null;

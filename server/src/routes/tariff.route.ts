@@ -34,7 +34,7 @@ import {
     updateTariffGroupSchema,
     updateTariffRowSchema,
     upsertCustomerPriceSchema,
-} from "@/schemas/index.js";
+} from "@keepit/schemas";
 
 const router = Router();
 

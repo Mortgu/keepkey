@@ -135,28 +135,92 @@ const tariffGroupSlimSchema = z.object({
 
 /** TariffGroup (create) */
 export const createTariffGroupSchema = z.object({
-    products: z.array(z.string()),
+    products: z.array(z.string().min(1)).min(1),
 });
 export type CreateTariffGroupInput = z.infer<typeof createTariffGroupSchema>;
 
-export const updateTariffGroupSchema = createTariffGroupSchema.partial();
+export const updateTariffGroupSchema = z.object({
+    products: z.array(z.string().min(1)).optional(),
+});
 export type UpdateTariffGroupInput = z.infer<typeof updateTariffGroupSchema>;
 
 /** Tariff (create) */
 export const createTariffSchema = z.object({
-    contractId: z.string(),
+    contractId: z.string().min(1),
 });
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
 export const createTariffColumnSchema = z.object({
-    duration: z.int().positive(),
+    duration: z.int(),
 });
 export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
 
 export const updateTariffColumnSchema = z.object({
-    duration: z.int().positive().optional(),
+    duration: z.int().optional(),
 });
 export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
+
+/** TariffRow (create) */
+export const createTariffRowSchema = z.object({
+    min_quantity: z.int(),
+    max_quantity: z.int().nullable(),
+});
+export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
+
+export const updateTariffRowSchema = z.object({
+    min_qty: z.int().optional(),
+    max_qty: z.int().nullable().optional(),
+});
+export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
+
+/**
+ * TariffCell (update).
+ *
+ * Genau eines von `default_price` / `customer_price` muss gesetzt sein; für
+ * `customer_price` ist zusätzlich `customerId` erforderlich.
+ */
+export const updateTariffCellSchema = z.object({
+    default_price: z.int().optional(),
+    customer_price: z.int().optional(),
+    customerId: z.string().min(1).optional(),
+}).superRefine((data, ctx) => {
+    if (data.customer_price !== undefined && !data.customerId) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['customerId'],
+            message: 'customerId is required when customer_price is set',
+        });
+    }
+    if (data.default_price === undefined && data.customer_price === undefined) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['default_price'],
+            message: 'default_price or customer_price is required',
+        });
+    }
+});
+export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
+
+/** Kundenspezifischen Stückpreis upserten. */
+export const upsertCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.int().positive(),
+    quantity: z.int().positive(),
+    customerId: z.string().min(1),
+    price: z.int().nonnegative(),
+});
+export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
+
+/** Kundenspezifischen Stückpreis entfernen. */
+export const deleteCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.int().positive(),
+    quantity: z.int().positive(),
+    customerId: z.string().min(1),
+});
+export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
 
 /**
  * Base tariff shape — without `tariffGroup`.

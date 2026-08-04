@@ -17,31 +17,17 @@ import {
 import type {
     CreateTariffInput,
     CreateTariffColumnInput,
-    UpdateTariffColumnInput
+    UpdateTariffColumnInput,
+    CreateTariffGroupInput,
+    UpdateTariffGroupInput,
+    CreateTariffRowInput,
+    UpdateTariffRowInput,
+    UpdateTariffCellInput,
+    UpsertCustomerPriceInput,
+    DeleteCustomerPriceInput,
 } from '@keepit/schemas';
 
 /* ========== Types ========== */
-
-export type CreateTariffRowInput = { min_quantity: number; max_quantity: number | null };
-export type UpdateTariffRowInput = { min_qty?: number; max_qty?: number | null };
-export type UpdateTariffCellInput = { default_price?: number; customer_price?: number; customerId?: string };
-export type CreateTariffGroupInput = { products: string[] };
-export type UpdateTariffGroupInput = { products?: string[] };
-export type UpsertCustomerPriceInput = {
-    productId: string;
-    contractId: string;
-    duration: number;
-    quantity: number;
-    customerId: string;
-    price: number;
-};
-export type DeleteCustomerPriceInput = {
-    productId: string;
-    contractId: string;
-    duration: number;
-    quantity: number;
-    customerId: string;
-};
 
 const TARIFF_INCLUDE = {
     contract: {
@@ -217,7 +203,7 @@ async function recalculateAfterOverrideChange(
 ): Promise<PositionPrice> {
     const { productId, contractId, duration, quantity, customerId } = params;
 
-    const result = await calculatePrice({ productId, contractId, duration, quantity, customerId, freeMonths: 0 });
+    const result = await calculatePrice({ productId, contractId, duration, quantity, customerId });
 
     if (!result.ok) {
         throw new AppException(failureMessage, 500, result.reason);
@@ -478,11 +464,12 @@ export async function getTariffDurations(productId: string, contractId: string):
 /**
  * Preis-Vorschau aus dem aktuell gültigen Tarif.
  *
- * `freeMonths` geht bewusst **nicht** in `calculatePrice` ein: `total_cents`
- * soll brutto sein und der Wert der Freimonate getrennt in `discount_cents`
- * stehen — dieselbe Aufteilung, in der eine Position später gespeichert wird
- * (siehe `priceOfferPositions` in offer.service). Damit zeigt die Vorschau
- * dieselben Zahlen wie das fertige Angebot.
+ * `freeMonths` ist ein Parameter dieser Funktion, nicht der Preisrechnung:
+ * `calculatePrice` liefert immer brutto, der Wert der Freimonate wird hier
+ * daraus abgeleitet und getrennt als `discount_cents` ausgewiesen — dieselbe
+ * Aufteilung, in der eine Position später gespeichert wird (siehe
+ * `pricePositions` in offer.service). Damit zeigt die Vorschau dieselben Zahlen
+ * wie das fertige Angebot.
  */
 export async function getTariffPrice(
     productId: string,
@@ -494,7 +481,7 @@ export async function getTariffPrice(
 ): Promise<PositionPrice> {
     const free_months = freeMonths ?? 0;
 
-    // Sonst nicht geprüft, weil selectPrice die Freimonate hier nicht sieht.
+    // Muss hier geprüft werden: die Preisrechnung kennt keine Freimonate.
     if (!Number.isInteger(free_months) || free_months < 0 || free_months > duration) {
         throw new AppException(
             "freeMonths muss eine Ganzzahl zwischen 0 und duration sein.",
@@ -509,7 +496,6 @@ export async function getTariffPrice(
         duration,
         quantity,
         customerId,
-        freeMonths: 0,
     });
 
     if (!result.ok) {

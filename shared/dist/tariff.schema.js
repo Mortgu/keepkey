@@ -95,18 +95,72 @@ const tariffGroupSlimSchema = z.object({
 });
 /** TariffGroup (create) */
 export const createTariffGroupSchema = z.object({
-    products: z.array(z.string()),
+    products: z.array(z.string().min(1)).min(1),
 });
-export const updateTariffGroupSchema = createTariffGroupSchema.partial();
+export const updateTariffGroupSchema = z.object({
+    products: z.array(z.string().min(1)).optional(),
+});
 /** Tariff (create) */
 export const createTariffSchema = z.object({
-    contractId: z.string(),
+    contractId: z.string().min(1),
 });
 export const createTariffColumnSchema = z.object({
-    duration: z.int().positive(),
+    duration: z.int(),
 });
 export const updateTariffColumnSchema = z.object({
-    duration: z.int().positive().optional(),
+    duration: z.int().optional(),
+});
+/** TariffRow (create) */
+export const createTariffRowSchema = z.object({
+    min_quantity: z.int(),
+    max_quantity: z.int().nullable(),
+});
+export const updateTariffRowSchema = z.object({
+    min_qty: z.int().optional(),
+    max_qty: z.int().nullable().optional(),
+});
+/**
+ * TariffCell (update).
+ *
+ * Genau eines von `default_price` / `customer_price` muss gesetzt sein; für
+ * `customer_price` ist zusätzlich `customerId` erforderlich.
+ */
+export const updateTariffCellSchema = z.object({
+    default_price: z.int().optional(),
+    customer_price: z.int().optional(),
+    customerId: z.string().min(1).optional(),
+}).superRefine((data, ctx) => {
+    if (data.customer_price !== undefined && !data.customerId) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['customerId'],
+            message: 'customerId is required when customer_price is set',
+        });
+    }
+    if (data.default_price === undefined && data.customer_price === undefined) {
+        ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['default_price'],
+            message: 'default_price or customer_price is required',
+        });
+    }
+});
+/** Kundenspezifischen Stückpreis upserten. */
+export const upsertCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.int().positive(),
+    quantity: z.int().positive(),
+    customerId: z.string().min(1),
+    price: z.int().nonnegative(),
+});
+/** Kundenspezifischen Stückpreis entfernen. */
+export const deleteCustomerPriceSchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.int().positive(),
+    quantity: z.int().positive(),
+    customerId: z.string().min(1),
 });
 /**
  * Standalone tariff — returned by `GET /api/tariffs/:groupId/:tariffId`.

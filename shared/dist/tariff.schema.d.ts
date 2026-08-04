@@ -191,6 +191,48 @@ export declare const updateTariffColumnSchema: z.ZodObject<{
     duration: z.ZodOptional<z.ZodInt>;
 }, z.core.$strip>;
 export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
+/** TariffRow (create) */
+export declare const createTariffRowSchema: z.ZodObject<{
+    min_quantity: z.ZodInt;
+    max_quantity: z.ZodNullable<z.ZodInt>;
+}, z.core.$strip>;
+export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
+export declare const updateTariffRowSchema: z.ZodObject<{
+    min_qty: z.ZodOptional<z.ZodInt>;
+    max_qty: z.ZodOptional<z.ZodNullable<z.ZodInt>>;
+}, z.core.$strip>;
+export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
+/**
+ * TariffCell (update).
+ *
+ * Genau eines von `default_price` / `customer_price` muss gesetzt sein; für
+ * `customer_price` ist zusätzlich `customerId` erforderlich.
+ */
+export declare const updateTariffCellSchema: z.ZodObject<{
+    default_price: z.ZodOptional<z.ZodInt>;
+    customer_price: z.ZodOptional<z.ZodInt>;
+    customerId: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
+/** Kundenspezifischen Stückpreis upserten. */
+export declare const upsertCustomerPriceSchema: z.ZodObject<{
+    productId: z.ZodString;
+    contractId: z.ZodString;
+    duration: z.ZodInt;
+    quantity: z.ZodInt;
+    customerId: z.ZodString;
+    price: z.ZodInt;
+}, z.core.$strip>;
+export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
+/** Kundenspezifischen Stückpreis entfernen. */
+export declare const deleteCustomerPriceSchema: z.ZodObject<{
+    productId: z.ZodString;
+    contractId: z.ZodString;
+    duration: z.ZodInt;
+    quantity: z.ZodInt;
+    customerId: z.ZodString;
+}, z.core.$strip>;
+export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
 /**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
@@ -406,8 +448,8 @@ export declare const tariffVersionSnapshotSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
 export declare const tariffVersionReasonSchema: z.ZodEnum<{
-    MANUAL: "MANUAL";
     OFFER: "OFFER";
+    MANUAL: "MANUAL";
     RESTORE: "RESTORE";
 }>;
 export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
@@ -433,8 +475,8 @@ export declare const tariffVersionSchema: z.ZodObject<{
         }, z.core.$strip>>;
     }, z.core.$strip>;
     reason: z.ZodEnum<{
-        MANUAL: "MANUAL";
         OFFER: "OFFER";
+        MANUAL: "MANUAL";
         RESTORE: "RESTORE";
     }>;
     createdBy: z.ZodNullable<z.ZodObject<{

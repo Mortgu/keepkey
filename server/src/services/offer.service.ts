@@ -89,7 +89,6 @@ async function pricePositions(
                 duration: position.duration_months,
                 quantity: position.quantity,
                 customerId,
-                freeMonths: 0,
             });
 
             if (!result.ok) {
@@ -816,7 +815,6 @@ async function priceFromPin(source: SourcePosition, quantity: number, customerId
         duration,
         quantity,
         customerId,
-        freeMonths: 0,
     });
 
     if (!result.ok) {
