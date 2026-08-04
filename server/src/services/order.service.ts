@@ -1,24 +1,35 @@
-import { z } from "zod";
 import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
 import { toDate } from "../utils/utils.js";
-import { createOrderSchema, updateOrderSchema } from "../schemas/order-schemas.js";
+import {
+    CreateOrderInput,
+    UpdateOrderInput,
+} from "@keepit/schemas";
+
 import {
     buildOrderRevisionSnapshot,
     parseOrderRevisionSnapshot,
 } from "../schemas/revision-schemas.js";
 
-/* ========== Types ========== */
-
-export type CreateOrderInput = z.infer<typeof createOrderSchema>;
-export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
 /* ========== Queries ========== */
 
-export async function getAllOrders() {
+export interface OrderListQuery {
+    companyIds?: unknown;
+}
+
+export async function getAllOrders(query: OrderListQuery = {}) {
+    const where: { customerId?: { in: string[] } } = {};
+
+    if (query.companyIds) {
+        const ids = Array.isArray(query.companyIds) ? query.companyIds : [query.companyIds];
+        where.customerId = { in: ids as string[] };
+    }
+
     return prisma.order.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
         include: {
             customer: true,
             customerContactPerson: true,

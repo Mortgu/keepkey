@@ -1,10 +1,18 @@
 import { Pen } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import {  coordinatesFrom } from "@keepit/schemas";
+import type {CreateOfferPositionInput} from "@keepit/schemas";
 import type { SyntheticEvent } from "react";
-import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { Button, Checkbox, Input, Select } from "@/components";
-import { useContracts, useLocale, usePrice, useProducts, useTariffDurationsHook } from "@/hooks";
+import {
+    useContracts,
+    useCustomerPriceOverride,
+    useLocale,
+    usePositionPrice,
+    useProducts,
+    useTariffDurationsHook,
+} from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
@@ -12,20 +20,17 @@ const eurToCents = (eur: number): number => Math.round(eur * 100);
 
 interface Props {
     customerId: string;
-    onPersistOverride?: (
-        data: CreateOfferPositionInput,
-        unitPriceCents: number,
-    ) => Promise<number>;
     currentWorkload?: CreateOfferPositionInput;
     cancelFn: () => void;
     saveFn: (values: CreateOfferPositionInput) => void;
 }
 
-export default function WorkloadFormOfferModal({ customerId, onPersistOverride, currentWorkload, cancelFn, saveFn }: Props) {
+export default function WorkloadFormOfferModal({ customerId, currentWorkload, cancelFn, saveFn }: Props) {
     const locale = useLocale();
     const { t } = useTranslation();
     const { products } = useProducts();
     const { contracts } = useContracts();
+    const { setOverride } = useCustomerPriceOverride();
 
     const [workload, setWorkload] = useState<string>(currentWorkload?.productId || products[0].id || "");
     const [contract, setContract] = useState<string>(currentWorkload?.contractId || contracts[0].id || "");
@@ -48,25 +53,20 @@ export default function WorkloadFormOfferModal({ customerId, onPersistOverride, 
         setDuration(durations[0] || 0);
     }, [durations]);
 
-    const priceWorkload: CreateOfferPositionInput = {
+    const coordinates = coordinatesFrom(customerId, {
         productId: workload,
         contractId: contract,
         duration_months: duration,
         quantity,
         free_months: freeMonths,
-        optional,
-        total_cents: 0,
-        eur_user_month: 0,
-        discount_cents: 0,
-    };
+    });
 
-    const { price, isPending: pricePending } = usePrice(customerId, priceWorkload);
-    const unitPriceCents = price?.breakdown.unitPrice ?? 0;
+    const { unitCents, isLoading: pricePending } = usePositionPrice({ source: "live", coordinates });
 
-    const canOverride = Boolean(onPersistOverride && customerId);
+    const canOverride = Boolean(customerId);
 
     const startEditPrice = () => {
-        setOverrideEur((unitPriceCents / 100).toString());
+        setOverrideEur((unitCents / 100).toString());
         setEditingPrice(true);
     };
 
@@ -94,13 +94,13 @@ export default function WorkloadFormOfferModal({ customerId, onPersistOverride, 
         };
 
         try {
-            if (editingPrice && onPersistOverride && customerId) {
+            if (editingPrice && canOverride) {
                 const parsed = Number(overrideEur.replace(",", "."));
                 if (isNaN(parsed) || parsed < 0) {
                     setError("Ungültiger Preis.");
                     return;
                 }
-                await onPersistOverride(data, eurToCents(parsed));
+                await setOverride({ coordinates, unitPriceCents: eurToCents(parsed) });
             }
 
             saveFn(data);
@@ -112,7 +112,7 @@ export default function WorkloadFormOfferModal({ customerId, onPersistOverride, 
 
     const displayUnitPrice = editingPrice
         ? overrideEur
-        : formatEur(unitPriceCents);
+        : formatEur(unitCents);
 
     return (
         <div className="w-full grid gap-3 p-4">

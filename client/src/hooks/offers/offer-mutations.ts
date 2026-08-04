@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
+import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, extendOffer, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
@@ -8,6 +8,7 @@ import type {
     CreateOfferInput,
 
     CreateOfferPositionInput,
+    ExtendOfferInput,
     OfferFilterParams,
 
     UpdateOfferFlatrateInput,
@@ -249,9 +250,23 @@ export function useRenewOffer() {
     const mutation = useMutation({
         mutationFn: ({ offerId, input }: { offerId: string; input: CreateOfferInput }) =>
             renewOffer(offerId, input),
-        onSuccess: () => {
+        onSuccess: (_data, { offerId }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(offerId) });
         }
     });
     return { renewOffer: mutation.mutateAsync, isRenewing: mutation.isPending, errorRenewing: mutation.error };
+}
+
+export function useExtendOffer() {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: ({ offerId, input }: { offerId: string; input: ExtendOfferInput }) =>
+            extendOffer(offerId, input),
+        onSuccess: (_data, { offerId }) => {
+            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: offerKeys.detail(offerId) });
+        }
+    });
+    return { extendOffer: mutation.mutateAsync, isExtending: mutation.isPending, errorExtending: mutation.error };
 }

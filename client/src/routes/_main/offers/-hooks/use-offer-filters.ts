@@ -6,23 +6,32 @@ const sortOptions = [
     { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
 ];
 
+interface Options {
+    customerId?: string;
+}
 
-export default function useOfferFilters() {
+export default function useOfferFilters({ customerId }: Options = {}) {
     const urlSearch = useSearch({ strict: false });
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter, setContactPersonFilter] = useState<Array<string>>([]);
     const [productFilter, setProductFilter] = useState<Array<string>>([]);
 
+    const allCustomersIds = useMemo(
+        () => [...(customerId ? [customerId] : []), ...customerFilter],
+        [customerId, customerFilter]
+    );
+
     const params = useMemo(() => ({
         search: searchInput || undefined,
-        companyIds: customerFilter.length > 0 ? customerFilter : undefined,
+        companyIds: allCustomersIds.length > 0 ? allCustomersIds : undefined,
         contactPersonIds: contactPersonFilter.length > 0 ? contactPersonFilter : undefined,
         productIds: productFilter.length > 0 ? productFilter : undefined,
         sort,
         limit: 50,
-    }), [searchInput, customerFilter, contactPersonFilter, productFilter, sort]);
+    }), [searchInput, allCustomersIds, contactPersonFilter, productFilter, sort]);
 
     const removeCustomerFilter = (id: string) =>
         setCustomerFilter((prev) => prev.filter((i) => i !== id));
@@ -52,5 +61,8 @@ export default function useOfferFilters() {
         removeProductFilter,
         activeFilterCount,
         params,
+        customerId,
     };
 }
+
+export type OfferFilters = ReturnType<typeof useOfferFilters>;

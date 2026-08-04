@@ -4,11 +4,11 @@ import { ChevronDown, Search, SlidersHorizontal } from "lucide-react";
 import {
     DEFAULT_LABELS,
     
-    formatEUR,
+    formatFilterAmount,
     sectionCount
-} from "./filter-sidebar-types";
+} from "./filter-sidebar-utils";
 import { FilterChip } from "./filter-chip";
-import type {FilterSidebarProps} from "./filter-sidebar-types";
+import type {FilterSidebarProps} from "./filter-sidebar-utils";
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
 
@@ -218,11 +218,11 @@ function PriceRangeSlider({
         <div>
             <div className="flex justify-between mb-2.5">
                 <span className="text-[12.5px] font-semibold text-(--text)">
-                    € {formatEUR(lo)}
+                    € {formatFilterAmount(lo)}
                 </span>
                 <span className="text-[12.5px] text-(--fg-3)">–</span>
                 <span className="text-[12.5px] font-semibold text-(--text)">
-                    € {formatEUR(hi)}
+                    € {formatFilterAmount(hi)}
                     {hi === max ? "+" : ""}
                 </span>
             </div>
@@ -260,9 +260,9 @@ function PriceRangeSlider({
                 />
             </div>
             <div className="flex justify-between mt-1.5">
-                <span className="text-[11px] text-(--fg-3)">€ {formatEUR(min)}</span>
+                <span className="text-[11px] text-(--fg-3)">€ {formatFilterAmount(min)}</span>
                 <span className="text-[11px] text-(--fg-3)">
-                    € {formatEUR(max)}+
+                    € {formatFilterAmount(max)}+
                 </span>
             </div>
         </div>

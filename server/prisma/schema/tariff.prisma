@@ -38,6 +38,9 @@ model Tariff {
   columns TariffColumn[]
   cells   TariffCell[]
 
+  versions       TariffVersion[]
+  customerPrices TariffCustomerPrice[]
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -95,8 +98,7 @@ model TariffCell {
   column   TariffColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
   columnId String
 
-  default_cells  TariffCellDefault[]
-  customer_cells TariffCellCustomer[]
+  default_cells TariffCellDefault[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -119,11 +121,14 @@ model TariffCellDefault {
   @@map("tariff_cell_default")
 }
 
-model TariffCellCustomer {
+/// Kundenspezifischer Stueckpreis. Haengt an den stabilen Koordinaten
+/// (duration, min_quantity) statt an einer cellId, damit Overrides
+/// strukturelle Umbauten und das Wiederherstellen einer Version ueberleben.
+model TariffCustomerPrice {
   id String @id @default(cuid())
 
-  cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
-  cellId String
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
+  tariffId String
 
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
   customerId String
@@ -131,26 +136,54 @@ model TariffCellCustomer {
   product   Product? @relation(fields: [productId], references: [id], onDelete: Cascade)
   productId String?
 
+  /// == TariffColumn.duration
+  duration     Int
+  /// == TariffRow.min_quantity
+  min_quantity Int
+
   price Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([cellId, customerId, productId])
-  @@map("tariff_cell_customer")
+  @@unique([tariffId, customerId, productId, duration, min_quantity])
+  @@map("tariff_customer_price")
 }
 
-model TariffHistory {
+enum TariffVersionReason {
+  /// Nutzer hat die Version explizit versiegelt
+  MANUAL
+  /// Beim Anlegen eines Angebots lazy versiegelt
+  OFFER
+  /// Zustand unmittelbar vor einem Wiederherstellen
+  RESTORE
+}
+
+/// Unveraenderlicher Stand einer Preistabelle. Dient zugleich als
+/// wiederherstellbare Version und als Preisgrundlage, die eine
+/// OfferPosition anpinnt.
+model TariffVersion {
   id String @id @default(cuid())
 
-  productId  String
-  contractId String
+  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Restrict)
+  tariffId String
 
-  version  Int
+  version         Int
+  snapshotVersion Int @default(1)
+
+  /// sha256 ueber den normalisierten Snapshot — Grundlage der Deduplizierung
+  hash     String
   snapshot Json
+  reason   TariffVersionReason
+
+  createdBy   User?   @relation(fields: [createdById], references: [id])
+  createdById String?
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  @@unique([productId, contractId, version])
-  @@map("tariff_history")
+  offerPositions OfferPosition[]
+
+  @@unique([tariffId, version])
+  @@index([tariffId, hash])
+  @@map("tariff_version")
 }

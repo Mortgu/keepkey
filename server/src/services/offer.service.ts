@@ -1,17 +1,20 @@
-import { Prisma } from "@prisma/client";
+import { OfferDerivationType, Prisma, TariffVersionReason } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import { requestOfferGeneration } from "./document-generation-request.service.js";
 import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
-import { calculatePrice } from "../utils/products.js";
+import { loadTariffForPricing, selectPrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
+import { sealTariffVersion } from "./tariff.service.js";
 
 import {
     CreateOfferInput,
     CreateOfferPositionInput,
     CreateOfferFlatrateInput,
+    ExtendOfferInput,
+    PositionPrice,
     UpdateOfferInput
 } from '@keepit/schemas';
 
@@ -19,6 +22,10 @@ import {
     buildOfferRevisionSnapshot,
     parseOfferRevisionSnapshot,
 } from "../schemas/revision-schemas.js";
+import {
+    parseTariffVersionSnapshot,
+    tariffFromSnapshot,
+} from "../schemas/tariff-version-schema.js";
 
 /* ========== Types ========== */
 
@@ -26,8 +33,9 @@ type PricedPosition = CreateOfferPositionInput & {
     total_cents: number;
     eur_user_month: number;
     discount_cents: number;
+    /** Angepinnte, unveränderliche Preisgrundlage dieser Position. */
+    tariffVersionId: string | null;
 };
-type StoredPosition = Omit<PricedPosition, "optional"> & { optional?: boolean | null };
 type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
 type PricedDiscount = {
     title: string;
@@ -47,15 +55,37 @@ export interface OfferListQuery {
 
 /* ========== Helpers ========== */
 
-/** Berechnet total_cents für jede Position über den Tarif (wirft AppException, wenn kein Preis ermittelbar). */
-async function pricePositions(positions: CreateOfferPositionInput[], customerId?: string): Promise<PricedPosition[]> {
+/**
+ * Berechnet total_cents für jede Position über den Tarif (wirft AppException,
+ * wenn kein Preis ermittelbar).
+ *
+ * Dabei wird der verwendete Tarifstand als unveränderliche `TariffVersion`
+ * versiegelt und an der Position angepinnt. Der Hash-Vergleich in
+ * {@link sealTariffVersion} sorgt dafür, dass unveränderte Tabellen keine neue
+ * Version erzeugen — es entsteht genau eine Version je tatsächlich verkaufter
+ * Konfiguration.
+ */
+async function pricePositions(
+    positions: CreateOfferPositionInput[],
+    customerId: string | undefined,
+    actorId: string | null,
+): Promise<PricedPosition[]> {
     const priced: PricedPosition[] = [];
 
     for (const position of positions) {
         try {
-            const result = await calculatePrice({
+            const tariff = await loadTariffForPricing(position.productId, position.contractId, customerId);
+
+            if (!tariff) {
+                throw new AppException(
+                    `Price calculation failed for product ${position.productId}: NO_TARIFF`,
+                    422,
+                    "PRICE_CALCULATION_FAILED",
+                );
+            }
+
+            const result = selectPrice(tariff, {
                 productId: position.productId,
-                contractId: position.contractId,
                 duration: position.duration_months,
                 quantity: position.quantity,
                 customerId,
@@ -70,10 +100,18 @@ async function pricePositions(positions: CreateOfferPositionInput[], customerId?
                 );
             }
 
+            const version = await sealTariffVersion(tariff.id, TariffVersionReason.OFFER, actorId);
+
             const eur_user_month = result.breakdown.unitPrice;
             const discount_cents = eur_user_month * position.quantity * (position.free_months ?? 0);
 
-            priced.push({ ...position, total_cents: result.price, eur_user_month, discount_cents });
+            priced.push({
+                ...position,
+                total_cents: result.price,
+                eur_user_month,
+                discount_cents,
+                tariffVersionId: version.id,
+            });
         } catch (exception: any) {
             if (exception instanceof AppException) throw exception;
             throw new AppException(
@@ -156,11 +194,12 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
     });
 }
 
-async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: StoredPosition[]) {
+async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents }) => ({
+        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
             offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+            tariffVersionId: tariffVersionId ?? null,
         })),
     });
 }
@@ -333,11 +372,35 @@ export async function getNextQuoteId(): Promise<number> {
 
 /* ========== Mutations ========== */
 
-export async function createOffer(input: CreateOfferInput) {
-    const positions = await pricePositions(input.offerPositions, input.customerId);
-    const flatrates = await priceFlatrates(input.flatrates);
-    const discounts = input.discounts;
+/** Skalarfelder eines Angebots — alles ausser Positionen, Flatrates und Rabatten. */
+type OfferFields = {
+    customerId: string;
+    contactPersonId: string;
+    userId: string;
+    supplierId: string | null;
+    quoteId: string;
+    paymentTerm: string;
+    language: "DE" | "EN";
+    validUntil: string | null;
+    requestFrom: string | null;
+    featureComparison: boolean;
+    toCompare: string[];
+};
 
+/**
+ * Schreibt ein Angebot mit bereits bepreisten Bestandteilen.
+ *
+ * Bewusst von der Preisermittlung getrennt: `createOffer` bepreist über den
+ * Live-Tarif, `extendOffer` über die angepinnte Tarif-Version — die Persistenz
+ * inklusive `net_amount`-Formel ist für beide dieselbe.
+ */
+async function persistOffer(
+    fields: OfferFields,
+    positions: PricedPosition[],
+    flatrates: PricedFlatrate[],
+    discounts: ReadonlyArray<PricedDiscount>,
+    options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType },
+) {
     return prisma.$transaction(async (tx) => {
         const net_amount =
             positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
@@ -346,32 +409,27 @@ export async function createOffer(input: CreateOfferInput) {
 
         const offer = await tx.offer.create({
             data: {
-                customerId: input.customerId,
-                contactPersonId: input.contactPersonId,
-                userId: input.userId,
-                quoteId: input.quoteId,
-                language: input.language,
-                supplierId: input.supplierId,
-                paymentTerm: input.paymentTerm,
-                validUntil: input.validUntil,
-                requestFrom: input.requestFrom,
-                featureComparison: input.featureComparison,
-                toCompare: input.toCompare,
-                net_amount: net_amount,
+                ...fields,
+                net_amount,
+                renewedFromOfferId: options?.renewedFromOfferId ?? null,
+                derivationType: options?.derivationType ?? null,
             },
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents }) => ({
+            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
                 offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+                tariffVersionId,
             })),
         });
 
-        await tx.offerFlatRate.createMany({
-            data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
-                offerId: offer.id, flatRateId, quantity, total_cents,
-            })),
-        });
+        if (flatrates.length > 0) {
+            await tx.offerFlatRate.createMany({
+                data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
+                    offerId: offer.id, flatRateId, quantity, total_cents,
+                })),
+            });
+        }
 
         await replaceDiscounts(tx, offer.id, discounts);
 
@@ -379,10 +437,38 @@ export async function createOffer(input: CreateOfferInput) {
     });
 }
 
+export async function createOffer(
+    input: CreateOfferInput,
+    options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType; actorId?: string | null },
+) {
+    const positions = await pricePositions(input.offerPositions, input.customerId, options?.actorId ?? null);
+    const flatrates = await priceFlatrates(input.flatrates);
+
+    return persistOffer(
+        {
+            customerId: input.customerId,
+            contactPersonId: input.contactPersonId,
+            userId: input.userId,
+            supplierId: input.supplierId,
+            quoteId: input.quoteId,
+            paymentTerm: input.paymentTerm,
+            language: input.language,
+            validUntil: input.validUntil,
+            requestFrom: input.requestFrom,
+            featureComparison: input.featureComparison,
+            toCompare: input.toCompare,
+        },
+        positions,
+        flatrates,
+        input.discounts,
+        { renewedFromOfferId: options?.renewedFromOfferId, derivationType: options?.derivationType },
+    );
+}
+
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
     const { offerPositions: rawPositions, flatrates: rawFlatrates, discounts, expectedVersion } = input;
 
-    const positions = await pricePositions(rawPositions, input.customerId);
+    const positions = await pricePositions(rawPositions, input.customerId, actorId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
     return prisma.$transaction(async (tx) => {
@@ -540,8 +626,23 @@ export async function restoreOfferRevision(
     });
 }
 
-export async function createOfferPositions(offerId: string, positions: CreateOfferPositionInput[]) {
-    const priced = await pricePositions(positions);
+export async function createOfferPositions(
+    offerId: string,
+    positions: CreateOfferPositionInput[],
+    actorId: string | null,
+) {
+    // Der Kunde stammt aus dem Angebot — ohne ihn würden kundenspezifische
+    // Preise auf diesem Pfad stillschweigend ignoriert.
+    const offer = await prisma.offer.findUnique({
+        where: { id: offerId },
+        select: { customerId: true },
+    });
+
+    if (!offer) {
+        throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
+    }
+
+    const priced = await pricePositions(positions, offer.customerId, actorId);
 
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const created = await tx.offerPosition.createManyAndReturn({
@@ -552,8 +653,6 @@ export async function createOfferPositions(offerId: string, positions: CreateOff
 
         return created;
     });
-
-
 }
 
 export async function createOfferFlatrates(offerId: string, flatrates: CreateOfferFlatrateInput[]) {
@@ -632,9 +731,9 @@ export async function deleteOffer(id: string): Promise<void> {
     });
 }
 
-/* ========== Renewal ========== */
+/* ========== Abgeleitete Angebote ========== */
 
-export async function renewOffer(sourceOfferId: string, input: CreateOfferInput) {
+export async function renewOffer(sourceOfferId: string, input: CreateOfferInput, actorId: string | null) {
     const source = await prisma.offer.findUnique({
         where: { id: sourceOfferId },
         select: { id: true },
@@ -643,5 +742,215 @@ export async function renewOffer(sourceOfferId: string, input: CreateOfferInput)
         throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
     }
 
-    return createOffer(input);
+    return createOffer(input, {
+        renewedFromOfferId: sourceOfferId,
+        derivationType: OfferDerivationType.RENEWAL,
+        actorId,
+    });
+}
+
+/** Quellposition in der Form, die {@link priceFromPin} benötigt. */
+type SourcePosition = {
+    id: string;
+    productId: string;
+    contractId: string;
+    duration_months: number;
+    free_months: number;
+    eur_user_month: number;
+    tariffVersionId: string | null;
+};
+
+/**
+ * Ermittelt den Preis einer Erweiterungsposition aus der Tarif-Version, die die
+ * Quellposition angepinnt hat. Dadurch gilt der Preis von damals, obwohl der
+ * Live-Tarif inzwischen ein anderer sein kann — und weil die volle Preistabelle
+ * eingefroren ist, greift auch bei geänderter Menge die richtige Staffel.
+ *
+ * Kundenspezifische Preise werden bewusst **aktuell** gelesen: Sie haben keine
+ * Historie, ein ausgehandelter Sonderpreis gilt also in seiner heutigen Fassung.
+ *
+ * Ohne Pin (Positionen aus der Zeit vor der Tarif-Versionierung) bleibt nur der
+ * flache Rückfall auf den gespeicherten Stückpreis — Mengenstaffeln lassen sich
+ * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet.
+ */
+async function priceFromPin(source: SourcePosition, quantity: number, customerId: string) {
+    const duration = source.duration_months;
+
+    const flat = (eur_user_month: number, fromSnapshot: boolean) => ({
+        eur_user_month,
+        total_cents: eur_user_month * quantity * duration,
+        discount_cents: eur_user_month * quantity * source.free_months,
+        tariffVersionId: source.tariffVersionId,
+        fromSnapshot,
+    });
+
+    if (!source.tariffVersionId) {
+        return flat(source.eur_user_month, false);
+    }
+
+    const version = await prisma.tariffVersion.findUnique({
+        where: { id: source.tariffVersionId },
+        select: { tariffId: true, snapshot: true, snapshotVersion: true },
+    });
+
+    if (!version) {
+        throw new AppException("Tariff version not found", 404, "TARIFF_VERSION_NOT_FOUND");
+    }
+
+    if (version.snapshotVersion !== 1) {
+        throw new AppException(
+            `Snapshot-Version ${version.snapshotVersion} wird nicht unterstützt.`,
+            422,
+            "UNSUPPORTED_SNAPSHOT_VERSION",
+        );
+    }
+
+    const customerPrices = await prisma.tariffCustomerPrice.findMany({
+        where: { tariffId: version.tariffId, customerId },
+    });
+
+    const tariff = tariffFromSnapshot(parseTariffVersionSnapshot(version.snapshot), customerPrices);
+
+    const result = selectPrice(tariff, {
+        productId: source.productId,
+        duration,
+        quantity,
+        customerId,
+        freeMonths: 0,
+    });
+
+    if (!result.ok) {
+        throw new AppException(
+            `Price calculation failed for product ${source.productId}: ${result.reason}`,
+            422,
+            "PRICE_CALCULATION_FAILED",
+        );
+    }
+
+    const eur_user_month = result.breakdown.unitPrice;
+
+    return {
+        eur_user_month,
+        total_cents: result.price,
+        discount_cents: eur_user_month * quantity * source.free_months,
+        tariffVersionId: source.tariffVersionId,
+        fromSnapshot: true,
+    };
+}
+
+/** Lädt eine Quellposition und stellt sicher, dass sie zum Angebot gehört. */
+async function loadSourcePosition(offerId: string, positionId: string) {
+    const position = await prisma.offerPosition.findUnique({
+        where: { id: positionId },
+        select: {
+            id: true, offerId: true, productId: true, contractId: true,
+            duration_months: true, free_months: true, eur_user_month: true, tariffVersionId: true,
+        },
+    });
+
+    if (!position || position.offerId !== offerId) {
+        throw new AppException("Offer position not found", 422, "OFFER_POSITION_NOT_FOUND");
+    }
+
+    return position;
+}
+
+/** Preis-Vorschau für eine einzelne Erweiterungsposition (Anzeige im Modal). */
+export async function getExtensionPrice(
+    offerId: string,
+    positionId: string,
+    quantity: number,
+): Promise<PositionPrice> {
+    if (!Number.isInteger(quantity) || quantity <= 0) {
+        throw new AppException("quantity muss eine positive Ganzzahl sein.", 400, "INVALID_INPUT");
+    }
+
+    const offer = await prisma.offer.findUnique({
+        where: { id: offerId },
+        select: { customerId: true },
+    });
+
+    if (!offer) {
+        throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
+    }
+
+    const source = await loadSourcePosition(offerId, positionId);
+    const { eur_user_month, total_cents, discount_cents, fromSnapshot } =
+        await priceFromPin(source, quantity, offer.customerId);
+
+    return { eur_user_month, total_cents, discount_cents, fromSnapshot };
+}
+
+/**
+ * Erzeugt eine Lizenzerweiterung: zusätzliche Seats innerhalb eines laufenden
+ * Vertrags, abgerechnet zu den Konditionen des Quellangebots.
+ *
+ * Produkt, Vertrag und Laufzeit stammen unverändert aus der Quellposition, nur
+ * die Menge darf abweichen. Flatrates entfallen bewusst — sie sind vertragsweite
+ * Pauschalen und wären in einer Nachbestellung eine Doppelfakturierung.
+ */
+export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput, actorId: string | null) {
+    const source = await prisma.offer.findUnique({
+        where: { id: sourceOfferId },
+        include: { offerPositions: true },
+    });
+
+    if (!source) {
+        throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
+    }
+
+    const sourceById = new Map(source.offerPositions.map((position) => [position.id, position]));
+    const positions: PricedPosition[] = [];
+
+    for (const requested of input.positions) {
+        const sourcePosition = sourceById.get(requested.sourcePositionId);
+
+        if (!sourcePosition) {
+            throw new AppException(
+                `Position ${requested.sourcePositionId} gehört nicht zum Quellangebot.`,
+                422,
+                "OFFER_POSITION_NOT_FOUND",
+            );
+        }
+
+        const priced = await priceFromPin(sourcePosition, requested.quantity, source.customerId);
+
+        positions.push({
+            productId: sourcePosition.productId,
+            contractId: sourcePosition.contractId,
+            duration_months: sourcePosition.duration_months,
+            free_months: sourcePosition.free_months,
+            quantity: requested.quantity,
+            optional: sourcePosition.optional,
+            total_cents: priced.total_cents,
+            eur_user_month: priced.eur_user_month,
+            discount_cents: priced.discount_cents,
+            // Der Pin wird weitergereicht, damit auch die Erweiterung einer
+            // Erweiterung noch auf derselben Preisgrundlage steht.
+            tariffVersionId: priced.tariffVersionId,
+        });
+    }
+
+    return persistOffer(
+        {
+            customerId: source.customerId,
+            contactPersonId: source.contactPersonId,
+            userId: source.userId,
+            supplierId: source.supplierId,
+            quoteId: input.quoteId,
+            paymentTerm: source.paymentTerm,
+            language: source.language,
+            validUntil: input.validUntil,
+            requestFrom: input.requestFrom,
+            featureComparison: source.featureComparison,
+            toCompare: source.toCompare,
+        },
+        positions,
+        [],
+        input.discounts,
+        {
+            renewedFromOfferId: sourceOfferId,
+            derivationType: OfferDerivationType.LICENSE_EXTENSION,
+        },
+    );
 }

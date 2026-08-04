@@ -1,19 +1,20 @@
 import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import RenewalModal from "../modals/renewal/renewal-modal";
+import DerivedModal from "../modals/derived/derived-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import { Button, Collapsable } from "@/components";
+import type { OfferFormTypes } from "../modals/offer/offer-form";
+import { Badge, Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import type { OfferFormTypes } from "../modals/offer/offer-form";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -21,7 +22,10 @@ type OfferListItemProps = {
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+    const { t } = useTranslation();
+
     const renewalModal = useModal<Offer>();
+    const extensionModal = useModal<Offer>();
 
     const {
         customerContactPerson: ccp,
@@ -49,14 +53,19 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
     };
 
     return (
-        <div className="border border-(--border) rounded-md">
+        <div className="bg-white border border-(--border) rounded-md">
             <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2 text-md">
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
-
+                            {offer.derivationType === "RENEWAL" && (
+                                <Badge variant="generated" size="xs">{t("derived.badge_renewal")}</Badge>
+                            )}
+                            {offer.derivationType === "LICENSE_EXTENSION" && (
+                                <Badge variant="processing" size="xs">{t("derived.badge_extension")}</Badge>
+                            )}
                         </div>
                     </div>
 
@@ -97,7 +106,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </div>
 
             <Collapsable label="Produkte"
-                className="w-full bg-(--subtle-50) justify-between rounded-none"
+                className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
                     {offerPositions.map((position, i) => (
@@ -114,14 +123,22 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </Collapsable>
 
+            <hr className="text-(--border)" />
+
             <Collapsable
                 label="Dokumente"
-                className="w-full bg-(--subtle-50) justify-between rounded-none"
+                className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
                     {offer.offerDocuments.map((document: OfferDocument) => (
                         <OfferCardDocument key={document.id} offerDocument={document} />
                     ))}
+
+                    {offer.offerDocuments.length === 0 && (
+                        <div className="flex items-center justify-center py-4">
+                            <p className="text-sm text-gray-500">Noch keine Dokumente generiert!</p>
+                        </div>
+                    )}
                 </div>
             </Collapsable>
 
@@ -140,11 +157,11 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
-                    {/*<Button variant="border" type="button" size="xs"
-                        onClick={() => onEdit("renewal", offer)}>Renewal</Button>*/}
+                    <Button variant="border" type="button" size="xs"
+                        onClick={() => renewalModal.open(offer)}>{t("derived.action_renewal")}</Button>
 
                     <Button variant="border" type="button" size="xs"
-                        onClick={() => renewalModal.open(offer)}>Renewal</Button>
+                        onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
                 </div>
 
                 {/* Actions right */}
@@ -180,10 +197,20 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {renewalModal.isOpen && (
-                <RenewalModal
-                    key={renewalModal.key}
+                <DerivedModal
+                    key={`renewal-${renewalModal.key}`}
+                    mode="renewal"
                     offer={offer}
                     onClose={renewalModal.close}
+                />
+            )}
+
+            {extensionModal.isOpen && (
+                <DerivedModal
+                    key={`extension-${extensionModal.key}`}
+                    mode="extension"
+                    offer={offer}
+                    onClose={extensionModal.close}
                 />
             )}
         </div>

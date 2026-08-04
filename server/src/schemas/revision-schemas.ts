@@ -31,10 +31,13 @@ const offerPosition = z.object({
   duration_months: z.number().int(),
   free_months: z.number().int().default(0),
   quantity: z.number().int(),
-  optional: z.boolean().nullable().default(false),
+  optional: z.boolean(),
   eur_user_month: z.number().int().optional(),
   total_cents: z.number().int(),
   discount_cents: z.number().int().default(0),
+  // Muss im Snapshot mitgeführt werden, sonst verliert ein Restore die
+  // angepinnte Preisgrundlage (z.object strippt unbekannte Keys).
+  tariffVersionId: z.string().nullable().default(null),
 }).transform((position) => ({
   ...position,
   eur_user_month: position.eur_user_month ?? Math.trunc(
@@ -82,7 +85,7 @@ const orderPosition = z.object({
   contractId: z.string(),
   duration_months: z.number().int(),
   quantity: z.number().int(),
-  optional: z.boolean().nullable(),
+  optional: z.boolean(),
   total_cents: z.number().int(),
 });
 

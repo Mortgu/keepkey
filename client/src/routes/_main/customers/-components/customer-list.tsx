@@ -1,32 +1,26 @@
-import { Plus } from "lucide-react";
-import { useMemo } from "react";
+import { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import useCustomerFilters from "../-hooks/use-customer-filters";
+import OfferModal from "../../offers/-components/modals/offer/offer-modal";
+import OrderModal from "../../orders/-components/order-modal";
+import { useCustomerActions } from "../-hooks/use-customer-actions";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type { Customer } from "@keepit/schemas";
-import { Button, FilterChip, PageWidth, RouteError, SearchBar } from "@/components";
-import { MultiDropdown } from "@/components/filters/multi-dropdown";
-import { SortDropdown } from "@/components/filters/sort-dropdown";
+import type {CustomerFilters} from "../-page.hooks";
+import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 
-const countryFilterOptions = [
-    { value: "Deutschland", label: "Deutschland" },
-    { value: "Schweiz", label: "Schweiz" },
-    { value: "Südafrika", label: "Südafrika" },
-];
+interface Props {
+    filters: CustomerFilters;
+    onEdit: (customer: Customer) => void;
+}
 
-const languageFilterOptions = [
-    { value: "DE", label: "Deutsch" },
-    { value: "EN", label: "English" },
-];
-
-export default function CustomerList() {
+export default function CustomerList({ filters, onEdit }: Props) {
     const { t } = useTranslation();
     const modal = useModal<Customer>();
+    const { actions, activeCustomerId, modals } = useCustomerActions();
 
-    const filters = useCustomerFilters();
     const { customers, isPending, error } = useCustomers(filters.params);
 
     const filteredCustomers = useMemo(() => {
@@ -42,91 +36,49 @@ export default function CustomerList() {
     }, [customers, filters.countryFilter, filters.languageFilter]);
 
     return (
-        <PageWidth variant="none">
-            <div className="flex justify-between items-center gap-4 p-4 border-b border-(--border)">
-                <SortDropdown
-                    value={filters.sort}
-                    onChange={filters.setSort}
-                    options={filters.sortOptions}
-                />
+        <Fragment>
+            <div className="grid gap-4">
+                {error && <RouteError error={error} />}
 
-                <MultiDropdown
-                    label="Land"
-                    options={countryFilterOptions}
-                    values={filters.countryFilter}
-                    onChange={filters.setCountryFilter}
-                />
+                {!error && !isPending && filteredCustomers.length === 0 && (
+                    <p className="text-sm text-(--text-secondary) py-8 text-center">
+                        {filters.searchInput || filters.activeFilterCount > 0
+                            ? t("common.noResults")
+                            : null}
+                    </p>
+                )}
 
-                <MultiDropdown
-                    label="Sprache"
-                    options={languageFilterOptions}
-                    values={filters.languageFilter}
-                    onChange={filters.setLanguageFilter}
-                />
-
-                <SearchBar
-                    value={filters.searchInput}
-                    onChange={filters.setSearchInput}
-                    onSubmit={() => { }}
-                    placeholder={t("common.search")}
-                />
-
-                <Button size="sm" onClick={() => modal.open()}>
-                    {t("button.create")} <Plus className="size-3.5 ml-1" />
-                </Button>
+                {!error && !isPending && filteredCustomers.map((customer) => (
+                    <CustomerListItem
+                        key={customer.id}
+                        customer={customer}
+                        onEdit={onEdit}
+                        onCreateOffer={() => actions.createOffer(customer.id)}
+                        onCreateOrder={() => actions.createOrder(customer.id)}
+                    />
+                ))}
             </div>
 
-            <PageWidth variant="full">
-                <div className="grid gap-4">
-                    {filters.activeFilterCount > 0 && (
-                        <div className="flex gap-2 w-fit flex-wrap">
-                            {filters.countryFilter.map((val) => {
-                                const option = countryFilterOptions.find((o) => o.value === val);
-                                if (!option) return null;
-                                return (
-                                    <FilterChip
-                                        key={`country-${val}`}
-                                        label="Land"
-                                        value={option.label}
-                                        onRemove={() => filters.removeCountryFilter(val)}
-                                    />
-                                );
-                            })}
-                            {filters.languageFilter.map((val) => {
-                                const option = languageFilterOptions.find((o) => o.value === val);
-                                if (!option) return null;
-                                return (
-                                    <FilterChip
-                                        key={`language-${val}`}
-                                        label="Sprache"
-                                        value={option.label}
-                                        onRemove={() => filters.removeLanguageFilter(val)}
-                                    />
-                                );
-                            })}
-                        </div>
-                    )}
+            {modal.isOpen && (
+                <CustomerModal key={modal.key} onClose={modal.close} />
+            )}
 
+            {modals.offerModal.isOpen && (
+                <OfferModal
+                    key={`offer-${activeCustomerId}`}
+                    closeFn={modals.offerModal.close}
+                    currentOffer={undefined}
+                    preselectedCustomerId={activeCustomerId ?? undefined}
+                />
+            )}
 
-                    {error && <RouteError error={error} />}
-
-                    {!error && !isPending && filteredCustomers.length === 0 && (
-                        <p className="text-sm text-(--text-secondary) py-8 text-center">
-                            {filters.searchInput || filters.activeFilterCount > 0
-                                ? t("common.noResults")
-                                : null}
-                        </p>
-                    )}
-
-                    {!error && !isPending && filteredCustomers.map((customer) => (
-                        <CustomerListItem key={customer.id} customer={customer} />
-                    ))}
-                </div>
-
-                {modal.isOpen && (
-                    <CustomerModal key={modal.key} onClose={modal.close} />
-                )}
-            </PageWidth>
-        </PageWidth>
+            {modals.orderModal.isOpen && (
+                <OrderModal
+                    key={`order-${activeCustomerId}`}
+                    onClose={modals.orderModal.close}
+                    customerId={activeCustomerId ?? undefined}
+                />
+            )}
+        </Fragment>
     );
 }

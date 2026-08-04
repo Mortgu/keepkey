@@ -1,21 +1,22 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
 import {
-    
+
     createOfferSchema
 } from '@keepit/schemas';
 import useOfferModal from "../-hooks/use-offer.offer-modal";
-import type {Offer} from '@keepit/schemas';
+import type { Offer } from '@keepit/schemas';
 import { useOfferManager } from "@/hooks";
 
 
 interface Props {
     currentOffer?: Offer;
     closeFn: () => void;
+    preselectedCustomerId?: string;
 }
 
-export default function useOfferForm({ currentOffer, closeFn }: Props) {
-    const { defaultValues } = useOfferModal({ currentOffer });
+export default function useOfferForm({ currentOffer, closeFn, preselectedCustomerId }: Props) {
+    const { defaultValues } = useOfferModal({ currentOffer, preselectedCustomerId });
     const { createOffer, updateOffer } = useOfferManager();
 
     const [expectedVersion] = useState(currentOffer?.version);

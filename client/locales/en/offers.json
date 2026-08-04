@@ -39,14 +39,28 @@
     "no_duration": "No duration configured",
     "invalid_price": "Invalid price."
   },
+  "licenseExtension": {
+    "title": "License extension for {{orderId}}",
+    "hint": "Additional seats are billed at the prices of the source offer. Product, contract and duration stay unchanged.",
+    "no_snapshot": "No frozen price table exists for this position — calculated with its stored unit price, without volume tiers."
+  },
+  "derived": {
+    "customer": "Customer:",
+    "contact": "Contact:",
+    "employee": "Employee:",
+    "original_period": "Original period",
+    "action_renewal": "Renewal",
+    "action_extension": "License extension",
+    "badge_renewal": "Renewal",
+    "badge_extension": "License extension"
+  },
   "offers": {
     "toast": {
       "deleteError": "Offer could not be deleted: {{message}}",
       "documentUploadError": "Document could not be uploaded: {{message}}",
       "documentDeleteError": "Document could not be deleted: {{message}}",
       "documentRenameError": "Document could not be renamed: {{message}}",
-      "restoreError": "Version could not be restored: {{message}}",
-      "renewalStub": "Offer generation from renewal will follow in an upcoming step."
+      "restoreError": "Version could not be restored: {{message}}"
     }
   }
 }

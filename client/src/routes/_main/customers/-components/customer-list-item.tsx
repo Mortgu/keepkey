@@ -1,103 +1,96 @@
-import { Pen, Plus, Trash } from "lucide-react";
-import { useState } from "react";
-
-import ContactListItem from "./contact-list-item";
-import ContactPersonForm from "./contact-person-form";
-import CustomerModal from "./customer-modal";
-
-import type {
-    CreateContactInput,
-    Customer
-} from "@keepit/schemas";
+import { Link } from "@tanstack/react-router";
+import { Pen, Trash } from "lucide-react";
+import type { Customer } from "@keepit/schemas";
+import type { SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
+import { useDeleteCustomer } from "@/hooks";
+import { Button } from "@/components";
 
-import { useCreateCustomerContact, useDeleteCustomer, useModal } from "@/hooks";
-import { Button, Collapsable } from "@/components";
-
-interface CustomerListItemProps {
+interface Props {
     customer: Customer;
+    onEdit: (customer: Customer) => void;
+    onCreateOffer: () => void;
+    onCreateOrder: () => void;
 }
 
-export default function CustomerListItem({ customer }: CustomerListItemProps) {
-    const editModal = useModal<Customer>();
+export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
+    const {
+        deleteCustomer,
+        isDeletingCustomer
+    } = useDeleteCustomer();
 
-    const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
-    const { createCustomerContact } = useCreateCustomerContact();
-
-    const [addContact, setAddContact] = useState<boolean>(false);
-
-    const contactPersons = customer.contactPersons;
+    const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
+        event.preventDefault();
+        if (confirm(`Möchten Sie den Kunden ${customer.companyName} wirklich löschen?`)) {
+            deleteCustomer({ customerId: customer.id });
+        }
+        return;
+    }
 
     return (
-        <div className="border border-(--border) rounded-md ">
-            <div className="flex items-center justify-between px-4 py-3">
-                <div className="grid gap-0">
+        <div className="border border-(--border) rounded-md overflow-hidden">
+            <Link to="/customers/$customerId" params={{ customerId: customer.id }} className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-(--page-bg)">
+                <div className="grid gap-1">
                     <h1 className="text-md">{customer.companyName}</h1>
-                    <p className="text-sm text-gray-500">
-                        {customer.customerId} · {formatDate(customer.createdAt || "")}
+                    <p className="text-xs text-gray-500">
+                        {formatDate(customer.createdAt || "")}
                     </p>
                 </div>
 
-                <div className="flex items-center gap-12">
-                    <p className="text-sm text-gray-500">
-                        {customer.orders.length} Bestellungen
-                    </p>
+                <div className="flex items-center">
+                    <div className="grid gap-1 text-right border-r border-(--border) pr-6">
+                        <p className="text-xs text-gray-400">Ansprechpartner</p>
+                        <p className="text-md">
+                            {customer.contactPersons.length ? (
+                                <span>
+                                    {customer.contactPersons[0]?.firstName ?? ""} {customer.contactPersons[0]?.lastName ?? ""}
+                                    {customer.contactPersons.length > 1 && (
+                                        <span className="font-mono text-(--text-secondary)"> +{customer.contactPersons.length - 1}</span>
+                                    )}
+                                </span>
+                            ) : (
+                                <span>-</span>
+                            )}
 
-                    <div className="flex items-center gap-2">
-                        <Button variant="secondary" size="sm" icon={<Pen className="size-3.5" />}
-                            iconOnly onClick={() => editModal.open(customer)} />
-
-                        <Button variant="secondary" size="sm" loading={isDeletingCustomer}
-                            icon={<Trash className="size-3.5" />} iconOnly
-                            onClick={() => deleteCustomer({ customerId: customer.id })} />
+                        </p>
                     </div>
+                    <div className="grid gap-1 text-right border-r border-(--border) px-6">
+                        <p className="text-xs text-gray-400">Angebote</p>
+                        <p className="font-mono text-md">{customer.orders.length}</p>
+                    </div>
+                    <div className="grid gap-1 text-right pl-6">
+                        <p className="text-xs text-gray-400">Bestellungen</p>
+                        <p className="font-mono text-md">{customer.orders.length}</p>
+                    </div>
+                </div>
+            </Link>
+
+
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+                <div className="flex items-center gap-2">
+                    <Button size="xs" variant="border" onClick={onCreateOffer}>Angebot erstellen</Button>
+                    <Button size="xs" variant="border" onClick={onCreateOrder}>Bestellung erstellen</Button>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="border"
+                        size="xs"
+                        icon={<Pen size={14} />}
+                        iconOnly
+                        onClick={() => onEdit(customer)}
+                    />
+
+                    <Button
+                        variant="border"
+                        size="xs"
+                        loading={isDeletingCustomer}
+                        icon={<Trash size={14} />}
+                        iconOnly
+                        onClick={handleDeleteCustomer}
+                    />
                 </div>
             </div>
-
-            <Collapsable label="Ansprechpartner" className="w-full bg-(--subtle-50) justify-between rounded-none">
-                <div className="grid">
-                    <div className="flex justify-end  mx-4 py-3">
-                        <Button size="sm" variant="secondary" icon={<Plus className="size-3.5" />}
-                            onClick={() => setAddContact(true)} disabled={addContact}>
-                            Kontaktperson hinzufügen
-                        </Button>
-                    </div>
-
-                    {addContact && (
-                        <ContactPersonForm
-                            saveFn={(data: CreateContactInput) => {
-                                createCustomerContact({
-                                    id: customer.id,
-                                    input: {
-                                        salutation: data.salutation,
-                                        firstName: data.firstName,
-                                        lastName: data.lastName,
-                                        email: data.email || "",
-                                        customerId: customer.id,
-                                    },
-                                });
-                                setAddContact(false);
-                            }}
-                            cancelFn={() => setAddContact(false)}
-                            currentCustomerId={customer.id}
-                        />
-                    )}
-
-
-
-                    {contactPersons.length === 0 && !addContact && (
-                        <p className="text-sm text-(--fg-3)">Keine Ansprechpartner.</p>
-                    )}
-
-                    {contactPersons.map((cp) => (
-                        <ContactListItem key={cp.id} cp={cp} currentCustomerId={customer.id} />
-                    ))}
-                </div>
-            </Collapsable>
-
-            {editModal.isOpen && (
-                <CustomerModal key={editModal.key} currentCustomer={editModal.data} onClose={editModal.close} />
-            )}
         </div>
     );
 }

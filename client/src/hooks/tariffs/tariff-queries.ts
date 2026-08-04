@@ -3,7 +3,7 @@ import {tariffKeys} from "./tariff-keys";
 import {
     getTariffDurations,
     getTariffGroups,
-    getTariffHistory,
+    getTariffVersions,
 } from "./tariff-api";
 
 export const tariffQueries = {
@@ -14,11 +14,11 @@ export const tariffQueries = {
         });
     },
 
-    history: (productId: string, contractId: string) => {
+    versions: (groupId: string, tariffId: string) => {
         return queryOptions({
-            queryKey: tariffKeys.history(productId, contractId),
-            queryFn: () => getTariffHistory(productId, contractId),
-            enabled: Boolean(productId) && Boolean(contractId),
+            queryKey: tariffKeys.versions(tariffId),
+            queryFn: () => getTariffVersions(groupId, tariffId),
+            enabled: Boolean(groupId) && Boolean(tariffId),
         });
     },
 

@@ -2,6 +2,7 @@ import type {
     CreateOfferFlatrateInput,
     CreateOfferInput,
     CreateOfferPositionInput,
+    ExtendOfferInput,
     Offer,
     OfferFilterParams,
 
@@ -116,6 +117,13 @@ export const getTask = async (taskId: string) =>
 
 export const renewOffer = (offerId: string, input: CreateOfferInput) =>
     api<Offer>(`/api/offers/${offerId}/renew`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(input),
+    });
+
+export const extendOffer = (offerId: string, input: ExtendOfferInput) =>
+    api<Offer>(`/api/offers/${offerId}/extend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),

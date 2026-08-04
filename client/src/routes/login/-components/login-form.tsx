@@ -80,11 +80,11 @@ export function LoginFormComponent() {
         <div className="absolute min-w-screen min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-sm">
                 <div
-                    className="bg-white border border-(--border) rounded-xl shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-7 py-8">
+                    className="bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-7 py-8">
                     {/* Logo */}
                     <div className="flex items-center justify-center gap-2 mb-6">
                         <div
-                            className="w-8 h-8 bg-(--primary-600) rounded-lg flex items-center justify-center shrink-0">
+                            className="w-8 h-8 bg-(--primary-600) rounded-md flex items-center justify-center shrink-0">
                             <svg
                                 width="18"
                                 height="18"
@@ -269,16 +269,16 @@ export function LoginFormComponent() {
 
                     {/* Divider */}
                     <div className="flex items-center gap-3 my-1">
-                        <div className="h-px flex-1 bg-(--border)"/>
+                        <div className="h-px flex-1 bg-(--border)" />
                         <span className="text-xs text-gray-400">oder</span>
-                        <div className="h-px flex-1 bg-(--border)"/>
+                        <div className="h-px flex-1 bg-(--border)" />
                     </div>
 
                     {/* Passkey sign-in */}
                     <Button
                         type="button"
                         variant="secondary"
-                        icon={<KeyRound size={16}/>}
+                        icon={<KeyRound size={16} />}
                         loading={passkeyLoading}
                         onClick={handlePasskeySignIn}
                         className="w-full"

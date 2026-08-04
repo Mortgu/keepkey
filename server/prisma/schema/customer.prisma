@@ -28,8 +28,8 @@ model Customer {
   orders   Order[]
   invoices Invoice[]
 
-  users       User[]
-  tariffCells TariffCellCustomer[]
+  users                User[]
+  tariffCustomerPrices TariffCustomerPrice[]
 
   @@map("customer")
 }

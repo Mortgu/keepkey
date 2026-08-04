@@ -11,7 +11,7 @@ export default function StatCard({ title, total, volume }: Props) {
     return (
         <div className="flex-1 grid gap-4 py-3 px-4">
             <div className="flex items-center gap-3">
-                <div className="bg-(--primary-500) p-2 rounded-xl text-white outline-2 outline-(--primary-500) outline-offset-2"><Scroll size={23} /></div>
+                <div className="bg-(--primary-500) p-2 rounded-md text-white outline-2 outline-(--primary-500) outline-offset-2"><Scroll size={23} /></div>
                 <div className="grid">
                     <p className="text-lg font-semibold">{title}</p>
                     <p className="text-sm font-medium text-gray-400">GJ: 2026</p>

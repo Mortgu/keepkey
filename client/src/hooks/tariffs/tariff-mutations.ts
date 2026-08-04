@@ -9,6 +9,8 @@ import {
     deleteTariffColumn,
     deleteTariffGroup,
     deleteTariffRow,
+    restoreTariffVersion,
+    sealTariffVersion,
     updateTariffCell,
     updateTariffColumn,
     updateTariffGroup,
@@ -20,8 +22,16 @@ import type {
     UpdateTariffGroupInput,
 } from "@keepit/schemas";
 
-const invalidateLists = (queryClient: ReturnType<typeof useQueryClient>) => {
+/**
+ * Strukturänderungen an Zeilen, Spalten oder Zellen.
+ *
+ * Die Versionsliste muss mit invalidiert werden: Sie hängt unterhalb von `all`
+ * und wird von `lists()` nicht erfasst — ohne das bliebe die `isCurrent`-Markierung
+ * nach jeder Preisänderung veraltet stehen.
+ */
+const invalidateStructure = (queryClient: ReturnType<typeof useQueryClient>) => {
     queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
+    queryClient.invalidateQueries({ queryKey: tariffKeys.allVersions() });
 };
 
 const invalidateAll = (queryClient: ReturnType<typeof useQueryClient>) => {
@@ -115,6 +125,44 @@ export function useDeleteTariff() {
 }
 
 /* ───────────────────────────────
+   Version
+   ─────────────────────────────── */
+
+export function useSealTariffVersion() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ groupId, tariffId }: { groupId: string, tariffId: string }) =>
+            sealTariffVersion(groupId, tariffId),
+        onSuccess: () => invalidateStructure(queryClient),
+    });
+
+    return {
+        sealVersion: mutation.mutateAsync,
+        sealingVersion: mutation.isPending,
+        errorSealingVersion: mutation.error,
+    };
+}
+
+export function useRestoreTariffVersion() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: ({ groupId, tariffId, versionId }: { groupId: string, tariffId: string, versionId: string }) =>
+            restoreTariffVersion(groupId, tariffId, versionId),
+        // Ein Restore ersetzt die gesamte Struktur und legt zusätzlich eine
+        // RESTORE-Version an — deshalb alles invalidieren.
+        onSuccess: () => invalidateAll(queryClient),
+    });
+
+    return {
+        restoreVersion: mutation.mutateAsync,
+        restoringVersion: mutation.isPending,
+        errorRestoringVersion: mutation.error,
+    };
+}
+
+/* ───────────────────────────────
    Column
    ─────────────────────────────── */
 
@@ -124,7 +172,7 @@ export function useCreateTariffColumn() {
     const mutation = useMutation({
         mutationFn: ({ groupId, tariffId, duration }: { groupId: string, tariffId: string, duration: number }) =>
             createTariffColumn(groupId, tariffId, duration),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -140,7 +188,7 @@ export function useDeleteTariffColumn() {
     const mutation = useMutation({
         mutationFn: ({ groupId, tariffId, columnId }: { groupId: string, tariffId: string, columnId: string }) =>
             deleteTariffColumn(groupId, tariffId, columnId),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -157,7 +205,7 @@ export function useUpdateTariffColumn() {
         mutationFn: ({ groupId, tariffId, columnId, duration }: {
             groupId: string, tariffId: string, columnId: string, duration: number
         }) => updateTariffColumn(groupId, tariffId, columnId, duration),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -178,7 +226,7 @@ export function useCreateTariffRow() {
         mutationFn: ({ groupId, tariffId, min_qty, max_qty }: {
             groupId: string, tariffId: string, min_qty: number, max_qty: number | null
         }) => createTariffRow(groupId, tariffId, min_qty, max_qty),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -194,7 +242,7 @@ export function useDeleteTariffRow() {
     const mutation = useMutation({
         mutationFn: ({ groupId, tariffId, rowId }: { groupId: string, tariffId: string, rowId: string }) =>
             deleteTariffRow(groupId, tariffId, rowId),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -211,7 +259,7 @@ export function useUpdateTariffRow() {
         mutationFn: ({ groupId, tariffId, rowId, min_qty, max_qty }: {
             groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number | null
         }) => updateTariffRow(groupId, tariffId, rowId, min_qty, max_qty),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {
@@ -232,7 +280,7 @@ export function useUpdateTariffCell() {
         mutationFn: ({ groupId, tariffId, cellId, default_price, customer_price }: {
             groupId: string, tariffId: string, cellId: string, default_price?: number, customer_price?: number
         }) => updateTariffCell(groupId, tariffId, cellId, default_price, customer_price),
-        onSuccess: () => invalidateLists(queryClient),
+        onSuccess: () => invalidateStructure(queryClient),
     });
 
     return {

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import type { ComponentSize } from "@/components/size";
+import type { ComponentSize } from "@/components/tokens";
 
 const chipSizeStyles: Record<ComponentSize, string> = {
   xs: "py-0.5 pl-2 pr-1.5 text-[10px]",

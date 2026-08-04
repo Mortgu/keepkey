@@ -40,7 +40,7 @@ const TYPE_ROUTE: Record<SearchType, string> = {
 const inputWrap = tv({
     base: [
         "flex items-center gap-2.5 px-3 py-2",
-        "bg-white rounded-lg border transition-[border-color,box-shadow] duration-100",
+        "bg-white rounded-md border transition-[border-color,box-shadow] duration-100",
     ],
     variants: {
         open: {
@@ -130,7 +130,7 @@ function ResultRow({ item, query }: { item: SearchResultItem; query: string }) {
     return (
         <div
             className="flex items-center gap-3 px-4 py-2 cursor-pointer hover:bg-(--page-bg) transition-colors"
-            // hover handled via Tailwind
+        // hover handled via Tailwind
         >
             <div
                 className={`size-[30px] rounded-[7px] bg-(--page-bg) flex items-center justify-center shrink-0 ${TYPE_COLOR[item.type]}`}

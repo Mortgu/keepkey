@@ -1,6 +1,6 @@
-import {  useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type {SyntheticEvent} from "react";
+import type { SyntheticEvent } from "react";
 import type { CreateOfferDiscountInput } from "@keepit/schemas";
 import { Button, Input, Textarea } from "@/components";
 
@@ -31,7 +31,7 @@ export default function DiscountFormOfferModal({ currentDiscount, saveFn, cancel
 
         saveFn({
             title: title.trim(),
-            description: description.trim() || undefined,
+            description: description.trim() || null,
             amount_cents: eurToCents(amountEur),
         });
         cancelFn();

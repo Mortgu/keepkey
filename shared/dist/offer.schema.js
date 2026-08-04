@@ -44,7 +44,7 @@ export const offerFlatrateSchema = createOfferFlatrateSchema.extend({
 /* OfferDiscount */
 export const createOfferDiscountSchema = z.object({
     title: z.string().min(1),
-    description: z.string().optional(),
+    description: z.string().nullable(),
     amount_cents: z.number().int().nonnegative(),
 });
 export const updateOfferDiscountSchema = createOfferDiscountSchema.partial();
@@ -95,6 +95,35 @@ export const createOfferSchema = z.object({
 export const updateOfferSchema = createOfferSchema.extend({
     expectedVersion: z.number().int().positive(),
 });
+/* Lizenzerweiterung */
+export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
+/**
+ * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden
+ * Vertrags. Sie verweist auf die Positionen des Quellangebots statt sie zu
+ * beschreiben: Produkt, Vertrag und Laufzeit bleiben unverändert, nur die Menge
+ * darf abweichen. Preise stehen bewusst nicht im Body — sie werden serverseitig
+ * aus der angepinnten Tarif-Version aufgelöst.
+ */
+export const extendOfferPositionSchema = z.object({
+    sourcePositionId: z.string(),
+    quantity: z.number().int().positive(),
+});
+export const extendOfferSchema = z.object({
+    quoteId: z.string().trim().nonempty("Required!"),
+    validUntil: z.string().nullable(),
+    requestFrom: z.string().nullable(),
+    positions: z.array(extendOfferPositionSchema).min(1),
+    discounts: z.array(createOfferDiscountSchema),
+});
+export const offerDiscountSchema = z.object({
+    id: z.string(),
+    offerId: z.string(),
+    title: z.string(),
+    description: z.string().nullable(),
+    amount_cents: z.number().int(),
+    createdAt: isoDateTime,
+    updatedAt: isoDateTime,
+});
 export const offerSchema = z.object({
     id: z.string(),
     customerId: z.string(),
@@ -110,8 +139,10 @@ export const offerSchema = z.object({
     toCompare: z.array(z.string()),
     offerPositions: z.array(offerPositionSchema),
     offerFlatRates: z.array(offerFlatrateSchema),
-    offerDiscounts: z.array(z.lazy(() => offerDiscountSchema)),
+    offerDiscounts: z.array(offerDiscountSchema),
     offerDocuments: z.array(offerDocumentSchema),
+    renewedFromOfferId: z.string().nullable().optional(),
+    derivationType: offerDerivationTypeSchema.nullable().optional(),
     user: userSchema,
     customer: customerSchema,
     customerContactPerson: contactSchema,
@@ -122,15 +153,6 @@ export const offerSchema = z.object({
     updatedAt: isoDateTime,
 });
 export const offerListSchema = z.array(offerSchema);
-export const offerDiscountSchema = z.object({
-    id: z.string(),
-    offerId: z.string(),
-    title: z.string(),
-    description: z.string().optional(),
-    amount_cents: z.number().int(),
-    createdAt: isoDateTime,
-    updatedAt: isoDateTime,
-});
 export const restoreOfferRevisionSchema = z.object({
     expectedVersion: z.number().int().positive(),
 });

@@ -8,7 +8,7 @@ import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import {authClient} from "@/lib/auth-client.ts";
 import { getErrorMessage } from "@/lib/errors";
-import { showToast } from "@/components/toast/toast";
+import { showToast } from "@/components";
 
 const queryClient = new QueryClient({
     defaultOptions: {

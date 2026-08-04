@@ -1,15 +1,6 @@
-import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
-import {
-    createContractSchema,
-    updateContractSchema,
-} from "../schemas/contract-schemas.js";
-
-/* ========== Types ========== */
-
-export type CreateContractInput = z.infer<typeof createContractSchema>;
-export type UpdateContractInput = z.infer<typeof updateContractSchema>;
+import { CreateContractInput, UpdateContractInput } from "@keepit/schemas";
 
 /* ========== Queries ========== */
 

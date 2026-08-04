@@ -4,6 +4,8 @@ import {
   createOffer,
   deleteOffer,
   enqueueGeneration,
+  extendOffer,
+  getExtensionPrice,
   getOfferById,
   getOfferRevisions,
   getOffers,
@@ -24,6 +26,8 @@ import {
 
   createOfferFlatrateSchema,
   updateOfferFlatrateSchema,
+
+  extendOfferSchema,
 
   restoreOfferRevisionSchema
 } from '@keepit/schemas';
@@ -50,7 +54,13 @@ router.delete('/:id', deleteOffer);
 /* [POST] /api/offers/:id/renew */
 router.post('/:id/renew', validate(createOfferSchema), renewOffer);
 
+/* [POST] /api/offers/:id/extend — Lizenzerweiterung */
+router.post('/:id/extend', validate(extendOfferSchema), extendOffer);
+
 /* ========== Offer Position ========== */
+
+/* [GET] /api/offers/:offerId/positions/:positionId/extension-price */
+router.get('/:offerId/positions/:positionId/extension-price', getExtensionPrice);
 
 /* [GET] /api/offers/:id/positions */
 router.get('/:id/positions', notImplemented);
