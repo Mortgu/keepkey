@@ -12,8 +12,10 @@ import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
+import { netCents } from "@keepit/schemas";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
+import { livePrice, storedPrice, toTemplateItem } from "./format/position-item.js";
 import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
 
 /* Helper function */
@@ -70,28 +72,16 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const language = offer.language;
     const customerId = offer.customerId;
 
-    const products = offer.offerPositions.map(pos => {
-        const productT = pickTranslation(pos.product.translations, language)!;
-        const contractT = pickTranslation(pos.contract.translations, language)!;
-        const discountTotal = pos.free_months * pos.eur_user_month * pos.quantity;
-
-        return {
-            name: productT.name,
-            description: productT.description ?? "",
-            content: productT.table ?? "",
-            quantity: String(pos.quantity),
-            eur_user_month: formatCentsToEur(pos.eur_user_month),
-            duration: `${pos.duration_months} Monate`,
-            total: formatCentsToEur(pos.total_cents),
-            contract: contractT.name,
-            optional: pos.optional ?? false,
-            discount: {
-                free_months: pos.free_months,
-                valid_until: formatDate(offer.validUntil),
-                total: formatCentsToEur(-discountTotal),
-            },
-        };
-    });
+    const products = offer.offerPositions.map(pos => toTemplateItem(
+        pos,
+        storedPrice(pos),
+        {
+            language,
+            contractName: pickTranslation(pos.contract.translations, language)!.name,
+            validUntil: offer.validUntil,
+            durationLabel: `${pos.duration_months} Monate`,
+        },
+    ));
 
     const groupMap = new Map<string, typeof offer.offerPositions>();
     for (const pos of offer.offerPositions) {
@@ -153,65 +143,87 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
     const tables: OfferTemplate["tables"] = [];
 
+    /**
+     * Baut eine Vertragstabelle.
+     *
+     * `live: false` ist der Normalfall — der Vertrag, für den das Angebot
+     * geschrieben wurde. Dann gelten die beim Anlegen festgeschriebenen Preise
+     * der Positionen, damit ein erneut erzeugtes Dokument dieselben Zahlen
+     * zeigt wie das verschickte.
+     *
+     * `live: true` gilt nur für die Vergleichstabellen anderer Verträge: diese
+     * Positionen wurden dort nie verkauft, es gibt also nichts Gespeichertes.
+     * Fehlt für einen Vergleichsvertrag eine Preistabelle, entfällt die
+     * Tabelle (`null`) — ein Vergleich ist optionales Beiwerk und darf die
+     * Erzeugung des Angebots nicht scheitern lassen.
+     *
+     * `withOfferWideTotals` steuert, ob Flatrates und Rabatte in die
+     * Tabellensumme eingehen. Sie gelten für das gesamte Angebot: bei mehreren
+     * Positionsgruppen (verschiedene Verträge oder Laufzeiten) sind die
+     * Tabellen Teilmengen desselben Angebots und dürften sie sonst mehrfach
+     * zählen. Die Vergleichsvarianten einer Gruppe sind dagegen vollständige
+     * Alternativen und bekommen sie jeweils mit.
+     */
     const buildTableForContract = async (
         contractId: string,
         productNames: string,
         positions: typeof offer.offerPositions,
-    ) => {
+        options: { live: boolean; withOfferWideTotals: boolean },
+    ): Promise<OfferTemplate["tables"][number] | null> => {
+        const contractName = pickTranslation(
+            contracts.find(c => c.id === contractId)!.translations,
+            language,
+        )!.name;
+
         const items: OfferTemplate["products"] = [];
-        let itemsTotalCents = 0;
+        let itemsNetCents = 0;
 
         for (const pos of positions) {
-            const productT = pickTranslation(pos.product.translations, language)!;
-            const contractT = pickTranslation(
-                contracts.find(c => c.id === contractId)!.translations,
+            let price;
+
+            if (options.live) {
+                const result = await calculatePrice({
+                    productId: pos.productId,
+                    contractId,
+                    duration: pos.duration_months,
+                    quantity: pos.quantity,
+                    customerId,
+                    freeMonths: 0,
+                });
+
+                if (!result.ok) return null;
+                price = livePrice(result.breakdown.unitPrice, pos);
+            } else {
+                price = storedPrice(pos);
+            }
+
+            // Die Tabellensumme ist netto — im Dokument steht über ihr der
+            // Bruttopreis und darunter der Rabatt als eigene Zeile.
+            itemsNetCents += netCents(price);
+
+            items.push(toTemplateItem(pos, price, {
                 language,
-            )!;
-
-            const priceResult = await calculatePrice({
-                productId: pos.productId,
-                contractId,
-                duration: pos.duration_months,
-                quantity: pos.quantity,
-                customerId,
-                freeMonths: pos.free_months,
-            });
-
-            const totalCents = priceResult.ok ? priceResult.price : 0;
-            const unitPrice = priceResult.ok ? priceResult.breakdown.unitPrice : 0;
-            const discountCents = pos.free_months * unitPrice * pos.quantity;
-
-            itemsTotalCents += totalCents;
-
-            items.push({
-                name: productT.name,
-                description: productT.description ?? "",
-                content: productT.table ?? "",
-                quantity: String(pos.quantity),
-                eur_user_month: formatCentsToEur(unitPrice),
-                duration: String(pos.duration_months),
-                total: formatCentsToEur(pos.total_cents),
-                contract: contractT.name,
-                optional: pos.optional ?? false,
-                discount: {
-                    free_months: pos.free_months,
-                    valid_until: formatDate(offer.validUntil),
-                    total: formatCentsToEur(-discountCents),
-                },
-            });
+                contractName,
+                validUntil: offer.validUntil,
+                durationLabel: String(pos.duration_months),
+            }));
         }
 
-        const tableTotalCents = itemsTotalCents + flatratesTotal - discountsTotal;
+        const tableTotalCents = options.withOfferWideTotals
+            ? itemsNetCents + flatratesTotal - discountsTotal
+            : itemsNetCents;
 
         return {
             products: productNames,
-            contract: items[0].contract,
-            duration: `${items[0].duration} Monaten`,
+            contract: contractName,
+            duration: `${positions[0].duration_months} Monaten`,
             items,
-            flatrates,
+            flatrates: options.withOfferWideTotals ? flatrates : [],
             total: formatCentsToEur(tableTotalCents),
         };
     };
+
+    let isFirstGroup = true;
 
     for (const [, positions] of groupMap) {
         const firstPos = positions[0];
@@ -219,17 +231,24 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
             .join(" & ");
 
-        tables.push(
-            await buildTableForContract(firstPos.contractId, productNames, positions),
+        const options = { live: false, withOfferWideTotals: isFirstGroup };
+
+        const table = await buildTableForContract(
+            firstPos.contractId, productNames, positions, options,
         );
+        if (table) tables.push(table);
 
         if (offer.featureComparison) {
             for (const otherContract of otherContracts) {
-                tables.push(
-                    await buildTableForContract(otherContract.id, productNames, positions),
+                const comparison = await buildTableForContract(
+                    otherContract.id, productNames, positions,
+                    { ...options, live: true },
                 );
+                if (comparison) tables.push(comparison);
             }
         }
+
+        isFirstGroup = false;
     }
 
     const cp = offer.customerContactPerson;
@@ -288,7 +307,6 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 
     try {
         const formated = await formatOfferData(context.fetchedData);
-        console.dir(formated, { depth: null });
         context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {

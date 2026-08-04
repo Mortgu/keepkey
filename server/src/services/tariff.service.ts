@@ -11,16 +11,17 @@ import {
 import {
     calculatePrice,
     loadTariffForPricing,
-    resolveCell,
-    selectPrice,
-    type PriceFailureReason,
+    resolveCell, type PriceFailureReason
 } from "../utils/products.js";
+
+import type {
+    CreateTariffInput,
+    CreateTariffColumnInput,
+    UpdateTariffColumnInput
+} from '@keepit/schemas';
 
 /* ========== Types ========== */
 
-export type CreateTariffInput = { contractId: string };
-export type CreateTariffColumnInput = { duration: number };
-export type UpdateTariffColumnInput = { duration?: number };
 export type CreateTariffRowInput = { min_quantity: number; max_quantity: number | null };
 export type UpdateTariffRowInput = { min_qty?: number; max_qty?: number | null };
 export type UpdateTariffCellInput = { default_price?: number; customer_price?: number; customerId?: string };
@@ -154,6 +155,53 @@ async function writeCustomerPrice(coordinates: CustomerPriceCoordinates, price: 
         },
         create: { tariffId, customerId, productId, duration, min_quantity, price },
         update: { price },
+    });
+}
+
+/**
+ * Zieht kundenspezifische Preise auf eine geänderte Koordinate nach.
+ *
+ * Kundenpreise hängen bewusst an `(duration, min_quantity)` statt an einer
+ * `cellId` — das lässt sie ein Wiederherstellen überleben, macht sie aber
+ * unsichtbar wirkungslos, sobald jemand die Zeile oder Spalte verschiebt.
+ * Deshalb wandern sie hier mit, statt still ins Leere zu zeigen.
+ *
+ * Auf der Zielkoordinate liegende Preise werden vorher entfernt. Dort kann es
+ * keine Zeile bzw. Spalte geben — Überschneidungen und doppelte Laufzeiten sind
+ * abgelehnt —, es handelt sich also um Waisen aus der Zeit vor dieser Pflege.
+ * Ohne dieses Aufräumen bräche der Unique-Index beim Verschieben.
+ *
+ * Beide Funktionen erwarten eine Transaktion: Verschieben und Strukturänderung
+ * müssen gemeinsam gelten oder gemeinsam ausbleiben.
+ */
+async function moveCustomerPricesToMinQuantity(
+    tx: Prisma.TransactionClient,
+    tariffId: string,
+    from: number,
+    to: number,
+) {
+    if (from === to) return;
+
+    await tx.tariffCustomerPrice.deleteMany({ where: { tariffId, min_quantity: to } });
+    await tx.tariffCustomerPrice.updateMany({
+        where: { tariffId, min_quantity: from },
+        data: { min_quantity: to },
+    });
+}
+
+/** Siehe {@link moveCustomerPricesToMinQuantity}. */
+async function moveCustomerPricesToDuration(
+    tx: Prisma.TransactionClient,
+    tariffId: string,
+    from: number,
+    to: number,
+) {
+    if (from === to) return;
+
+    await tx.tariffCustomerPrice.deleteMany({ where: { tariffId, duration: to } });
+    await tx.tariffCustomerPrice.updateMany({
+        where: { tariffId, duration: from },
+        data: { duration: to },
     });
 }
 
@@ -734,36 +782,48 @@ export async function updateTariffColumn(columnId: string, input: UpdateTariffCo
         return prisma.tariffColumn.findUniqueOrThrow({ where: { id: columnId } });
     }
 
-    const current = await prisma.tariffColumn.findUnique({
-        where: { id: columnId },
-        select: { id: true, tariffId: true },
-    });
+    return prisma.$transaction(async (tx) => {
+        const current = await tx.tariffColumn.findUnique({
+            where: { id: columnId },
+            select: { id: true, tariffId: true, duration: true },
+        });
 
-    if (!current) {
-        throw new AppException("Tariff column not found.", 404, "NO_COLUMN");
-    }
+        if (!current) {
+            throw new AppException("Tariff column not found.", 404, "NO_COLUMN");
+        }
 
-    const duplicate = await prisma.tariffColumn.findFirst({
-        where: { tariffId: current.tariffId, duration, id: { not: columnId } },
-    });
+        const duplicate = await tx.tariffColumn.findFirst({
+            where: { tariffId: current.tariffId, duration, id: { not: columnId } },
+        });
 
-    if (duplicate) {
-        throw new AppException(
-            `Für die Laufzeit ${duration} existiert bereits eine Spalte.`,
-            422,
-            "DURATION_ALREADY_EXISTS",
-        );
-    }
+        if (duplicate) {
+            throw new AppException(
+                `Für die Laufzeit ${duration} existiert bereits eine Spalte.`,
+                422,
+                "DURATION_ALREADY_EXISTS",
+            );
+        }
 
-    return prisma.tariffColumn.update({
-        where: { id: columnId },
-        data: { duration },
+        await moveCustomerPricesToDuration(tx, current.tariffId, current.duration, duration);
+
+        return tx.tariffColumn.update({
+            where: { id: columnId },
+            data: { duration },
+        });
     });
 }
 
 export async function deleteTariffColumn(columnId: string) {
     return prisma.$transaction(async (tx) => {
         const column = await tx.tariffColumn.delete({ where: { id: columnId } });
+
+        // Mit der Spalte verschwinden die Kundenpreise auf ihrer Laufzeit —
+        // sonst leben sie als Waisen weiter und greifen wieder, sobald jemand
+        // dieselbe Laufzeit erneut anlegt.
+        await tx.tariffCustomerPrice.deleteMany({
+            where: { tariffId: column.tariffId, duration: column.duration },
+        });
+
         await reindexColumns(tx, column.tariffId);
         return column;
     });
@@ -811,38 +871,51 @@ export async function createTariffRow(tariffId: string, input: CreateTariffRowIn
 export async function updateTariffRow(rowId: string, input: UpdateTariffRowInput) {
     const { min_qty, max_qty } = input;
 
-    const current = await prisma.tariffRow.findUnique({
-        where: { id: rowId },
-        select: { id: true, tariffId: true, min_quantity: true, max_quantity: true },
-    });
+    return prisma.$transaction(async (tx) => {
+        const current = await tx.tariffRow.findUnique({
+            where: { id: rowId },
+            select: { id: true, tariffId: true, min_quantity: true, max_quantity: true },
+        });
 
-    if (!current) {
-        throw new AppException("Tariff row not found.", 404, "NO_ROW");
-    }
+        if (!current) {
+            throw new AppException("Tariff row not found.", 404, "NO_ROW");
+        }
 
-    const next: QuantityRange = {
-        min_quantity: min_qty ?? current.min_quantity,
-        max_quantity: max_qty !== undefined ? max_qty : current.max_quantity,
-    };
+        const next: QuantityRange = {
+            min_quantity: min_qty ?? current.min_quantity,
+            max_quantity: max_qty !== undefined ? max_qty : current.max_quantity,
+        };
 
-    assertQuantityRange(next);
+        assertQuantityRange(next);
 
-    const siblings = await prisma.tariffRow.findMany({
-        where: { tariffId: current.tariffId },
-        select: { id: true, min_quantity: true, max_quantity: true },
-    });
+        const siblings = await tx.tariffRow.findMany({
+            where: { tariffId: current.tariffId },
+            select: { id: true, min_quantity: true, max_quantity: true },
+        });
 
-    assertNoOverlap(siblings, next, rowId);
+        assertNoOverlap(siblings, next, rowId);
 
-    return prisma.tariffRow.update({
-        where: { id: rowId },
-        data: next,
+        await moveCustomerPricesToMinQuantity(
+            tx, current.tariffId, current.min_quantity, next.min_quantity,
+        );
+
+        return tx.tariffRow.update({
+            where: { id: rowId },
+            data: next,
+        });
     });
 }
 
 export async function deleteTariffRow(rowId: string) {
     return prisma.$transaction(async (tx) => {
         const row = await tx.tariffRow.delete({ where: { id: rowId } });
+
+        // Siehe deleteTariffColumn: ohne dieses Aufräumen bleibt der
+        // Kundenpreis liegen und wacht bei derselben Mengenuntergrenze wieder auf.
+        await tx.tariffCustomerPrice.deleteMany({
+            where: { tariffId: row.tariffId, min_quantity: row.min_quantity },
+        });
+
         await reindexRows(tx, row.tariffId);
         return row;
     });

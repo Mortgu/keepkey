@@ -3,8 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 import type { CreateOfferDiscountInput } from "@keepit/schemas";
 import { Button, Input, Textarea } from "@/components";
-
-const eurToCents = (eur: number): number => Math.round(eur * 100);
+import { eurToCents } from "@/utils/utils";
 
 interface Props {
     currentDiscount?: CreateOfferDiscountInput;

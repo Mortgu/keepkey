@@ -148,6 +148,16 @@ export const createTariffSchema = z.object({
 });
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
+export const createTariffColumnSchema = z.object({
+    duration: z.int().positive(),
+});
+export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
+
+export const updateTariffColumnSchema = z.object({
+    duration: z.int().positive().optional(),
+});
+export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
+
 /**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
@@ -183,9 +193,7 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
  * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
  */
 export const tariffVersionSnapshotSchema = z.object({
-    columns: z.array(z.object({
-        duration: z.number().int(),
-    })),
+    columns: z.array(createTariffColumnSchema),
     rows: z.array(z.object({
         min_quantity: z.number().int(),
         max_quantity: z.number().int().nullable(),

@@ -14,9 +14,7 @@ import {
     useTariffDurationsHook,
 } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
-
-const eurToCents = (eur: number): number => Math.round(eur * 100);
+import { eurToCents, formatEur } from "@/utils/utils";
 
 interface Props {
     customerId: string;

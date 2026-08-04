@@ -102,6 +102,12 @@ export const updateTariffGroupSchema = createTariffGroupSchema.partial();
 export const createTariffSchema = z.object({
     contractId: z.string(),
 });
+export const createTariffColumnSchema = z.object({
+    duration: z.int().positive(),
+});
+export const updateTariffColumnSchema = z.object({
+    duration: z.int().positive().optional(),
+});
 /**
  * Standalone tariff — returned by `GET /api/tariffs/:groupId/:tariffId`.
  * Includes the slim tariff group (without nested tariffs).
@@ -125,9 +131,7 @@ export const tariffGroupSchema = z.object({
  * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
  */
 export const tariffVersionSnapshotSchema = z.object({
-    columns: z.array(z.object({
-        duration: z.number().int(),
-    })),
+    columns: z.array(createTariffColumnSchema),
     rows: z.array(z.object({
         min_quantity: z.number().int(),
         max_quantity: z.number().int().nullable(),

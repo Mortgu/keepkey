@@ -183,6 +183,14 @@ export declare const createTariffSchema: z.ZodObject<{
     contractId: z.ZodString;
 }, z.core.$strip>;
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
+export declare const createTariffColumnSchema: z.ZodObject<{
+    duration: z.ZodInt;
+}, z.core.$strip>;
+export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
+export declare const updateTariffColumnSchema: z.ZodObject<{
+    duration: z.ZodOptional<z.ZodInt>;
+}, z.core.$strip>;
+export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
 /**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
@@ -384,7 +392,7 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
  */
 export declare const tariffVersionSnapshotSchema: z.ZodObject<{
     columns: z.ZodArray<z.ZodObject<{
-        duration: z.ZodNumber;
+        duration: z.ZodInt;
     }, z.core.$strip>>;
     rows: z.ZodArray<z.ZodObject<{
         min_quantity: z.ZodNumber;
@@ -398,8 +406,8 @@ export declare const tariffVersionSnapshotSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
 export declare const tariffVersionReasonSchema: z.ZodEnum<{
-    OFFER: "OFFER";
     MANUAL: "MANUAL";
+    OFFER: "OFFER";
     RESTORE: "RESTORE";
 }>;
 export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
@@ -412,7 +420,7 @@ export declare const tariffVersionSchema: z.ZodObject<{
     hash: z.ZodString;
     snapshot: z.ZodObject<{
         columns: z.ZodArray<z.ZodObject<{
-            duration: z.ZodNumber;
+            duration: z.ZodInt;
         }, z.core.$strip>>;
         rows: z.ZodArray<z.ZodObject<{
             min_quantity: z.ZodNumber;
@@ -425,8 +433,8 @@ export declare const tariffVersionSchema: z.ZodObject<{
         }, z.core.$strip>>;
     }, z.core.$strip>;
     reason: z.ZodEnum<{
-        OFFER: "OFFER";
         MANUAL: "MANUAL";
+        OFFER: "OFFER";
         RESTORE: "RESTORE";
     }>;
     createdBy: z.ZodNullable<z.ZodObject<{

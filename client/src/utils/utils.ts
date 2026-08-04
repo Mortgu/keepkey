@@ -10,6 +10,16 @@ export const formatEur = (cent: number): string => {
   );
 };
 
+/**
+ * Preise werden durchgehend in Cent gespeichert und übertragen, in der
+ * Oberfläche aber in Euro eingegeben. Beide Richtungen liegen hier neben
+ * {@link formatEur}, damit keine Eingabemaske ihre eigene Umrechnung erfindet —
+ * eine vergessene Umrechnung ist ein Faktor-100-Fehler am Preis.
+ */
+export const eurToCents = (eur: number): number => Math.round(eur * 100);
+
+export const centsToEur = (cent: number): number => cent / 100;
+
 export const formatStatus = (status: TaskStatus) => {
   switch (status) {
     case "COMPLETED":
