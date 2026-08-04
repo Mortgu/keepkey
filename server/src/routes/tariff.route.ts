@@ -23,18 +23,19 @@ import {
     updateTariffRow,
     upsertCustomerPrice
 } from "@/controllers/index.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
     createTariffColumnSchema,
     createTariffGroupSchema,
     createTariffRowSchema,
     createTariffSchema,
+    deleteCustomerPriceSchema,
     updateTariffCellSchema,
     updateTariffColumnSchema,
     updateTariffGroupSchema,
     updateTariffRowSchema,
     upsertCustomerPriceSchema,
-} from "@/schemas/index.js";
+} from "@keepit/schemas";
 
 const router = Router();
 
@@ -51,7 +52,7 @@ router.get("/price", getTariffPrice);
 router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustomerPrice);
 
 /* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
-router.delete("/customer-price", deleteCustomerPrice);
+router.delete("/customer-price", validateQuery(deleteCustomerPriceSchema), deleteCustomerPrice);
 
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);

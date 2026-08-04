@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import type { DocumentFormatParam, DocumentType } from "../schemas/document-schemas.js";
+import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import * as documentsService from "../services/documents.service.js";
 
 export const renameDocument = async (request: Request, response: Response) => {

@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import {  useMutation, useQueryClient } from "@tanstack/react-query";
 import { tariffKeys } from "./tariff-keys";
 import {
     createTariff,
@@ -16,6 +16,7 @@ import {
     updateTariffGroup,
     updateTariffRow,
 } from "./tariff-api";
+import type {QueryClient} from "@tanstack/react-query";
 import type {
     CreateTariffGroupInput,
     CreateTariffInput,
@@ -29,63 +30,61 @@ import type {
  * und wird von `lists()` nicht erfasst — ohne das bliebe die `isCurrent`-Markierung
  * nach jeder Preisänderung veraltet stehen.
  */
-const invalidateStructure = (queryClient: ReturnType<typeof useQueryClient>) => {
+const invalidateStructure = (queryClient: QueryClient) => {
     queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
     queryClient.invalidateQueries({ queryKey: tariffKeys.allVersions() });
 };
 
-const invalidateAll = (queryClient: ReturnType<typeof useQueryClient>) => {
+const invalidateAll = (queryClient: QueryClient) => {
     queryClient.invalidateQueries({ queryKey: tariffKeys.all });
 };
+
+/**
+ * `useMutation` mit der Invalidierung, die zu dieser Änderung gehört.
+ *
+ * Nimmt dem Aufrufer nur das wiederkehrende `useQueryClient` + `onSuccess` ab;
+ * zurück kommt die unveränderte Mutation von React Query.
+ *
+ * Ob ein Hook danach `mutate` oder `mutateAsync` nach außen gibt, ist keine
+ * Geschmacksfrage: `mutateAsync` überall würde in den Klick-Handlern, die das
+ * Ergebnis nicht abwarten, unbehandelte Promise-Rejections erzeugen. Deshalb
+ * `mutateAsync` nur dort, wo der Aufrufer wirklich sequenziert — und `mutate`,
+ * wo der Fehler über `error` angezeigt wird.
+ */
+function useTariffMutation<TArgs, TResult>(
+    mutationFn: (args: TArgs) => Promise<TResult>,
+    invalidate: (queryClient: QueryClient) => void,
+) {
+    const queryClient = useQueryClient();
+    return useMutation({ mutationFn, onSuccess: () => invalidate(queryClient) });
+}
 
 /* ───────────────────────────────
    TariffGroup
    ─────────────────────────────── */
 
 export function useCreateTariffGroup() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: (input: CreateTariffGroupInput) => createTariffGroup(input),
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        createTariffGroup: mutation.mutate,
-        createTariffGroupPending: mutation.isPending,
-        createTariffGroupError: mutation.error,
-    };
+    const { mutate, isPending, error } = useTariffMutation(
+        (input: CreateTariffGroupInput) => createTariffGroup(input),
+        invalidateAll,
+    );
+    return { createTariffGroup: mutate, isPending, error };
 }
 
 export function useUpdateTariffGroup() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ id, input }: { id: string, input: UpdateTariffGroupInput }) =>
-            updateTariffGroup(id, input),
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        updateTariffGroup: mutation.mutate,
-        updateTariffGroupPending: mutation.isPending,
-        updateTariffGroupError: mutation.error,
-    };
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ id, input }: { id: string; input: UpdateTariffGroupInput }) => updateTariffGroup(id, input),
+        invalidateAll,
+    );
+    return { updateTariffGroup: mutate, isPending, error };
 }
 
 export function useDeleteTariffGroup() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ id }: { id: string }) => deleteTariffGroup(id),
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        deleteTariffGroup: mutation.mutateAsync,
-        deleteTariffGroupPending: mutation.isPending,
-        deleteTariffGroupError: mutation.error,
-    };
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ id }: { id: string }) => deleteTariffGroup(id),
+        invalidateAll,
+    );
+    return { deleteTariffGroup: mutate, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -93,35 +92,19 @@ export function useDeleteTariffGroup() {
    ─────────────────────────────── */
 
 export function useCreateTariff() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, input }: { groupId: string, input: CreateTariffInput }) =>
-            createTariff(groupId, input),
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        createTariff: mutation.mutate,
-        createTariffPending: mutation.isPending,
-        createTariffError: mutation.error,
-    };
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, input }: { groupId: string; input: CreateTariffInput }) => createTariff(groupId, input),
+        invalidateAll,
+    );
+    return { createTariff: mutateAsync, isPending, error };
 }
 
 export function useDeleteTariff() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId }: { groupId: string, tariffId: string }) =>
-            deleteTariff(groupId, tariffId),
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        deleteTariff: mutation.mutateAsync,
-        deleteTariffPending: mutation.isPending,
-        deleteTariffError: mutation.error,
-    };
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId }: { groupId: string; tariffId: string }) => deleteTariff(groupId, tariffId),
+        invalidateAll,
+    );
+    return { deleteTariff: mutate, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -129,37 +112,22 @@ export function useDeleteTariff() {
    ─────────────────────────────── */
 
 export function useSealTariffVersion() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId }: { groupId: string, tariffId: string }) =>
-            sealTariffVersion(groupId, tariffId),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        sealVersion: mutation.mutateAsync,
-        sealingVersion: mutation.isPending,
-        errorSealingVersion: mutation.error,
-    };
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId }: { groupId: string; tariffId: string }) => sealTariffVersion(groupId, tariffId),
+        invalidateStructure,
+    );
+    return { sealVersion: mutateAsync, isPending, error };
 }
 
 export function useRestoreTariffVersion() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, versionId }: { groupId: string, tariffId: string, versionId: string }) =>
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, versionId }: { groupId: string; tariffId: string; versionId: string }) =>
             restoreTariffVersion(groupId, tariffId, versionId),
         // Ein Restore ersetzt die gesamte Struktur und legt zusätzlich eine
         // RESTORE-Version an — deshalb alles invalidieren.
-        onSuccess: () => invalidateAll(queryClient),
-    });
-
-    return {
-        restoreVersion: mutation.mutateAsync,
-        restoringVersion: mutation.isPending,
-        errorRestoringVersion: mutation.error,
-    };
+        invalidateAll,
+    );
+    return { restoreVersion: mutateAsync, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -167,52 +135,31 @@ export function useRestoreTariffVersion() {
    ─────────────────────────────── */
 
 export function useCreateTariffColumn() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, duration }: { groupId: string, tariffId: string, duration: number }) =>
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, duration }: { groupId: string; tariffId: string; duration: number }) =>
             createTariffColumn(groupId, tariffId, duration),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        createColumn: mutation.mutateAsync,
-        creatingColumn: mutation.isPending,
-        errorCreatingColumn: mutation.error,
-    };
+        invalidateStructure,
+    );
+    return { createColumn: mutate, isPending, error };
 }
 
 export function useDeleteTariffColumn() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, columnId }: { groupId: string, tariffId: string, columnId: string }) =>
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, columnId }: { groupId: string; tariffId: string; columnId: string }) =>
             deleteTariffColumn(groupId, tariffId, columnId),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        deleteColumn: mutation.mutateAsync,
-        deletingColumn: mutation.isPending,
-        errorDeletingColumn: mutation.error,
-    };
+        invalidateStructure,
+    );
+    return { deleteColumn: mutate, isPending, error };
 }
 
 export function useUpdateTariffColumn() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, columnId, duration }: {
-            groupId: string, tariffId: string, columnId: string, duration: number
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, columnId, duration }: {
+            groupId: string; tariffId: string; columnId: string; duration: number;
         }) => updateTariffColumn(groupId, tariffId, columnId, duration),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        updateColumn: mutation.mutateAsync,
-        updatingColumn: mutation.isPending,
-        errorUpdatingColumn: mutation.error,
-    };
+        invalidateStructure,
+    );
+    return { updateColumn: mutateAsync, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -220,53 +167,32 @@ export function useUpdateTariffColumn() {
    ─────────────────────────────── */
 
 export function useCreateTariffRow() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, min_qty, max_qty }: {
-            groupId: string, tariffId: string, min_qty: number, max_qty: number | null
-        }) => createTariffRow(groupId, tariffId, min_qty, max_qty),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        createRow: mutation.mutateAsync,
-        creatingRow: mutation.isPending,
-        errorCreatingRow: mutation.error,
-    };
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, min_quantity, max_quantity }: {
+            groupId: string; tariffId: string; min_quantity: number; max_quantity: number | null;
+        }) => createTariffRow(groupId, tariffId, min_quantity, max_quantity),
+        invalidateStructure,
+    );
+    return { createRow: mutateAsync, isPending, error };
 }
 
 export function useDeleteTariffRow() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, rowId }: { groupId: string, tariffId: string, rowId: string }) =>
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, rowId }: { groupId: string; tariffId: string; rowId: string }) =>
             deleteTariffRow(groupId, tariffId, rowId),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        deleteRow: mutation.mutateAsync,
-        deletingRow: mutation.isPending,
-        errorDeletingRow: mutation.error,
-    };
+        invalidateStructure,
+    );
+    return { deleteRow: mutate, isPending, error };
 }
 
 export function useUpdateTariffRow() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, rowId, min_qty, max_qty }: {
-            groupId: string, tariffId: string, rowId: string, min_qty: number, max_qty: number | null
-        }) => updateTariffRow(groupId, tariffId, rowId, min_qty, max_qty),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        updateRow: mutation.mutateAsync,
-        updatingRow: mutation.isPending,
-        errorUpdatingRow: mutation.error,
-    };
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, rowId, min_quantity, max_quantity }: {
+            groupId: string; tariffId: string; rowId: string; min_quantity: number; max_quantity: number | null;
+        }) => updateTariffRow(groupId, tariffId, rowId, min_quantity, max_quantity),
+        invalidateStructure,
+    );
+    return { updateRow: mutateAsync, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -274,18 +200,11 @@ export function useUpdateTariffRow() {
    ─────────────────────────────── */
 
 export function useUpdateTariffCell() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ groupId, tariffId, cellId, default_price, customer_price }: {
-            groupId: string, tariffId: string, cellId: string, default_price?: number, customer_price?: number
-        }) => updateTariffCell(groupId, tariffId, cellId, default_price, customer_price),
-        onSuccess: () => invalidateStructure(queryClient),
-    });
-
-    return {
-        updateCell: mutation.mutateAsync,
-        updatingCell: mutation.isPending,
-        errorUpdatingCell: mutation.error,
-    };
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, cellId, default_price }: {
+            groupId: string; tariffId: string; cellId: string; default_price: number;
+        }) => updateTariffCell(groupId, tariffId, cellId, default_price),
+        invalidateStructure,
+    );
+    return { updateCell: mutateAsync, isPending, error };
 }

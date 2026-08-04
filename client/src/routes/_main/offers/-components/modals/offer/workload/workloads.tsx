@@ -89,7 +89,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
             {offerPositions.map((workload, index) => (
                 <WorkloadItemOfferModal
                     key={index}
-                    updateFn={(workload) => updateWorkload(index, workload)}
+                    updateFn={(updatedWl) => updateWorkload(index, updatedWl)}
                     deleteFn={() => deleteWorkload(index)}
                     customerId={customerId}
                     workload={workload}

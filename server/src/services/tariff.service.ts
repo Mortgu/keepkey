@@ -11,36 +11,23 @@ import {
 import {
     calculatePrice,
     loadTariffForPricing,
-    resolveCell,
-    selectPrice,
-    type PriceFailureReason,
+    resolveCell, type PriceFailureReason
 } from "../utils/products.js";
 
-/* ========== Types ========== */
+import type {
+    CreateTariffInput,
+    CreateTariffColumnInput,
+    UpdateTariffColumnInput,
+    CreateTariffGroupInput,
+    UpdateTariffGroupInput,
+    CreateTariffRowInput,
+    UpdateTariffRowInput,
+    UpdateTariffCellInput,
+    UpsertCustomerPriceInput,
+    DeleteCustomerPriceInput,
+} from '@keepit/schemas';
 
-export type CreateTariffInput = { contractId: string };
-export type CreateTariffColumnInput = { duration: number };
-export type UpdateTariffColumnInput = { duration?: number };
-export type CreateTariffRowInput = { min_quantity: number; max_quantity: number | null };
-export type UpdateTariffRowInput = { min_qty?: number; max_qty?: number | null };
-export type UpdateTariffCellInput = { default_price?: number; customer_price?: number; customerId?: string };
-export type CreateTariffGroupInput = { products: string[] };
-export type UpdateTariffGroupInput = { products?: string[] };
-export type UpsertCustomerPriceInput = {
-    productId: string;
-    contractId: string;
-    duration: number;
-    quantity: number;
-    customerId: string;
-    price: number;
-};
-export type DeleteCustomerPriceInput = {
-    productId: string;
-    contractId: string;
-    duration: number;
-    quantity: number;
-    customerId: string;
-};
+/* ========== Types ========== */
 
 const TARIFF_INCLUDE = {
     contract: {
@@ -62,10 +49,10 @@ const TARIFF_INCLUDE = {
         }
     },
     rows: {
-        orderBy: { order: 'asc' },
+        orderBy: { min_quantity: 'asc' },
     },
     columns: {
-        orderBy: { order: 'asc' },
+        orderBy: { duration: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },
@@ -94,10 +81,10 @@ const TARIFF_GROUP_INCLUDE = {
                 },
             },
             rows: {
-                orderBy: { order: 'asc' },
+                orderBy: { min_quantity: 'asc' },
             },
             columns: {
-                orderBy: { order: 'asc' },
+                orderBy: { duration: 'asc' },
             },
             cells: {
                 orderBy: { createdAt: 'asc' },
@@ -110,50 +97,50 @@ const TARIFF_GROUP_INCLUDE = {
     },
 } as const;
 
-/** Koordinaten, über die ein kundenspezifischer Preis adressiert wird. */
-type CustomerPriceCoordinates = {
-    tariffId: string;
-    customerId: string;
-    productId: string | null;
-    duration: number;
-    min_quantity: number;
-};
-
 /**
- * Schreibt einen kundenspezifischen Stückpreis auf seine Koordinaten.
+ * Zieht kundenspezifische Preise auf eine geänderte Koordinate nach.
  *
- * Für `productId: null` (gruppenweiter Override) kann kein `upsert` verwendet
- * werden: Postgres behandelt NULL in Unique-Indizes als verschieden, ein Upsert
- * würde also jedes Mal eine weitere Zeile anlegen.
+ * Kundenpreise hängen bewusst an `(duration, min_quantity)` statt an einer
+ * `cellId` — das lässt sie ein Wiederherstellen überleben, macht sie aber
+ * unsichtbar wirkungslos, sobald jemand die Zeile oder Spalte verschiebt.
+ * Deshalb wandern sie hier mit, statt still ins Leere zu zeigen.
+ *
+ * Auf der Zielkoordinate liegende Preise werden vorher entfernt. Dort kann es
+ * keine Zeile bzw. Spalte geben — Überschneidungen und doppelte Laufzeiten sind
+ * abgelehnt —, es handelt sich also um Waisen aus der Zeit vor dieser Pflege.
+ * Ohne dieses Aufräumen bräche der Unique-Index beim Verschieben.
+ *
+ * Beide Funktionen erwarten eine Transaktion: Verschieben und Strukturänderung
+ * müssen gemeinsam gelten oder gemeinsam ausbleiben.
  */
-async function writeCustomerPrice(coordinates: CustomerPriceCoordinates, price: number) {
-    const { tariffId, customerId, productId, duration, min_quantity } = coordinates;
+async function moveCustomerPricesToMinQuantity(
+    tx: Prisma.TransactionClient,
+    tariffId: string,
+    from: number,
+    to: number,
+) {
+    if (from === to) return;
 
-    if (productId === null) {
-        const existing = await prisma.tariffCustomerPrice.findFirst({
-            where: { tariffId, customerId, productId: null, duration, min_quantity },
-        });
+    await tx.tariffCustomerPrice.deleteMany({ where: { tariffId, min_quantity: to } });
+    await tx.tariffCustomerPrice.updateMany({
+        where: { tariffId, min_quantity: from },
+        data: { min_quantity: to },
+    });
+}
 
-        if (existing) {
-            return prisma.tariffCustomerPrice.update({
-                where: { id: existing.id },
-                data: { price },
-            });
-        }
+/** Siehe {@link moveCustomerPricesToMinQuantity}. */
+async function moveCustomerPricesToDuration(
+    tx: Prisma.TransactionClient,
+    tariffId: string,
+    from: number,
+    to: number,
+) {
+    if (from === to) return;
 
-        return prisma.tariffCustomerPrice.create({
-            data: { tariffId, customerId, productId: null, duration, min_quantity, price },
-        });
-    }
-
-    return prisma.tariffCustomerPrice.upsert({
-        where: {
-            tariffId_customerId_productId_duration_min_quantity: {
-                tariffId, customerId, productId, duration, min_quantity,
-            },
-        },
-        create: { tariffId, customerId, productId, duration, min_quantity, price },
-        update: { price },
+    await tx.tariffCustomerPrice.deleteMany({ where: { tariffId, duration: to } });
+    await tx.tariffCustomerPrice.updateMany({
+        where: { tariffId, duration: from },
+        data: { duration: to },
     });
 }
 
@@ -169,7 +156,7 @@ async function recalculateAfterOverrideChange(
 ): Promise<PositionPrice> {
     const { productId, contractId, duration, quantity, customerId } = params;
 
-    const result = await calculatePrice({ productId, contractId, duration, quantity, customerId, freeMonths: 0 });
+    const result = await calculatePrice({ productId, contractId, duration, quantity, customerId });
 
     if (!result.ok) {
         throw new AppException(failureMessage, 500, result.reason);
@@ -207,8 +194,10 @@ function assertQuantityRange({ min_quantity, max_quantity }: QuantityRange) {
 
 /**
  * Verhindert überlappende Mengenstaffeln. Ohne diese Prüfung nimmt
- * {@link resolveCell} bei Überschneidung einfach den ersten Treffer nach
- * `order` — welcher Preis gilt, wäre dann von der Zeilenreihenfolge abhängig.
+ * {@link resolveCell} bei Überschneidung einfach den ersten Treffer — welcher
+ * Preis gilt, wäre dann von der Zeilenreihenfolge abhängig. Die Prüfung hält
+ * zugleich `min_quantity` innerhalb eines Tarifs eindeutig und macht sie damit
+ * zum tragfähigen Sortierschlüssel.
  */
 function assertNoOverlap(
     existing: ReadonlyArray<{ id: string } & QuantityRange>,
@@ -232,44 +221,10 @@ function assertNoOverlap(
     }
 }
 
-/** Vergibt `order` nach dem Löschen lückenlos neu. */
-async function reindexRows(tx: Prisma.TransactionClient, tariffId: string) {
-    const rows = await tx.tariffRow.findMany({
-        where: { tariffId },
-        select: { id: true },
-        orderBy: { order: 'asc' },
-    });
-
-    // Erst auf negative Werte ausweichen: @@unique([tariffId, order]) würde
-    // sonst beim Herunterzählen mit noch bestehenden Zeilen kollidieren.
-    for (const [index, row] of rows.entries()) {
-        await tx.tariffRow.update({ where: { id: row.id }, data: { order: -(index + 1) } });
-    }
-    for (const [index, row] of rows.entries()) {
-        await tx.tariffRow.update({ where: { id: row.id }, data: { order: index } });
-    }
-}
-
-/** Vergibt `order` nach dem Löschen lückenlos neu. */
-async function reindexColumns(tx: Prisma.TransactionClient, tariffId: string) {
-    const columns = await tx.tariffColumn.findMany({
-        where: { tariffId },
-        select: { id: true },
-        orderBy: { order: 'asc' },
-    });
-
-    for (const [index, column] of columns.entries()) {
-        await tx.tariffColumn.update({ where: { id: column.id }, data: { order: -(index + 1) } });
-    }
-    for (const [index, column] of columns.entries()) {
-        await tx.tariffColumn.update({ where: { id: column.id }, data: { order: index } });
-    }
-}
-
 /** Genau die Felder, die in einen Versions-Snapshot einfließen. */
 const TARIFF_STRUCTURE_INCLUDE = {
-    rows: { orderBy: { order: 'asc' } },
-    columns: { orderBy: { order: 'asc' } },
+    rows: { orderBy: { min_quantity: 'asc' } },
+    columns: { orderBy: { duration: 'asc' } },
     cells: { include: { default_cells: true } },
 } as const satisfies Prisma.TariffInclude;
 
@@ -325,21 +280,24 @@ export async function sealTariffVersion(
     });
 }
 
-const CUSTOMER_PRICE_MESSAGE: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, string> = {
-    NO_TARIFF: "Tariff für das Produkt/den Vertrag wurde nicht gefunden.",
-    NO_CELL: "Keine Zelle für die gewählte Zeile/Spalte konfiguriert.",
-    NO_DEFAULT: "Kein Default-Preis für die Zelle hinterlegt.",
-    NO_COLUMN: "Laufzeit ist in keiner Tariff-Spalte konfiguriert.",
-    NO_ROW: "Menge liegt außerhalb aller konfigurierten Mengenbereiche.",
+/**
+ * Übersetzt einen Grund aus der Preisrechnung in eine Antwort.
+ *
+ * Meldung und Status stehen beieinander, weil sie zusammengehören — zwei
+ * parallele Tabellen könnten auseinanderlaufen. `INVALID_INPUT` fehlt bewusst:
+ * das ist ein Fehler des Aufrufers, kein unkonfigurierter Tarif, und wird an
+ * den Stellen behandelt, die die Eingabe kennen.
+ */
+const PRICE_FAILURE: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, { status: number; message: string }> = {
+    NO_TARIFF: { status: 404, message: "Tariff für das Produkt/den Vertrag wurde nicht gefunden." },
+    NO_CELL: { status: 404, message: "Keine Zelle für die gewählte Zeile/Spalte konfiguriert." },
+    NO_DEFAULT: { status: 404, message: "Kein Default-Preis für die Zelle hinterlegt." },
+    NO_COLUMN: { status: 422, message: "Laufzeit ist in keiner Tariff-Spalte konfiguriert." },
+    NO_ROW: { status: 422, message: "Menge liegt außerhalb aller konfigurierten Mengenbereiche." },
 };
 
-const CUSTOMER_PRICE_STATUS: Record<Exclude<PriceFailureReason, 'INVALID_INPUT'>, number> = {
-    NO_TARIFF: 404,
-    NO_CELL: 404,
-    NO_DEFAULT: 404,
-    NO_COLUMN: 422,
-    NO_ROW: 422,
-};
+const priceFailure = (reason: Exclude<PriceFailureReason, 'INVALID_INPUT'>) =>
+    new AppException(PRICE_FAILURE[reason].message, PRICE_FAILURE[reason].status, reason);
 
 /* ========== Queries ========== */
 
@@ -430,11 +388,12 @@ export async function getTariffDurations(productId: string, contractId: string):
 /**
  * Preis-Vorschau aus dem aktuell gültigen Tarif.
  *
- * `freeMonths` geht bewusst **nicht** in `calculatePrice` ein: `total_cents`
- * soll brutto sein und der Wert der Freimonate getrennt in `discount_cents`
- * stehen — dieselbe Aufteilung, in der eine Position später gespeichert wird
- * (siehe `priceOfferPositions` in offer.service). Damit zeigt die Vorschau
- * dieselben Zahlen wie das fertige Angebot.
+ * `freeMonths` ist ein Parameter dieser Funktion, nicht der Preisrechnung:
+ * `calculatePrice` liefert immer brutto, der Wert der Freimonate wird hier
+ * daraus abgeleitet und getrennt als `discount_cents` ausgewiesen — dieselbe
+ * Aufteilung, in der eine Position später gespeichert wird (siehe
+ * `pricePositions` in offer.service). Damit zeigt die Vorschau dieselben Zahlen
+ * wie das fertige Angebot.
  */
 export async function getTariffPrice(
     productId: string,
@@ -446,7 +405,7 @@ export async function getTariffPrice(
 ): Promise<PositionPrice> {
     const free_months = freeMonths ?? 0;
 
-    // Sonst nicht geprüft, weil selectPrice die Freimonate hier nicht sieht.
+    // Muss hier geprüft werden: die Preisrechnung kennt keine Freimonate.
     if (!Number.isInteger(free_months) || free_months < 0 || free_months > duration) {
         throw new AppException(
             "freeMonths muss eine Ganzzahl zwischen 0 und duration sein.",
@@ -461,7 +420,6 @@ export async function getTariffPrice(
         duration,
         quantity,
         customerId,
-        freeMonths: 0,
     });
 
     if (!result.ok) {
@@ -473,9 +431,7 @@ export async function getTariffPrice(
             );
         }
 
-        const status = CUSTOMER_PRICE_STATUS[result.reason];
-        const message = CUSTOMER_PRICE_MESSAGE[result.reason];
-        throw new AppException(message, status, result.reason);
+        throw priceFailure(result.reason);
     }
 
     const eur_user_month = result.breakdown.unitPrice;
@@ -548,7 +504,29 @@ export async function updateTariffGroup(id: string, input: UpdateTariffGroupInpu
     });
 }
 
+/**
+ * Löscht eine Tarifgruppe samt ihrer Preistabellen.
+ *
+ * Die Versionsprüfung ist dieselbe wie in {@link deleteTariff} und hier nicht
+ * verzichtbar: das Löschen cascadet über die Gruppe auf ihre `Tariff`-Zeilen,
+ * an denen `TariffVersion` per `onDelete: Restrict` hängt. Ohne diese Prüfung
+ * käme der Fremdschlüsselfehler roh als 500 zurück statt als verständliche
+ * Meldung — und der Schutz der angepinnten Angebotspreise wäre eine
+ * Zufallseigenschaft der Datenbank statt einer Regel der Fachlogik.
+ */
 export async function deleteTariffGroup(id: string): Promise<void> {
+    const versionCount = await prisma.tariffVersion.count({
+        where: { tariff: { tariffGroupId: id } },
+    });
+
+    if (versionCount > 0) {
+        throw new AppException(
+            "Tarifgruppen mit Versionshistorie können nicht gelöscht werden.",
+            409,
+            "TARIFF_HAS_VERSIONS",
+        );
+    }
+
     await prisma.tariffGroup.delete({
         where: { id },
     });
@@ -633,15 +611,13 @@ export async function restoreTariffVersion(tariffId: string, versionId: string, 
         await tx.tariffColumn.deleteMany({ where: { tariffId } });
 
         const columns = await tx.tariffColumn.createManyAndReturn({
-            data: snapshot.columns.map((column, index) => ({
-                tariffId, duration: column.duration, order: index,
-            })),
+            data: snapshot.columns.map((column) => ({ tariffId, duration: column.duration })),
             select: { id: true, duration: true },
         });
 
         const rows = await tx.tariffRow.createManyAndReturn({
-            data: snapshot.rows.map((row, index) => ({
-                tariffId, min_quantity: row.min_quantity, max_quantity: row.max_quantity, order: index,
+            data: snapshot.rows.map((row) => ({
+                tariffId, min_quantity: row.min_quantity, max_quantity: row.max_quantity,
             })),
             select: { id: true, min_quantity: true },
         });
@@ -689,7 +665,7 @@ export async function createTariffColumn(tariffId: string, input: CreateTariffCo
         where: { id: tariffId },
         include: {
             rows: true,
-            columns: { select: { order: true, duration: true } },
+            columns: { select: { duration: true } },
         }
     });
 
@@ -701,13 +677,9 @@ export async function createTariffColumn(tariffId: string, input: CreateTariffCo
         );
     }
 
-    // max(order) + 1 statt length: Nach dem Löschen einer mittleren Spalte
-    // wäre length bereits vergeben und verletzt @@unique([tariffId, order]).
-    const nextOrder = tariff.columns.reduce((max, column) => Math.max(max, column.order), -1) + 1;
-
     await prisma.$transaction(async (tx) => {
         const col = await tx.tariffColumn.create({
-            data: { tariffId, duration, order: nextOrder },
+            data: { tariffId, duration },
         });
 
         // Zellen entstehen ohne Default-Preis — ein vorbelegter Preis würde
@@ -734,37 +706,48 @@ export async function updateTariffColumn(columnId: string, input: UpdateTariffCo
         return prisma.tariffColumn.findUniqueOrThrow({ where: { id: columnId } });
     }
 
-    const current = await prisma.tariffColumn.findUnique({
-        where: { id: columnId },
-        select: { id: true, tariffId: true },
-    });
+    return prisma.$transaction(async (tx) => {
+        const current = await tx.tariffColumn.findUnique({
+            where: { id: columnId },
+            select: { id: true, tariffId: true, duration: true },
+        });
 
-    if (!current) {
-        throw new AppException("Tariff column not found.", 404, "NO_COLUMN");
-    }
+        if (!current) {
+            throw new AppException("Tariff column not found.", 404, "NO_COLUMN");
+        }
 
-    const duplicate = await prisma.tariffColumn.findFirst({
-        where: { tariffId: current.tariffId, duration, id: { not: columnId } },
-    });
+        const duplicate = await tx.tariffColumn.findFirst({
+            where: { tariffId: current.tariffId, duration, id: { not: columnId } },
+        });
 
-    if (duplicate) {
-        throw new AppException(
-            `Für die Laufzeit ${duration} existiert bereits eine Spalte.`,
-            422,
-            "DURATION_ALREADY_EXISTS",
-        );
-    }
+        if (duplicate) {
+            throw new AppException(
+                `Für die Laufzeit ${duration} existiert bereits eine Spalte.`,
+                422,
+                "DURATION_ALREADY_EXISTS",
+            );
+        }
 
-    return prisma.tariffColumn.update({
-        where: { id: columnId },
-        data: { duration },
+        await moveCustomerPricesToDuration(tx, current.tariffId, current.duration, duration);
+
+        return tx.tariffColumn.update({
+            where: { id: columnId },
+            data: { duration },
+        });
     });
 }
 
 export async function deleteTariffColumn(columnId: string) {
     return prisma.$transaction(async (tx) => {
         const column = await tx.tariffColumn.delete({ where: { id: columnId } });
-        await reindexColumns(tx, column.tariffId);
+
+        // Mit der Spalte verschwinden die Kundenpreise auf ihrer Laufzeit —
+        // sonst leben sie als Waisen weiter und greifen wieder, sobald jemand
+        // dieselbe Laufzeit erneut anlegt.
+        await tx.tariffCustomerPrice.deleteMany({
+            where: { tariffId: column.tariffId, duration: column.duration },
+        });
+
         return column;
     });
 }
@@ -776,20 +759,16 @@ export async function createTariffRow(tariffId: string, input: CreateTariffRowIn
         where: { id: tariffId },
         include: {
             columns: true,
-            rows: { select: { id: true, order: true, min_quantity: true, max_quantity: true } },
+            rows: { select: { id: true, min_quantity: true, max_quantity: true } },
         }
     });
 
     assertQuantityRange({ min_quantity, max_quantity });
     assertNoOverlap(tariff.rows, { min_quantity, max_quantity });
 
-    // max(order) + 1 statt length: Nach dem Löschen einer mittleren Zeile wäre
-    // length bereits vergeben und verletzt @@unique([tariffId, order]).
-    const nextOrder = tariff.rows.reduce((max, row) => Math.max(max, row.order), -1) + 1;
-
     await prisma.$transaction(async (tx) => {
         const r = await tx.tariffRow.create({
-            data: { tariffId, min_quantity, max_quantity, order: nextOrder },
+            data: { tariffId, min_quantity, max_quantity },
         });
 
         // Zellen entstehen ohne Default-Preis — siehe createTariffColumn.
@@ -809,113 +788,100 @@ export async function createTariffRow(tariffId: string, input: CreateTariffRowIn
 }
 
 export async function updateTariffRow(rowId: string, input: UpdateTariffRowInput) {
-    const { min_qty, max_qty } = input;
+    const { min_quantity, max_quantity } = input;
 
-    const current = await prisma.tariffRow.findUnique({
-        where: { id: rowId },
-        select: { id: true, tariffId: true, min_quantity: true, max_quantity: true },
-    });
+    return prisma.$transaction(async (tx) => {
+        const current = await tx.tariffRow.findUnique({
+            where: { id: rowId },
+            select: { id: true, tariffId: true, min_quantity: true, max_quantity: true },
+        });
 
-    if (!current) {
-        throw new AppException("Tariff row not found.", 404, "NO_ROW");
-    }
+        if (!current) {
+            throw new AppException("Tariff row not found.", 404, "NO_ROW");
+        }
 
-    const next: QuantityRange = {
-        min_quantity: min_qty ?? current.min_quantity,
-        max_quantity: max_qty !== undefined ? max_qty : current.max_quantity,
-    };
+        const next: QuantityRange = {
+            min_quantity: min_quantity ?? current.min_quantity,
+            max_quantity: max_quantity !== undefined ? max_quantity : current.max_quantity,
+        };
 
-    assertQuantityRange(next);
+        assertQuantityRange(next);
 
-    const siblings = await prisma.tariffRow.findMany({
-        where: { tariffId: current.tariffId },
-        select: { id: true, min_quantity: true, max_quantity: true },
-    });
+        const siblings = await tx.tariffRow.findMany({
+            where: { tariffId: current.tariffId },
+            select: { id: true, min_quantity: true, max_quantity: true },
+        });
 
-    assertNoOverlap(siblings, next, rowId);
+        assertNoOverlap(siblings, next, rowId);
 
-    return prisma.tariffRow.update({
-        where: { id: rowId },
-        data: next,
+        await moveCustomerPricesToMinQuantity(
+            tx, current.tariffId, current.min_quantity, next.min_quantity,
+        );
+
+        return tx.tariffRow.update({
+            where: { id: rowId },
+            data: next,
+        });
     });
 }
 
 export async function deleteTariffRow(rowId: string) {
     return prisma.$transaction(async (tx) => {
         const row = await tx.tariffRow.delete({ where: { id: rowId } });
-        await reindexRows(tx, row.tariffId);
+
+        // Siehe deleteTariffColumn: ohne dieses Aufräumen bleibt der
+        // Kundenpreis liegen und wacht bei derselben Mengenuntergrenze wieder auf.
+        await tx.tariffCustomerPrice.deleteMany({
+            where: { tariffId: row.tariffId, min_quantity: row.min_quantity },
+        });
+
         return row;
     });
 }
 
+/**
+ * Setzt den Listenpreis einer Zelle.
+ *
+ * Muss ein Upsert sein: Zellen entstehen ohne `TariffCellDefault`, ein reines
+ * Update würde null Zeilen treffen und stillschweigend nichts tun.
+ */
 export async function updateTariffCell(cellId: string, input: UpdateTariffCellInput) {
-    const { default_price, customer_price, customerId } = input;
-
-    if (default_price !== undefined) {
-        // Muss ein Upsert sein: Zellen entstehen ohne TariffCellDefault, ein
-        // reines Update würde null Zeilen treffen und stillschweigend nichts tun.
-        return prisma.tariffCellDefault.upsert({
-            where: { cellId },
-            create: { cellId, price: default_price },
-            update: { price: default_price },
-        });
-    }
-
-    if (customer_price !== undefined && customerId) {
-        const cell = await prisma.tariffCell.findUnique({
-            where: { id: cellId },
-            select: {
-                tariffId: true,
-                row: { select: { min_quantity: true } },
-                column: { select: { duration: true } },
-            },
-        });
-
-        if (!cell) {
-            throw new AppException(CUSTOMER_PRICE_MESSAGE.NO_CELL, CUSTOMER_PRICE_STATUS.NO_CELL, "NO_CELL");
-        }
-
-        return writeCustomerPrice({
-            tariffId: cell.tariffId,
-            customerId,
-            productId: null,
-            duration: cell.column.duration,
-            min_quantity: cell.row.min_quantity,
-        }, customer_price);
-    }
-
-    throw new AppException("Bad request!", 400, "MISSING_PRICE");
+    return prisma.tariffCellDefault.upsert({
+        where: { cellId },
+        create: { cellId, price: input.default_price },
+        update: { price: input.default_price },
+    });
 }
 
 export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
     const { productId, contractId, duration, quantity, customerId, price } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
-
-    if (!tariff) {
-        throw new AppException(
-            CUSTOMER_PRICE_MESSAGE.NO_TARIFF,
-            CUSTOMER_PRICE_STATUS.NO_TARIFF,
-            "NO_TARIFF"
-        );
-    }
+    if (!tariff) throw priceFailure("NO_TARIFF");
 
     const resolved = resolveCell(tariff, { duration, quantity });
-    if (!resolved.ok) {
-        throw new AppException(
-            CUSTOMER_PRICE_MESSAGE[resolved.reason],
-            CUSTOMER_PRICE_STATUS[resolved.reason],
-            resolved.reason
-        );
-    }
+    if (!resolved.ok) throw priceFailure(resolved.reason);
 
-    await writeCustomerPrice({
-        tariffId: tariff.id,
-        customerId,
-        productId,
-        duration: resolved.column.duration,
-        min_quantity: resolved.row.min_quantity,
-    }, price);
+    await prisma.tariffCustomerPrice.upsert({
+        where: {
+            tariffId_customerId_productId_duration_min_quantity: {
+                tariffId: tariff.id,
+                customerId,
+                productId,
+                duration: resolved.column.duration,
+                min_quantity: resolved.row.min_quantity,
+            },
+        },
+        create: {
+            tariffId: tariff.id,
+            customerId,
+            productId,
+            duration: resolved.column.duration,
+            min_quantity: resolved.row.min_quantity,
+            price,
+        },
+        update: { price },
+    });
 
     return recalculateAfterOverrideChange(
         { productId, contractId, duration, quantity, customerId },
@@ -927,23 +893,10 @@ export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
     const { productId, contractId, duration, quantity, customerId } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
-
-    if (!tariff) {
-        throw new AppException(
-            CUSTOMER_PRICE_MESSAGE.NO_TARIFF,
-            CUSTOMER_PRICE_STATUS.NO_TARIFF,
-            "NO_TARIFF"
-        );
-    }
+    if (!tariff) throw priceFailure("NO_TARIFF");
 
     const resolved = resolveCell(tariff, { duration, quantity });
-    if (!resolved.ok) {
-        throw new AppException(
-            CUSTOMER_PRICE_MESSAGE[resolved.reason],
-            CUSTOMER_PRICE_STATUS[resolved.reason],
-            resolved.reason
-        );
-    }
+    if (!resolved.ok) throw priceFailure(resolved.reason);
 
     await prisma.tariffCustomerPrice.deleteMany({
         where: {

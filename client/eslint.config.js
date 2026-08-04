@@ -8,7 +8,7 @@ import { tanstackConfig } from "@tanstack/eslint-config";
 
 export default defineConfig([
   ...tanstackConfig,
-  globalIgnores(["dist"]),
+  globalIgnores(["dist", "eslint.config.js"]),
   {
     files: ["**/*.{ts,tsx}"],
     extends: [

@@ -9,7 +9,7 @@ export function useModal<TData = null>() {
     data: state,
     open: (data: TData | null = null) => setState(data),
     close: () => setState(undefined),
-    key: state == null ? "create" : String((state as any).id ?? JSON.stringify(state)),
+    key: state == null ? "create" : String((state as { id?: unknown }).id ?? JSON.stringify(state)),
   };
 }
 

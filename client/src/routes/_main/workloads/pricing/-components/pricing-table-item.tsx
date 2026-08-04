@@ -20,7 +20,7 @@ export default function PricingTableItem({ tariff }: Props) {
     const [open, setOpen] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
-    const { sealVersion, sealingVersion, errorSealingVersion } = useSealTariffVersion();
+    const { sealVersion, isPending: sealingVersion, error: errorSealingVersion } = useSealTariffVersion();
 
     const contract = tariff.contract;
 

@@ -1,18 +1,16 @@
-import { useTranslation } from "react-i18next";
-import type { Customer } from "@keepit/schemas";
-import { useModal } from "@/hooks";
 import { useCustomerPage } from "./-page.hooks";
-import { PageWidth } from "@/components";
 import CustomerPageHeader from "./-components/header";
 import CustomerPageFilters from "./-components/filter";
 import CustomerModal from "./-components/customer-modal";
 import CustomerList from "./-components/customer-list";
+import type { Customer } from "@keepit/schemas";
+import { PageWidth } from "@/components";
+import { useModal } from "@/hooks";
 
 export default function CustomerPage() {
-    const { t } = useTranslation();
     const modal = useModal<Customer>();
 
-    const { filters, isPending, error, customers } = useCustomerPage();
+    const { filters } = useCustomerPage();
 
     return (
         <PageWidth variant="none">

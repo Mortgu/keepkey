@@ -4,7 +4,6 @@ export declare const tariffRowSchema: z.ZodObject<{
     tariffId: z.ZodString;
     min_quantity: z.ZodNumber;
     max_quantity: z.ZodNullable<z.ZodNumber>;
-    order: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -13,7 +12,6 @@ export declare const tariffColumnSchema: z.ZodObject<{
     id: z.ZodString;
     tariffId: z.ZodString;
     duration: z.ZodNumber;
-    order: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -128,7 +126,6 @@ declare const tariffBaseSchema: z.ZodObject<{
         tariffId: z.ZodString;
         min_quantity: z.ZodNumber;
         max_quantity: z.ZodNullable<z.ZodNumber>;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -136,7 +133,6 @@ declare const tariffBaseSchema: z.ZodObject<{
         id: z.ZodString;
         tariffId: z.ZodString;
         duration: z.ZodNumber;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -184,6 +180,69 @@ export declare const createTariffSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 /**
+ * Die Laufzeit muss positiv sein — deckungsgleich mit
+ * {@link tariffVersionSnapshotSchema}. Ohne diese Schranke ließe sich eine
+ * Spalte mit Laufzeit 0 anlegen, an der anschließend jedes Versiegeln einer
+ * Version scheitert. Damit wäre die ganze Preistabelle blockiert, inklusive
+ * der Angebotserstellung.
+ */
+export declare const createTariffColumnSchema: z.ZodObject<{
+    duration: z.ZodInt;
+}, z.core.$strip>;
+export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
+export declare const updateTariffColumnSchema: z.ZodObject<{
+    duration: z.ZodOptional<z.ZodInt>;
+}, z.core.$strip>;
+export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
+/** TariffRow (create) */
+export declare const createTariffRowSchema: z.ZodObject<{
+    min_quantity: z.ZodInt;
+    max_quantity: z.ZodNullable<z.ZodInt>;
+}, z.core.$strip>;
+export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
+export declare const updateTariffRowSchema: z.ZodObject<{
+    min_quantity: z.ZodOptional<z.ZodInt>;
+    max_quantity: z.ZodOptional<z.ZodNullable<z.ZodInt>>;
+}, z.core.$strip>;
+export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
+/**
+ * TariffCell (update) — setzt den Listenpreis der Zelle.
+ *
+ * Kundenspezifische Preise laufen ausschließlich über
+ * {@link upsertCustomerPriceSchema}: sie hängen an den Koordinaten
+ * (duration, min_quantity), nicht an einer cellId.
+ */
+export declare const updateTariffCellSchema: z.ZodObject<{
+    default_price: z.ZodInt;
+}, z.core.$strip>;
+export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
+/** Kundenspezifischen Stückpreis upserten. */
+export declare const upsertCustomerPriceSchema: z.ZodObject<{
+    productId: z.ZodString;
+    contractId: z.ZodString;
+    duration: z.ZodInt;
+    quantity: z.ZodInt;
+    customerId: z.ZodString;
+    price: z.ZodInt;
+}, z.core.$strip>;
+export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
+/**
+ * Kundenspezifischen Stückpreis entfernen.
+ *
+ * Wird als Query-String übertragen, deshalb `coerce`: dort kommt alles als
+ * String an. Ohne diese Validierung landete ein `NaN` aus `Number(…)` in der
+ * Preislogik und lief dort als „keine passende Spalte" auf — mit einer
+ * Fehlermeldung, die auf die falsche Ursache zeigt.
+ */
+export declare const deleteCustomerPriceSchema: z.ZodObject<{
+    productId: z.ZodString;
+    contractId: z.ZodString;
+    duration: z.ZodCoercedNumber<unknown>;
+    quantity: z.ZodCoercedNumber<unknown>;
+    customerId: z.ZodString;
+}, z.core.$strip>;
+export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
+/**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
  */
@@ -215,7 +274,6 @@ export declare const tariffSchema: z.ZodObject<{
         tariffId: z.ZodString;
         min_quantity: z.ZodNumber;
         max_quantity: z.ZodNullable<z.ZodNumber>;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -223,7 +281,6 @@ export declare const tariffSchema: z.ZodObject<{
         id: z.ZodString;
         tariffId: z.ZodString;
         duration: z.ZodNumber;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -333,7 +390,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             tariffId: z.ZodString;
             min_quantity: z.ZodNumber;
             max_quantity: z.ZodNullable<z.ZodNumber>;
-            order: z.ZodNumber;
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;
@@ -341,7 +397,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             id: z.ZodString;
             tariffId: z.ZodString;
             duration: z.ZodNumber;
-            order: z.ZodNumber;
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;
@@ -381,25 +436,34 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
 /**
  * Snapshot einer Preistabelle — koordinatenbasiert, damit er unabhängig von
  * Datenbank-Ids wiederherstellbar und stabil hashbar ist.
+ *
+ * **Die einzige Definition dieser Form.** Sie beschreibt zugleich, was der
+ * Server in `TariffVersion.snapshot` schreibt und liest, und was der Client in
+ * der API-Antwort bekommt. Solange beides von hier kommt, können die Schranken
+ * nicht auseinanderlaufen.
+ *
+ * Alle Koordinaten sind positiv: eine Laufzeit oder Mengenuntergrenze von 0
+ * ergibt fachlich keinen Sinn und würde beim Wiederherstellen eine Zeile bzw.
+ * Spalte erzeugen, die keine Preisabfrage mehr trifft.
  */
 export declare const tariffVersionSnapshotSchema: z.ZodObject<{
     columns: z.ZodArray<z.ZodObject<{
-        duration: z.ZodNumber;
+        duration: z.ZodInt;
     }, z.core.$strip>>;
     rows: z.ZodArray<z.ZodObject<{
-        min_quantity: z.ZodNumber;
-        max_quantity: z.ZodNullable<z.ZodNumber>;
+        min_quantity: z.ZodInt;
+        max_quantity: z.ZodNullable<z.ZodInt>;
     }, z.core.$strip>>;
     cells: z.ZodArray<z.ZodObject<{
-        duration: z.ZodNumber;
-        min_quantity: z.ZodNumber;
-        price: z.ZodNullable<z.ZodNumber>;
+        duration: z.ZodInt;
+        min_quantity: z.ZodInt;
+        price: z.ZodNullable<z.ZodInt>;
     }, z.core.$strip>>;
 }, z.core.$strip>;
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
 export declare const tariffVersionReasonSchema: z.ZodEnum<{
-    OFFER: "OFFER";
     MANUAL: "MANUAL";
+    OFFER: "OFFER";
     RESTORE: "RESTORE";
 }>;
 export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
@@ -412,21 +476,21 @@ export declare const tariffVersionSchema: z.ZodObject<{
     hash: z.ZodString;
     snapshot: z.ZodObject<{
         columns: z.ZodArray<z.ZodObject<{
-            duration: z.ZodNumber;
+            duration: z.ZodInt;
         }, z.core.$strip>>;
         rows: z.ZodArray<z.ZodObject<{
-            min_quantity: z.ZodNumber;
-            max_quantity: z.ZodNullable<z.ZodNumber>;
+            min_quantity: z.ZodInt;
+            max_quantity: z.ZodNullable<z.ZodInt>;
         }, z.core.$strip>>;
         cells: z.ZodArray<z.ZodObject<{
-            duration: z.ZodNumber;
-            min_quantity: z.ZodNumber;
-            price: z.ZodNullable<z.ZodNumber>;
+            duration: z.ZodInt;
+            min_quantity: z.ZodInt;
+            price: z.ZodNullable<z.ZodInt>;
         }, z.core.$strip>>;
     }, z.core.$strip>;
     reason: z.ZodEnum<{
-        OFFER: "OFFER";
         MANUAL: "MANUAL";
+        OFFER: "OFFER";
         RESTORE: "RESTORE";
     }>;
     createdBy: z.ZodNullable<z.ZodObject<{

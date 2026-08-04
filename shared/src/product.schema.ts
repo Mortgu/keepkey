@@ -35,3 +35,9 @@ export type Product = z.infer<typeof productSchema>;
 export const productListSchema = z.array(productSchema);
 
 export type ProductList = z.infer<typeof productListSchema>;
+
+export const workloadFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.enum(["createdAt:asc", "createdAt:desc"]).optional(),
+});
+export type WorkloadFilterParams = z.input<typeof workloadFilterSchema>;

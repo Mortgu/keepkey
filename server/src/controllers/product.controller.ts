@@ -1,14 +1,15 @@
 import { Request, Response } from "express";
 
 import * as productService from "../services/product.service.js";
-import { productListSchema, productSchema } from "@keepit/schemas";
+import { productListSchema, productSchema, workloadFilterSchema } from "@keepit/schemas";
 
 /*
  * Get Workload
  * [GET] http://localhost:3000/api/products
  */
 export const getProducts = async (request: Request, response: Response) => {
-    const products = await productService.getProducts();
+    const filters = workloadFilterSchema.parse(request.query);
+    const products = await productService.getProducts(filters);
     return response.status(200).json(productListSchema.parse(products));
 }
 

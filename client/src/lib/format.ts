@@ -5,7 +5,7 @@ export const formatDate = (date: Date | string) => {
 }
 
 export const sumItems = (items: Array<{ price36Raw: number }>) => {
-    return items?.reduce((acc, i) => acc + i.price36Raw, 0) ?? 0;
+    return items.reduce((acc, i) => acc + i.price36Raw, 0);
 }
 
 export const formatCurrency = (value: number) => new Intl.NumberFormat("de-DE", {

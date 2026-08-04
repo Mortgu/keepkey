@@ -34,7 +34,7 @@ export default function FormOfferModal({ form }: Props) {
         form.setFieldValue("contactPersonId", customer?.contactPersons[0]?.id || "");
 
         if (customer?.language) {
-            form.setFieldValue("language", customer.language as Language);
+            form.setFieldValue("language", customer.language);
         }
     }
 

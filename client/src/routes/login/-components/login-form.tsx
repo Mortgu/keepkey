@@ -70,7 +70,7 @@ export function LoginFormComponent() {
 
                 window.location.assign("/");
                 return data;
-            } catch (exception: any) {
+            } catch (exception: unknown) {
                 console.error(exception);
             }
         },

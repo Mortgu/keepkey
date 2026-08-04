@@ -1,6 +1,6 @@
-import { Button } from "@/components";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components";
 
 interface Props {
     onCreate: () => void;
@@ -19,7 +19,7 @@ export default function CustomerPageHeader({ onCreate }: Props) {
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    {/*<Button icon={<Download size={14} />} variant="border" size="sm">
+                    {/* <Button icon={<Download size={14} />} variant="border" size="sm">
                         {t("button.export")}
                     </Button>*/}
                     <Button

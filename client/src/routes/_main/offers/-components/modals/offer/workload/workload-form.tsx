@@ -1,5 +1,5 @@
 import { Pen } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {  coordinatesFrom } from "@keepit/schemas";
 import type {CreateOfferPositionInput} from "@keepit/schemas";
@@ -14,9 +14,7 @@ import {
     useTariffDurationsHook,
 } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
-
-const eurToCents = (eur: number): number => Math.round(eur * 100);
+import { eurToCents, formatEur } from "@/utils/utils";
 
 interface Props {
     customerId: string;
@@ -37,7 +35,16 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
 
     const { durations } = useTariffDurationsHook(workload, contract);
 
-    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || durations[0] || 0);
+    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || 0);
+    // Reset duration when the available durations change (workload/contract switch).
+    // React-recommended render-phase reset instead of setState-in-effect.
+    const [prevDurations, setPrevDurations] = useState(durations);
+    if (durations !== prevDurations) {
+        setPrevDurations(durations);
+        setDuration(currentWorkload?.duration_months && durations.includes(currentWorkload.duration_months)
+            ? currentWorkload.duration_months
+            : durations[0] || 0);
+    }
 
     const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 1);
 
@@ -48,10 +55,6 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
     const [editingPrice, setEditingPrice] = useState<boolean>(false);
     const [overrideEur, setOverrideEur] = useState<string>("");
     const [error, setError] = useState<string>("");
-
-    useEffect(() => {
-        setDuration(durations[0] || 0);
-    }, [durations]);
 
     const coordinates = coordinatesFrom(customerId, {
         productId: workload,
@@ -129,9 +132,9 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
 
                 {/* Contracts */}
                 <Select label="Contract" value={contract} onChange={(e) => setContract(e.target.value)}>
-                    {contracts.map(contract => (
-                        <option key={contract.id} value={contract.id}>
-                            {localized(contract.translations, locale, "name")}
+                    {contracts.map(ctr => (
+                        <option key={ctr.id} value={ctr.id}>
+                            {localized(ctr.translations, locale, "name")}
                         </option>
                     ))}
                 </Select>
@@ -142,8 +145,8 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
                         <option value={0}>Keine Laufzeit definiert!</option>
                     )}
 
-                    {durations.map(duration => (
-                        <option key={duration} value={duration}>{duration} {t("common.months")}</option>
+                    {durations.map(dur => (
+                        <option key={dur} value={dur}>{dur} {t("common.months")}</option>
                     ))}
                 </Select>
 

@@ -34,7 +34,6 @@ export const getPinnedPrice = (offerId: string, positionId: string, quantity: nu
 export const upsertCustomerPrice = (coordinates: PriceCoordinates, unitPriceCents: number) =>
     api<PositionPrice>("/api/tariffs/customer-price", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             productId: coordinates.productId,
             contractId: coordinates.contractId,

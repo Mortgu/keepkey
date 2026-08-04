@@ -14,29 +14,35 @@ export async function createTask(target: TaskTarget): Promise<Task> {
   });
 }
 
-export async function enqueueTask(
-  taskId: string,
-  options: { markFailedOnError?: boolean } = {},
-): Promise<void> {
+export async function enqueueTask(taskId: string, options: { markFailedOnError?: boolean } = {}): Promise<void> {
   const { markFailedOnError = true } = options;
+
   let job;
+
   try {
     const existing = await taskQueue.getJob(taskId);
+
     if (existing) {
       const state = await existing.getState();
+
       if (state === "completed") {
         await prisma.task.updateMany({
           where: { id: taskId, status: TaskStatus.COMPLETED },
           data: { status: TaskStatus.PENDING, error: null, runToken: null },
         });
+
         await existing.retry("completed");
+
       } else if (state === "failed") {
         await existing.retry(state);
       }
+
       job = existing;
+
     } else {
       job = await taskQueue.add(taskQueueKey, { taskId }, { jobId: taskId });
     }
+
   } catch (exception: any) {
     logger.error('enqueue_task_failed', { taskId, error: exception.message });
 

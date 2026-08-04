@@ -2,9 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import type { DiscountItemState } from "./discount.derived-modal";
 import { Button, Input, Textarea } from "@/components";
-import { formatEur } from "@/utils/utils";
-
-const eurToCents = (eur: number): number => Math.round(eur * 100);
+import { eurToCents, formatEur } from "@/utils/utils";
 
 interface Props {
     item: DiscountItemState;

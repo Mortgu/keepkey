@@ -1,8 +1,8 @@
+import type { Customer } from "@keepit/schemas";
 import { useCustomerContacts, useProducts } from "@/hooks";
 import OfferFilters from "@/routes/_main/offers/-components/offer-filters";
 import OfferList from "@/routes/_main/offers/-components/offer-list";
 import useOfferFilters from "@/routes/_main/offers/-hooks/use-offer-filters";
-import type { Customer } from "@keepit/schemas";
 
 interface Props {
     customer: Customer;

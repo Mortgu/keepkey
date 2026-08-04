@@ -1,15 +1,19 @@
 import { z } from "zod";
 
-export const documentTypeSchema = z.enum(["offer", "order"]);
-export const documentFormatSchema = z.enum(["pdf", "docx"]);
+import { documentFormatParamSchema, documentTypeSchema } from "@keepit/schemas";
 
+/**
+ * Route-Parameter der Dokument-Endpunkte. Die Bausteine `documentTypeSchema`
+ * und `documentFormatParamSchema` gehören zum API-Vertrag und liegen deshalb
+ * in `@keepit/schemas` — hier steht nur, wie sie sich zu einem Pfad fügen.
+ */
 export const documentParamsSchema = z.object({
     type: documentTypeSchema,
     documentId: z.string().min(1),
 });
 
 export const documentArtifactParamsSchema = documentParamsSchema.extend({
-    format: documentFormatSchema,
+    format: documentFormatParamSchema,
 });
 
 export const renameDocumentSchema = z.object({
@@ -20,5 +24,3 @@ export const renameDocumentSchema = z.object({
         .refine((value) => !/[\\/\u0000-\u001f\u007f]/.test(value), "displayName contains invalid characters"),
 });
 
-export type DocumentType = z.infer<typeof documentTypeSchema>;
-export type DocumentFormatParam = z.infer<typeof documentFormatSchema>;

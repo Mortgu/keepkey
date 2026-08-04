@@ -4,8 +4,8 @@ import { languageSchema } from "./language.schema.js";
 
 export const flatrateTranslationSchema = z.object({
     language: languageSchema,
-    name: z.string(),
-    table: z.string(),
+    name: z.string().nonempty("Required!"),
+    table: z.string().nonempty("Required!"),
 });
 
 export type CreateFlatrateTranslationInput = z.infer<typeof flatrateTranslationSchema>;

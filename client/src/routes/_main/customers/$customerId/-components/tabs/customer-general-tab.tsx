@@ -1,8 +1,8 @@
+import { tv } from "tailwind-variants";
+import type { Customer } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { formatEur } from "@/utils/utils";
-import type { Customer } from "@keepit/schemas";
-import { tv } from "tailwind-variants";
 
 interface Props {
     customer: Customer;

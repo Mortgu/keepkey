@@ -1,4 +1,4 @@
-import { ExternalLink, Pen, Trash } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
 import ProductModal from "./product-modal";
@@ -47,30 +47,30 @@ export default function ProductItem({ product }: Props) {
         <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
           {/* Actions left */}
           <div className="flex items-center gap-2">
-            <Button variant="secondary" size="sm" icon={<ExternalLink size={15} />}>
+            {/*} <Button variant="secondary" size="sm" icon={<ExternalLink size={15} />}>
               {t("section.offers")}
             </Button>
             <Button variant="secondary" size="sm" icon={<ExternalLink size={15} />}>
               {t("section.orders")}
-            </Button>
+            </Button>*/}
           </div>
           {/* Actions right */}
           <div className="flex items-center gap-2">
             <Button
-              variant="secondary"
-              icon={<Pen className="size-3.5" />}
+              variant="border"
+              icon={<Pen size={14} />}
               iconOnly
               onClick={() => modal.open(product)}
-              size="xs"
+              size="sm"
             />
             <Button
               variant="secondary"
               loading={isDeletingProduct}
               danger
-              icon={<Trash className="size-3.5" />}
+              icon={<Trash size={14} />}
               iconOnly
               onClick={() => deleteProduct(product.id)}
-              size="xs"
+              size="sm"
             />
           </div>
         </div>

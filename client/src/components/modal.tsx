@@ -1,6 +1,7 @@
 import { X } from "lucide-react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import type { ReactElement } from "react";
 import { Button } from "@/components";
 
 interface ModalProps {
@@ -33,9 +34,9 @@ function ModalDialog({ onClose, children }: ModalProps) {
     }, [onClose]);
 
     const childArray = Array.isArray(children) ? children : [children];
-    const header = childArray.find((c: any) => c?.type === Header);
-    const content = childArray.find((c: any) => c?.type === Content);
-    const footer = childArray.find((c: any) => c?.type === Footer);
+    const header = childArray.find((c: ReactElement) => c.type === Header);
+    const content = childArray.find((c: ReactElement) => c.type === Content);
+    const footer = childArray.find((c: ReactElement) => c.type === Footer);
 
     return (
         <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">

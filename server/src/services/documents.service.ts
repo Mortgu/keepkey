@@ -3,10 +3,7 @@ import { findArtifact } from "../lib/document-artifacts.js";
 import { getDocumentDownloadUrl } from "../lib/document-artifact-store.js";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
-import type {
-    DocumentFormatParam,
-    DocumentType,
-} from "../schemas/document-schemas.js";
+import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
 
 export type RenameDocumentInput = { displayName: string };

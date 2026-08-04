@@ -1,5 +1,6 @@
-import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import {  useLayoutEffect, useRef, useState } from "react";
 import { cn, tv } from "tailwind-variants";
+import type {ReactNode} from "react";
 
 interface Props {
     tabs: Array<{
@@ -12,20 +13,6 @@ interface Props {
     onChange: (value: string) => void;
     className?: string;
 }
-
-const tabStyles = tv({
-    base: [
-        "flex items-center gap-[7px] px-1 py-2.5",
-        "font-sans text-[13.5px] font-medium cursor-pointer bg-transparent  border-b-2 border-transparent",
-        "text-(--fg-3) hover:text-(--text-600) transition-colors duration-[140ms]",
-    ],
-    variants: {
-        active: {
-            true: 'text-(--primary-600) font-medium hover:text-(--text) border-b-2 border-(--primary-600)',
-            false: ''
-        }
-    }
-});
 
 const underlineButton = tv({
     base: [
@@ -43,7 +30,7 @@ const underlineButton = tv({
 
 export function Tabs({ tabs, value, onChange, className }: Props) {
     const refs = useRef<Record<string, HTMLButtonElement | null>>({});
-    const [rect, setRect] = useState<{ left: number; width: number } | null>(null);
+    const [, setRect] = useState<{ left: number; width: number } | null>(null);
 
     useLayoutEffect(() => {
         const el = refs.current[value];

@@ -4,6 +4,7 @@ import { prisma } from "../lib/prismaClient.js";
 import type {
     CreateProductInput,
     UpdateProductInput,
+    WorkloadFilterParams,
 
     productSchema,
     productListSchema,
@@ -14,9 +15,15 @@ import type { z } from 'zod';
 type Product = z.input<typeof productSchema>;
 type ProductList = z.input<typeof productListSchema>;
 
-export async function getProducts(): Promise<ProductList> {
+export async function getProducts(filters: WorkloadFilterParams = {}): Promise<ProductList> {
+    const { search, sort } = filters;
+    const sortDir = sort?.split(":")[1] === "asc" ? "asc" : "desc";
+
     const products = await prisma.product.findMany({
-        orderBy: { createdAt: "asc" },
+        where: search
+            ? { translations: { some: { name: { contains: search, mode: "insensitive" } } } }
+            : undefined,
+        orderBy: { createdAt: sortDir },
         include: { translations: true },
     });
 

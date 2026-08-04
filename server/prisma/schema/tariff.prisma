@@ -54,17 +54,17 @@ model TariffRow {
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
+  /// Zugleich Sortierschlüssel: Mengenstaffeln überschneiden sich nicht
+  /// (siehe assertNoOverlap), die Untergrenze ist innerhalb eines Tarifs
+  /// also eindeutig und ordnet die Zeilen fachlich richtig.
   min_quantity Int
   max_quantity Int?
-
-  order Int
 
   cells TariffCell[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([tariffId, order])
   @@map("tariff_row")
 }
 
@@ -74,15 +74,15 @@ model TariffColumn {
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
+  /// Zugleich Sortierschlüssel: doppelte Laufzeiten werden abgelehnt, die
+  /// Laufzeit ist innerhalb eines Tarifs also eindeutig.
   duration Int
-  order    Int
 
   cells TariffCell[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([tariffId, order])
   @@map("tariff_column")
 }
 

@@ -7,6 +7,5 @@ export const restoreOrderRevisionAction = (
   expectedVersion: number,
 ) => api<Order>(`/api/orders/${orderId}/revisions/${revisionId}/restore`, {
   method: "POST",
-  headers: { "Content-Type": "application/json" },
   body: JSON.stringify({ expectedVersion }),
 });

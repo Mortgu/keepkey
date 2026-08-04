@@ -7,5 +7,5 @@ import type { Language } from "@keepit/schemas";
  */
 export function useLocale(): Language {
   const { i18n } = useTranslation();
-  return i18n.language?.toLowerCase().startsWith("de") ? "DE" : "EN";
+  return i18n.language.toLowerCase().startsWith("de") ? "DE" : "EN";
 }

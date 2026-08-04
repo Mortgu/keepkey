@@ -16,14 +16,12 @@ export const getFlatrate = (id: string) =>
 export const createFlatRate = (flatRate: CreateFlatrateInput) =>
     api<Flatrate>("/api/flatrates", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(flatRate),
     });
 
 export const updateFlatRate = (id: string, flatRate: Partial<UpdateFlatrateInput>) =>
     api<Flatrate>(`/api/flatrates/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(flatRate),
     });
 

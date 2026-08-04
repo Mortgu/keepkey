@@ -52,7 +52,7 @@ export function SortDropdown({ value, onChange, options, className, size = "sm" 
   }, []);
 
   const selected = options.find(o => o.value === value);
-  const dir = value?.includes('asc') ? 'asc' : value ? 'desc' : null;
+  const dir = value.includes('asc') ? 'asc' : value ? 'desc' : null;
 
   return (
     <div ref={ref} className={`relative select-none ${className ?? ''}`}>

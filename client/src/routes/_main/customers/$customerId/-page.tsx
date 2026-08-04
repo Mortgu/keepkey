@@ -1,13 +1,13 @@
 import { useState } from "react";
+import CustomerModal from "../-components/customer-modal";
 import CustomerDetailPageHeader from "./-components/header";
+import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
+import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import { Route } from "./index";
+import type { Customer } from "@keepit/schemas";
 import { PageWidth, RouteError } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
 import { Tabs } from "@/components/tabs";
-import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
-import CustomerModal from "../-components/customer-modal";
-import type { Customer } from "@keepit/schemas";
-import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 
 const TABS = [
     { value: "general", label: "Allgemein" },
@@ -28,7 +28,7 @@ export default function CustomerDetailPage() {
 
     return (
         <PageWidth variant="none">
-            <CustomerDetailPageHeader customer={customer} onEdit={(customer) => modal.open(customer)} />
+            <CustomerDetailPageHeader customer={customer} onEdit={(c) => modal.open(c)} />
 
             <div className="w-full h-full flex">
                 <div className="w-full flex-2  border-r border-(--border)">

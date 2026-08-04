@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { AppException } from "../lib/exceptions.js";
 
 import * as supplierService from "../services/supplier.service.js";
 
@@ -13,10 +12,6 @@ export const getSuppliers = async (request: Request, response: Response) => {
 /* ========== POST ========== */
 
 export const createSupplier = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Bad request", 400, "MISSING_BODY");
-    }
-
     const supplier = await supplierService.createSupplier(request.body);
     return response.status(200).json(supplier);
 };
@@ -24,10 +19,6 @@ export const createSupplier = async (request: Request, response: Response) => {
 /* ========== UPDATE ========== */
 
 export const updateSupplier = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Bad request! Missing body or id!", 400, "MISSING_BODY");
-    }
-
     const supplier = await supplierService.updateSupplier(
         request.params.id as string,
         request.body

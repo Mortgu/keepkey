@@ -1,5 +1,4 @@
 import { Request, Response } from "express";
-import { AppException } from "../lib/exceptions.js";
 
 import * as customerService from "../services/customer.service.js";
 
@@ -29,10 +28,6 @@ export const getAllCustomerContacts = async (request: Request, response: Respons
 /* ========== POST ========== */
 
 export const createCustomer = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Bad request! Missing body data.", 400, "MISSING_BODY");
-    }
-
     const customer = await customerService.createCustomer(request.body);
     return response.status(200).json(customer);
 };
@@ -48,10 +43,6 @@ export const createCustomerContact = async (request: Request, response: Response
 /* ========== UPDATE ========== */
 
 export const updateCustomer = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Bad request! Missing body data.", 400, "MISSING_BODY");
-    }
-
     await customerService.updateCustomer(request.params.id as string, request.body);
     return response.status(200).json({ message: "Successfully updated customer!" });
 };

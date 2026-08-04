@@ -6,7 +6,6 @@ interface PriceCalculatorProps {
     duration: number;
     quantity: number;
     customerId?: string;
-    freeMonths?: number;
 }
 
 interface SelectPriceParams {
@@ -14,7 +13,6 @@ interface SelectPriceParams {
     duration: number;
     quantity: number;
     customerId?: string;
-    freeMonths?: number;
 }
 
 /** Minimal tariff shape required by {@link selectPrice}. */
@@ -49,7 +47,7 @@ export type PriceFailureReason =
     | 'INVALID_INPUT';
 
 export type PriceResult =
-    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number; freeMonths: number; effectiveDuration: number } }
+    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number } }
     | { ok: false; reason: PriceFailureReason };
 
 export class PriceError extends Error {
@@ -59,18 +57,6 @@ export class PriceError extends Error {
     }
 }
 
-/**
- * Pure pricing logic: given an already-loaded tariff, selects the matching
- * column (by duration), row (by quantity range) and cell, applies an optional
- * customer-specific override and returns the total price.
- *
- * `price` is the unit price per piece per time unit (Stückpreis pro
- * Zeiteinheit). Total = unitPrice * quantity * duration. The `duration`
- * selects the column AND is a multiplier.
- *
- * Returns a discriminated union so callers can distinguish "not configured"
- * from "out of range" from "invalid input".
- */
 /**
  * Resolve the concrete cell for a given tariff, duration and quantity.
  * Returns the matching column, row and cell, or a {@link PriceFailureReason}
@@ -101,17 +87,38 @@ export function resolveCell(
     return { ok: true, column, row, cell };
 }
 
+/**
+ * Pure pricing logic: given an already-loaded tariff, selects the matching
+ * column (by duration), row (by quantity range) and cell, applies an optional
+ * customer-specific override and returns the total price.
+ *
+ * `price` is the unit price per piece per time unit (Stückpreis pro
+ * Zeiteinheit). Total = unitPrice * quantity * duration. The `duration`
+ * selects the column AND is a multiplier.
+ *
+ * **Immer brutto.** Freimonate kennt diese Funktion bewusst nicht: ihr Wert
+ * wird überall getrennt als `discount_cents` geführt (siehe `PositionPrice` in
+ * `@keepit/schemas`), netto ist die Differenz. Ein Rabatt-Parameter hier hätte
+ * zwei Bedeutungen von „Gesamtpreis" nebeneinander gestellt — genau daran ist
+ * die Angebots-PDF einmal auseinandergelaufen.
+ *
+ * Returns a discriminated union so callers can distinguish "not configured"
+ * from "out of range" from "invalid input".
+ */
 export function selectPrice(
     tariff: TariffForPricing | null | undefined,
-    { productId, duration, quantity, customerId, freeMonths = 0 }: SelectPriceParams,
+    { productId, duration, quantity, customerId }: SelectPriceParams,
 ): PriceResult {
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-    if (!Number.isInteger(quantity) || quantity <= 0) {
+    // `duration` wählt nicht nur die Spalte, sie ist auch Multiplikator — ein
+    // NaN aus einem Query-Parameter lief hier bisher als NO_COLUMN auf und
+    // meldete damit die falsche Ursache.
+    if (!Number.isInteger(duration) || duration <= 0) {
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
-    if (!Number.isInteger(freeMonths) || freeMonths < 0 || freeMonths > duration) {
+    if (!Number.isInteger(quantity) || quantity <= 0) {
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
@@ -132,26 +139,27 @@ export function selectPrice(
             && cp.min_quantity === resolved.row.min_quantity
         );
         const productSpecific = overrides.find(cp => cp.productId === productId);
+        // Altbestand: gruppenweite Overrides (productId === null) stammen aus der
+        // Zeit vor der Migration 20260803120000. Es gibt keinen Schreibpfad mehr,
+        // der sie erzeugt — gelesen werden sie weiterhin.
         const groupWide = overrides.find(cp => cp.productId === null);
         const override = productSpecific ?? groupWide;
         if (override) unitPrice = override.price;
     }
 
-    const effectiveDuration = duration - freeMonths;
-
     return {
         ok: true,
-        price: unitPrice * quantity * effectiveDuration,
-        breakdown: { unitPrice, quantity, duration, freeMonths, effectiveDuration },
+        price: unitPrice * quantity * duration,
+        breakdown: { unitPrice, quantity, duration },
     };
 }
 
 const CALCULATE_PRICE_INCLUDE = {
     rows: {
-        orderBy: { order: 'asc' },
+        orderBy: { min_quantity: 'asc' },
     },
     columns: {
-        orderBy: { order: 'asc' },
+        orderBy: { duration: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },
@@ -187,13 +195,13 @@ export async function loadTariffForPricing(productId: string, contractId: string
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {
-    const { productId, contractId, duration, quantity, customerId, freeMonths } = props;
+    const { productId, contractId, duration, quantity, customerId } = props;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
 
     if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
 
-    return selectPrice(tariff, { productId, duration, quantity, customerId, freeMonths });
+    return selectPrice(tariff, { productId, duration, quantity, customerId });
 }
 
 /**

@@ -1,35 +1,34 @@
-import { useTranslation } from "react-i18next";
+
+import { useFlatRates } from "@/hooks";
 import FlatRateItem from "./flatrate-item";
-import FlatRateModal from "./flatrate-modal";
+import { LoaderCircle } from "lucide-react";
+import type { Flatrate } from "@keepit/schemas";
 
-import { ListPage } from "@/components";
-import { useFlatRateManager, useModal } from "@/hooks";
+interface Props {
+  onEdit: (flatrate: Flatrate) => void;
+}
 
-export default function FlatRateList() {
-  const { t } = useTranslation();
-  const modal = useModal();
-  const { flatRates, isPending, error, createFlatRate } = useFlatRateManager();
+export default function FlatRateList({ onEdit }: Props) {
+  const { flatRates, isPending, error } = useFlatRates();
 
   return (
-    <ListPage
-      title={t("section.flatRates")}
-      items={flatRates}
-      isPending={isPending}
-      error={error}
-      keyOf={(item) => item.id}
-      createLabel={t("button.create")}
-      onCreate={() => modal.open()}
-      renderItem={(item) => (
-        <FlatRateItem item={item} />
+    <div className="grid gap-4">
+      {isPending && (
+        <div className="w-full flex items-center justify-center py-8">
+          <LoaderCircle className="animate-spin" />
+        </div>
       )}
-    >
-      {modal.isOpen && (
-        <FlatRateModal
-          key={modal.key}
-          onClose={modal.close}
-          submitFn={(value) => createFlatRate({ ...value })}
-        />
+
+      {error && (
+        <div className="w-full grid items-center justify-start py-8">
+          <p className="text-(--destructive) text-lg font-semibold">Error</p>
+          <p className="text-(--destructive) font-medium">Something went wrong trying to fetch flatrates!</p>
+        </div>
       )}
-    </ListPage>
+
+      {flatRates.map((flatrate, _) => (
+        <FlatRateItem key={flatrate.id} flatrate={flatrate} onEdit={onEdit} />
+      ))}
+    </div>
   );
 }
