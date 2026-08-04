@@ -6,7 +6,7 @@ import type { OfferDiscount } from "@keepit/schemas";
 
 export interface DiscountItemState {
     title: string;
-    description?: string;
+    description: string | null;
     amount_cents: number;
     deleted: boolean;
 }
@@ -22,7 +22,7 @@ export default function DiscountDerivedModal({ form, originalDiscounts }: Props)
     const [items, setItems] = useState<Array<DiscountItemState>>(
         originalDiscounts.map((d) => ({
             title: d.title,
-            description: d.description ?? undefined,
+            description: d.description,
             amount_cents: d.amount_cents,
             deleted: false,
         })),

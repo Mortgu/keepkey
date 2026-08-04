@@ -97,7 +97,7 @@ export declare const supplierSchema: z.ZodObject<{
             id: z.ZodString;
             offerId: z.ZodString;
             title: z.ZodString;
-            description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+            description: z.ZodNullable<z.ZodString>;
             amount_cents: z.ZodNumber;
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;

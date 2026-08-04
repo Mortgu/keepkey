@@ -1,6 +1,6 @@
-import OrderCard from "../../../orders/-components/card/order-card";
 import { RouteError, Skeleton } from "@/components";
 import { useOrders } from "@/hooks";
+import OrderCard from "@/routes/_main/orders/-components/card/order-card";
 
 interface Props {
     customerId: string;

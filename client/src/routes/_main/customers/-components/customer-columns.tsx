@@ -1,4 +1,3 @@
-import type { Column } from "@/components";
 import type { Customer } from "@keepit/schemas";
 
 export interface CustomerTableRow {
@@ -21,13 +20,4 @@ export function Avatar({ name, size = 30 }: { name: string; size?: number }) {
             {initials(name)}
         </span>
     );
-}
-
-export function buildColumns(actions: {
-    isOpen: (id: string) => void;
-    onEdit: (c: Customer) => void;
-    onDelete: (id: string) => void;
-    isDeleting: boolean;
-}): Array<Column<CustomerTableRow>> {
-    return [];
 }

@@ -119,7 +119,7 @@ export const offerDiscountSchema = z.object({
     id: z.string(),
     offerId: z.string(),
     title: z.string(),
-    description: z.string().nullish().transform(v => (v === undefined) ? null : v),
+    description: z.string().nullable(),
     amount_cents: z.number().int(),
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
