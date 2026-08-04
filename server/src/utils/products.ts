@@ -139,6 +139,9 @@ export function selectPrice(
             && cp.min_quantity === resolved.row.min_quantity
         );
         const productSpecific = overrides.find(cp => cp.productId === productId);
+        // Altbestand: gruppenweite Overrides (productId === null) stammen aus der
+        // Zeit vor der Migration 20260803120000. Es gibt keinen Schreibpfad mehr,
+        // der sie erzeugt — gelesen werden sie weiterhin.
         const groupWide = overrides.find(cp => cp.productId === null);
         const override = productSpecific ?? groupWide;
         if (override) unitPrice = override.price;
@@ -153,10 +156,10 @@ export function selectPrice(
 
 const CALCULATE_PRICE_INCLUDE = {
     rows: {
-        orderBy: { order: 'asc' },
+        orderBy: { min_quantity: 'asc' },
     },
     columns: {
-        orderBy: { order: 'asc' },
+        orderBy: { duration: 'asc' },
     },
     cells: {
         orderBy: { createdAt: 'asc' },

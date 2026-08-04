@@ -13,7 +13,6 @@ export const getNextOrderNumber = () =>
 export const createOrder = (input: CreateOrderInput) =>
     api<Order>("/api/orders", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
             id: input.id,
             orderId: input.orderId,
@@ -30,7 +29,6 @@ export const deleteOrder = (id: string) =>
 export const updateOrder = (orderId: string, input: UpdateOrderInput) =>
     api<Order>(`/api/orders/${orderId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -43,6 +41,5 @@ export const getOrderRevisions = (orderId: string) =>
 export const restoreOrderRevision = (orderId: string, revisionId: string, expectedVersion: number) =>
     api<Order>(`/api/orders/${orderId}/revisions/${revisionId}/restore`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ expectedVersion }),
     });

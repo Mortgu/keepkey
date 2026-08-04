@@ -21,7 +21,7 @@ const REASON_LABELS: Record<TariffVersionReason, string> = {
 
 export function TariffVersionList({ groupId, tariffId }: Props) {
     const { versions, isPending } = useTariffVersionsHook(groupId, tariffId);
-    const { restoreVersion, restoringVersion } = useRestoreTariffVersion();
+    const { restoreVersion, isPending: restoringVersion } = useRestoreTariffVersion();
 
     const [expandedId, setExpandedId] = useState<string | null>(null);
     const [confirmingId, setConfirmingId] = useState<string | null>(null);

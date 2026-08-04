@@ -4,7 +4,7 @@ import TariffCellComponent from "./cell-component";
 import TariffColumnComponent from "./column-component";
 import TariffRowComponent from "./row-component";
 import type { TariffBase, TariffCell } from "@keepit/schemas";
-import { useTariffGroupHook } from "@/hooks";
+import { useCreateTariffColumn, useCreateTariffRow, useUpdateTariffRow } from "@/hooks/tariffs/tariff-mutations";
 import { Button } from "@/components";
 
 type Props = {
@@ -29,7 +29,9 @@ function nextDuration(columns: TariffBase["columns"]): number {
 }
 
 export default function TariffComponent({ tariff }: Props) {
-    const { createColumn, createRow, updateRow } = useTariffGroupHook();
+    const { createColumn } = useCreateTariffColumn();
+    const { createRow } = useCreateTariffRow();
+    const { updateRow } = useUpdateTariffRow();
 
     const groupId = tariff.tariffGroupId;
     const cells = tariff.cells;

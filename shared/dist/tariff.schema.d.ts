@@ -4,7 +4,6 @@ export declare const tariffRowSchema: z.ZodObject<{
     tariffId: z.ZodString;
     min_quantity: z.ZodNumber;
     max_quantity: z.ZodNullable<z.ZodNumber>;
-    order: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -13,7 +12,6 @@ export declare const tariffColumnSchema: z.ZodObject<{
     id: z.ZodString;
     tariffId: z.ZodString;
     duration: z.ZodNumber;
-    order: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -128,7 +126,6 @@ declare const tariffBaseSchema: z.ZodObject<{
         tariffId: z.ZodString;
         min_quantity: z.ZodNumber;
         max_quantity: z.ZodNullable<z.ZodNumber>;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -136,7 +133,6 @@ declare const tariffBaseSchema: z.ZodObject<{
         id: z.ZodString;
         tariffId: z.ZodString;
         duration: z.ZodNumber;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -210,15 +206,14 @@ export declare const updateTariffRowSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
 /**
- * TariffCell (update).
+ * TariffCell (update) — setzt den Listenpreis der Zelle.
  *
- * Genau eines von `default_price` / `customer_price` muss gesetzt sein; für
- * `customer_price` ist zusätzlich `customerId` erforderlich.
+ * Kundenspezifische Preise laufen ausschließlich über
+ * {@link upsertCustomerPriceSchema}: sie hängen an den Koordinaten
+ * (duration, min_quantity), nicht an einer cellId.
  */
 export declare const updateTariffCellSchema: z.ZodObject<{
-    default_price: z.ZodOptional<z.ZodInt>;
-    customer_price: z.ZodOptional<z.ZodInt>;
-    customerId: z.ZodOptional<z.ZodString>;
+    default_price: z.ZodInt;
 }, z.core.$strip>;
 export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
 /** Kundenspezifischen Stückpreis upserten. */
@@ -279,7 +274,6 @@ export declare const tariffSchema: z.ZodObject<{
         tariffId: z.ZodString;
         min_quantity: z.ZodNumber;
         max_quantity: z.ZodNullable<z.ZodNumber>;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -287,7 +281,6 @@ export declare const tariffSchema: z.ZodObject<{
         id: z.ZodString;
         tariffId: z.ZodString;
         duration: z.ZodNumber;
-        order: z.ZodNumber;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
@@ -397,7 +390,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             tariffId: z.ZodString;
             min_quantity: z.ZodNumber;
             max_quantity: z.ZodNullable<z.ZodNumber>;
-            order: z.ZodNumber;
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;
@@ -405,7 +397,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             id: z.ZodString;
             tariffId: z.ZodString;
             duration: z.ZodNumber;
-            order: z.ZodNumber;
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;

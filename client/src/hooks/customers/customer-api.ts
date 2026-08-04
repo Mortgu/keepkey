@@ -37,14 +37,12 @@ export const getCustomer = (id: string) =>
 export const createCustomer = (input: CreateCustomerInput) =>
     api<Customer>(`/api/customers`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input)
     });
 
 export const updateCustomer = (id: string, input: UpdateCustomerInput) =>
     api<Customer>(`/api/customers/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input)
     });
 
@@ -56,14 +54,12 @@ export const deleteCustomer = (id: string) =>
 export const createCustomerContact = (id: string, input: CreateContactInput) =>
     api<Contact>(`/api/customers/${id}/contacts`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
 export const updateCustomerContact = (id: string, contactId: string, input: UpdateContactInput) =>
     api<Contact>(`/api/customers/${id}/contacts/${contactId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 

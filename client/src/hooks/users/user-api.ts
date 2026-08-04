@@ -15,14 +15,12 @@ export const getUsers = () =>
 export const createUser = (body: CreateUserInput) =>
     api<User>("/api/users", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
 
 export const updateUser = (id: string, body: UpdateUserInput) =>
     api<User>(`/api/users/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
     });
 

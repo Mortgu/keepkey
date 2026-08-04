@@ -2,7 +2,7 @@ import { Trash } from "lucide-react";
 import {  useState } from "react";
 import type {ChangeEvent} from "react";
 import { Button, Input } from "@/components";
-import { useTariffGroupHook } from "@/hooks";
+import { useDeleteTariffColumn, useUpdateTariffColumn } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
     groupId: string;
@@ -12,7 +12,8 @@ interface Props {
 }
 
 export default function TariffColumnComponent({ groupId, tariffId, columnId, duration }: Props) {
-    const { deleteColumn, updateColumn } = useTariffGroupHook();
+    const { deleteColumn } = useDeleteTariffColumn();
+    const { updateColumn } = useUpdateTariffColumn();
     const [edit, setEdit] = useState(false);
     const [value, setValue] = useState(duration);
 

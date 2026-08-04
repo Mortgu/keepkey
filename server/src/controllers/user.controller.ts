@@ -24,10 +24,6 @@ export const getSessionUser = async (request: Request, response: Response) => {
 /* ========== POST ========== */
 
 export const createUser = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Missing data!", 400, "MISSING_BODY");
-    }
-
     const user = await userService.createUser(request.body);
     return response.status(200).json(user);
 };
@@ -46,10 +42,6 @@ export const createContactPersons = async (request: Request, response: Response)
 /* ========== UPDATE ========== */
 
 export const updateUserById = async (request: Request, response: Response) => {
-    if (!request.body) {
-        throw new AppException("Missing data!", 400, "MISSING_BODY");
-    }
-
     const user = await userService.updateUser(
         request.params.id as string,
         request.body,

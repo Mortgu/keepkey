@@ -29,14 +29,12 @@ export const getOffers = async (filters: OfferFilterParams) =>
 export const createOffer = (payload: CreateOfferInput) =>
     api<Offer>("/api/offers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ ...payload }),
     });
 
 export const updateOffer = (id: string, input: UpdateOfferInput) =>
     api<Offer>(`/api/offers/${id}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -49,14 +47,12 @@ export const deleteOffer = async (id: string) =>
 export const createOfferPositions = async (id: string, input: Array<CreateOfferPositionInput>) =>
     api<Array<OfferPosition>>(`/api/offers/${id}/positions`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input)
     });
 
 export const updateOfferPosition = async (id: string, positionId: string, input: UpdateOfferPositionInput) =>
     api<OfferPosition>(`/api/offers/${id}/positions/${positionId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -69,14 +65,12 @@ export const deleteOfferPosition = async (id: string, positionId: string) =>
 export const createOfferFlatrates = async (id: string, input: Array<CreateOfferFlatrateInput>) =>
     api<Array<OfferPosition>>(`/api/offers/${id}/flatrates`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
 export const updateOfferFlatrate = async (id: string, flatrateId: string, input: UpdateOfferFlatrateInput) =>
     api<OfferPosition>(`/api/offers/${id}/flatrates/${flatrateId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -100,7 +94,6 @@ export const getOfferRevisions = async (id: string) =>
 export const restoreOfferRevision = async (id: string, revisionId: string, expectedVersion: number) =>
     api<Offer>(`/api/offers/${id}/revisions/${revisionId}/restore`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ expectedVersion }),
     });
 
@@ -118,13 +111,11 @@ export const getTask = async (taskId: string) =>
 export const renewOffer = (offerId: string, input: CreateOfferInput) =>
     api<Offer>(`/api/offers/${offerId}/renew`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
 export const extendOffer = (offerId: string, input: ExtendOfferInput) =>
     api<Offer>(`/api/offers/${offerId}/extend`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });

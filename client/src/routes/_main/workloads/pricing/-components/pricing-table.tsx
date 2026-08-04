@@ -18,9 +18,9 @@ type Props = {
 export default function PricingTable({ group }: Props) {
     const locale = useLocale();
 
-    const { deleteTariffGroup, deleteTariffGroupPending, deleteTariffGroupError } = useDeleteTariffGroup();
-    const { createTariff, createTariffPending, createTariffError } = useCreateTariff();
-    const { updateTariffGroup, updateTariffGroupPending, updateTariffGroupError } = useUpdateTariffGroup();
+    const { deleteTariffGroup, isPending: deleteTariffGroupPending, error: deleteTariffGroupError } = useDeleteTariffGroup();
+    const { createTariff, isPending: createTariffPending, error: createTariffError } = useCreateTariff();
+    const { updateTariffGroup, isPending: updateTariffGroupPending, error: updateTariffGroupError } = useUpdateTariffGroup();
     const { products } = useProducts();
     const { contracts } = useContracts();
     const modal = useModal();

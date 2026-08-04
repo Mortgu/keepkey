@@ -12,14 +12,12 @@ export const getSuppliers = () =>
 export const createSupplier = (supplier: CreateSupplierInput) =>
     api<Supplier>("/api/suppliers", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(supplier),
     });
 
 export const updateSupplier = (id: string, supplier: UpdateSupplierInput) =>
     api<Supplier>(`/api/suppliers/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(supplier),
     });
 

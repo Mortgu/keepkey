@@ -2,7 +2,7 @@ import { Trash } from "lucide-react";
 import { useState } from "react";
 import type { ChangeEvent } from "react";
 import { Button } from "@/components";
-import { useTariffGroupHook } from "@/hooks";
+import { useDeleteTariffRow, useUpdateTariffRow } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
     groupId: string;
@@ -20,7 +20,8 @@ export default function TariffRowComponent(props: Props) {
     const [min, setMin] = useState(minQty);
     const [max, setMax] = useState(maxQty);
 
-    const { deleteRow, updateRow } = useTariffGroupHook();
+    const { deleteRow } = useDeleteTariffRow();
+    const { updateRow } = useUpdateTariffRow();
 
     const handleMinBlur = async () => {
         setEditMin(false);

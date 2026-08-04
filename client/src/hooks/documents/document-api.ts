@@ -4,7 +4,6 @@ import { BASE_URL, api } from "@/lib/api-client";
 export const renameDocument = (type: DocumentType, documentId: string, displayName: string) =>
     api<GeneratedDocument>(`/api/documents/${type}/${documentId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ displayName }),
     });
 

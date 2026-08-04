@@ -7,7 +7,6 @@ export const tariffRowSchema = z.object({
     tariffId: z.string(),
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
-    order: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -16,7 +15,6 @@ export const tariffColumnSchema = z.object({
     id: z.string(),
     tariffId: z.string(),
     duration: z.number().int(),
-    order: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -127,30 +125,14 @@ export const updateTariffRowSchema = z.object({
     max_quantity: z.int().nullable().optional(),
 });
 /**
- * TariffCell (update).
+ * TariffCell (update) — setzt den Listenpreis der Zelle.
  *
- * Genau eines von `default_price` / `customer_price` muss gesetzt sein; für
- * `customer_price` ist zusätzlich `customerId` erforderlich.
+ * Kundenspezifische Preise laufen ausschließlich über
+ * {@link upsertCustomerPriceSchema}: sie hängen an den Koordinaten
+ * (duration, min_quantity), nicht an einer cellId.
  */
 export const updateTariffCellSchema = z.object({
-    default_price: z.int().optional(),
-    customer_price: z.int().optional(),
-    customerId: z.string().min(1).optional(),
-}).superRefine((data, ctx) => {
-    if (data.customer_price !== undefined && !data.customerId) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['customerId'],
-            message: 'customerId is required when customer_price is set',
-        });
-    }
-    if (data.default_price === undefined && data.customer_price === undefined) {
-        ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            path: ['default_price'],
-            message: 'default_price or customer_price is required',
-        });
-    }
+    default_price: z.int(),
 });
 /** Kundenspezifischen Stückpreis upserten. */
 export const upsertCustomerPriceSchema = z.object({

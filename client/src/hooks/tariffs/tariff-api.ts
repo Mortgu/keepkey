@@ -24,14 +24,12 @@ export const getTariffGroup = (id: string) =>
 export const createTariffGroup = (input: CreateTariffGroupInput) =>
     api<TariffGroup>('/api/tariffs', {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
 export const updateTariffGroup = (id: string, input: UpdateTariffGroupInput) =>
     api<TariffGroup>(`/api/tariffs/${id}`, {
         method: 'PATCH',
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -48,7 +46,6 @@ export const getTariff = (groupId: string, tariffId: string) =>
 export const createTariff = (groupId: string, input: CreateTariffInput) =>
     api<Tariff>(`/api/tariffs/${groupId}/tariffs`, {
         method: 'POST',
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(input),
     });
 
@@ -75,7 +72,6 @@ export const getTariffDurations = (productId: string, contractId: string) =>
 export const createTariffColumn = (groupId: string, tariffId: string, duration: number) =>
     api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ duration }),
     });
 
@@ -87,7 +83,6 @@ export const deleteTariffColumn = (groupId: string, tariffId: string, columnId: 
 export const updateTariffColumn = (groupId: string, tariffId: string, columnId: string, duration: number) =>
     api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column/${columnId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ duration }),
     });
 
@@ -98,7 +93,6 @@ export const updateTariffColumn = (groupId: string, tariffId: string, columnId: 
 export const createTariffRow = (groupId: string, tariffId: string, min_quantity: number, max_quantity: number | null) =>
     api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
@@ -110,7 +104,6 @@ export const deleteTariffRow = (groupId: string, tariffId: string, rowId: string
 export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_quantity: number, max_quantity: number | null) =>
     api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
@@ -118,17 +111,10 @@ export const updateTariffRow = (groupId: string, tariffId: string, rowId: string
    Tariff Cell
    ─────────────────────────────── */
 
-export const updateTariffCell = (
-    groupId: string,
-    tariffId: string,
-    cellId: string,
-    default_price?: number,
-    customer_price?: number,
-) =>
+export const updateTariffCell = (groupId: string, tariffId: string, cellId: string, default_price: number) =>
     api<TariffCell>(`/api/tariffs/${groupId}/${tariffId}/cell/${cellId}`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ default_price, customer_price }),
+        body: JSON.stringify({ default_price }),
     });
 
 /* ───────────────────────────────

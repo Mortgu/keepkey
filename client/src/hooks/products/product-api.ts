@@ -16,14 +16,12 @@ export const getProduct = (id: string) =>
 export const createProduct = (product: CreateProductInput) =>
     api<Product>("/api/products", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
     });
 
 export const updateProduct = (id: string, product: UpdateProductInput) =>
     api<Product>(`/api/products/${id}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(product),
     });
 
