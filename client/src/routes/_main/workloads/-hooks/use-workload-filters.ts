@@ -1,5 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -8,9 +8,13 @@ const sortOptions = [
 
 export default function useWorkloadFilters() {
     const urlSearch = useSearch({ strict: false });
-
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
-    const [sort, setSort] = useState(sortOptions[0].value);
+    const [sort, setSort] = useState<string>(sortOptions[0].value);
+
+    const params = useMemo(() => ({
+        search: searchInput || undefined,
+        sort: sort as "createdAt:asc" | "createdAt:desc",
+    }), [searchInput, sort]);
 
     return {
         sortOptions,
@@ -20,6 +24,8 @@ export default function useWorkloadFilters() {
 
         searchInput,
         setSearchInput,
+
+        params,
     }
 }
 

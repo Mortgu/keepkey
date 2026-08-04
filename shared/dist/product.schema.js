@@ -22,6 +22,6 @@ export const productSchema = z.object({
 export const productListSchema = z.array(productSchema);
 export const workloadFilterSchema = z.object({
     search: z.string().optional(),
-    sort: z.string().optional(),
+    sort: z.enum(["createdAt:asc", "createdAt:desc"]).optional(),
 });
 //# sourceMappingURL=product.schema.js.map

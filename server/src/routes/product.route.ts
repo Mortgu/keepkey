@@ -6,17 +6,18 @@ import {
     getProducts,
     updateProduct,
 } from "@/controllers/product.controller.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 
 import {
     createProductSchema,
-    updateProductSchema
+    updateProductSchema,
+    workloadFilterSchema
 } from '@keepit/schemas';
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/products */
-router.get("/", getProducts);
+router.get("/", validateQuery(workloadFilterSchema), getProducts);
 
 /* [GET] http://localhost:3000/api/products/:id */
 router.get("/:id", getProduct);

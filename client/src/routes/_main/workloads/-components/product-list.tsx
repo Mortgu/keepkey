@@ -1,16 +1,15 @@
-import { useProducts } from "@/hooks";
+import { useTranslation } from "react-i18next";
+import useWorkloadFilters from "../-hooks/use-workload-filters";
 import ProductItem from "./product-item";
 import type { Product } from "@keepit/schemas";
-import useWorkloadFilters from "../-hooks/use-workload-filters";
+import { useProducts } from "@/hooks";
 import { SearchBar, SortDropdown } from "@/components";
-import { t } from "i18next";
 
-type Props = {}
-
-export default function ProductList({ }: Props) {
+export default function ProductList() {
+    const { t } = useTranslation();
     const filters = useWorkloadFilters();
 
-    const { products, isPending, error } = useProducts(filters);
+    const { products } = useProducts(filters.params);
 
     return (
         <div>

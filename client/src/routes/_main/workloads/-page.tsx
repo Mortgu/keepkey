@@ -1,42 +1,16 @@
 import { useTranslation } from "react-i18next";
-import { LoaderCircle, Plus } from "lucide-react";
-import { Fragment, useMemo, useState } from "react";
-import { Button, PageWidth } from "@/components";
-import { useLocale, useModal, useProductManager } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
+import { Plus } from "lucide-react";
+import { Fragment } from "react";
 import ProductModal from "./-components/product-modal";
 import ProductList from "./-components/product-list";
+import { Button, PageWidth } from "@/components";
+import { useModal, useProductManager } from "@/hooks";
 
 export default function ProductPage() {
     const { t } = useTranslation()
-    const {
-        products,
-        isPending,
-
-        createProduct,
-    } = useProductManager();
+    const { createProduct } = useProductManager();
 
     const modal = useModal();
-    const locale = useLocale();
-
-    const [searchQuery, setSearchQuery] = useState<string>("");
-
-    const filteredProducts = useMemo(() => {
-        if (!searchQuery.trim()) return products;
-        const query = searchQuery.toLowerCase();
-        return products.filter((product) => {
-            const name = localized(product.translations, locale, "name");
-            return name.toLowerCase().includes(query);
-        });
-    }, [products, searchQuery, locale]);
-
-    const renderLoading = () => {
-        return (
-            <div className="flex items-center justify-center my-5">
-                <LoaderCircle className="animate-spin" />
-            </div>
-        )
-    }
 
     return (
         <Fragment>
@@ -51,9 +25,6 @@ export default function ProductPage() {
                             </p>
                         </div>
                         <div className="flex items-center gap-4">
-                            {/* <Button icon={<Download size={14} />} variant="border" size="sm">
-                        {t("button.export")}
-                    </Button>*/}
                             <Button
                                 icon={<Plus size={14} strokeWidth={3} />}
                                 variant="primary"
