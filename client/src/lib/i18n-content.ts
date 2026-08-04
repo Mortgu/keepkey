@@ -22,10 +22,10 @@ export function pickTranslation<T extends Translatable>(
  * Resolves a single localized field (e.g. `name`) for the active locale.
  * Returns an empty string when nothing matches so it is render-safe.
  */
-export function localized<T extends Translatable, K extends keyof T>(
+export function localized<T extends Translatable, TKey extends keyof T>(
   translations: Array<T> | undefined,
   locale: Language,
-  field: K,
-): T[K] | "" {
+  field: TKey,
+): T[TKey] | "" {
   return pickTranslation(translations, locale)?.[field] ?? "";
 }

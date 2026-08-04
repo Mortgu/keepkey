@@ -1,6 +1,6 @@
-import { useCustomers } from "@/hooks";
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { useCustomers } from "@/hooks";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -11,6 +11,7 @@ const sortOptions = [
 
 export function useCustomerFilters() {
     const urlSearch = useSearch({ strict: false });
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [countryFilter, setCountryFilter] = useState<Array<string>>([]);

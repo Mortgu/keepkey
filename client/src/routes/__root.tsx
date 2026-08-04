@@ -1,9 +1,9 @@
 import "../i18n";
 
-import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { createRootRouteWithContext } from "@tanstack/react-router";
 
+import { RootComponent } from "./__root.component";
 import type { RouterContext } from "@/lib/session";
-import { AuthProvider } from "@/context/auth.tsx";
 import { PageHeaderSkeleton, RouteError } from "@/components";
 
 export const Route = createRootRouteWithContext<RouterContext>()({
@@ -11,11 +11,3 @@ export const Route = createRootRouteWithContext<RouterContext>()({
     errorComponent: ({ error }) => <RouteError error={error} />,
     pendingComponent: () => <PageHeaderSkeleton />,
 });
-
-function RootComponent() {
-  return (
-    <AuthProvider>
-      <Outlet />
-    </AuthProvider>
-  );
-}

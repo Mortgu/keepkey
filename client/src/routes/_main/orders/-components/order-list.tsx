@@ -21,6 +21,7 @@ export default function OrderList() {
     const { t } = useTranslation();
 
     const urlSearch = useSearch({ strict: false });
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sort_options[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);

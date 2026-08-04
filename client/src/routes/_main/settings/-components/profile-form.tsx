@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput } from "@/components";
-import { useAuth } from "@/context/auth.tsx";
+import { useAuth } from "@/context/auth-context";
 import { authClient } from "@/lib/auth-client.ts";
 
 const profileSchema = z.object({

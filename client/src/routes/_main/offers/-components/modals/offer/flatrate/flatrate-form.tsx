@@ -35,9 +35,9 @@ export default function FlatrateFormOfferModal({ currentFlatrate, cancelFn, save
 
                 <Select label={t("offerModal.flatrate")} value={flatrate}
                     onChange={(e) => setFlatrate(e.target.value)}>
-                    {flatRates.map(flatrate => (
-                        <option key={flatrate.id} value={flatrate.id}>
-                            {localized(flatrate.translations, locale, "name")}
+                    {flatRates.map(fr => (
+                        <option key={fr.id} value={fr.id}>
+                            {localized(fr.translations, locale, "name")}
                         </option>
                     ))}
                 </Select>

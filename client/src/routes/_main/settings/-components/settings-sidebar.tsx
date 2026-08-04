@@ -37,7 +37,11 @@ const SettingsLinkComponent = React.forwardRef<HTMLAnchorElement, SettingsLinkPr
 
 const CreatedSettingsLink = createLink(SettingsLinkComponent);
 
-const SettingsSidebarLink = ((props: any) => (
+type SettingsSidebarLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+    to: string;
+};
+
+const SettingsSidebarLink = ((props: SettingsSidebarLinkProps) => (
     <CreatedSettingsLink
         activeOptions={{ exact: true }}
         {...props}

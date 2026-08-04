@@ -3,10 +3,9 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import FlatrateItemOfferModal from "./flatrate-item";
 import FlatrateFormOfferModal from "./flatrate-form";
-import { useFlatRates } from "@/hooks";
+import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
 import { Button } from "@/components";
 import useFlatrateOfferModal from "@/routes/_main/offers/-hooks/use-flatreate.offer-modal";
-import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
 
 interface Props {
     form: OfferFormApi;
@@ -14,8 +13,6 @@ interface Props {
 
 export default function FlatrateOfferModalSection({ form }: Props) {
     const { t } = useTranslation();
-
-    const { flatRates } = useFlatRates();
 
     const {
         flatrates,
@@ -64,7 +61,7 @@ export default function FlatrateOfferModalSection({ form }: Props) {
             {flatrates.map((flatrate, index) => (
                 <FlatrateItemOfferModal
                     flatrate={flatrate}
-                    updateFn={(flatrate) => updateFlatrate(index, flatrate)}
+                    updateFn={(updatedFr) => updateFlatrate(index, updatedFr)}
                     deleteFn={() => deleteFlatrate(index)}
                 />
             ))}

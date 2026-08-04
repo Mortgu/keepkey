@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
+import {  useMutation, useQueryClient } from "@tanstack/react-query";
 import { tariffKeys } from "./tariff-keys";
 import {
     createTariff,
@@ -16,6 +16,7 @@ import {
     updateTariffGroup,
     updateTariffRow,
 } from "./tariff-api";
+import type {QueryClient} from "@tanstack/react-query";
 import type {
     CreateTariffGroupInput,
     CreateTariffInput,

@@ -39,8 +39,8 @@ export default function TemplateList() {
         try {
             await uploadTemplate({ file });
             toast.success("Vorlage hochgeladen");
-        } catch (exception: any) {
-            toast.error(exception.message);
+        } catch (exception: unknown) {
+            toast.error(exception instanceof Error ? exception.message : String(exception));
         }
     };
 
@@ -50,8 +50,8 @@ export default function TemplateList() {
         try {
             await deleteTemplate({ basename: templateToDelete.basename });
             toast.success("Vorlage gelöscht");
-        } catch (exception: any) {
-            toast.error(exception.message);
+        } catch (exception: unknown) {
+            toast.error(exception instanceof Error ? exception.message : String(exception));
         } finally {
             setTemplateToDelete(null);
         }

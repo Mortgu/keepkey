@@ -92,7 +92,12 @@ const BasicLinkComponent = React.forwardRef<HTMLAnchorElement, BasicLinkProps>(
 
 const CreatedLinkComponent = createLink(BasicLinkComponent);
 
-export const NavLink = ((props: any) => {
+type NavLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+    indent?: boolean;
+    to: string;
+};
+
+export const NavLink = ((props: NavLinkProps) => {
     return (
         <CreatedLinkComponent
             activeOptions={{ exact: true }}

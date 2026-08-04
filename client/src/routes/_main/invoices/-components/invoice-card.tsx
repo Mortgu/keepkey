@@ -1,7 +1,4 @@
-interface Props {
-};
-
-export default function InvoiceCard({ }: Props) {
+export default function InvoiceCard() {
     return (
         <div></div>
     )

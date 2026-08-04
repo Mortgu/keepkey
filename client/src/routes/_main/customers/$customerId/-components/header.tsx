@@ -1,8 +1,8 @@
-import { Button } from "@/components";
-import type { Customer } from "@keepit/schemas";
 import { Link } from "@tanstack/react-router";
 import { t } from "i18next";
 import { ArrowLeft } from "lucide-react";
+import type { Customer } from "@keepit/schemas";
+import { Button } from "@/components";
 
 interface Props {
     customer: Customer;

@@ -19,7 +19,7 @@ import { tv } from "tailwind-variants";
 import { NavGroup, NavLink } from "./nav-link";
 import type { ReactNode } from "react";
 import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
-import { useAuth } from "@/context/auth";
+import { useAuth } from "@/context/auth-context";
 
 const ICON_SIZE = 14;
 

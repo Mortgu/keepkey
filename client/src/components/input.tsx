@@ -123,7 +123,6 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
     (
         {
             className,
-            variant: _variant,
             size,
             label,
             error,

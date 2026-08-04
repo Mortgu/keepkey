@@ -45,7 +45,7 @@ const styles = tv({
 });
 
 export const Select = forwardRef<HTMLSelectElement, SelectComponentProps>(
-    ({ className, variant, size, label, error, options, placeholder, children, ...rest }, ref) => (
+    ({ className, size, label, error, options, placeholder, children, ...rest }, ref) => (
         <div className="w-full">
             <div className="flex items-center justify-between">
                 {label && (
