@@ -4,10 +4,7 @@ import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { TaskJobData } from "./task-queue.js";
 
-export async function markTaskRunning(
-    taskId: string,
-    runToken: string,
-): Promise<boolean> {
+export async function markTaskRunning(taskId: string, runToken: string): Promise<boolean> {
     return prisma.$transaction(async (tx) => {
         const claimed = await tx.task.updateMany({
             where: {
@@ -62,10 +59,7 @@ export async function releaseTaskRun(taskId: string, runToken: string): Promise<
     });
 }
 
-export async function handleTaskFailure(
-    job: Job<TaskJobData> | undefined,
-    error: Error,
-): Promise<void> {
+export async function handleTaskFailure(job: Job<TaskJobData> | undefined, error: Error): Promise<void> {
     if (!job) {
         logger.error('task_worker', { error: 'missing_job' });
         return;

@@ -30,6 +30,60 @@ function remotePath(directory: string, filename: string): string {
     return `${directory.replace(/\/$/, "")}/${filename}`;
 }
 
+/** Verzeichnisanteil eines Remote-Pfads, ohne abschließenden Schrägstrich. */
+function directoryOf(path: string): string {
+    return path.slice(0, path.lastIndexOf("/"));
+}
+
+export class RemoteDocumentExistsError extends Error {
+    constructor(public readonly remotePath: string) {
+        super(`Remote document ${remotePath} already exists.`);
+        this.name = "RemoteDocumentExistsError";
+    }
+}
+
+/**
+ * Benennt eine hochgeladene Datei um und gibt den neuen Pfad zurück.
+ *
+ * Das Zielverzeichnis wird aus dem bisherigen Pfad abgeleitet, nicht aus den
+ * `env`-Variablen: die Datei soll dort bleiben, wo sie tatsächlich liegt, auch
+ * wenn die konfigurierten Verzeichnisse sich seit dem Upload geändert haben.
+ *
+ * Ein belegter Zielpfad wird als {@link RemoteDocumentExistsError} gemeldet
+ * statt überschrieben — sonst ginge ein fremdes Dokument verloren.
+ */
+export async function moveDocumentArtifact(from: string, filename: string): Promise<string> {
+    const to = remotePath(directoryOf(from), filename);
+    if (to === from) return from;
+
+    const client = getNextCloudClient();
+
+    if (await client.exists(to)) {
+        throw new RemoteDocumentExistsError(to);
+    }
+
+    await client.moveFile(from, to);
+    return to;
+}
+
+/**
+ * Entfernt eine hochgeladene Datei.
+ *
+ * Bewusst idempotent: eine bereits fehlende Datei gilt als Erfolg. Andernfalls
+ * ließe sich ein Dokument, dessen Datei jemand von Hand auf Nextcloud entfernt
+ * hat, in der Anwendung nie wieder löschen.
+ */
+export async function deleteDocumentArtifact(path: string): Promise<void> {
+    const client = getNextCloudClient();
+
+    if (!await client.exists(path)) {
+        logger.debug('nextcloud_delete_skipped_missing', { path });
+        return;
+    }
+
+    await client.deleteFile(path);
+}
+
 function toBuffer(content: Buffer | ArrayBuffer | string): Buffer {
     if (Buffer.isBuffer(content)) return content;
     if (typeof content === "string") return Buffer.from(content);

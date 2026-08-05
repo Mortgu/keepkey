@@ -6,9 +6,16 @@ import type { ReactNode } from "react";
 export interface ActionMenuItem {
     label: string;
     icon?: ReactNode;
-    onSelect: () => void;
+    onSelect?: () => void;
+    /** Wenn gesetzt, wird ein <a> gerendert (z. B. für Downloads). */
+    href?: string;
+    /** Mit href: erzwingt Download statt Navigation. */
+    download?: string;
     danger?: boolean;
     disabled?: boolean;
+
+    condition?: boolean;
+
 }
 
 export interface ActionMenuProps {
@@ -16,15 +23,18 @@ export interface ActionMenuProps {
     className?: string;
     /** Accessible label for the trigger button. */
     label?: string;
+    icon?: ReactNode;
 }
 
 /**
  * Ellipsis trigger that opens a small action list. Stops click propagation so
  * it can sit inside a clickable table row without triggering the row handler.
  */
-export function ActionMenu({ items, className, label = "Aktionen" }: ActionMenuProps) {
+export function ActionMenu({ items, className, label = "Aktionen", icon }: ActionMenuProps) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
+    const resolvedIcon = icon ? icon : <EllipsisVertical size={14} />
 
     useEffect(() => {
         if (!open) return;
@@ -56,39 +66,68 @@ export function ActionMenu({ items, className, label = "Aktionen" }: ActionMenuP
                 aria-label={label}
                 aria-haspopup="menu"
                 aria-expanded={open}
-                icon={<EllipsisVertical className="size-4 text-(--border-200)" />}
+                icon={resolvedIcon}
                 onClick={() => setOpen((o) => !o)}
             />
 
             {open && (
-                <div
-                    role="menu"
-                    className="absolute top-[calc(100%+4px)] right-0 z-50 min-w-[184px] overflow-hidden rounded-md border border-(--border) bg-white py-1 shadow-[0_4px_12px_rgba(0,0,0,0.10)]"
-                >
+                <div role="menu" className="absolute top-[calc(100%+4px)] right-0 z-50 min-w-fit overflow-hidden rounded-md border border-(--border) bg-white py-1 shadow-[0_4px_12px_rgba(0,0,0,0.10)]">
                     {items.map((item) => (
-                        <button
-                            key={item.label}
-                            type="button"
-                            role="menuitem"
-                            disabled={item.disabled}
-                            onClick={() => {
-                                setOpen(false);
-                                item.onSelect();
-                            }}
-                            className={[
-                                "flex w-full items-center gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
-                                "disabled:cursor-not-allowed disabled:opacity-50",
-                                item.danger
-                                    ? "text-(--destructive) hover:bg-(--destructive-subtle)"
-                                    : "text-(--text) hover:bg-(--page-bg)",
-                            ].join(" ")}
-                        >
-                            {item.icon}
-                            <span className="flex-1">{item.label}</span>
-                        </button>
+                        <ActionMenuItem key={item.label} item={item} setOpen={setOpen} />
                     ))}
                 </div>
             )}
         </div>
+    );
+}
+
+interface ActionMenuItemProps {
+    item: ActionMenuItem;
+    setOpen: (value: boolean) => void;
+}
+
+function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
+    const { label, icon, onSelect, href, download, danger, disabled, condition = true } = item;
+    const isDisabled = disabled || !condition;
+
+    const className = [
+        "flex w-full items-center gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
+        isDisabled ? "cursor-not-allowed opacity-50" : "",
+        danger
+            ? "text-(--destructive) hover:bg-(--destructive-subtle)"
+            : "text-(--text) hover:bg-(--page-bg)",
+    ].join(" ");
+
+    if (href && !isDisabled) {
+        return (
+            <a
+                key={label}
+                role="menuitem"
+                href={href}
+                download={download}
+                onClick={() => setOpen(false)}
+                className={className}
+            >
+                {icon}
+                <span className="flex-1 whitespace-pre">{label}</span>
+            </a>
+        );
+    }
+
+    return (
+        <button
+            key={label}
+            type="button"
+            role="menuitem"
+            disabled={isDisabled}
+            onClick={() => {
+                onSelect?.();
+                setOpen(false);
+            }}
+            className={className}
+        >
+            {icon}
+            <span className="flex-1 whitespace-pre">{label}</span>
+        </button>
     );
 }
