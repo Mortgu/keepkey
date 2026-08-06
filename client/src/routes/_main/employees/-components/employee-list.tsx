@@ -1,41 +1,33 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import UserModal from "./user-modal";
 import UserListItem from "./user-list-item";
 
 import type { User } from "@keepit/schemas";
 import { useModal, useUsers } from "@/hooks";
-import { ListPage, SearchBar } from "@/components";
+import type { EmployeeFilter } from "../-hooks/use-employee-filters";
 
-export default function EmployeeList() {
+interface Props {
+  filters: EmployeeFilter;
+  onEdit: (employee: User) => void;
+}
+
+
+export default function EmployeeList({ filters, onEdit }: Props) {
   const { t } = useTranslation();
-  const { users, isPending, error } = useUsers();
+  const { users, isPending, error } = useUsers(filters.params);
   const modal = useModal<User>();
 
   const [searchInput, setSearchInput] = useState<string>("");
 
   return (
-    <ListPage
-      title={t("section.employees")}
-      items={users}
-      isPending={isPending}
-      error={error}
-      keyOf={(u) => u.id}
-      createLabel={t("button.create")}
-      onCreate={() => modal.open()}
-      toolbar={
-        <SearchBar
-          value={searchInput}
-          onChange={setSearchInput}
-          onSubmit={() => setSearchInput(searchInput)}
-          placeholder={t("common.search")}
+    <div className="grid gap-4">
+      {users.map((user) => (
+        <UserListItem
+          key={user.id}
+          user={user}
+          onEdit={onEdit}
         />
-      }
-      renderItem={(user) => <UserListItem user={user} />}
-    >
-      {modal.isOpen && (
-        <UserModal key={modal.key} currentUser={null} onClose={modal.close} />
-      )}
-    </ListPage>
+      ))}
+    </div>
   );
 }

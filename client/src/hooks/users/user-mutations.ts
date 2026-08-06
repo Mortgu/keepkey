@@ -33,7 +33,7 @@ export function useUpdateUser() {
     });
 
     return {
-        updateUser: mutation.mutate,
+        updateUser: mutation.mutateAsync,
         isUpdatingUser: mutation.isPending,
         errorUpdatingUser: mutation.error,
     };

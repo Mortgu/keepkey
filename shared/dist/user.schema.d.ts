@@ -41,4 +41,9 @@ export declare const userListSchema: z.ZodArray<z.ZodObject<{
     updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
 }, z.core.$strip>>;
 export type UserList = z.infer<typeof userListSchema>;
+export declare const userFilterSchema: z.ZodObject<{
+    search: z.ZodOptional<z.ZodString>;
+    sort: z.ZodOptional<z.ZodString>;
+}, z.core.$strip>;
+export type UserFilterParams = z.infer<typeof userFilterSchema>;
 //# sourceMappingURL=user.schema.d.ts.map

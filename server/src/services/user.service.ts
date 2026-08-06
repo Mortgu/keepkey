@@ -1,22 +1,30 @@
-import { z } from "zod";
 import { prisma } from "../lib/prismaClient.js";
 import { auth } from "../lib/auth.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     type CreateContactInput,
     type CreateUserInput,
-    type UpdateUserInput,
-    userSchema,
-    userListSchema,
+    type UpdateUserInput, UserFilterParams
 } from "@keepit/schemas";
-
-type User = z.input<typeof userSchema>;
-type UserList = z.input<typeof userListSchema>;
 
 /* ========== Queries ========== */
 
-export async function getAllUsers(): Promise<UserList> {
+export async function getAllUsers(query: UserFilterParams) {
+    const { search, sort } = query;
+
+    const where: {
+        name?: { contains: string };
+    } = {};
+
+    if (search && typeof search === "string") {
+        where.name = { contains: search };
+    }
+
+    const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+
     return prisma.user.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
+        orderBy,
         include: {
             orders: true,
             customer: true,
@@ -25,7 +33,7 @@ export async function getAllUsers(): Promise<UserList> {
     });
 }
 
-export async function getUserById(id: string): Promise<User> {
+export async function getUserById(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {

@@ -1,11 +1,6 @@
-import {createFileRoute} from '@tanstack/react-router'
-import SupplierList from './-components/supplier-list'
-import {PageWidth} from '@/components'
+import { createFileRoute } from '@tanstack/react-router'
+import SupplierPage from './-page'
 
 export const Route = createFileRoute('/_main/suppliers/')({
-    component: () => (
-        <PageWidth>
-            <SupplierList/>
-        </PageWidth>
-    ),
+    component: SupplierPage,
 })

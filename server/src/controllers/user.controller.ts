@@ -6,8 +6,8 @@ import { userListSchema, userSchema } from "@keepit/schemas";
 
 /* ========== GET ========== */
 
-export const getAllUsers = async (request: Request, response: Response) => {
-    const users = await userService.getAllUsers();
+export const getUsers = async (request: Request, response: Response) => {
+    const users = await userService.getAllUsers(request.query);
     return response.status(200).json(userListSchema.parse(users));
 };
 

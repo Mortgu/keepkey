@@ -1,44 +1,62 @@
-import { Fragment } from "react";
-import UserModal from "./user-modal";
 
 import type { User } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
-import { useDeleteUser, useModal } from "@/hooks";
-import { ListItemRow } from "@/components";
+import { Button } from "@/components";
+import { Pen, Trash } from "lucide-react";
+import { useDeleteUser } from "@/hooks";
 
 interface UserListItemProps {
   user: User;
+  onEdit: (user: User) => void;
 }
 
-export default function UserListItem({ user }: UserListItemProps) {
-  const modal = useModal<User>();
-
+export default function UserListItem({ user, onEdit }: UserListItemProps) {
   const { deleteUser, isDeletingUser } = useDeleteUser();
 
-  return (
-    <Fragment>
-      <ListItemRow
-        onEdit={() => modal.open(user)}
-        onDelete={() => deleteUser(user.id)}
-        deleteLoading={isDeletingUser}
-        editLabel="Nutzer bearbeiten"
-        deleteLabel="Nutzer löschen"
-      >
-        <div className="grid gap-0">
-          <h1 className="text-md">
-            {user.firstName} {user.lastName}
-          </h1>
-          <p className="text-sm text-gray-500">{formatDate(user.createdAt)}</p>
-        </div>
-      </ListItemRow>
+  const handleDeleteUser = (id: string) => {
+    if (confirm(`Möchten Sie "${user.name}" wirklich löschen?`)) {
+      deleteUser(id);
+    }
 
-      {modal.isOpen && (
-        <UserModal
-          key={modal.key}
-          currentUser={modal.data ?? null}
-          onClose={modal.close}
-        />
-      )}
-    </Fragment>
+    return;
+  }
+
+  return (
+    <div className="grid items-center border border-(--border) rounded-md overflow-hidden">
+      <div className="grid bg-(--page-bg) px-4 py-3">
+        <p className="text-md">{user.name}</p>
+        <p className="text-sm text-(--text-secondary)">{formatDate(user.createdAt)}</p>
+      </div>
+
+      <div className="flex items-center justify-between border-t border-(--border) px-4 py-2">
+
+        <div className="flex items-center">
+
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            size="xs"
+            variant="border"
+            icon={<Pen size={14} />}
+            iconOnly
+            aria-label="Zulieferer bearbeiten"
+            onClick={() => onEdit(user)}
+          />
+
+          <Button
+            size="xs"
+            variant="border"
+            icon={<Trash size={14} />}
+            iconOnly
+            aria-label="Zulieferer löschen"
+            onClick={() => handleDeleteUser(user.id)}
+            loading={isDeletingUser}
+          />
+        </div>
+
+      </div>
+
+    </div>
   );
 }

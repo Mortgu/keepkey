@@ -2,16 +2,33 @@ import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     CreateSupplierInput,
+    SupplierFilterParams,
     UpdateSupplierInput,
 } from "@keepit/schemas";
 
 
 /* ========== Queries ========== */
 
-export async function getSuppliers() {
+export async function getSuppliers(query: SupplierFilterParams) {
+    const { search, sort } = query;
+
+    const where: {
+        name?: { contains: string };
+    } = {};
+
+    if (search && typeof search === "string") {
+        where.name = { contains: search };
+    }
+
+    const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+
     return prisma.supplier.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
+        orderBy,
         include: {
-            offers: true,
+            _count: {
+                select: { offers: true, orders: true },
+            }
         }
     });
 }

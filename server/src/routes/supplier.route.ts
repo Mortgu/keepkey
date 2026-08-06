@@ -5,16 +5,15 @@ import {
   getSuppliers,
   updateSupplier,
 } from "@/controllers/index.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
-  createSupplierSchema,
-  updateSupplierSchema,
+  createSupplierSchema, supplierFilterSchema, updateSupplierSchema
 } from "@keepit/schemas";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/supplier */
-router.get("/", getSuppliers);
+router.get("/", validateQuery(supplierFilterSchema), getSuppliers);
 
 /* [POST] http://localhost:3000/api/supplier */
 router.post("/", validate(createSupplierSchema), createSupplier);

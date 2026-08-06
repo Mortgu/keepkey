@@ -30,3 +30,9 @@ export type User = z.infer<typeof userSchema>;
 
 export const userListSchema = z.array(userSchema);
 export type UserList = z.infer<typeof userListSchema>;
+
+export const userFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.string().optional(),
+});
+export type UserFilterParams = z.infer<typeof userFilterSchema>;
