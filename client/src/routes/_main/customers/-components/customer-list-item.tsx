@@ -14,16 +14,15 @@ interface Props {
 }
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
-    const {
-        deleteCustomer,
-        isDeletingCustomer
-    } = useDeleteCustomer();
+    const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
+
         if (confirm(`Möchten Sie den Kunden ${customer.companyName} wirklich löschen?`)) {
             deleteCustomer({ customerId: customer.id });
         }
+
         return;
     }
 
@@ -56,11 +55,11 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     </div>
                     <div className="grid gap-1 text-right border-r border-(--border) px-6">
                         <p className="text-xs text-gray-400">Angebote</p>
-                        <p className="font-mono text-md">{customer.orders.length}</p>
+                        <p className="font-mono text-md">{customer._count.offers}</p>
                     </div>
                     <div className="grid gap-1 text-right pl-6">
                         <p className="text-xs text-gray-400">Bestellungen</p>
-                        <p className="font-mono text-md">{customer.orders.length}</p>
+                        <p className="font-mono text-md">{customer._count.orders}</p>
                     </div>
                 </div>
             </Link>

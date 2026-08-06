@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { isoDateTime } from './common.js';
 import { contactListSchema } from './contact.schema.js';
-import { orderListSchema } from './order.schema.js';
 import { currencySchema } from './currency.schema.js';
 import { languageSchema } from './language.schema.js';
 
@@ -48,7 +47,11 @@ export const customerSchema = createCustomerSchema.extend({
     id: z.string(),
 
     contactPersons: contactListSchema,
-    orders: orderListSchema,
+
+    _count: z.object({
+        offers: z.int().positive(),
+        orders: z.int().positive(),
+    }),
 
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
@@ -62,4 +65,4 @@ export const customerFiltersSchema = z.object({
     search: z.string().optional(),
     sort: z.string().optional(),
 });
-export type CustomerFilters = z.infer<typeof customerFiltersSchema>;
+export type CustomerFilterParams = z.infer<typeof customerFiltersSchema>;

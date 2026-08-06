@@ -10,12 +10,13 @@ import {
     updateCustomer,
     updateCustomerContact
 } from "@/controllers/index.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
     createContactSchema,
     updateContactSchema,
     createCustomerSchema,
-    updateCustomerSchema
+    updateCustomerSchema,
+    customerFiltersSchema
 } from "@keepit/schemas";
 
 const router = Router();
@@ -23,7 +24,7 @@ const router = Router();
 /* ========== Customer ========== */
 
 /* [GET] /api/customers */
-router.get('/', getCustomers);
+router.get('/', validateQuery(customerFiltersSchema), getCustomers);
 
 /* [GET] /api/customers/:id */
 router.get('/:id', getCustomer);
