@@ -1,103 +1,82 @@
-import { useForm } from "@tanstack/react-form";
 
-import {
-    
-    createUserSchema
-} from '@keepit/schemas';
-import type {User} from '@keepit/schemas';
-import { useUserManager } from "@/hooks";
-import { FieldInput, FormModal } from "@/components";
+import type { User } from '@keepit/schemas';
+import { Button, FieldInput, ModalDialog } from "@/components";
+import useEmployeeForm from "../-hooks/use-employee-form";
+import { useTranslation } from 'react-i18next';
 
-
-interface UserModalProps {
+interface Props {
     onClose: () => void;
-    currentUser: User | null;
+    currentEmployee?: User | null;
 }
 
-const emptyUser = {
-    firstName: "",
-    lastName: "",
-    salutation: "",
-    email: "",
-    phone: "",
-    password: "",
-};
+export default function UserModal({ onClose, currentEmployee }: Props) {
+    const { t } = useTranslation();
 
-export default function UserModal({ onClose, currentUser }: UserModalProps) {
-    const isEdit = currentUser !== null;
-
-    const { updateUser, createUser } = useUserManager();
-
-    const userForm = useForm({
-        defaultValues: isEdit ? {
-            firstName: currentUser.firstName,
-            lastName: currentUser.lastName,
-            salutation: currentUser.salutation,
-            email: currentUser.email,
-            phone: currentUser.phone ?? "",
-            password: "",
-        } : emptyUser,
-        validators: {
-            onChange: createUserSchema,
-            onMount: createUserSchema,
-        },
-        onSubmit: async ({ value }) => {
-            if (isEdit) {
-                updateUser({ id: currentUser.id, body: value });
-            } else {
-                await createUser({ ...value });
-            }
-            onClose();
-        },
+    const { form, formId, handleSubmit } = useEmployeeForm({
+        currentEmployee, onClose,
     });
 
     return (
-        <FormModal
-            form={userForm}
-            onClose={onClose}
-            title={<h1 className="text-lg">{isEdit ? "Nutzer bearbeiten" : "Neuen Nutzer anlegen"}</h1>}
-            formId="user-form"
-            size="xs"
-        >
-            <div className="flex items-center gap-4">
-                <userForm.Field name="salutation" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="Anrede" size="sm" />
-                    </div>
-                )} />
+        <ModalDialog onClose={onClose}>
+            <ModalDialog.Header>
+                <h1 className="text-lg">
+                    {currentEmployee && "Angestellten bearbeiten"}
+                    {!currentEmployee && "Neuen Angestellten anlegen"}
+                </h1>
+            </ModalDialog.Header>
+            <ModalDialog.Content>
+                <form id={formId} onSubmit={handleSubmit} className='grid gap-4'>
+                    <div className="flex items-center gap-4">
+                        <form.Field name="salutation" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} label="Anrede" size="sm" />
+                            </div>
+                        )} />
 
-                <userForm.Field name="firstName" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} size="sm" label="Vorname" />
-                    </div>
-                )} />
+                        <form.Field name="firstName" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} size="sm" label="Vorname" />
+                            </div>
+                        )} />
 
-                <userForm.Field name="lastName" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} size="sm" label="Nachname" />
+                        <form.Field name="lastName" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} size="sm" label="Nachname" />
+                            </div>
+                        )} />
                     </div>
-                )} />
-            </div>
 
-            <div className="flex items-center gap-4">
-                <userForm.Field name="email" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="E-Mail" size="sm" />
-                    </div>
-                )} />
+                    <div className="flex items-center gap-4">
+                        <form.Field name="email" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} label="E-Mail" size="sm" />
+                            </div>
+                        )} />
 
-                <userForm.Field name="phone" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} label="Telefonnummer" size="sm" />
-                    </div>
-                )} />
+                        <form.Field name="phone" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} label="Telefonnummer" size="sm" />
+                            </div>
+                        )} />
 
-                <userForm.Field name="password" children={(field) => (
-                    <div className="flex-1 grid gap-2">
-                        <FieldInput field={field} type="password" size="sm" label="Passwort" />
+                        <form.Field name="password" children={(field) => (
+                            <div className="flex-1 grid gap-2">
+                                <FieldInput field={field} type="password" size="sm" label="Passwort" />
+                            </div>
+                        )} />
                     </div>
+                </form>
+            </ModalDialog.Content>
+            <ModalDialog.Footer>
+                <Button onClick={onClose} type="button" size="sm" variant="border">
+                    {t("button.cancel")}
+                </Button>
+                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                    <Button type="submit" form={formId} size="sm" disabled={!canSubmit} loading={isSubmitting}>
+                        {t("button.save")}
+                    </Button>
                 )} />
-            </div>
-        </FormModal>
+            </ModalDialog.Footer>
+        </ModalDialog>
     );
 }

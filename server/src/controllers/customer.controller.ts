@@ -5,8 +5,7 @@ import * as customerService from "../services/customer.service.js";
 /* ========== GET ========== */
 
 export const getCustomers = async (request: Request, response: Response) => {
-    const { search, sort } = request.query as { search?: string; sort?: string };
-    const customers = await customerService.getCustomers({ search, sort });
+    const customers = await customerService.getCustomers(request.query);
     return response.status(200).json(customers);
 };
 

@@ -18,7 +18,7 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
     focus?: boolean;
 }
 
-const styles = tv({
+export const buttonStyles = tv({
     base: [
         'w-fit h-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-md h-fit',
         'transition-all duration-200 outline-none font-medium',
@@ -126,7 +126,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
         return (
             <button
                 ref={ref}
-                className={styles({ variant, size, active, danger, iconOnly, className })}
+                className={buttonStyles({ variant, size, active, danger, iconOnly, className })}
                 disabled={loading || rest.disabled}
                 {...rest}
             >

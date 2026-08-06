@@ -21,4 +21,8 @@ export const userSchema = z.object({
     updatedAt: isoDateTime,
 });
 export const userListSchema = z.array(userSchema);
+export const userFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.string().optional(),
+});
 //# sourceMappingURL=user.schema.js.map

@@ -1,17 +1,15 @@
-import { Fragment } from "react";
-import { Pen, Trash } from "lucide-react";
-import SupplierModal from "./supplier-modal";
+import { Dot, Pen, Trash } from "lucide-react";
 import type { Supplier } from "@keepit/schemas";
-import { useDeleteSupplier, useModal } from "@/hooks";
+import { useDeleteSupplier } from "@/hooks";
 import { Badge, Button } from "@/components";
+import { formatDate } from "@/lib/format";
 
 type Props = {
     supplier: Supplier;
+    onEdit: (supplier: Supplier) => void;
 };
 
-export default function SupplierListItem({ supplier }: Props) {
-    const modal = useModal<Supplier>();
-
+export default function SupplierListItem({ supplier, onEdit }: Props) {
     const { deleteSupplier, isDeletingSupplier } = useDeleteSupplier();
 
     const handleDeleteSupplier = () => {
@@ -21,43 +19,49 @@ export default function SupplierListItem({ supplier }: Props) {
     }
 
     return (
-        <Fragment>
-            <div className="flex items-center justify-between bg-(--page-bg) border border-(--border) rounded-md overflow-hidden px-4 py-3">
-                <div className="grid gap-1">
-                    <div className="flex items-center gap-2">
-                        <p className="text-md">{supplier.name}</p>
-                        {supplier.supplierId && (
-                            <Badge variant="draft" className="text-sm">{supplier.supplierId}</Badge>
-                        )}
-                    </div>
+        <div className="grid items-center border border-(--border) rounded-md overflow-hidden">
+            <div className="grid bg-(--page-bg) px-4 py-3">
+                <div className="flex items-center gap-2">
+                    <p className="text-md">{supplier.name}</p>
+                    {supplier.supplierId && (
+                        <Badge variant="generated" className="text-sm">{supplier.supplierId}</Badge>
+                    )}
+                </div>
 
-                    <p className="text-sm text-(--text-secondary)">{supplier.offers.length} Angebot</p>
+                <p className="text-sm text-(--text-secondary)">{formatDate(supplier.createdAt)}</p>
+
+            </div>
+
+            <div className="flex items-center justify-between border-t border-(--border) px-4 py-2">
+
+                <div className="flex items-center">
+                    <p className="text-sm">{supplier._count.offers} Angebot</p>
+                    <Dot size={18} />
+                    <p className="text-sm">{supplier._count.orders} Bestellungen</p>
                 </div>
 
                 <div className="flex items-center gap-2">
                     <Button
-                        size="sm"
+                        size="xs"
                         variant="border"
-                        icon={<Pen className="size-3.5" />}
+                        icon={<Pen size={14} />}
                         iconOnly
                         aria-label="Zulieferer bearbeiten"
-                        onClick={() => modal.open(supplier)}
+                        onClick={() => onEdit(supplier)}
                     />
                     <Button
-                        size="sm"
+                        size="xs"
                         variant="border"
-                        icon={<Trash className="size-3.5" />}
+                        icon={<Trash size={14} />}
                         iconOnly
                         aria-label="Zulieferer löschen"
                         onClick={handleDeleteSupplier}
                         loading={isDeletingSupplier}
                     />
                 </div>
+
             </div>
 
-            {modal.isOpen && (
-                <SupplierModal key={modal.key} currentSupplier={modal.data ?? undefined} onClose={modal.close} />
-            )}
-        </Fragment>
+        </div>
     )
 }

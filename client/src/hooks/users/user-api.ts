@@ -2,15 +2,18 @@ import type {
     CreateUserInput,
     UpdateUserInput,
     User,
+    UserFilterParams,
 } from '@keepit/schemas';
 import { api } from "@/lib/api-client";
-
+import { formatQueryString } from '@/lib/utils';
 
 export const getSessionUser = () =>
     api<User>("/api/users/session", { method: "GET" });
 
-export const getUsers = () =>
-    api<Array<User>>("/api/users", { method: "GET" });
+export const getUsers = (filters: UserFilterParams = {}) =>
+    api<Array<User>>(`/api/users?${formatQueryString(filters)}`, {
+        method: "GET"
+    });
 
 export const createUser = (body: CreateUserInput) =>
     api<User>("/api/users", {

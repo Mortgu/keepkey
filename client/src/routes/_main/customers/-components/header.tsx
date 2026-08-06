@@ -19,9 +19,6 @@ export default function CustomerPageHeader({ onCreate }: Props) {
                     </p>
                 </div>
                 <div className="flex items-center gap-4">
-                    {/* <Button icon={<Download size={14} />} variant="border" size="sm">
-                        {t("button.export")}
-                    </Button>*/}
                     <Button
                         icon={<Plus size={14} strokeWidth={3} />}
                         variant="primary"

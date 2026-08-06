@@ -1,9 +1,9 @@
-import { Download, File, LoaderCircle, Pencil, Trash, UploadCloud } from "lucide-react";
+import { Download, ExternalLink, File, LoaderCircle, Pencil, Trash2, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { findDocumentArtifact } from "@keepit/schemas";
 import type { OfferDocument } from "@keepit/schemas";
-import { Button, DocumentRenameModal, showToast } from "@/components";
+import { ActionMenu, Button, DocumentRenameModal, showToast } from "@/components";
 import { useDocumentMutations, useDocumentTask } from "@/hooks";
 import { documentDownloadUrl } from "@/data/documents";
 import { getErrorMessage } from "@/lib/errors";
@@ -67,35 +67,9 @@ export default function OfferCardDocument({ offerDocument }: Props) {
 
             <div className="flex items-center ">
                 {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
-                    <>
-                        <a href={documentDownloadUrl("offer", offerDocument.id, "pdf")} download>
-                            <Button variant="ghost" size="sm" icon={<Download className="size-4" />} iconOnly title="PDF herunterladen" />
-                        </a>
-                        <a href={documentDownloadUrl("offer", offerDocument.id, "docx")} download>
-                            <Button variant="ghost" size="sm" icon={<File className="size-4" />} iconOnly title="DOCX herunterladen" />
-                        </a>
-                    </>
-                )}
-
-                {(status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING") && (
-                    <>
-                        <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
-                            onClick={() => uploadDocument(offerDocument.id)} loading={isUploadingDocument}
-                            disabled={status === "UPLOADED" || isUploadingDocument}
-                        />
-                    </>
-                )}
-
-                {(status === "GENERATED" || status === "UPLOADED") && (
-                    <Button variant="ghost" size="sm" icon={<Pencil className="size-4" />} iconOnly
-                        title="Dokument umbenennen" onClick={() => setRenameOpen(true)} />
-                )}
-
-                {(status === "GENERATED" || status === "UPLOADED" || status === "FAILED") && (
-                    <Button variant="ghost" size="sm" icon={<Trash className="size-4" />} iconOnly
-                        onClick={() => deleteDocument(offerDocument.id)}
-                        loading={isDeletingDocument}
-                        disabled={isDeletingDocument}
+                    <Button variant="ghost" size="sm" icon={<UploadCloud className="size-4" />} iconOnly
+                        onClick={() => uploadDocument(offerDocument.id)} loading={isUploadingDocument}
+                        disabled={status === "UPLOADED" || isUploadingDocument}
                     />
                 )}
 
@@ -105,7 +79,58 @@ export default function OfferCardDocument({ offerDocument }: Props) {
                     </div>
                 )}
 
+                {(status !== "PENDING" && status !== "PROCESSING") && (
+                    <>
+                        <ActionMenu
+                            label="Downloads"
+                            icon={<Download size={14} />}
+                            items={[
+                                {
+                                    label: "PDF herunterladen",
+                                    icon: <Download size={14} />,
+                                    href: documentDownloadUrl("offer", offerDocument.id, "pdf"),
+                                    download: "",
+                                    condition: status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING"
+                                },
+                                {
+                                    label: "DOCX herunterladen",
+                                    icon: <File size={14} />,
+                                    href: documentDownloadUrl("offer", offerDocument.id, "docx"),
+                                    download: "",
+                                    condition: status === "GENERATED" || status === "UPLOADED" || status === "UPLOADING"
+                                },
+                            ]}
+                        />
 
+                        <ActionMenu
+                            label="Aktionen"
+                            items={[
+                                {
+                                    label: "In NextCloud ansehen",
+                                    icon: <ExternalLink className="size-3.5" />,
+                                    onSelect: () => { },
+                                    condition: status === "FAILED",
+                                },
+                                {
+                                    label: "Bearbeiten",
+                                    icon: <Pencil className="size-3.5" />,
+                                    onSelect: () => setRenameOpen(true),
+                                    // Auch nach dem Upload: das Umbenennen verschiebt die
+                                    // Dateien auf Nextcloud mit.
+                                    condition: status === "GENERATED" || status === "UPLOADED"
+                                },
+                                {
+                                    label: "Löschen",
+                                    icon: <Trash2 className="size-3.5" />,
+                                    danger: true,
+                                    disabled: isDeletingDocument,
+                                    onSelect: () => deleteDocument(offerDocument.id),
+                                    condition: status === "GENERATED" || status === "UPLOADED" || status === "FAILED"
+                                },
+                            ]}
+                        />
+                    </>
+                )}
             </div>
             {renameOpen && (
                 <DocumentRenameModal

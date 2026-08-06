@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-import { useForm } from "@tanstack/react-form";
 import { ArrowLeft, Search } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -11,6 +10,7 @@ import { useCreateOrder, useNextOrderNumber } from "@/hooks";
 
 import { Button, Input, ModalDialog, Textarea } from "@/components";
 import { useOffers } from "@/hooks/offers/offer-hooks";
+import useOrderForm from "../-hooks/use-order-form";
 
 
 interface OrderModalProps {
@@ -37,29 +37,8 @@ export default function OrderModal({ onClose, customerId }: OrderModalProps) {
   const { nextOrderNumber } = useNextOrderNumber();
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
 
-  const form = useForm({
-    defaultValues: {
-      orderId: nextOrderNumber ?? "",
-      date: toInputDate(new Date()),
-      projectNumber: "",
-      projectDescription: "",
-      orderDetails: "",
-    },
-    validators: {
-      onChange: orderSchema,
-    },
-    onSubmit: async ({ value }) => {
-      if (!selectedOffer) return;
-      await createOrder({
-        id: selectedOffer.id,
-        orderId: value.orderId,
-        date: value.date,
-        projectNumber: value.projectNumber || undefined,
-        projectDescription: value.projectDescription || undefined,
-        orderDetails: value.orderDetails || undefined,
-      });
-      onClose();
-    },
+  const { form } = useOrderForm({
+    closeFn: onClose,
   });
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -97,13 +76,12 @@ export default function OrderModal({ onClose, customerId }: OrderModalProps) {
               <div key={offer.id} className="border border-(--border) rounded-md p-2 hover:border-(--primary) hover:cursor-pointer hover:bg-(--primary-100)"
                 onClick={() => setSelectedOffer(offer)}>
                 <div className="grid">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <p className="text-gray-600 font-normal">
+                      [{offer.quoteId}]
+                    </p>
                     <p className="text-(--text) font-normal">
                       {offer.customer.companyName}
-                    </p>
-                    -
-                    <p className="text-(--text) font-normal">
-                      {offer.quoteId}
                     </p>
                   </div>
 
@@ -191,7 +169,7 @@ export default function OrderModal({ onClose, customerId }: OrderModalProps) {
             </Button>
           </>
         ) : (
-          <Button onClick={onClose} type="button" size="sm" variant="secondary">
+          <Button onClick={onClose} type="button" size="sm" variant="border">
             {t("button.cancel")}
           </Button>
         )}

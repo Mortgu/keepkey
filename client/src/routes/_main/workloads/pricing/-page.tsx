@@ -32,24 +32,32 @@ export default function PricingPage() {
     }
 
     return (
-        <PageWidth>
-            <div className="grid gap-4">
-                {/* Page header */}
+        <PageWidth variant="none">
+
+            {/* Page header */}
+            <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-medium">{t('section.workloads')}</h1>
-                </div>
+                    <div className="flex-1 grid gap-1">
+                        <h1 className="font-medium text-xl">{t('section.workloads')}</h1>
+                        <p className="font-light text-sm text-gray-400">
+                            Zentrale Preistabellen Verwaltung
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-4">
 
-                {/* Page header actions */}
-                <div className="flex items-center justify-between gap-4">
-                    <div></div>
-
-                    <div className="flex items-center gap-2">
-                        <Button onClick={() => modal.open()} size="sm">
-                            {t('button.create')} <Plus className="size-4" />
+                        <Button
+                            icon={<Plus size={14} strokeWidth={3} />}
+                            variant="primary"
+                            size="sm"
+                            onClick={() => modal.open()}
+                        >
+                            {t("customer.create")}
                         </Button>
                     </div>
                 </div>
+            </div>
 
+            <div className="grid gap-4 px-8 py-6">
                 {groups.map(group => (
                     <PricingTable key={group.id} group={group} />
                 ))}

@@ -1,10 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getUsers } from "./user-api";
 import { userKeys } from "./user-keys";
+import type { UserFilterParams } from "@keepit/schemas";
 
 export const userQueries = {
-    list: () => queryOptions({
-        queryKey: userKeys.list(),
-        queryFn: getUsers,
+    list: (filters: UserFilterParams = {}) => queryOptions({
+        queryKey: userKeys.list(filters),
+        queryFn: () => getUsers(filters),
     }),
 };

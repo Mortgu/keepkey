@@ -5,7 +5,7 @@ import * as supplierService from "../services/supplier.service.js";
 /* ========== GET ========== */
 
 export const getSuppliers = async (request: Request, response: Response) => {
-    const suppliers = await supplierService.getSuppliers();
+    const suppliers = await supplierService.getSuppliers(request.query);
     return response.status(200).json(suppliers);
 };
 

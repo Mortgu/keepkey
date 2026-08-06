@@ -15,7 +15,8 @@ import {
     CreateOfferFlatrateInput,
     ExtendOfferInput,
     PositionPrice,
-    UpdateOfferInput
+    UpdateOfferInput,
+    OfferFilterParams
 } from '@keepit/schemas';
 
 import {
@@ -42,16 +43,6 @@ type PricedDiscount = {
     description?: string | null;
     amount_cents: number;
 };
-
-export interface OfferListQuery {
-    search?: unknown;
-    companyIds?: unknown;
-    contactPersonIds?: unknown;
-    productIds?: unknown;
-    sort?: unknown;
-    cursor?: unknown;
-    limit?: unknown;
-}
 
 /* ========== Helpers ========== */
 
@@ -229,7 +220,7 @@ function sumDiscounts(discounts: ReadonlyArray<PricedDiscount>): number {
 
 /* ========== Queries ========== */
 
-export async function getOffers(query: OfferListQuery) {
+export async function getOffers(query: OfferFilterParams) {
     const { search, companyIds, contactPersonIds, productIds, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);

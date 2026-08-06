@@ -1,31 +1,30 @@
-import {useTranslation} from "react-i18next";
+import { useTranslation } from "react-i18next";
 import SupplierListItem from "./supplier-list-item";
-import SupplierModal from "./supplier-modal";
-import {ListPage} from "@/components";
-import {useModal, useSuppliers} from "@/hooks";
+import { useSuppliers } from "@/hooks";
+import type { SupplierFilter } from "../-hooks/use-supplier-filters";
+import type { Supplier } from "@keepit/schemas";
 
-export default function SupplierList() {
-    const {t} = useTranslation();
+interface Props {
+    filters: SupplierFilter;
+    onEdit: (supplier: Supplier) => void;
+}
 
-    const modal = useModal();
-    const {suppliers, isPending, error} = useSuppliers();
+export default function SupplierList({ filters, onEdit }: Props) {
+    const { t } = useTranslation();
+
+    const { suppliers, isPending, error } = useSuppliers(filters.params);
+
+    console.log(suppliers);
 
     return (
-        <ListPage
-            title={t("section.suppliers")}
-            items={suppliers}
-            isPending={isPending}
-            error={error}
-            keyOf={(s) => s.id}
-            createLabel={t("button.create")}
-            onCreate={() => modal.open()}
-            renderItem={(supplier) => (
-                <SupplierListItem supplier={supplier}/>
-            )}
-        >
-            {modal.isOpen && (
-                <SupplierModal key={modal.key} onClose={modal.close}/>
-            )}
-        </ListPage>
+        <div className="grid gap-4">
+            {suppliers.map((supplier) => (
+                <SupplierListItem
+                    key={supplier.id}
+                    supplier={supplier}
+                    onEdit={onEdit}
+                />
+            ))}
+        </div>
     );
 }

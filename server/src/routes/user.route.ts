@@ -3,20 +3,21 @@ import {
   createContactPersons,
   createUser,
   deleteUser,
-  getAllUsers,
+  getUsers,
   getSessionUser,
   updateUserById,
 } from "@/controllers/index.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
   createContactSchema,
   createUserSchema,
   updateUserSchema,
+  userFilterSchema,
 } from "@keepit/schemas";
 
 const router = Router();
 
-router.get("/", getAllUsers);
+router.get("/", validateQuery(userFilterSchema), getUsers);
 
 router.get("/session", getSessionUser);
 

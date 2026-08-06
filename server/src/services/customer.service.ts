@@ -6,29 +6,32 @@ import {
 
     CreateContactInput,
     UpdateContactInput,
+    CustomerFilterParams,
 } from "@keepit/schemas";
 
 
 /* ========== Queries ========== */
 
-export async function getCustomers(params?: { search?: string; sort?: string; }) {
+export async function getCustomers(filters: CustomerFilterParams) {
+    const { search, sort } = filters;
+
     const where: Prisma.CustomerWhereInput = {};
 
-    if (params?.search) {
-        const search = params.search.trim();
+    if (search) {
+        const s = search.trim();
         where.OR = [
-            { companyName: { contains: search, mode: "insensitive" } },
-            { customerId: { contains: search, mode: "insensitive" } },
-            { email: { contains: search, mode: "insensitive" } },
-            { phone: { contains: search, mode: "insensitive" } },
-            { contactPersons: { some: { firstName: { contains: search, mode: "insensitive" } } } },
-            { contactPersons: { some: { lastName: { contains: search, mode: "insensitive" } } } },
+            { companyName: { contains: s, mode: "insensitive" } },
+            { customerId: { contains: s, mode: "insensitive" } },
+            { email: { contains: s, mode: "insensitive" } },
+            { phone: { contains: s, mode: "insensitive" } },
+            { contactPersons: { some: { firstName: { contains: s, mode: "insensitive" } } } },
+            { contactPersons: { some: { lastName: { contains: s, mode: "insensitive" } } } },
         ];
     }
 
     let orderBy: Prisma.CustomerOrderByWithRelationInput = { createdAt: "desc" };
-    if (params?.sort) {
-        const [field, direction] = params.sort.split(":") as [string, Prisma.SortOrder | undefined];
+    if (sort) {
+        const [field, direction] = sort.split(":") as [string, Prisma.SortOrder | undefined];
         const dir = direction ?? "desc";
         if (field === "companyName" || field === "createdAt" || field === "customerId") {
             orderBy = { [field]: dir as Prisma.SortOrder };
@@ -40,8 +43,12 @@ export async function getCustomers(params?: { search?: string; sort?: string; })
         orderBy,
         include: {
             contactPersons: true,
-            orders: true,
-            offers: true,
+            _count: {
+                select: {
+                    offers: true,
+                    orders: true,
+                }
+            }
         },
     });
 }

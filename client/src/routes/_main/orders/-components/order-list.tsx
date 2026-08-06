@@ -1,78 +1,23 @@
-import { Plus } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useSearch } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import OrderCard from "./card/order-card";
 import OrderModal from "./order-modal";
-import type { Customer, Order } from "@keepit/schemas";
-import { useCustomers, useModal, useOrders } from "@/hooks";
+import type { Order } from "@keepit/schemas";
+import { useModal, useOrders } from "@/hooks";
 
-import { Button, FilterChip, MultiDropdown, SearchBar, SortDropdown } from "@/components";
+import type { OrderFilters } from "../-hooks/use-order-filters";
 
-const sort_options = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-];
+interface Props {
+    filters: OrderFilters;
+}
 
-export default function OrderList() {
+export default function OrderList({ filters }: Props) {
     const editModal = useModal();
 
-
     const { t } = useTranslation();
-
-    const urlSearch = useSearch({ strict: false });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
-    const [sort, setSort] = useState(sort_options[0].value);
-    const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
-    const [contactPersonFilter] = useState<Array<string>>([]);
-
-    const { orders } = useOrders();
-    const { customers } = useCustomers();
-
-    const customerFilterOptions = useMemo(() =>
-        customers.map((c: Customer) => ({
-            value: c.id,
-            label: c.companyName,
-        })),
-        [customers]);
-
-    const activeFilterCount = customerFilter.length + contactPersonFilter.length;
-
-    const handleSearch = () => {
-        setSearchInput(searchInput);
-    };
+    const { orders } = useOrders(filters.params);
 
     return (
         <>
-            <div className='flex justify-between items-center gap-4'>
-                <div className="w-full flex items-center gap-2">
-                    <SortDropdown value={sort} onChange={setSort} options={sort_options} />
-
-                    <MultiDropdown label="Kunde" options={customerFilterOptions}
-                        values={customerFilter} onChange={setCustomerFilter} />
-
-                    <SearchBar value={searchInput} onChange={setSearchInput}
-                        onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button onClick={() => editModal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
-                </div>
-            </div>
-
-            {activeFilterCount > 0 && (
-                <div className="flex gap-2 w-fit flex-wrap">
-                    {customerFilter.map((id) => {
-                        const option = customerFilterOptions.find(i => i.value === id);
-                        if (!option) return null;
-                        return (
-                            <FilterChip key={`customer-${id}`} label="Kunde" value={option.label}
-                                onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))} />
-                        );
-                    })}
-                </div>
-            )}
-
             <div className='grid gap-2'>
                 {orders.map((order: Order) => (
                     <OrderCard key={order.id} order={order} />
@@ -82,8 +27,6 @@ export default function OrderList() {
             {editModal.isOpen && (
                 <OrderModal key={editModal.key} onClose={editModal.close} />
             )}
-
-
         </>
     )
 }

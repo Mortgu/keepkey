@@ -1,13 +1,15 @@
 import type {
     CreateSupplierInput,
     Supplier,
+    SupplierFilterParams,
     UpdateSupplierInput,
 } from '@keepit/schemas';
 import { api } from "@/lib/api-client";
+import { formatQueryString } from '@/lib/utils';
 
 
-export const getSuppliers = () =>
-    api<Array<Supplier>>("/api/suppliers", { method: "GET" });
+export const getSuppliers = (filters: SupplierFilterParams) =>
+    api<Array<Supplier>>(`/api/suppliers?${formatQueryString(filters)}`, { method: "GET" });
 
 export const createSupplier = (supplier: CreateSupplierInput) =>
     api<Supplier>("/api/suppliers", {
