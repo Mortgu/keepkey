@@ -61,10 +61,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
                             {offer.derivationType === "RENEWAL" && (
-                                <Badge variant="generated" size="xs">{t("derived.badge_renewal")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                             )}
                             {offer.derivationType === "LICENSE_EXTENSION" && (
-                                <Badge variant="processing" size="xs">{t("derived.badge_extension")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>
                             )}
                         </div>
                     </div>

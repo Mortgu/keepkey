@@ -8,6 +8,7 @@ import { tv } from "tailwind-variants";
 import { Badge } from '@/components';
 import { formatDate } from "@/lib/format";
 import { getDocumentStatus } from "@/utils/status";
+import { toast } from "react-toastify";
 
 const cardStyles = tv({
     slots: {
@@ -58,7 +59,13 @@ export default function DocumentCard({ offerId, document }: Props) {
                 format: "docx",
                 file
             });
-        }
+        },
+        onDropAccepted: (files) => {
+            toast.info("File was successfully replaced!")
+        },
+        onDropRejected(fileRejections, event) {
+            toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
+        },
     });
     const styles = cardStyles({ focused: dropzone.isFocused });
     const renameModal = useModal();
@@ -199,8 +206,8 @@ export default function DocumentCard({ offerId, document }: Props) {
                                     {
                                         label: "View in NextCloud",
                                         icon: <ExternalLink className="size-3.5" />,
-                                        onSelect: () => { },
-                                        condition: document.status === "FAILED",
+                                        href: `/`,
+                                        condition: false, // document.status === "UPLOADED"
                                     },
                                     {
                                         label: "Replace file",

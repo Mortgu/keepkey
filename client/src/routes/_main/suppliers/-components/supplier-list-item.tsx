@@ -24,7 +24,7 @@ export default function SupplierListItem({ supplier, onEdit }: Props) {
                 <div className="flex items-center gap-2">
                     <p className="text-md">{supplier.name}</p>
                     {supplier.supplierId && (
-                        <Badge variant="generated" className="text-sm">{supplier.supplierId}</Badge>
+                        <Badge variant="GENERATED" className="text-sm">{supplier.supplierId}</Badge>
                     )}
                 </div>
 
