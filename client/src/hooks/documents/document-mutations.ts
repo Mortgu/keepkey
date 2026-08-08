@@ -1,6 +1,14 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteDocument, renameDocument, uploadDocument } from "./document-api";
-import type { DocumentType } from "@keepit/schemas";
+import {
+    confirmReplacementUpload,
+    deleteDocument,
+    putReplacementFile,
+    renameDocument,
+    requestReplacementUpload,
+    resyncDocument,
+    uploadDocument,
+} from "./document-api";
+import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
 
@@ -32,7 +40,36 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         onSuccess: invalidate,
     });
 
+    /**
+     * Ersetzt die erzeugte Datei: URL anfordern, direkt nach S3 hochladen,
+     * bestätigen. Nextcloud bleibt dabei unberührt — liegt das Dokument dort
+     * schon, wird die Abweichung anschließend in der Karte angezeigt.
+     */
+    const replaceMutation = useMutation({
+        mutationFn: async ({ documentId, format, file }: {
+            documentId: string;
+            format: DocumentFormatParam;
+            file: File;
+        }) => {
+            const upload = await requestReplacementUpload(type, documentId, format);
+            await putReplacementFile(upload, file);
+            return confirmReplacementUpload(type, documentId, format, upload.objectKey);
+        },
+        onSuccess: invalidate,
+    });
+
+    const resyncMutation = useMutation({
+        mutationFn: (documentId: string) => resyncDocument(type, documentId),
+        onSuccess: invalidate,
+    });
+
     return {
+        replaceDocumentFile: replaceMutation.mutateAsync,
+        isReplacingDocumentFile: replaceMutation.isPending,
+        errorReplacingDocumentFile: replaceMutation.error,
+        resyncDocument: resyncMutation.mutateAsync,
+        isResyncingDocument: resyncMutation.isPending,
+        errorResyncingDocument: resyncMutation.error,
         renameDocument: renameMutation.mutateAsync,
         isRenamingDocument: renameMutation.isPending,
         errorRenamingDocument: renameMutation.error,

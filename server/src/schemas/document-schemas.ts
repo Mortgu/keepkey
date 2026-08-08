@@ -16,6 +16,15 @@ export const documentArtifactParamsSchema = documentParamsSchema.extend({
     format: documentFormatParamSchema,
 });
 
+/**
+ * Bestätigt einen abgeschlossenen Direkt-Upload nach S3. Der Schlüssel stammt
+ * aus der zuvor ausgestellten Upload-URL; der Service prüft zusätzlich, dass er
+ * zum Präfix dieses Dokuments gehört.
+ */
+export const confirmReplacementSchema = z.object({
+    objectKey: z.string().min(1),
+});
+
 export const renameDocumentSchema = z.object({
     displayName: z.string()
         .trim()
