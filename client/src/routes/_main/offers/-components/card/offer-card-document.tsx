@@ -6,7 +6,7 @@ import { useDropzone } from 'react-dropzone';
 import { tv } from "tailwind-variants";
 import type { OfferDocument } from "@keepit/schemas";
 import { ActionMenu, Button, DocumentRenameModal, showToast } from "@/components";
-import { useDocumentMutations, useDocumentTask } from "@/hooks";
+import { useDocumentMutations, useDocumentTask, useLocale } from "@/hooks";
 import { documentDownloadUrl } from "@/data/documents";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
@@ -39,7 +39,10 @@ const styles = tv({
 
 export default function OfferCardDocument({ offerDocument }: Props) {
     const { t } = useTranslation();
+    const locales = useLocale()
+
     const { offerId, status, taskId } = offerDocument;
+
     const [renameOpen, setRenameOpen] = useState(false);
     const pdf = findDocumentArtifact(offerDocument.artifacts, "PDF");
     const docx = findDocumentArtifact(offerDocument.artifacts, "DOCX");

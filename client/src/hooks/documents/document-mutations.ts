@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
     confirmReplacementUpload,
     deleteDocument,
@@ -12,32 +12,33 @@ import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
 
+const invalidate = (queryClient: QueryClient, type: DocumentType, parentId: string) => {
+    if (type === "offer") {
+        queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: offerKeys.detail(parentId) });
+    } else {
+        queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+    }
+};
+
 export function useDocumentMutations(type: DocumentType, parentId: string) {
     const queryClient = useQueryClient();
 
-    const invalidate = () => {
-        if (type === "offer") {
-            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: offerKeys.detail(parentId) });
-        } else {
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-        }
-    };
 
     const renameMutation = useMutation({
         mutationFn: ({ documentId, displayName }: { documentId: string; displayName: string }) =>
             renameDocument(type, documentId, displayName),
-        onSuccess: invalidate,
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     const deleteMutation = useMutation({
         mutationFn: (documentId: string) => deleteDocument(type, documentId),
-        onSuccess: invalidate,
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     const uploadMutation = useMutation({
         mutationFn: (documentId: string) => uploadDocument(type, documentId),
-        onSuccess: invalidate,
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     /**
@@ -55,12 +56,12 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
             await putReplacementFile(upload, file);
             return confirmReplacementUpload(type, documentId, format, upload.objectKey);
         },
-        onSuccess: invalidate,
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     const resyncMutation = useMutation({
         mutationFn: (documentId: string) => resyncDocument(type, documentId),
-        onSuccess: invalidate,
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     return {
@@ -80,4 +81,19 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         isUploadingDocument: uploadMutation.isPending,
         errorUploadingDocument: uploadMutation.error,
     };
+}
+
+export function useUploadDocument(type: DocumentType, parentId: string) {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: (documentId: string) => uploadDocument(type, documentId),
+        onSuccess: () => invalidate(queryClient, type, parentId),
+    });
+
+    return {
+        uploadDocument: mutation.mutateAsync,
+        isUploadingDocument: mutation.isPending,
+        errorUploadingDocument: mutation.error,
+    }
 }

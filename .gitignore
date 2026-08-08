@@ -21,3 +21,4 @@ dist/*
 /shared/dist
 
 shared/dist/*
+.commands.txt

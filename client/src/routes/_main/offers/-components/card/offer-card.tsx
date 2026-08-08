@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import DerivedModal from "../modals/derived/derived-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
-import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
@@ -15,6 +14,7 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -131,7 +131,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             >
                 <div className="grid mx-4">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <OfferCardDocument key={document.id} offerDocument={document} />
+                        <DocumentCard key={document.id} document={document} offerId={offer.id} />
                     ))}
 
                     {offer.offerDocuments.length === 0 && (
