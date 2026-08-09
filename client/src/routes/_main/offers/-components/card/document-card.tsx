@@ -43,10 +43,13 @@ export default function DocumentCard({ offerId, document }: Props) {
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
 
     const mutations = useDocumentMutations("offer", offerId);
+
+    const canReplace = (document.status === "GENERATED" || document.status === "UPLOADED") && !mutations.isReplacingDocumentFile;
     const dropzone = useDropzone({
         noClick: true,
         noKeyboard: true,
         multiple: false,
+        disabled: !canReplace,
         accept: {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": []
         },
@@ -63,8 +66,11 @@ export default function DocumentCard({ offerId, document }: Props) {
         onDropAccepted: (files) => {
             toast.info("File was successfully replaced!")
         },
-        onDropRejected(fileRejections, event) {
+        onDropRejected(fileRejections, _) {
             toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
+        },
+        onError(err) {
+            toast.error(`File rejected! ${err.message}`)
         },
     });
     const styles = cardStyles({ focused: dropzone.isFocused });

@@ -169,16 +169,16 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         onClick={() => setDrawerOpen(true)}
                         size="xs"
-                        variant="secondary"
-                        icon={<UndoDot className="size-3" />}
+                        variant="border"
+                        icon={<UndoDot size={13} />}
                         iconOnly
                     />
 
                     <Button
                         size="xs"
-                        variant="secondary"
+                        variant="border"
                         onClick={() => onEdit("edit", offer)}
-                        icon={<Pen className="size-3" />}
+                        icon={<Pen size={13} />}
                         iconOnly
                     />
 
@@ -188,7 +188,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         danger
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
-                        icon={<Trash className="size-3" />}
+                        icon={<Trash size={13} />}
                         iconOnly
                     />
                 </div>
