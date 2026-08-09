@@ -105,7 +105,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Collapsable label="Produkte"
+            <Collapsable label={t("offerCard.products")}
                 className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
@@ -126,7 +126,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <hr className="text-(--border)" />
 
             <Collapsable
-                label="Dokumente"
+                label={t("offerCard.documents")}
                 className="w-full justify-between rounded-none"
             >
                 <div className="grid mx-4">
@@ -154,14 +154,14 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         disabled={isGenerating}
                         onClick={() => generateOfferDocument({ offerId: offer.id })}
                     >
-                        Dokument generieren
+                        {t("offerCard.actions.generate")}
                     </Button>
 
                     <Button variant="border" type="button" size="xs"
-                        onClick={() => renewalModal.open(offer)}>{t("derived.action_renewal")}</Button>
+                        onClick={() => renewalModal.open(offer)}>{t("offerCard.actions.renewal")}</Button>
 
                     <Button variant="border" type="button" size="xs"
-                        onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
+                        onClick={() => extensionModal.open(offer)}>{t("offerCard.actions.extension")}</Button>
                 </div>
 
                 {/* Actions right */}

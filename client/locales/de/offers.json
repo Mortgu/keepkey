@@ -20,6 +20,20 @@
     "flatrate_section": "Flatrate",
     "discount_section": "Rabatte"
   },
+  "offerPage": {
+    "title": "Angebote",
+    "description": "Zentrale verwaltung der Angebote",
+    "createButton": "Angebot erstellen"
+  },
+  "offerCard": {
+    "documents": "Dokumente",
+    "products": "Produkte",
+    "actions": {
+      "generate": "Dokument generieren",
+      "renewal": "Verlängerung",
+      "extension": "Lizenzerweiterung"
+    }
+  },
   "renewal": {
     "title": "Verlängerung für {{orderId}}",
     "period_section": "Periode",
@@ -49,8 +63,6 @@
     "contact": "Ansprechpartner:",
     "employee": "Mitarbeiter:",
     "original_period": "Ursprüngliche Laufzeit",
-    "action_renewal": "Verlängerung",
-    "action_extension": "Lizenzerweiterung",
     "badge_renewal": "Verlängerung",
     "badge_extension": "Lizenzerweiterung"
   },

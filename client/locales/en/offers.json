@@ -20,6 +20,20 @@
     "flatrate_section": "Flatrates",
     "discount_section": "Discounts"
   },
+  "offerPage": {
+    "title": "Offers",
+    "description": "Central Offers management site.",
+    "createButton": "Create Offer"
+  },
+  "offerCard": {
+    "documents": "Documents",
+    "products": "Products",
+    "actions": {
+      "generate": "Generate document",
+      "renewal": "Renewal",
+      "extension": "Extension"
+    }
+  },
   "renewal": {
     "title": "Renewal for {{orderId}}",
     "period_section": "Period",
@@ -49,8 +63,6 @@
     "contact": "Contact:",
     "employee": "Employee:",
     "original_period": "Original period",
-    "action_renewal": "Renewal",
-    "action_extension": "License extension",
     "badge_renewal": "Renewal",
     "badge_extension": "License extension"
   },

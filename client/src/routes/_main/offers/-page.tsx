@@ -27,14 +27,15 @@ export function OfferPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex-1 grid gap-1">
                         <h1 className="font-medium text-xl">{t("section.offers")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Angebote</h1>
+                        <h1 className="font-light text-sm text-gray-400">{t("offerPage.description")}</h1>
                     </div>
                     <div className="flex items-center gap-4">
-                        {/* Export Button */}
-                        {/* <Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>*/}
-                        {/* Create Customer Button */}
-                        <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-                            onClick={() => modal.open()}>Angebot erstellen</Button>
+                        <Button
+                            icon={<Plus size={14} strokeWidth={3} />}
+                            variant="primary" size="sm"
+                            onClick={() => modal.open()}>
+                            {t("offerPage.createButton")}
+                        </Button>
                     </div>
                 </div>
 
