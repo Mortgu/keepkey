@@ -105,7 +105,15 @@ export default function DocumentCard({ offerId, document }: Props) {
                 <div className="grid gap-1">
                     {/* Document display name + info tooltip */}
                     <div className="flex items-center gap-4">
-                        <p className="text-md font-medium">{document.displayName}</p>
+                        <div className="flex items-center gap-2">
+                            {document.isCurrent && (
+                                <Tooltip side="top" content="This is the latest generated document.">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-(--primary-600)" />
+                                </Tooltip>
+                            )}
+
+                            <p className="text-md font-medium">{document.displayName}</p>
+                        </div>
                         <Tooltip content={<>{renderDocumentTooltip()}</>} side="right">
                             <Info size={18} className="text-gray-400 hover:text-black" />
                         </Tooltip>
