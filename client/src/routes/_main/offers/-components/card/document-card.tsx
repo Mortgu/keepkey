@@ -117,8 +117,8 @@ export default function DocumentCard({ offerId, document }: Props) {
                         {!remoteOutdated && (
                             <>
                                 <Dot size={14} className="text-gray-200" />
-                                <Tooltip content='The document is generated but not on NextCloud!'>
-                                    <Badge variant={document.status}>{getDocumentStatus(document.status, locales)}</Badge>
+                                <Tooltip content={getDocumentStatus(document.status, locales, "description")}>
+                                    <Badge variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
                                 </Tooltip>
                             </>
                         )}
