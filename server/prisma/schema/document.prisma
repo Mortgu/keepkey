@@ -25,6 +25,11 @@ model DocumentArtifact {
   remotePath String?   @unique
   remoteEtag String?
 
+  /// Pruefsumme des Inhalts, der zuletzt nach Nextcloud uebertragen wurde.
+  /// Weicht sie von `sha256` ab, wurde die Datei in S3 danach ersetzt und der
+  /// Stand auf Nextcloud ist veraltet.
+  remoteSha256 String?
+
   offerDocument   OfferDocument? @relation("OfferDocumentArtifacts", fields: [offerDocumentId], references: [id], onDelete: Cascade)
   offerDocumentId String?
 

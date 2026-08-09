@@ -1,9 +1,10 @@
 import { tv } from "tailwind-variants";
 import type { HTMLAttributes } from "react";
 import type { ComponentSize } from "@/components/tokens";
+import type { DocumentStatus } from "@keepit/schemas";
 
 export interface BadgeComponentProps extends HTMLAttributes<HTMLSpanElement> {
-  variant?: "generated" | "pending" | "failed" | "processing" | "draft";
+  variant: DocumentStatus;
   format?: "pdf" | "docx" | "html";
   count?: number | string;
   countVariant?: "success" | "error";
@@ -11,11 +12,12 @@ export interface BadgeComponentProps extends HTMLAttributes<HTMLSpanElement> {
 }
 
 const VARIANT_LABELS: Record<NonNullable<BadgeComponentProps["variant"]>, string> = {
-  generated: "Generated",
-  pending: "Pending",
-  failed: "Failed",
-  processing: "Processing",
-  draft: "Draft",
+  GENERATED: "Generated",
+  PENDING: "Pending",
+  FAILED: "Failed",
+  PROCESSING: "Processing",
+  UPLOADED: "Uploaded",
+  UPLOADING: "Uploading"
 };
 
 const badgeSizeStyles = {
@@ -40,11 +42,12 @@ const styles = tv({
   base: "inline-flex items-center justify-center w-fit",
   variants: {
     variant: {
-      generated: "bg-[#E6F2EC] text-[#00683F]",
-      pending: "bg-[#FEF3C7] text-[#B45309]",
-      failed: "bg-[#FDECEA] text-[#C0392B]",
-      processing: "bg-[#E1F0FA] text-[#1D6FA4]",
-      draft: "bg-[#F0F4F1] text-[#4B5C52]",
+      GENERATED: "bg-[#E6F2EC] text-[#00683F]",
+      PENDING: "bg-[#FEF3C7] text-[#B45309]",
+      FAILED: "bg-[#FDECEA] text-[#C0392B]",
+      PROCESSING: "bg-[#E1F0FA] text-[#1D6FA4]",
+      UPLOADED: "bg-[#E6F2EC] text-[#00683F]",
+      UPLOADING: "bg-[#F0F4F1] text-[#4B5C52]",
     },
   },
 });
@@ -93,17 +96,9 @@ export function Badge({
     );
   }
 
-  if (variant) {
-    return (
-      <span className={`${styles({ variant })} rounded-full ${badgeSizeStyles[size]} ${className ?? ''}`} {...props}>
-        {children ?? VARIANT_LABELS[variant]}
-      </span>
-    );
-  }
-
   return (
-    <span className={`${styles()} rounded-full ${badgeSizeStyles[size]} ${className ?? ''}`} {...props}>
-      {children}
+    <span className={`${styles({ variant })} rounded-full ${badgeSizeStyles[size]} ${className ?? ''}`} {...props}>
+      {children ?? VARIANT_LABELS[variant]}
     </span>
   );
 }

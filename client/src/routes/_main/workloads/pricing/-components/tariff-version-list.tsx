@@ -84,7 +84,7 @@ function VersionRow({
                     <div className="flex items-center gap-2">
                         <ChevronRight className={expanded ? "size-4 rotate-90 transition-all" : "size-4 transition-all"} />
                         <span className="font-medium">Version {version.version}</span>
-                        {version.isCurrent && <Badge variant="generated" size="xs">Aktuell</Badge>}
+                        {version.isCurrent && <Badge variant="GENERATED" size="xs">Aktuell</Badge>}
                         {version.usageCount > 0 && (
                             <span className="text-xs text-gray-500">
                                 in {version.usageCount} {version.usageCount === 1 ? "Angebot" : "Angeboten"} verwendet
