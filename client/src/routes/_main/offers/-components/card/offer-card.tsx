@@ -5,7 +5,6 @@ import { useTranslation } from "react-i18next";
 import DerivedModal from "../modals/derived/derived-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
-import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
@@ -15,6 +14,7 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -61,10 +61,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
                             {offer.derivationType === "RENEWAL" && (
-                                <Badge variant="generated" size="xs">{t("derived.badge_renewal")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                             )}
                             {offer.derivationType === "LICENSE_EXTENSION" && (
-                                <Badge variant="processing" size="xs">{t("derived.badge_extension")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>
                             )}
                         </div>
                     </div>
@@ -131,7 +131,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             >
                 <div className="grid mx-4">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <OfferCardDocument key={document.id} offerDocument={document} />
+                        <DocumentCard key={document.id} document={document} offerId={offer.id} />
                     ))}
 
                     {offer.offerDocuments.length === 0 && (
@@ -169,16 +169,16 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         onClick={() => setDrawerOpen(true)}
                         size="xs"
-                        variant="secondary"
-                        icon={<UndoDot className="size-3" />}
+                        variant="border"
+                        icon={<UndoDot size={13} />}
                         iconOnly
                     />
 
                     <Button
                         size="xs"
-                        variant="secondary"
+                        variant="border"
                         onClick={() => onEdit("edit", offer)}
-                        icon={<Pen className="size-3" />}
+                        icon={<Pen size={13} />}
                         iconOnly
                     />
 
@@ -188,7 +188,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         danger
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
-                        icon={<Trash className="size-3" />}
+                        icon={<Trash size={13} />}
                         iconOnly
                     />
                 </div>

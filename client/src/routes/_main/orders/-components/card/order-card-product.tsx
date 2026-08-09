@@ -20,7 +20,7 @@ export default function OrderCardProduct({ position }: Props) {
                     <p className="text-md">
                         {localized(product.translations, locale, "name")}
                     </p>
-                    <Badge variant="draft">
+                    <Badge variant="UPLOADED">
                         {localized(contract.translations, locale, "name")}
                     </Badge>
                 </div>

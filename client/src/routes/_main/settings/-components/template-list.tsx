@@ -95,7 +95,7 @@ export default function TemplateList() {
                             <div className="grid gap-0">
                                 <div className="flex items-center gap-2">
                                     <p>{template.basename}</p>
-                                    <Badge variant="generated">{formatBytesToKB(template.size)}</Badge>
+                                    <Badge variant="GENERATED">{formatBytesToKB(template.size)}</Badge>
                                 </div>
                                 <p className="text-sm text-(--text-secondary) font-light">{template.filename}</p>
                             </div>
