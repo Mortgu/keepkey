@@ -20,10 +20,10 @@ export const pricingQueries = {
         }),
 
     /** Preis aus der von der Quellposition angepinnten Tarif-Version. */
-    pinned: (offerId: string, positionId: string, quantity: number, enabled = true) =>
+    pinned: (offerId: string, positionId: string, quantity: number, free_months: number, enabled = true) =>
         queryOptions({
-            queryKey: pricingKeys.pinned(offerId, positionId, quantity),
-            queryFn: () => getPinnedPrice(offerId, positionId, quantity),
+            queryKey: pricingKeys.pinned(offerId, positionId, quantity, free_months),
+            queryFn: () => getPinnedPrice(offerId, positionId, quantity, free_months),
             enabled: enabled
                 && Boolean(offerId) && Boolean(positionId)
                 && Number.isInteger(quantity) && quantity > 0,

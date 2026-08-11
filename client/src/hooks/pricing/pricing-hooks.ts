@@ -47,6 +47,7 @@ export function usePositionPrice({ source, query, pin }: UsePositionPriceArgs) {
         pin?.offerId ?? "",
         pin?.positionId ?? "",
         query.quantity,
+        query.free_months,
         isPinned,
     ));
 

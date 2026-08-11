@@ -7,6 +7,6 @@ export const pricingKeys = {
     live: (query: LivePriceQuery) => [...pricingKeys.lives(), query] as const,
 
     pinneds: () => [...pricingKeys.all, "pinned"] as const,
-    pinned: (offerId: string, positionId: string, quantity: number) =>
-        [...pricingKeys.pinneds(), offerId, positionId, quantity] as const,
+    pinned: (offerId: string, positionId: string, quantity: number, free_months: number) =>
+        [...pricingKeys.pinneds(), offerId, positionId, quantity, free_months] as const,
 };

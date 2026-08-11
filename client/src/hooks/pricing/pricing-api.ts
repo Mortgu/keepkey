@@ -24,9 +24,9 @@ export const getLivePrice = (query: LivePriceQuery) =>
  * die vollständige Preistabelle eingefroren ist, greift auch bei geänderter
  * Menge die richtige Staffel.
  */
-export const getPinnedPrice = (offerId: string, positionId: string, quantity: number) =>
+export const getPinnedPrice = (offerId: string, positionId: string, quantity: number, free_months: number) =>
     api<PositionPrice>(
-        `/api/offers/${offerId}/positions/${positionId}/extension-price?quantity=${quantity}`,
+        `/api/offers/${offerId}/positions/${positionId}/extension-price?quantity=${quantity}&free_months=${free_months}`,
         { method: "GET" },
     );
 

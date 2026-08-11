@@ -835,13 +835,13 @@ type SourcePosition = {
  * flache Rückfall auf den gespeicherten Stückpreis — Mengenstaffeln lassen sich
  * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet.
  */
-async function priceFromPin(source: SourcePosition, quantity: number, customerId: string) {
+async function priceFromPin(source: SourcePosition, quantity: number, free_months: number, customerId: string) {
     const duration = source.duration;
 
     const flat = (eur_user_month: number, fromSnapshot: boolean) => ({
         eur_user_month,
         total_cents: eur_user_month * quantity * duration,
-        discount_cents: eur_user_month * quantity * source.free_months,
+        discount_cents: eur_user_month * quantity * free_months,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot,
     });
@@ -893,7 +893,7 @@ async function priceFromPin(source: SourcePosition, quantity: number, customerId
     return {
         eur_user_month,
         total_cents: result.price,
-        discount_cents: eur_user_month * quantity * source.free_months,
+        discount_cents: eur_user_month * quantity * free_months,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot: true,
     };
@@ -921,9 +921,14 @@ export async function getExtensionPrice(
     offerId: string,
     positionId: string,
     quantity: number,
+    free_months: number,
 ): Promise<PositionPrice> {
     if (!Number.isInteger(quantity) || quantity <= 0) {
         throw new AppException("quantity muss eine positive Ganzzahl sein.", 400, "INVALID_INPUT");
+    }
+
+    if (!Number.isInteger(free_months) || free_months < 0) {
+        throw new AppException("free_months muss eine positive Ganzzahl sein.", 400, "INVALID_INPUT");
     }
 
     const offer = await prisma.offer.findUnique({
@@ -937,7 +942,7 @@ export async function getExtensionPrice(
 
     const source = await loadSourcePosition(offerId, positionId);
     const { eur_user_month, total_cents, discount_cents, fromSnapshot } =
-        await priceFromPin(source, quantity, offer.customerId);
+        await priceFromPin(source, quantity, free_months, offer.customerId);
 
     return { eur_user_month, total_cents, discount_cents, fromSnapshot };
 }

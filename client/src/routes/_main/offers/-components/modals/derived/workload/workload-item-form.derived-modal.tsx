@@ -52,6 +52,8 @@ export default function WorkloadItemFormDerivedModal({
     });
 
     const save = () => {
+        console.log(totalCents, free_months)
+
         form.setFieldValue(`offerPositions[${index}]`, {
             ...position,
             duration,

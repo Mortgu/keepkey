@@ -105,6 +105,7 @@ export const getExtensionPrice = async (request: Request, response: Response) =>
         request.params.offerId as string,
         request.params.positionId as string,
         Number(request.query.quantity),
+        Number(request.query.free_months),
     );
     return response.status(200).json(price);
 };
