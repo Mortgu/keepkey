@@ -1,11 +1,13 @@
 import { Router } from "express";
 
 import {
+  checkQuoteIdAvailability,
   createOffer,
   deleteOffer,
   enqueueGeneration,
   extendOffer,
   getExtensionPrice,
+  getNextQuoteId,
   getOfferById,
   getOfferRevisions,
   getOffers,
@@ -33,6 +35,15 @@ import {
 } from '@keepit/schemas';
 
 const router = Router();
+
+/* ========== Belegnummern ========== */
+/* Muessen vor '/:id' stehen, sonst schluckt der Wildcard-Parameter diese Pfade. */
+
+/* [GET] /api/offers/next-quote-id */
+router.get('/next-quote-id', getNextQuoteId);
+
+/* [GET] /api/offers/quote-id/:quoteId/availability */
+router.get('/quote-id/:quoteId/availability', checkQuoteIdAvailability);
 
 /* ========== Offer ========== */
 

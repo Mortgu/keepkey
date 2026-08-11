@@ -28,6 +28,15 @@ export type FindFilesByIdResult = {
     id: string;
     found: boolean;
     files: Record<string, NextcloudFileMetadata[]>;
+    /** false, wenn mindestens ein Verzeichnis nicht gelesen werden konnte — `found` ist dann kein Beweis. */
+    complete: boolean;
+};
+
+/** Alle belegten Praefixe aus einer Verzeichnisgruppe. */
+export type ListUsedIdsResult = {
+    ids: Set<string>;
+    /** false, wenn mindestens ein Verzeichnis nicht gelesen werden konnte. */
+    complete: boolean;
 };
 
 type DirectoryConfig = {
@@ -61,6 +70,7 @@ export async function findFilesById(
 ): Promise<FindFilesByIdResult> {
     const files: Record<string, NextcloudFileMetadata[]> = {};
     let anyFound = false;
+    let complete = true;
 
     const results = await Promise.all(
         directories.map(async (dir) => {
@@ -69,15 +79,15 @@ export async function findFilesById(
                 const matches = contents.filter(
                     (f) => f.type === "file" && f.basename.startsWith(`${id}_`)
                 );
-                return { label: dir.label, matches };
+                return { label: dir.label, matches, ok: true };
             } catch (exception: any) {
                 logger.error('nextcloud_find_files_error', { label: dir.label, error: exception.message });
-                return { label: dir.label, matches: [] as FileStat[] };
+                return { label: dir.label, matches: [] as FileStat[], ok: false };
             }
         })
     );
 
-    for (const { label, matches } of results) {
+    for (const { label, matches, ok } of results) {
         files[label] = matches.map((f) => ({
             basename: f.basename,
             filename: f.filename,
@@ -86,9 +96,60 @@ export async function findFilesById(
             mime: (f as any).mime ?? null,
         }));
         if (matches.length > 0) anyFound = true;
+        if (!ok) complete = false;
     }
 
-    return { id, found: anyFound, files };
+    return { id, found: anyFound, files, complete };
+}
+
+/**
+ * Sammelt alle Praefixe, die in den angegebenen Verzeichnissen bereits als Dateiname vergeben sind.
+ *
+ * Gegenstueck zu `findFilesById`: statt eine bekannte Nummer zu suchen, wird der gesamte Bestand
+ * einmal gelesen, damit der Nummernkreis-Allocator ohne N Einzelabfragen auskommt. Ein nicht
+ * lesbares Verzeichnis wird geloggt und ueber `complete: false` gemeldet — der Aufrufer entscheidet,
+ * ob er mit einem unvollstaendigen Bild weiterarbeitet.
+ */
+export async function listUsedIdsInDirectories(
+    directories: DirectoryConfig[],
+    pattern: RegExp,
+): Promise<ListUsedIdsResult> {
+    const ids = new Set<string>();
+    let complete = true;
+
+    // Ein /g-Pattern haette einen wandernden lastIndex und wuerde bei jedem zweiten
+    // Dateinamen danebengreifen — deshalb hier entschaerfen statt darauf zu vertrauen.
+    const matcher = pattern.global
+        ? new RegExp(pattern.source, pattern.flags.replace("g", ""))
+        : pattern;
+
+    const results = await Promise.all(
+        directories.map(async (dir) => {
+            try {
+                const contents = await getCachedDirectoryContents(dir.path);
+                return { label: dir.label, contents, ok: true };
+            } catch (exception: any) {
+                logger.error('nextcloud_list_used_ids_error', { label: dir.label, error: exception.message });
+                return { label: dir.label, contents: [] as FileStat[], ok: false };
+            }
+        })
+    );
+
+    for (const { contents, ok } of results) {
+        if (!ok) {
+            complete = false;
+            continue;
+        }
+
+        for (const file of contents) {
+            if (file.type !== "file") continue;
+
+            const match = matcher.exec(file.basename);
+            if (match?.[1]) ids.add(match[1]);
+        }
+    }
+
+    return { ids, complete };
 }
 
 export function isNextcloudConfigured(): boolean {

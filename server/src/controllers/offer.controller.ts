@@ -1,6 +1,7 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 import * as offerService from "../services/offer.service.js";
+import * as quoteIdService from "../services/quote-id.service.js";
 
 /* ========== GET ========== */
 
@@ -19,9 +20,14 @@ export const getOfferRevisions = async (request: Request, response: Response) =>
     return response.status(200).json(revisions);
 };
 
-export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-    const quoteId = await offerService.getNextQuoteId();
-    return response.status(200).json(quoteId);
+export const getNextQuoteId = async (request: Request, response: Response) => {
+    const suggestion = await quoteIdService.getNextQuoteId();
+    return response.status(200).json(suggestion);
+};
+
+export const checkQuoteIdAvailability = async (request: Request, response: Response) => {
+    const availability = await quoteIdService.checkQuoteIdAvailability(request.params.quoteId as string);
+    return response.status(200).json(availability);
 };
 
 /* ========== DELETE ========== */

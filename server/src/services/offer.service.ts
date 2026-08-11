@@ -355,11 +355,6 @@ export async function getOfferRevisions(offerId: string) {
     });
 }
 
-export async function getNextQuoteId(): Promise<number> {
-    const quoteId = 0; //await getLatestQuoteId();
-    return quoteId + 1;
-}
-
 /* ========== Mutations ========== */
 
 /** Skalarfelder eines Angebots — alles ausser Positionen, Flatrates und Rabatten. */
@@ -378,6 +373,68 @@ type OfferFields = {
 };
 
 /**
+ * Übersetzt die Unique-Verletzung auf `quoteId` in einen eigenen Fehlercode.
+ *
+ * Der generische P2002-Handler der Exception-Middleware meldet nur "existiert bereits" —
+ * zu unspezifisch, damit das Formular die Meldung an das Belegnummern-Feld hängen und sich
+ * einen neuen Vorschlag holen kann. Jeder andere Fehler wird unverändert durchgereicht.
+ */
+function rethrowQuoteIdConflict(exception: unknown): never {
+    // Wo der verletzte Spaltenname steht, hängt vom Treiber ab: klassisch in `meta.target`,
+    // unter dem pg-Driver-Adapter dagegen verschachtelt in
+    // `meta.driverAdapterError.cause.constraint.fields`. Statt beide privaten Formen
+    // nachzubauen, wird das gesamte `meta` durchsucht — "quoteId" kommt in keinem anderen
+    // Unique-Constraint dieses Schemas vor.
+    const isQuoteIdConflict =
+        exception instanceof Prisma.PrismaClientKnownRequestError &&
+        exception.code === "P2002" &&
+        JSON.stringify(exception.meta ?? "").includes("quoteId");
+
+    if (isQuoteIdConflict) {
+        throw new AppException(
+            "Diese Belegnummer ist bereits vergeben!",
+            409,
+            "QUOTE_ID_TAKEN",
+        );
+    }
+
+    throw exception;
+}
+
+/**
+ * Verhindert, dass eine Belegnummer geändert wird, nachdem sie nach draussen gegangen ist.
+ *
+ * Die Nummer ist der Dateipräfix des erzeugten Dokuments — sobald eines existiert, würde eine
+ * Änderung den Datensatz von der Datei in NextCloud abkoppeln. Solange noch kein Dokument
+ * angestossen wurde, bleibt sie korrigierbar.
+ *
+ * `FAILED` zählt nicht: ein fehlgeschlagener Lauf hat nie eine Datei erzeugt. `PENDING` und
+ * `PROCESSING` zählen sehr wohl — die Pipeline baut den Dateinamen aus der Nummer, eine Änderung
+ * mitten im Lauf ergäbe eine Datei, die zu nichts passt. `deletedAt` wird bewusst nicht gefiltert,
+ * denn ein in der Datenbank weich gelöschtes Dokument kann in der Cloud weiterhin liegen.
+ */
+async function assertQuoteIdStillEditable(
+    tx: Prisma.TransactionClient,
+    offerId: string,
+    currentQuoteId: string,
+    nextQuoteId: string,
+): Promise<void> {
+    if (currentQuoteId === nextQuoteId) return;
+
+    const documents = await tx.offerDocument.count({
+        where: { offerId, status: { not: "FAILED" } },
+    });
+
+    if (documents > 0) {
+        throw new AppException(
+            "Die Belegnummer kann nicht mehr geändert werden, es existiert bereits ein Dokument!",
+            409,
+            "QUOTE_ID_LOCKED",
+        );
+    }
+}
+
+/**
  * Schreibt ein Angebot mit bereits bepreisten Bestandteilen.
  *
  * Bewusst von der Preisermittlung getrennt: `createOffer` bepreist über den
@@ -391,40 +448,44 @@ async function persistOffer(
     discounts: ReadonlyArray<PricedDiscount>,
     options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType },
 ) {
-    return prisma.$transaction(async (tx) => {
-        const net_amount =
-            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
-            sumDiscounts(discounts);
+    try {
+        return await prisma.$transaction(async (tx) => {
+            const net_amount =
+                positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
+                flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+                sumDiscounts(discounts);
 
-        const offer = await tx.offer.create({
-            data: {
-                ...fields,
-                net_amount,
-                renewedFromOfferId: options?.renewedFromOfferId ?? null,
-                derivationType: options?.derivationType ?? null,
-            },
-        });
+            const offer = await tx.offer.create({
+                data: {
+                    ...fields,
+                    net_amount,
+                    renewedFromOfferId: options?.renewedFromOfferId ?? null,
+                    derivationType: options?.derivationType ?? null,
+                },
+            });
 
-        await tx.offerPosition.createMany({
-            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
-                tariffVersionId,
-            })),
-        });
-
-        if (flatrates.length > 0) {
-            await tx.offerFlatRate.createMany({
-                data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
-                    offerId: offer.id, flatRateId, quantity, total_cents,
+            await tx.offerPosition.createMany({
+                data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+                    offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+                    tariffVersionId,
                 })),
             });
-        }
 
-        await replaceDiscounts(tx, offer.id, discounts);
+            if (flatrates.length > 0) {
+                await tx.offerFlatRate.createMany({
+                    data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
+                        offerId: offer.id, flatRateId, quantity, total_cents,
+                    })),
+                });
+            }
 
-        return offer;
-    });
+            await replaceDiscounts(tx, offer.id, discounts);
+
+            return offer;
+        });
+    } catch (exception) {
+        rethrowQuoteIdConflict(exception);
+    }
 }
 
 export async function createOffer(
@@ -461,73 +522,79 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
     const positions = await pricePositions(rawPositions, input.customerId, actorId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
-    return prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
+    try {
+        return await prisma.$transaction(async (tx) => {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
 
-        const net_amount =
-            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
-            sumDiscounts(discounts);
+            const net_amount =
+                positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
+                flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+                sumDiscounts(discounts);
 
-        const current = await tx.offer.findFirstOrThrow({
-            where: { id: offerId },
-            include: {
-                offerPositions: true,
-                offerFlatRates: true,
-                offerDiscounts: true,
-            },
+            const current = await tx.offer.findFirstOrThrow({
+                where: { id: offerId },
+                include: {
+                    offerPositions: true,
+                    offerFlatRates: true,
+                    offerDiscounts: true,
+                },
+            });
+
+            if (current.version !== expectedVersion) {
+                throw new AppException(
+                    "The offer was changed by another user. Reload it and try again.",
+                    409,
+                    "VERSION_CONFLICT",
+                );
+            }
+
+            await assertQuoteIdStillEditable(tx, offerId, current.quoteId, input.quoteId);
+
+            const snapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
+
+            await tx.offerRevision.create({
+                data: {
+                    offerId,
+                    version: current.version,
+                    changedById: actorId,
+                    snapshotVersion: 1,
+                    snapshot: snapshot as Prisma.InputJsonValue,
+                },
+            });
+
+            const [offer] = await tx.offer.updateManyAndReturn({
+                where: { id: offerId },
+                data: {
+                    customerId: input.customerId,
+                    contactPersonId: input.contactPersonId,
+                    userId: input.userId,
+                    quoteId: input.quoteId,
+                    language: input.language,
+                    supplierId: input.supplierId,
+                    paymentTerm: input.paymentTerm,
+                    validUntil: input.validUntil,
+                    requestFrom: input.requestFrom,
+                    featureComparison: input.featureComparison,
+                    toCompare: input.toCompare,
+                    net_amount,
+                    version: { increment: 1 },
+                },
+            });
+
+            await replacePositions(tx, offerId, positions);
+            await replaceFlatRates(tx, offerId, flatrates);
+            await replaceDiscounts(tx, offerId, discounts);
+
+            await tx.offerDocument.updateMany({
+                where: { offerId, isCurrent: true },
+                data: { isCurrent: false },
+            });
+
+            return offer;
         });
-
-        if (current.version !== expectedVersion) {
-            throw new AppException(
-                "The offer was changed by another user. Reload it and try again.",
-                409,
-                "VERSION_CONFLICT",
-            );
-        }
-
-        const snapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
-
-        await tx.offerRevision.create({
-            data: {
-                offerId,
-                version: current.version,
-                changedById: actorId,
-                snapshotVersion: 1,
-                snapshot: snapshot as Prisma.InputJsonValue,
-            },
-        });
-
-        const [offer] = await tx.offer.updateManyAndReturn({
-            where: { id: offerId },
-            data: {
-                customerId: input.customerId,
-                contactPersonId: input.contactPersonId,
-                userId: input.userId,
-                quoteId: input.quoteId,
-                language: input.language,
-                supplierId: input.supplierId,
-                paymentTerm: input.paymentTerm,
-                validUntil: input.validUntil,
-                requestFrom: input.requestFrom,
-                featureComparison: input.featureComparison,
-                toCompare: input.toCompare,
-                net_amount,
-                version: { increment: 1 },
-            },
-        });
-
-        await replacePositions(tx, offerId, positions);
-        await replaceFlatRates(tx, offerId, flatrates);
-        await replaceDiscounts(tx, offerId, discounts);
-
-        await tx.offerDocument.updateMany({
-            where: { offerId, isCurrent: true },
-            data: { isCurrent: false },
-        });
-
-        return offer;
-    });
+    } catch (exception) {
+        rethrowQuoteIdConflict(exception);
+    }
 }
 
 export async function restoreOfferRevision(
@@ -592,10 +659,15 @@ export async function restoreOfferRevision(
             },
         });
 
+        // Die Belegnummer wird bewusst nicht mitrestauriert: eine Revision stellt den Inhalt
+        // eines Angebots wieder her, nicht seine Identität. Sonst könnte ein Restore eine
+        // inzwischen anderweitig vergebene Nummer zurückholen.
+        const { quoteId: _restoredQuoteId, ...restoredFields } = restored.offer;
+
         const offer = await tx.offer.update({
             where: { id: offerId },
             data: {
-                ...restored.offer,
+                ...restoredFields,
                 date: new Date(restored.offer.date),
                 validUntil: restored.offer.validUntil ? new Date(restored.offer.validUntil) : null,
                 requestFrom: restored.offer.requestFrom ? new Date(restored.offer.requestFrom) : null,

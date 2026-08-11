@@ -36,6 +36,13 @@ const env = createEnv({
         NEXTCLOUD_ORDER_PDF_PATH: z.string().default('/'),
         NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().default('/'),
 
+        /**
+         * Zweistelliges Geschaeftsjahr, das jede Belegnummer einleitet (26 -> 26000, 26001, ...).
+         * Bewusst ohne Default und ohne Datumsableitung: der Wechsel wird beim Jahreswechsel
+         * gemeinsam mit den NEXTCLOUD_OFFER_*_PATH von Hand umgestellt.
+         */
+        FISCAL_YEAR_PREFIX: z.string().regex(/^\d{2}$/, "FISCAL_YEAR_PREFIX muss zweistellig sein, z.B. 26"),
+
         REDIS_URL: z.string().min(1),
         WORKER_CONCURRENCY: z.coerce.number().default(2),
 

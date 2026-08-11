@@ -8,6 +8,34 @@ import { productSchema } from "./product.schema.js";
 import { flatrateSchema } from "./flatrate.schema.js";
 import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
 
+/* Belegnummer */
+
+/**
+ * 2 Ziffern Geschaeftsjahr + 3 Ziffern Zaehler (26000, 26001, ...). Die Nummer ist zugleich
+ * der Dateipraefix in NextCloud, deshalb wird das Format schon an der API-Grenze erzwungen.
+ */
+export const quoteIdSchema = z
+    .string()
+    .trim()
+    .regex(/^\d{6}$/, "Belegnummer muss 6-stellig sein");
+
+export const quoteIdSuggestionSchema = z.object({
+    quoteId: z.string(),
+    cloudChecked: z.boolean(),
+});
+export type QuoteIdSuggestion = z.infer<typeof quoteIdSuggestionSchema>;
+
+export const quoteIdConflictSchema = z.enum(["db", "cloud", "format"]);
+export type QuoteIdConflict = z.infer<typeof quoteIdConflictSchema>;
+
+export const quoteIdAvailabilitySchema = z.object({
+    quoteId: z.string(),
+    available: z.boolean(),
+    conflict: quoteIdConflictSchema.nullable(),
+    cloudChecked: z.boolean(),
+});
+export type QuoteIdAvailability = z.infer<typeof quoteIdAvailabilitySchema>;
+
 /* OfferPosition */
 export const createOfferPositionSchema = z.object({
     productId: z.string(),
@@ -116,7 +144,7 @@ export const createOfferSchema = z.object({
     contactPersonId: z.string(),
     userId: z.string(),
     supplierId: z.string().nullable(),
-    quoteId: z.string().trim().nonempty("Required!"),
+    quoteId: quoteIdSchema,
     paymentTerm: z.string().nonempty("Required!"),
     validUntil: z.string().nullable(),
     requestFrom: z.string().nullable(),
@@ -156,7 +184,7 @@ export const extendOfferPositionSchema = z.object({
 export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>;
 
 export const extendOfferSchema = z.object({
-    quoteId: z.string().trim().nonempty("Required!"),
+    quoteId: quoteIdSchema,
     validUntil: z.string().nullable(),
     requestFrom: z.string().nullable(),
 
