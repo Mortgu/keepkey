@@ -43,16 +43,14 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
     const { isPending, error, result } = usePositionPrice({
         source: priceSourceFor(mode),
-        query: isExtension ? {
+        query: {
             customerId,
             ...position,
             positionId: originalPosition.id
-        } : {
-            customerId,
-            ...position,
-            positionId: originalPosition.id
-        },
+        }
     });
+
+    console.log(result)
 
     return (
         <Fragment>

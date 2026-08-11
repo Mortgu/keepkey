@@ -23,7 +23,7 @@ export default function WorkloadItemOfferModal({ offerId, customerId, workload, 
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
-    const { totalCents, unitCents, isLoading: pricePending, discountCents, unit, total, totalDiscounted } = usePositionPrice({
+    const { isPending, error, result } = usePositionPrice({
         source: "live",
         query: {
             customerId,
@@ -41,7 +41,7 @@ export default function WorkloadItemOfferModal({ offerId, customerId, workload, 
         )
     }
 
-    if (productsPending || contractPending || pricePending) {
+    if (productsPending || contractPending || isPending) {
         <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
             <div className="flex items-center justify-center px-4 py-3 gap-4">
                 <LoaderCircle size={14} />
@@ -66,14 +66,14 @@ export default function WorkloadItemOfferModal({ offerId, customerId, workload, 
                     <div className="flex items-center gap-8">
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Total</p>
-                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(total)}</p>}
+                            {isPending && <LoaderCircle size={14} className="animate-spin" />}
+                            {!isPending && <p className="text-sm font-semibold">{formatEur(result?.total ?? 0)}</p>}
                         </div>
 
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Price per unit</p>
-                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(unit)}</p>}
+                            {isPending && <LoaderCircle size={14} className="animate-spin" />}
+                            {!isPending && <p className="text-sm font-semibold">{formatEur(result?.unit ?? 0)}</p>}
                         </div>
                     </div>
 

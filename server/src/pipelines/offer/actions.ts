@@ -12,7 +12,6 @@ import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { convert as libconvert } from "libreoffice-convert";
 import { z } from "zod";
-import { netCents } from "@keepit/schemas";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { livePrice, storedPrice, toTemplateItem } from "./format/position-item.js";
@@ -198,7 +197,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
             // Die Tabellensumme ist netto — im Dokument steht über ihr der
             // Bruttopreis und darunter der Rabatt als eigene Zeile.
-            itemsNetCents += netCents(price);
+            itemsNetCents += price.totalDiscounted;
 
             items.push(toTemplateItem(pos, price, {
                 language,

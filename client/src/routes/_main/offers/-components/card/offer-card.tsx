@@ -15,6 +15,7 @@ import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 import DocumentCard from "./document-card";
+import ExtensionModal from "../modals/extension-modal";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -214,11 +215,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             )}
 
             {extensionModal.isOpen && (
-                <DerivedModal
+                <ExtensionModal
                     key={`extension-${extensionModal.key}`}
-                    mode="extension"
-                    offer={offer}
-                    onClose={extensionModal.close}
+                    currentOffer={offer}
+                    closeFn={extensionModal.close}
                 />
             )}
         </div>
