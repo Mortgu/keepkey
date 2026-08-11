@@ -2,11 +2,11 @@ import { useStore } from "@tanstack/react-form";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { priceSourceFor } from "../hook/use-derived-form";
-import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
+import { priceSourceFor, type DerivedFormApi, type DerivedMode } from "../hook/use-derived-form";
 import { Button, Input, Select } from "@/components";
 import { usePositionPrice, useTariffDurationsHook } from "@/hooks";
 import { formatEur } from "@/utils/utils";
+import type { OfferPosition } from "@keepit/schemas";
 
 interface Props {
     form: DerivedFormApi;
@@ -15,11 +15,12 @@ interface Props {
     index: number;
     customerId: string;
     sourcePositionId: string;
+    originalPosition: OfferPosition;
     closeFn: () => void;
 }
 
 export default function WorkloadItemFormDerivedModal({
-    form, mode, offerId, index, customerId, sourcePositionId, closeFn,
+    form, mode, offerId, index, customerId, sourcePositionId, closeFn, originalPosition,
 }: Props) {
     const { t } = useTranslation();
 
@@ -38,22 +39,21 @@ export default function WorkloadItemFormDerivedModal({
     const [quantity, setQuantity] = useState(position.quantity);
     const [free_months, setFreeMonths] = useState(position.free_months);
 
-    const { totalCents, netCents, unitCents, discountCents, isLoading, unit, total, totalDiscounted } = usePositionPrice({
+
+    const { isPending, error, result } = usePositionPrice({
         source: priceSourceFor(mode),
-        query: {
+        query: isExtension ? {
             customerId,
-            productId: position.productId,
-            contractId: position.contractId,
-            duration,
-            quantity,
-            free_months,
+            ...position,
+            positionId: originalPosition.id
+        } : {
+            customerId,
+            ...position,
         },
-        pin: { customerId, positionId: sourcePositionId },
     });
 
-    const save = () => {
-        console.log(totalCents, free_months)
 
+    const save = () => {
         form.setFieldValue(`offerPositions[${index}]`, {
             ...position,
             duration,
@@ -61,10 +61,11 @@ export default function WorkloadItemFormDerivedModal({
             free_months,
             // total_cents ist brutto, der Wert der Freimonate steht getrennt —
             // so wird die Position auch gespeichert.
-            total_cents: totalCents,
-            discount_cents: discountCents,
-            eur_user_month: unitCents,
+            total_cents: result?.total ?? 0,
+            discount_cents: result?.discount ?? 0,
+            eur_user_month: result?.unit ?? 0,
         });
+
         closeFn();
     };
 
@@ -119,13 +120,13 @@ export default function WorkloadItemFormDerivedModal({
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unit)}
+                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(result?.unit ?? 0)}
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalDiscounted)}
+                            {isPending ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(result?.total ?? 0)}
                         </p>
                     </div>
                 </div>
@@ -134,7 +135,7 @@ export default function WorkloadItemFormDerivedModal({
                     <Button size="xs" variant="border" onClick={closeFn}>
                         {t("button.cancel")}
                     </Button>
-                    <Button size="xs" variant="primary" onClick={save} disabled={isLoading}>
+                    <Button size="xs" variant="primary" onClick={save} disabled={isPending}>
                         {t("button.save")}
                     </Button>
                 </div>

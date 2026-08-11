@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query";
 import { isLivePriceable } from "@keepit/schemas";
 import { getLivePrice, getPinnedPrice } from "./pricing-api";
 import { pricingKeys } from "./pricing-keys";
-import type { LivePriceQuery } from "@keepit/schemas";
+import type { LivePriceQuery, PinnedPriceQuery } from "@keepit/schemas";
 
 export const pricingQueries = {
     /**
@@ -20,12 +20,10 @@ export const pricingQueries = {
         }),
 
     /** Preis aus der von der Quellposition angepinnten Tarif-Version. */
-    pinned: (customerId: string, positionId: string, duration: number, quantity: number, free_months: number, enabled = true) =>
+    pinned: (query: PinnedPriceQuery, enabled = true) =>
         queryOptions({
-            queryKey: pricingKeys.pinned(customerId, positionId, duration, quantity, free_months),
-            queryFn: () => getPinnedPrice(customerId, positionId, duration, quantity, free_months),
-            enabled: enabled
-                && Boolean(customerId) && Boolean(duration) && Boolean(positionId)
-                && Number.isInteger(quantity) && quantity > 0,
+            queryKey: pricingKeys.pinned(query),
+            queryFn: () => getPinnedPrice(query),
+            enabled: enabled,
         }),
 };

@@ -1,4 +1,4 @@
-import type { LivePriceQuery, PositionPrice } from "@keepit/schemas";
+import type { LivePriceQuery, PinnedPriceQuery, PositionPrice } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 
 /**
@@ -24,7 +24,7 @@ export const getLivePrice = (query: LivePriceQuery) =>
  * die vollständige Preistabelle eingefroren ist, greift auch bei geänderter
  * Menge die richtige Staffel.
  */
-export const getPinnedPrice = (customerId: string, positionId: string, duration: number, quantity: number, free_months: number) =>
+export const getPinnedPrice = ({ customerId, positionId, duration, quantity, free_months }: PinnedPriceQuery) =>
     api<PositionPrice>(
         `/api/pricing/price/pinned?customerId=${customerId}&positionId=${positionId}&duration=${duration}&quantity=${quantity}&free_months=${free_months}`,
         { method: "GET" },

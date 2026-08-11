@@ -1,4 +1,4 @@
-import type { LivePriceQuery } from "@keepit/schemas";
+import type { LivePriceQuery, PinnedPriceQuery } from "@keepit/schemas";
 
 export const pricingKeys = {
     all: ["pricing"] as const,
@@ -7,6 +7,6 @@ export const pricingKeys = {
     live: (query: LivePriceQuery) => [...pricingKeys.lives(), query] as const,
 
     pinneds: () => [...pricingKeys.all, "pinned"] as const,
-    pinned: (customerId: string, positionId: string, duration: number, quantity: number, free_months: number) =>
-        [...pricingKeys.pinneds(), customerId, positionId, duration, quantity, free_months] as const,
+    pinned: (query: PinnedPriceQuery) =>
+        [...pricingKeys.pinneds(), query] as const,
 };

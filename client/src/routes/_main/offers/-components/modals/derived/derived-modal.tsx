@@ -8,7 +8,6 @@ import type { DerivedMode } from "./hook/use-derived-form";
 import type { Offer } from "@keepit/schemas";
 import { Button, ModalDialog } from "@/components";
 import { formatDate } from "@/lib/format";
-import WorkloadOfferModalSection from "../offer/workload/workloads";
 
 interface Props {
     offer: Offer;
@@ -72,12 +71,6 @@ export default function DerivedModal({ offer, mode, onClose }: Props) {
                         offerId={offer.id}
                         customerId={offer.customerId}
                         workloads={offer.offerPositions}
-                    />
-
-                    <WorkloadOfferModalSection
-                        customerId={offer.customerId}
-                        currentOffer={offer}
-                        form={form}
                     />
 
                     {/* Eine Erweiterung bestellt nur Seats nach — vertragsweite

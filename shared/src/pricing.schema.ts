@@ -43,7 +43,6 @@ export type LivePriceQuery = z.infer<typeof livePriceQuerySchema>;
 export const pinnedPriceQuerySchema = z.object({
     customerId: z.string().min(1),
     positionId: z.string().min(1),
-
     duration: z.coerce.number().int().positive(),
     quantity: z.coerce.number().int().positive(),
     free_months: z.coerce.number().int().min(0).optional(),
@@ -66,32 +65,12 @@ export type PinnedPriceQuery = z.infer<typeof pinnedPriceQuerySchema>;
  * gespeichertes Angebot zeigen dadurch dieselben Zahlen.
  */
 export const positionPriceSchema = z.object({
-    /** Stückpreis pro Einheit und Monat. */
-    eur_user_month: z.number().int(),
-    /** Brutto-Gesamtpreis, vor Abzug der Freimonate. */
-    total_cents: z.number().int(),
-    /** Wert der Freimonate: `eur_user_month * quantity * free_months`. */
-    discount_cents: z.number().int(),
-    /**
-     * true, wenn der Preis aus einer angepinnten Tarif-Version stammt.
-     *
-     * Live-Preise melden `false`. Bei einer Erweiterung bedeutet `false`
-     * dagegen, dass die Quellposition keinen Pin hat und flach mit ihrem
-     * gespeicherten Stückpreis gerechnet wurde — dann greifen Mengenstaffeln
-     * nicht mehr.
-     */
-    fromSnapshot: z.boolean(),
-
     unit: z.int().positive(),
     discount: z.int().min(0),
     total: z.int().positive(),
     totalDiscounted: z.int().positive(),
 });
 export type PositionPrice = z.infer<typeof positionPriceSchema>;
-
-/** Netto-Gesamtpreis einer Position: brutto abzüglich der Freimonate. */
-export const netCents = (price: Pick<PositionPrice, "total_cents" | "discount_cents">): number =>
-    price.total_cents - price.discount_cents;
 
 /** true, wenn die Koordinaten vollständig sind und abgefragt werden dürfen. */
 export const isLivePriceable = (query: LivePriceQuery): boolean =>

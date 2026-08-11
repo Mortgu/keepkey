@@ -1,12 +1,10 @@
 import { useStore } from "@tanstack/react-form";
-import { LoaderCircle, MoveRight, Pen, Trash, TriangleAlert } from "lucide-react";
+import { LoaderCircle, Pen, Trash } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { netCents } from "@keepit/schemas";
-import { priceSourceFor } from "../hook/use-derived-form";
 import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
 import type { OfferPosition } from "@keepit/schemas";
-import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
+import { priceSourceFor, type DerivedFormApi, type DerivedMode } from "../hook/use-derived-form";
 import { Button } from "@/components";
 import { useLocale, usePositionPrice } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
@@ -43,22 +41,18 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
     const isExtension = mode === "extension";
 
-    const { netCents: newTotal, isLoading, hasPrice, fromSnapshot, price, } = usePositionPrice({
+    const { isPending, error, result } = usePositionPrice({
         source: priceSourceFor(mode),
-        query: {
+        query: isExtension ? {
             customerId,
-            ...position
+            ...position,
+            positionId: originalPosition.id
+        } : {
+            customerId,
+            ...position,
+            positionId: originalPosition.id
         },
-        pin: { customerId, positionId: originalPosition.id },
     });
-
-    // Beide Seiten netto, also nach Abzug der Freimonate — sonst meldet der
-    // Vergleich bei Freimonaten eine Preisänderung, die keine ist.
-    const originalTotal = netCents(originalPosition);
-
-    const priceChanged = originalTotal !== price.total;
-    const quantityChanged = originalPosition.quantity !== position.quantity;
-    const durationChanged = originalPosition.duration !== position.duration;
 
     return (
         <Fragment>
@@ -77,12 +71,6 @@ export default function WorkloadItemDerivedModal(props: Props) {
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
                             <span className="text-xs text-gray-500">{t("renewal.duration")}</span>
                             <div className="flex items-center gap-2">
-                                {durationChanged && (
-                                    <>
-                                        <span className="text-md font-mono font-normal line-through">{originalPosition.duration} Mo.</span>
-                                        <MoveRight size={14} className="text-gray-500" />
-                                    </>
-                                )}
                                 <span className="text-md font-mono font-normal">{position.duration} Mo.</span>
                             </div>
                         </div>
@@ -91,40 +79,27 @@ export default function WorkloadItemDerivedModal(props: Props) {
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
                             <span className="text-xs text-gray-500">{t("renewal.quantity")}</span>
                             <div className="flex items-center gap-2">
-                                {quantityChanged && (
+                                {/*quantityChanged && (
                                     <>
                                         <span className="text-md font-mono font-normal line-through">{originalPosition.quantity}</span>
                                         <MoveRight size={14} className="text-gray-500" />
                                     </>
-                                )}
+                                )*/}
                                 <span className="text-md font-mono font-normal">{position.quantity}</span>
                             </div>
                         </div>
                         <div className="flex-1 min-w-fit grid items-center px-4 last:pr-0">
                             <span className="text-xs text-gray-500">{t("renewal.total")}</span>
                             <div className="flex items-center gap-2">
-                                {priceChanged && (
-                                    <>
-                                        <span className="text-md font-mono font-normal line-through">{formatEur(originalTotal)}</span>
-                                        <MoveRight size={14} className="text-gray-500" />
-                                    </>
-                                )}
-                                {isLoading ? (
+                                {isPending ? (
                                     <LoaderCircle size={14} className="animate-spin" />
                                 ) : (
-                                    <span className="text-md font-mono font-normal">{formatEur(price.total)}</span>
+                                    <span className="text-md font-mono font-normal">{formatEur(result?.totalDiscounted ?? 0)}</span>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
-
-                {isExtension && hasPrice && !fromSnapshot && (
-                    <div className="flex items-center gap-2 border-t border-(--border) px-4 py-2 text-sm text-gray-500">
-                        <TriangleAlert size={14} />
-                        <span>{t("licenseExtension.no_snapshot")}</span>
-                    </div>
-                )}
 
                 {edit && (
                     <WorkloadItemFormDerivedModal
@@ -132,6 +107,7 @@ export default function WorkloadItemDerivedModal(props: Props) {
                         mode={mode}
                         offerId={offerId}
                         index={index}
+                        originalPosition={originalPosition}
                         customerId={customerId}
                         sourcePositionId={originalPosition.id}
                         closeFn={() => setEdit(false)}
