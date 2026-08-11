@@ -38,7 +38,7 @@ export default function WorkloadItemFormDerivedModal({
     const [quantity, setQuantity] = useState(position.quantity);
     const [free_months, setFreeMonths] = useState(position.free_months);
 
-    const { totalCents, netCents, unitCents, discountCents, isLoading } = usePositionPrice({
+    const { totalCents, netCents, unitCents, discountCents, isLoading, unit, total, totalDiscounted } = usePositionPrice({
         source: priceSourceFor(mode),
         query: {
             customerId,
@@ -48,7 +48,7 @@ export default function WorkloadItemFormDerivedModal({
             quantity,
             free_months,
         },
-        pin: { offerId, positionId: sourcePositionId },
+        pin: { customerId, positionId: sourcePositionId },
     });
 
     const save = () => {
@@ -119,13 +119,13 @@ export default function WorkloadItemFormDerivedModal({
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.unit_price")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unitCents)}
+                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(unit)}
                         </p>
                     </div>
                     <div className="flex items-center justify-center gap-2">
                         <span className="text-md font-light text-gray-400">{t("renewal.total")}:</span>
                         <p className="text-md font-mono font-normal">
-                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(netCents)}
+                            {isLoading ? <LoaderCircle size={14} className="animate-spin" /> : formatEur(totalDiscounted)}
                         </p>
                     </div>
                 </div>

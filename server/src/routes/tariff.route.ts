@@ -12,9 +12,7 @@ import {
     getTariff,
     getTariffDurations,
     getTariffGroup,
-    getTariffGroups,
-    getTariffPrice,
-    getTariffVersions,
+    getTariffGroups, getTariffVersions,
     restoreTariffVersion,
     sealTariffVersion,
     updateTariffCell,
@@ -44,9 +42,6 @@ router.get('/', getTariffGroups);
 
 /* [POST] /api/tariffs — neue TariffGroup */
 router.post('/', validate(createTariffGroupSchema), createTariffGroup);
-
-/* [GET] /api/tariffs/price */
-router.get("/price", getTariffPrice);
 
 /* [PUT] /api/tariffs/customer-price — kundenspezifischen Stückpreis upserten */
 router.put("/customer-price", validate(upsertOverrideSchema), upsertCustomerPrice);

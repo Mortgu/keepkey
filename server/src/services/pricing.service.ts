@@ -97,8 +97,8 @@ export async function getPinnedPrice(query: PinnedPriceQuery): Promise<Calculate
     return result;
 }
 
-export async function upsertOverride(query: UpsertOverrideInput): Promise<PositionPrice> {
-    const { productId, contractId, duration, quantity, customerId, price } = query;
+export async function upsertOverride(input: UpsertOverrideInput): Promise<PositionPrice> {
+    const { productId, contractId, duration, quantity, customerId, price } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
     if (!tariff) throw priceFailure("NO_TARIFF");
@@ -133,8 +133,8 @@ export async function upsertOverride(query: UpsertOverrideInput): Promise<Positi
     );
 }
 
-export async function deleteOverride(query: DeleteOverrideInput): Promise<PositionPrice> {
-    const { productId, contractId, duration, quantity, customerId } = query;
+export async function deleteOverride(input: DeleteOverrideInput): Promise<PositionPrice> {
+    const { productId, contractId, duration, quantity, customerId } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
     if (!tariff) throw priceFailure("NO_TARIFF");

@@ -23,8 +23,8 @@ import type {
     CreateTariffRowInput,
     UpdateTariffRowInput,
     UpdateTariffCellInput,
-    UpsertCustomerPriceInput,
-    DeleteCustomerPriceInput,
+    UpsertOverrideInput,
+    DeleteOverrideInput,
 } from '@keepit/schemas';
 
 /* ========== Types ========== */
@@ -162,13 +162,19 @@ export async function recalculateAfterOverrideChange(
         throw new AppException(failureMessage, 500, result.reason);
     }
 
-    // Ein Override adressiert eine Tarif-Zelle, keine Angebotsposition — es gibt
-    // hier keine Freimonate, die abzuziehen wären.
+    const unitPrice = result.breakdown.unitPrice;
+
     return {
         eur_user_month: result.breakdown.unitPrice,
         total_cents: result.price,
         discount_cents: 0,
         fromSnapshot: false,
+
+        unit: result.breakdown.unitPrice,
+        discount: unitPrice * quantity * duration,
+
+        total: result.price,
+        totalDiscounted: 0,
     };
 }
 
@@ -853,7 +859,7 @@ export async function updateTariffCell(cellId: string, input: UpdateTariffCellIn
     });
 }
 
-export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
+export async function upsertCustomerPrice(input: UpsertOverrideInput) {
     const { productId, contractId, duration, quantity, customerId, price } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
@@ -889,7 +895,7 @@ export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
     );
 }
 
-export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
+export async function deleteCustomerPrice(input: DeleteOverrideInput) {
     const { productId, contractId, duration, quantity, customerId } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);

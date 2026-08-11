@@ -7,32 +7,32 @@ import { api } from "@/lib/api-client";
  */
 const toQuery = (query: LivePriceQuery) =>
     new URLSearchParams({
+        customerId: query.customerId,
         productId: query.productId,
         contractId: query.contractId,
         duration: String(query.duration),
         quantity: String(query.quantity),
-        customerId: query.customerId,
         free_months: String(query.free_months),
     });
 
 /** Preis aus dem aktuell gültigen Tarif. */
 export const getLivePrice = (query: LivePriceQuery) =>
-    api<PositionPrice>(`/api/tariffs/price?${toQuery(query)}`, { method: "GET" });
+    api<PositionPrice>(`/api/pricing/price/live?${toQuery(query)}`, { method: "GET" });
 
 /**
  * Preis aus der Tarif-Version, die die Quellposition angepinnt hat. Weil dort
  * die vollständige Preistabelle eingefroren ist, greift auch bei geänderter
  * Menge die richtige Staffel.
  */
-export const getPinnedPrice = (offerId: string, positionId: string, quantity: number, free_months: number) =>
+export const getPinnedPrice = (customerId: string, positionId: string, duration: number, quantity: number, free_months: number) =>
     api<PositionPrice>(
-        `/api/offers/${offerId}/positions/${positionId}/extension-price?quantity=${quantity}&free_months=${free_months}`,
+        `/api/pricing/price/pinned?customerId=${customerId}&positionId=${positionId}&duration=${duration}&quantity=${quantity}&free_months=${free_months}`,
         { method: "GET" },
     );
 
 /** Schreibt einen kundenspezifischen Stückpreis und gibt den neuen Preis zurück. */
 export const upsertCustomerPrice = (query: LivePriceQuery, unitPriceCents: number) =>
-    api<PositionPrice>("/api/tariffs/customer-price", {
+    api<PositionPrice>("/api/pricing/override", {
         method: "PUT",
         body: JSON.stringify({
             productId: query.productId,
@@ -53,5 +53,5 @@ export const deleteCustomerPrice = (query: LivePriceQuery) => {
         quantity: String(query.quantity),
         customerId: query.customerId,
     });
-    return api<PositionPrice>(`/api/tariffs/customer-price?${params}`, { method: "DELETE" });
+    return api<PositionPrice>(`/api/pricing/override?${params}`, { method: "DELETE" });
 };

@@ -23,7 +23,7 @@ export default function WorkloadItemOfferModal({ offerId, customerId, workload, 
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
-    const { totalCents, unitCents, isLoading: pricePending, discountCents } = usePositionPrice({
+    const { totalCents, unitCents, isLoading: pricePending, discountCents, unit, total, totalDiscounted } = usePositionPrice({
         source: "live",
         query: {
             customerId,
@@ -67,13 +67,13 @@ export default function WorkloadItemOfferModal({ offerId, customerId, workload, 
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Total</p>
                             {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents - discountCents)}</p>}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(total)}</p>}
                         </div>
 
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Price per unit</p>
                             {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(unitCents)}</p>}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(unit)}</p>}
                         </div>
                     </div>
 

@@ -81,6 +81,11 @@ export const positionPriceSchema = z.object({
      * nicht mehr.
      */
     fromSnapshot: z.boolean(),
+
+    unit: z.int().positive(),
+    discount: z.int().min(0),
+    total: z.int().positive(),
+    totalDiscounted: z.int().positive(),
 });
 export type PositionPrice = z.infer<typeof positionPriceSchema>;
 

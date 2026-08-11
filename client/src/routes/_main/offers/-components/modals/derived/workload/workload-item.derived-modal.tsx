@@ -7,7 +7,7 @@ import { priceSourceFor } from "../hook/use-derived-form";
 import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
 import type { OfferPosition } from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
-import { Button, Checkbox } from "@/components";
+import { Button } from "@/components";
 import { useLocale, usePositionPrice } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
@@ -43,20 +43,20 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
     const isExtension = mode === "extension";
 
-    const { netCents: newTotal, isLoading, hasPrice, fromSnapshot } = usePositionPrice({
+    const { netCents: newTotal, isLoading, hasPrice, fromSnapshot, price, } = usePositionPrice({
         source: priceSourceFor(mode),
         query: {
             customerId,
             ...position
         },
-        pin: { offerId, positionId: originalPosition.id },
+        pin: { customerId, positionId: originalPosition.id },
     });
 
     // Beide Seiten netto, also nach Abzug der Freimonate — sonst meldet der
     // Vergleich bei Freimonaten eine Preisänderung, die keine ist.
     const originalTotal = netCents(originalPosition);
 
-    const priceChanged = originalTotal !== newTotal;
+    const priceChanged = originalTotal !== price.total;
     const quantityChanged = originalPosition.quantity !== position.quantity;
     const durationChanged = originalPosition.duration !== position.duration;
 
@@ -66,13 +66,9 @@ export default function WorkloadItemDerivedModal(props: Props) {
                 <div className="flex items-center justify-between bg-(--subtle-50) px-4 py-3">
 
                     {/* Checkbox + Product name + contract */}
-                    <div className="flex items-center gap-4">
-                        <Checkbox checked={checked} onChange={() => setChecked(!checked)} />
-
-                        <div className="grid">
-                            <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>
-                            <p className="font-normal text-sm text-gray-400">{localized(originalPosition.contract.translations, locales, "name")}</p>
-                        </div>
+                    <div className="grid">
+                        <p className="font-normal">{localized(originalPosition.product.translations, locales, "name")}</p>
+                        <p className="font-normal text-sm text-gray-400">{localized(originalPosition.contract.translations, locales, "name")}</p>
                     </div>
 
                     <div className="relative divide-x divide-(--border) flex items-center">
@@ -116,7 +112,7 @@ export default function WorkloadItemDerivedModal(props: Props) {
                                 {isLoading ? (
                                     <LoaderCircle size={14} className="animate-spin" />
                                 ) : (
-                                    <span className="text-md font-mono font-normal">{formatEur(newTotal)}</span>
+                                    <span className="text-md font-mono font-normal">{formatEur(price.total)}</span>
                                 )}
                             </div>
                         </div>

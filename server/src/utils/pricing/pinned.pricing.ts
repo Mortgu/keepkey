@@ -28,6 +28,8 @@ export async function calculatePinnedPrice({ customerId, position, duration, qua
         }
     });
 
+    console.dir(version, { depth: null })
+
     if (!version) {
         throw new AppException("Tariff version not found", 404, "TARIFF_VERSION_NOT_FOUND");
     }
@@ -42,6 +44,8 @@ export async function calculatePinnedPrice({ customerId, position, duration, qua
 
     const tariff = tariffFromSnapshot(parseTariffVersionSnapshot(version.snapshot), customerOverride);
 
+    console.dir(tariff, { depth: null })
+
     const result = selectPrice({
         tariff: tariff,
         customerId: customerId,
@@ -51,6 +55,8 @@ export async function calculatePinnedPrice({ customerId, position, duration, qua
         quantity: quantity ?? position.quantity,
         free_months: free_months ?? 0,
     });
+
+    console.log(result)
 
     if (!result.ok) {
         throw new AppException(

@@ -19,6 +19,11 @@ const EMPTY_PRICE: PositionPrice = {
     total_cents: 0,
     discount_cents: 0,
     fromSnapshot: false,
+
+    total: 0,
+    totalDiscounted: 0,
+    unit: 0,
+    discount: 0
 };
 
 interface UsePositionPriceArgs {
@@ -29,7 +34,7 @@ interface UsePositionPriceArgs {
      * `positionId: null`, wenn die Position keine Entsprechung im Quellangebot
      * hat.
      */
-    pin?: { offerId: string; positionId: string | null };
+    pin?: { customerId: string; positionId: string | null };
 }
 
 /**
@@ -44,8 +49,9 @@ export function usePositionPrice({ source, query, pin }: UsePositionPriceArgs) {
 
     const live = useQuery(pricingQueries.live(query, !isPinned));
     const pinned = useQuery(pricingQueries.pinned(
-        pin?.offerId ?? "",
+        pin?.customerId ?? "",
         pin?.positionId ?? "",
+        query.duration,
         query.quantity,
         query.free_months,
         isPinned,
@@ -72,6 +78,11 @@ export function usePositionPrice({ source, query, pin }: UsePositionPriceArgs) {
         /** Nur true, solange wirklich eine Anfrage läuft. */
         isLoading: active.isLoading,
         error: active.error,
+
+        total: price.total,
+        totalDiscounted: price.totalDiscounted,
+        unit: price.unit,
+        discount: price.discount,
     };
 }
 

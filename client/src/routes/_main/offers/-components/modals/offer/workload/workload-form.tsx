@@ -64,12 +64,12 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
         free_months,
     };
 
-    const { unitCents, isLoading: pricePending } = usePositionPrice({ source: "live", query });
+    const { unitCents, unit, isLoading: pricePending } = usePositionPrice({ source: "live", query });
 
     const canOverride = Boolean(customerId);
 
     const startEditPrice = () => {
-        setOverrideEur((unitCents / 100).toString());
+        setOverrideEur((unit / 100).toString());
         setEditingPrice(true);
     };
 
@@ -115,7 +115,7 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
 
     const displayUnitPrice = editingPrice
         ? overrideEur
-        : formatEur(unitCents);
+        : formatEur(unit);
 
     return (
         <div className="w-full grid gap-3 p-4">
