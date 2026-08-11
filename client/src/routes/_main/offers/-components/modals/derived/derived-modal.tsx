@@ -8,6 +8,7 @@ import type { DerivedMode } from "./hook/use-derived-form";
 import type { Offer } from "@keepit/schemas";
 import { Button, ModalDialog } from "@/components";
 import { formatDate } from "@/lib/format";
+import WorkloadOfferModalSection from "../offer/workload/workloads";
 
 interface Props {
     offer: Offer;
@@ -17,7 +18,7 @@ interface Props {
 
 export default function DerivedModal({ offer, mode, onClose }: Props) {
     const { t } = useTranslation();
-    const { form } = useDerivedForm({ offer, mode, closeFn: onClose });
+    const { form, isLoadingQuoteId, quoteIdCloudChecked } = useDerivedForm({ offer, mode, closeFn: onClose });
 
     const isExtension = mode === "extension";
     const formId = isExtension ? "extension-form" : "renewal-form";
@@ -57,13 +58,13 @@ export default function DerivedModal({ offer, mode, onClose }: Props) {
                         </div>
                     </div>
 
-                    {isExtension && (
-                        <p className="text-sm text-gray-500 mb-4">{t("licenseExtension.hint")}</p>
-                    )}
-
                     <hr className="text-(--border)" />
 
-                    <OfferDerivedModal form={form} />
+                    <OfferDerivedModal
+                        form={form}
+                        isLoadingQuoteId={isLoadingQuoteId}
+                        quoteIdCloudChecked={quoteIdCloudChecked}
+                    />
 
                     <WorkloadDerivedModal
                         form={form}
@@ -71,6 +72,12 @@ export default function DerivedModal({ offer, mode, onClose }: Props) {
                         offerId={offer.id}
                         customerId={offer.customerId}
                         workloads={offer.offerPositions}
+                    />
+
+                    <WorkloadOfferModalSection
+                        customerId={offer.customerId}
+                        currentOffer={offer}
+                        form={form}
                     />
 
                     {/* Eine Erweiterung bestellt nur Seats nach — vertragsweite

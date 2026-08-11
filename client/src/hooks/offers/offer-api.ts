@@ -10,6 +10,8 @@ import type {
     OfferRevision,
 
     OffersPage,
+    QuoteIdAvailability,
+    QuoteIdSuggestion,
     Task,
 
     UpdateOfferFlatrateInput,
@@ -83,6 +85,17 @@ export const deleteOfferFlatrate = async (id: string, flatrateId: string) =>
 export const generateOfferDocument = async (id: string) =>
     api<Task>(`/api/offers/${id}/documents`, {
         method: "POST"
+    });
+
+/* Belegnummern */
+export const getNextQuoteId = async () =>
+    api<QuoteIdSuggestion>("/api/offers/next-quote-id", {
+        method: "GET"
+    });
+
+export const getQuoteIdAvailability = async (quoteId: string) =>
+    api<QuoteIdAvailability>(`/api/offers/quote-id/${encodeURIComponent(quoteId)}/availability`, {
+        method: "GET"
     });
 
 /* Offer Revisions */

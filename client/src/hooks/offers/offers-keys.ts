@@ -12,4 +12,7 @@ export const offerKeys = {
 
     tasks: () => [...offerKeys.all, 'tasks'] as const,
     task: (taskId: string) => [...offerKeys.tasks(), taskId] as const,
+
+    nextQuoteId: () => [...offerKeys.all, 'next-quote-id'] as const,
+    quoteIdAvailability: (quoteId: string) => [...offerKeys.all, 'quote-id', quoteId] as const,
 };

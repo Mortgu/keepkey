@@ -3,7 +3,9 @@ import type {
     CreateOfferInput,
     Offer
 } from '@keepit/schemas';
+import { useQuery } from "@tanstack/react-query";
 import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
+import { offerQueries } from "@/hooks/offers/offer-queries";
 import { localized } from "@/lib/i18n-content";
 
 
@@ -27,12 +29,21 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
 
     const preselected = customers.find(c => c.id === preselectedCustomerId);
 
+    // Beim Anlegen die nächste freie Belegnummer vorschlagen; ein bestehendes Angebot
+    // behält seine. Der Vorschlag ist nicht reserviert — beim Speichern entscheidet der
+    // Unique-Constraint.
+    const isNewOffer = !currentOffer;
+    const { data: suggestion, isLoading: isLoadingQuoteId } = useQuery({
+        ...offerQueries.nextQuoteId(),
+        enabled: isNewOffer,
+    });
+
     const defaultValues: CreateOfferInput = {
         customerId: currentOffer?.customerId || preselected?.id || customers[0]?.id || "",
         contactPersonId: currentOffer?.contactPersonId || preselected?.contactPersons[0]?.id || customers[0]?.contactPersons[0]?.id || "",
         userId: currentOffer?.userId || users[0]?.id || "",
         supplierId: currentOffer?.supplierId || suppliers[0]?.id || null,
-        quoteId: currentOffer?.quoteId || "",
+        quoteId: currentOffer?.quoteId || suggestion?.quoteId || "",
         paymentTerm: currentOffer?.paymentTerm || "30 Tage",
         validUntil: currentOffer?.validUntil || null,
         requestFrom: currentOffer?.requestFrom || null,
@@ -68,5 +79,8 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
     return {
         compareOptions,
         defaultValues,
+        suggestedQuoteId: suggestion?.quoteId,
+        isLoadingQuoteId,
+        quoteIdCloudChecked: suggestion?.cloudChecked ?? true,
     };
 }

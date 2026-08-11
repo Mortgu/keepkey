@@ -1,27 +1,50 @@
 import { useState } from "react";
-import { findOfferFilesByIdAction } from "@/data/nextcloud";
+import { getQuoteIdAvailability } from "@/hooks/offers/offer-api";
+import type { QuoteIdConflict } from "@keepit/schemas";
 
+export type QuoteIdCheckResult = {
+    conflict: QuoteIdConflict | null;
+    /** false = NextCloud war nicht erreichbar, Bestandsdateien blieben ungeprüft. */
+    cloudChecked: boolean;
+};
+
+/**
+ * Prüft eine eingegebene Belegnummer gegen Datenbank und NextCloud.
+ *
+ * Reines Vorab-Feedback: verbindlich entscheidet erst der Unique-Constraint beim Speichern.
+ * Ein Fehler beim Prüfen darf deshalb nie das Formular blockieren.
+ */
 export function useQuoteIdCheck() {
-    const [quoteIdWarning, setQuoteIdWarning] = useState<string | undefined>(undefined);
+    const [result, setResult] = useState<QuoteIdCheckResult | undefined>(undefined);
     const [checkingQuoteId, setCheckingQuoteId] = useState(false);
 
-    const clearQuoteIdWarning = () => setQuoteIdWarning(undefined);
+    const clearQuoteIdWarning = () => setResult(undefined);
 
     const checkQuoteId = async (id: string) => {
         if (!id) {
-            setQuoteIdWarning(undefined);
+            setResult(undefined);
             return;
         }
+
         setCheckingQuoteId(true);
         try {
-            const result = await findOfferFilesByIdAction(id);
-            setQuoteIdWarning(result.found ? "Datei existiert bereits" : undefined);
+            const availability = await getQuoteIdAvailability(id);
+            setResult({
+                conflict: availability.available ? null : availability.conflict,
+                cloudChecked: availability.cloudChecked,
+            });
         } catch {
-            setQuoteIdWarning(undefined);
+            setResult(undefined);
         } finally {
             setCheckingQuoteId(false);
         }
     };
 
-    return { quoteIdWarning, checkingQuoteId, checkQuoteId, clearQuoteIdWarning };
+    return {
+        quoteIdConflict: result?.conflict ?? null,
+        quoteIdCloudChecked: result?.cloudChecked ?? true,
+        checkingQuoteId,
+        checkQuoteId,
+        clearQuoteIdWarning,
+    };
 }

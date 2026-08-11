@@ -58,7 +58,7 @@ export function OfferPage() {
                 />
             </div>
 
-            <div className="px-8 py-6">
+            <div className="px-8 py-6 bg-(--page-bg)">
                 <OfferList filters={filters} />
             </div>
 

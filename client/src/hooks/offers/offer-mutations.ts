@@ -1,7 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import { createOffer, createOfferFlatrates, createOfferPositions, deleteOffer, deleteOfferFlatrate, deleteOfferPosition, extendOffer, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer, updateOfferFlatrate, updateOfferPosition } from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
+import { ApiError } from "@/lib/api-client";
 
 import type {
     CreateOfferFlatrateInput,
@@ -17,6 +19,19 @@ import type {
     UpdateOfferPositionInput,
 } from '@keepit/schemas';
 
+/**
+ * Nach einer verlorenen Belegnummer den Vorschlag verwerfen.
+ *
+ * Nummern werden nicht reserviert: zwei parallele Anlagen sehen denselben Vorschlag, der
+ * zweite läuft in den Unique-Constraint. Der Cache muss dann weg, damit das Formular beim
+ * nächsten Versuch die tatsächlich nächste freie Nummer bekommt statt der verbrannten.
+ */
+function invalidateQuoteIdSuggestionOnConflict(queryClient: QueryClient, error: unknown) {
+    if (error instanceof ApiError && error.code === "QUOTE_ID_TAKEN") {
+        queryClient.invalidateQueries({ queryKey: offerKeys.nextQuoteId() });
+    }
+}
+
 export function useCreateOffer() {
     const queryClient = useQueryClient();
 
@@ -25,6 +40,7 @@ export function useCreateOffer() {
         onSuccess: () => queryClient.invalidateQueries({
             queryKey: offerKeys.lists()
         }),
+        onError: (error) => invalidateQuoteIdSuggestionOnConflict(queryClient, error),
     });
 
     return {
@@ -45,6 +61,7 @@ export function useUpdateOffer() {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
         },
+        onError: (error) => invalidateQuoteIdSuggestionOnConflict(queryClient, error),
     });
 
     return {
@@ -253,7 +270,8 @@ export function useRenewOffer() {
         onSuccess: (_data, { offerId }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(offerId) });
-        }
+        },
+        onError: (error) => invalidateQuoteIdSuggestionOnConflict(queryClient, error),
     });
     return { renewOffer: mutation.mutateAsync, isRenewing: mutation.isPending, errorRenewing: mutation.error };
 }
@@ -266,7 +284,8 @@ export function useExtendOffer() {
         onSuccess: (_data, { offerId }) => {
             queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
             queryClient.invalidateQueries({ queryKey: offerKeys.detail(offerId) });
-        }
+        },
+        onError: (error) => invalidateQuoteIdSuggestionOnConflict(queryClient, error),
     });
     return { extendOffer: mutation.mutateAsync, isExtending: mutation.isPending, errorExtending: mutation.error };
 }

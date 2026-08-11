@@ -1,5 +1,5 @@
 import { useForm, useStore } from "@tanstack/react-form";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 
     createOfferSchema
@@ -16,7 +16,12 @@ interface Props {
 }
 
 export default function useOfferForm({ currentOffer, closeFn, preselectedCustomerId }: Props) {
-    const { defaultValues } = useOfferModal({ currentOffer, preselectedCustomerId });
+    const {
+        defaultValues,
+        suggestedQuoteId,
+        isLoadingQuoteId,
+        quoteIdCloudChecked,
+    } = useOfferModal({ currentOffer, preselectedCustomerId });
     const { createOffer, updateOffer } = useOfferManager();
 
     const [expectedVersion] = useState(currentOffer?.version);
@@ -43,9 +48,27 @@ export default function useOfferForm({ currentOffer, closeFn, preselectedCustome
 
     const customerId = useStore(form.store, (s) => s.values.customerId);
 
+    // Der Vorschlag trifft erst nach dem Mount ein, `defaultValues` ist da schon eingefroren.
+    // Nachtragen nur, solange das Feld leer ist — was der Nutzer selbst getippt hat, bleibt stehen.
+    useEffect(() => {
+        if (currentOffer || !suggestedQuoteId) return;
+        if (form.getFieldValue("quoteId")) return;
+
+        form.setFieldValue("quoteId", suggestedQuoteId);
+    }, [currentOffer, suggestedQuoteId, form]);
+
+    // Die Belegnummer ist der Dateipräfix des Dokuments — sobald eines existiert, liegt sie fest.
+    // Der Server lehnt eine Änderung ohnehin ab, hier geht es nur um die Anzeige.
+    const quoteIdLocked = Boolean(
+        currentOffer?.offerDocuments.some((document) => document.status !== "FAILED"),
+    );
+
     return {
         form,
-        customerId
+        customerId,
+        quoteIdLocked,
+        isLoadingQuoteId,
+        quoteIdCloudChecked,
     }
 }
 

@@ -25,7 +25,8 @@ export default function OfferModal(props: OfferModalProps) {
 
   const { t } = useTranslation();
 
-  const { form, customerId } = useOfferForm({ currentOffer, closeFn, preselectedCustomerId });
+  const { form, customerId, quoteIdLocked, isLoadingQuoteId, quoteIdCloudChecked } =
+    useOfferForm({ currentOffer, closeFn, preselectedCustomerId });
 
   return (
     <ModalDialog onClose={closeFn}>
@@ -39,7 +40,12 @@ export default function OfferModal(props: OfferModalProps) {
       <ModalDialog.Content>
         <div className="grid gap-4">
 
-          <FormOfferModal form={form} />
+          <FormOfferModal
+            form={form}
+            quoteIdLocked={quoteIdLocked}
+            isLoadingQuoteId={isLoadingQuoteId}
+            quoteIdCloudChecked={quoteIdCloudChecked}
+          />
 
           <WorkloadOfferModalSection
             customerId={customerId}

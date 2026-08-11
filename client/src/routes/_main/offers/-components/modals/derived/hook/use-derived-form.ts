@@ -1,8 +1,11 @@
 import { useForm } from "@tanstack/react-form";
+import { useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { createOfferSchema } from "@keepit/schemas";
 import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
 import type { PriceSource } from "@/hooks";
 import { useExtendOffer, useRenewOffer } from "@/hooks";
+import { offerQueries } from "@/hooks/offers/offer-queries";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 
 /**
@@ -60,12 +63,19 @@ export default function useDerivedForm({ offer, mode, closeFn }: Props) {
     const { renewOffer } = useRenewOffer();
     const { extendOffer } = useExtendOffer();
 
+    // Verlängerung und Erweiterung sind eigene Belege und brauchen eine eigene Nummer.
+    // `defaultValues` kommt aus dem Quellangebot und trüge sonst dessen Nummer mit.
+    const { data: suggestion, isLoading: isLoadingQuoteId } = useQuery(offerQueries.nextQuoteId());
+
     const form = useForm({
         // In der Erweiterung gibt es keine Pauschalen und keine übernommenen
         // Rabatte — sonst würde eine Nachbestellung sie ein zweites Mal berechnen.
-        defaultValues: mode === "extension"
-            ? { ...defaultValues, flatrates: [], discounts: [] }
-            : defaultValues,
+        defaultValues: {
+            ...(mode === "extension"
+                ? { ...defaultValues, flatrates: [], discounts: [] }
+                : defaultValues),
+            quoteId: suggestion?.quoteId ?? "",
+        },
         validators: {
             onMount: createOfferSchema,
             onChange: createOfferSchema,
@@ -80,7 +90,19 @@ export default function useDerivedForm({ offer, mode, closeFn }: Props) {
         },
     });
 
-    return { form };
+    // Der Vorschlag trifft erst nach dem Mount ein — nachtragen, solange das Feld leer ist.
+    useEffect(() => {
+        if (!suggestion?.quoteId) return;
+        if (form.getFieldValue("quoteId")) return;
+
+        form.setFieldValue("quoteId", suggestion.quoteId);
+    }, [suggestion?.quoteId, form]);
+
+    return {
+        form,
+        isLoadingQuoteId,
+        quoteIdCloudChecked: suggestion?.cloudChecked ?? true,
+    };
 }
 
 export type DerivedFormApi = ReturnType<typeof useDerivedForm>["form"];

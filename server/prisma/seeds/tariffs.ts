@@ -57,26 +57,26 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
 
         // 3. Columns (Laufzeiten): 12 und 24 Monate
         const column12 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 12, order: 0 },
+            data: { tariffId: tariff.id, duration: 12 },
         });
         const column24 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 24, order: 1 },
+            data: { tariffId: tariff.id, duration: 24 },
         });
 
         // 4. Rows (Mengenbereiche)
         const rowSmall = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 1, max_quantity: 10, order: 0 },
+            data: { tariffId: tariff.id, min_quantity: 1, max_quantity: 10 },
         });
         const rowLarge = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 11, max_quantity: null, order: 1 },
+            data: { tariffId: tariff.id, min_quantity: 11, max_quantity: null },
         });
 
         // 5. Cells + Default-Preise
         const cells = [
-            { rowId: rowSmall.id, columnId: column12.id, duration: 12, min_quantity: 1,  price: 10 },
-            { rowId: rowSmall.id, columnId: column24.id, duration: 24, min_quantity: 1,  price: 9  },
-            { rowId: rowLarge.id, columnId: column12.id, duration: 12, min_quantity: 11, price: 5  },
-            { rowId: rowLarge.id, columnId: column24.id, duration: 24, min_quantity: 11, price: 4  },
+            { rowId: rowSmall.id, columnId: column12.id, duration: 12, min_quantity: 1, price: 10 },
+            { rowId: rowSmall.id, columnId: column24.id, duration: 24, min_quantity: 1, price: 9 },
+            { rowId: rowLarge.id, columnId: column12.id, duration: 12, min_quantity: 11, price: 5 },
+            { rowId: rowLarge.id, columnId: column24.id, duration: 24, min_quantity: 11, price: 4 },
         ];
 
         for (const cellData of cells) {

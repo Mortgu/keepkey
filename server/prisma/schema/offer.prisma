@@ -24,7 +24,11 @@ model Offer {
 
   language Language @default(DE)
 
-  quoteId         String // quoteId / voucherId
+  /// Belegnummer: 2 Ziffern Geschaeftsjahr + 3 Ziffern Zaehler (26000, 26001, ...).
+  /// Einmal vergeben und an einem Dokument haengend ist sie unveraenderlich — sie ist
+  /// zugleich der Dateipraefix in NextCloud.
+  quoteId         String @unique
+
   /// @openapi.ignore
   documentVersion Int    @default(0)
   paymentTerm     String

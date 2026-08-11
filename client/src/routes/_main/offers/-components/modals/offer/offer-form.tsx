@@ -6,19 +6,41 @@ import type { Language } from "@keepit/schemas";
 import { getFormError } from "@/lib/utils";
 import { useCustomers, useSuppliers, useUsers } from "@/hooks";
 import { Input, Select } from "@/components";
+import { useQuoteIdCheck } from "../../../-hooks/use-quote-check";
 
 interface Props {
     form: OfferFormApi;
+    /** Belegnummer ist festgeschrieben, weil bereits ein Dokument dazu existiert. */
+    quoteIdLocked?: boolean;
+    /** Der Vorschlag wird gerade geholt. */
+    isLoadingQuoteId?: boolean;
+    /** false = NextCloud war beim Vorschlagen nicht erreichbar. */
+    quoteIdCloudChecked?: boolean;
 }
 
 export type OfferFormTypes = "create" | "edit" | "renewal";
 
-export default function FormOfferModal({ form }: Props) {
+export default function FormOfferModal({ form, quoteIdLocked, isLoadingQuoteId, quoteIdCloudChecked = true }: Props) {
     const { t } = useTranslation();
 
     const { customers } = useCustomers();
     const { users } = useUsers();
     const { suppliers } = useSuppliers();
+
+    const { quoteIdConflict, quoteIdCloudChecked: checkedOnBlur, checkingQuoteId, checkQuoteId, clearQuoteIdWarning } = useQuoteIdCheck();
+
+    // Die Formatprüfung macht schon das zod-Schema — hier nur melden, was dort niemand sehen kann.
+    const quoteIdWarning =
+        quoteIdConflict === "db" ? t("offerModal.quoteIdTaken")
+            : quoteIdConflict === "cloud" ? t("offerModal.quoteIdCloudConflict")
+                : (!quoteIdCloudChecked || !checkedOnBlur) ? t("offerModal.quoteIdCloudUnavailable")
+                    : undefined;
+
+    const quoteIdWarningTooltip =
+        quoteIdConflict === "db" ? t("offerModal.quoteIdTakenHint")
+            : quoteIdConflict === "cloud" ? t("offerModal.quoteIdCloudConflictHint")
+                : quoteIdWarning ? t("offerModal.quoteIdCloudUnavailableHint")
+                    : undefined;
 
     const handleSubmit = (event: SyntheticEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -100,8 +122,20 @@ export default function FormOfferModal({ form }: Props) {
                 <div className="flex items-center gap-4">
                     {/* QuoteId */}
                     <form.Field name="quoteId" children={(field) => (
-                        <Input label={t("offerModal.quoteId")} value={field.state.value} onChange={(e) => field.handleChange(e.target.value)}
-                            error={getFormError(field.state.meta.errors)} />
+                        <Input label={t("offerModal.quoteId")} value={field.state.value}
+                            disabled={quoteIdLocked}
+                            loading={isLoadingQuoteId || checkingQuoteId}
+                            onChange={(e) => {
+                                clearQuoteIdWarning();
+                                field.handleChange(e.target.value);
+                            }}
+                            onBlur={() => {
+                                field.handleBlur();
+                                if (!quoteIdLocked) void checkQuoteId(field.state.value);
+                            }}
+                            error={getFormError(field.state.meta.errors)}
+                            warning={quoteIdLocked ? t("offerModal.quoteIdLocked") : quoteIdWarning}
+                            warningTooltip={quoteIdLocked ? t("offerModal.quoteIdLockedHint") : quoteIdWarningTooltip} />
                     )} />
 
                     {/* Lieferant */}
