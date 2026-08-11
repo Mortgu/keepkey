@@ -27,7 +27,7 @@ model Offer {
   /// Belegnummer: 2 Ziffern Geschaeftsjahr + 3 Ziffern Zaehler (26000, 26001, ...).
   /// Einmal vergeben und an einem Dokument haengend ist sie unveraenderlich — sie ist
   /// zugleich der Dateipraefix in NextCloud.
-  quoteId         String @unique
+  quoteId String @unique
 
   /// @openapi.ignore
   documentVersion Int    @default(0)
@@ -101,10 +101,10 @@ model OfferPosition {
   tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
   tariffVersionId String?
 
-  duration_months Int
-  free_months     Int     @default(0)
-  quantity        Int
-  optional        Boolean @default(false)
+  duration    Int
+  free_months Int     @default(0)
+  quantity    Int
+  optional    Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int

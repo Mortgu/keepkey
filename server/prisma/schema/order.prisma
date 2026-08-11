@@ -78,8 +78,8 @@ model OrderPosition {
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
-  duration_months Int
-  quantity        Int
+  duration Int
+  quantity Int
 
   optional Boolean? @default(false)
 

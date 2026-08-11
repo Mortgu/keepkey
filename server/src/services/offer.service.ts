@@ -77,7 +77,7 @@ async function pricePositions(
 
             const result = selectPrice(tariff, {
                 productId: position.productId,
-                duration: position.duration_months,
+                duration: position.duration,
                 quantity: position.quantity,
                 customerId,
             });
@@ -187,8 +187,8 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
 async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-            offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+        data: positions.map(({ productId, contractId, duration, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+            offerId, productId, contractId, duration, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
             tariffVersionId: tariffVersionId ?? null,
         })),
     });
@@ -465,8 +465,8 @@ async function persistOffer(
             });
 
             await tx.offerPosition.createMany({
-                data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-                    offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+                data: positions.map(({ productId, contractId, duration, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+                    offerId: offer.id, productId, contractId, duration, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
                     tariffVersionId,
                 })),
             });
@@ -816,7 +816,7 @@ type SourcePosition = {
     id: string;
     productId: string;
     contractId: string;
-    duration_months: number;
+    duration: number;
     free_months: number;
     eur_user_month: number;
     tariffVersionId: string | null;
@@ -836,7 +836,7 @@ type SourcePosition = {
  * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet.
  */
 async function priceFromPin(source: SourcePosition, quantity: number, customerId: string) {
-    const duration = source.duration_months;
+    const duration = source.duration;
 
     const flat = (eur_user_month: number, fromSnapshot: boolean) => ({
         eur_user_month,
@@ -905,7 +905,7 @@ async function loadSourcePosition(offerId: string, positionId: string) {
         where: { id: positionId },
         select: {
             id: true, offerId: true, productId: true, contractId: true,
-            duration_months: true, free_months: true, eur_user_month: true, tariffVersionId: true,
+            duration: true, free_months: true, eur_user_month: true, tariffVersionId: true,
         },
     });
 
@@ -979,7 +979,7 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
         positions.push({
             productId: sourcePosition.productId,
             contractId: sourcePosition.contractId,
-            duration_months: sourcePosition.duration_months,
+            duration: sourcePosition.duration,
             free_months: sourcePosition.free_months,
             quantity: requested.quantity,
             optional: sourcePosition.optional,

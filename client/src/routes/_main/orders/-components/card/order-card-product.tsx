@@ -9,7 +9,7 @@ type Props = {
 }
 
 export default function OrderCardProduct({ position }: Props) {
-    const { product, contract, quantity, duration_months, total_cents } = position;
+    const { product, contract, quantity, duration, total_cents } = position;
 
     const locale = useLocale();
 
@@ -31,7 +31,7 @@ export default function OrderCardProduct({ position }: Props) {
                     </div>
                     <div className="flex gap-1 text-sm font-light">
                         <span className="text-(--text-secondary)">Laufzeit:</span>
-                        <p>{duration_months} Monate</p>
+                        <p>{duration} Monate</p>
                     </div>
                 </div>
             </div>

@@ -2,7 +2,6 @@ import { useStore } from "@tanstack/react-form";
 import { LoaderCircle } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { coordinatesFrom } from "@keepit/schemas";
 import { priceSourceFor } from "../hook/use-derived-form";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
 import { Button, Input, Select } from "@/components";
@@ -32,31 +31,32 @@ export default function WorkloadItemFormDerivedModal({
     // In der Erweiterung bleibt die Laufzeit der Quellposition bindend — sie
     // bestimmt die Spalte in der eingefrorenen Preistabelle.
     const [duration, setDuration] = useState(
-        !isExtension && durations.length > 0 && !durations.includes(position.duration_months)
+        !isExtension && durations.length > 0 && !durations.includes(position.duration)
             ? durations[0]
-            : position.duration_months,
+            : position.duration,
     );
     const [quantity, setQuantity] = useState(position.quantity);
-    const [freeMonths, setFreeMonths] = useState(position.free_months);
+    const [free_months, setFreeMonths] = useState(position.free_months);
 
     const { totalCents, netCents, unitCents, discountCents, isLoading } = usePositionPrice({
         source: priceSourceFor(mode),
-        coordinates: coordinatesFrom(customerId, {
+        query: {
+            customerId,
             productId: position.productId,
             contractId: position.contractId,
-            duration_months: duration,
+            duration,
             quantity,
-            free_months: freeMonths,
-        }),
+            free_months,
+        },
         pin: { offerId, positionId: sourcePositionId },
     });
 
     const save = () => {
         form.setFieldValue(`offerPositions[${index}]`, {
             ...position,
-            duration_months: duration,
+            duration,
             quantity,
-            free_months: freeMonths,
+            free_months,
             // total_cents ist brutto, der Wert der Freimonate steht getrennt —
             // so wird die Position auch gespeichert.
             total_cents: totalCents,
@@ -72,7 +72,7 @@ export default function WorkloadItemFormDerivedModal({
                 {isExtension ? (
                     <Input
                         label={t("renewal.duration")}
-                        value={`${position.duration_months} ${t("renewal.months")}`}
+                        value={`${position.duration} ${t("renewal.months")}`}
                         disabled
                         readOnly
                     />
@@ -104,7 +104,7 @@ export default function WorkloadItemFormDerivedModal({
                     label={t("renewal.free_months")}
                     type="number"
                     min={0}
-                    value={freeMonths}
+                    value={free_months}
                     onChange={(e) => {
                         const num = Number(e.target.value);
                         if (!isNaN(num)) setFreeMonths(Math.max(0, num));

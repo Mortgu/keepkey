@@ -29,12 +29,12 @@ import {
     createTariffGroupSchema,
     createTariffRowSchema,
     createTariffSchema,
-    deleteCustomerPriceSchema,
+    deleteOverrideSchema,
     updateTariffCellSchema,
     updateTariffColumnSchema,
     updateTariffGroupSchema,
     updateTariffRowSchema,
-    upsertCustomerPriceSchema,
+    upsertOverrideSchema
 } from "@keepit/schemas";
 
 const router = Router();
@@ -49,10 +49,10 @@ router.post('/', validate(createTariffGroupSchema), createTariffGroup);
 router.get("/price", getTariffPrice);
 
 /* [PUT] /api/tariffs/customer-price — kundenspezifischen Stückpreis upserten */
-router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustomerPrice);
+router.put("/customer-price", validate(upsertOverrideSchema), upsertCustomerPrice);
 
 /* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
-router.delete("/customer-price", validateQuery(deleteCustomerPriceSchema), deleteCustomerPrice);
+router.delete("/customer-price", validateQuery(deleteOverrideSchema), deleteCustomerPrice);
 
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);

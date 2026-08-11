@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCustomerPrice, upsertCustomerPrice } from "./pricing-api";
 import { pricingKeys } from "./pricing-keys";
-import type { PriceCoordinates } from "@keepit/schemas";
+import type { LivePriceQuery } from "@keepit/schemas";
 
 /**
  * Kundenspezifischer Stückpreis für eine Tarif-Zelle.
@@ -15,13 +15,13 @@ export function useCustomerPriceOverride() {
     const invalidate = () => queryClient.invalidateQueries({ queryKey: pricingKeys.all });
 
     const { mutateAsync: setOverride, isPending: isSaving, error: saveError } = useMutation({
-        mutationFn: (args: { coordinates: PriceCoordinates; unitPriceCents: number }) =>
-            upsertCustomerPrice(args.coordinates, args.unitPriceCents),
+        mutationFn: (args: { query: LivePriceQuery; unitPriceCents: number }) =>
+            upsertCustomerPrice(args.query, args.unitPriceCents),
         onSuccess: invalidate,
     });
 
     const { mutateAsync: clearOverride, isPending: isClearing, error: clearError } = useMutation({
-        mutationFn: (coordinates: PriceCoordinates) => deleteCustomerPrice(coordinates),
+        mutationFn: (query: LivePriceQuery) => deleteCustomerPrice(query),
         onSuccess: invalidate,
     });
 

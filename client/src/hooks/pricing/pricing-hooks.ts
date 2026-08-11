@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback } from "react";
-import {   netCents } from "@keepit/schemas";
+import { netCents } from "@keepit/schemas";
 import { pricingQueries } from "./pricing-queries";
-import type {PositionPrice, PriceCoordinates} from "@keepit/schemas";
+import type { LivePriceQuery, PositionPrice } from "@keepit/schemas";
 
 /**
  * Woher der Preis einer Position kommt:
@@ -23,7 +23,7 @@ const EMPTY_PRICE: PositionPrice = {
 
 interface UsePositionPriceArgs {
     source: PriceSource;
-    coordinates: PriceCoordinates;
+    query: LivePriceQuery;
     /**
      * Quellangebot und -position. Nur bei `source: "pinned"` nötig;
      * `positionId: null`, wenn die Position keine Entsprechung im Quellangebot
@@ -39,14 +39,14 @@ interface UsePositionPriceArgs {
  * normalisieren — nur auszuwählen. Die nicht gewählte Abfrage bleibt über
  * `enabled` abgeschaltet.
  */
-export function usePositionPrice({ source, coordinates, pin }: UsePositionPriceArgs) {
+export function usePositionPrice({ source, query, pin }: UsePositionPriceArgs) {
     const isPinned = source === "pinned";
 
-    const live = useQuery(pricingQueries.live(coordinates, !isPinned));
+    const live = useQuery(pricingQueries.live(query, !isPinned));
     const pinned = useQuery(pricingQueries.pinned(
         pin?.offerId ?? "",
         pin?.positionId ?? "",
-        coordinates.quantity,
+        query.quantity,
         isPinned,
     ));
 
@@ -85,7 +85,7 @@ export function usePriceResolver() {
     const queryClient = useQueryClient();
 
     return useCallback(
-        (coordinates: PriceCoordinates) => queryClient.fetchQuery(pricingQueries.live(coordinates)),
+        (query: LivePriceQuery) => queryClient.fetchQuery(pricingQueries.live(query)),
         [queryClient],
     );
 }

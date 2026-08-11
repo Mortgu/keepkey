@@ -58,7 +58,7 @@ export default function OrderEditModal({ order, onClose }: Props) {
       key: position.id,
       productId: position.productId,
       contractId: position.contractId,
-      duration_months: position.duration_months,
+      duration: position.duration,
       quantity: position.quantity,
       optional: position.optional ?? false,
       total_cents: position.total_cents,
@@ -108,7 +108,7 @@ export default function OrderEditModal({ order, onClose }: Props) {
           positions: positions.map((position) => ({
             productId: position.productId,
             contractId: position.contractId,
-            duration_months: position.duration_months,
+            duration: position.duration,
             quantity: position.quantity,
             optional: position.optional,
             total_cents: position.total_cents,
@@ -159,7 +159,7 @@ export default function OrderEditModal({ order, onClose }: Props) {
               <h2 className="font-semibold">Produkte</h2>
               <Button size="xs" variant="secondary" icon={<Plus className="size-3.5" />} onClick={() => setPositions((current) => [...current, {
                 key: crypto.randomUUID(), productId: products[0]?.id ?? "", contractId: contracts[0]?.id ?? "",
-                duration_months: 12, quantity: 1, optional: false, total_cents: 0,
+                duration: 12, quantity: 1, optional: false, total_cents: 0,
               }])}>Produkt</Button>
             </div>
             {positions.map((position) => (
@@ -168,12 +168,12 @@ export default function OrderEditModal({ order, onClose }: Props) {
                   options={products.map((product) => ({ value: product.id, label: optionLabel(product.translations) }))} />
                 <Select label="Vertrag" value={position.contractId} onChange={(event) => updatePosition(position.key, { contractId: event.target.value, total_cents: 0 })}
                   options={contracts.map((contract) => ({ value: contract.id, label: optionLabel(contract.translations) }))} />
-                <Input label="Monate" type="number" value={position.duration_months} onChange={(event) => {
+                <Input label="Monate" type="number" value={position.duration} onChange={(event) => {
                   const duration = Number(event.target.value);
                   updatePosition(position.key, {
-                    duration_months: duration,
-                    total_cents: position.duration_months > 0
-                      ? Math.round(position.total_cents * duration / position.duration_months)
+                    duration: duration,
+                    total_cents: position.duration > 0
+                      ? Math.round(position.total_cents * duration / position.duration)
                       : position.total_cents,
                   });
                 }} />

@@ -1,8 +1,7 @@
 import { Pen } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {  coordinatesFrom } from "@keepit/schemas";
-import type {CreateOfferPositionInput} from "@keepit/schemas";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import type { SyntheticEvent } from "react";
 import { Button, Checkbox, Input, Select } from "@/components";
 import {
@@ -35,20 +34,20 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
 
     const { durations } = useTariffDurationsHook(workload, contract);
 
-    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || 0);
+    const [duration, setDuration] = useState<number>(currentWorkload?.duration || 0);
     // Reset duration when the available durations change (workload/contract switch).
     // React-recommended render-phase reset instead of setState-in-effect.
     const [prevDurations, setPrevDurations] = useState(durations);
     if (durations !== prevDurations) {
         setPrevDurations(durations);
-        setDuration(currentWorkload?.duration_months && durations.includes(currentWorkload.duration_months)
-            ? currentWorkload.duration_months
+        setDuration(currentWorkload?.duration && durations.includes(currentWorkload.duration)
+            ? currentWorkload.duration
             : durations[0] || 0);
     }
 
     const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 1);
 
-    const [freeMonths, setFreeMonths] = useState<number>(currentWorkload?.free_months || 0);
+    const [free_months, setFreeMonths] = useState<number>(currentWorkload?.free_months || 0);
 
     const [optional, setOptional] = useState<boolean>(currentWorkload?.optional || false);
 
@@ -56,15 +55,16 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
     const [overrideEur, setOverrideEur] = useState<string>("");
     const [error, setError] = useState<string>("");
 
-    const coordinates = coordinatesFrom(customerId, {
+    const query = {
+        customerId,
         productId: workload,
         contractId: contract,
-        duration_months: duration,
+        duration,
         quantity,
-        free_months: freeMonths,
-    });
+        free_months,
+    };
 
-    const { unitCents, isLoading: pricePending } = usePositionPrice({ source: "live", coordinates });
+    const { unitCents, isLoading: pricePending } = usePositionPrice({ source: "live", query });
 
     const canOverride = Boolean(customerId);
 
@@ -87,9 +87,9 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
         const data: CreateOfferPositionInput = {
             productId: workload,
             contractId: contract,
-            duration_months: duration,
+            duration: duration,
             quantity,
-            free_months: freeMonths,
+            free_months,
             optional,
             total_cents: 0,
             eur_user_month: 0,
@@ -103,7 +103,7 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
                     setError("Ungültiger Preis.");
                     return;
                 }
-                await setOverride({ coordinates, unitPriceCents: eurToCents(parsed) });
+                await setOverride({ query, unitPriceCents: eurToCents(parsed) });
             }
 
             saveFn(data);
@@ -174,7 +174,7 @@ export default function WorkloadFormOfferModal({ customerId, currentWorkload, ca
                     } : undefined}
                 />
 
-                <Input label={t("offerModal.free_months")} value={freeMonths} onChange={(e) => {
+                <Input label={t("offerModal.free_months")} value={free_months} onChange={(e) => {
                     const value = Number(e.target.value);
                     if (isNaN(value)) return;
                     setFreeMonths(value);

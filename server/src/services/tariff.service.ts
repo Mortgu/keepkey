@@ -150,7 +150,7 @@ async function moveCustomerPricesToDuration(
  * Wichtig ist das erneute Laden: Der vor der Änderung geladene Tarif enthält
  * den neuen Override noch nicht und würde weiterhin den alten Preis liefern.
  */
-async function recalculateAfterOverrideChange(
+export async function recalculateAfterOverrideChange(
     params: { productId: string; contractId: string; duration: number; quantity: number; customerId: string },
     failureMessage: string,
 ): Promise<PositionPrice> {

@@ -39,7 +39,7 @@ async function main() {
         offerPositions: [{
             productId: product.id,
             contractId: contract.id,
-            duration_months: duration,
+            duration: duration,
             free_months: 0,
             quantity,
             optional: false,

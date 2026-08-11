@@ -1,4 +1,4 @@
-import { Pen, Trash, UndoDot } from "lucide-react";
+import { Info, Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -167,10 +167,18 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 {/* Actions right */}
                 <div className="flex items-center gap-2">
                     <Button
+                        size="xs"
+                        variant="border"
+                        onClick={() => { }}
+                        icon={<Info size={14} />}
+                        iconOnly
+                    />
+
+                    <Button
                         onClick={() => setDrawerOpen(true)}
                         size="xs"
                         variant="border"
-                        icon={<UndoDot size={13} />}
+                        icon={<UndoDot size={14} />}
                         iconOnly
                     />
 
@@ -178,7 +186,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         size="xs"
                         variant="border"
                         onClick={() => onEdit("edit", offer)}
-                        icon={<Pen size={13} />}
+                        icon={<Pen size={14} />}
                         iconOnly
                     />
 
@@ -188,7 +196,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         danger
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
-                        icon={<Trash size={13} />}
+                        icon={<Trash size={14} />}
                         iconOnly
                     />
                 </div>

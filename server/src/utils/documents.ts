@@ -50,7 +50,7 @@ export function getOfferProductItems(
 
         quantity: String(offerPosition.quantity),
         eur_user_month: formatCentsToEur(offerPosition.eur_user_month),
-        duration: String(offerPosition.duration_months),
+        duration: String(offerPosition.duration),
         total: formatCentsToEur(offerPosition.total_cents),
         contract: ct.name,
         optional: offerPosition.optional ? true : null,

@@ -12,7 +12,7 @@ import { formatCentsToEur, formatDate } from "@/utils/utils.js";
  */
 export interface PositionForTemplate {
     quantity: number;
-    duration_months: number;
+    duration: number;
     free_months: number;
     optional: boolean | null;
     product: {
@@ -113,10 +113,10 @@ export const storedPrice = (position: {
  */
 export const livePrice = (
     unitPrice: number,
-    position: { quantity: number; duration_months: number; free_months: number },
+    position: { quantity: number; duration: number; free_months: number },
 ): PositionPrice => ({
     eur_user_month: unitPrice,
-    total_cents: unitPrice * position.quantity * position.duration_months,
+    total_cents: unitPrice * position.quantity * position.duration,
     discount_cents: unitPrice * position.quantity * position.free_months,
     fromSnapshot: false,
 });

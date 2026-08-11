@@ -1,7 +1,7 @@
 import type { PrismaClient, Product } from "@prisma/client";
 
 const TABLE_TEMPLATE = (name: string) =>
-    `Sicherung von „${name}" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration_months} Monaten`;
+    `Sicherung von „${name}" mit unbegrenztem Datenvolumen und max. Aufbewahrungszeit der Backups von 1 Jahr/unlimitierter Aufbewahrungszeit; - Preis / Active User / Monat - bei einer Vertragslaufzeit von {duration} Monaten`;
 
 const PRODUCTS = [
     {

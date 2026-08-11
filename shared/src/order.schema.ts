@@ -15,7 +15,7 @@ export const orderPositionSchema = z.object({
     product: productSchema,
     contract: contractSchema,
 
-    duration_months: z.number().int(),
+    duration: z.number().int(),
     quantity: z.number().int(),
     optional: z.boolean().optional(),
 
@@ -103,7 +103,7 @@ const orderFieldsSchema = z.object({
 const orderPositionInputSchema = z.object({
     productId: z.string().min(1),
     contractId: z.string().min(1),
-    duration_months: z.number().int().positive(),
+    duration: z.number().int().positive(),
     quantity: z.number().int().positive(),
     optional: z.boolean().nullable(),
     total_cents: z.number().int().min(0),

@@ -28,7 +28,7 @@ const offerFields = z.object({
 const offerPosition = z.object({
   productId: z.string(),
   contractId: z.string(),
-  duration_months: z.number().int(),
+  duration: z.number().int(),
   free_months: z.number().int().default(0),
   quantity: z.number().int(),
   optional: z.boolean(),
@@ -41,7 +41,7 @@ const offerPosition = z.object({
 }).transform((position) => ({
   ...position,
   eur_user_month: position.eur_user_month ?? Math.trunc(
-    position.total_cents / Math.max(1, position.quantity * position.duration_months),
+    position.total_cents / Math.max(1, position.quantity * position.duration),
   ),
 }));
 
@@ -83,7 +83,7 @@ const orderFields = z.object({
 const orderPosition = z.object({
   productId: z.string(),
   contractId: z.string(),
-  duration_months: z.number().int(),
+  duration: z.number().int(),
   quantity: z.number().int(),
   optional: z.boolean(),
   total_cents: z.number().int(),

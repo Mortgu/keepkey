@@ -17,6 +17,7 @@ import supplierRouter from "./supplier.route.js";
 import tariffRouter from './tariff.route.js';
 import taskRouter from "./task.route.js";
 import userRouter from "./user.route.js";
+import pricingRouter from "./pricing.route.js";
 
 const router = Router();
 
@@ -64,5 +65,8 @@ router.use('/integrations', requireSession, integrationsRouter);
 
 /* /api/search */
 router.use('/search', requireSession, searchRouter);
+
+/* /api/pricing */
+router.use('/pricing', requireSession, pricingRouter);
 
 export default router;

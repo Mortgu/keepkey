@@ -1,8 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
-import {  isPriceable } from "@keepit/schemas";
+import { isLivePriceable } from "@keepit/schemas";
 import { getLivePrice, getPinnedPrice } from "./pricing-api";
 import { pricingKeys } from "./pricing-keys";
-import type {PriceCoordinates} from "@keepit/schemas";
+import type { LivePriceQuery } from "@keepit/schemas";
 
 export const pricingQueries = {
     /**
@@ -11,11 +11,11 @@ export const pricingQueries = {
      * `staleTime: 0`, weil ein kundenspezifischer Preis jederzeit daneben
      * geschrieben werden kann und die Vorschau das sofort zeigen soll.
      */
-    live: (coordinates: PriceCoordinates, enabled = true) =>
+    live: (query: LivePriceQuery, enabled = true) =>
         queryOptions({
-            queryKey: pricingKeys.live(coordinates),
-            queryFn: () => getLivePrice(coordinates),
-            enabled: enabled && isPriceable(coordinates),
+            queryKey: pricingKeys.live(query),
+            queryFn: () => getLivePrice(query),
+            enabled: enabled && isLivePriceable(query),
             staleTime: 0,
         }),
 

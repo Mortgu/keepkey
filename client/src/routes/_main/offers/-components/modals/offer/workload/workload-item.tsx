@@ -1,14 +1,14 @@
 import { LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
-import {  coordinatesFrom } from "@keepit/schemas";
 import WorkloadFormOfferModal from "./workload-form";
-import type {CreateOfferPositionInput} from "@keepit/schemas";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
+    offerId: string;
     customerId: string;
     workload: CreateOfferPositionInput;
 
@@ -16,16 +16,23 @@ interface Props {
     deleteFn: () => void;
 }
 
-export default function WorkloadItemOfferModal({ customerId, workload, updateFn, deleteFn }: Props) {
+export default function WorkloadItemOfferModal({ offerId, customerId, workload, updateFn, deleteFn }: Props) {
     const locale = useLocale();
 
     const [isEdit, setEdit] = useState<boolean>(false);
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
-    const { totalCents, unitCents, isLoading: pricePending } = usePositionPrice({
+    const { totalCents, unitCents, isLoading: pricePending, discountCents } = usePositionPrice({
         source: "live",
-        coordinates: coordinatesFrom(customerId, workload),
+        query: {
+            customerId,
+            productId: workload.productId,
+            contractId: workload.contractId,
+            duration: workload.duration,
+            quantity: workload.quantity,
+            free_months: workload.free_months,
+        },
     });
 
     if (!product || !contract) {
@@ -51,7 +58,7 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
                         {workload.quantity} <X size={14} /> {localized(product.translations, locale, "name")}
                     </p>
                     <p className="text-sm text-(--text-secondary)">
-                        {localized(contract.translations, locale, "name")} | {workload.duration_months} Months
+                        {localized(contract.translations, locale, "name")} | {workload.duration} Months
                     </p>
                 </div>
 
@@ -60,7 +67,7 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
                         <div className="grid">
                             <p className="text-xs text-(--text-secondary)">Total</p>
                             {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents)}</p>}
+                            {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents - discountCents)}</p>}
                         </div>
 
                         <div className="grid">

@@ -79,13 +79,13 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             language,
             contractName: pickTranslation(pos.contract.translations, language)!.name,
             validUntil: offer.validUntil,
-            durationLabel: `${pos.duration_months} Monate`,
+            durationLabel: `${pos.duration} Monate`,
         },
     ));
 
     const groupMap = new Map<string, typeof offer.offerPositions>();
     for (const pos of offer.offerPositions) {
-        const key = `${pos.contractId}_${pos.duration_months}`;
+        const key = `${pos.contractId}_${pos.duration}`;
         if (!groupMap.has(key)) groupMap.set(key, []);
         groupMap.get(key)!.push(pos);
     }
@@ -106,8 +106,8 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
             names: productNames,
             contract: contractT.name,
             features: contractT.features,
-            _duration: firstPos.duration_months,
-            duration: `${firstPos.duration_months} Monate`,
+            _duration: firstPos.duration,
+            duration: `${firstPos.duration} Monate`,
         });
 
         if (offer.featureComparison) {
@@ -117,8 +117,8 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                     names: productNames,
                     contract: otherContractT.name,
                     features: otherContractT.features,
-                    _duration: firstPos.duration_months,
-                    duration: `${firstPos.duration_months} Monate`,
+                    _duration: firstPos.duration,
+                    duration: `${firstPos.duration} Monate`,
                 });
             }
         }
@@ -185,7 +185,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                 const result = await calculatePrice({
                     productId: pos.productId,
                     contractId,
-                    duration: pos.duration_months,
+                    duration: pos.duration,
                     quantity: pos.quantity,
                     customerId,
                 });
@@ -204,7 +204,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
                 language,
                 contractName,
                 validUntil: offer.validUntil,
-                durationLabel: String(pos.duration_months),
+                durationLabel: String(pos.duration),
             }));
         }
 
@@ -215,7 +215,7 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         return {
             products: productNames,
             contract: contractName,
-            duration: `${positions[0].duration_months} Monaten`,
+            duration: `${positions[0].duration} Monaten`,
             items,
             flatrates: options.withOfferWideTotals ? flatrates : [],
             total: formatCentsToEur(tableTotalCents),

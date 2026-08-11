@@ -1,8 +1,7 @@
 import { createHash } from "node:crypto";
 
-import { tariffVersionSnapshotSchema, type TariffVersionSnapshot } from "@keepit/schemas";
+import { TariffForPricing, tariffVersionSnapshotSchema, type TariffVersionSnapshot } from "@keepit/schemas";
 
-import type { TariffForPricing } from "../utils/products.js";
 
 /**
  * Die Form des Snapshots liegt in `@keepit/schemas` — sie beschreibt sowohl das

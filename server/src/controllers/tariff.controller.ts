@@ -33,7 +33,7 @@ export const getTariffDurations = async (request: Request, response: Response) =
 };
 
 export const getTariffPrice = async (request: Request, response: Response) => {
-    const { productId, contractId, duration, quantity, customerId, freeMonths } = request.query;
+    const { productId, contractId, duration, quantity, customerId, free_months } = request.query;
 
     const result = await tariffService.getTariffPrice(
         productId as string,
@@ -41,7 +41,7 @@ export const getTariffPrice = async (request: Request, response: Response) => {
         Number(duration),
         Number(quantity),
         customerId as string | undefined,
-        freeMonths ? Number(freeMonths) : undefined
+        free_months ? Number(free_months) : undefined
     );
 
     return response.status(200).json(result);

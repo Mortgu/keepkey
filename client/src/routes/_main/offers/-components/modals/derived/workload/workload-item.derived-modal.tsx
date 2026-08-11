@@ -2,10 +2,10 @@ import { useStore } from "@tanstack/react-form";
 import { LoaderCircle, MoveRight, Pen, Trash, TriangleAlert } from "lucide-react";
 import { Fragment, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {  coordinatesFrom, netCents } from "@keepit/schemas";
+import { netCents } from "@keepit/schemas";
 import { priceSourceFor } from "../hook/use-derived-form";
 import WorkloadItemFormDerivedModal from "./workload-item-form.derived-modal";
-import type {OfferPosition} from "@keepit/schemas";
+import type { OfferPosition } from "@keepit/schemas";
 import type { DerivedFormApi, DerivedMode } from "../hook/use-derived-form";
 import { Button, Checkbox } from "@/components";
 import { useLocale, usePositionPrice } from "@/hooks";
@@ -45,7 +45,10 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
     const { netCents: newTotal, isLoading, hasPrice, fromSnapshot } = usePositionPrice({
         source: priceSourceFor(mode),
-        coordinates: coordinatesFrom(customerId, position),
+        query: {
+            customerId,
+            ...position
+        },
         pin: { offerId, positionId: originalPosition.id },
     });
 
@@ -55,7 +58,7 @@ export default function WorkloadItemDerivedModal(props: Props) {
 
     const priceChanged = originalTotal !== newTotal;
     const quantityChanged = originalPosition.quantity !== position.quantity;
-    const durationChanged = originalPosition.duration_months !== position.duration_months;
+    const durationChanged = originalPosition.duration !== position.duration;
 
     return (
         <Fragment>
@@ -80,11 +83,11 @@ export default function WorkloadItemDerivedModal(props: Props) {
                             <div className="flex items-center gap-2">
                                 {durationChanged && (
                                     <>
-                                        <span className="text-md font-mono font-normal line-through">{originalPosition.duration_months} Mo.</span>
+                                        <span className="text-md font-mono font-normal line-through">{originalPosition.duration} Mo.</span>
                                         <MoveRight size={14} className="text-gray-500" />
                                     </>
                                 )}
-                                <span className="text-md font-mono font-normal">{position.duration_months} Mo.</span>
+                                <span className="text-md font-mono font-normal">{position.duration} Mo.</span>
                             </div>
                         </div>
 

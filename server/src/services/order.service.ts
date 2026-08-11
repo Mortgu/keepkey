@@ -175,7 +175,7 @@ export async function createOrder(input: CreateOrderInput) {
                 orderId: order.id,
                 productId: offerPosition.productId,
                 contractId: offerPosition.contractId,
-                duration_months: offerPosition.duration_months,
+                duration: offerPosition.duration,
                 quantity: offerPosition.quantity,
                 optional: offerPosition.optional,
                 total_cents: offerPosition.total_cents - offerPosition.discount_cents,

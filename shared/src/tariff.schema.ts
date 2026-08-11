@@ -181,7 +181,7 @@ export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
  * TariffCell (update) — setzt den Listenpreis der Zelle.
  *
  * Kundenspezifische Preise laufen ausschließlich über
- * {@link upsertCustomerPriceSchema}: sie hängen an den Koordinaten
+ * {@link upsertOverrideSchema}: sie hängen an den Koordinaten
  * (duration, min_quantity), nicht an einer cellId.
  */
 export const updateTariffCellSchema = z.object({
@@ -190,7 +190,7 @@ export const updateTariffCellSchema = z.object({
 export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
 
 /** Kundenspezifischen Stückpreis upserten. */
-export const upsertCustomerPriceSchema = z.object({
+export const upsertOverrideSchema = z.object({
     productId: z.string().min(1),
     contractId: z.string().min(1),
     duration: z.int().positive(),
@@ -198,7 +198,7 @@ export const upsertCustomerPriceSchema = z.object({
     customerId: z.string().min(1),
     price: z.int().nonnegative(),
 });
-export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>;
+export type UpsertOverrideInput = z.infer<typeof upsertOverrideSchema>;
 
 /**
  * Kundenspezifischen Stückpreis entfernen.
@@ -208,14 +208,14 @@ export type UpsertCustomerPriceInput = z.infer<typeof upsertCustomerPriceSchema>
  * Preislogik und lief dort als „keine passende Spalte" auf — mit einer
  * Fehlermeldung, die auf die falsche Ursache zeigt.
  */
-export const deleteCustomerPriceSchema = z.object({
+export const deleteOverrideSchema = z.object({
     productId: z.string().min(1),
     contractId: z.string().min(1),
     duration: z.coerce.number().int().positive(),
     quantity: z.coerce.number().int().positive(),
     customerId: z.string().min(1),
 });
-export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
+export type DeleteOverrideInput = z.infer<typeof deleteOverrideSchema>;
 
 /**
  * Base tariff shape — without `tariffGroup`.

@@ -55,7 +55,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
         offerPositions: currentOffer?.offerPositions.map(op => ({
             productId: op.productId,
             contractId: op.contractId,
-            duration_months: op.duration_months,
+            duration: op.duration,
             free_months: op.free_months,
             quantity: op.quantity,
             optional: op.optional,

@@ -68,13 +68,13 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         contract: position.contract,
         ...position.product,
 
-        duration_months: position.duration_months,
-        duration: formatDuration(position.duration_months),
+        duration_months: position.duration,
+        duration: formatDuration(position.duration),
     }));
 
     const groups = Object.groupBy(
         orderPositions,
-        (p) => `${p.contract.id}_${p.duration_months}`,
+        (p) => `${p.contract.id}_${p.duration}`,
     );
 
     const grouped = Object.values(groups).map((group) => {
@@ -87,8 +87,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         return {
             names: group?.map((p) => p.product.name).join(" & "),
             contract: first.contract,
-            duration_months: first.duration_months,
-            duration: formatDuration(first.duration_months),
+            duration_months: first.duration,
+            duration: formatDuration(first.duration),
             total: formatEur(group_total! / 100),
             items: group?.map((item) => ({
                 name: item.product.name,
@@ -97,12 +97,12 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
                 quantity: item.quantity,
                 optional: item.optional,
                 contract: item.contract,
-                duration_months: item.duration_months,
+                duration: item.duration,
                 price: {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(
-                        item.quantity && item.duration_months
-                            ? item.total_cents / item.quantity / item.duration_months / 100
+                        item.quantity && item.duration
+                            ? item.total_cents / item.quantity / item.duration / 100
                             : 0,
                     ),
                 },
