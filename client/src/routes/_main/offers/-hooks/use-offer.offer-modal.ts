@@ -1,8 +1,6 @@
 import type { DropdownOption } from "@/components";
-import type {
-    CreateOfferInput,
-    Offer
-} from '@keepit/schemas';
+import type { Offer } from '@keepit/schemas';
+import type { OfferModalValues } from "../-schemas/offer-modal-schema";
 import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
@@ -27,7 +25,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
 
     const preselected = customers.find(c => c.id === preselectedCustomerId);
 
-    const defaultValues: CreateOfferInput = {
+    const defaultValues: OfferModalValues = {
         customerId: currentOffer?.customerId || preselected?.id || customers[0]?.id || "",
         contactPersonId: currentOffer?.contactPersonId || preselected?.contactPersons[0]?.id || customers[0]?.contactPersons[0]?.id || "",
         userId: currentOffer?.userId || users[0]?.id || "",
@@ -42,6 +40,9 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
         toCompare: currentOffer?.toCompare ?? [],
 
         offerPositions: currentOffer?.offerPositions.map(op => ({
+            // Hält die Verbindung zur Quellposition — die Lizenzerweiterung
+            // verweist darauf, statt die Positionsdaten selbst zu schicken.
+            sourcePositionId: op.id,
             productId: op.productId,
             contractId: op.contractId,
             duration_months: op.duration_months,

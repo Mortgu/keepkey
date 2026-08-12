@@ -1,6 +1,6 @@
 import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
-import OfferModal from "./modals/offer/offer-modal";
+import OfferModal from "./modals/offer-modal";
 import type { OfferFilters } from "../-hooks/use-offer-filters";
 
 
@@ -78,7 +78,7 @@ export default function OfferList({ filters }: Props) {
             <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
           )}
           {offers.map((offer) => (
-            <OfferCard key={offer.id} offer={offer} onEdit={(_, o) => modal.open(o)} />
+            <OfferCard key={offer.id} offer={offer} onEdit={(o) => modal.open(o)} />
           ))}
         </div>
 
@@ -88,7 +88,7 @@ export default function OfferList({ filters }: Props) {
         <OfferModal
           key={modal.key}
           closeFn={modal.close}
-          currentOffer={modal.data ?? undefined}
+          sourceOffer={modal.data ?? undefined}
         />
       )}
     </div>

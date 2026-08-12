@@ -1,12 +1,12 @@
 import { useStore } from "@tanstack/react-form";
 import {  coordinatesFrom } from "@keepit/schemas";
 import type {CreateOfferPositionInput} from "@keepit/schemas";
-import type { OfferFormApi } from "../-hooks/use-offer-form";
+import type { OfferModalFormApi } from "./use-offer-modal-form";
 import { usePriceResolver } from "@/hooks";
 
 interface Props {
     customerId: string;
-    form: OfferFormApi;
+    form: OfferModalFormApi;
 }
 
 export default function useWorkloadOfferModal({ customerId, form }: Props) {
@@ -36,7 +36,12 @@ export default function useWorkloadOfferModal({ customerId, form }: Props) {
 
     const updateWorkload = async (index: number, workload: CreateOfferPositionInput) => {
         const next = await priced(workload);
-        form.setFieldValue("offerPositions", offerPositions.map((p, i) => (i === index ? next : p)));
+
+        form.setFieldValue("offerPositions", offerPositions.map((position, i) => (
+            // Die Verbindung zur Quellposition überlebt das Bearbeiten — ohne sie
+            // wüsste eine Lizenzerweiterung nicht mehr, worauf sie sich bezieht.
+            i === index ? { ...position, ...next } : position
+        )));
     }
 
     const deleteWorkload = (index: number) => {

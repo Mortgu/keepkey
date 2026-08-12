@@ -2,13 +2,12 @@ import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import DerivedModal from "../modals/derived/derived-modal";
+import OfferModal from "../modals/offer-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import type { OfferFormTypes } from "../modals/offer/offer-form";
 import { Badge, Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
@@ -18,7 +17,7 @@ import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (type: OfferFormTypes, offer: Offer) => void;
+    onEdit: (offer: Offer) => void;
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
@@ -177,7 +176,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => onEdit("edit", offer)}
+                        onClick={() => onEdit(offer)}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
@@ -197,20 +196,20 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {renewalModal.isOpen && (
-                <DerivedModal
+                <OfferModal
                     key={`renewal-${renewalModal.key}`}
                     mode="renewal"
-                    offer={offer}
-                    onClose={renewalModal.close}
+                    sourceOffer={offer}
+                    closeFn={renewalModal.close}
                 />
             )}
 
             {extensionModal.isOpen && (
-                <DerivedModal
+                <OfferModal
                     key={`extension-${extensionModal.key}`}
                     mode="extension"
-                    offer={offer}
-                    onClose={extensionModal.close}
+                    sourceOffer={offer}
+                    closeFn={extensionModal.close}
                 />
             )}
         </div>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pen, Trash, X } from "lucide-react";
-import FlatrateFormOfferModal from "./flatrate-form";
+import FlatrateForm from "./flatrate-form";
 import type {
     CreateOfferFlatrateInput
 } from '@keepit/schemas';
@@ -12,10 +12,11 @@ import { localized } from "@/lib/i18n-content";
 interface Props {
     flatrate: CreateOfferFlatrateInput;
     updateFn: (flatrate: CreateOfferFlatrateInput) => void;
-    deleteFn: () => void;
+    /** Nicht gesetzt, wenn die Flatrate nicht entfernt werden darf. */
+    deleteFn?: () => void;
 }
 
-export default function FlatrateItemOfferModal({ flatrate, updateFn, deleteFn }: Props) {
+export default function FlatrateItem({ flatrate, updateFn, deleteFn }: Props) {
     const locale = useLocale();
 
     const { flatRates } = useFlatRates();
@@ -41,9 +42,11 @@ export default function FlatrateItemOfferModal({ flatrate, updateFn, deleteFn }:
                             <Pen size={14} />
                         } iconOnly onClick={() => setEdit(true)} />
 
-                        <Button variant="border" type="button" size="sm" icon={
-                            <Trash size={14} />
-                        } iconOnly onClick={deleteFn} />
+                        {deleteFn && (
+                            <Button variant="border" type="button" size="sm" icon={
+                                <Trash size={14} />
+                            } iconOnly onClick={deleteFn} />
+                        )}
 
                     </div>
                 </div>
@@ -56,7 +59,7 @@ export default function FlatrateItemOfferModal({ flatrate, updateFn, deleteFn }:
             )}
 
             {isEdit && (
-                <FlatrateFormOfferModal
+                <FlatrateForm
                     currentFlatrate={flatrate}
                     cancelFn={() => setEdit(false)}
                     saveFn={(v) => updateFn(v)}
