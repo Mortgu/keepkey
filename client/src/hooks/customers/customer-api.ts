@@ -5,15 +5,14 @@ import type {
     CreateCustomerInput,
 
     Customer,
-    CustomerFilters,
+    CustomerFilterParams,
     UpdateContactInput,
     UpdateCustomerInput
 } from '@keepit/schemas';
 import { api } from "@/lib/api-client";
 
 
-
-export const getCustomers = (filters: CustomerFilters = {}) => {
+export const getCustomers = (filters: CustomerFilterParams = {}) => {
     const params = new URLSearchParams();
     if (filters.search) params.set("search", filters.search);
     if (filters.sort) params.set("sort", filters.sort);

@@ -2,23 +2,16 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useStore } from "@tanstack/react-form";
-import WorkloadFormOfferModal from "./workload-form";
-import WorkloadItemOfferModal from "./workload-item";
-import type { Offer } from '@keepit/schemas';
-import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
+import { useOfferModalContext } from "../offer-modal-context";
+import WorkloadForm from "./workload-form";
+import WorkloadItem from "./workload-item";
 import { Button, Checkbox, MultiSelectList } from "@/components";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
 
-
-interface Props {
-    customerId: string;
-    currentOffer?: Offer;
-    form: OfferFormApi;
-}
-
-export default function WorkloadOfferModalSection({ customerId, currentOffer, form }: Props) {
+export default function WorkloadSection() {
     const { t } = useTranslation();
+    const { form, policy, sourceOffer, customerId } = useOfferModalContext();
 
     const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
     const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
@@ -26,9 +19,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
     const toCompare = useStore(form.store, (s) => s.values.toCompare);
     const setToCompare = (vals: Array<string>) => form.setFieldValue("toCompare", vals);
 
-    const {
-        compareOptions,
-    } = useOfferModal({ currentOffer });
+    const { compareOptions } = useOfferModal({ currentOffer: sourceOffer });
 
     const {
         offerPositions,
@@ -39,6 +30,11 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 
+    if (policy.positions.access === "hidden") return null;
+
+    // Ein Angebot ohne Position gibt es nicht — die letzte bleibt stehen.
+    const canRemove = policy.positions.canRemove && offerPositions.length > 1;
+    const showsComparison = policy.featureComparison === "edit";
 
     return (
         <div className="grid gap-4">
@@ -51,18 +47,23 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
                 {/* Header actions */}
                 <div className="flex items-center gap-4">
 
-                    <Checkbox label={t("offerModal.compare")} checked={featureComparison} onChange={(e) => setFeatureComparison(e.target.checked)} />
+                    {showsComparison && (
+                        <Checkbox label={t("offerModal.compare")} checked={featureComparison}
+                            onChange={(e) => setFeatureComparison(e.target.checked)} />
+                    )}
 
-                    <Button type="button" variant="link" size="fit_sm"
-                        onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
-                        <Plus size={14} /> {t("offerModal.add_workload")}
-                    </Button>
+                    {policy.positions.canAdd && (
+                        <Button type="button" variant="link" size="fit_sm"
+                            onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
+                            <Plus size={14} /> {t("offerModal.add_workload")}
+                        </Button>
+                    )}
 
                 </div>
 
             </div>
 
-            {featureComparison && (
+            {showsComparison && featureComparison && (
                 <MultiSelectList
                     options={compareOptions}
                     onChange={(c) => setToCompare(c)}
@@ -78,8 +79,7 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
             {showWorkloadForm && (
                 <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
-                    <WorkloadFormOfferModal
-                        customerId={customerId}
+                    <WorkloadForm
                         cancelFn={() => setShowWorkloadForm(false)}
                         saveFn={(v) => addWorkload(v)}
                     />
@@ -87,12 +87,11 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
             )}
 
             {offerPositions.map((workload, index) => (
-                <WorkloadItemOfferModal
-                    key={index}
-                    updateFn={(updatedWl) => updateWorkload(index, updatedWl)}
-                    deleteFn={() => deleteWorkload(index)}
-                    customerId={customerId}
+                <WorkloadItem
+                    key={workload.sourcePositionId ?? index}
                     workload={workload}
+                    updateFn={(updatedWl) => updateWorkload(index, updatedWl)}
+                    deleteFn={canRemove ? () => deleteWorkload(index) : undefined}
                 />
             ))}
 

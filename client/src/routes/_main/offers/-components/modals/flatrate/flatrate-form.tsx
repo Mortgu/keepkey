@@ -12,7 +12,7 @@ interface Props {
     saveFn: (values: CreateOfferFlatrateInput) => void;
 }
 
-export default function FlatrateFormOfferModal({ currentFlatrate, cancelFn, saveFn }: Props) {
+export default function FlatrateForm({ currentFlatrate, cancelFn, saveFn }: Props) {
     const locale = useLocale();
     const { t } = useTranslation();
 

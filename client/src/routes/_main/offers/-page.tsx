@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 
 import { Plus } from "lucide-react";
 import OfferList from "./-components/offer-list";
-import OfferModal from "./-components/modals/offer/offer-modal";
+import OfferModal from "./-components/modals/offer-modal";
 import useOfferFilters from "./-hooks/use-offer-filters";
 import OfferFilters from "./-components/offer-filters";
 import type { Offer } from "@keepit/schemas";
@@ -44,7 +44,7 @@ export function OfferPage() {
         <OfferModal
           key={modal.key}
           closeFn={modal.close}
-          currentOffer={modal.data ?? undefined}
+          sourceOffer={modal.data ?? undefined}
         />
       )}
 

@@ -2,23 +2,22 @@ import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import DerivedModal from "../modals/derived/derived-modal";
+import OfferModal from "../modals/offer-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
-import OfferCardDocument from "./offer-card-document";
 import OfferCardFlatRate from "./offer-card-flatrate";
 import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import type { OfferFormTypes } from "../modals/offer/offer-form";
 import { Badge, Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (type: OfferFormTypes, offer: Offer) => void;
+    onEdit: (offer: Offer) => void;
 };
 
 export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
@@ -61,10 +60,10 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
                             {offer.derivationType === "RENEWAL" && (
-                                <Badge variant="generated" size="xs">{t("derived.badge_renewal")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                             )}
                             {offer.derivationType === "LICENSE_EXTENSION" && (
-                                <Badge variant="processing" size="xs">{t("derived.badge_extension")}</Badge>
+                                <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>
                             )}
                         </div>
                     </div>
@@ -131,7 +130,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             >
                 <div className="grid mx-4">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <OfferCardDocument key={document.id} offerDocument={document} />
+                        <DocumentCard key={document.id} document={document} offerId={offer.id} />
                     ))}
 
                     {offer.offerDocuments.length === 0 && (
@@ -177,7 +176,7 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="secondary"
-                        onClick={() => onEdit("edit", offer)}
+                        onClick={() => onEdit(offer)}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
@@ -197,20 +196,20 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {renewalModal.isOpen && (
-                <DerivedModal
+                <OfferModal
                     key={`renewal-${renewalModal.key}`}
                     mode="renewal"
-                    offer={offer}
-                    onClose={renewalModal.close}
+                    sourceOffer={offer}
+                    closeFn={renewalModal.close}
                 />
             )}
 
             {extensionModal.isOpen && (
-                <DerivedModal
+                <OfferModal
                     key={`extension-${extensionModal.key}`}
                     mode="extension"
-                    offer={offer}
-                    onClose={extensionModal.close}
+                    sourceOffer={offer}
+                    closeFn={extensionModal.close}
                 />
             )}
         </div>

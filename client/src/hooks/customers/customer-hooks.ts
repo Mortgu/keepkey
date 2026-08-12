@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { customerQueries } from "./customer-queries";
-import type { CustomerFilters } from "@keepit/schemas";
+import type { CustomerFilterParams } from "@keepit/schemas";
 
-export function useCustomers(filters: CustomerFilters = {}) {
+export function useCustomers(filters: CustomerFilterParams = {}) {
     const { data: customers = [], isPending, error } = useQuery(customerQueries.list(filters));
     return { customers, isPending, error };
 }

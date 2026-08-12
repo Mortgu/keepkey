@@ -26,3 +26,4 @@ export * from './toast';
 
 export * from './filters';
 export * from './form';
+export * from './tooltip';

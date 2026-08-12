@@ -11,7 +11,7 @@ interface Props {
     cancelFn: () => void;
 }
 
-export default function DiscountFormOfferModal({ currentDiscount, saveFn, cancelFn }: Props) {
+export default function DiscountForm({ currentDiscount, saveFn, cancelFn }: Props) {
     const { t } = useTranslation();
 
     const [title, setTitle] = useState(currentDiscount?.title ?? "");

@@ -1,9 +1,9 @@
 import { useStore } from "@tanstack/react-form";
-import type { OfferFormApi } from "../-hooks/use-offer-form";
+import type { OfferModalFormApi } from "./use-offer-modal-form";
 import type { CreateOfferFlatrateInput } from "@keepit/schemas";
 
 interface Props {
-    form: OfferFormApi;
+    form: OfferModalFormApi;
 }
 
 export default function useFlatrateOfferModal({ form }: Props) {

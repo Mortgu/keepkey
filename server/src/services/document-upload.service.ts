@@ -198,6 +198,12 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
     }
 }
 
+/**
+ * `remoteSha256` hält fest, welcher Inhalt tatsächlich auf Nextcloud liegt.
+ * Solange nichts ersetzt wird, ist er mit `sha256` identisch; nach einem
+ * Ersetzen in S3 laufen die beiden auseinander und genau daran erkennt die
+ * Oberfläche den veralteten Stand.
+ */
 function artifactUpdates(result: DocumentUploadResult, hashes: { pdf: string; docx: string }) {
     return {
         pdf: {
@@ -206,6 +212,7 @@ function artifactUpdates(result: DocumentUploadResult, hashes: { pdf: string; do
             uploadedAt: result.pdf.uploadedAt,
             size: result.pdf.size,
             sha256: hashes.pdf,
+            remoteSha256: hashes.pdf,
         },
         docx: {
             remotePath: result.docx.remotePath,
@@ -213,6 +220,7 @@ function artifactUpdates(result: DocumentUploadResult, hashes: { pdf: string; do
             uploadedAt: result.docx.uploadedAt,
             size: result.docx.size,
             sha256: hashes.docx,
+            remoteSha256: hashes.docx,
         },
     };
 }

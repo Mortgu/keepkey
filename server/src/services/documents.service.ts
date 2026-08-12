@@ -1,11 +1,20 @@
+import { randomUUID } from "node:crypto";
 import { DocumentFormat, DocumentStatus } from "@prisma/client";
 import { artifactPair, findArtifact } from "../lib/document-artifacts.js";
-import { getDocumentDownloadUrl, removeDocumentArtifacts } from "../lib/document-artifact-store.js";
+import {
+    getDocumentArtifact,
+    getDocumentDownloadUrl,
+    getDocumentUploadUrl,
+    removeDocumentArtifact,
+    removeDocumentArtifacts,
+    type DocumentArtifactScope,
+} from "../lib/document-artifact-store.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     RemoteDocumentExistsError,
     deleteDocumentArtifact,
     moveDocumentArtifact,
+    sha256Document,
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
@@ -34,6 +43,35 @@ const MIME_TYPES: Record<DocumentFormatParam, string> = {
     pdf: "application/pdf",
     docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
+
+/**
+ * Ersetzen ist erlaubt, sobald es überhaupt ein Artefakt gibt. Bei `UPLOADED`
+ * bleibt der Status stehen — es entsteht lediglich eine sichtbare Abweichung
+ * zum Stand auf Nextcloud, die der Nutzer gezielt auflösen kann.
+ */
+const REPLACEABLE_STATUSES = new Set<DocumentStatus>([
+    DocumentStatus.GENERATED,
+    DocumentStatus.UPLOADED,
+]);
+
+/** Wie bei der Vorlagen-Route: mehr als das ist kein Angebotsdokument mehr. */
+const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
+
+const toDocumentFormat = (format: DocumentFormatParam): DocumentFormat =>
+    format === "pdf" ? DocumentFormat.PDF : DocumentFormat.DOCX;
+
+const scopeOf = (type: DocumentType): DocumentArtifactScope =>
+    type === "offer" ? "offers" : "orders";
+
+/**
+ * Präfix, unter dem ersetzte Dateien liegen.
+ *
+ * Der Schlüssel wird immer serverseitig gebildet und beim Bestätigen gegen
+ * dieses Präfix geprüft — ein vom Client frei gewählter Schlüssel könnte sonst
+ * jedes beliebige Objekt im Bucket überschreiben.
+ */
+const replacementPrefix = (type: DocumentType, documentId: string) =>
+    `replaced/${scopeOf(type)}/${documentId}/`;
 
 async function findGeneratedDocument(type: DocumentType, id: string) {
     return type === "offer"
@@ -269,5 +307,182 @@ export async function downloadDocument(
 }
 
 export function uploadDocument(type: DocumentType, id: string) {
+    return uploadGeneratedDocument(type, id);
+}
+
+/* ========== Erzeugte Datei durch eine eigene ersetzen ========== */
+
+/** Lädt das Dokument und stellt sicher, dass das Format ersetzt werden darf. */
+async function requireReplaceableArtifact(
+    type: DocumentType,
+    id: string,
+    format: DocumentFormatParam,
+) {
+    const document = await requireGeneratedDocument(type, id);
+
+    if (!REPLACEABLE_STATUSES.has(document.status)) {
+        throw new AppException(
+            "Nur erzeugte oder hochgeladene Dokumente können ersetzt werden.",
+            409,
+            "DOCUMENT_NOT_REPLACEABLE",
+        );
+    }
+
+    const artifact = findArtifact(document.artifacts, toDocumentFormat(format));
+    if (!artifact) {
+        throw new AppException("File not found", 404, "FILE_NOT_FOUND");
+    }
+
+    return { document, artifact };
+}
+
+/**
+ * Stellt eine signierte URL aus, unter der der Browser die Ersatzdatei direkt
+ * nach S3 legt. Der Server sieht die Bytes dabei nie.
+ *
+ * S3 meldet den Abschluss nicht zurück — deshalb ist der Vorgang zweiteilig
+ * und wird erst durch {@link confirmReplacementUpload} wirksam.
+ */
+export async function createReplacementUpload(
+    type: DocumentType,
+    id: string,
+    format: DocumentFormatParam,
+) {
+    await requireReplaceableArtifact(type, id, format);
+
+    const objectKey = `${replacementPrefix(type, id)}${randomUUID()}.${format}`;
+    const contentType = MIME_TYPES[format];
+
+    return {
+        url: await getDocumentUploadUrl(objectKey, contentType),
+        objectKey,
+        contentType,
+    };
+}
+
+/**
+ * Übernimmt eine hochgeladene Datei als neuen Inhalt des Artefakts.
+ *
+ * `remotePath`, `remoteEtag`, `uploadedAt` und `remoteSha256` bleiben bewusst
+ * unangetastet: Liegt das Dokument bereits auf Nextcloud, entsteht dadurch die
+ * sichtbare Abweichung, die der Nutzer anschließend gezielt auflöst.
+ */
+export async function confirmReplacementUpload(
+    type: DocumentType,
+    id: string,
+    format: DocumentFormatParam,
+    objectKey: string,
+) {
+    const { artifact } = await requireReplaceableArtifact(type, id, format);
+
+    if (!objectKey.startsWith(replacementPrefix(type, id)) || !objectKey.endsWith(`.${format}`)) {
+        throw new AppException(
+            "Der Objektschlüssel gehört nicht zu diesem Dokument.",
+            400,
+            "INVALID_OBJECT_KEY",
+        );
+    }
+
+    let content: Buffer;
+    try {
+        content = await getDocumentArtifact(objectKey);
+    } catch {
+        throw new AppException(
+            "Die hochgeladene Datei wurde nicht gefunden. Wurde der Upload abgeschlossen?",
+            404,
+            "UPLOAD_NOT_FOUND",
+        );
+    }
+
+    // Eine signierte PUT-URL kann die Größe nicht begrenzen — das geht erst hier.
+    if (content.length === 0) {
+        await removeDocumentArtifact(objectKey).catch((error) => logger.error(error));
+        throw new AppException("Die hochgeladene Datei ist leer.", 400, "EMPTY_FILE");
+    }
+
+    if (content.length > MAX_UPLOAD_BYTES) {
+        await removeDocumentArtifact(objectKey).catch((error) => logger.error(error));
+        throw new AppException(
+            `Die Datei ist größer als ${MAX_UPLOAD_BYTES / 1024 / 1024} MB.`,
+            413,
+            "FILE_TOO_LARGE",
+        );
+    }
+
+    const previousKey = artifact.objectKey;
+
+    await prisma.documentArtifact.update({
+        where: { id: artifact.id },
+        data: {
+            objectKey,
+            size: content.length,
+            sha256: sha256Document(content),
+        },
+    });
+
+    // Erst nach dem Umbiegen: schlägt das Aufräumen fehl, bleibt nur ein
+    // verwaistes Objekt zurück — der Datensatz ist bereits korrekt.
+    if (previousKey !== objectKey) {
+        await removeDocumentArtifact(previousKey).catch((error) => {
+            logger.error('document_replacement_cleanup_failed', {
+                objectKey: previousKey,
+                error: (error as Error).message,
+            });
+        });
+    }
+
+    return requireGeneratedDocument(type, id);
+}
+
+/**
+ * Überträgt den aktuellen Stand erneut nach Nextcloud, nachdem die Datei
+ * ersetzt wurde.
+ *
+ * Der reguläre Upload taugt dafür nicht: er kehrt bei Status `UPLOADED` sofort
+ * zurück, und `uploadDocumentArtifact` weigert sich, abweichende Inhalte zu
+ * überschreiben. Deshalb wird die Remote-Datei zuerst entfernt und der Status
+ * zurückgesetzt — danach greift der gewöhnliche Upload samt seiner Lease-Logik
+ * unverändert.
+ */
+export async function resyncDocument(type: DocumentType, id: string) {
+    const document = await requireGeneratedDocument(type, id);
+
+    if (document.status !== DocumentStatus.UPLOADED) {
+        throw new AppException(
+            "Nur bereits übertragene Dokumente können erneut übertragen werden.",
+            409,
+            "DOCUMENT_NOT_UPLOADED",
+        );
+    }
+
+    const { pdf, docx } = artifactPair(document.artifacts);
+
+    for (const artifact of [pdf, docx]) {
+        if (artifact?.remotePath) {
+            await deleteDocumentArtifact(artifact.remotePath);
+        }
+    }
+
+    await prisma.$transaction(async (tx) => {
+        const where = { id, deletedAt: null, status: DocumentStatus.UPLOADED };
+        const data = { status: DocumentStatus.GENERATED };
+        const reset = type === "offer"
+            ? await tx.offerDocument.updateMany({ where, data })
+            : await tx.orderDocument.updateMany({ where, data });
+
+        if (reset.count !== 1) {
+            throw new AppException(
+                "Das Dokument wurde zwischenzeitlich verändert.",
+                409,
+                "DOCUMENT_STATE_CHANGED",
+            );
+        }
+
+        await tx.documentArtifact.updateMany({
+            where: { id: { in: [pdf?.id, docx?.id].filter((value): value is string => Boolean(value)) } },
+            data: { remotePath: null, remoteEtag: null, uploadedAt: null, remoteSha256: null },
+        });
+    });
+
     return uploadGeneratedDocument(type, id);
 }

@@ -1,18 +1,15 @@
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import FlatrateItemOfferModal from "./flatrate-item";
-import FlatrateFormOfferModal from "./flatrate-form";
-import type { OfferFormApi } from "@/routes/_main/offers/-hooks/use-offer-form";
+import { useOfferModalContext } from "../offer-modal-context";
+import FlatrateItem from "./flatrate-item";
+import FlatrateForm from "./flatrate-form";
 import { Button } from "@/components";
 import useFlatrateOfferModal from "@/routes/_main/offers/-hooks/use-flatreate.offer-modal";
 
-interface Props {
-    form: OfferFormApi;
-}
-
-export default function FlatrateOfferModalSection({ form }: Props) {
+export default function FlatrateSection() {
     const { t } = useTranslation();
+    const { form, policy } = useOfferModalContext();
 
     const {
         flatrates,
@@ -22,6 +19,8 @@ export default function FlatrateOfferModalSection({ form }: Props) {
     } = useFlatrateOfferModal({ form });
 
     const [showFlatrateForm, setShowFlatrateForm] = useState<boolean>(false);
+
+    if (policy.flatrates.access === "hidden") return null;
 
     return (
         <div className="grid gap-4">
@@ -34,10 +33,12 @@ export default function FlatrateOfferModalSection({ form }: Props) {
                 {/* Header actions */}
                 <div className="flex items-center gap-4">
 
-                    <Button type="button" variant="link" size="fit_sm"
-                        onClick={() => setShowFlatrateForm(true)} disabled={false}>
-                        <Plus size={14} /> {t("offerModal.add_flatrate")}
-                    </Button>
+                    {policy.flatrates.canAdd && (
+                        <Button type="button" variant="link" size="fit_sm"
+                            onClick={() => setShowFlatrateForm(true)} disabled={showFlatrateForm}>
+                            <Plus size={14} /> {t("offerModal.add_flatrate")}
+                        </Button>
+                    )}
 
                 </div>
 
@@ -51,7 +52,7 @@ export default function FlatrateOfferModalSection({ form }: Props) {
 
             {showFlatrateForm && (
                 <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
-                    <FlatrateFormOfferModal
+                    <FlatrateForm
                         cancelFn={() => setShowFlatrateForm(false)}
                         saveFn={(v) => addFlatrate(v)}
                     />
@@ -59,10 +60,11 @@ export default function FlatrateOfferModalSection({ form }: Props) {
             )}
 
             {flatrates.map((flatrate, index) => (
-                <FlatrateItemOfferModal
+                <FlatrateItem
+                    key={`${flatrate.flatRateId}-${index}`}
                     flatrate={flatrate}
                     updateFn={(updatedFr) => updateFlatrate(index, updatedFr)}
-                    deleteFn={() => deleteFlatrate(index)}
+                    deleteFn={policy.flatrates.canRemove ? () => deleteFlatrate(index) : undefined}
                 />
             ))}
         </div>

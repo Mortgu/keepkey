@@ -2,10 +2,10 @@ import { queryOptions } from "@tanstack/react-query";
 import { getContacts, getCustomer, getCustomers } from "./customer-api";
 import { customerKeys } from "./customer-keys";
 
-import type { CustomerFilters } from "@keepit/schemas";
+import type { CustomerFilterParams } from "@keepit/schemas";
 
 export const customerQueries = {
-    list: (filters: CustomerFilters = {}) => {
+    list: (filters: CustomerFilterParams = {}) => {
         return queryOptions({
             queryKey: customerKeys.list(filters),
             queryFn: () => getCustomers(filters),

@@ -1,45 +1,46 @@
 import { LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
 import {  coordinatesFrom } from "@keepit/schemas";
-import WorkloadFormOfferModal from "./workload-form";
+import { useOfferModalContext } from "../offer-modal-context";
+import WorkloadForm from "./workload-form";
 import type {CreateOfferPositionInput} from "@keepit/schemas";
+import type { OfferModalPositionValues } from "@/routes/_main/offers/-schemas/offer-modal-schema";
 import { Button } from "@/components";
 import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
-    customerId: string;
-    workload: CreateOfferPositionInput;
-
+    workload: OfferModalPositionValues;
     updateFn: (workload: CreateOfferPositionInput) => void;
-    deleteFn: () => void;
+    /** Nicht gesetzt, wenn die Position nicht entfernt werden darf. */
+    deleteFn?: () => void;
 }
 
-export default function WorkloadItemOfferModal({ customerId, workload, updateFn, deleteFn }: Props) {
+export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
     const locale = useLocale();
+    const { policy, sourceOffer, customerId } = useOfferModalContext();
 
     const [isEdit, setEdit] = useState<boolean>(false);
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
     const { contract, isPending: contractPending } = useContract(workload.contractId);
     const { totalCents, unitCents, isLoading: pricePending } = usePositionPrice({
-        source: "live",
+        source: policy.priceSource,
         coordinates: coordinatesFrom(customerId, workload),
+        pin: sourceOffer
+            ? { offerId: sourceOffer.id, positionId: workload.sourcePositionId ?? null }
+            : undefined,
     });
 
-    if (!product || !contract) {
+    if (productsPending || contractPending || !product || !contract) {
         return (
-            <div>dw</div>
-        )
-    }
-
-    if (productsPending || contractPending || pricePending) {
-        <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
-            <div className="flex items-center justify-center px-4 py-3 gap-4">
-                <LoaderCircle size={14} />
+            <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
+                <div className="flex items-center justify-center px-4 py-3 gap-4">
+                    <LoaderCircle size={14} className="animate-spin" />
+                </div>
             </div>
-        </div>
+        );
     }
 
     return (
@@ -73,13 +74,15 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
                     {/* actions */}
                     <div className="flex items-center gap-2">
 
-                        <Button variant="border" type="button" size="sm" icon={
+                        <Button variant="border" type="button" size="sm" disabled={isEdit} icon={
                             <Pen size={14} />
                         } iconOnly onClick={() => setEdit(true)} />
 
-                        <Button variant="border" type="button" size="sm" icon={
-                            <Trash size={14} />
-                        } iconOnly onClick={deleteFn} />
+                        {deleteFn && (
+                            <Button variant="border" type="button" size="sm" icon={
+                                <Trash size={14} />
+                            } iconOnly onClick={deleteFn} />
+                        )}
 
                     </div>
                 </div>
@@ -92,8 +95,7 @@ export default function WorkloadItemOfferModal({ customerId, workload, updateFn,
             )}
 
             {isEdit && (
-                <WorkloadFormOfferModal
-                    customerId={customerId}
+                <WorkloadForm
                     currentWorkload={workload}
                     cancelFn={() => setEdit(false)}
                     saveFn={(v) => updateFn(v)}

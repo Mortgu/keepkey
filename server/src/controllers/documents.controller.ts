@@ -35,3 +35,30 @@ export const downloadDocument = async (request: Request, response: Response) => 
     );
     return response.redirect(302, result.url);
 };
+
+export const createReplacementUpload = async (request: Request, response: Response) => {
+    const result = await documentsService.createReplacementUpload(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.params.format as DocumentFormatParam,
+    );
+    return response.status(201).json(result);
+};
+
+export const confirmReplacementUpload = async (request: Request, response: Response) => {
+    const document = await documentsService.confirmReplacementUpload(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.params.format as DocumentFormatParam,
+        request.body.objectKey as string,
+    );
+    return response.status(200).json(document);
+};
+
+export const resyncDocument = async (request: Request, response: Response) => {
+    await documentsService.resyncDocument(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+    );
+    return response.status(204).send();
+};

@@ -38,6 +38,7 @@ export declare const documentArtifactSchema: z.ZodObject<{
     uploadedAt: z.ZodOptional<z.ZodString>;
     remotePath: z.ZodOptional<z.ZodString>;
     remoteEtag: z.ZodOptional<z.ZodString>;
+    remoteSha256: z.ZodOptional<z.ZodString>;
     offerDocumentId: z.ZodOptional<z.ZodString>;
     orderDocumentId: z.ZodOptional<z.ZodString>;
     updatedAt: z.ZodString;
@@ -72,6 +73,7 @@ export declare const generatedDocumentSchema: z.ZodObject<{
         uploadedAt: z.ZodOptional<z.ZodString>;
         remotePath: z.ZodOptional<z.ZodString>;
         remoteEtag: z.ZodOptional<z.ZodString>;
+        remoteSha256: z.ZodOptional<z.ZodString>;
         offerDocumentId: z.ZodOptional<z.ZodString>;
         orderDocumentId: z.ZodOptional<z.ZodString>;
         updatedAt: z.ZodString;
@@ -90,7 +92,21 @@ export declare const findDocumentArtifact: (artifacts: Array<DocumentArtifact>, 
     uploadedAt?: string | undefined;
     remotePath?: string | undefined;
     remoteEtag?: string | undefined;
+    remoteSha256?: string | undefined;
     offerDocumentId?: string | undefined;
     orderDocumentId?: string | undefined;
 } | undefined;
+/**
+ * true, wenn die Datei auf Nextcloud nicht mehr dem Stand in S3 entspricht.
+ *
+ * Das passiert, wenn jemand die erzeugte Datei nach dem Synchronisieren ersetzt
+ * hat. Nextcloud wird dabei bewusst nicht automatisch nachgezogen — der Nutzer
+ * soll sehen, dass die Stände auseinanderlaufen, und selbst entscheiden.
+ *
+ * Ohne `remotePath` liegt noch nichts auf Nextcloud, dann gibt es auch nichts,
+ * wovon abgewichen werden könnte.
+ */
+export declare const isRemoteOutdated: (artifact: DocumentArtifact) => boolean;
+/** true, wenn irgendein Artefakt des Dokuments von Nextcloud abweicht. */
+export declare const hasOutdatedRemote: (artifacts: Array<DocumentArtifact>) => boolean;
 //# sourceMappingURL=document.schema.d.ts.map
