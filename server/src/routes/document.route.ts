@@ -1,12 +1,16 @@
 import { Router } from "express";
 import {
+    confirmReplacementUpload,
+    createReplacementUpload,
     deleteDocument,
     downloadDocument,
     renameDocument,
+    resyncDocument,
     uploadDocument,
 } from "@/controllers/index.js";
 import { validate, validateParams } from "@/middlewares/zod.middleware.js";
 import {
+    confirmReplacementSchema,
     documentArtifactParamsSchema,
     documentParamsSchema,
     renameDocumentSchema,
@@ -30,10 +34,31 @@ router.post(
     validateParams(documentParamsSchema),
     uploadDocument,
 );
+/* Erneut nach Nextcloud übertragen, nachdem die Datei ersetzt wurde. */
+router.post(
+    "/:type/:documentId/resync",
+    validateParams(documentParamsSchema),
+    resyncDocument,
+);
 router.get(
     "/:type/:documentId/artifacts/:format",
     validateParams(documentArtifactParamsSchema),
     downloadDocument,
+);
+
+/* Signierte URL anfordern, um die erzeugte Datei zu ersetzen. */
+router.post(
+    "/:type/:documentId/artifacts/:format/upload-url",
+    validateParams(documentArtifactParamsSchema),
+    createReplacementUpload,
+);
+
+/* Den abgeschlossenen Direkt-Upload übernehmen. */
+router.post(
+    "/:type/:documentId/artifacts/:format/replace",
+    validateParams(documentArtifactParamsSchema),
+    validate(confirmReplacementSchema),
+    confirmReplacementUpload,
 );
 
 export default router;

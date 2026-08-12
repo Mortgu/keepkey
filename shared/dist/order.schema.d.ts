@@ -90,6 +90,7 @@ export declare const orderDocumentSchema: z.ZodObject<{
         uploadedAt: z.ZodOptional<z.ZodString>;
         remotePath: z.ZodOptional<z.ZodString>;
         remoteEtag: z.ZodOptional<z.ZodString>;
+        remoteSha256: z.ZodOptional<z.ZodString>;
         offerDocumentId: z.ZodOptional<z.ZodString>;
         orderDocumentId: z.ZodOptional<z.ZodString>;
         updatedAt: z.ZodString;
@@ -209,6 +210,7 @@ export declare const orderSchema: z.ZodObject<{
             uploadedAt: z.ZodOptional<z.ZodString>;
             remotePath: z.ZodOptional<z.ZodString>;
             remoteEtag: z.ZodOptional<z.ZodString>;
+            remoteSha256: z.ZodOptional<z.ZodString>;
             offerDocumentId: z.ZodOptional<z.ZodString>;
             orderDocumentId: z.ZodOptional<z.ZodString>;
             updatedAt: z.ZodString;
@@ -338,6 +340,7 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
             uploadedAt: z.ZodOptional<z.ZodString>;
             remotePath: z.ZodOptional<z.ZodString>;
             remoteEtag: z.ZodOptional<z.ZodString>;
+            remoteSha256: z.ZodOptional<z.ZodString>;
             offerDocumentId: z.ZodOptional<z.ZodString>;
             orderDocumentId: z.ZodOptional<z.ZodString>;
             updatedAt: z.ZodString;

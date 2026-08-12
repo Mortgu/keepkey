@@ -21,9 +21,10 @@ model DocumentArtifact {
   size   Int?
   sha256 String?
 
-  uploadedAt DateTime? @db.Timestamptz(6)
-  remotePath String?   @unique
-  remoteEtag String?
+  uploadedAt   DateTime? @db.Timestamptz(6)
+  remotePath   String?   @unique
+  remoteEtag   String?
+  remoteSha256 String?
 
   offerDocument   OfferDocument? @relation("OfferDocumentArtifacts", fields: [offerDocumentId], references: [id], onDelete: Cascade)
   offerDocumentId String?
