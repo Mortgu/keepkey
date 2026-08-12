@@ -44,7 +44,7 @@ export const createOfferPositionSchema = z.object({
     optional: z.boolean(),
     quantity: z.number().int(),
     total_cents: z.number().int(),
-    duration_months: z.number().int(),
+    duration: z.number().int(),
 
     // TODO: remove these from the body
     discount_cents: z.number().int(),

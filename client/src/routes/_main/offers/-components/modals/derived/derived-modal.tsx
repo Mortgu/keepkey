@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useDerivedForm from "./hook/use-derived-form";
 import OfferDerivedModal from "./offer/offer.derived-modal";
-import WorkloadDerivedModal from "./workload/workloads.derived-modal";
 import FlatratesDerivedModal from "./flatrate/flatrates.derived-modal";
 import DiscountDerivedModal from "./discounts/discount.derived-modal";
 import type { DerivedMode } from "./hook/use-derived-form";
@@ -66,18 +65,19 @@ export default function DerivedModal({ offer, mode, onClose }: Props) {
                         quoteIdCloudChecked={quoteIdCloudChecked}
                     />
 
-                    <WorkloadDerivedModal
+                    {/*<WorkloadDerivedModal
                         form={form}
                         mode={mode}
                         offerId={offer.id}
                         customerId={offer.customerId}
                         workloads={offer.offerPositions}
-                    />
+                    />*/}
 
                     <WorkloadOfferModalSection
                         customerId={offer.customerId}
                         currentOffer={offer}
                         form={form}
+                        actionsEnabled={isExtension}
                     />
 
                     {/* Eine Erweiterung bestellt nur Seats nach — vertragsweite

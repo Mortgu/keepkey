@@ -15,9 +15,11 @@ interface Props {
     customerId: string;
     currentOffer?: Offer;
     form: OfferFormApi;
+
+    actionsEnabled?: boolean;
 }
 
-export default function WorkloadOfferModalSection({ customerId, currentOffer, form }: Props) {
+export default function WorkloadOfferModalSection({ customerId, currentOffer, form, actionsEnabled = true }: Props) {
     const { t } = useTranslation();
 
     const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
@@ -42,23 +44,24 @@ export default function WorkloadOfferModalSection({ customerId, currentOffer, fo
 
     return (
         <div className="grid gap-4">
-            <hr className="text-(--border)" />
 
             {/* Head */}
             <div className="flex items-center justify-between">
                 <p>{t("offerModal.workload_section")}</p>
 
                 {/* Header actions */}
-                <div className="flex items-center gap-4">
+                {actionsEnabled && (
+                    <div className="flex items-center gap-4">
 
-                    <Checkbox label={t("offerModal.compare")} checked={featureComparison} onChange={(e) => setFeatureComparison(e.target.checked)} />
+                        <Checkbox label={t("offerModal.compare")} checked={featureComparison} onChange={(e) => setFeatureComparison(e.target.checked)} />
 
-                    <Button type="button" variant="link" size="fit_sm"
-                        onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
-                        <Plus size={14} /> {t("offerModal.add_workload")}
-                    </Button>
+                        <Button type="button" variant="link" size="fit_sm"
+                            onClick={() => setShowWorkloadForm(true)} disabled={showWorkloadForm}>
+                            <Plus size={14} /> {t("offerModal.add_workload")}
+                        </Button>
 
-                </div>
+                    </div>
+                )}
 
             </div>
 

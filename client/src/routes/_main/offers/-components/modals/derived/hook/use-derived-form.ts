@@ -81,6 +81,7 @@ export default function useDerivedForm({ offer, mode, closeFn }: Props) {
             onChange: createOfferSchema,
         },
         onSubmit: async ({ value }) => {
+            console.log(value)
             if (mode === "renewal") {
                 await renewOffer({ offerId: offer.id, input: value });
             } else {
