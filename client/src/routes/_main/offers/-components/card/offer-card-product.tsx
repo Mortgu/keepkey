@@ -14,14 +14,14 @@ export default function OfferCardProduct({ position }: Props) {
     const locale = useLocale();
 
     return (
-        <>
-            <div className="flex items-center justify-between gap-2 py-3 border-b border-(--border) last:border-0">
-                <div className="grid">
+        <div className="grid gap-4 border-b border-(--border) py-3">
+            <div className="flex items-center justify-between gap-2  last:border-0">
+                <div className="grid gap-1">
                     <div className="flex gap-2">
                         <p className="text-md">
                             {localized(product.translations, locale, "name")}
                         </p>
-                        <Badge variant="draft">
+                        <Badge variant="GENERATED">
                             {localized(contract.translations, locale, "name")}
                         </Badge>
                     </div>
@@ -43,7 +43,7 @@ export default function OfferCardProduct({ position }: Props) {
             </div>
 
             {(position.free_months > 0) && (
-                <div className="flex items-center justify-between gap-2 py-3 border-b border-(--border) last:border-0">
+                <div className="flex items-center justify-between gap-2 last:border-0">
                     <div className="grid">
                         <div className="flex gap-2">
                             <p className="text-md">
@@ -66,6 +66,6 @@ export default function OfferCardProduct({ position }: Props) {
                     </div>
                 </div>
             )}
-        </>
+        </div>
     )
 }
