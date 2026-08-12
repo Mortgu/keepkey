@@ -2,7 +2,6 @@ import { tv } from "tailwind-variants";
 import type { Customer } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import { formatEur } from "@/utils/utils";
 
 interface Props {
     customer: Customer;
@@ -19,6 +18,7 @@ const styles = tv({
 
 export default function CustomerGeneralTab({ customer }: Props) {
     const css = styles();
+    console.log(customer)
 
     return (
         <div>
@@ -46,10 +46,8 @@ export default function CustomerGeneralTab({ customer }: Props) {
                 <dd className={cn(css.base(), css.dd())}>{customer.language}</dd>
                 <dt className={cn(css.base(), css.dt())}>Bestellungen</dt>
                 <dd className={cn(css.base(), css.dd())}>
-                    {customer.orders.length}
+                    {customer._count.offers}
                 </dd>
-                <dt className={cn(css.base(), css.dt())}>Jahresumsatz</dt>
-                <dd className={cn(css.base(), css.dd())}>{formatEur(0)}</dd>
                 <dt className={cn(css.base(), css.dt())}>Erstellt</dt>
                 <dd className={cn(css.base(), css.dd())}>
                     {formatDate(customer.createdAt)}

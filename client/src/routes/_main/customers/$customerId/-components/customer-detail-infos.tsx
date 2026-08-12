@@ -34,7 +34,7 @@ export default function CustomerDetailPageInfos({ customer }: Props) {
                 <dd className="font-medium text-right">{customer.language}</dd>
                 <dt className="text-gray-400">Bestellungen</dt>
                 <dd className="font-medium text-right">
-                    {customer.orders.length}
+                    {customer._count.orders}
                 </dd>
                 <dt className="text-gray-400">Jahresumsatz</dt>
                 <dd className="font-medium text-right">

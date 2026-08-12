@@ -58,8 +58,12 @@ export async function getCustomerById(id: string) {
         where: { id },
         include: {
             contactPersons: true,
-            orders: true,
-            offers: true,
+            _count: {
+                select: {
+                    offers: true,
+                    orders: true,
+                }
+            }
         },
     });
 

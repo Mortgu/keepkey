@@ -63,7 +63,7 @@ export default function DocumentCard({ offerId, document }: Props) {
                 file
             });
         },
-        onDropAccepted: (files) => {
+        onDropAccepted: (_) => {
             toast.info("File was successfully replaced!")
         },
         onDropRejected(fileRejections, _) {
