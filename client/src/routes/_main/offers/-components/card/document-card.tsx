@@ -1,5 +1,13 @@
 import { ActionMenu, Button, buttonStyles, DocumentRenameModal, Tooltip } from "@/components";
-import { documentDownloadUrl, useDocumentMutations, useDocumentTask, useLocale, useModal } from "@/hooks";
+import {
+    documentDownloadUrl,
+    replaceBlockerMessage,
+    useDocumentCapabilities,
+    useDocumentMutations,
+    useDocumentTask,
+    useLocale,
+    useModal,
+} from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
 import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@keepit/schemas";
 import { Dot, File, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
@@ -44,7 +52,11 @@ export default function DocumentCard({ offerId, document }: Props) {
 
     const mutations = useDocumentMutations("offer", offerId);
 
-    const canReplace = (document.status === "GENERATED" || document.status === "UPLOADED") && !mutations.isReplacingDocumentFile;
+    const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
+
+    const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
+    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
+
     const dropzone = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -53,18 +65,23 @@ export default function DocumentCard({ offerId, document }: Props) {
         accept: {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": []
         },
-        onDrop: (acceptedFiles) => {
+        // Erst nach dem Hochladen melden, nicht schon beim Annehmen der Datei:
+        // Bricht der Upload ab — etwa an einer fehlenden CORS-Regel des Buckets —
+        // stand hier vorher trotzdem "erfolgreich ersetzt".
+        onDrop: async (acceptedFiles) => {
             const [file] = acceptedFiles;
-            if (acceptedFiles.length === 0) return;
+            if (file === undefined) return;
 
-            mutations.replaceDocumentFile({
-                documentId: document.id,
-                format: "docx",
-                file
-            });
-        },
-        onDropAccepted: (_) => {
-            toast.info("File was successfully replaced!")
+            try {
+                await mutations.replaceDocumentFile({
+                    documentId: document.id,
+                    format: "docx",
+                    file,
+                });
+                toast.success("Datei wurde ersetzt.");
+            } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Datei konnte nicht ersetzt werden.");
+            }
         },
         onDropRejected(fileRejections, _) {
             toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
@@ -227,6 +244,8 @@ export default function DocumentCard({ offerId, document }: Props) {
                                         label: "Replace file",
                                         icon: <Replace className="size-3.5" />,
                                         onSelect: () => dropzone.open(),
+                                        disabled: !canReplace,
+                                        hint: canReplaceFiles ? undefined : replaceBlockerMessage(replaceBlocker),
                                     },
                                     {
                                         label: "Edit",

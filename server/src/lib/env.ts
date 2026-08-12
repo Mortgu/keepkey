@@ -10,8 +10,14 @@ const env = createEnv({
 
         TEMPLATES_DIR: z.string().min(1),
 
-        S3_ENDPOINT: z.url(),
-        S3_PUBLIC_ENDPOINT: z.url().optional(),
+        /**
+         * Schema verpflichtend: `z.url()` allein akzeptiert auch `host:port`
+         * ohne Schema — `new URL()` liest den Host dann als Protokoll. Der
+         * S3-Client scheitert daran erst beim ersten Request ("Custom endpoint
+         * ... was not a valid URI"), also mit 500 statt mit einem Startfehler.
+         */
+        S3_ENDPOINT: z.url({ protocol: /^https?$/ }),
+        S3_PUBLIC_ENDPOINT: z.url({ protocol: /^https?$/ }).optional(),
         S3_REGION: z.string().min(1).default("auto"),
         S3_BUCKET: z.string().min(1),
         S3_ACCESS_KEY_ID: z.string().min(1),

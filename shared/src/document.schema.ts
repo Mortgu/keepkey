@@ -57,6 +57,33 @@ export const findDocumentArtifact = (
 ) => artifacts.find((artifact) => artifact.format === format);
 
 /**
+ * Warum das Ersetzen einer erzeugten Datei in dieser Umgebung nicht geht.
+ *
+ * Der Browser legt die Ersatzdatei direkt im Objektspeicher ab. Ist der dafür
+ * signierte Endpunkt von aussen nicht erreichbar oder der Speicher gar nicht
+ * ansprechbar, kann das nur fehlschlagen — dann bleibt die Funktion aus, statt
+ * den Nutzer in einen Fehler laufen zu lassen.
+ */
+export const documentReplaceBlockerSchema = z.enum([
+    /** Signiert wird auf einen internen Host (z. B. *.railway.internal). */
+    "endpoint_private_network",
+    /** Signiert wird auf localhost, obwohl der Server produktiv läuft. */
+    "endpoint_loopback",
+    /** Der Objektspeicher antwortet dem Server nicht. */
+    "storage_unreachable",
+    /** Der Bucket hat keine CORS-Regel, die ein PUT von dieser Origin erlaubt. */
+    "cors_not_configured",
+]);
+export type DocumentReplaceBlocker = z.infer<typeof documentReplaceBlockerSchema>;
+
+export const documentCapabilitiesSchema = z.object({
+    canReplaceFiles: z.boolean(),
+    /** Nur gesetzt, wenn `canReplaceFiles` false ist. */
+    blocker: documentReplaceBlockerSchema.optional(),
+});
+export type DocumentCapabilities = z.infer<typeof documentCapabilitiesSchema>;
+
+/**
  * true, wenn die Datei auf Nextcloud nicht mehr dem Stand in S3 entspricht.
  *
  * Das passiert, wenn jemand die erzeugte Datei nach dem Synchronisieren ersetzt

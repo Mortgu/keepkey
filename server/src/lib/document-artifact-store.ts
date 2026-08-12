@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from "crypto";
 import {
     DeleteObjectCommand,
+    GetBucketCorsCommand,
     GetObjectCommand,
     HeadBucketCommand,
     PutObjectCommand,
@@ -68,6 +69,97 @@ const downloadClient = env.S3_PUBLIC_ENDPOINT && env.S3_PUBLIC_ENDPOINT !== env.
 const uploadSigningClient = createClient(env.S3_PUBLIC_ENDPOINT ?? env.S3_ENDPOINT, {
     requestChecksumCalculation: "WHEN_REQUIRED",
 });
+
+/**
+ * Warum der Browser den Endpunkt nicht erreichen kann, unter dem signiert wird.
+ *
+ * `loopback` und `private_network` sind die beiden Fälle, die sich allein am
+ * Endpunkt erkennen lassen: Ein Ersetzen legt die Datei direkt aus dem Browser
+ * ab, ein interner Host läuft dort zwangsläufig ins Leere. Die dritte Hürde,
+ * die fehlende CORS-Regel, prüft {@link bucketAllowsBrowserUploads}.
+ */
+export type BrowserEndpointIssue = "loopback" | "private_network";
+
+const PRIVATE_HOST_SUFFIXES = [".internal", ".local"];
+const LOOPBACK_HOSTS = ["localhost", "127.0.0.1", "::1", "[::1]"];
+
+/**
+ * Prüft den Endpunkt, gegen den Upload-URLs signiert werden, auf offensichtliche
+ * Unerreichbarkeit aus dem Browser. In der Entwicklung ist ein Loopback-Host der
+ * Normalfall und daher in Ordnung — dort läuft der Browser auf derselben Maschine.
+ */
+export function browserEndpointIssue(): BrowserEndpointIssue | null {
+    const { hostname } = new URL(env.S3_PUBLIC_ENDPOINT ?? env.S3_ENDPOINT);
+
+    if (PRIVATE_HOST_SUFFIXES.some((suffix) => hostname.endsWith(suffix))) {
+        return "private_network";
+    }
+
+    if (env.NODE_ENV === "production" && LOOPBACK_HOSTS.includes(hostname)) {
+        return "loopback";
+    }
+
+    return null;
+}
+
+/**
+ * Ergebnis der CORS-Prüfung am Bucket.
+ *
+ * `unknown` ist bewusst kein Fehler: Manche Anbieter geben die
+ * CORS-Konfiguration nicht heraus. Wer sie nicht lesen kann, weiß nichts über
+ * sie — und Unwissen darf die Funktion nicht abschalten.
+ */
+export type BucketCorsState = "allowed" | "missing" | "unknown";
+
+/**
+ * Prüft, ob eine CORS-Regel des Buckets ein `PUT` von der App-Origin erlaubt.
+ *
+ * Ohne diese Regel bricht der Browser den Direkt-Upload ab, obwohl der Server
+ * alles richtig signiert hat — der `PUT` läuft sogar durch, nur darf der Client
+ * die Antwort nicht lesen und den Upload deshalb nie bestätigen.
+ */
+export async function bucketAllowsBrowserUploads(): Promise<BucketCorsState> {
+    try {
+        const { CORSRules } = await storageClient.send(new GetBucketCorsCommand({
+            Bucket: env.S3_BUCKET,
+        }));
+
+        const allowed = (CORSRules ?? []).some((rule) =>
+            (rule.AllowedMethods ?? []).some((method) => method.toUpperCase() === "PUT")
+            && (rule.AllowedOrigins ?? []).some(allowsAppOrigin));
+
+        return allowed ? "allowed" : "missing";
+    } catch (error) {
+        // Nur das ausdrückliche „es gibt keine Konfiguration" ist eine Aussage;
+        // alles andere (NotImplemented, AccessDenied, Netzwerk) ist keine.
+        return errorName(error) === "NoSuchCORSConfiguration" ? "missing" : "unknown";
+    }
+}
+
+function errorName(error: unknown): string | undefined {
+    return error instanceof Error ? error.name : undefined;
+}
+
+/** Origins, unter denen die App im Browser läuft. */
+function appOrigins(): Array<string> {
+    return env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).filter(Boolean);
+}
+
+/**
+ * S3-CORS erlaubt genau ein `*` als Platzhalter je Origin-Eintrag, etwa
+ * `https://*.example.com`. Ein alleinstehendes `*` erlaubt alles.
+ */
+function allowsAppOrigin(allowedOrigin: string): boolean {
+    if (allowedOrigin === "*") return true;
+
+    const [prefix, suffix] = allowedOrigin.split("*");
+
+    return appOrigins().some((origin) => (
+        suffix === undefined
+            ? origin === allowedOrigin
+            : origin.startsWith(prefix!) && origin.endsWith(suffix) && origin.length >= prefix!.length + suffix.length
+    ));
+}
 
 async function settleOperations(operations: Promise<unknown>[]): Promise<void> {
     const results = await Promise.allSettled(operations);

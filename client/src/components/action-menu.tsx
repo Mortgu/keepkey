@@ -13,6 +13,8 @@ export interface ActionMenuItem {
     download?: string;
     danger?: boolean;
     disabled?: boolean;
+    /** Kurze Begründung unter dem Label — gedacht für deaktivierte Einträge. */
+    hint?: string;
 
     condition?: boolean;
 
@@ -87,11 +89,11 @@ interface ActionMenuItemProps {
 }
 
 function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
-    const { label, icon, onSelect, href, download, danger, disabled, condition = true } = item;
+    const { label, icon, onSelect, href, download, danger, disabled, hint, condition = true } = item;
     const isDisabled = disabled || !condition;
 
     const className = [
-        "flex w-full items-center gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
+        "flex w-full items-start gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
         isDisabled ? "cursor-not-allowed opacity-50" : "",
         danger
             ? "text-(--destructive) hover:bg-(--destructive-subtle)"
@@ -127,7 +129,10 @@ function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
             className={className}
         >
             {icon}
-            <span className="flex-1 whitespace-pre">{label}</span>
+            <span className="flex-1">
+                <span className="block whitespace-pre">{label}</span>
+                {hint && <span className="block max-w-[22rem] text-xs text-(--text-secondary)">{hint}</span>}
+            </span>
         </button>
     );
 }

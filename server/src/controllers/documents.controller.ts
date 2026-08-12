@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import * as documentsService from "../services/documents.service.js";
 
+export const getDocumentCapabilities = async (_request: Request, response: Response) => {
+    return response.status(200).json(await documentsService.getDocumentCapabilities());
+};
+
 export const renameDocument = async (request: Request, response: Response) => {
     const document = await documentsService.renameDocument(
         request.params.type as DocumentType,

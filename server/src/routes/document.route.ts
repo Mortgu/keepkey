@@ -4,6 +4,7 @@ import {
     createReplacementUpload,
     deleteDocument,
     downloadDocument,
+    getDocumentCapabilities,
     renameDocument,
     resyncDocument,
     uploadDocument,
@@ -17,6 +18,9 @@ import {
 } from "@/schemas/document-schemas.js";
 
 const router = Router();
+
+/* Was diese Umgebung beim Ersetzen von Dateien überhaupt hergibt. */
+router.get("/capabilities", getDocumentCapabilities);
 
 router.patch(
     "/:type/:documentId",

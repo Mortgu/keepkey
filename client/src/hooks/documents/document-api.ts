@@ -1,5 +1,14 @@
-import type { DocumentFormatParam, DocumentType, GeneratedDocument } from "@keepit/schemas";
+import type {
+    DocumentCapabilities,
+    DocumentFormatParam,
+    DocumentType,
+    GeneratedDocument,
+} from "@keepit/schemas";
 import { BASE_URL, api } from "@/lib/api-client";
+
+/** Was diese Umgebung beim Ersetzen erzeugter Dateien hergibt. */
+export const fetchDocumentCapabilities = () =>
+    api<DocumentCapabilities>("/api/documents/capabilities");
 
 export const renameDocument = (type: DocumentType, documentId: string, displayName: string) =>
     api<GeneratedDocument>(`/api/documents/${type}/${documentId}`, {
@@ -50,11 +59,26 @@ export const requestReplacementUpload = (
  * sonst weist S3 den PUT ab.
  */
 export const putReplacementFile = async (upload: ReplacementUpload, file: File): Promise<void> => {
-    const response = await fetch(upload.url, {
-        method: "PUT",
-        headers: { "Content-Type": upload.contentType },
-        body: file,
-    });
+    if (!/^https?:$/.test(new URL(upload.url).protocol)) {
+        throw new Error("Der Objektspeicher ist aus dem Browser nicht erreichbar.");
+    }
+
+    let response: Response;
+    try {
+        response = await fetch(upload.url, {
+            method: "PUT",
+            headers: { "Content-Type": upload.contentType },
+            body: file,
+        });
+    } catch {
+        // Ein CORS-Abbruch kommt ohne Status hier an, und zwar auch dann, wenn
+        // der PUT im Bucket längst durchgelaufen ist — der Browser gibt die
+        // Antwort nur nicht heraus. Ohne diese Übersetzung stünde da bloß
+        // "Failed to fetch".
+        throw new Error(
+            "Der Bucket nimmt keine Uploads von dieser Domain an — es fehlt eine CORS-Regel.",
+        );
+    }
 
     if (!response.ok) {
         throw new Error(`Upload nach S3 fehlgeschlagen (${response.status}).`);
