@@ -1,4 +1,4 @@
-.PHONY: dev install build docker-build docker-up docker-down docker-logs docker-clean db-generate db-migrate db-seed db-reset db-studio lint clean
+.PHONY: dev install build docker-build docker-up docker-down docker-logs docker-clean bucket-cors bucket-cors-dry db-generate db-migrate db-seed db-reset db-studio lint clean
 
 # ── Development ──
 
@@ -34,6 +34,14 @@ docker-logs:
 docker-clean:
 	docker compose --project-directory dev down -v
 	docker rmi keepit:latest || true
+
+# ── Object storage ──
+
+bucket-cors:
+	npm --prefix server run cors:apply
+
+bucket-cors-dry:
+	npm --prefix server run cors:apply -- --dry-run
 
 # ── Database ──
 

@@ -48,6 +48,7 @@ export function OfferPage() {
         />
       )}
 
+
       <div className="">
         <div className="px-8 py-4 border-b border-(--border)">
           <OfferFilters
@@ -61,6 +62,9 @@ export function OfferPage() {
         <div className="px-8 py-6">
           <OfferList filters={filters} />
         </div>
+
+
+
       </div>
     </PageWidth>
   );

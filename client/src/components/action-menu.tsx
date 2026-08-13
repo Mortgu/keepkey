@@ -93,7 +93,7 @@ function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
     const isDisabled = disabled || !condition;
 
     const className = [
-        "flex w-full items-start gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
+        "flex w-full items-center gap-2 px-3 py-[7px] text-left text-sm transition-colors duration-80",
         isDisabled ? "cursor-not-allowed opacity-50" : "",
         danger
             ? "text-(--destructive) hover:bg-(--destructive-subtle)"
