@@ -327,7 +327,7 @@ export default function DocumentCard({ offerId, document }: Props) {
             </div>
 
             {editDocx && (
-                <div className="absolute top-0 left-0 w-full h-full z-1000">
+                <div className="fixed inset-0 z-[1000]">
                     <OfferDocxEditor
                         document={bytes}
                         displayName={document.displayName ?? document.id + ".docx"}
@@ -343,6 +343,10 @@ export default function DocumentCard({ offerId, document }: Props) {
                             } catch (error) {
                                 toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
                             }
+                        }}
+                        onClose={() => {
+                            setBytes(undefined);
+                            setEditDocx(false)
                         }}
                     />
 

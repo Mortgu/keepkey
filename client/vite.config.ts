@@ -7,6 +7,13 @@ import tailwindcss from '@tailwindcss/vite';
 
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: [
+      '@docx-editor.dev/fonts',
+      '@docx-editor.dev/core',
+      '@docx-editor.dev/react',
+    ],
+  },
   resolve: {
     alias: {
       "@": path.resolve("./src"),
