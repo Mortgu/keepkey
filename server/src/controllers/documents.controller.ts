@@ -40,6 +40,15 @@ export const downloadDocument = async (request: Request, response: Response) => 
     return response.redirect(302, result.url);
 };
 
+export const getDocumentDownloadUrl = async (request: Request, response: Response) => {
+    const result = await documentsService.downloadDocument(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.params.format as DocumentFormatParam,
+    );
+    return response.status(200).json(result);
+};
+
 export const createReplacementUpload = async (request: Request, response: Response) => {
     const result = await documentsService.createReplacementUpload(
         request.params.type as DocumentType,

@@ -10,17 +10,19 @@ import {
 } from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
 import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@keepit/schemas";
-import { Dot, File, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
+import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
 import { Badge } from '@/components';
 import { formatDate } from "@/lib/format";
 import { getDocumentStatus } from "@/utils/status";
 import { toast } from "react-toastify";
-import { DocxEditor, type DocxEditorRef } from "@docx-editor.dev/react";
+import { type DocxEditorRef } from "@docx-editor.dev/react";
 import { useRef, useState } from "react";
 import '@docx-editor.dev/core/styles/editor.css';
 import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import OfferDocxEditor from "./docx-editor";
 
 const cardStyles = tv({
     slots: {
@@ -114,12 +116,14 @@ export default function DocumentCard({ offerId, document }: Props) {
         )
     }
 
-    const { data, isPending, error } = useQuery({
+    const { refetch } = useQuery({
         queryKey: ['fetched', document.id],
+        enabled: false,
         queryFn: async () => {
-            const res = await fetch(documentDownloadUrl("offer", document.id, "docx"), {
-                credentials: "same-origin",
-            });
+            const { url } = await api<{ url: string }>(
+                `/api/documents/offer/${document.id}/artifacts/docx/url`
+            );
+            const res = await fetch(url);
             if (!res.ok) throw new Error(`Download failed (${res.status})`);
             return new Uint8Array(await res.arrayBuffer());
         }
@@ -133,7 +137,7 @@ export default function DocumentCard({ offerId, document }: Props) {
                 {dropzone.isDragAccept && (
                     <div className={styles.dropzone()}>
                         <div className="flex-row h-full flex items-center justify-center gap-4">
-                            <File className="" size={22} />
+                            <FileIcon className="" size={22} />
                             <div className="grid gap-1">
                                 <p className="uppercase text-sm font-medium">Drop the file to replace this one!</p>
                             </div>
@@ -271,10 +275,9 @@ export default function DocumentCard({ offerId, document }: Props) {
                                             label: "Edit",
                                             icon: <Pencil className="size-3.5" />,
                                             onSelect: async () => {
-                                                console.log(data, isPending, error);
-
-                                                //setBytes(data);
-                                                setEditDocx(false)
+                                                const result = await refetch();
+                                                if (result.data) setBytes(result.data);
+                                                setEditDocx(true)
                                             },
                                             condition: document.status === "GENERATED" || document.status === "UPLOADED"
                                         },
@@ -324,16 +327,28 @@ export default function DocumentCard({ offerId, document }: Props) {
             </div>
 
             {editDocx && (
-                <div className="absolute top-0 left-0 w-full h-full">
-                    <DocxEditor
-                        ref={editorRef}
+                <div className="absolute top-0 left-0 w-full h-full z-1000">
+                    <OfferDocxEditor
                         document={bytes}
-                        onSave={async () => {
-                            //const buffer = await editorRef.current?.save();
-                            //console.log(buffer);
-                            setEditDocx(false)
+                        displayName={document.displayName ?? document.id + ".docx"}
+                        onSave={async (file) => {
+                            try {
+                                await mutations.replaceDocumentFile({
+                                    documentId: document.id,
+                                    format: "docx",
+                                    file,
+                                });
+                                toast.success("Datei wurde gespeichert.");
+                                setEditDocx(false);
+                            } catch (error) {
+                                toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
+                            }
                         }}
                     />
+
+                    {/* */}
+
+
                 </div>
             )}
         </>

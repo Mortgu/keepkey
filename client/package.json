@@ -13,6 +13,7 @@
   "dependencies": {
     "@better-auth/passkey": "^1.6.23",
     "@docx-editor.dev/core": "^2.2.1",
+    "@docx-editor.dev/fonts": "^2.2.1",
     "@docx-editor.dev/react": "^2.2.1",
     "@keepit/schemas": "workspace:*",
     "@tailwindcss/vite": "^4.2.2",

@@ -5,6 +5,7 @@ import {
     deleteDocument,
     downloadDocument,
     getDocumentCapabilities,
+    getDocumentDownloadUrl,
     renameDocument,
     resyncDocument,
     uploadDocument,
@@ -48,6 +49,11 @@ router.get(
     "/:type/:documentId/artifacts/:format",
     validateParams(documentArtifactParamsSchema),
     downloadDocument,
+);
+router.get(
+    "/:type/:documentId/artifacts/:format/url",
+    validateParams(documentArtifactParamsSchema),
+    getDocumentDownloadUrl,
 );
 
 /* Signierte URL anfordern, um die erzeugte Datei zu ersetzen. */

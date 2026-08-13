@@ -122,7 +122,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
         header: DERIVED_HEADER_FIELDS,
         positions: {
             access: "edit",
-            canAdd: false,
+            canAdd: true,
             canRemove: true,
             startEmpty: false,
             fields: {
