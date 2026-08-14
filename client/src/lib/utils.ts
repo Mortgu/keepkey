@@ -20,9 +20,12 @@ export function formatBytesToKB(bytes: number): string {
 
 export function formatQueryString(obj: object): string {
     const params = new URLSearchParams();
+
     for (const [key, value] of Object.entries(obj)) {
         if (value !== undefined && value !== null) {
-            params.append(key, String(value));
+            Array.isArray(value) ?
+                value.forEach(v => params.append(key, v)) :
+                params.append(key, String(value));
         }
     }
     return params.toString();
