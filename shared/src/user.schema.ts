@@ -1,6 +1,12 @@
 import { z } from "zod";
 import { isoDateTime } from './common.js';
 
+export const loginSchema = z.object({
+    email: z.email(),
+    password: z.string().min(8),
+});
+export type LoginInput = z.infer<typeof loginSchema>;
+
 export const createUserSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
