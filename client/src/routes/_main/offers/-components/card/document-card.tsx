@@ -1,14 +1,28 @@
 import { ActionMenu, Button, buttonStyles, DocumentRenameModal, Tooltip } from "@/components";
-import { documentDownloadUrl, useDocumentMutations, useDocumentTask, useLocale, useModal } from "@/hooks";
+import {
+    documentDownloadUrl,
+    replaceBlockerMessage,
+    useDocumentCapabilities,
+    useDocumentMutations,
+    useDocumentTask,
+    useLocale,
+    useModal,
+} from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
 import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@keepit/schemas";
-import { Dot, File, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
+import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
 import { Badge } from '@/components';
 import { formatDate } from "@/lib/format";
 import { getDocumentStatus } from "@/utils/status";
 import { toast } from "react-toastify";
+import { type DocxEditorRef } from "@docx-editor.dev/react";
+import { useRef, useState } from "react";
+import '@docx-editor.dev/core/styles/editor.css';
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api-client";
+import OfferDocxEditor from "./docx-editor";
 
 const cardStyles = tv({
     slots: {
@@ -44,7 +58,11 @@ export default function DocumentCard({ offerId, document }: Props) {
 
     const mutations = useDocumentMutations("offer", offerId);
 
-    const canReplace = (document.status === "GENERATED" || document.status === "UPLOADED") && !mutations.isReplacingDocumentFile;
+    const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
+
+    const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
+    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
+
     const dropzone = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -53,18 +71,23 @@ export default function DocumentCard({ offerId, document }: Props) {
         accept: {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": []
         },
-        onDrop: (acceptedFiles) => {
+        // Erst nach dem Hochladen melden, nicht schon beim Annehmen der Datei:
+        // Bricht der Upload ab — etwa an einer fehlenden CORS-Regel des Buckets —
+        // stand hier vorher trotzdem "erfolgreich ersetzt".
+        onDrop: async (acceptedFiles) => {
             const [file] = acceptedFiles;
-            if (acceptedFiles.length === 0) return;
+            if (file === undefined) return;
 
-            mutations.replaceDocumentFile({
-                documentId: document.id,
-                format: "docx",
-                file
-            });
-        },
-        onDropAccepted: (_) => {
-            toast.info("File was successfully replaced!")
+            try {
+                await mutations.replaceDocumentFile({
+                    documentId: document.id,
+                    format: "docx",
+                    file,
+                });
+                toast.success("Datei wurde ersetzt.");
+            } catch (error) {
+                toast.error(error instanceof Error ? error.message : "Datei konnte nicht ersetzt werden.");
+            }
         },
         onDropRejected(fileRejections, _) {
             toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
@@ -79,6 +102,10 @@ export default function DocumentCard({ offerId, document }: Props) {
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
     const task = useDocumentTask(document.taskId);
 
+    const editorRef = useRef<DocxEditorRef>(null);
+    const [bytes, setBytes] = useState<Uint8Array>();
+    const [editDocx, setEditDocx] = useState<boolean>(false);
+
     const renderDocumentTooltip = () => {
         return (
             <div className="grid">
@@ -89,186 +116,245 @@ export default function DocumentCard({ offerId, document }: Props) {
         )
     }
 
+    const { refetch } = useQuery({
+        queryKey: ['fetched', document.id],
+        enabled: false,
+        queryFn: async () => {
+            const { url } = await api<{ url: string }>(
+                `/api/documents/offer/${document.id}/artifacts/docx/url`
+            );
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`Download failed (${res.status})`);
+            return new Uint8Array(await res.arrayBuffer());
+        }
+    });
+
     return (
-        <div {...dropzone.getRootProps()} className={styles.base({ focused: dropzone.isDragAccept })}>
-            {/* Dropzone */}
-            <input {...dropzone.getInputProps()} />
-            {dropzone.isDragAccept && (
-                <div className={styles.dropzone()}>
-                    <div className="flex-row h-full flex items-center justify-center gap-4">
-                        <File className="" size={22} />
-                        <div className="grid gap-1">
-                            <p className="uppercase text-sm font-medium">Drop the file to replace this one!</p>
+        <>
+            <div {...dropzone.getRootProps()} className={styles.base({ focused: dropzone.isDragAccept })}>
+                {/* Dropzone */}
+                <input {...dropzone.getInputProps()} />
+                {dropzone.isDragAccept && (
+                    <div className={styles.dropzone()}>
+                        <div className="flex-row h-full flex items-center justify-center gap-4">
+                            <FileIcon className="" size={22} />
+                            <div className="grid gap-1">
+                                <p className="uppercase text-sm font-medium">Drop the file to replace this one!</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
+                )}
 
-            {/* Card */}
-            <div className={styles.card()}>
+                {/* Card */}
+                <div className={styles.card()}>
 
-                {/* Card - Left */}
-                <div className="grid gap-1">
-                    {/* Document display name + info tooltip */}
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                            {document.isCurrent && (
-                                <Tooltip side="top" content="This is the latest generated document.">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-(--primary-600)" />
-                                </Tooltip>
+                    {/* Card - Left */}
+                    <div className="grid gap-1">
+                        {/* Document display name + info tooltip */}
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2">
+                                {document.isCurrent && (
+                                    <Tooltip side="top" content="This is the latest generated document.">
+                                        <div className="w-1.5 h-1.5 rounded-full bg-(--primary-600)" />
+                                    </Tooltip>
+                                )}
+
+                                <p className="text-md font-medium">{document.displayName}</p>
+                            </div>
+                            <Tooltip content={<>{renderDocumentTooltip()}</>} side="right">
+                                <Info size={18} className="text-gray-400 hover:text-black" />
+                            </Tooltip>
+                        </div>
+                        {/* createdAt + document status */}
+                        <div className="flex items-center gap-1 text-sm">
+                            <p className="text-gray-400 font-normal">{formatDate(document.createdAt)}</p>
+                            {/* Displays normal status badge */}
+                            {!remoteOutdated && (
+                                <>
+                                    <Dot size={14} className="text-gray-200" />
+                                    <Tooltip content={getDocumentStatus(document.status, locales, "description")}>
+                                        <Badge variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
+                                    </Tooltip>
+                                </>
                             )}
-
-                            <p className="text-md font-medium">{document.displayName}</p>
+                            {/* Displays "out of sync" badge */}
+                            {remoteOutdated && (
+                                <>
+                                    <Dot size={14} className="text-gray-200" />
+                                    <Tooltip content='The NextCloud version differs from the local one!'>
+                                        <Badge variant="FAILED">Out of Sync</Badge>
+                                    </Tooltip>
+                                </>
+                            )}
                         </div>
-                        <Tooltip content={<>{renderDocumentTooltip()}</>} side="right">
-                            <Info size={18} className="text-gray-400 hover:text-black" />
-                        </Tooltip>
                     </div>
-                    {/* createdAt + document status */}
-                    <div className="flex items-center gap-1 text-sm">
-                        <p className="text-gray-400 font-normal">{formatDate(document.createdAt)}</p>
-                        {/* Displays normal status badge */}
-                        {!remoteOutdated && (
-                            <>
-                                <Dot size={14} className="text-gray-200" />
-                                <Tooltip content={getDocumentStatus(document.status, locales, "description")}>
-                                    <Badge variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
-                                </Tooltip>
-                            </>
-                        )}
-                        {/* Displays "out of sync" badge */}
+
+                    {/* Card - right */}
+                    <div className="flex items-center">
+                        {/* "Out of sync" actions */}
                         {remoteOutdated && (
-                            <>
-                                <Dot size={14} className="text-gray-200" />
-                                <Tooltip content='The NextCloud version differs from the local one!'>
-                                    <Badge variant="FAILED">Out of Sync</Badge>
-                                </Tooltip>
-                            </>
-                        )}
-                    </div>
-                </div>
+                            <div className="flex items-center border-r border-(--border) pr-4">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={<RefreshCw size={16} strokeWidth={2} />}
+                                    iconOnly
+                                    onClick={() => mutations.resyncDocument(document.id)}
+                                    loading={mutations.isResyncingDocument}
+                                    disabled={mutations.isResyncingDocument}
+                                />
 
-                {/* Card - right */}
-                <div className="flex items-center">
-                    {/* "Out of sync" actions */}
-                    {remoteOutdated && (
-                        <div className="flex items-center border-r border-(--border) pr-4">
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={<RefreshCw size={16} strokeWidth={2} />}
-                                iconOnly
-                                onClick={() => mutations.resyncDocument(document.id)}
-                                loading={mutations.isResyncingDocument}
-                                disabled={mutations.isResyncingDocument}
-                            />
-
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={<X size={18} strokeWidth={2.2} />}
-                                iconOnly
-                                disabled
-                            />
-                        </div>
-                    )}
-
-                    {/* "normal" actions */}
-                    <div className="flex items-center pl-4">
-                        {/* Upload Button */}
-                        {(document.status === "GENERATED" || document.status === "UPLOADING") && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                icon={<UploadCloud size={16} strokeWidth={2} />}
-                                iconOnly
-                                onClick={() => mutations.uploadDocument(document.id)}
-                                loading={mutations.isUploadingDocument}
-                                disabled={document.status === "UPLOADING"}
-                            />
-                        )}
-
-                        {/* Download Button */}
-                        {(document.status === "GENERATED" || document.status === "UPLOADED") && (
-                            <ActionMenu
-                                label="Downloads"
-                                icon={<Download size={16} strokeWidth={2} />}
-                                items={[
-                                    {
-                                        label: "Download PDF",
-                                        icon: <Download size={14} />,
-                                        href: documentDownloadUrl("offer", document.id, "pdf"),
-                                        download: '',
-                                        condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
-                                    },
-                                    {
-                                        label: "Download DOCX",
-                                        icon: <Download size={14} />,
-                                        href: documentDownloadUrl("offer", document.id, "docx"),
-                                        download: '',
-                                        condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
-                                    }
-                                ]}
-                            />
-                        )}
-
-                        {/* Menu Button */}
-                        {(document.status !== "UPLOADING" && document.status !== "PROCESSING") && (
-                            <ActionMenu
-                                label="Actions"
-                                items={[
-                                    {
-                                        label: "View in NextCloud",
-                                        icon: <ExternalLink className="size-3.5" />,
-                                        href: `/`,
-                                        condition: false, // document.status === "UPLOADED"
-                                    },
-                                    {
-                                        label: "Replace file",
-                                        icon: <Replace className="size-3.5" />,
-                                        onSelect: () => dropzone.open(),
-                                    },
-                                    {
-                                        label: "Edit",
-                                        icon: <Pencil className="size-3.5" />,
-                                        onSelect: () => renameModal.open(),
-                                        condition: document.status === "GENERATED" || document.status === "UPLOADED"
-                                    },
-                                    {
-                                        label: "Delete",
-                                        icon: <Trash2 className="size-3.5" />,
-                                        danger: true,
-                                        disabled: mutations.isDeletingDocument,
-                                        onSelect: () => mutations.deleteDocument(document.id),
-                                        condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "FAILED"
-                                    },
-                                ]}
-                            />
-                        )}
-
-                        {/* Loader Circle */}
-                        {(document.status === "PROCESSING") && (
-                            <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
-                                <LoaderCircle size={16} strokeWidth={2} className="animate-spin" />
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={<X size={18} strokeWidth={2.2} />}
+                                    iconOnly
+                                    disabled
+                                />
                             </div>
                         )}
-                    </div>
 
+                        {/* "normal" actions */}
+                        <div className="flex items-center pl-4">
+                            {/* Upload Button */}
+                            {(document.status === "GENERATED" || document.status === "UPLOADING") && (
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    icon={<UploadCloud size={16} strokeWidth={2} />}
+                                    iconOnly
+                                    onClick={() => mutations.uploadDocument(document.id)}
+                                    loading={mutations.isUploadingDocument}
+                                    disabled={document.status === "UPLOADING"}
+                                />
+                            )}
+
+                            {/* Download Button */}
+                            {(document.status === "GENERATED" || document.status === "UPLOADED") && (
+                                <ActionMenu
+                                    label="Downloads"
+                                    icon={<Download size={16} strokeWidth={2} />}
+                                    items={[
+                                        {
+                                            label: "Download PDF",
+                                            icon: <Download size={14} />,
+                                            href: documentDownloadUrl("offer", document.id, "pdf"),
+                                            download: '',
+                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
+                                        },
+                                        {
+                                            label: "Download DOCX",
+                                            icon: <Download size={14} />,
+                                            href: documentDownloadUrl("offer", document.id, "docx"),
+                                            download: '',
+                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
+                                        }
+                                    ]}
+                                />
+                            )}
+
+                            {/* Menu Button */}
+                            {(document.status !== "UPLOADING" && document.status !== "PROCESSING") && (
+                                <ActionMenu
+                                    label="Actions"
+                                    items={[
+                                        {
+                                            label: "View in NextCloud",
+                                            icon: <ExternalLink className="size-3.5" />,
+                                            href: `/`,
+                                            condition: false, // document.status === "UPLOADED"
+                                        },
+                                        {
+                                            label: "Replace file",
+                                            icon: <Replace className="size-3.5" />,
+                                            onSelect: () => dropzone.open(),
+                                            disabled: !canReplace,
+                                            hint: canReplaceFiles ? undefined : replaceBlockerMessage(replaceBlocker),
+                                        },
+                                        {
+                                            label: "Edit",
+                                            icon: <Pencil className="size-3.5" />,
+                                            onSelect: async () => {
+                                                const result = await refetch();
+                                                if (result.data) setBytes(result.data);
+                                                setEditDocx(true)
+                                            },
+                                            condition: document.status === "GENERATED" || document.status === "UPLOADED"
+                                        },
+                                        {
+                                            label: "Rename",
+                                            icon: <Pencil className="size-3.5" />,
+                                            onSelect: () => renameModal.open(),
+                                            condition: document.status === "GENERATED" || document.status === "UPLOADED"
+                                        },
+                                        {
+                                            label: "Delete",
+                                            icon: <Trash2 className="size-3.5" />,
+                                            danger: true,
+                                            disabled: mutations.isDeletingDocument,
+                                            onSelect: () => mutations.deleteDocument(document.id),
+                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "FAILED"
+                                        },
+                                    ]}
+                                />
+                            )}
+
+                            {/* Loader Circle */}
+                            {(document.status === "PROCESSING") && (
+                                <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
+                                    <LoaderCircle size={16} strokeWidth={2} className="animate-spin" />
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
                 </div>
+
+                {renameModal.isOpen && (
+                    <DocumentRenameModal
+                        key={renameModal.key}
+                        onClose={renameModal.close}
+                        isPending={mutations.isRenamingDocument}
+                        initialValue={document.displayName ?? `v${document.version}`}
+                        onSubmit={(displayName) => mutations.renameDocument({
+                            documentId: document.id,
+                            displayName: displayName,
+                        })}
+                    />
+                )}
+
+
             </div>
 
-            {renameModal.isOpen && (
-                <DocumentRenameModal
-                    key={renameModal.key}
-                    onClose={renameModal.close}
-                    isPending={mutations.isRenamingDocument}
-                    initialValue={document.displayName ?? `v${document.version}`}
-                    onSubmit={(displayName) => mutations.renameDocument({
-                        documentId: document.id,
-                        displayName: displayName,
-                    })}
-                />
+            {editDocx && (
+                <div className="fixed inset-0 z-[1000]">
+                    <OfferDocxEditor
+                        document={bytes}
+                        displayName={document.displayName ?? document.id + ".docx"}
+                        onSave={async (file) => {
+                            try {
+                                await mutations.replaceDocumentFile({
+                                    documentId: document.id,
+                                    format: "docx",
+                                    file,
+                                });
+                                toast.success("Datei wurde gespeichert.");
+                                setEditDocx(false);
+                            } catch (error) {
+                                toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
+                            }
+                        }}
+                        onClose={() => {
+                            setBytes(undefined);
+                            setEditDocx(false)
+                        }}
+                    />
+
+                    {/* */}
+
+
+                </div>
             )}
-        </div>
+        </>
     )
 }

@@ -2,6 +2,10 @@ import { Request, Response } from "express";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import * as documentsService from "../services/documents.service.js";
 
+export const getDocumentCapabilities = async (_request: Request, response: Response) => {
+    return response.status(200).json(await documentsService.getDocumentCapabilities());
+};
+
 export const renameDocument = async (request: Request, response: Response) => {
     const document = await documentsService.renameDocument(
         request.params.type as DocumentType,
@@ -34,6 +38,15 @@ export const downloadDocument = async (request: Request, response: Response) => 
         request.params.format as DocumentFormatParam,
     );
     return response.redirect(302, result.url);
+};
+
+export const getDocumentDownloadUrl = async (request: Request, response: Response) => {
+    const result = await documentsService.downloadDocument(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.params.format as DocumentFormatParam,
+    );
+    return response.status(200).json(result);
 };
 
 export const createReplacementUpload = async (request: Request, response: Response) => {

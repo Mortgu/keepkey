@@ -1,3 +1,4 @@
+export * from './use-block-file-drop';
 export * from './use-modal';
 export * from './use-locale';
 export * from './use-debounce';

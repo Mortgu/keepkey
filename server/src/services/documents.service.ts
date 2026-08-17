@@ -2,9 +2,12 @@ import { randomUUID } from "node:crypto";
 import { DocumentFormat, DocumentStatus } from "@prisma/client";
 import { artifactPair, findArtifact } from "../lib/document-artifacts.js";
 import {
+    browserEndpointIssue,
+    bucketAllowsBrowserUploads,
     getDocumentArtifact,
     getDocumentDownloadUrl,
     getDocumentUploadUrl,
+    isS3Available,
     removeDocumentArtifact,
     removeDocumentArtifacts,
     type DocumentArtifactScope,
@@ -18,10 +21,14 @@ import {
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
+import type { DocumentCapabilities, DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
 
 export type RenameDocumentInput = { displayName: string };
+
+/** Kurz genug, dass eine gesetzte CORS-Regel zügig sichtbar wird. */
+const CAPABILITIES_TTL_MS = 60_000;
+let capabilitiesCache: { value: DocumentCapabilities; expiresAt: number } | null = null;
 
 const DOWNLOADABLE_STATUSES = new Set<DocumentStatus>([
     DocumentStatus.GENERATED,
@@ -334,6 +341,53 @@ async function requireReplaceableArtifact(
     }
 
     return { document, artifact };
+}
+
+/**
+ * Ob diese Umgebung das Ersetzen erzeugter Dateien tragen kann.
+ *
+ * Der Upload läuft direkt aus dem Browser in den Objektspeicher, also muss
+ * dreierlei stimmen: ein von aussen erreichbarer Endpunkt, ein antwortender
+ * Speicher und eine CORS-Regel, die das `PUT` von der App-Origin erlaubt. Fehlt
+ * das Letzte, läuft der Upload sogar durch — nur darf der Browser die Antwort
+ * nicht lesen, und der Vorgang bliebe für immer unbestätigt.
+ *
+ * Das Ergebnis hängt an der Umgebung, nicht an Daten, und kostet zwei
+ * S3-Roundtrips: deshalb kurz zwischengespeichert.
+ */
+export async function getDocumentCapabilities(): Promise<DocumentCapabilities> {
+    const cached = capabilitiesCache;
+    if (cached && cached.expiresAt > Date.now()) {
+        return cached.value;
+    }
+
+    const value = await resolveDocumentCapabilities();
+    capabilitiesCache = { value, expiresAt: Date.now() + CAPABILITIES_TTL_MS };
+
+    return value;
+}
+
+async function resolveDocumentCapabilities(): Promise<DocumentCapabilities> {
+    const issue = browserEndpointIssue();
+
+    if (issue !== null) {
+        return {
+            canReplaceFiles: false,
+            blocker: issue === "loopback" ? "endpoint_loopback" : "endpoint_private_network",
+        };
+    }
+
+    if (!await isS3Available()) {
+        return { canReplaceFiles: false, blocker: "storage_unreachable" };
+    }
+
+    // `unknown` heißt: Der Anbieter gibt die CORS-Konfiguration nicht heraus.
+    // Das ist kein Grund, die Funktion abzuschalten.
+    if (await bucketAllowsBrowserUploads() === "missing") {
+        return { canReplaceFiles: false, blocker: "cors_not_configured" };
+    }
+
+    return { canReplaceFiles: true };
 }
 
 /**

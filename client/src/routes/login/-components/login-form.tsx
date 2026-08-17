@@ -1,19 +1,13 @@
 import { useEffect, useState } from "react";
-import { useForm } from "@tanstack/react-form";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
-import { z } from "zod";
-import { Route } from "../";
 
 import { Button, Input } from "@/components";
-import { authClient } from "@/lib/auth-client.js";
 import { getFormError } from "@/lib/utils";
+import useLoginForm from "../-hooks/use-login-form";
+import { authClient } from "@/lib/auth-client";
 
 export function LoginFormComponent() {
-    const [error, setError] = useState<string | undefined>(undefined);
     const [showPassword, setShowPassword] = useState(false);
-    const [remember, setRemember] = useState(false);
-    const [passkeyLoading, setPasskeyLoading] = useState(false);
-    const { redirect } = Route.useSearch();
 
     useEffect(() => {
         const supportsConditional =
@@ -27,100 +21,30 @@ export function LoginFormComponent() {
         });
     }, []);
 
-    const handlePasskeySignIn = async () => {
-        setPasskeyLoading(true);
-        setError(undefined);
-        const { error: err } = await authClient.signIn.passkey({
-            fetchOptions: {
-                onSuccess: () => {
-                    window.location.assign(redirect ? `${redirect}` : "/");
-                },
-            },
-        });
-        setPasskeyLoading(false);
-        if (err) {
-            setError(err.message ?? "Passkey-Anmeldung fehlgeschlagen");
-        }
-    };
-
-    const form = useForm({
-        defaultValues: {
-            email: "",
-            password: "",
-        },
-        validators: {
-            onChange: z.object({
-                email: z.email(),
-                password: z.string().min(8),
-            }),
-        },
-        onSubmit: async ({ value }) => {
-            setError(undefined);
-            try {
-                const { data, error: err } = await authClient.signIn.email({
-                    ...value,
-                    rememberMe: remember,
-                    callbackURL: redirect ? `${redirect}` : "/",
-                });
-
-                if (err) {
-                    setError(err.message);
-                    return null;
-                }
-
-                window.location.assign("/");
-                return data;
-            } catch (exception: unknown) {
-                console.error(exception);
-            }
-        },
-    });
+    const {
+        form,
+        handleSubmit,
+        handlePasskeySignIn,
+        passkeyLoading,
+        rememberMe,
+        setRememberMe,
+        error
+    } = useLoginForm();
 
     return (
         <div className="absolute min-w-screen min-h-screen flex items-center justify-center p-4">
             <div className="w-full max-w-sm">
-                <div
-                    className="bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-7 py-8">
-                    {/* Logo */}
-                    <div className="flex items-center justify-center gap-2 mb-6">
-                        <div
-                            className="w-8 h-8 bg-(--primary-600) rounded-md flex items-center justify-center shrink-0">
-                            <svg
-                                width="18"
-                                height="18"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="white"
-                                strokeWidth="2.2"
-                                strokeLinecap="round"
-                            >
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                <polyline points="14 2 14 8 20 8" />
-                                <line x1="8" y1="13" x2="16" y2="13" />
-                                <line x1="8" y1="17" x2="13" y2="17" />
-                            </svg>
-                        </div>
-                        <span className="font-semibold text-[17px] text-gray-900 tracking-tight">
-                            keepit
-                        </span>
-                    </div>
+                <div className="bg-white border border-(--border) rounded-md shadow-[0_4px_12px_rgba(0,0,0,0.08)] px-7 py-8">
 
                     {/* Heading */}
                     <div className="text-center mb-6">
-                        <h1 className="font-semibold text-lg text-gray-900 tracking-tight">
+                        <h1 className="font-medium text-xl text-gray-900 tracking-tight">
                             Anmelden
                         </h1>
                         <p className="text-sm text-gray-400 mt-1">Willkommen zurück</p>
                     </div>
 
-                    <form
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            form.handleSubmit();
-                        }}
-                        className="flex flex-col gap-4"
-                    >
+                    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {/* Error banner */}
                         {error && (
                             <div
@@ -222,11 +146,11 @@ export function LoginFormComponent() {
                             <label className="flex items-center gap-2 cursor-pointer select-none text-sm text-gray-600">
                                 <div
                                     role="checkbox"
-                                    aria-checked={remember}
-                                    onClick={() => setRemember((v) => !v)}
-                                    className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all cursor-pointer border ${remember ? "bg-(--primary-600) border-(--primary-600)" : "bg-white border-gray-300"}`}
+                                    aria-checked={rememberMe}
+                                    onClick={() => setRememberMe((v) => !v)}
+                                    className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-all cursor-pointer border ${rememberMe ? "bg-(--primary-600) border-(--primary-600)" : "bg-white border-gray-300"}`}
                                 >
-                                    {remember && (
+                                    {rememberMe && (
                                         <svg
                                             width="9"
                                             height="9"
@@ -251,9 +175,7 @@ export function LoginFormComponent() {
                         </div>
 
                         {/* Submit */}
-                        <form.Subscribe
-                            selector={(state) => [state.canSubmit, state.isSubmitting]}
-                        >
+                        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
                             {([canSubmit, isSubmitting]) => (
                                 <Button
                                     type="submit"
@@ -268,7 +190,7 @@ export function LoginFormComponent() {
                     </form>
 
                     {/* Divider */}
-                    <div className="flex items-center gap-3 my-1">
+                    <div className="flex items-center gap-3 my-3">
                         <div className="h-px flex-1 bg-(--border)" />
                         <span className="text-xs text-gray-400">oder</span>
                         <div className="h-px flex-1 bg-(--border)" />

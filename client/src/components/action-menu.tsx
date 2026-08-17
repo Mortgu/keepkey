@@ -13,6 +13,8 @@ export interface ActionMenuItem {
     download?: string;
     danger?: boolean;
     disabled?: boolean;
+    /** Kurze Begründung unter dem Label — gedacht für deaktivierte Einträge. */
+    hint?: string;
 
     condition?: boolean;
 
@@ -87,7 +89,7 @@ interface ActionMenuItemProps {
 }
 
 function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
-    const { label, icon, onSelect, href, download, danger, disabled, condition = true } = item;
+    const { label, icon, onSelect, href, download, danger, disabled, hint, condition = true } = item;
     const isDisabled = disabled || !condition;
 
     const className = [
@@ -127,7 +129,10 @@ function ActionMenuItem({ item, setOpen }: ActionMenuItemProps) {
             className={className}
         >
             {icon}
-            <span className="flex-1 whitespace-pre">{label}</span>
+            <span className="flex-1">
+                <span className="block whitespace-pre">{label}</span>
+                {hint && <span className="block max-w-[22rem] text-xs text-(--text-secondary)">{hint}</span>}
+            </span>
         </button>
     );
 }

@@ -97,6 +97,31 @@ export declare const findDocumentArtifact: (artifacts: Array<DocumentArtifact>, 
     orderDocumentId?: string | undefined;
 } | undefined;
 /**
+ * Warum das Ersetzen einer erzeugten Datei in dieser Umgebung nicht geht.
+ *
+ * Der Browser legt die Ersatzdatei direkt im Objektspeicher ab. Ist der dafür
+ * signierte Endpunkt von aussen nicht erreichbar oder der Speicher gar nicht
+ * ansprechbar, kann das nur fehlschlagen — dann bleibt die Funktion aus, statt
+ * den Nutzer in einen Fehler laufen zu lassen.
+ */
+export declare const documentReplaceBlockerSchema: z.ZodEnum<{
+    endpoint_private_network: "endpoint_private_network";
+    endpoint_loopback: "endpoint_loopback";
+    storage_unreachable: "storage_unreachable";
+    cors_not_configured: "cors_not_configured";
+}>;
+export type DocumentReplaceBlocker = z.infer<typeof documentReplaceBlockerSchema>;
+export declare const documentCapabilitiesSchema: z.ZodObject<{
+    canReplaceFiles: z.ZodBoolean;
+    blocker: z.ZodOptional<z.ZodEnum<{
+        endpoint_private_network: "endpoint_private_network";
+        endpoint_loopback: "endpoint_loopback";
+        storage_unreachable: "storage_unreachable";
+        cors_not_configured: "cors_not_configured";
+    }>>;
+}, z.core.$strip>;
+export type DocumentCapabilities = z.infer<typeof documentCapabilitiesSchema>;
+/**
  * true, wenn die Datei auf Nextcloud nicht mehr dem Stand in S3 entspricht.
  *
  * Das passiert, wenn jemand die erzeugte Datei nach dem Synchronisieren ersetzt
