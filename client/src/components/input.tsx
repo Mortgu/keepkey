@@ -37,7 +37,7 @@ export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputE
     loading?: boolean;
 }
 
-const styles = tv({
+export const inputStyles = tv({
     base: [
         "w-full rounded-md border border-(--border) bg-white transition-all duration-150",
         "text-sm text-(--text) outline-none",
@@ -73,7 +73,8 @@ const styles = tv({
 const adornmentButtonClass =
     "absolute right-1 top-1/2 -translate-y-1/2 h-[29px] w-[29px] rounded-md";
 
-function LabelBadge({
+/** Error/warning badge shown next to a field label. Shared with other form controls. */
+export function LabelBadge({
     kind,
     label,
     tooltip,
@@ -159,7 +160,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                 <div className="relative">
                     <input
                         ref={ref}
-                        className={styles({ input_size: size, state, adornment, className })}
+                        className={inputStyles({ input_size: size, state, adornment, className })}
                         {...rest}
                     />
 

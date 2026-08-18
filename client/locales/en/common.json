@@ -42,6 +42,8 @@
     "errorTitle": "Something went wrong",
     "errorRetry": "Try again",
     "errorGeneric": "An unexpected error occurred.",
-    "months": "months"
+    "months": "months",
+    "increment": "Increase value",
+    "decrement": "Decrease value"
   }
 }

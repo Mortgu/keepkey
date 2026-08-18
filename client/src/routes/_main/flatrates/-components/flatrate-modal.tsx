@@ -1,108 +1,104 @@
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 
-import {
-
-
-
-  createFlatrateSchema
-} from '@keepit/schemas';
+import { createFlatrateSchema } from '@keepit/schemas';
 import type { CreateFlatrateTranslationInput, Flatrate, Language } from '@keepit/schemas';
 
 import {
-  DEFAULT_LANGUAGE_OPTIONS,
-  FieldInput,
-  FieldTextarea,
-  FormModal,
-  SegmentedLanguageToggle
+	DEFAULT_LANGUAGE_OPTIONS,
+	FieldInput,
+	FieldTextarea,
+	FormModal,
+	NumberField,
+	SegmentedLanguageToggle
 } from "@/components";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
 
 interface Props {
-  currentFlatrate?: Flatrate | null;
-  onClose: () => void;
+	currentFlatrate?: Flatrate | null;
+	onClose: () => void;
 }
 
 function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefined, lang: Language) {
-  const t = translations?.find((x) => x.language === lang);
-  return { name: t?.name ?? "", table: t?.table ?? "", language: lang };
+	const t = translations?.find((x) => x.language === lang);
+	return { name: t?.name ?? "", table: t?.table ?? "", language: lang };
 }
 
 export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
-  const isEdit = currentFlatrate != null;
+	const isEdit = currentFlatrate != null;
 
-  const [language, setLanguage] = useState<Language>("DE");
-  const langIndex = language === "DE" ? 0 : 1;
+	const [language, setLanguage] = useState<Language>("DE");
+	const langIndex = language === "DE" ? 0 : 1;
 
-  const { createFlatRate } = useCreateFlatRate();
-  const { updateFlatRate } = useUpdateFlatRate();
+	const { createFlatRate } = useCreateFlatRate();
+	const { updateFlatRate } = useUpdateFlatRate();
 
-  const form = useForm({
-    defaultValues: {
-      total_cents: currentFlatrate?.total_cents ?? 0,
-      translations: [
-        seedLang(currentFlatrate?.translations, "DE"),
-        seedLang(currentFlatrate?.translations, "EN"),
-      ]
-    },
-    validators: {
-      onChange: createFlatrateSchema,
-      onMount: createFlatrateSchema,
-    },
-    onSubmit: async ({ value }) => {
-      if (isEdit) {
-        await updateFlatRate({ id: currentFlatrate.id, flatRate: value });
-      } else {
-        await createFlatRate(value);
-      }
+	const form = useForm({
+		defaultValues: {
+			total_cents: currentFlatrate?.total_cents ?? 0,
+			translations: [
+				seedLang(currentFlatrate?.translations, "DE"),
+				seedLang(currentFlatrate?.translations, "EN"),
+			]
+		},
+		validators: {
+			onChange: createFlatrateSchema,
+			onMount: createFlatrateSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (isEdit) {
+				await updateFlatRate({ id: currentFlatrate.id, flatRate: value });
+			} else {
+				await createFlatRate(value);
+			}
 
-      onClose();
-    },
-  });
+			onClose();
+		},
+	});
 
-  return (
-    <FormModal
-      form={form}
-      onClose={onClose}
-      formId="flatrate-form"
-      title={
-        <div className="flex items-center justify-between w-full mr-2">
-          <h1 className="text-lg">
-            {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
-          </h1>
-          <SegmentedLanguageToggle
-            options={DEFAULT_LANGUAGE_OPTIONS}
-            value={language}
-            onChange={(lng) => setLanguage(lng)}
-          />
-        </div>
-      }
-    >
-      <form.Field name={`translations[${langIndex}].name`}>
-        {(field) => (
-          <div className="grid gap-1">
-            <FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
-          </div>
-        )}
-      </form.Field>
+	return (
+		<FormModal
+			form={form}
+			onClose={onClose}
+			formId="flatrate-form"
+			title={
+				<div className="flex items-center justify-between w-full mr-2">
+					<h1 className="text-lg">
+						{isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
+					</h1>
+					<SegmentedLanguageToggle
+						options={DEFAULT_LANGUAGE_OPTIONS}
+						value={language}
+						onChange={(lng) => setLanguage(lng)}
+					/>
+				</div>
+			}
+		>
+			<form.Field name={`translations[${langIndex}].name`}>
+				{(field) => (
+					<div className="grid gap-1">
+						<FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
+					</div>
+				)}
+			</form.Field>
 
-      <form.Field name={`translations[${langIndex}].table`}>
-        {(field) => (
-          <FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
-        )}
-      </form.Field>
+			<form.Field name={`translations[${langIndex}].table`}>
+				{(field) => (
+					<FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
+				)}
+			</form.Field>
 
-      <form.Field name="total_cents">
-        {(field) => (
-          <FieldInput
-            field={field}
-            type="number"
-            min={1}
-            label="Preis (in Cent)"
-            onChange={(e, f) => f.handleChange(parseInt(e.target.value))}
-          />
-        )}
-      </form.Field>
-    </FormModal>
-  );
+			<form.Field name="total_cents">
+				{(field) => (
+					<NumberField
+						min={1}
+						label="Preis (€)"
+						value={field.state.value}
+						onValueChange={(value) => field.handleChange(value ?? 0)}
+						step={1}
+					/>
+				)}
+			</form.Field>
+		</FormModal>
+	);
 }

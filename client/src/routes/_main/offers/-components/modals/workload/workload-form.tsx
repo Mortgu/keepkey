@@ -1,13 +1,13 @@
 import { Pen } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import {  coordinatesFrom } from "@keepit/schemas";
+import { coordinatesFrom } from "@keepit/schemas";
 import { useOfferModalContext } from "../offer-modal-context";
 import type { PositionField } from "../offer-modal-policy";
-import type {CreateOfferPositionInput} from "@keepit/schemas";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
 import type { OfferModalPositionValues } from "@/routes/_main/offers/-schemas/offer-modal-schema";
 import type { SyntheticEvent } from "react";
-import { Button, Checkbox, Input, Select } from "@/components";
+import { Button, Checkbox, Input, NumberField, Select } from "@/components";
 import {
     useContracts,
     useCustomerPriceOverride,
@@ -185,8 +185,13 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
                 {/* Quantity */}
                 {shows("quantity") && (
-                    <Input type="text" label={t("offerModal.quantity")} value={quantity} disabled={locked("quantity")}
-                        onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} />
+                    <NumberField
+                        step={1}
+                        label={t("offerModal.quantity")}
+                        value={quantity}
+                        disabled={locked("quantity")}
+                        onValueChange={(value) => setQuantity(value ?? 0)}
+                    />
                 )}
 
             </div>
@@ -212,12 +217,16 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                 )}
 
                 {shows("free_months") && (
-                    <Input label={t("offerModal.free_months")} value={freeMonths} disabled={locked("free_months")}
-                        onChange={(e) => {
-                            const value = Number(e.target.value);
-                            if (isNaN(value)) return;
-                            setFreeMonths(value);
-                        }} />
+                    <NumberField
+                        step={1}
+                        min={0}
+                        max={duration}
+                        label={t("offerModal.free_months")}
+                        value={freeMonths}
+                        disabled={locked("free_months")}
+                        onValueChange={(value) => setFreeMonths(value ?? 0)}
+                    />
+
                 )}
             </div>
 

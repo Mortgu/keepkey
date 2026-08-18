@@ -68,54 +68,13 @@ export default function DashboardPage() {
                 />
             </div>
 
-            {/* <div className="grid">
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="md">Button md</Button>
-                    <Button size="md" icon={<Plus size={18} />}>Button md</Button>
-                    <Button size="md" icon={<Plus size={18} />} iconOnly />
-                    <Button size="md" variant="primary" loading>Button xs</Button>
+            {/*<div className="p-4">
 
-                    <Button size="md" variant="secondary">Button md</Button>
-                    <Button size="md" variant="border">Button md</Button>
-                    <Button size="md" variant="ghost">Button md</Button>
+                <Dialog />
+            </div>
 
-                    <Button size="md" variant="primary" danger>Button xs</Button>
-                    <Button size="md" variant="secondary" danger>Button xs</Button>
-                    <Button size="md" variant="border" danger>Button xs</Button>
-                </div>
-
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="sm">Button sm</Button>
-                    <Button size="sm" icon={<Plus size={16} />}>Button sm</Button>
-                    <Button size="sm" icon={<Plus size={16} />} iconOnly />
-                    <Button size="sm" variant="primary" loading>Button xs</Button>
-
-                    <Button size="sm" variant="secondary">Button sm</Button>
-                    <Button size="sm" variant="border">Button sm</Button>
-                    <Button size="sm" variant="ghost">Button sm</Button>
-
-                    <Button size="sm" variant="primary" danger>Button xs</Button>
-                    <Button size="sm" variant="secondary" danger>Button xs</Button>
-                    <Button size="sm" variant="border" danger>Button xs</Button>
-
-                </div>
-
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="xs">Button xs</Button>
-                    <Button size="xs" icon={<Plus size={14} />}>Button xs</Button>
-                    <Button size="xs" icon={<Plus size={14} />} iconOnly />
-                    <Button size="xs" variant="primary" loading>Button xs</Button>
-
-                    <Button size="xs" variant="secondary">Button xs</Button>
-                    <Button size="xs" variant="border">Button xs</Button>
-                    <Button size="xs" variant="ghost">Button xs</Button>
-
-                    <Button size="xs" variant="primary" danger>Button xs</Button>
-                    <Button size="xs" variant="secondary" danger>Button xs</Button>
-                    <Button size="xs" variant="border" danger>Button xs</Button>
-
-
-                </div>
+            <div className="p-4">
+                <ExampleTabs />
             </div>*/}
         </PageWidth>
     );

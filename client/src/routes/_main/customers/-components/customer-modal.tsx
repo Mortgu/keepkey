@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { customerFormSchema } from "@keepit/schemas";
 import type { Customer } from "@keepit/schemas";
-import { FieldInput, FieldSelect, FormModal, Select } from "@/components";
+import { FieldInput, FieldSelect, FormModal, NumberField, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {
   COUNTRY_OPTIONS,
@@ -150,8 +150,13 @@ export default function CustomerModal({
 
         <customerForm.Field name="taxRate" children={(field) => (
           <div className="flex-1 grid gap-2">
-            <FieldInput field={field} size="sm" label="Steuersatz (%)" type="number" step="0.1"
-              onChange={(e, f) => f.handleChange(e.target.valueAsNumber || 0)} />
+            <NumberField
+              value={field.state.value}
+              min={0}
+              max={100}
+              step={0.1}
+              onValueChange={(value) => field.handleChange(value ?? 0)}
+              label="Steuersatz (%)" />
           </div>
         )} />
       </div>

@@ -1,4 +1,4 @@
-import { Pen, Trash, UndoDot } from "lucide-react";
+import { ArrowRight, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -161,21 +161,17 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
                     <Button variant="border" type="button" size="xs"
                         onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
+
+                    <Button size="xs" variant="border">Bestellung erstellen <ArrowRight size={14} /></Button>
                 </div>
 
                 {/* Actions right */}
                 <div className="flex items-center gap-2">
-                    <Button
-                        onClick={() => setDrawerOpen(true)}
-                        size="xs"
-                        variant="secondary"
-                        icon={<UndoDot className="size-3" />}
-                        iconOnly
-                    />
+                    {/*<OfferCardDrawer />*/}
 
                     <Button
                         size="xs"
-                        variant="secondary"
+                        variant="border"
                         onClick={() => onEdit(offer)}
                         icon={<Pen className="size-3" />}
                         iconOnly

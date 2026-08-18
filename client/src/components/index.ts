@@ -16,6 +16,7 @@ export * from './list-page';
 export * from './modal';
 export * from './nav-link';
 export * from './navigation';
+export * from './number-field';
 export * from './page-width';
 export * from './select';
 export * from './skeleton';

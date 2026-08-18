@@ -21,8 +21,14 @@ Download URLs are always valid for five minutes.
 Replacing a generated file uploads it **from the browser** straight to the bucket via a
 signed `PUT`. That requires a CORS rule on the bucket allowing `PUT` from the app origin —
 without it the browser blocks the response, the upload is never confirmed, and the request
-fails with `Access-Control-Allow-Origin` missing. Downloads are unaffected because they go
-through a 302 redirect, which is a navigation and needs no preflight.
+fails with `Access-Control-Allow-Origin` missing.
+
+Downloads need CORS too. `<a download>` points at our own API, which answers `302` with the
+signed bucket URL. A redirect across an origin boundary marks the request "tainted origin",
+so the browser sends `Origin: null` to the bucket instead of the app origin. The rule
+therefore lists `null` next to `CORS_ORIGIN`, allows `GET`/`HEAD`, and exposes
+`Content-Disposition` so the browser can name the saved file. Objects stay private: reading
+one still requires a signed URL valid for five minutes.
 
 Set the rule once per environment with `make bucket-cors` (or `make bucket-cors-dry` to see
 what it would write). The script reads the same `S3_*` and `CORS_ORIGIN` variables the

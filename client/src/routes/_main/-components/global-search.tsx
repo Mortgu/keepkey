@@ -207,7 +207,9 @@ export default function GlobalSearch() {
     const showEmpty = trimmedDebounced.length > 0 && items.length === 0 && !isFetching;
 
     const navigateToResult = (item: SearchResultItem) => {
-        saveRecent(item.title);
+        // Recents sind Suchbegriffe, keine Anzeigetitel – der Titel ("Angebot #X")
+        // matcht serverseitig nichts.
+        saveRecent(item.searchValue);
         setOpen(false);
         navigate({
             to: TYPE_ROUTE[item.type],

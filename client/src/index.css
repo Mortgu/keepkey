@@ -8,8 +8,15 @@
   --font-mono: "IBM Plex Sans", monospace;
 }
 
+#root {
+  isolation: isolate;
+}
+
 :root {
   --viewport: 1280px;
+  --viewport-padding: 3px;
+  --bleed: 30px;
+  --peek: 50px;
 
   --primary: #00683f;
 

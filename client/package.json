@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@base-ui/react": "^1.7.0",
     "@better-auth/passkey": "^1.6.23",
     "@docx-editor.dev/core": "^2.2.1",
     "@docx-editor.dev/fonts": "^2.2.1",
@@ -29,6 +30,7 @@
     "i18next": "^26.3.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "lucide-react": "^0.577.0",
+    "match-sorter": "^8.3.0",
     "react": "^19.2.4",
     "react-date-picker": "^12.0.2",
     "react-dom": "^19.2.4",

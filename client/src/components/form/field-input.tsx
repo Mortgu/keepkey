@@ -1,9 +1,11 @@
 import { Input } from "../input";
 import { Textarea } from "../textarea";
 import { Select } from "../select";
+import { NumberField } from "../number-field";
 import type { InputComponentProps } from "../input";
 import type { TextareaComponentProps } from "../textarea";
 import type { SelectComponentProps } from "../select";
+import type { NumberFieldComponentProps } from "../number-field";
 import type { ChangeEvent } from "react";
 import { getFormError } from "@/lib/utils";
 
@@ -77,6 +79,36 @@ export function FieldTextarea<TValue = string>({
                 onChange
                     ? (e) => onChange(e, field)
                     : (e) => field.handleChange(e.target.value as TValue)
+            }
+            {...rest}
+        />
+    );
+}
+
+/* ── Number ─────────────────────────────────────────────────────────── */
+
+export interface FieldNumberProps<TValue = number | null>
+    extends Omit<NumberFieldComponentProps, "value" | "onValueChange" | "onBlur" | "id" | "error"> {
+    field: BindableField<TValue>;
+    onValueChange?: (value: number | null, field: BindableField<TValue>) => void;
+}
+
+export function FieldNumber<TValue = number | null>({
+    field,
+    onValueChange,
+    ...rest
+}: FieldNumberProps<TValue>) {
+    return (
+        <NumberField
+            id={field.name}
+            name={field.name}
+            value={(field.state.value ?? null) as number | null}
+            error={getFormError(field.state.meta.errors)}
+            onBlur={field.handleBlur}
+            onValueChange={
+                onValueChange
+                    ? (value) => onValueChange(value, field)
+                    : (value) => field.handleChange(value as TValue)
             }
             {...rest}
         />

@@ -75,7 +75,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     <Button
                         variant="border"
                         size="xs"
-                        icon={<Pen size={14} />}
+                        icon={<Pen size={13} />}
                         iconOnly
                         onClick={() => onEdit(customer)}
                     />
@@ -84,7 +84,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                         variant="border"
                         size="xs"
                         loading={isDeletingCustomer}
-                        icon={<Trash size={14} />}
+                        icon={<Trash size={13} />}
                         iconOnly
                         onClick={handleDeleteCustomer}
                     />

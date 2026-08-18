@@ -1,12 +1,13 @@
-import { useTranslation } from "react-i18next";
 import useWorkloadFilters from "../-hooks/use-workload-filters";
 import ProductItem from "./product-item";
 import type { Product } from "@keepit/schemas";
-import { useProducts } from "@/hooks";
-import { SearchBar, SortDropdown } from "@/components";
+import { useLocale, useProducts } from "@/hooks";
+import { SortDropdown } from "@/components";
+import ProductAutocomplete from "./product-autocomplete";
+import { localized } from "@/lib/i18n-content";
 
 export default function ProductList() {
-    const { t } = useTranslation();
+    const locale = useLocale();
     const filters = useWorkloadFilters();
 
     const { products } = useProducts(filters.params);
@@ -21,18 +22,15 @@ export default function ProductList() {
                         options={filters.sortOptions}
                     />
 
-                    <SearchBar
-                        className="flex-1"
-                        value={filters.searchInput}
-                        onChange={filters.setSearchInput}
-                        onSubmit={() => { }}
-                        placeholder={t("common.search")}
+                    <ProductAutocomplete
+                        items={products.map(product => ({
+                            title: localized(product.translations, locale, "name") ?? "",
+                            description: localized(product.translations, locale, "description") ?? ""
+                        }))}
+                        filters={filters}
                     />
-
                 </div>
-
             </div>
-
 
             <div className="grid gap-4 px-8 py-6">
                 {products.map((product: Product) => (

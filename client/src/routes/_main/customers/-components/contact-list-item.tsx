@@ -51,7 +51,12 @@ export default function ContactListItem({ currentCustomerId, cp }: Props) {
                     <Button type="button" variant="secondary" size="sm" icon={<Pen className="size-3.5" />} iconOnly
                         onClick={() => editModal.open(cp)} loading={isUpdatingCustomerContact} />
 
-                    <Button type="button" variant="secondary" size="sm" icon={<Trash className="size-3.5" />} iconOnly
+                    <Button
+                        variant="secondary"
+                        type="button"
+                        size="sm"
+                        icon={<Trash className="size-3.5" />}
+                        iconOnly
                         loading={isDeletingCustomerContact}
                         onClick={() => deleteCustomerContact({
                             id: currentCustomerId, contactId: cp.id

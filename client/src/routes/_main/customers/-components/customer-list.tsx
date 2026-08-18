@@ -7,7 +7,7 @@ import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 
 import type { Customer } from "@keepit/schemas";
-import type {CustomerFilters} from "../-page.hooks";
+import type { CustomerFilters } from "../-page.hooks";
 import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 

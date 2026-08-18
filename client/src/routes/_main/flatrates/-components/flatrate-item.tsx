@@ -18,9 +18,9 @@ export default function FlatRateItem({ flatrate, onEdit }: Props) {
 
   return (
     <div className="bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
-      <div className="flex flex-wrap items-center justify-between ">
-        <div className="px-4 py-3 gap-4">
-          <p className="text-lg font-medium">{localized(flatrate.translations, locale, "name")}</p>
+      <div className="flex flex-wrap items-center justify-between">
+        <div className="px-4 py-3">
+          <p className="text-md font-medium">{localized(flatrate.translations, locale, "name")}</p>
           <p className="text-sm font-light text-gray-500">
             {formatDate(flatrate.createdAt || "")}
           </p>

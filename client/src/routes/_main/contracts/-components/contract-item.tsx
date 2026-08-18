@@ -22,9 +22,9 @@ export default function ContractListItem({ contract, onEdit }: ContractListItemP
 
   return (
     <div className="bg-white border border-(--border) rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) bg-(--page-bg)">
-        <p className="text-lg font-medium">{name}</p>
-        <p className="text-xs font-light text-gray-500">
+      <div className="grid items-center justify-between px-4 py-3 border-b border-(--border) bg-(--page-bg)">
+        <p className="text-md font-medium">{name}</p>
+        <p className="text-sm font-light text-gray-500">
           {formatDate(contract.createdAt || "")}
         </p>
       </div>

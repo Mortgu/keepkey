@@ -42,6 +42,8 @@
     "errorTitle": "Etwas ist schiefgelaufen",
     "errorRetry": "Erneut versuchen",
     "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten.",
-    "months": "Monate"
+    "months": "Monate",
+    "increment": "Wert erhöhen",
+    "decrement": "Wert verringern"
   }
 }
