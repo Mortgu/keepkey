@@ -45,7 +45,7 @@ export interface NumberFieldComponentProps
     inputClassName?: string;
 }
 
-export const numberFieldStyles = tv({
+const numberFieldStyles = tv({
     slots: {
         group: [
             "flex w-full items-stretch overflow-hidden rounded-md border border-(--border) bg-white",

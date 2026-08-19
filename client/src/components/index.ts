@@ -11,8 +11,6 @@ export * from './error-boundary';
 export * from './input';
 export * from './language-toggle';
 export * from './language-toggle-options';
-export * from './list-item-row';
-export * from './list-page';
 export * from './modal';
 export * from './nav-link';
 export * from './navigation';

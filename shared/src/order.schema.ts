@@ -3,6 +3,7 @@ import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
 import { flatrateSchema } from './flatrate.schema.js';
 import { documentStatusSchema, documentArtifactSchema } from './document.schema.js';
+import { offerSchema } from './offer.schema.js';
 
 /* OrderPosition */
 export const orderPositionSchema = z.object({
@@ -163,6 +164,8 @@ export const orderSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
     }),
+
+    offer: offerSchema,
 
     documents: z.array(orderDocumentSchema),
     orderPositions: z.array(orderPositionSchema),

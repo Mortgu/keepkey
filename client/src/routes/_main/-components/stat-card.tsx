@@ -1,4 +1,3 @@
-import { Scroll } from "lucide-react";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
@@ -9,24 +8,20 @@ interface Props {
 
 export default function StatCard({ title, total, volume }: Props) {
     return (
-        <div className="flex-1 grid gap-4 py-3 px-4">
-            <div className="flex items-center gap-3">
-                <div className="bg-(--primary-500) p-2 rounded-md text-white outline-2 outline-(--primary-500) outline-offset-2"><Scroll size={23} /></div>
-                <div className="grid">
-                    <p className="text-lg font-semibold">{title}</p>
-                    <p className="text-sm font-medium text-gray-400">GJ: 2026</p>
-                </div>
+        <div className="flex-1 grid gap-2 py-3 px-4">
+            <div className="flex items-center">
+                <p className="text-lg font-semibold">{title}</p>
             </div>
 
             <div className="flex items-center gap-8">
                 <div className="grid gap-1">
-                    <span className="text-sm text-(--text-secondary) font-medium">Insgesamt:</span>
+                    <span className="text-sm text-(--text-secondary)">Insgesamt:</span>
                     <p className="text-2xl font-semibold font-mono">
                         {total}
                     </p>
                 </div>
                 <div className="grid gap-1">
-                    <span className="text-sm text-(--text-secondary) font-medium">Volumen:</span>
+                    <span className="text-sm text-(--text-secondary)">Volumen:</span>
                     <p className="text-2xl font-semibold font-mono">
                         {formatEur(volume)}
                     </p>

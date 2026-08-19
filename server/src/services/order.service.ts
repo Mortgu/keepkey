@@ -32,6 +32,7 @@ export async function getAllOrders(query: OrderListQuery = {}) {
         where: Object.keys(where).length > 0 ? where : undefined,
         include: {
             customer: true,
+            offer: true,
             customerContactPerson: true,
             documents: {
                 where: { deletedAt: null },
@@ -61,6 +62,7 @@ export async function getOrderById(orderId: string) {
         where: { id: orderId },
         include: {
             customer: true,
+            offer: true,
             customerContactPerson: true,
             documents: {
                 where: { deletedAt: null },

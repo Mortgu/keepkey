@@ -14,11 +14,12 @@ export const dialogStyles = tv({
         ScrollbarThumb: 'w-full bg-red-500 z-101',
         Popup: [
             'relative flex flex-col w-[min(50rem,calc(100vw_-_2rem))] max-h-full max-w-full border border-(--border) min-h-0 bg-white',
-            'rounded-md'
+            'rounded-md data-nested-dialog-open:scale-96',
+            'transition-all '
         ],
         Header: 'flex items-center justify-between gap-1 p-4 border-b border-(--border)',
         Title: 'text-base leading-6 font-medium m-0',
-        Description: 'text-sm leading-5 text-black m-0',
+        Description: 'flex items-center text-sm leading-5 text-black m-0',
         Body: 'relative flex-auto flex min-h-0 overflow-hidden',
         BodyViewport: 'box-border flex-auto min-h-0 overscroll-contain',
         BodyContent: 'flex flex-col p-4',

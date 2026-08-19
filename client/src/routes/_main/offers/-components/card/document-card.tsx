@@ -1,16 +1,14 @@
-import { ActionMenu, Button, buttonStyles, DocumentRenameModal, Tooltip } from "@/components";
+import { Button, buttonStyles, DocumentRenameModal, Tooltip } from "@/components";
 import {
-    documentDownloadUrl,
-    replaceBlockerMessage,
-    useDocumentCapabilities,
+    documentDownloadUrl, useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
     useLocale,
-    useModal,
+    useModal
 } from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
 import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@keepit/schemas";
-import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace } from "lucide-react";
+import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace, EllipsisVertical } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
 import { Badge } from '@/components';
@@ -23,6 +21,8 @@ import '@docx-editor.dev/core/styles/editor.css';
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import OfferDocxEditor from "./docx-editor";
+import { Menu } from "@base-ui/react";
+import { menuStyles } from "@/comp/menu";
 
 const cardStyles = tv({
     slots: {
@@ -221,7 +221,7 @@ export default function DocumentCard({ offerId, document }: Props) {
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    icon={<UploadCloud size={16} strokeWidth={2} />}
+                                    icon={<UploadCloud size={14} strokeWidth={2} />}
                                     iconOnly
                                     onClick={() => mutations.uploadDocument(document.id)}
                                     loading={mutations.isUploadingDocument}
@@ -231,72 +231,57 @@ export default function DocumentCard({ offerId, document }: Props) {
 
                             {/* Download Button */}
                             {(document.status === "GENERATED" || document.status === "UPLOADED") && (
-                                <ActionMenu
-                                    label="Downloads"
-                                    icon={<Download size={16} strokeWidth={2} />}
-                                    items={[
-                                        {
-                                            label: "Download PDF",
-                                            icon: <Download size={14} />,
-                                            href: documentDownloadUrl("offer", document.id, "pdf"),
-                                            download: '',
-                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
-                                        },
-                                        {
-                                            label: "Download DOCX",
-                                            icon: <Download size={14} />,
-                                            href: documentDownloadUrl("offer", document.id, "docx"),
-                                            download: '',
-                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "UPLOADING"
-                                        }
-                                    ]}
-                                />
+                                <Menu.Root>
+                                    <Menu.Trigger className={menuStyles().Trigger()}>
+                                        <Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />
+                                    </Menu.Trigger>
+                                    <Menu.Portal>
+                                        <Menu.Positioner className={menuStyles().Positioner()} align="end">
+                                            <Menu.Popup className={menuStyles().Popup()}>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl("offer", document.id, "pdf"))}>
+                                                    <Download size={14} /> Download PDF
+                                                </Menu.Item>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl("offer", document.id, "docx"))}>
+                                                    <Download size={14} /> Download DOCX
+                                                </Menu.Item>
+                                            </Menu.Popup>
+                                        </Menu.Positioner>
+                                    </Menu.Portal>
+                                </Menu.Root>
                             )}
 
                             {/* Menu Button */}
                             {(document.status !== "UPLOADING" && document.status !== "PROCESSING") && (
-                                <ActionMenu
-                                    label="Actions"
-                                    items={[
-                                        {
-                                            label: "View in NextCloud",
-                                            icon: <ExternalLink className="size-3.5" />,
-                                            href: `/`,
-                                            condition: false, // document.status === "UPLOADED"
-                                        },
-                                        {
-                                            label: "Replace file",
-                                            icon: <Replace className="size-3.5" />,
-                                            onSelect: () => dropzone.open(),
-                                            disabled: !canReplace,
-                                            hint: canReplaceFiles ? undefined : replaceBlockerMessage(replaceBlocker),
-                                        },
-                                        {
-                                            label: "Edit",
-                                            icon: <Pencil className="size-3.5" />,
-                                            onSelect: async () => {
-                                                const result = await refetch();
-                                                if (result.data) setBytes(result.data);
-                                                setEditDocx(true)
-                                            },
-                                            condition: document.status === "GENERATED" || document.status === "UPLOADED"
-                                        },
-                                        {
-                                            label: "Rename",
-                                            icon: <Pencil className="size-3.5" />,
-                                            onSelect: () => renameModal.open(),
-                                            condition: document.status === "GENERATED" || document.status === "UPLOADED"
-                                        },
-                                        {
-                                            label: "Delete",
-                                            icon: <Trash2 className="size-3.5" />,
-                                            danger: true,
-                                            disabled: mutations.isDeletingDocument,
-                                            onSelect: () => mutations.deleteDocument(document.id),
-                                            condition: document.status === "GENERATED" || document.status === "UPLOADED" || document.status === "FAILED"
-                                        },
-                                    ]}
-                                />
+                                <Menu.Root>
+                                    <Menu.Trigger className={menuStyles().Trigger()}>
+                                        <Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />
+                                    </Menu.Trigger>
+                                    <Menu.Portal>
+                                        <Menu.Positioner className={menuStyles().Positioner()} align="end">
+                                            <Menu.Popup className={menuStyles().Popup()}>
+                                                <Menu.Item className={menuStyles().Item()} disabled>
+                                                    <ExternalLink size={14} /> View in NextCloud
+                                                </Menu.Item>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => dropzone.open()}>
+                                                    <Replace size={14} /> Replace File
+                                                </Menu.Item>
+                                                <Menu.Item className={menuStyles().Item()} onClick={async () => {
+                                                    const result = await refetch();
+                                                    if (result.data) setBytes(result.data);
+                                                    setEditDocx(true)
+                                                }}>
+                                                    <Pencil size={14} /> Edit
+                                                </Menu.Item>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => renameModal.open()}>
+                                                    <Pencil size={14} /> Rename File
+                                                </Menu.Item>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => mutations.deleteDocument(document.id)} data-danger>
+                                                    <Trash2 size={14} /> Delete
+                                                </Menu.Item>
+                                            </Menu.Popup>
+                                        </Menu.Positioner>
+                                    </Menu.Portal>
+                                </Menu.Root>
                             )}
 
                             {/* Loader Circle */}
@@ -349,10 +334,6 @@ export default function DocumentCard({ offerId, document }: Props) {
                             setEditDocx(false)
                         }}
                     />
-
-                    {/* */}
-
-
                 </div>
             )}
         </>

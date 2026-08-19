@@ -4,34 +4,41 @@ import { useForm } from "@tanstack/react-form";
 
 interface Props {
     currentOrder?: Order;
-    closeFn: () => void;
+    currentOfferId: string;
+    setOpen: (value: boolean) => void;
 }
 
-export default function useOrderForm({ currentOrder, closeFn }: Props) {
+export default function useOrderForm({ currentOrder, currentOfferId, setOpen }: Props) {
     const { createOrder } = useCreateOrder();
     const { updateOrder } = useUpdateOrder();
 
     const form = useForm({
-        defaultValues: currentOrder ?? { id: '', orderId: '' },
+        defaultValues: currentOrder ?? { id: currentOfferId, orderId: '' },
         validators: {
             onMount: createOrderSchema,
             onChange: createOrderSchema,
         },
         onSubmit: async ({ value }) => {
             if (currentOrder) {
-                /* await updateOrder({
-                     orderId: currentOrder.id,
-                     input: value,
-                 })*/
+
             } else {
-                createOrder({ ...value });
+                createOrder(value);
             }
 
-            closeFn();
+            console.log(value)
+
+            setOpen(false);
         }
     });
 
-    return { form };
+    const handleSubmit = (event: React.SubmitEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        form.handleSubmit();
+    }
+
+    return { form, handleSubmit };
 }
 
 export type OrderFormApi = ReturnType<typeof useOrderForm>['form'];

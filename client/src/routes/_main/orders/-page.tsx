@@ -4,7 +4,7 @@ import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
 import { useModal } from "@/hooks";
 import type { Order } from "@keepit/schemas";
-import OrderModal from "./-components/order-modal";
+import OrderModal from "./-components/order-select-modal";
 import OrderFilters from "./-components/order-filters";
 import useOrderFilters from "./-hooks/use-order-filters";
 
@@ -25,13 +25,18 @@ export function OrderPage() {
                         <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Angebote</h1>
                     </div>
                     <div className="flex items-center gap-4">
-                        <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-                            onClick={() => modal.open()}>{t("button.create")}</Button>
+                        <Button
+                            icon={<Plus size={14} strokeWidth={3} />}
+                            variant="primary"
+                            size="sm"
+                            onClick={() => modal.open()}>
+                            {t("button.create")}
+                        </Button>
+
+                        <OrderModal />
                     </div>
                 </div>
-
             </div>
-
 
             <div className="px-8 py-4 border-b border-(--border)">
                 <OrderFilters filters={filters} />
@@ -40,13 +45,6 @@ export function OrderPage() {
             <div className="px-8 py-6">
                 <OrderList filters={filters} />
             </div>
-
-            {modal.isOpen && (
-                <OrderModal
-                    key={modal.key}
-                    onClose={modal.close}
-                />
-            )}
 
         </PageWidth>
     );

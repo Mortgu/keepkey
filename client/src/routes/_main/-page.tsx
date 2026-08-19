@@ -67,15 +67,6 @@ export default function DashboardPage() {
                     volume={stats.orders.volume}
                 />
             </div>
-
-            {/*<div className="p-4">
-
-                <Dialog />
-            </div>
-
-            <div className="p-4">
-                <ExampleTabs />
-            </div>*/}
         </PageWidth>
     );
 }
