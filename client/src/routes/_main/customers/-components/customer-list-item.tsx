@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Pen, Trash } from "lucide-react";
+import { Pen, Trash, User } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
-import type { SyntheticEvent } from "react";
+import { useState, type SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
 import { useDeleteCustomer } from "@/hooks";
 import { Button } from "@/components";
+import ContactPersonModal from "./contact-person-modal";
 
 interface Props {
     customer: Customer;
@@ -15,6 +16,8 @@ interface Props {
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
+
+    const [open, setOpen] = useState(false);
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -83,6 +86,14 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     <Button
                         variant="border"
                         size="xs"
+                        icon={<User size={14} />}
+                        iconOnly
+                        onClick={() => setOpen(true)}
+                    />
+
+                    <Button
+                        variant="border"
+                        size="xs"
                         loading={isDeletingCustomer}
                         icon={<Trash size={14} />}
                         iconOnly
@@ -90,6 +101,13 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     />
                 </div>
             </div>
+
+            {open && (
+                <ContactPersonModal
+                    onClose={() => setOpen(false)}
+                    currentCustomerId={customer.id}
+                />
+            )}
         </div>
     );
 }
