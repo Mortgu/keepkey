@@ -1,5 +1,5 @@
-import type { ReactNode, HTMLAttributes } from "react";
 import { tv } from "tailwind-variants";
+import type { HTMLAttributes, ReactNode } from "react";
 
 export interface TooltipComponentProps extends Omit<HTMLAttributes<HTMLSpanElement>, "content"> {
     content: ReactNode;
@@ -9,7 +9,7 @@ export interface TooltipComponentProps extends Omit<HTMLAttributes<HTMLSpanEleme
 }
 
 const sideStyles = tv({
-    base: "absolute z-10 min-w-32 w-fit bg-(--text) text-white text-xs font-normal leading-[1.45] px-2.5 py-2 rounded-md shadow-lg opacity-0 pointer-events-none transition-[opacity,transform] duration-120 ease-out group-hover:opacity-100 group-focus-within:opacity-100",
+    base: "absolute z-10 min-w-32 w-fit bg-(--text) text-(--text-inv) text-xs font-normal leading-[1.45] px-2.5 py-2 rounded-md shadow-lg opacity-0 pointer-events-none transition-[opacity,transform] duration-120 ease-out group-hover:opacity-100 group-focus-within:opacity-100",
     variants: {
         side: {
             top: "bottom-[calc(100%+6px)] left-1/2 -translate-x-1/2 translate-y-0.5 group-hover:translate-y-0",

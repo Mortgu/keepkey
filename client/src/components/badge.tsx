@@ -1,6 +1,6 @@
 import { tv } from "tailwind-variants";
 import type { HTMLAttributes } from "react";
-import type { ComponentSize } from "@/components/tokens";
+import type { ComponentSize } from "./tokens";
 import type { DocumentStatus } from "@keepit/schemas";
 
 export interface BadgeComponentProps extends HTMLAttributes<HTMLSpanElement> {
@@ -42,26 +42,26 @@ const styles = tv({
   base: "inline-flex items-center justify-center w-fit",
   variants: {
     variant: {
-      GENERATED: "bg-[#E6F2EC] text-[#00683F]",
-      PENDING: "bg-[#FEF3C7] text-[#B45309]",
-      FAILED: "bg-[#FDECEA] text-[#C0392B]",
-      PROCESSING: "bg-[#E1F0FA] text-[#1D6FA4]",
-      UPLOADED: "bg-[#E6F2EC] text-[#00683F]",
-      UPLOADING: "bg-[#F0F4F1] text-[#4B5C52]",
+      GENERATED: "bg-(--success-subtle) text-(--success)",
+      PENDING: "bg-(--warning-subtle) text-(--warning)",
+      FAILED: "bg-(--destructive-subtle) text-(--destructive)",
+      PROCESSING: "bg-(--info-subtle) text-(--info)",
+      UPLOADED: "bg-(--success-subtle) text-(--success)",
+      UPLOADING: "bg-(--subtle-50) text-(--text-600)",
     },
   },
 });
 
 const formatStyles = tv({
-  base: "inline-flex items-center justify-center rounded font-medium font-mono bg-[#E0E4E1] text-[#2D4035]",
+  base: "inline-flex items-center justify-center rounded font-medium font-mono bg-(--border) text-(--neutral-800)",
 });
 
 const countStyles = tv({
-  base: "inline-flex items-center justify-center rounded-full font-medium text-white",
+  base: "inline-flex items-center justify-center rounded-full font-medium text-(--text-inv)",
   variants: {
     countVariant: {
-      success: "bg-[#00683F]",
-      error: "bg-[#C0392B]",
+      success: "bg-(--success)",
+      error: "bg-(--destructive)",
     },
   },
   defaultVariants: {

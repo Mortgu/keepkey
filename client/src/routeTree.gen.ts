@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
 import { Route as MainSettingsRouteRouteImport } from './routes/_main/settings/route'
+import { Route as DevComponentsRouteImport } from './routes/dev/components'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
 import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
@@ -42,6 +43,11 @@ const MainSettingsRouteRoute = MainSettingsRouteRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => MainRouteRoute,
+} as any)
+const DevComponentsRoute = DevComponentsRouteImport.update({
+  id: '/dev/components',
+  path: '/dev/components',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
@@ -132,6 +138,7 @@ const MainWorkloadsPricingIndexRoute =
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
   '/settings': typeof MainSettingsRouteRouteWithChildren
+  '/dev/components': typeof DevComponentsRoute
   '/login/': typeof LoginIndexRoute
   '/contracts/': typeof MainContractsIndexRoute
   '/customers/': typeof MainCustomersIndexRoute
@@ -150,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
+  '/dev/components': typeof DevComponentsRoute
   '/': typeof MainIndexRoute
   '/login': typeof LoginIndexRoute
   '/contracts': typeof MainContractsIndexRoute
@@ -172,6 +180,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
   '/_main/settings': typeof MainSettingsRouteRouteWithChildren
+  '/dev/components': typeof DevComponentsRoute
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
   '/_main/contracts/': typeof MainContractsIndexRoute
@@ -195,6 +204,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/settings'
+    | '/dev/components'
     | '/login/'
     | '/contracts/'
     | '/customers/'
@@ -213,6 +223,7 @@ export interface FileRouteTypes {
     | '/workloads/pricing/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/dev/components'
     | '/'
     | '/login'
     | '/contracts'
@@ -234,6 +245,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_main'
     | '/_main/settings'
+    | '/dev/components'
     | '/_main/'
     | '/login/'
     | '/_main/contracts/'
@@ -255,6 +267,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   MainRouteRoute: typeof MainRouteRouteWithChildren
+  DevComponentsRoute: typeof DevComponentsRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
@@ -280,6 +293,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/settings'
       preLoaderRoute: typeof MainSettingsRouteRouteImport
       parentRoute: typeof MainRouteRoute
+    }
+    '/dev/components': {
+      id: '/dev/components'
+      path: '/dev/components'
+      fullPath: '/dev/components'
+      preLoaderRoute: typeof DevComponentsRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/login/': {
       id: '/login/'
@@ -451,6 +471,7 @@ const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   MainRouteRoute: MainRouteRouteWithChildren,
+  DevComponentsRoute: DevComponentsRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport

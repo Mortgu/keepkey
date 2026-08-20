@@ -1,8 +1,7 @@
-import { ArrowRight, Pen, Trash } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import OfferModal from "../modals/offer-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferCardDiscount from "./offer-card-discount";
 import OfferCardFlatRate from "./offer-card-flatrate";
@@ -10,21 +9,19 @@ import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
 import { Badge, Button, Collapsable } from "@/components";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { useModal } from "@/hooks";
+import { useModals } from "@/context/modal-context";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (offer: Offer) => void;
 };
 
-export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+export default function OfferCard({ offer }: OfferListItemProps) {
     const { t } = useTranslation();
 
-    const renewalModal = useModal<Offer>();
-    const extensionModal = useModal<Offer>();
+    const { openModal } = useModals();
 
     const {
         customerContactPerson: ccp,
@@ -156,23 +153,30 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
-                    <Button variant="border" type="button" size="xs"
-                        onClick={() => renewalModal.open(offer)}>{t("derived.action_renewal")}</Button>
+                    <Button
+                        variant="border"
+                        type="button"
+                        size="xs"
+                        onClick={() => openModal("offer", { mode: "renewal", sourceOffer: offer })}>
+                        {t("derived.action_renewal")}
+                    </Button>
 
-                    <Button variant="border" type="button" size="xs"
-                        onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
+                    <Button
+                        variant="border"
+                        type="button"
+                        size="xs"
+                        onClick={() => openModal("offer", { mode: "extension", sourceOffer: offer })}>
+                        {t("derived.action_extension")}
+                    </Button>
 
-                    <Button size="xs" variant="border">Bestellung erstellen <ArrowRight size={14} /></Button>
                 </div>
 
                 {/* Actions right */}
                 <div className="flex items-center gap-2">
-                    {/*<OfferCardDrawer />*/}
-
                     <Button
                         size="xs"
                         variant="border"
-                        onClick={() => onEdit(offer)}
+                        onClick={() => openModal("offer", { sourceOffer: offer })}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
@@ -190,24 +194,6 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
             </div>
 
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
-
-            {renewalModal.isOpen && (
-                <OfferModal
-                    key={`renewal-${renewalModal.key}`}
-                    mode="renewal"
-                    sourceOffer={offer}
-                    closeFn={renewalModal.close}
-                />
-            )}
-
-            {extensionModal.isOpen && (
-                <OfferModal
-                    key={`extension-${extensionModal.key}`}
-                    mode="extension"
-                    sourceOffer={offer}
-                    closeFn={extensionModal.close}
-                />
-            )}
         </div>
     );
 }

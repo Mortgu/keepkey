@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { LoaderCircle } from 'lucide-react';
-import { SIZE_STYLES } from './tokens';
+import { ACTION_FOCUS, ACTION_SIZE } from './tokens';
 import type { ComponentSize, ComponentVariant } from './tokens';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
@@ -15,46 +15,42 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
     iconOnly?: boolean;
     loading?: boolean;
     children?: ReactNode;
-    focus?: boolean;
 }
 
 export const buttonStyles = tv({
     base: [
-        'w-fit h-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-md h-fit',
-        'transition-all duration-200 outline-none font-medium',
-        'disabled:opacity-50 disabled:cursor-not-allowed ',
-        'placeholder:font-light'
+        'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-md',
+        'transition-all duration-200 font-medium',
+        ACTION_FOCUS,
+        'disabled:opacity-50 disabled:cursor-not-allowed',
     ],
     variants: {
         variant: {
             primary: [
-                'bg-(--primary-600) text-white',
+                'bg-(--primary-600) text-(--text-inv)',
                 'hover:opacity-90 active:opacity-80',
-                'focus:ring-(--primary-400)',
             ],
             secondary: [
-                'bg-(--page-bg)',
-                'hover:bg-(--subtle-50) active:bg-gray-300',
-                'focus:ring-gray-300',
+                'bg-(--page-bg) text-(--text)',
+                'hover:bg-(--subtle-50) active:bg-(--border-200)',
             ],
             border: [
-                'bg-white border border-(--border)',
-                'hover:bg-(--page-bg)'
+                'bg-white border border-(--border) text-(--text)',
+                'hover:bg-(--page-bg) active:bg-(--subtle-50)',
             ],
             ghost: [
-                'bg-transparent text-gray-700',
-                'hover:bg-gray-100 active:bg-gray-200',
-                'focus:ring-gray-300',
+                'bg-transparent text-(--text-600)',
+                'hover:bg-(--subtle-50) active:bg-(--border)',
             ],
             link: [
                 'p-0',
-                'bg-transparent text-gray-700 cursor-pointer',
+                'bg-transparent text-(--text-600)',
                 'hover:text-(--primary) active:text-(--primary)',
             ]
         },
         active: {
             true: [
-                "bg-(--primary-600) text-white border-(--primary-600)",
+                "bg-(--primary-600) text-(--text-inv) border-(--primary-600)",
                 "hover:bg-(--primary-800)"
             ],
             false: ""
@@ -68,34 +64,30 @@ export const buttonStyles = tv({
             fit_sm: 'h-fit p-0 w-fit text-sm',
             fit_md: 'h-fit p-0 w-fit text-md',
 
-            md: SIZE_STYLES.md,
-            sm: SIZE_STYLES.sm,
-            xs: SIZE_STYLES.xs,
+            md: ACTION_SIZE.md,
+            sm: ACTION_SIZE.sm,
+            xs: ACTION_SIZE.xs,
         },
         iconOnly: {
             true: 'aspect-square px-0',
             false: ''
         },
-        focus: {
-            true: 'focus:ring-2',
-            false: ''
-        }
     },
     compoundVariants: [
         {
             variant: "primary",
             danger: true,
-            class: "bg-red-500 hover:bg-red-400"
+            class: "bg-(--destructive) text-(--text-inv) hover:opacity-90"
         },
         {
             variant: 'border',
             danger: true,
-            class: "border-red-500 text-red-500 hover:bg-red-100"
+            class: "border-(--destructive) text-(--destructive) hover:bg-(--destructive-subtle)"
         },
         {
             variant: 'secondary',
             danger: true,
-            class: "bg-red-100 text-red-800 hover:bg-red-200"
+            class: "bg-(--destructive-subtle) text-(--destructive) hover:bg-(--destructive-subtle) hover:opacity-80"
         }
     ],
     defaultVariants: {
@@ -104,7 +96,6 @@ export const buttonStyles = tv({
         active: false,
         danger: false,
         iconOnly: false,
-        focus: false,
     }
 });
 

@@ -7,6 +7,7 @@ import type { IntegrationEntry } from "@/data/integrations";
 import { PageWidth, RouteError } from "@/components";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
+import { Badge } from "@/comp/badge";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 
@@ -66,6 +67,42 @@ export default function DashboardPage() {
                     total={stats.orders.total}
                     volume={stats.orders.volume}
                 />
+            </div>
+
+            <div className="p-4 flex gap-4">
+                <Badge variant="default" rounded="default" type="default">Generiert</Badge>
+                <Badge variant="border" rounded="default" type="default">Generiert</Badge>
+                <Badge variant="default" rounded="full" type="default">Generiert</Badge>
+                <Badge variant="border" rounded="full" type="default">Generiert</Badge>
+            </div>
+            <div className="p-4 flex gap-4">
+                <Badge variant="default" rounded="default" type="info">
+                    <Badge.Content>dwa</Badge.Content>
+                    <Badge.Tooltip>
+                        daw
+                    </Badge.Tooltip>
+                </Badge>
+                <Badge variant="border" rounded="default" type="info">Generiert</Badge>
+                <Badge variant="default" rounded="full" type="info">Generiert</Badge>
+                <Badge variant="border" rounded="full" type="info">Generiert</Badge>
+            </div>
+            <div className="p-4 flex gap-4">
+                <Badge variant="default" rounded="default" type="success">Generiert</Badge>
+                <Badge variant="border" rounded="default" type="success">Generiert</Badge>
+                <Badge variant="default" rounded="full" type="success">Generiert</Badge>
+                <Badge variant="border" rounded="full" type="success">Generiert</Badge>
+            </div>
+            <div className="p-4 flex gap-4">
+                <Badge variant="default" rounded="default" type="warning">Generiert</Badge>
+                <Badge variant="border" rounded="default" type="warning">Generiert</Badge>
+                <Badge variant="default" rounded="full" type="warning">Generiert</Badge>
+                <Badge variant="border" rounded="full" type="warning">Generiert</Badge>
+            </div>
+            <div className="p-4 flex gap-4">
+                <Badge variant="default" rounded="default" type="error">Generiert</Badge>
+                <Badge variant="border" rounded="default" type="error">Generiert</Badge>
+                <Badge variant="default" rounded="full" type="error">Generiert</Badge>
+                <Badge variant="border" rounded="full" type="error">Generiert</Badge>
             </div>
         </PageWidth>
     );

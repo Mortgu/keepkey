@@ -1,5 +1,4 @@
-import { drawerStyles } from "@/comp/drawer";
-import { Button } from "@/components";
+import { Button, drawerStyles } from "@/components";
 import { Drawer } from "@base-ui/react";
 import { UndoDot, X } from "lucide-react";
 

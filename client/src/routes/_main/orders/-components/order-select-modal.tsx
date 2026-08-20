@@ -1,5 +1,4 @@
-import { dialogStyles } from "@/comp/dialog";
-import { buttonStyles } from "@/components";
+import { buttonStyles, dialogStyles } from "@/components";
 import { Dialog, ScrollArea, type DialogRootChangeEventDetails } from "@base-ui/react";
 import { Plus, X } from "lucide-react";
 import { useTranslation } from "react-i18next";

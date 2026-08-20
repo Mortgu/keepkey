@@ -3,7 +3,8 @@ import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
 import { Minus, MoveHorizontal, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
-import { LabelBadge } from "./input";
+import { FIELD_LABEL_CLASS, Field } from "./field";
+import { ACTION_FOCUS, CONTROL_HEIGHT, CONTROL_TEXT, FIELD_FOCUS_WITHIN, FIELD_STATE_WITHIN, fieldState } from "./tokens";
 import type { NumberFieldRootProps } from "@base-ui/react/number-field";
 import type { ReactNode } from "react";
 import type { ComponentSize } from "./tokens";
@@ -50,7 +51,7 @@ const numberFieldStyles = tv({
         group: [
             "flex w-full items-stretch overflow-hidden rounded-md border border-(--border) bg-white",
             "transition-all duration-150",
-            "focus-within:border-(--primary) focus-within:shadow-[0_0_0_3px_rgba(0,104,63,0.15)]",
+            FIELD_FOCUS_WITHIN,
             "data-disabled:bg-(--subtle-50) data-disabled:cursor-not-allowed",
         ],
         input: [
@@ -62,7 +63,7 @@ const numberFieldStyles = tv({
             "flex shrink-0 cursor-pointer items-center justify-center select-none",
             "border-(--border) text-(--text-600) transition-colors duration-100",
             "hover:not-data-disabled:bg-(--subtle-50) active:not-data-disabled:bg-(--border)",
-            "focus-visible:z-1 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-(--primary)",
+            `focus-visible:z-1 ${ACTION_FOCUS}`,
             "data-disabled:cursor-not-allowed data-disabled:text-(--text-secondary)",
             "disabled:cursor-not-allowed disabled:text-(--text-secondary) disabled:hover:bg-transparent",
         ],
@@ -71,32 +72,28 @@ const numberFieldStyles = tv({
     variants: {
         input_size: {
             xs: {
-                group: "h-[34px]",
-                input: "text-xs font-light",
+                group: CONTROL_HEIGHT.xs,
+                input: `${CONTROL_TEXT.xs} font-light`,
                 stepper: "w-8",
-                suffix: "text-xs",
+                suffix: CONTROL_TEXT.xs,
             },
             sm: {
-                group: "h-[38px]",
-                input: "text-sm font-normal",
+                group: CONTROL_HEIGHT.sm,
+                input: `${CONTROL_TEXT.sm} font-normal`,
                 stepper: "w-9",
-                suffix: "text-sm",
+                suffix: CONTROL_TEXT.sm,
             },
             md: {
-                group: "h-[42px]",
-                input: "text-md font-semibold",
+                group: CONTROL_HEIGHT.md,
+                input: `${CONTROL_TEXT.md} font-semibold`,
                 stepper: "w-10",
-                suffix: "text-md",
+                suffix: CONTROL_TEXT.md,
             },
         },
         state: {
             none: {},
-            error: {
-                group: "border-(--destructive) focus-within:shadow-[0_0_0_3px_rgba(192,57,43,0.15)]",
-            },
-            warning: {
-                group: "border-(--warning) focus-within:shadow-[0_0_0_3px_rgba(180,83,9,0.18)]",
-            },
+            error: { group: FIELD_STATE_WITHIN.error },
+            warning: { group: FIELD_STATE_WITHIN.warning },
         },
     },
     defaultVariants: {
@@ -126,13 +123,13 @@ export function NumberField({
     const generatedId = useId();
     const inputId = id ?? generatedId;
 
-    const state = error ? "error" : warning ? "warning" : "none";
+    const state = fieldState(error, warning);
     const styles = numberFieldStyles({ input_size: size, state });
 
     const labelNode = label ? (
         <label
             htmlFor={inputId}
-            className={`text-sm font-medium text-(--text) ${scrubbable ? "cursor-ew-resize" : ""}`}
+            className={`${FIELD_LABEL_CLASS} ${scrubbable ? "cursor-ew-resize" : ""}`}
         >
             {label}
         </label>
@@ -146,51 +143,51 @@ export function NumberField({
             className="w-full"
             {...rest}
         >
-            {(label || error || warning) && (
-                <div className="mb-1 flex items-center justify-between gap-1.5">
-                    {scrubbable && labelNode ? (
+            <Field
+                label={
+                    scrubbable && labelNode ? (
                         <BaseNumberField.ScrubArea className="cursor-ew-resize select-none">
                             {labelNode}
-                            <BaseNumberField.ScrubAreaCursor className="drop-shadow-[0_1px_1px_#0008] filter">
+                            <BaseNumberField.ScrubAreaCursor className="drop-shadow-(--shadow-thumb) filter">
                                 <MoveHorizontal size={20} className="text-(--text)" />
                             </BaseNumberField.ScrubAreaCursor>
                         </BaseNumberField.ScrubArea>
                     ) : (
                         labelNode
+                    )
+                }
+                error={error}
+                errorTooltip={errorTooltip}
+                warning={warning}
+                warningTooltip={warningTooltip}
+            >
+                <BaseNumberField.Group className={styles.group({ className })}>
+                    {!hideSteppers && (
+                        <BaseNumberField.Decrement
+                            className={styles.stepper({ className: "border-r" })}
+                            aria-label={t("common.decrement")}
+                        >
+                            <Minus size={15} />
+                        </BaseNumberField.Decrement>
                     )}
-                    {error && <LabelBadge kind="error" label={error} tooltip={errorTooltip} />}
-                    {!error && warning && (
-                        <LabelBadge kind="warning" label={warning} tooltip={warningTooltip} />
+
+                    <BaseNumberField.Input
+                        placeholder={placeholder}
+                        className={styles.input({ className: inputClassName })}
+                    />
+
+                    {suffix && <span className={styles.suffix()}>{suffix}</span>}
+
+                    {!hideSteppers && (
+                        <BaseNumberField.Increment
+                            className={styles.stepper({ className: "border-l" })}
+                            aria-label={t("common.increment")}
+                        >
+                            <Plus size={15} />
+                        </BaseNumberField.Increment>
                     )}
-                </div>
-            )}
-
-            <BaseNumberField.Group className={styles.group({ className })}>
-                {!hideSteppers && (
-                    <BaseNumberField.Decrement
-                        className={styles.stepper({ className: "border-r" })}
-                        aria-label={t("common.decrement")}
-                    >
-                        <Minus size={15} />
-                    </BaseNumberField.Decrement>
-                )}
-
-                <BaseNumberField.Input
-                    placeholder={placeholder}
-                    className={styles.input({ className: inputClassName })}
-                />
-
-                {suffix && <span className={styles.suffix()}>{suffix}</span>}
-
-                {!hideSteppers && (
-                    <BaseNumberField.Increment
-                        className={styles.stepper({ className: "border-l" })}
-                        aria-label={t("common.increment")}
-                    >
-                        <Plus size={15} />
-                    </BaseNumberField.Increment>
-                )}
-            </BaseNumberField.Group>
+                </BaseNumberField.Group>
+            </Field>
         </BaseNumberField.Root>
     );
 }

@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Pen, Trash, User } from "lucide-react";
+import { Pen, Trash } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
-import { useState, type SyntheticEvent } from "react";
+import { type SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
 import { useDeleteCustomer } from "@/hooks";
 import { Button } from "@/components";
-import ContactPersonModal from "./contact-person-modal";
+import ContactsModal from "./contact/contacts-modal";
 
 interface Props {
     customer: Customer;
@@ -16,8 +16,6 @@ interface Props {
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
-
-    const [open, setOpen] = useState(false);
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -83,21 +81,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                         onClick={() => onEdit(customer)}
                     />
 
-                    <Button
-                        variant="border"
-                        size="xs"
-                        icon={<Pen size={13} />}
-                        iconOnly
-                        onClick={() => onEdit(customer)}
-                    />
-
-                    <Button
-                        variant="border"
-                        size="xs"
-                        icon={<User size={14} />}
-                        iconOnly
-                        onClick={() => setOpen(true)}
-                    />
+                    <ContactsModal customerId={customer.id} contacts={customer.contactPersons ?? []} />
 
                     <Button
                         variant="border"
@@ -109,13 +93,6 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     />
                 </div>
             </div>
-
-            {open && (
-                <ContactPersonModal
-                    onClose={() => setOpen(false)}
-                    currentCustomerId={customer.id}
-                />
-            )}
         </div>
     );
 }

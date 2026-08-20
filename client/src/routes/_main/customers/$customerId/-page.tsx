@@ -7,7 +7,7 @@ import { Route } from "./index";
 import type { Customer } from "@keepit/schemas";
 import { PageWidth, RouteError } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
-import { Tabs } from "@/components/tabs";
+import { Tabs } from "@/components";
 
 const TABS = [
     { value: "general", label: "Allgemein" },

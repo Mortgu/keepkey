@@ -1,9 +1,8 @@
-import { dialogStyles } from "@/comp/dialog";
+import { Button, buttonStyles, dialogStyles, Input, Textarea } from "@/components";
 import { Dialog } from "@base-ui/react";
 import { Dot, X } from "lucide-react";
 import { formatDate } from "@/lib/format";
 import type { Offer } from "@keepit/schemas";
-import { Button, buttonStyles, Input, Textarea } from "@/components";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
 import { getFormError } from "@/lib/utils";

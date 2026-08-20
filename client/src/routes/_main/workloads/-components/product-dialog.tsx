@@ -1,5 +1,4 @@
-import { dialogStyles } from '@/comp/dialog';
-import { Button, buttonStyles, DEFAULT_LANGUAGE_OPTIONS, Input, SegmentedLanguageToggle, Textarea } from '@/components';
+import { Button, buttonStyles, DEFAULT_LANGUAGE_OPTIONS, dialogStyles, Input, SegmentedLanguageToggle, Textarea } from "@/components";
 import { Dialog } from '@base-ui/react';
 import type { Language, UpdateProductInput } from '@keepit/schemas';
 import { Plus, X } from 'lucide-react';

@@ -2,16 +2,15 @@ import { useTranslation } from "react-i18next";
 
 import { Plus } from "lucide-react";
 import OfferList from "./-components/offer-list";
-import OfferModal from "./-components/modals/offer-modal";
 import useOfferFilters from "./-hooks/use-offer-filters";
 import OfferFilters from "./-components/offer-filters";
-import type { Offer } from "@keepit/schemas";
-import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
+import { useContacts, useCustomers, useProducts } from "@/hooks";
+import { useModals } from "@/context/modal-context";
 import { Button, PageWidth } from "@/components";
 
 export function OfferPage() {
   const { t } = useTranslation();
-  const modal = useModal<Offer>();
+  const { openModal } = useModals();
 
   const filters = useOfferFilters();
 
@@ -34,20 +33,11 @@ export function OfferPage() {
             {/* <Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>*/}
             {/* Create Customer Button */}
             <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-              onClick={() => modal.open()}>Angebot erstellen</Button>
+              onClick={() => openModal("offer")}>Angebot erstellen</Button>
           </div>
         </div>
 
       </div>
-
-      {modal.isOpen && (
-        <OfferModal
-          key={modal.key}
-          closeFn={modal.close}
-          sourceOffer={modal.data ?? undefined}
-        />
-      )}
-
 
       <div className="">
         <div className="px-8 py-4 border-b border-(--border)">

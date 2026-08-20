@@ -1,5 +1,15 @@
+/* ──────────────────────────────────────────────────────────────────────
+   Nur Styles, keine Komponenten — react-refresh verlangt, dass ein Modul
+   ausschließlich React-Komponenten exportiert (vgl. ehem. table-styles.ts).
+   ────────────────────────────────────────────────────────────────────── */
+
 import { tv } from "tailwind-variants";
 
+/**
+ * Slots für einen base-ui-Drawer (Swipe-fähiges Seitenpanel mit Stacking für
+ * verschachtelte Drawer). Ablösung für das handgebaute `Drawer` aus `drawer.tsx` —
+ * bis die Migration durch ist, existieren beide nebeneinander.
+ */
 export const drawerStyles = tv({
     slots: {
         Backdrop: '[--backdrop-opacity:0.2] dark:[--backdrop-opacity:0.7] fixed inset-0 min-h-dvh bg-black opacity-[calc(var(--backdrop-opacity)*(1-var(--drawer-swipe-progress)))] transition-opacity duration-[450ms] ease-[cubic-bezier(0.32,0.72,0,1)] data-swiping:duration-0 data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)] supports-[-webkit-touch-callout:none]:absolute',
@@ -22,7 +32,6 @@ export const drawerStyles = tv({
             'data-starting-style:[transform:translateX(calc(100%-var(--bleed)+var(--viewport-padding)+2px))]',
             'data-ending-style:[transform:translateX(calc(100%-var(--bleed)+var(--viewport-padding)+2px))]',
             'data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)]',
-            '[--stack-peek-offset:max(0px,calc((var(--nested-drawers)-var(--stack-progress))*var(--peek)))]',
         ],
 
         Content: 'transition-opacity duration-[300ms] ease-[cubic-bezier(0.45,1.005,0,1.005)] group-data-nested-drawer-open/popup:opacity-0 group-data-nested-drawer-swiping/popup:opacity-100',

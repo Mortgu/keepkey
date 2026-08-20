@@ -40,16 +40,15 @@ function ModalDialog({ onClose, children }: ModalProps) {
 
     return (
         <div className="fixed inset-0 bg-white/50 backdrop-blur-xs z-50 flex items-center justify-center">
-            <div
-                className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-md w-full max-w-4xl max-h-[90vh] flex flex-col">
-                <div className="flex items-center justify-between pt-5 px-5">
+            <div className="scrollbar-none overflow-x-hidden relative border border-(--border) bg-white rounded-md w-full max-w-4xl max-h-[90vh] flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b border-(--border)">
                     {header}
 
-                    <Button className="w-9.5 h-9.5"
+                    <Button
                         onClick={onClose}
                         variant="border"
                         size="xs"
-                        icon={<X className="size-4" />}
+                        icon={<X size={14} />}
                         iconOnly
                     />
 

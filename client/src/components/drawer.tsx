@@ -32,7 +32,7 @@ export interface DrawerFooterProps {
 const scrimStyles = tv({
     base: [
         "fixed inset-0 z-40 transition-opacity duration-200",
-        "bg-[rgba(17,26,20,0.38)]",
+        "bg-(--scrim)",
     ],
     variants: {
         open: {
@@ -42,10 +42,10 @@ const scrimStyles = tv({
     },
 });
 
-const drawerStyles = tv({
+const legacyDrawerStyles = tv({
     base: [
         "fixed top-0 right-0 bottom-0 z-50 transition-all",
-        "bg-white shadow-[-8px_0_24px_rgba(0,0,0,0.12)]",
+        "bg-white shadow-(--shadow-drawer)",
         "flex flex-col",
         "transition-transform duration-[280ms] ease-[cubic-bezier(0.32,0.72,0,1)]",
         "will-change-transform",
@@ -92,7 +92,7 @@ function DrawerHeader({ eyebrow, title, subtitle }: DrawerHeaderProps) {
                 {title}
             </div>
             {subtitle && (
-                <div className="text-[13px] text-gray-400 mt-0.5">
+                <div className="text-[13px] text-(--text-secondary) mt-0.5">
                     {subtitle}
                 </div>
             )}
@@ -143,7 +143,7 @@ function Drawer({ open, onClose, children, wide, className }: DrawerProps) {
                 aria-hidden="true"
             />
             <aside
-                className={drawerStyles({ open, wide, className })}
+                className={legacyDrawerStyles({ open, wide, className })}
                 role="dialog"
                 aria-modal="true"
             >

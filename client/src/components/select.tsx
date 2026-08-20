@@ -1,6 +1,7 @@
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import { SIZE_STYLES } from "./tokens";
+import { Field } from "./field";
+import { FIELD_BASE, FIELD_FOCUS, FIELD_SIZE, FIELD_STATE, fieldState } from "./tokens";
 import type { ComponentSize } from "./tokens";
 import type { ReactNode, SelectHTMLAttributes } from "react";
 
@@ -10,70 +11,91 @@ export interface SelectOption {
 }
 
 export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> {
-    variant?: "primary";
     size?: ComponentSize;
+
+    /** Optional label text rendered above the field. */
     label?: string;
+
+    /** Short error label shown as a badge next to the field label. Turns the border red. */
     error?: string;
+
+    /** Longer explanation shown in a tooltip when the error badge is hovered. */
+    errorTooltip?: string;
+
+    /** Short warning label shown as a badge next to the field label. Turns the border amber. */
+    warning?: string;
+
+    /** Longer explanation shown in a tooltip when the warning badge is hovered. */
+    warningTooltip?: string;
+
+    /** Renders the options; alternatively pass `<option>` elements as children. */
     options?: Array<SelectOption>;
+
+    /** Shown as a disabled first entry while no value is selected. */
     placeholder?: string;
+
     children?: ReactNode;
 }
 
 const styles = tv({
-    base: [
-        "w-full rounded-md border border-(--border)",
-        "transition-all duration-200",
-        "px-3 text-base outline-none",
-        "focus:bg-gray-100",
-        "disabled:opacity-50 disabled:cursor-not-allowed",
-    ],
+    base: [FIELD_BASE, FIELD_FOCUS],
     variants: {
-        size: {
-            xs: `px-3 font-light ${SIZE_STYLES.xs}`,
-            sm: `px-3 font-normal ${SIZE_STYLES.sm}`,
-            md: `px-3 font-semibold ${SIZE_STYLES.md}`,
+        input_size: {
+            xs: `${FIELD_SIZE.xs} font-light`,
+            sm: `${FIELD_SIZE.sm} font-normal`,
+            md: `${FIELD_SIZE.md} font-semibold`,
         },
-        error: {
-            true: "border-red-500",
-            false: "",
-        },
+        state: FIELD_STATE,
     },
     defaultVariants: {
-        size: "sm",
-        error: false,
+        input_size: "sm",
+        state: "none",
     },
 });
 
 export const Select = forwardRef<HTMLSelectElement, SelectComponentProps>(
-    ({ className, size, label, error, options, placeholder, children, ...rest }, ref) => (
-        <div className="w-full">
-            <div className="flex items-center justify-between">
-                {label && (
-                    <label className="block text-sm font-normal text-(--text-600) mb-1">
-                        {label}
-                    </label>
-                )}
-                {error && (
-                    <label className="text-sm font-normal text-red-500 mb-1">
-                        {error}
-                    </label>
-                )}
-            </div>
+    (
+        {
+            className,
+            size,
+            label,
+            error,
+            errorTooltip,
+            warning,
+            warningTooltip,
+            options,
+            placeholder,
+            children,
+            ...rest
+        },
+        ref,
+    ) => (
+        <Field
+            label={label}
+            error={error}
+            errorTooltip={errorTooltip}
+            warning={warning}
+            warningTooltip={warningTooltip}
+            htmlFor={rest.id}
+        >
             <select
                 ref={ref}
-                className={styles({ size, error: !!error, className })}
+                className={styles({ input_size: size, state: fieldState(error, warning), className })}
                 {...rest}
             >
+                {/* Nicht `disabled`: FieldSelect bindet leere Werte auf "", die
+                    Platzhalter-Option ist dann die ausgewählte. Sie zu sperren
+                    würde das Zurücksetzen einer Auswahl verhindern. */}
                 {placeholder && <option value="">{placeholder}</option>}
-                {options?.map((opt) => (
-                    <option key={opt.value} value={opt.value}>
-                        {opt.label}
+                {options?.map((option) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
                     </option>
                 ))}
                 {children}
             </select>
-        </div>
-    )
+        </Field>
+    ),
 );
 
 Select.displayName = "Select";

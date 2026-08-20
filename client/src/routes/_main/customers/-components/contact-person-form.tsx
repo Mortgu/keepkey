@@ -2,10 +2,10 @@ import { z } from "zod";
 import { useForm } from "@tanstack/react-form";
 
 import type {
-  Contact,
-  CreateContactInput
+  Contact
 } from "@keepit/schemas";
 import { FieldInput, FormModal } from "@/components";
+import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
 
 const contactPersonSchema = z.object({
   salutation: z.string().min(1, "Anrede fehlt"),
@@ -15,14 +15,16 @@ const contactPersonSchema = z.object({
 });
 
 interface Props {
-  saveFn: (data: CreateContactInput) => void;
   cancelFn: () => void;
 
   currentCustomerId: string;
   currentContactPerson?: Contact | null;
 }
 
-export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId, currentContactPerson }: Props) {
+export default function ContactPersonForm({ cancelFn, currentCustomerId, currentContactPerson }: Props) {
+  const { createCustomerContact } = useCreateCustomerContact();
+  const { updateCustomerContact } = useUpdateCustomerContact();
+
   const contactForm = useForm({
     defaultValues: {
       salutation: currentContactPerson?.salutation ?? '',
@@ -35,13 +37,32 @@ export default function ContactPersonForm({ saveFn, cancelFn, currentCustomerId,
       onMount: contactPersonSchema,
     },
     onSubmit: ({ value }) => {
-      saveFn({
-        salutation: value.salutation,
-        firstName: value.firstName,
-        lastName: value.lastName,
-        email: value.email || "",
-        customerId: currentCustomerId,
-      });
+      if (currentContactPerson) {
+        updateCustomerContact({
+          id: currentCustomerId,
+          contactId: currentContactPerson.id,
+          input: {
+            salutation: value.salutation,
+            firstName: value.firstName,
+            lastName: value.lastName,
+            email: value.email || "",
+            customerId: currentCustomerId,
+          }
+        })
+      } else {
+        createCustomerContact({
+          id: currentCustomerId,
+          input: {
+            salutation: value.salutation,
+            firstName: value.firstName,
+            lastName: value.lastName,
+            email: value.email || "",
+            customerId: currentCustomerId,
+          }
+        });
+      }
+
+      cancelFn();
     }
   });
 

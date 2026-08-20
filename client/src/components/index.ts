@@ -1,16 +1,19 @@
 export * from './tokens';
 
-export * from './action-menu';
 export * from './badge';
 export * from './button';
 export * from './checkbox';
 export * from './collapsable';
+export * from './dialog-styles';
 export * from './document-rename-modal';
 export * from './drawer';
+export * from './drawer-styles';
 export * from './error-boundary';
+export * from './field';
 export * from './input';
 export * from './language-toggle';
 export * from './language-toggle-options';
+export * from './menu-styles';
 export * from './modal';
 export * from './nav-link';
 export * from './navigation';
@@ -18,8 +21,8 @@ export * from './number-field';
 export * from './page-width';
 export * from './select';
 export * from './skeleton';
-export * from './table';
-export * from './table-styles';
+export * from './tab-styles';
+export * from './tabs';
 export * from './textarea';
 export * from './toast';
 

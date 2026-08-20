@@ -1,4 +1,4 @@
-import { Button, buttonStyles, DocumentRenameModal, Tooltip } from "@/components";
+import { Badge, Button, buttonStyles, DocumentRenameModal, menuStyles, Tooltip } from "@/components";
 import {
     documentDownloadUrl, useDocumentCapabilities,
     useDocumentMutations,
@@ -11,7 +11,6 @@ import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@ke
 import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace, EllipsisVertical } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
-import { Badge } from '@/components';
 import { formatDate } from "@/lib/format";
 import { getDocumentStatus } from "@/utils/status";
 import { toast } from "react-toastify";
@@ -22,7 +21,6 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
 import OfferDocxEditor from "./docx-editor";
 import { Menu } from "@base-ui/react";
-import { menuStyles } from "@/comp/menu";
 
 const cardStyles = tv({
     slots: {

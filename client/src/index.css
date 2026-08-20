@@ -64,6 +64,27 @@
   --success-subtle: #e6f2ec;
 
   --white: #f2f2f2;
+
+  /* ── Abgeleitete Zustandsfarben ──────────────────────────────────────────
+     Aus den Basis-Token gemischt, damit ein Farbwechsel oben automatisch
+     durchschlägt. In Komponenten nie als rgba()/Hex duplizieren. */
+  --destructive-line: color-mix(in srgb, var(--destructive) 30%, transparent);
+  --warning-line: color-mix(in srgb, var(--warning) 30%, transparent);
+
+  /* ── Fokusringe ─────────────────────────────────────────────────────────
+     Werden über components/tokens.ts konsumiert (FIELD_FOCUS, FIELD_STATE).
+     Komponenten definieren Fokus nicht selbst. */
+  --focus-ring: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
+  --focus-ring-destructive: 0 0 0 3px color-mix(in srgb, var(--destructive) 15%, transparent);
+  --focus-ring-warning: 0 0 0 3px color-mix(in srgb, var(--warning) 18%, transparent);
+
+  /* ── Elevation & Scrim ──────────────────────────────────────────────────
+     Neutrale Schatten. Aus --text gemischt statt aus reinem Schwarz, damit
+     sie zur Farbtemperatur der Oberfläche passen. */
+  --shadow-popover: 0 4px 12px color-mix(in srgb, var(--text) 10%, transparent);
+  --shadow-drawer: -8px 0 24px color-mix(in srgb, var(--text) 12%, transparent);
+  --shadow-thumb: 0 1px 3px color-mix(in srgb, var(--text) 25%, transparent);
+  --scrim: color-mix(in srgb, var(--text) 38%, transparent);
 }
 
 html,
