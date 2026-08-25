@@ -1,9 +1,9 @@
 export * from './tokens';
 
+export * from './accordion';
 export * from './badge';
 export * from './button';
 export * from './checkbox';
-export * from './collapsable';
 export * from './dialog-styles';
 export * from './document-rename-modal';
 export * from './drawer';

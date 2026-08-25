@@ -1,4 +1,16 @@
-import { Badge, Button, buttonStyles, DocumentRenameModal, menuStyles, Tooltip } from "@/components";
+import {    findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
+import { Dot, Download, EllipsisVertical, ExternalLink, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
+import { useDropzone } from "react-dropzone";
+import { tv } from "tailwind-variants";
+import { toast } from "react-toastify";
+import { useRef, useState } from "react";
+import '@docx-editor.dev/core/styles/editor.css';
+import { useQuery } from "@tanstack/react-query";
+import { Menu } from "@base-ui/react";
+import DocumentDocxEditor from "./docx-editor";
+import type {DocxEditorRef} from "@docx-editor.dev/react";
+import type {DocumentType, OfferDocument, OrderDocument} from "@keepit/schemas";
+import { Badge, Button, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
 import {
     documentDownloadUrl, useDocumentCapabilities,
     useDocumentMutations,
@@ -6,21 +18,10 @@ import {
     useLocale,
     useModal
 } from "@/hooks";
-import { formatBytesToKB } from "@/lib/utils";
-import { findDocumentArtifact, hasOutdatedRemote, type OfferDocument } from "@keepit/schemas";
-import { Dot, File as FileIcon, Download, ExternalLink, Info, Pencil, RefreshCw, Trash2, UploadCloud, X, LoaderCircle, Replace, EllipsisVertical } from "lucide-react";
-import { useDropzone } from "react-dropzone";
-import { tv } from "tailwind-variants";
-import { formatDate } from "@/lib/format";
-import { getDocumentStatus } from "@/utils/status";
-import { toast } from "react-toastify";
-import { type DocxEditorRef } from "@docx-editor.dev/react";
-import { useRef, useState } from "react";
-import '@docx-editor.dev/core/styles/editor.css';
-import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api-client";
-import OfferDocxEditor from "./docx-editor";
-import { Menu } from "@base-ui/react";
+import { getDocumentStatus } from "@/utils/status";
+import { formatDate } from "@/lib/format";
+import { formatBytesToKB } from "@/lib/utils";
 
 const cardStyles = tv({
     slots: {
@@ -44,17 +45,20 @@ const cardStyles = tv({
 })
 
 interface Props {
-    offerId: string;
-    document: OfferDocument;
+    /** Woran das Dokument hängt — steuert Endpunkte und Cache-Keys. */
+    type: DocumentType;
+    /** Id des Angebots bzw. der Bestellung. */
+    parentId: string;
+    document: OfferDocument | OrderDocument;
 }
 
-export default function DocumentCard({ offerId, document }: Props) {
+export default function DocumentCard({ type, parentId, document }: Props) {
     const locales = useLocale();
 
     const pdf = findDocumentArtifact(document.artifacts, "PDF");
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
 
-    const mutations = useDocumentMutations("offer", offerId);
+    const mutations = useDocumentMutations(type, parentId);
 
     const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
 
@@ -115,11 +119,11 @@ export default function DocumentCard({ offerId, document }: Props) {
     }
 
     const { refetch } = useQuery({
-        queryKey: ['fetched', document.id],
+        queryKey: ['fetched', type, document.id],
         enabled: false,
         queryFn: async () => {
             const { url } = await api<{ url: string }>(
-                `/api/documents/offer/${document.id}/artifacts/docx/url`
+                `/api/documents/${type}/${document.id}/artifacts/docx/url`
             );
             const res = await fetch(url);
             if (!res.ok) throw new Error(`Download failed (${res.status})`);
@@ -236,10 +240,10 @@ export default function DocumentCard({ offerId, document }: Props) {
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl("offer", document.id, "pdf"))}>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "pdf"))}>
                                                     <Download size={14} /> Download PDF
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl("offer", document.id, "docx"))}>
+                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "docx"))}>
                                                     <Download size={14} /> Download DOCX
                                                 </Menu.Item>
                                             </Menu.Popup>
@@ -311,7 +315,7 @@ export default function DocumentCard({ offerId, document }: Props) {
 
             {editDocx && (
                 <div className="fixed inset-0 z-[1000]">
-                    <OfferDocxEditor
+                    <DocumentDocxEditor
                         document={bytes}
                         displayName={document.displayName ?? document.id + ".docx"}
                         onSave={async (file) => {

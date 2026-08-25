@@ -1,18 +1,18 @@
-import { Pen, Trash } from "lucide-react";
+import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
-import OfferCardDiscount from "./offer-card-discount";
-import OfferCardFlatRate from "./offer-card-flatrate";
-import OfferCardProduct from "./offer-card-product";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import { Badge, Button, Collapsable } from "@/components";
+import { Accordion, Badge, Button } from "@/components";
+import DiscountRow from "@/routes/_main/-components/card/discount-row";
+import DocumentCard from "@/routes/_main/-components/card/document-card";
+import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
+import PositionRow from "@/routes/_main/-components/card/position-row";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModals } from "@/context/modal-context";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -101,42 +101,38 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Collapsable label="Produkte"
-                className="w-full justify-between rounded-none"
-            >
-                <div className="grid mx-4">
-                    {offerPositions.map((position, i) => (
-                        <OfferCardProduct key={i} position={position} />
+            <Accordion>
+                <Accordion.Section value="products" label="Produkte">
+                    {offerPositions.map((position) => (
+                        <PositionRow key={position.id} position={position} />
                     ))}
 
-                    {offerFlatRates.map((flatrate, i) => (
-                        <OfferCardFlatRate key={i} flatrate={flatrate} />
+                    {offerFlatRates.map((flatrate) => (
+                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
                     ))}
 
                     {offerDiscounts.map((discount) => (
-                        <OfferCardDiscount key={discount.id} discount={discount} />
+                        <DiscountRow key={discount.id} discount={discount} />
                     ))}
-                </div>
-            </Collapsable>
+                </Accordion.Section>
 
-            <hr className="text-(--border)" />
-
-            <Collapsable
-                label="Dokumente"
-                className="w-full justify-between rounded-none"
-            >
-                <div className="grid mx-4">
+                <Accordion.Section value="documents" label="Dokumente">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <DocumentCard key={document.id} document={document} offerId={offer.id} />
+                        <DocumentCard
+                            key={document.id}
+                            type="offer"
+                            parentId={offer.id}
+                            document={document}
+                        />
                     ))}
 
                     {offer.offerDocuments.length === 0 && (
                         <div className="flex items-center justify-center py-4">
-                            <p className="text-sm text-gray-500">Noch keine Dokumente generiert!</p>
+                            <p className="text-sm text-(--text-secondary)">Noch keine Dokumente generiert!</p>
                         </div>
                     )}
-                </div>
-            </Collapsable>
+                </Accordion.Section>
+            </Accordion>
 
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
 
@@ -173,6 +169,15 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
                 {/* Actions right */}
                 <div className="flex items-center gap-2">
+                    <Button
+                        size="xs"
+                        variant="border"
+                        title={t("versionHistory.title")}
+                        onClick={() => setDrawerOpen(true)}
+                        icon={<UndoDot className="size-3" />}
+                        iconOnly
+                    />
+
                     <Button
                         size="xs"
                         variant="border"

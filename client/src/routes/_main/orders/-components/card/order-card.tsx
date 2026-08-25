@@ -1,16 +1,21 @@
-import { Button } from "@/components";
+import type { Order } from "@keepit/schemas";
+
+import { Accordion, Button } from "@/components";
+import DocumentCard from "@/routes/_main/-components/card/document-card";
+import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
+import PositionRow from "@/routes/_main/-components/card/position-row";
+import { useGenerateOrderDocument } from "@/hooks/orders/order-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import { Accordion } from "@base-ui/react";
-import type { Order } from "@keepit/schemas";
-import { ChevronDown } from "lucide-react";
 
 interface Props {
     order: Order;
 }
 
 export default function OrderCard({ order }: Props) {
-    const { customer, customerContactPerson: ccp } = order;
+    const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
+
+    const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
 
     return (
         <div className="bg-white border border-(--border) rounded-md">
@@ -59,33 +64,36 @@ export default function OrderCard({ order }: Props) {
                 </div>
             </div>
 
-            <Accordion.Root multiple>
-                <Accordion.Item>
-                    <Accordion.Header>
-                        <Accordion.Trigger className="w-full flex items-center justify-between py-2 px-4 bg-(--page-bg) border-b border-(--border)">
-                            <p className="text-sm">Produkte</p>
-                            <ChevronDown size={14} className="duration-100 ease-[ease-out] group-data-panel-open:rotate-360 rotate-270" />
-                        </Accordion.Trigger>
-                    </Accordion.Header>
-                    <Accordion.Panel className="border-b border-(--border) px-4 py-2">
-                        dadwa
-                    </Accordion.Panel>
-                </Accordion.Item>
+            <Accordion>
+                <Accordion.Section value="products" label="Produkte">
+                    {orderPositions.map((position) => (
+                        <PositionRow key={position.id} position={position} />
+                    ))}
 
-                <Accordion.Item>
-                    <Accordion.Header>
-                        <Accordion.Trigger className="w-full flex items-center justify-between py-2 px-4 bg-(--page-bg) border-b border-(--border)">
-                            <p className="text-sm">Produkte</p>
-                            <ChevronDown size={14} />
-                        </Accordion.Trigger>
-                    </Accordion.Header>
-                    <Accordion.Panel className="border-b border-(--border) px-4 py-2">
-                        dadwa
-                    </Accordion.Panel>
-                </Accordion.Item>
-            </Accordion.Root>
+                    {flatRates.map((flatrate) => (
+                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
+                    ))}
+                </Accordion.Section>
 
-            <div className="flex items-center justify-between px-2 py-2 ">
+                <Accordion.Section value="documents" label="Dokumente">
+                    {documents.map((document) => (
+                        <DocumentCard
+                            key={document.id}
+                            type="order"
+                            parentId={order.id}
+                            document={document}
+                        />
+                    ))}
+
+                    {documents.length === 0 && (
+                        <div className="flex items-center justify-center py-4">
+                            <p className="text-sm text-(--text-secondary)">Noch keine Dokumente generiert!</p>
+                        </div>
+                    )}
+                </Accordion.Section>
+            </Accordion>
+
+            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
 
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
@@ -93,6 +101,9 @@ export default function OrderCard({ order }: Props) {
                         className="min-w-fit"
                         variant="primary"
                         size="xs"
+                        loading={isGeneratingDocument}
+                        disabled={isGeneratingDocument}
+                        onClick={() => generateOrderDocument({ orderId: order.id })}
                     >
                         Dokument generieren
                     </Button>
@@ -105,5 +116,5 @@ export default function OrderCard({ order }: Props) {
             </div>
 
         </div>
-    )
+    );
 }

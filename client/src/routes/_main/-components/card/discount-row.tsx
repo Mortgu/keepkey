@@ -5,7 +5,7 @@ type Props = {
     discount: OfferDiscount;
 };
 
-export default function OfferCardDiscount({ discount }: Props) {
+export default function DiscountRow({ discount }: Props) {
     const { title, description, amount_cents } = discount;
 
     return (

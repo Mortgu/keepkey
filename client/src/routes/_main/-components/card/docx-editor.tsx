@@ -1,10 +1,11 @@
 import '@docx-editor.dev/core/styles/editor.css';
 
 import { loadDefaultFonts } from '@docx-editor.dev/fonts';
-import { composeFontConfiguration, DocxEditor, useFonts, type DocxEditorRef, type FontResolver } from '@docx-editor.dev/react';
+import { DocxEditor,   composeFontConfiguration, useFonts } from '@docx-editor.dev/react';
 import { useRef } from 'react';
 import { toast } from 'react-toastify';
 import { googleFonts } from '@docx-editor.dev/fonts/google';
+import type {DocxEditorRef, FontResolver} from '@docx-editor.dev/react';
 import { Button } from '@/components';
 
 interface Props {
@@ -14,7 +15,7 @@ interface Props {
     onClose: () => void;
 }
 
-export default function OfferDocxEditor({ document, displayName = "unnamed.docx", onSave, onClose }: Props) {
+export default function DocumentDocxEditor({ document, displayName = "unnamed.docx", onSave, onClose }: Props) {
     const editorRef = useRef<DocxEditorRef>(null);
     const fonts = useFonts(googleFonts());
 
@@ -42,7 +43,7 @@ export default function OfferDocxEditor({ document, displayName = "unnamed.docx"
         const buffer = await editorRef.current?.save();
 
         if (!buffer) {
-            toast.error("OfferDocxEditor: File buffer dose not exists!");
+            toast.error("DocumentDocxEditor: File-Buffer existiert nicht!");
             return;
         }
 
