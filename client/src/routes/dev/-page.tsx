@@ -126,6 +126,28 @@ export function ComponentMatrix() {
                 </Row>
             </Section>
 
+            {/* TEMP-PROBE */}
+            <Section title="Addons (temp)">
+                <Row label="prefix">
+                    <div className="w-52"><Input label="Angebots-Nr." prefix="AG" placeholder="1042" /></div>
+                    <div className="w-52"><Input label="Icon" prefix={<Search className="size-4" />} placeholder="x" /></div>
+                    <div className="w-52"><Input label="Beides" prefix={<><Search className="size-4" />AG</>} placeholder="x" /></div>
+                    <div className="w-52"><Input label="Suffix" suffix="€" placeholder="12" /></div>
+                </Row>
+                <Row label="kombi">
+                    <div className="w-52"><Input prefix="AG" rightIcon={<Search className="size-4" />} placeholder="x" /></div>
+                    <div className="w-52"><Input prefix="AG" error="Pflicht" placeholder="x" /></div>
+                    <div className="w-52"><Input prefix="AG" warning="Prüfen" placeholder="x" /></div>
+                    <div className="w-52"><Input prefix="AG" disabled placeholder="x" /></div>
+                </Row>
+                {SIZES.map((size) => (
+                    <Row key={size} label={size}>
+                        <div className="w-52"><Input size={size} prefix="AG" placeholder="1042" /></div>
+                        <div className="w-52"><NumberField size={size} defaultValue={42} suffix="€" /></div>
+                    </Row>
+                ))}
+            </Section>
+
             {/* 3 — Button-Varianten: deckt Palettenfarben statt Token auf. */}
             <Section
                 title="Button-Varianten"

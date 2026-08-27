@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
 
+import useLoginForm from "../-hooks/use-login-form";
 import { Button, Input } from "@/components";
 import { getFormError } from "@/lib/utils";
-import useLoginForm from "../-hooks/use-login-form";
 import { authClient } from "@/lib/auth-client";
 
 export function LoginFormComponent() {
@@ -112,26 +112,27 @@ export function LoginFormComponent() {
                                     >
                                         Passwort
                                     </label>
-                                    <div className="relative">
-                                        <Input
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onChange={(e) => field.handleChange(e.target.value)}
-                                            onBlur={field.handleBlur}
-                                            type={showPassword ? "text" : "password"}
-                                            autoComplete="current-password webauthn"
-                                            placeholder="••••••••"
-                                            className={`pr-10 ${field.state.meta.isTouched && field.state.meta.errors.length > 0 ? "border-red-400!" : ""}`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword((v) => !v)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-                                        >
-                                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                                        </button>
-                                    </div>
+                                    <Input
+                                        id={field.name}
+                                        name={field.name}
+                                        value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                        onBlur={field.handleBlur}
+                                        type={showPassword ? "text" : "password"}
+                                        autoComplete="current-password webauthn"
+                                        placeholder="••••••••"
+                                        className={
+                                            field.state.meta.isTouched && field.state.meta.errors.length > 0
+                                                ? "border-red-400!"
+                                                : ""
+                                        }
+                                        rightButton={{
+                                            variant: "ghost",
+                                            onClick: () => setShowPassword((v) => !v),
+                                            "aria-label": showPassword ? "Passwort verbergen" : "Passwort anzeigen",
+                                            icon: showPassword ? <EyeOff size={15} /> : <Eye size={15} />,
+                                        }}
+                                    />
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
                                             {getFormError(field.state.meta.errors)}

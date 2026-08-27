@@ -4,14 +4,6 @@ import { tv } from "tailwind-variants";
 import { ACTION_FOCUS } from "./tokens";
 import type { ReactNode } from "react";
 
-/**
- * Aufklappbare Abschnitte auf base-ui. Ersetzt das handgebaute `Collapsable`
- * (kein `aria-expanded`, keine Animation) und das duplizierte Root/Item/
- * Header/Trigger/Panel-Boilerplate an den Call-Sites.
- *
- * Die Styles bleiben modul-privat — react-refresh verlangt, dass ein Modul
- * ausschließlich React-Komponenten exportiert (vgl. `menu-styles.ts`).
- */
 const accordionStyles = tv({
     slots: {
         Root: "grid",
@@ -23,14 +15,10 @@ const accordionStyles = tv({
         ],
         Icon: [
             "size-4 shrink-0 text-(--text-secondary)",
-            "transition-transform duration-150 ease-out",
             "group-data-panel-open:rotate-180",
         ],
-        /* Kein Padding hier — base-ui misst diese Box für `--accordion-panel-height`. */
         Panel: [
             "overflow-hidden h-(--accordion-panel-height)",
-            "transition-[height] duration-150 ease-out",
-            "data-starting-style:h-0 data-ending-style:h-0",
         ],
         Content: "px-4",
     },
@@ -38,9 +26,7 @@ const accordionStyles = tv({
 
 export interface AccordionComponentProps {
     children: ReactNode;
-    /** Werte der Abschnitte, die initial offen sind. */
     defaultValue?: Array<string>;
-    /** Mehrere Abschnitte gleichzeitig offen. */
     multiple?: boolean;
     className?: string;
 }

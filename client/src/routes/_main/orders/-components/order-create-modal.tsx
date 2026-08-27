@@ -1,10 +1,10 @@
-import { Button, buttonStyles, dialogStyles, Input, Textarea } from "@/components";
 import { Dialog } from "@base-ui/react";
 import { Dot, X } from "lucide-react";
-import { formatDate } from "@/lib/format";
-import type { Offer } from "@keepit/schemas";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
+import type { Offer } from "@keepit/schemas";
+import { formatDate } from "@/lib/format";
+import { Button, Input, Textarea, buttonStyles, dialogStyles } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 interface Props {
@@ -63,6 +63,7 @@ export default function OrderCreateModal({ offer, setOpen }: Props) {
                                             id={field.name}
                                             name={field.name}
                                             label="Bestell-Nr."
+                                            prefix="BE"
                                             value={field.state.value}
                                             error={getFormError(field.state.meta.errors)}
                                             onChange={(e) => field.handleChange(e.target.value)}

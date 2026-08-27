@@ -67,6 +67,31 @@ export const FIELD_BASE = [
     "disabled:bg-(--subtle-50) disabled:text-(--text-secondary) disabled:cursor-not-allowed",
 ].join(" ");
 
+/**
+ * Basis einer Feld-*Gruppe*: ein Container, der Rahmen und Hintergrund für einen
+ * transparenten `<input>` darin trägt — nötig, sobald neben dem Eingabefeld noch
+ * etwas im selben Rahmen sitzt (Addon, Stepper, Suffix). Genutzt von `Input` mit
+ * `prefix`/`suffix` und von `NumberField`.
+ *
+ * Fokus und Zustand kommen getrennt über {@link FIELD_FOCUS_WITHIN} und
+ * {@link FIELD_STATE_WITHIN} dazu, die Höhe über {@link CONTROL_HEIGHT}.
+ */
+export const FIELD_GROUP_BASE = [
+    "flex w-full items-stretch overflow-hidden rounded-md border border-(--border) bg-white",
+    "transition-all duration-150",
+].join(" ");
+
+/** Der transparente `<input>` innerhalb einer {@link FIELD_GROUP_BASE}. */
+export const FIELD_GROUP_INPUT = [
+    "h-full min-w-0 flex-1 bg-transparent text-(--text) outline-none",
+    "placeholder:text-(--text-secondary)",
+    "disabled:cursor-not-allowed disabled:text-(--text-secondary)",
+].join(" ");
+
+/** Statischer Inhalt neben dem Eingabefeld innerhalb einer {@link FIELD_GROUP_BASE}. */
+export const FIELD_GROUP_ADDON =
+    "flex shrink-0 items-center gap-1.5 text-(--text-secondary) select-none";
+
 /** Fokus für Eingabefelder: Rahmen wechselt, Ring erscheint. */
 export const FIELD_FOCUS = "focus:border-(--primary) focus:shadow-(--focus-ring)";
 

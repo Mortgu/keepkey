@@ -4,7 +4,7 @@ import { Minus, MoveHorizontal, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { FIELD_LABEL_CLASS, Field } from "./field";
-import { ACTION_FOCUS, CONTROL_HEIGHT, CONTROL_TEXT, FIELD_FOCUS_WITHIN, FIELD_STATE_WITHIN, fieldState } from "./tokens";
+import { ACTION_FOCUS, CONTROL_HEIGHT, CONTROL_TEXT, FIELD_FOCUS_WITHIN, FIELD_GROUP_ADDON, FIELD_GROUP_BASE, FIELD_GROUP_INPUT, FIELD_STATE_WITHIN, fieldState } from "./tokens";
 import type { NumberFieldRootProps } from "@base-ui/react/number-field";
 import type { ReactNode } from "react";
 import type { ComponentSize } from "./tokens";
@@ -49,14 +49,13 @@ export interface NumberFieldComponentProps
 const numberFieldStyles = tv({
     slots: {
         group: [
-            "flex w-full items-stretch overflow-hidden rounded-md border border-(--border) bg-white",
-            "transition-all duration-150",
+            FIELD_GROUP_BASE,
             FIELD_FOCUS_WITHIN,
             "data-disabled:bg-(--subtle-50) data-disabled:cursor-not-allowed",
         ],
         input: [
-            "h-full min-w-0 flex-1 bg-transparent px-3 text-(--text) tabular-nums outline-none",
-            "placeholder:text-(--text-secondary)",
+            FIELD_GROUP_INPUT,
+            "px-3 tabular-nums",
             "data-disabled:cursor-not-allowed data-disabled:text-(--text-secondary)",
         ],
         stepper: [
@@ -67,7 +66,7 @@ const numberFieldStyles = tv({
             "data-disabled:cursor-not-allowed data-disabled:text-(--text-secondary)",
             "disabled:cursor-not-allowed disabled:text-(--text-secondary) disabled:hover:bg-transparent",
         ],
-        suffix: "flex shrink-0 items-center pr-3 pl-1 text-(--text-secondary) select-none",
+        suffix: [FIELD_GROUP_ADDON, "pr-3 pl-1"],
     },
     variants: {
         input_size: {

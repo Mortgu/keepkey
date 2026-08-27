@@ -121,6 +121,7 @@ export default function HeaderForm() {
                     {shows("quoteId") && (
                         <form.Field name="quoteId" children={(field) => (
                             <Input label={t("offerModal.quoteId")} value={field.state.value} disabled={locked("quoteId")}
+                                prefix="AG"
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 error={getFormError(field.state.meta.errors)} />
                         )} />
