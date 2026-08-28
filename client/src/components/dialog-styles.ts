@@ -7,11 +7,11 @@ import { tv } from "tailwind-variants";
 
 /**
  * Slots für einen base-ui-Dialog: Portal → Backdrop → Viewport → Popup,
- * darin Header / Body (scrollbar) / Actions.
+ * darin Header / Toolbar / Body (scrollbar) / Actions.
  *
- * Vorerst nur die Styles — die Call-Sites setzen die Anatomie noch selbst
- * zusammen. Der Compound-Wrapper, der das Boilerplate übernimmt, kommt hier
- * dazu und löst dann `modal.tsx` ab.
+ * Die Anatomie setzt `dialog.tsx` zusammen — Call-Sites bauen sie nicht mehr
+ * selbst. Wer nur einzelne Slots braucht (Sonderlayouts), kann sie hier direkt
+ * abgreifen.
  */
 export const dialogStyles = tv({
     slots: {
@@ -22,13 +22,14 @@ export const dialogStyles = tv({
         Scrollbar: 'flex justify-center bg-black w-4 opacity-0 transition-opacity duration pointer-events-none z-100',
         ScrollbarThumb: 'w-full bg-(--destructive) z-101',
         Popup: [
-            'relative flex flex-col w-[min(50rem,calc(100vw_-_2rem))] max-h-full max-w-full border border-(--border) min-h-0 bg-white',
+            'relative flex flex-col max-h-full max-w-full border border-(--border) min-h-0 bg-white',
             'rounded-md data-nested-dialog-open:scale-96',
             'transition-all '
         ],
         Header: 'flex items-center justify-between gap-1 p-4 border-b border-(--border)',
         Title: 'text-base leading-6 font-medium m-0',
         Description: 'flex items-center text-sm leading-5 text-(--text) m-0',
+        Toolbar: 'flex items-center justify-start gap-4 p-4 border-b border-(--border)',
         Body: 'relative flex-auto flex min-h-0 overflow-hidden',
         BodyViewport: 'box-border flex-auto min-h-0 overscroll-contain',
         BodyContent: 'flex flex-col p-4',
@@ -36,5 +37,15 @@ export const dialogStyles = tv({
         SectionTitle: 'text-sm leaning-5 font-bold m-0',
         SectionBody: 'text-sm leading-5',
         Actions: 'flex justify-end gap-3 p-4 border-t border-(--border)',
-    }
+    },
+    variants: {
+        size: {
+            sm: { Popup: 'w-[min(28rem,calc(100vw_-_2rem))]' },
+            md: { Popup: 'w-[min(40rem,calc(100vw_-_2rem))]' },
+            lg: { Popup: 'w-[min(50rem,calc(100vw_-_2rem))]' },
+        },
+    },
+    defaultVariants: {
+        size: 'lg',
+    },
 });

@@ -6,6 +6,7 @@ import {
     Badge,
     Button,
     Checkbox,
+    Dialog,
     Input,
     NumberField,
     Select,
@@ -60,6 +61,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
  */
 export function ComponentMatrix() {
     const [checked, setChecked] = useState(true);
+    const [controlledOpen, setControlledOpen] = useState(false);
 
     // col-span-2: #root ist ein Grid `auto 1fr` (Sidebar + Inhalt); ohne Span
     // landet die Seite in der schmalen auto-Spalte.
@@ -156,6 +158,94 @@ export function ComponentMatrix() {
                         <Badge size={size} variant="GENERATED" count={1} countVariant="error" />
                     </Row>
                 ))}
+            </Section>
+            {/* 5 — Dialog: deckt abweichende Anatomie und fehlenden Fokus-Trap auf. */}
+            <Section
+                title="Dialog"
+                hint="Alle Varianten teilen sich Header, Body und Footer aus dialog-styles.ts. Escape schließt; ein Klick auf den Backdrop schließt nur mit `dismissible`."
+            >
+                <Row label="Trigger innen">
+                    <Dialog trigger={<Button size="sm">Öffnen (uncontrolled)</Button>}>
+                        <Dialog.Header title="Dialog mit eigenem Trigger" description="Der Trigger steckt in der Dialog-Komponente." />
+                        <Dialog.Body>
+                            <p className="text-body">Kein `open`-State an der Call-Site nötig.</p>
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
+                        </Dialog.Footer>
+                    </Dialog>
+                </Row>
+
+                <Row label="Controlled">
+                    <Button size="sm" variant="border" onClick={() => setControlledOpen(true)}>
+                        Öffnen (externer Trigger)
+                    </Button>
+                    <Dialog open={controlledOpen} onOpenChange={setControlledOpen}>
+                        <Dialog.Header title="Von außen gesteuert" />
+                        <Dialog.Body>
+                            <p className="text-body">`open` / `onOpenChange` — für useModal() oder Trigger außerhalb des Dialogs.</p>
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
+                        </Dialog.Footer>
+                    </Dialog>
+                </Row>
+
+                <Row label="dismissible">
+                    <Dialog dismissible size="sm" trigger={<Button size="sm" variant="border">Backdrop-Klick schließt</Button>}>
+                        <Dialog.Header title="Dismissible" />
+                        <Dialog.Body>
+                            <p className="text-body">Klick außerhalb schließt diesen Dialog — Standard ist das Gegenteil.</p>
+                        </Dialog.Body>
+                    </Dialog>
+                </Row>
+
+                <Row label="Toolbar">
+                    <Dialog trigger={<Button size="sm" variant="border">Mit Toolbar</Button>}>
+                        <Dialog.Header title="Liste mit Filterzeile" />
+                        <Dialog.Toolbar>
+                            <div className="w-52"><Input size="sm" placeholder="Suchen" /></div>
+                            <Button size="sm">Neu</Button>
+                        </Dialog.Toolbar>
+                        <Dialog.Body>
+                            <p className="text-body">Die Toolbar sitzt zwischen Header und scrollendem Body.</p>
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
+                        </Dialog.Footer>
+                    </Dialog>
+                </Row>
+
+                <Row label="Scroll + nested">
+                    <Dialog trigger={<Button size="sm" variant="border">Langer Inhalt</Button>}>
+                        <Dialog.Header title="Body scrollt, Header und Footer bleiben stehen" />
+                        <Dialog.Body className="gap-2">
+                            {Array.from({ length: 40 }, (_, i) => (
+                                <p key={i} className="text-body">Zeile {i + 1}</p>
+                            ))}
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Dialog trigger={<Button size="sm" variant="border">Verschachtelt öffnen</Button>} size="sm">
+                                <Dialog.Header title="Verschachtelter Dialog" />
+                                <Dialog.Body>
+                                    <p className="text-body">Der Eltern-Dialog skaliert zurück (data-nested-dialog-open).</p>
+                                </Dialog.Body>
+                            </Dialog>
+                            <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
+                        </Dialog.Footer>
+                    </Dialog>
+                </Row>
+
+                <Row label="Größen">
+                    {(["sm", "md", "lg"] as const).map((size) => (
+                        <Dialog key={size} size={size} trigger={<Button size="sm" variant="border">{size}</Button>}>
+                            <Dialog.Header title={`Größe ${size}`} />
+                            <Dialog.Body>
+                                <p className="text-body">Breite kommt aus der size-Variante in dialog-styles.ts.</p>
+                            </Dialog.Body>
+                        </Dialog>
+                    ))}
+                </Row>
             </Section>
         </div>
     );

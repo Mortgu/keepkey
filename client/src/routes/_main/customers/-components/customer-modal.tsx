@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { customerFormSchema } from "@keepit/schemas";
 import type { Customer } from "@keepit/schemas";
-import { FieldInput, FieldSelect, FormModal, NumberField, Select } from "@/components";
+import { FieldInput, FieldSelect, FormDialog, NumberField, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {
   COUNTRY_OPTIONS,
@@ -67,11 +67,12 @@ export default function CustomerModal({
   });
 
   return (
-    <FormModal
+    <FormDialog
       form={customerForm}
+      defaultOpen
       onClose={onClose}
       formId="customer-form"
-      title={<h1 className="text-lg">{isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"}</h1>}
+      title={isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"}
       error={
         errorCreatingCustomer ? (
           <div className="p-4 bg-red-50 mb-2">
@@ -180,6 +181,6 @@ export default function CustomerModal({
           </div>
         )} />
       </div>
-    </FormModal>
+    </FormDialog>
   );
 }

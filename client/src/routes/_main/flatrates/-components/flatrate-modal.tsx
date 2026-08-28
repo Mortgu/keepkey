@@ -8,7 +8,7 @@ import {
 	DEFAULT_LANGUAGE_OPTIONS,
 	FieldInput,
 	FieldTextarea,
-	FormModal,
+	FormDialog,
 	NumberField,
 	SegmentedLanguageToggle
 } from "@/components";
@@ -57,21 +57,18 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 	});
 
 	return (
-		<FormModal
+		<FormDialog
 			form={form}
+			defaultOpen
 			onClose={onClose}
 			formId="flatrate-form"
-			title={
-				<div className="flex items-center justify-between w-full mr-2">
-					<h1 className="text-lg">
-						{isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
-					</h1>
-					<SegmentedLanguageToggle
-						options={DEFAULT_LANGUAGE_OPTIONS}
-						value={language}
-						onChange={(lng) => setLanguage(lng)}
-					/>
-				</div>
+			title={isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
+			headerActions={
+				<SegmentedLanguageToggle
+					options={DEFAULT_LANGUAGE_OPTIONS}
+					value={language}
+					onChange={(lng) => setLanguage(lng)}
+				/>
 			}
 		>
 			<form.Field name={`translations[${langIndex}].name`}>
@@ -99,6 +96,6 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 					/>
 				)}
 			</form.Field>
-		</FormModal>
+		</FormDialog>
 	);
 }

@@ -1,7 +1,7 @@
-import { Button } from "@/components";
-import type { Contact } from "@keepit/schemas";
 import { Pen, Trash } from "lucide-react";
 import ContactModal from "./contact-modal";
+import type { Contact } from "@keepit/schemas";
+import { Button } from "@/components";
 import { useDeleteCustomerContact } from "@/hooks";
 
 interface Props {
@@ -23,7 +23,7 @@ export default function ContactCard({ customerId, contact }: Props) {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                    <ContactModal customerId={customerId} contact={contact} render={
+                    <ContactModal customerId={customerId} contact={contact} trigger={
                         <Button
                             variant="border"
                             size="sm"

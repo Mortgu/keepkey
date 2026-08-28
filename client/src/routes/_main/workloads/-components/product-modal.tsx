@@ -13,7 +13,7 @@ import {
   DEFAULT_LANGUAGE_OPTIONS,
   FieldInput,
   FieldTextarea,
-  FormModal,
+  FormDialog,
   SegmentedLanguageToggle,
 } from "@/components";
 
@@ -69,21 +69,18 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
   });
 
   return (
-    <FormModal
+    <FormDialog
       form={productForm}
+      defaultOpen
       onClose={onClose}
       formId="product-form"
-      title={
-        <div className="flex items-center justify-between w-full mr-2">
-          <h1 className="text-lg">
-            {isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}
-          </h1>
-          <SegmentedLanguageToggle
-            options={DEFAULT_LANGUAGE_OPTIONS}
-            value={language}
-            onChange={(lng) => setLanguage(lng)}
-          />
-        </div>
+      title={isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}
+      headerActions={
+        <SegmentedLanguageToggle
+          options={DEFAULT_LANGUAGE_OPTIONS}
+          value={language}
+          onChange={(lng) => setLanguage(lng)}
+        />
       }
     >
       <productForm.Field name={`${language}.name`} children={(field) => (
@@ -99,6 +96,6 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
       <productForm.Field name={`${language}.table`} children={(field) => (
         <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
       )} />
-    </FormModal>
+    </FormDialog>
   );
 }

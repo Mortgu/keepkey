@@ -4,7 +4,7 @@ import { Download, Plus, RotateCcw, Trash } from "lucide-react";
 
 import { useTranslation } from "react-i18next";
 import type { CloudFile } from "@keepit/schemas";
-import { Badge, Button, ModalDialog } from "@/components";
+import { Badge, Button, Dialog } from "@/components";
 import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud/nextcloud-hooks";
 import { templateDownloadUrl } from "@/hooks/nextcloud/nextcloud-api";
 import { formatBytesToKB } from "@/lib/utils";
@@ -114,22 +114,22 @@ export default function TemplateList() {
             )}
 
             {templateToDelete && (
-                <ModalDialog onClose={() => setTemplateToDelete(null)}>
-                    <ModalDialog.Header>
-                        <h1 className="text-lg">Vorlage löschen</h1>
-                    </ModalDialog.Header>
-                    <ModalDialog.Content>
+                <Dialog
+                    defaultOpen
+                    size="sm"
+                    onOpenChange={(open) => { if (!open) setTemplateToDelete(null); }}
+                >
+                    <Dialog.Header title="Vorlage löschen" />
+                    <Dialog.Body>
                         <p>Möchten Sie die Vorlage „{templateToDelete.basename}" wirklich löschen?</p>
-                    </ModalDialog.Content>
-                    <ModalDialog.Footer>
-                        <Button onClick={() => setTemplateToDelete(null)} variant="border" size="sm">
-                            {t("button.cancel")}
-                        </Button>
+                    </Dialog.Body>
+                    <Dialog.Footer>
+                        <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
                         <Button size="sm" danger loading={isDeletingTemplate} onClick={handleDelete}>
                             {t("button.delete")}
                         </Button>
-                    </ModalDialog.Footer>
-                </ModalDialog>
+                    </Dialog.Footer>
+                </Dialog>
             )}
 
 

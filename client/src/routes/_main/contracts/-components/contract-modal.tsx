@@ -12,7 +12,7 @@ import {
   DEFAULT_LANGUAGE_OPTIONS,
   FieldInput,
   FieldTextarea,
-  FormModal,
+  FormDialog,
   Input,
   SegmentedLanguageToggle
 } from "@/components";
@@ -81,22 +81,19 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
   });
 
   return (
-    <FormModal
+    <FormDialog
       form={contractForm}
+      defaultOpen
       onClose={onClose}
       formId="contract-form"
-      size="xs"
-      title={
-        <div className="flex items-center justify-between w-full mr-2">
-          <h1 className="text-lg">
-            {isEdit ? "Vertrag bearbeiten" : "Neuen Vertrag anlegen"}
-          </h1>
-          <SegmentedLanguageToggle
-            options={DEFAULT_LANGUAGE_OPTIONS}
-            value={language}
-            onChange={(lng) => setLanguage(lng)}
-          />
-        </div>
+      buttonSize="xs"
+      title={isEdit ? "Vertrag bearbeiten" : "Neuen Vertrag anlegen"}
+      headerActions={
+        <SegmentedLanguageToggle
+          options={DEFAULT_LANGUAGE_OPTIONS}
+          value={language}
+          onChange={(lng) => setLanguage(lng)}
+        />
       }
     >
       <contractForm.Field name={`${language}.name`} children={(field) => (
@@ -132,6 +129,6 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       <contractForm.Field name={`${language}.table`} children={(field) => (
         <FieldTextarea field={field} rows={5} label={`Tabelle (${language})`} placeholder="Datenvolumen" />
       )} />
-    </FormModal>
+    </FormDialog>
   );
 }

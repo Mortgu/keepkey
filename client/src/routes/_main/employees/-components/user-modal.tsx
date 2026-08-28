@@ -1,8 +1,7 @@
 
-import type { User } from '@keepit/schemas';
-import { Button, FieldInput, ModalDialog } from "@/components";
 import useEmployeeForm from "../-hooks/use-employee-form";
-import { useTranslation } from 'react-i18next';
+import type { User } from '@keepit/schemas';
+import { FieldInput, FormDialog } from "@/components";
 
 interface Props {
     onClose: () => void;
@@ -10,22 +9,20 @@ interface Props {
 }
 
 export default function UserModal({ onClose, currentEmployee }: Props) {
-    const { t } = useTranslation();
 
-    const { form, formId, handleSubmit } = useEmployeeForm({
+    const { form, formId } = useEmployeeForm({
         currentEmployee, onClose,
     });
 
     return (
-        <ModalDialog onClose={onClose}>
-            <ModalDialog.Header>
-                <h1 className="text-lg">
-                    {currentEmployee && "Angestellten bearbeiten"}
-                    {!currentEmployee && "Neuen Angestellten anlegen"}
-                </h1>
-            </ModalDialog.Header>
-            <ModalDialog.Content>
-                <form id={formId} onSubmit={handleSubmit} className='grid gap-4'>
+        <FormDialog
+            form={form}
+            defaultOpen
+            onClose={onClose}
+            formId={formId}
+            title={currentEmployee ? "Angestellten bearbeiten" : "Neuen Angestellten anlegen"}
+        >
+            <>
                     <div className="flex items-center gap-4">
                         <form.Field name="salutation" children={(field) => (
                             <div className="flex-1 grid gap-2">
@@ -65,18 +62,7 @@ export default function UserModal({ onClose, currentEmployee }: Props) {
                             </div>
                         )} />
                     </div>
-                </form>
-            </ModalDialog.Content>
-            <ModalDialog.Footer>
-                <Button onClick={onClose} type="button" size="sm" variant="border">
-                    {t("button.cancel")}
-                </Button>
-                <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                    <Button type="submit" form={formId} size="sm" disabled={!canSubmit} loading={isSubmitting}>
-                        {t("button.save")}
-                    </Button>
-                )} />
-            </ModalDialog.Footer>
-        </ModalDialog>
+            </>
+        </FormDialog>
     );
 }

@@ -1,2 +1,2 @@
 export * from "./field-input";
-export * from "./form-modal";
+export * from "./form-dialog";
