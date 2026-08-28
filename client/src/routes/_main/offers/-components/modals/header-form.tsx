@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { useOfferModalContext } from "./offer-modal-context";
 import { OFFER_MODAL_FORM_ID } from "./offer-modal-policy";
 import type { HeaderField } from "./offer-modal-policy";
-import type { ChangeEvent, SyntheticEvent } from "react";
+import type { SyntheticEvent } from "react";
 import type { Language } from "@keepit/schemas";
 import { getFormError } from "@/lib/utils";
 import { useCustomers, useSuppliers, useUsers } from "@/hooks";
@@ -37,8 +37,7 @@ export default function HeaderForm() {
         form.handleSubmit();
     }
 
-    const handleCustomerChange = (event: ChangeEvent<HTMLSelectElement>) => {
-        const id = event.target.value;
+    const handleCustomerChange = (id: string) => {
         const customer = customers.find(c => c.id === id);
 
         form.setFieldValue("contactPersonId", customer?.contactPersons[0]?.id || "");
@@ -57,17 +56,20 @@ export default function HeaderForm() {
                     {/* Kunde */}
                     {shows("customerId") && (
                         <form.Field name="customerId" children={(field) => (
-                            <Select label={t("offerModal.customer")} value={field.state.value} disabled={locked("customerId")}
-                                onChange={(e) => {
-                                    handleCustomerChange(e);
-                                    field.handleChange(e.target.value)
-                                }} error={getFormError(field.state.meta.errors)}>
-                                {customers.map(customer => (
-                                    <option key={customer.id} id={customer.id} value={customer.id}>
-                                        {customer.companyName}
-                                    </option>
-                                ))}
-                            </Select>
+                            <Select
+                                label={t("offerModal.customer")}
+                                value={field.state.value}
+                                disabled={locked("customerId")}
+                                error={getFormError(field.state.meta.errors)}
+                                options={customers.map(customer => ({
+                                    value: customer.id,
+                                    label: customer.companyName,
+                                }))}
+                                onValueChange={(customerId) => {
+                                    handleCustomerChange(customerId);
+                                    field.handleChange(customerId);
+                                }}
+                            />
                         )} />
                     )}
 
@@ -79,18 +81,19 @@ export default function HeaderForm() {
                                 const contacts = customer?.contactPersons || [];
 
                                 return (
-                                    <Select label={t("offerModal.contact")} value={field.state.value}
+                                    <Select
+                                        label={t("offerModal.contact")}
+                                        value={field.state.value}
                                         disabled={locked("contactPersonId")}
-                                        onChange={(e) => field.handleChange(e.target.value)}
-                                        error={getFormError(field.state.meta.errors)}>
-                                        {contacts.map(contact => (
-                                            <option key={contact.id} value={contact.id}>
-                                                {contact.firstName} {contact.lastName}
-                                            </option>
-                                        ))}
-
-                                        {contacts.length === 0 && <option value="">-</option>}
-                                    </Select>
+                                        error={getFormError(field.state.meta.errors)}
+                                        options={contacts.length > 0
+                                            ? contacts.map(contact => ({
+                                                value: contact.id,
+                                                label: `${contact.firstName} ${contact.lastName}`,
+                                            }))
+                                            : [{ value: "", label: "-" }]}
+                                        onValueChange={field.handleChange}
+                                    />
                                 )
                             }} />
                         )} />
@@ -99,17 +102,19 @@ export default function HeaderForm() {
                     {/* Unser Ansprechpartner */}
                     {shows("userId") && (
                         <form.Field name="userId" children={(field) => (
-                            <Select label={t("offerModal.employee")} value={field.state.value} disabled={locked("userId")}
-                                onChange={(e) => field.handleChange(e.target.value)}
-                                error={getFormError(field.state.meta.errors)}>
-                                {users.map(user => (
-                                    <option key={user.id} value={user.id}>
-                                        {user.firstName} {user.lastName}
-                                    </option>
-                                ))}
-
-                                {users.length === 0 && <option value="">-</option>}
-                            </Select>
+                            <Select
+                                label={t("offerModal.employee")}
+                                value={field.state.value}
+                                disabled={locked("userId")}
+                                error={getFormError(field.state.meta.errors)}
+                                options={users.length > 0
+                                    ? users.map(user => ({
+                                        value: user.id,
+                                        label: `${user.firstName} ${user.lastName}`,
+                                    }))
+                                    : [{ value: "", label: "-" }]}
+                                onValueChange={field.handleChange}
+                            />
                         )} />
                     )}
 
@@ -130,15 +135,17 @@ export default function HeaderForm() {
                     {/* Lieferant */}
                     {shows("supplierId") && (
                         <form.Field name="supplierId" children={(field) => (
-                            <Select label={t("offerModal.supplierId")} value={String(field.state.value)}
+                            <Select
+                                label={t("offerModal.supplierId")}
+                                value={field.state.value}
                                 disabled={locked("supplierId")}
-                                error={getFormError(field.state.meta.errors)} onChange={(e) => field.handleChange(e.target.value)}>
-                                {suppliers.map(supplier => (
-                                    <option key={supplier.id} value={supplier.id}>
-                                        {supplier.name}
-                                    </option>
-                                ))}
-                            </Select>
+                                error={getFormError(field.state.meta.errors)}
+                                options={suppliers.map(supplier => ({
+                                    value: supplier.id,
+                                    label: supplier.name,
+                                }))}
+                                onValueChange={field.handleChange}
+                            />
                         )} />
                     )}
 
@@ -178,11 +185,16 @@ export default function HeaderForm() {
 
                     {shows("language") && (
                         <form.Field name="language" children={(field) => (
-                            <Select label={t("offerModal.language")} value={field.state.value} disabled={locked("language")}
-                                onChange={(e) => field.handleChange(e.target.value as Language)}>
-                                <option value="DE">Deutsch</option>
-                                <option value="EN">Englisch</option>
-                            </Select>
+                            <Select
+                                label={t("offerModal.language")}
+                                value={field.state.value}
+                                disabled={locked("language")}
+                                options={[
+                                    { value: "DE", label: "Deutsch" },
+                                    { value: "EN", label: "Englisch" },
+                                ]}
+                                onValueChange={(language) => field.handleChange(language as Language)}
+                            />
                         )} />
                     )}
                 </div>

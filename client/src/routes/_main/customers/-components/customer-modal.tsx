@@ -139,8 +139,8 @@ export default function CustomerModal({
                   placeholder="Land wählen"
                   value={field.state.value}
                   error={getFormError(field.state.meta.errors)}
-                  onChange={(e) => {
-                    const cfg = findCountryByName(e.target.value);
+                  onValueChange={(country) => {
+                    const cfg = findCountryByName(country);
                     field.handleChange(cfg.name);
                     customerForm.setFieldValue("language", cfg.language);
                     customerForm.setFieldValue("currency", cfg.currency);

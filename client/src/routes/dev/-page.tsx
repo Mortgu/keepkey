@@ -8,8 +8,10 @@ import {
     Checkbox,
     Dialog,
     Input,
+    MultiDropdown,
     NumberField,
     Select,
+    SortDropdown,
     Textarea,
 } from "@/components";
 
@@ -26,6 +28,24 @@ const SELECT_OPTIONS = [
     { value: "a", label: "Option A" },
     { value: "b", label: "Option B" },
 ];
+
+const SORT_OPTIONS = [
+    { value: "name_asc", label: "Name aufsteigend" },
+    { value: "name_desc", label: "Name absteigend" },
+    { value: "created_desc", label: "Neueste zuerst" },
+];
+
+const TAG_OPTIONS = [
+    { value: "draft", label: "Entwurf", dot: "var(--warning)" },
+    { value: "sent", label: "Versendet", dot: "var(--info)" },
+    { value: "won", label: "Gewonnen", dot: "var(--success)" },
+    { value: "lost", label: "Verloren", dot: "var(--destructive)" },
+];
+
+const LONG_OPTIONS = Array.from({ length: 40 }, (_, i) => ({
+    value: String(i),
+    label: `Eintrag ${i + 1}`,
+}));
 
 function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
     return (
@@ -62,6 +82,8 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 export function ComponentMatrix() {
     const [checked, setChecked] = useState(true);
     const [controlledOpen, setControlledOpen] = useState(false);
+    const [sort, setSort] = useState("name_asc");
+    const [tags, setTags] = useState<Array<string>>([]);
 
     // col-span-2: #root ist ein Grid `auto 1fr` (Sidebar + Inhalt); ohne Span
     // landet die Seite in der schmalen auto-Spalte.
@@ -87,7 +109,7 @@ export function ComponentMatrix() {
                             <Input size={size} placeholder="Input" />
                         </div>
                         <div className="w-44">
-                            <Select size={size} options={SELECT_OPTIONS} />
+                            <Select size={size} options={SELECT_OPTIONS} defaultValue="a" />
                         </div>
                         <div className="w-44">
                             <NumberField size={size} defaultValue={42} />
@@ -104,25 +126,25 @@ export function ComponentMatrix() {
             >
                 <Row label="normal">
                     <div className="w-52"><Input label="Input" placeholder="Wert" /></div>
-                    <div className="w-52"><Select label="Select" options={SELECT_OPTIONS} /></div>
+                    <div className="w-52"><Select label="Select" options={SELECT_OPTIONS} defaultValue="a" /></div>
                     <div className="w-52"><NumberField label="NumberField" defaultValue={12} /></div>
                     <div className="w-52"><Textarea label="Textarea" placeholder="Text" /></div>
                 </Row>
                 <Row label="error">
                     <div className="w-52"><Input label="Input" error="Pflichtfeld" errorTooltip="Ohne Wert kein Speichern." /></div>
-                    <div className="w-52"><Select label="Select" error="Pflichtfeld" options={SELECT_OPTIONS} /></div>
+                    <div className="w-52"><Select label="Select" error="Pflichtfeld" options={SELECT_OPTIONS} placeholder="Wählen" /></div>
                     <div className="w-52"><NumberField label="NumberField" error="Zu klein" /></div>
                     <div className="w-52"><Textarea label="Textarea" error="Zu kurz" /></div>
                 </Row>
                 <Row label="warning">
                     <div className="w-52"><Input label="Input" warning="Ungewöhnlich" warningTooltip="Bitte gegenprüfen." /></div>
-                    <div className="w-52"><Select label="Select" warning="Veraltet" options={SELECT_OPTIONS} /></div>
+                    <div className="w-52"><Select label="Select" warning="Veraltet" options={SELECT_OPTIONS} defaultValue="a" /></div>
                     <div className="w-52"><NumberField label="NumberField" warning="Hoch" /></div>
                     <div className="w-52"><Textarea label="Textarea" warning="Sehr lang" /></div>
                 </Row>
                 <Row label="disabled">
                     <div className="w-52"><Input label="Input" placeholder="Wert" disabled /></div>
-                    <div className="w-52"><Select label="Select" options={SELECT_OPTIONS} disabled /></div>
+                    <div className="w-52"><Select label="Select" options={SELECT_OPTIONS} defaultValue="a" disabled /></div>
                     <div className="w-52"><NumberField label="NumberField" defaultValue={12} disabled /></div>
                     <div className="w-52"><Textarea label="Textarea" placeholder="Text" disabled /></div>
                 </Row>
@@ -245,6 +267,43 @@ export function ComponentMatrix() {
                             </Dialog.Body>
                         </Dialog>
                     ))}
+                </Row>
+            </Section>
+
+            {/* 6 — Select & Filter: deckt Clipping, Tastaturbedienung und abweichende Trigger-Höhen auf. */}
+            <Section
+                title="Select & Filter"
+                hint="Alle drei teilen sich Popup und Item aus select-styles.ts. Der Trigger des Select ist ein Feld, der von MultiDropdown und SortDropdown ein Button — die Höhen kommen trotzdem aus denselben Tokens."
+            >
+                <Row label="Einfach">
+                    <div className="w-52">
+                        <Select label="Select" options={SELECT_OPTIONS} placeholder="Wählen" />
+                    </div>
+                    <SortDropdown value={sort} onChange={setSort} options={SORT_OPTIONS} />
+                </Row>
+
+                <Row label="Mehrfach">
+                    <MultiDropdown label="Tags" options={TAG_OPTIONS} values={tags} onChange={setTags} />
+                    <span className="text-caption text-(--text-600)">gewählt: {tags.join(", ") || "—"}</span>
+                </Row>
+
+                <Row label="Lange Liste">
+                    <div className="w-52">
+                        <Select label="40 Einträge" options={LONG_OPTIONS} placeholder="Wählen" />
+                    </div>
+                </Row>
+
+                <Row label="Im Dialog">
+                    <Dialog trigger={<Button size="sm" variant="border">Dialog mit Select</Button>}>
+                        <Dialog.Header title="Popup darf über den Dialogrand hinaus" />
+                        <Dialog.Body className="gap-4">
+                            <Select label="Select" options={LONG_OPTIONS} placeholder="Wählen" />
+                            <MultiDropdown label="Tags" options={TAG_OPTIONS} values={tags} onChange={setTags} />
+                        </Dialog.Body>
+                        <Dialog.Footer>
+                            <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
+                        </Dialog.Footer>
+                    </Dialog>
                 </Row>
             </Section>
         </div>

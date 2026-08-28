@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { ChevronDown } from 'lucide-react';
-import { Button } from '../button';
-import type { ComponentSize } from "@/components/tokens";
+import { Select } from "@base-ui/react";
+import { Check, ChevronDown } from "lucide-react";
+import { buttonStyles } from "../button";
+import { selectStyles } from "../select-styles";
+import type { ComponentSize } from "../tokens";
 
 export interface DropdownOption {
   value: string;
@@ -18,84 +19,73 @@ export interface MultiDropdownProps {
   size?: ComponentSize;
 }
 
+/**
+ * Mehrfachauswahl als Popover. Anatomie und Optik teilen sich Trigger und Popup
+ * mit `Select` über `selectStyles` — der Trigger ist hier aber ein Button, kein
+ * Eingabefeld.
+ */
 export function MultiDropdown({ label, options, values, onChange, className, size = "sm" }: MultiDropdownProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
-  const toggle = (v: string) =>
-    onChange(values.includes(v) ? values.filter(x => x !== v) : [...values, v]);
-
+  const styles = selectStyles();
   const count = values.length;
 
   return (
-    <div ref={ref} className={`w-fit relative select-none ${className ?? ''}`}>
-      <Button
-        variant="border"
-        type="button"
-        size={size}
-        onClick={() => setOpen(o => !o)}
-
+    <Select.Root multiple items={options} value={values} onValueChange={onChange}>
+      <Select.Trigger
+        className={buttonStyles({ variant: "border", size, className: `w-fit ${className ?? ""}` })}
       >
-        <span className={`flex-1 text-left ${count > 0 ? 'text-(--text)' : 'text-(--fg-3)'}`}>
+        <span className={count > 0 ? "text-(--text)" : "text-(--text-secondary)"}>
           {count > 0 ? `${label}: ${count} selected` : label}
         </span>
         {count > 0 && (
-          <span className="bg-(--primary-600) text-white rounded-full text-xs aspect-square px-1.5 py-px min-w-[18px] text-center">
+          <span className="bg-(--primary-600) text-(--text-inv) rounded-full text-xs aspect-square px-1.5 py-px min-w-[18px] text-center">
             {count}
           </span>
         )}
-        <ChevronDown className="size-3 shrink-0" />
-      </Button>
+        <Select.Icon className={styles.Icon()}>
+          <ChevronDown size={12} />
+        </Select.Icon>
+      </Select.Trigger>
 
-      {open && (
-        <div className="absolute top-[calc(100%+4px)] left-0 z-50 bg-white border border-(--border) rounded-md shadow-(--shadow-popover) min-w-[200px] overflow-hidden py-1">
-          {options.map(o => {
-            const checked = values.includes(o.value);
-            return (
-              <div
-                key={o.value}
-                onClick={() => toggle(o.value)}
-                className={[
-                  'flex items-center gap-2.5 px-3 py-[7px] cursor-pointer text-sm text-(--text) transition-colors duration-[80ms]',
-                  checked ? 'bg-(--primary-50) hover:bg-(--primary-50)' : 'hover:bg-(--page-bg)',
-                ].join(' ')}
-              >
-                <div className={[
-                  'size-[15px] rounded-[4px] shrink-0 flex items-center justify-center border-[1.5px] transition-all duration-[120ms]',
-                  checked ? 'bg-(--primary-600) border-(--primary-600)' : 'bg-white border-(--border-200)',
-                ].join(' ')}>
-                  {checked && (
-                    <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3.5" strokeLinecap="round">
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                  )}
+      <Select.Portal>
+        <Select.Positioner className={styles.Positioner()} sideOffset={4} align="start" alignItemWithTrigger={false}>
+          <Select.Popup className={styles.Popup()}>
+            <Select.List className={styles.List()}>
+              {options.map((option) => (
+                <Select.Item key={option.value} value={option.value} className={styles.Item()}>
+                  <Select.ItemIndicator className={styles.ItemIndicator()}>
+                    <Check size={14} />
+                  </Select.ItemIndicator>
+
+                  <Select.ItemText className={styles.ItemText()}>
+                    {option.dot && (
+                      <span
+                        className="inline-block size-[7px] rounded-full shrink-0 mr-2 align-middle"
+                        style={{ background: option.dot }}
+                      />
+                    )}
+                    {option.label}
+                  </Select.ItemText>
+                </Select.Item>
+              ))}
+            </Select.List>
+
+            {count > 0 && (
+              <>
+                <div className={styles.Separator()} />
+                <div className={styles.Footer()}>
+                  <button
+                    type="button"
+                    onClick={() => onChange([])}
+                    className="text-xs text-(--text-secondary) cursor-pointer hover:text-(--text) transition-colors"
+                  >
+                    Clear selection
+                  </button>
                 </div>
-                {o.dot && <span className="size-[7px] rounded-full shrink-0" style={{ background: o.dot }} />}
-                <span className="flex-1">{o.label}</span>
-              </div>
-            );
-          })}
-          {count > 0 && (
-            <div className="border-t border-(--border) px-3 py-1.5">
-              <button
-                type="button"
-                onClick={() => onChange([])}
-                className="text-xs text-(--fg-3) bg-transparent border-none cursor-pointer p-0 hover:text-(--text) transition-colors"
-              >
-                Clear selection
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+              </>
+            )}
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 }

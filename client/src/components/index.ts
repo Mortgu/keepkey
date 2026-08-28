@@ -20,6 +20,7 @@ export * from './navigation';
 export * from './number-field';
 export * from './page-width';
 export * from './select';
+export * from './select-styles';
 export * from './skeleton';
 export * from './tab-styles';
 export * from './tabs';

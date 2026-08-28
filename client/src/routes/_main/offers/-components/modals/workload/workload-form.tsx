@@ -143,26 +143,30 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
                 {/* Workloads */}
                 {shows("productId") && (
-                    <Select label="Workload" value={workload} disabled={locked("productId")}
-                        onChange={(e) => setWorkload(e.target.value)}>
-                        {products.map(product => (
-                            <option key={product.id} value={product.id}>
-                                {localized(product.translations, locale, "name")}
-                            </option>
-                        ))}
-                    </Select>
+                    <Select
+                        label="Workload"
+                        value={workload}
+                        disabled={locked("productId")}
+                        onValueChange={setWorkload}
+                        options={products.map(product => ({
+                            value: product.id,
+                            label: localized(product.translations, locale, "name"),
+                        }))}
+                    />
                 )}
 
                 {/* Contracts */}
                 {shows("contractId") && (
-                    <Select label="Contract" value={contract} disabled={locked("contractId")}
-                        onChange={(e) => setContract(e.target.value)}>
-                        {contracts.map(ctr => (
-                            <option key={ctr.id} value={ctr.id}>
-                                {localized(ctr.translations, locale, "name")}
-                            </option>
-                        ))}
-                    </Select>
+                    <Select
+                        label="Contract"
+                        value={contract}
+                        disabled={locked("contractId")}
+                        onValueChange={setContract}
+                        options={contracts.map(ctr => ({
+                            value: ctr.id,
+                            label: localized(ctr.translations, locale, "name"),
+                        }))}
+                    />
                 )}
 
                 {/* Runtime — gesperrt als Klartext, weil die Laufzeit der
@@ -171,15 +175,18 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                     locked("duration_months") ? (
                         <Input label="Runtime" value={`${duration} ${t("common.months")}`} disabled readOnly />
                     ) : (
-                        <Select label="Runtime" value={duration} onChange={(e) => setDuration(Number(e.target.value))} disabled={durations.length === 0}>
-                            {durations.length === 0 && (
-                                <option value={0}>Keine Laufzeit definiert!</option>
-                            )}
-
-                            {durations.map(dur => (
-                                <option key={dur} value={dur}>{dur} {t("common.months")}</option>
-                            ))}
-                        </Select>
+                        <Select<number>
+                            label="Runtime"
+                            value={duration}
+                            onValueChange={setDuration}
+                            disabled={durations.length === 0}
+                            options={durations.length > 0
+                                ? durations.map(dur => ({
+                                    value: dur,
+                                    label: `${dur} ${t("common.months")}`,
+                                }))
+                                : [{ value: 0, label: "Keine Laufzeit definiert!" }]}
+                        />
                     )
                 )}
 

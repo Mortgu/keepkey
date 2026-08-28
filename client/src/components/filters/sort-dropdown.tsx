@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
-import type { ComponentSize } from "@/components/tokens";
-import { Button } from "@/components";
+import { Select } from "@base-ui/react";
+import { Check, ChevronDown } from "lucide-react";
+import { buttonStyles } from "../button";
+import { selectStyles } from "../select-styles";
+import type { ComponentSize } from "../tokens";
 
 export interface SortOption {
   value: string;
@@ -39,57 +40,51 @@ export const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => (
   </svg>
 );
 
+/**
+ * Einfachauswahl als Popover. Wie `MultiDropdown` auf base-ui `Select`, nur ohne
+ * `multiple` — Größe und Fokus kommen über `buttonStyles` aus den Tokens.
+ */
 export function SortDropdown({ value, onChange, options, className, size = "sm" }: SortDropdownProps) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  const styles = selectStyles();
 
   const selected = options.find(o => o.value === value);
   const dir = value.includes('asc') ? 'asc' : value ? 'desc' : null;
 
   return (
-    <div ref={ref} className={`relative select-none ${className ?? ''}`}>
-      <Button
-        type="button"
-        size={size}
-        onClick={() => setOpen(o => !o)}
-        className={[
-          'flex items-center gap-1.5 py-[6px] pl-3 pr-2.5 bg-white border rounded-md cursor-pointer text-sm whitespace-nowrap transition-[border-color,box-shadow] duration-[120ms]',
-          open ? 'border-(--primary-600) ring-3 ring-(--primary-600)/12' : 'border-(--border)',
-        ].join(' ')}
+    <Select.Root
+      items={options}
+      value={value}
+      onValueChange={(next) => { if (next !== null) onChange(next); }}
+    >
+      <Select.Trigger
+        className={buttonStyles({ variant: "border", size, className: `w-fit whitespace-nowrap ${className ?? ""}` })}
       >
-        <span className="text-(--fg-3) flex items-center">
+        <span className="text-(--text-secondary) flex items-center">
           <SortIcon dir={dir} />
         </span>
-        <span className="text-(--fg-2) font-normal">Sort:</span>
+        <span className="text-(--text-600) font-normal">Sort:</span>
         <span className="font-medium text-(--text)">{selected?.label ?? options[0]?.label}</span>
-        <ChevronDown className="size-3 shrink-0" />
-      </Button>
+        <Select.Icon className={styles.Icon()}>
+          <ChevronDown size={12} />
+        </Select.Icon>
+      </Select.Trigger>
 
-      {open && (
-        <div className="w-full absolute top-[calc(100%+4px)] right-0 z-50 bg-white border border-(--border) rounded-md shadow-(--shadow-popover) min-w-[220px] overflow-hidden py-1">
-          {options.map(o => (
-            <div
-              key={o.value}
-              onClick={() => { onChange(o.value); setOpen(false); }}
-              className={[
-                'flex items-center gap-2 px-3 py-[7px] cursor-pointer text-sm text-(--text) transition-colors duration-80',
-                o.value === value ? 'bg-(--primary-50) hover:bg-(--primary-50)' : 'hover:bg-(--page-bg)',
-              ].join(' ')}
-            >
-              <span className="flex-1">{o.label}</span>
-              {o.value === value && <Check className="size-3.5 text-(--primary-600)" />}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+      <Select.Portal>
+        <Select.Positioner className={styles.Positioner()} sideOffset={4} align="end" alignItemWithTrigger={false}>
+          <Select.Popup className={styles.Popup()}>
+            <Select.List className={styles.List()}>
+              {options.map((option) => (
+                <Select.Item key={option.value} value={option.value} className={styles.Item()}>
+                  <Select.ItemIndicator className={styles.ItemIndicator()}>
+                    <Check size={14} />
+                  </Select.ItemIndicator>
+                  <Select.ItemText className={styles.ItemText()}>{option.label}</Select.ItemText>
+                </Select.Item>
+              ))}
+            </Select.List>
+          </Select.Popup>
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 }

@@ -1,17 +1,35 @@
-import { forwardRef } from "react";
-import { tv } from "tailwind-variants";
+import { Select as BaseSelect } from "@base-ui/react";
+import { Check, ChevronDown } from "lucide-react";
 import { Field } from "./field";
-import { FIELD_BASE, FIELD_FOCUS, FIELD_SIZE, FIELD_STATE, fieldState } from "./tokens";
+import { selectStyles } from "./select-styles";
+import { fieldState } from "./tokens";
 import type { ComponentSize } from "./tokens";
-import type { ReactNode, SelectHTMLAttributes } from "react";
+import type { ReactElement, ReactNode } from "react";
 
-export interface SelectOption {
-    value: string;
+export interface SelectOption<TValue = string> {
+    value: TValue;
     label: string;
 }
 
-export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "size"> {
+export interface SelectComponentProps<TValue = string> {
+    /** Aktuelle Auswahl. `null` = nichts gewählt. */
+    value?: TValue | null;
+    onValueChange?: (value: TValue) => void;
+    defaultValue?: TValue | null;
+
+    options: Array<SelectOption<TValue>>;
+
+    /** Shown while no value is selected. */
+    placeholder?: string;
+
+    onBlur?: () => void;
+
     size?: ComponentSize;
+    disabled?: boolean;
+    name?: string;
+    /** Identifiziert das Formular, wenn der Select außerhalb davon steht. */
+    form?: string;
+    id?: string;
 
     /** Optional label text rendered above the field. */
     label?: string;
@@ -28,74 +46,121 @@ export interface SelectComponentProps extends Omit<SelectHTMLAttributes<HTMLSele
     /** Longer explanation shown in a tooltip when the warning badge is hovered. */
     warningTooltip?: string;
 
-    /** Renders the options; alternatively pass `<option>` elements as children. */
-    options?: Array<SelectOption>;
+    /**
+     * Ersetzt den feldförmigen Trigger durch ein eigenes Element (via base-ui
+     * `render`). Dann entfällt der `Field`-Rahmen — gedacht für Filterleisten,
+     * die einen Button statt eines Eingabefelds zeigen.
+     */
+    trigger?: ReactElement;
 
-    /** Shown as a disabled first entry while no value is selected. */
-    placeholder?: string;
+    /** Zusätzlicher Inhalt am Ende des Popups, z.B. „Auswahl zurücksetzen". */
+    popupFooter?: ReactNode;
 
-    children?: ReactNode;
+    className?: string;
 }
 
-const styles = tv({
-    base: [FIELD_BASE, FIELD_FOCUS],
-    variants: {
-        input_size: {
-            xs: `${FIELD_SIZE.xs} font-light`,
-            sm: `${FIELD_SIZE.sm} font-normal`,
-            md: `${FIELD_SIZE.md} font-semibold`,
-        },
-        state: FIELD_STATE,
-    },
-    defaultVariants: {
-        input_size: "sm",
-        state: "none",
-    },
-});
+/**
+ * Select auf Basis von base-ui. Kapselt Portal / Positioner / Popup, damit
+ * Call-Sites nur `options` und `onValueChange` angeben.
+ *
+ * Anders als das frühere native `<select>` ist der Wert nicht auf `string`
+ * festgelegt — `value` und `options[].value` folgen demselben Typ.
+ */
+export function Select<TValue = string>({
+    value,
+    onValueChange,
+    defaultValue,
+    options,
+    placeholder,
+    onBlur,
+    size,
+    disabled,
+    name,
+    form,
+    id,
+    label,
+    error,
+    errorTooltip,
+    warning,
+    warningTooltip,
+    trigger,
+    popupFooter,
+    className,
+}: SelectComponentProps<TValue>) {
+    const styles = selectStyles({ size, state: fieldState(error, warning) });
 
-export const Select = forwardRef<HTMLSelectElement, SelectComponentProps>(
-    (
-        {
-            className,
-            size,
-            label,
-            error,
-            errorTooltip,
-            warning,
-            warningTooltip,
-            options,
-            placeholder,
-            children,
-            ...rest
-        },
-        ref,
-    ) => (
+    const control = (
+        <BaseSelect.Root
+            items={options as ReadonlyArray<{ label: ReactNode; value: unknown }>}
+            value={value as never}
+            defaultValue={defaultValue as never}
+            onValueChange={(next) => onValueChange?.(next as TValue)}
+            disabled={disabled}
+            name={name}
+            form={form}
+            id={id}
+        >
+            {trigger ? (
+                <BaseSelect.Trigger render={trigger} />
+            ) : (
+                <BaseSelect.Trigger className={styles.Trigger({ className })} onBlur={onBlur}>
+                    <BaseSelect.Value className={styles.Value()}>
+                        {(selected: TValue | null) => {
+                            const match = options.find((o) => o.value === selected);
+                            if (match) return match.label;
+                            return <span className={styles.Placeholder()}>{placeholder}</span>;
+                        }}
+                    </BaseSelect.Value>
+                    <BaseSelect.Icon className={styles.Icon()}>
+                        <ChevronDown size={14} />
+                    </BaseSelect.Icon>
+                </BaseSelect.Trigger>
+            )}
+
+            <BaseSelect.Portal>
+                <BaseSelect.Positioner
+                    className={styles.Positioner()}
+                    sideOffset={4}
+                    /* false: normal verankert statt über dem Trigger — nur so setzt
+                       base-ui --available-height, das das Popup auf Viewporthöhe deckelt. */
+                    alignItemWithTrigger={false}
+                >
+                    <BaseSelect.Popup className={styles.Popup()}>
+                        <BaseSelect.List className={styles.List()}>
+                            {options.map((option) => (
+                                <BaseSelect.Item
+                                    key={String(option.value)}
+                                    value={option.value}
+                                    className={styles.Item()}
+                                >
+                                    <BaseSelect.ItemIndicator className={styles.ItemIndicator()}>
+                                        <Check size={14} />
+                                    </BaseSelect.ItemIndicator>
+                                    <BaseSelect.ItemText className={styles.ItemText()}>
+                                        {option.label}
+                                    </BaseSelect.ItemText>
+                                </BaseSelect.Item>
+                            ))}
+                        </BaseSelect.List>
+                        {popupFooter}
+                    </BaseSelect.Popup>
+                </BaseSelect.Positioner>
+            </BaseSelect.Portal>
+        </BaseSelect.Root>
+    );
+
+    if (trigger) return control;
+
+    return (
         <Field
             label={label}
             error={error}
             errorTooltip={errorTooltip}
             warning={warning}
             warningTooltip={warningTooltip}
-            htmlFor={rest.id}
+            htmlFor={id}
         >
-            <select
-                ref={ref}
-                className={styles({ input_size: size, state: fieldState(error, warning), className })}
-                {...rest}
-            >
-                {/* Nicht `disabled`: FieldSelect bindet leere Werte auf "", die
-                    Platzhalter-Option ist dann die ausgewählte. Sie zu sperren
-                    würde das Zurücksetzen einer Auswahl verhindern. */}
-                {placeholder && <option value="">{placeholder}</option>}
-                {options?.map((option) => (
-                    <option key={option.value} value={option.value}>
-                        {option.label}
-                    </option>
-                ))}
-                {children}
-            </select>
+            {control}
         </Field>
-    ),
-);
-
-Select.displayName = "Select";
+    );
+}

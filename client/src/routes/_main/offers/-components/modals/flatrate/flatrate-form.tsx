@@ -33,14 +33,15 @@ export default function FlatrateForm({ currentFlatrate, cancelFn, saveFn }: Prop
         <div className="w-full grid gap-3 p-4">
             <div className="flex items-end gap-3">
 
-                <Select label={t("offerModal.flatrate")} value={flatrate}
-                    onChange={(e) => setFlatrate(e.target.value)}>
-                    {flatRates.map(fr => (
-                        <option key={fr.id} value={fr.id}>
-                            {localized(fr.translations, locale, "name")}
-                        </option>
-                    ))}
-                </Select>
+                <Select
+                    label={t("offerModal.flatrate")}
+                    value={flatrate}
+                    onValueChange={setFlatrate}
+                    options={flatRates.map(fr => ({
+                        value: fr.id,
+                        label: localized(fr.translations, locale, "name"),
+                    }))}
+                />
 
                 <Input label={t("offerModal.quantity")} type="number" value={quantity}
                     onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))} />

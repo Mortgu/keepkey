@@ -117,27 +117,31 @@ export function FieldNumber<TValue = number | null>({
 
 /* ── Select ─────────────────────────────────────────────────────────── */
 
+/* Die Optionen bleiben absichtlich `string`-basiert: TanStacks Feldwert ist ein
+   `Updater<…>`-Union, mit dem sich die Options-Arrays der Call-Sites nicht
+   decken. Der Wert wird beim Setzen auf TValue gecastet — wie zuvor auch. */
 export interface FieldSelectProps<TValue = string>
-    extends Omit<SelectComponentProps, "value" | "onChange" | "onBlur" | "id" | "error"> {
+    extends Omit<SelectComponentProps<string>, "value" | "onValueChange" | "onBlur" | "id" | "error"> {
     field: BindableField<TValue>;
-    onChange?: (e: ChangeEvent<HTMLSelectElement>, field: BindableField<TValue>) => void;
+    /** Überschreibt das Setzen des Feldwerts — bekommt den neuen Wert, nicht ein Event. */
+    onValueChange?: (value: string, field: BindableField<TValue>) => void;
 }
 
 export function FieldSelect<TValue = string>({
     field,
-    onChange,
+    onValueChange,
     ...rest
 }: FieldSelectProps<TValue>) {
     return (
         <Select
             id={field.name}
-            value={(field.state.value ?? "") as SelectComponentProps["value"]}
+            value={(field.state.value ?? null) as string | null}
             error={getFormError(field.state.meta.errors)}
             onBlur={field.handleBlur}
-            onChange={
-                onChange
-                    ? (e) => onChange(e, field)
-                    : (e) => field.handleChange(e.target.value as TValue)
+            onValueChange={
+                onValueChange
+                    ? (value) => onValueChange(value, field)
+                    : (value) => field.handleChange(value as TValue)
             }
             {...rest}
         />
