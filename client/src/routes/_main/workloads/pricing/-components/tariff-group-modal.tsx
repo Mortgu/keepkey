@@ -1,13 +1,14 @@
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import type { CreateTariffGroupInput,
     ProductList
  } from "@keepit/schemas";
 import type {DropdownOption} from "@/components";
 import {
-    
-    FormDialog,
-    MultiSelectList
+    Button,
+    Dialog,
+    MultiSelectList,
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
@@ -33,6 +34,7 @@ export default function TariffGroupModal({
     excludeProductIds,
     loading,
 }: TariffGroupModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = products
@@ -57,17 +59,31 @@ export default function TariffGroupModal({
     });
 
 
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+
+        e.preventDefault();
+
+
+        e.stopPropagation();
+
+
+        form.handleSubmit();
+
+
+    };
+
+
+
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId="tariff-group-form"
-            title="Neue Preistabelle"
-            submitDisabled={options.length === 0}
-            submitLoading={loading}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <form.Field name="products" children={(field) => (
+            <Dialog.Header title="Neue Preistabelle" />
+            <Dialog.Body>
+                <form id="tariff-group-form" onSubmit={handleSubmit} className="grid gap-4">
+                    <form.Field name="products" children={(field) => (
                         <div className="grid gap-1">
                             <label className="text-sm text-gray-500">Produkte</label>
                             <MultiSelectList
@@ -86,7 +102,26 @@ export default function TariffGroupModal({
                                 </p>
                             )}
                         </div>
-            )} />
-        </FormDialog>
+                    )} />
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form="tariff-group-form"
+                            size="sm"
+                            disabled={!canSubmit || options.length === 0}
+                            loading={loading ?? isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     );
 }

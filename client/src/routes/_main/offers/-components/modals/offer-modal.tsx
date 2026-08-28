@@ -8,7 +8,7 @@ import { OfferModalProvider } from "./offer-modal-context";
 import { OFFER_MODAL_FORM_ID } from "./offer-modal-policy";
 import type { OfferModalMode } from "./offer-modal-policy";
 import type { Offer } from '@keepit/schemas';
-import { FormDialog } from "@/components";
+import { Button, Dialog } from "@/components";
 import useOfferModalForm from "@/routes/_main/offers/-hooks/use-offer-modal-form";
 
 interface OfferModalProps {
@@ -45,18 +45,38 @@ export default function OfferModal(props: OfferModalProps) {
 
     return (
         <OfferModalProvider value={{ mode, policy, form, sourceOffer, customerId }}>
-            <FormDialog
-                form={form}
+            <Dialog
                 defaultOpen
-                onClose={closeFn}
-                formId={OFFER_MODAL_FORM_ID}
-                title={title()}
+                onOpenChange={(nextOpen) => { if (!nextOpen) closeFn(); }}
             >
-                <HeaderForm />
-                <WorkloadSection />
-                <FlatrateSection />
-                <DiscountSection />
-            </FormDialog>
+                <Dialog.Header title={title()} />
+                <Dialog.Body>
+                    <HeaderForm />
+                    <hr className="text-(--border)" />
+                    <WorkloadSection />
+                    <hr className="text-(--border)" />
+                    <FlatrateSection />
+                    <hr className="text-(--border)" />
+                    <DiscountSection />
+                </Dialog.Body>
+                <Dialog.Footer>
+                    <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                    <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={([canSubmit, isSubmitting]) => (
+                            <Button
+                                type="submit"
+                                form={OFFER_MODAL_FORM_ID}
+                                size="sm"
+                                disabled={!canSubmit}
+                                loading={isSubmitting}
+                            >
+                                {t("button.save")}
+                            </Button>
+                        )}
+                    />
+                </Dialog.Footer>
+            </Dialog>
         </OfferModalProvider>
     );
 }

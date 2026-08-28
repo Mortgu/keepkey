@@ -24,8 +24,6 @@ export default function FlatrateSection() {
 
     return (
         <div className="grid gap-4">
-            <hr className="text-(--border)" />
-
             {/* Head */}
             <div className="flex items-center justify-between">
                 <p>{t("offerModal.flatrate_section")}</p>

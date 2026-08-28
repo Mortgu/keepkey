@@ -1,7 +1,8 @@
 
+import { useTranslation } from "react-i18next";
 import useEmployeeForm from "../-hooks/use-employee-form";
 import type { User } from '@keepit/schemas';
-import { FieldInput, FormDialog } from "@/components";
+import { Button, Dialog, FieldInput } from "@/components";
 
 interface Props {
     onClose: () => void;
@@ -10,19 +11,20 @@ interface Props {
 
 export default function UserModal({ onClose, currentEmployee }: Props) {
 
-    const { form, formId } = useEmployeeForm({
+    const { t } = useTranslation();
+
+    const { form, formId, handleSubmit } = useEmployeeForm({
         currentEmployee, onClose,
     });
 
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId={formId}
-            title={currentEmployee ? "Angestellten bearbeiten" : "Neuen Angestellten anlegen"}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <>
+            <Dialog.Header title={currentEmployee ? "Angestellten bearbeiten" : "Neuen Angestellten anlegen"} />
+            <Dialog.Body>
+                <form id={formId} onSubmit={handleSubmit} className="grid gap-4">
                     <div className="flex items-center gap-4">
                         <form.Field name="salutation" children={(field) => (
                             <div className="flex-1 grid gap-2">
@@ -62,7 +64,25 @@ export default function UserModal({ onClose, currentEmployee }: Props) {
                             </div>
                         )} />
                     </div>
-            </>
-        </FormDialog>
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form={formId}
+                            size="sm"
+                            disabled={!canSubmit}
+                            loading={isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     );
 }

@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import type { Product } from "@keepit/schemas";
 import type {DropdownOption} from "@/components";
 import {
-    
-    FormDialog,
-    MultiSelectList
+    Button,
+    Dialog,
+    MultiSelectList,
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
@@ -30,6 +31,7 @@ export default function EditProductsModal({
     selectedProductIds,
     loading,
 }: EditProductsModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = products.map(p => ({
@@ -52,16 +54,31 @@ export default function EditProductsModal({
     });
 
 
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+
+        e.preventDefault();
+
+
+        e.stopPropagation();
+
+
+        form.handleSubmit();
+
+
+    };
+
+
+
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId="edit-products-form"
-            title="Produkte bearbeiten"
-            submitLoading={loading}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <form.Field name="products" children={(field) => (
+            <Dialog.Header title="Produkte bearbeiten" />
+            <Dialog.Body>
+                <form id="edit-products-form" onSubmit={handleSubmit} className="grid gap-4">
+                    <form.Field name="products" children={(field) => (
                         <div className="grid gap-1">
                             <label className="text-sm text-gray-500">Produkte</label>
                             <MultiSelectList
@@ -75,7 +92,26 @@ export default function EditProductsModal({
                                 </p>
                             )}
                         </div>
-            )} />
-        </FormDialog>
+                    )} />
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form="edit-products-form"
+                            size="sm"
+                            disabled={!canSubmit}
+                            loading={loading ?? isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     );
 }

@@ -1,16 +1,18 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 import { createFlatrateSchema } from '@keepit/schemas';
 import type { CreateFlatrateTranslationInput, Flatrate, Language } from '@keepit/schemas';
 
 import {
-	DEFAULT_LANGUAGE_OPTIONS,
-	FieldInput,
-	FieldTextarea,
-	FormDialog,
-	NumberField,
-	SegmentedLanguageToggle
+    Button,
+    DEFAULT_LANGUAGE_OPTIONS,
+    Dialog,
+    FieldInput,
+    FieldTextarea,
+    NumberField,
+    SegmentedLanguageToggle,
 } from "@/components";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
 
@@ -25,6 +27,7 @@ function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefine
 }
 
 export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
+	const { t } = useTranslation();
 	const isEdit = currentFlatrate != null;
 
 	const [language, setLanguage] = useState<Language>("DE");
@@ -56,46 +59,75 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 		},
 	});
 
+	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+	    e.preventDefault();
+
+	    e.stopPropagation();
+
+	    form.handleSubmit();
+
+	};
+
+
 	return (
-		<FormDialog
-			form={form}
+		<Dialog
 			defaultOpen
-			onClose={onClose}
-			formId="flatrate-form"
-			title={isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
-			headerActions={
+			onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
+		>
+			<Dialog.Header title={isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}>
 				<SegmentedLanguageToggle
 					options={DEFAULT_LANGUAGE_OPTIONS}
 					value={language}
 					onChange={(lng) => setLanguage(lng)}
 				/>
-			}
-		>
-			<form.Field name={`translations[${langIndex}].name`}>
-				{(field) => (
-					<div className="grid gap-1">
-						<FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
-					</div>
-				)}
-			</form.Field>
+			</Dialog.Header>
+			<Dialog.Body>
+				<form id="flatrate-form" onSubmit={handleSubmit} className="grid gap-4">
+					<form.Field name={`translations[${langIndex}].name`}>
+						{(field) => (
+							<div className="grid gap-1">
+								<FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
+							</div>
+						)}
+					</form.Field>
 
-			<form.Field name={`translations[${langIndex}].table`}>
-				{(field) => (
-					<FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
-				)}
-			</form.Field>
+					<form.Field name={`translations[${langIndex}].table`}>
+						{(field) => (
+							<FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
+						)}
+					</form.Field>
 
-			<form.Field name="total_cents">
-				{(field) => (
-					<NumberField
-						min={1}
-						label="Preis (€)"
-						value={field.state.value}
-						onValueChange={(value) => field.handleChange(value ?? 0)}
-						step={1}
-					/>
-				)}
-			</form.Field>
-		</FormDialog>
+					<form.Field name="total_cents">
+						{(field) => (
+							<NumberField
+								min={1}
+								label="Preis (€)"
+								value={field.state.value}
+								onValueChange={(value) => field.handleChange(value ?? 0)}
+								step={1}
+							/>
+						)}
+					</form.Field>
+				</form>
+			</Dialog.Body>
+			<Dialog.Footer>
+				<Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+				<form.Subscribe
+					selector={(state) => [state.canSubmit, state.isSubmitting]}
+					children={([canSubmit, isSubmitting]) => (
+						<Button
+							type="submit"
+							form="flatrate-form"
+							size="sm"
+							disabled={!canSubmit}
+							loading={isSubmitting}
+						>
+							{t("button.save")}
+						</Button>
+					)}
+				/>
+			</Dialog.Footer>
+		</Dialog>
 	);
 }

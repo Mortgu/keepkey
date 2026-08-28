@@ -1,7 +1,8 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import { customerFormSchema } from "@keepit/schemas";
 import type { Customer } from "@keepit/schemas";
-import { FieldInput, FieldSelect, FormDialog, NumberField, Select } from "@/components";
+import { Button, Dialog, FieldInput, FieldSelect, NumberField, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {
   COUNTRY_OPTIONS,
@@ -20,6 +21,7 @@ export default function CustomerModal({
   onClose,
   currentCustomer = null,
 }: CustomerModalProps) {
+  const { t } = useTranslation();
   const isEdit = currentCustomer !== null;
 
   const { createCustomer, errorCreatingCustomer } = useCreateCustomer();
@@ -66,121 +68,151 @@ export default function CustomerModal({
     },
   });
 
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+      e.preventDefault();
+
+      e.stopPropagation();
+
+      customerForm.handleSubmit();
+
+  };
+
+
   return (
-    <FormDialog
-      form={customerForm}
+    <Dialog
       defaultOpen
-      onClose={onClose}
-      formId="customer-form"
-      title={isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"}
-      error={
+      onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
+    >
+      <Dialog.Header title={isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"} />
+      <Dialog.Body>
+        {
         errorCreatingCustomer ? (
           <div className="p-4 bg-red-50 mb-2">
             <p>{errorCreatingCustomer.message}</p>
           </div>
         ) : null
       }
-    >
-      <div className="flex items-center gap-4">
-        <customerForm.Field name="customerId" children={(field) => (
-          <div className="flex gap-2">
-            <FieldInput field={field} label="Kunden-Nr." size="sm" />
-          </div>
-        )} />
+        <form id="customer-form" onSubmit={handleSubmit} className="grid gap-4">
+          <div className="flex items-center gap-4">
+            <customerForm.Field name="customerId" children={(field) => (
+              <div className="flex gap-2">
+                <FieldInput field={field} label="Kunden-Nr." size="sm" />
+              </div>
+            )} />
 
-        <customerForm.Field name="companyName" children={(field) => (
-          <div className="flex-3 grid gap-2">
-            <FieldInput field={field} label="Firmenname" size="sm" />
-          </div>
-        )} />
+            <customerForm.Field name="companyName" children={(field) => (
+              <div className="flex-3 grid gap-2">
+                <FieldInput field={field} label="Firmenname" size="sm" />
+              </div>
+            )} />
 
-        <customerForm.Field name="phone" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <FieldInput field={field} label="Telefonnummer" size="sm" />
+            <customerForm.Field name="phone" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <FieldInput field={field} label="Telefonnummer" size="sm" />
+              </div>
+            )} />
           </div>
-        )} />
-      </div>
 
-      <div className="flex items-center gap-4">
-        <customerForm.Field name="email" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <FieldInput field={field} label="E-Mail" size="sm" />
+          <div className="flex items-center gap-4">
+            <customerForm.Field name="email" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <FieldInput field={field} label="E-Mail" size="sm" />
+              </div>
+            )} />
+
+            <customerForm.Field name="invoiceEmail" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <FieldInput field={field} label="Rechnungs E-Mail" size="sm" />
+              </div>
+            )} />
           </div>
-        )} />
 
-        <customerForm.Field name="invoiceEmail" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <FieldInput field={field} label="Rechnungs E-Mail" size="sm" />
+          <div className="flex items-center gap-4">
+            <customerForm.Field name="country" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <Select
+                  id={field.name}
+                  size="sm"
+                  label="Land"
+                  options={COUNTRY_OPTIONS}
+                  placeholder="Land wählen"
+                  value={field.state.value}
+                  error={getFormError(field.state.meta.errors)}
+                  onChange={(e) => {
+                    const cfg = findCountryByName(e.target.value);
+                    field.handleChange(cfg.name);
+                    customerForm.setFieldValue("language", cfg.language);
+                    customerForm.setFieldValue("currency", cfg.currency);
+                    customerForm.setFieldValue("taxRate", cfg.taxRate);
+                  }}
+                />
+              </div>
+            )} />
+
+            <customerForm.Field name="language" children={(field) => (
+              <div className="flex-1 grid gap-2">
+                <FieldSelect field={field} size="sm" label="Sprache" options={LANGUAGE_OPTIONS} />
+              </div>
+            )} />
+
+            <customerForm.Field name="currency" children={(field) => (
+              <div className="flex-1 grid gap-2">
+                <FieldSelect field={field} size="sm" label="Währung" options={CURRENCY_OPTIONS} />
+              </div>
+            )} />
+
+            <customerForm.Field name="taxRate" children={(field) => (
+              <div className="flex-1 grid gap-2">
+                <NumberField
+                  value={field.state.value}
+                  min={0}
+                  max={100}
+                  step={0.1}
+                  onValueChange={(value) => field.handleChange(value ?? 0)}
+                  label="Steuersatz (%)" />
+              </div>
+            )} />
           </div>
-        )} />
-      </div>
 
-      <div className="flex items-center gap-4">
-        <customerForm.Field name="country" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <Select
-              id={field.name}
+          <div className="flex items-center gap-4">
+            <customerForm.Field name="street" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <FieldInput field={field} size="sm" label="Straße" />
+              </div>
+            )} />
+
+            <customerForm.Field name="city" children={(field) => (
+              <div className="flex-2 grid gap-2">
+                <FieldInput field={field} size="sm" label="Stadt" />
+              </div>
+            )} />
+
+            <customerForm.Field name="zip" children={(field) => (
+              <div className="flex-1 grid gap-2">
+                <FieldInput field={field} size="sm" label="Postleitzahl" />
+              </div>
+            )} />
+          </div>
+        </form>
+      </Dialog.Body>
+      <Dialog.Footer>
+        <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+        <customerForm.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              type="submit"
+              form="customer-form"
               size="sm"
-              label="Land"
-              options={COUNTRY_OPTIONS}
-              placeholder="Land wählen"
-              value={field.state.value}
-              error={getFormError(field.state.meta.errors)}
-              onChange={(e) => {
-                const cfg = findCountryByName(e.target.value);
-                field.handleChange(cfg.name);
-                customerForm.setFieldValue("language", cfg.language);
-                customerForm.setFieldValue("currency", cfg.currency);
-                customerForm.setFieldValue("taxRate", cfg.taxRate);
-              }}
-            />
-          </div>
-        )} />
-
-        <customerForm.Field name="language" children={(field) => (
-          <div className="flex-1 grid gap-2">
-            <FieldSelect field={field} size="sm" label="Sprache" options={LANGUAGE_OPTIONS} />
-          </div>
-        )} />
-
-        <customerForm.Field name="currency" children={(field) => (
-          <div className="flex-1 grid gap-2">
-            <FieldSelect field={field} size="sm" label="Währung" options={CURRENCY_OPTIONS} />
-          </div>
-        )} />
-
-        <customerForm.Field name="taxRate" children={(field) => (
-          <div className="flex-1 grid gap-2">
-            <NumberField
-              value={field.state.value}
-              min={0}
-              max={100}
-              step={0.1}
-              onValueChange={(value) => field.handleChange(value ?? 0)}
-              label="Steuersatz (%)" />
-          </div>
-        )} />
-      </div>
-
-      <div className="flex items-center gap-4">
-        <customerForm.Field name="street" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <FieldInput field={field} size="sm" label="Straße" />
-          </div>
-        )} />
-
-        <customerForm.Field name="city" children={(field) => (
-          <div className="flex-2 grid gap-2">
-            <FieldInput field={field} size="sm" label="Stadt" />
-          </div>
-        )} />
-
-        <customerForm.Field name="zip" children={(field) => (
-          <div className="flex-1 grid gap-2">
-            <FieldInput field={field} size="sm" label="Postleitzahl" />
-          </div>
-        )} />
-      </div>
-    </FormDialog>
+              disabled={!canSubmit}
+              loading={isSubmitting}
+            >
+              {t("button.save")}
+            </Button>
+          )}
+        />
+      </Dialog.Footer>
+    </Dialog>
   );
 }

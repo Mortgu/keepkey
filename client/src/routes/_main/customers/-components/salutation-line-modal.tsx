@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import type { Contact } from "@keepit/schemas";
-import { FormDialog, Textarea } from "@/components";
+import { Button, Dialog, Textarea } from "@/components";
 
 interface SalutationLineModalProps {
     onClose: () => void;
@@ -8,6 +9,7 @@ interface SalutationLineModalProps {
 }
 
 export default function SalutationLineModal({ onClose, contactPerson }: SalutationLineModalProps) {
+    const { t } = useTranslation();
     const form = useForm({
         defaultValues: {
             salutationLine: "",
@@ -19,16 +21,26 @@ export default function SalutationLineModal({ onClose, contactPerson }: Salutati
 
     const fullName = `${contactPerson.salutation ? contactPerson.salutation + " " : ""}${contactPerson.firstName} ${contactPerson.lastName}`;
 
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+        e.preventDefault();
+
+        e.stopPropagation();
+
+        form.handleSubmit();
+
+    };
+
+
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId="salutation-line-form"
-            title="Anredezeile"
-            description={fullName}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <form.Field name="salutationLine" children={(field) => (
+            <Dialog.Header title="Anredezeile" description={fullName} />
+            <Dialog.Body>
+                <form id="salutation-line-form" onSubmit={handleSubmit} className="grid gap-4">
+                    <form.Field name="salutationLine" children={(field) => (
                         <Textarea
                             id={field.name}
                             size="sm"
@@ -38,7 +50,26 @@ export default function SalutationLineModal({ onClose, contactPerson }: Salutati
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                         />
-            )} />
-        </FormDialog>
+                    )} />
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form="salutation-line-form"
+                            size="sm"
+                            disabled={!canSubmit}
+                            loading={isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     );
 }

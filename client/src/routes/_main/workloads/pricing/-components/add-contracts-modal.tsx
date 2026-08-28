@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import type { Contract } from "@keepit/schemas";
 import type {DropdownOption} from "@/components";
 import {
-    
-    FormDialog,
-    MultiSelectList
+    Button,
+    Dialog,
+    MultiSelectList,
 } from "@/components";
 import { getFormError } from "@/lib/utils";
 import { useLocale } from "@/hooks";
@@ -30,6 +31,7 @@ export default function AddContractsModal({
     excludeContractIds,
     loading,
 }: AddContractsModalProps) {
+    const { t } = useTranslation();
     const locale = useLocale();
 
     const options: Array<DropdownOption> = contracts
@@ -54,17 +56,31 @@ export default function AddContractsModal({
     });
 
 
+    const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+
+        e.preventDefault();
+
+
+        e.stopPropagation();
+
+
+        form.handleSubmit();
+
+
+    };
+
+
+
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId="add-contracts-form"
-            title="Verträge hinzufügen"
-            submitDisabled={options.length === 0}
-            submitLoading={loading}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <form.Field name="contracts" children={(field) => (
+            <Dialog.Header title="Verträge hinzufügen" />
+            <Dialog.Body>
+                <form id="add-contracts-form" onSubmit={handleSubmit} className="grid gap-4">
+                    <form.Field name="contracts" children={(field) => (
                         <div className="grid gap-1">
                             <label className="text-sm text-gray-500">Verträge</label>
                             <MultiSelectList
@@ -83,7 +99,26 @@ export default function AddContractsModal({
                                 </p>
                             )}
                         </div>
-            )} />
-        </FormDialog>
+                    )} />
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form="add-contracts-form"
+                            size="sm"
+                            disabled={!canSubmit || options.length === 0}
+                            loading={loading ?? isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     );
 }

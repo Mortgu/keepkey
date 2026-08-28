@@ -15,8 +15,8 @@ import { tv } from "tailwind-variants";
  */
 export const dialogStyles = tv({
     slots: {
-        Backdrop: 'fixed bg-white/25 backdrop-blur-xs transition-opacity duration inset-0',
-        Viewport: 'fixed flex items-center justify-center overflow-hidden px-0 py-6 inset-0',
+        Backdrop: 'fixed z-100 bg-white/25 backdrop-blur-xs transition-opacity duration inset-0',
+        Viewport: 'fixed z-100 flex items-center justify-center overflow-hidden px-0 py-6 inset-0',
         ScrollView: 'box-border h-full overscroll-contain',
         ScrollContent: 'flex items-center justify-center min-h-full',
         Scrollbar: 'flex justify-center bg-black w-4 opacity-0 transition-opacity duration pointer-events-none z-100',
@@ -32,7 +32,7 @@ export const dialogStyles = tv({
         Toolbar: 'flex items-center justify-start gap-4 p-4 border-b border-(--border)',
         Body: 'relative flex-auto flex min-h-0 overflow-hidden',
         BodyViewport: 'box-border flex-auto min-h-0 overscroll-contain',
-        BodyContent: 'flex flex-col p-4',
+        BodyContent: 'flex flex-col p-4 gap-4',
         Section: 'box-border flex flex-col gap-1 p-4',
         SectionTitle: 'text-sm leaning-5 font-bold m-0',
         SectionBody: 'text-sm leading-5',

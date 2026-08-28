@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
 
@@ -10,11 +11,12 @@ import type {
   UpdateProductInput
 } from '@keepit/schemas';
 import {
-  DEFAULT_LANGUAGE_OPTIONS,
-  FieldInput,
-  FieldTextarea,
-  FormDialog,
-  SegmentedLanguageToggle,
+    Button,
+    DEFAULT_LANGUAGE_OPTIONS,
+    Dialog,
+    FieldInput,
+    FieldTextarea,
+    SegmentedLanguageToggle,
 } from "@/components";
 
 
@@ -45,6 +47,7 @@ function seedLang(translations: Array<ProductTranslationInput> | undefined, lang
 }
 
 export default function ProductModal({ onClose, submitFn, currentItem = null }: ProductModalProps) {
+  const { t } = useTranslation();
   const isEdit = currentItem != null;
 
   const [language, setLanguage] = useState<Language>("DE");
@@ -68,34 +71,63 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
     },
   });
 
+  const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
+
+      e.preventDefault();
+
+      e.stopPropagation();
+
+      productForm.handleSubmit();
+
+  };
+
+
   return (
-    <FormDialog
-      form={productForm}
+    <Dialog
       defaultOpen
-      onClose={onClose}
-      formId="product-form"
-      title={isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}
-      headerActions={
+      onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
+    >
+      <Dialog.Header title={isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
           value={language}
           onChange={(lng) => setLanguage(lng)}
         />
-      }
-    >
-      <productForm.Field name={`${language}.name`} children={(field) => (
-        <div className="grid gap-1">
-          <FieldInput field={field} label={`Produkt Name (${language})`} placeholder="Produkt Name" />
-        </div>
-      )} />
+      </Dialog.Header>
+      <Dialog.Body>
+        <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
+          <productForm.Field name={`${language}.name`} children={(field) => (
+            <div className="grid gap-1">
+              <FieldInput field={field} label={`Produkt Name (${language})`} placeholder="Produkt Name" />
+            </div>
+          )} />
 
-      <productForm.Field name={`${language}.description`} children={(field) => (
-        <FieldTextarea field={field} rows={5} label={`Produkt Beschreibung (${language})`} placeholder="Produkt Beschreibung" />
-      )} />
+          <productForm.Field name={`${language}.description`} children={(field) => (
+            <FieldTextarea field={field} rows={5} label={`Produkt Beschreibung (${language})`} placeholder="Produkt Beschreibung" />
+          )} />
 
-      <productForm.Field name={`${language}.table`} children={(field) => (
-        <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
-      )} />
-    </FormDialog>
+          <productForm.Field name={`${language}.table`} children={(field) => (
+            <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
+          )} />
+        </form>
+      </Dialog.Body>
+      <Dialog.Footer>
+        <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+        <productForm.Subscribe
+          selector={(state) => [state.canSubmit, state.isSubmitting]}
+          children={([canSubmit, isSubmitting]) => (
+            <Button
+              type="submit"
+              form="product-form"
+              size="sm"
+              disabled={!canSubmit}
+              loading={isSubmitting}
+            >
+              {t("button.save")}
+            </Button>
+          )}
+        />
+      </Dialog.Footer>
+    </Dialog>
   );
 }

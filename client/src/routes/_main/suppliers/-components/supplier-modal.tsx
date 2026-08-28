@@ -1,7 +1,8 @@
 import { z } from 'zod';
+import { useTranslation } from "react-i18next";
 import useSupplierForm from "../-hooks/use-supplier-form";
 import type { Supplier } from "@keepit/schemas";
-import { FieldInput, FormDialog } from "@/components";
+import { Button, Dialog, FieldInput } from "@/components";
 
 interface Props {
     onClose: () => void;
@@ -14,17 +15,18 @@ const supplierSchema = z.object({
 })
 
 export default function SupplierModal({ onClose, currentSupplier }: Props) {
-    const { form, formId } = useSupplierForm({ currentSupplier: currentSupplier, closeFn: onClose });
+    const { t } = useTranslation();
+    const { form, formId, handleSubmit } = useSupplierForm({ currentSupplier: currentSupplier, closeFn: onClose });
 
     return (
-        <FormDialog
-            form={form}
+        <Dialog
             defaultOpen
-            onClose={onClose}
-            formId={formId}
-            title={currentSupplier ? "Update Supplier" : "Create Supplier"}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <div className="flex items-center gap-2">
+            <Dialog.Header title={currentSupplier ? "Update Supplier" : "Create Supplier"} />
+            <Dialog.Body>
+                <form id={formId} onSubmit={handleSubmit} className="grid gap-4">
+                    <div className="flex items-center gap-2">
                         <form.Field name="name" children={(field) => (
                             <FieldInput field={field} label="Name" />
                         )} />
@@ -32,7 +34,26 @@ export default function SupplierModal({ onClose, currentSupplier }: Props) {
                         <form.Field name="supplierId" children={(field) => (
                             <FieldInput field={field} label="id" />
                         )} />
-            </div>
-        </FormDialog>
+                    </div>
+                </form>
+            </Dialog.Body>
+            <Dialog.Footer>
+                <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                <form.Subscribe
+                    selector={(state) => [state.canSubmit, state.isSubmitting]}
+                    children={([canSubmit, isSubmitting]) => (
+                        <Button
+                            type="submit"
+                            form={formId}
+                            size="sm"
+                            disabled={!canSubmit}
+                            loading={isSubmitting}
+                        >
+                            {t("button.save")}
+                        </Button>
+                    )}
+                />
+            </Dialog.Footer>
+        </Dialog>
     )
 }
