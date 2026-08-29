@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { ChangeEvent } from "react";
 import type { TariffCell } from "@keepit/schemas";
+import { NumberField } from "@/components";
 import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
 import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
 
@@ -18,7 +18,7 @@ export default function TariffCellComponent({ groupId, tariffId, cell }: Props) 
     const serverPrice = defaultCell === undefined ? null : defaultCell.price;
 
     const [edit, setEdit] = useState<boolean>(false);
-    const [draft, setDraft] = useState<string>("");
+    const [draft, setDraft] = useState<number | null>(null);
 
     const { updateCell } = useUpdateTariffCell();
 
@@ -33,18 +33,18 @@ export default function TariffCellComponent({ groupId, tariffId, cell }: Props) 
         // Guard würde jeder Klick ins Feld den Entwurf zurücksetzen.
         if (edit) return;
 
-        setDraft(serverPrice === null ? "" : String(centsToEur(serverPrice)));
+        setDraft(serverPrice === null ? null : centsToEur(serverPrice));
         setEdit(true);
     };
 
-    const handleBlur = async () => {
-        setEdit(false);
+    // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui
+    // parst den getippten Text erst in seinem eigenen Blur-Handler, der nach dem
+    // externen läuft — der externe Handler läse also noch den alten Wert.
+    // Das Dezimalkomma übernimmt `NumberField` selbst über die UI-Sprache.
+    const handleCommit = async (committed: number | null) => {
+        if (committed === null || committed < 0) return;
 
-        // Komma als Dezimaltrennzeichen zulassen — deutsche Tastaturbelegung.
-        const value = Number(draft.trim().replace(",", "."));
-        if (draft.trim() === "" || isNaN(value) || value < 0) return;
-
-        const cents = eurToCents(value);
+        const cents = eurToCents(committed);
         if (cents === serverPrice) return;
 
         await updateCell({
@@ -55,13 +55,16 @@ export default function TariffCellComponent({ groupId, tariffId, cell }: Props) 
         });
     };
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => setDraft(e.target.value);
-
     return (
         <td className="relative border border-(--border) px-3 py-1" onClick={startEdit}>
             {edit && (
-                <input className="absolute inset-3 w-fit box-border" type="text" value={draft}
-                    autoFocus onBlur={handleBlur} onChange={handleChange} />
+                <div className="absolute inset-0 flex items-center px-1">
+                    <NumberField size="xs" hideSteppers autoFocus min={0} step={0.01}
+                        format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
+                        suffix="€"
+                        value={draft} onValueChange={(v) => setDraft(v)}
+                        onValueCommitted={handleCommit} onBlur={() => setEdit(false)} />
+                </div>
             )}
             {!edit && serverPrice !== null && (
                 <p className="text-sm font-normal">{formatEur(serverPrice)}</p>

@@ -153,6 +153,7 @@ export default function HeaderForm() {
                     {shows("paymentTerm") && (
                         <form.Field name="paymentTerm" children={(field) => (
                             <Input label={t("offerModal.paymentTerm")} value={String(field.state.value)}
+                                selectOnFocus
                                 disabled={locked("paymentTerm")}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 error={getFormError(field.state.meta.errors)} />

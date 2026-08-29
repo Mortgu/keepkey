@@ -3,6 +3,7 @@ import { forwardRef, useId } from "react";
 import { tv } from "tailwind-variants";
 import { Button } from "./button";
 import { Field } from "./field";
+import { selectOnFocus } from "./select-on-focus";
 import {
     CONTROL_HEIGHT,
     CONTROL_TEXT,
@@ -15,7 +16,7 @@ import {
     fieldState,
 } from "./tokens";
 import type { ButtonComponentProps } from "./button";
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
 import type { ComponentSize } from "./tokens";
 
 type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
@@ -59,6 +60,13 @@ export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputE
 
     /** Klassen für den inneren `<input>` — `className` trifft die Gruppe (Rahmen). */
     inputClassName?: string;
+
+    /**
+     * Markiert beim Fokus den kompletten Wert, sodass die erste Eingabe ihn
+     * ersetzt. Bei `type="number"` ohne Zutun aktiv; explizit nötig für Felder,
+     * die eine Zahl in einem Text-Input führen (z. B. das Zahlungsziel).
+     */
+    selectOnFocus?: boolean;
 }
 
 /* Modul-privat: das Modul exportiert nur Komponenten (react-refresh). */
@@ -120,6 +128,9 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
             rightButton,
             loading,
             disabled,
+            selectOnFocus: selectOnFocusProp,
+            type,
+            onFocus,
             ...rest
         },
         ref,
@@ -131,6 +142,16 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
         // bloß Dekor — ohne diese Verknüpfung bliebe es für Screenreader unsichtbar.
         const generatedId = useId();
         const prefixId = `${rest.id ?? generatedId}-prefix`;
+
+        // Zahlenfelder markieren ihren Wert beim Fokus von selbst; Textfelder nur
+        // auf Ansage. Ein eigener Handler der Call-Site wird angehängt, nicht ersetzt.
+        const selectsOnFocus = selectOnFocusProp ?? type === "number";
+        const handleFocus = selectsOnFocus
+            ? (event: FocusEvent<HTMLInputElement>) => {
+                  selectOnFocus(event);
+                  onFocus?.(event);
+              }
+            : onFocus;
 
         return (
             <Field
@@ -154,6 +175,8 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                         aria-describedby={prefix != null ? prefixId : undefined}
                         className={styles.input({ className: inputClassName })}
                         {...rest}
+                        type={type}
+                        onFocus={handleFocus}
                     />
 
                     {suffix != null && <span className={styles.addon()}>{suffix}</span>}
@@ -165,12 +188,12 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                     )}
 
                     {!loading && rightButton && (() => {
-                        const { icon, className: btnClassName, type, ...btnRest } = rightButton;
+                        const { icon, className: btnClassName, type: btnType, ...btnRest } = rightButton;
                         return (
                             <span className={styles.addon({ className: "pl-0" })}>
                                 <Button
                                     size="xs"
-                                    type={type ?? "button"}
+                                    type={btnType ?? "button"}
                                     {...btnRest}
                                     icon={icon}
                                     iconOnly

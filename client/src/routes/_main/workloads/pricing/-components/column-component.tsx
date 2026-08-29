@@ -1,7 +1,6 @@
 import { Trash } from "lucide-react";
-import {  useState } from "react";
-import type {ChangeEvent} from "react";
-import { Button, Input } from "@/components";
+import { useState } from "react";
+import { Button, NumberField } from "@/components";
 import { useDeleteTariffColumn, useUpdateTariffColumn } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
@@ -17,15 +16,14 @@ export default function TariffColumnComponent({ groupId, tariffId, columnId, dur
     const [edit, setEdit] = useState(false);
     const [value, setValue] = useState(duration);
 
-    const handleBlur = async () => {
-        setEdit(false);
-        await updateColumn({ groupId, tariffId, columnId, duration: value });
-    };
+    // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui
+    // parst den getippten Text erst in seinem eigenen Blur-Handler, der nach dem
+    // externen läuft — der externe Handler läse also noch den alten Wert.
+    const handleCommit = async (committed: number | null) => {
+        if (committed === null || committed === duration) return;
 
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-        const v = Number(e.target.value);
-        if (isNaN(v)) return;
-        setValue(v);
+        setValue(committed);
+        await updateColumn({ groupId, tariffId, columnId, duration: committed });
     };
 
     return (
@@ -34,7 +32,9 @@ export default function TariffColumnComponent({ groupId, tariffId, columnId, dur
                 <div onClick={() => setEdit(true)}>{value} Monate</div>
                 {edit && (
                     <div className="absolute top-0 left-0 w-full">
-                        <Input autoFocus size="xs" onBlur={handleBlur} value={value} onChange={handleChange} />
+                        <NumberField size="xs" hideSteppers autoFocus min={1} step={1}
+                            value={value} onValueChange={(v) => setValue(v ?? duration)}
+                            onValueCommitted={handleCommit} onBlur={() => setEdit(false)} />
                     </div>
                 )}
                 <Button icon={<Trash className="size-3.5" />} iconOnly variant="link" size="xs"

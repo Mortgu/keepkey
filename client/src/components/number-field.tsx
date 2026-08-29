@@ -4,14 +4,27 @@ import { Minus, MoveHorizontal, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { FIELD_LABEL_CLASS, Field } from "./field";
+import { selectOnFocus } from "./select-on-focus";
 import { ACTION_FOCUS, CONTROL_HEIGHT, CONTROL_TEXT, FIELD_FOCUS_WITHIN, FIELD_GROUP_ADDON, FIELD_GROUP_BASE, FIELD_GROUP_INPUT, FIELD_STATE_WITHIN, fieldState } from "./tokens";
 import type { NumberFieldRootProps } from "@base-ui/react/number-field";
-import type { ReactNode } from "react";
+import type { FocusEventHandler, ReactNode } from "react";
 import type { ComponentSize } from "./tokens";
 
+/* `NumberFieldRootProps` erbt die `<div>`-Attribute des Wrappers — Fokus, Blur und
+   Autofocus gehörten damit dem Gruppen-Container statt dem Eingabefeld. Sie werden
+   hier herausgenommen und weiter unten gezielt an `NumberField.Input` gereicht. */
 export interface NumberFieldComponentProps
-    extends Omit<NumberFieldRootProps, "className" | "render" | "children"> {
+    extends Omit<NumberFieldRootProps, "className" | "render" | "children" | "onFocus" | "onBlur" | "autoFocus"> {
     size?: ComponentSize;
+
+    /** Fokussiert das Eingabefeld beim Mounten — z. B. für Inline-Editoren im Tarif-Grid. */
+    autoFocus?: boolean;
+
+    /** Läuft auf dem `<input>`, nachdem dessen Wert markiert wurde. */
+    onFocus?: FocusEventHandler<HTMLInputElement>;
+
+    /** Läuft auf dem `<input>`, nicht auf der Feldgruppe. */
+    onBlur?: FocusEventHandler<HTMLInputElement>;
 
     /** Optional label text rendered above the field. */
     label?: string;
@@ -116,6 +129,9 @@ export function NumberField({
     inputClassName,
     id,
     locale,
+    autoFocus,
+    onFocus,
+    onBlur,
     ...rest
 }: NumberFieldComponentProps) {
     const { t, i18n } = useTranslation();
@@ -173,6 +189,12 @@ export function NumberField({
                     <BaseNumberField.Input
                         placeholder={placeholder}
                         className={styles.input({ className: inputClassName })}
+                        autoFocus={autoFocus}
+                        onBlur={onBlur}
+                        onFocus={(event) => {
+                            selectOnFocus(event);
+                            onFocus?.(event);
+                        }}
                     />
 
                     {suffix && <span className={styles.suffix()}>{suffix}</span>}
