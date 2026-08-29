@@ -28,19 +28,22 @@ export function MultiDropdown({ label, options, values, onChange, className, siz
   const styles = selectStyles();
   const count = values.length;
 
+  function renderValue(selected: string[]) {
+    if (selected.length === 0) { return 'Select languages'; }
+    const firstLanguage = selected[0];
+    const additionalLanguages = selected.length > 1 ? ` (+${selected.length - 1} more)` : '';
+
+    return `: ${firstLanguage + additionalLanguages}`;
+  }
+
   return (
     <Select.Root multiple items={options} value={values} onValueChange={onChange}>
-      <Select.Trigger
-        className={buttonStyles({ variant: "border", size, className: `w-fit ${className ?? ""}` })}
-      >
+      <Select.Trigger className={buttonStyles({ variant: "border", size, className: `w-fit ${className ?? ""}` })}>
         <span className={count > 0 ? "text-(--text)" : "text-(--text-secondary)"}>
-          {count > 0 ? `${label}: ${count} selected` : label}
+          {label}
+          {count > 0 && renderValue(values)}
         </span>
-        {count > 0 && (
-          <span className="bg-(--primary-600) text-(--text-inv) rounded-full text-xs aspect-square px-1.5 py-px min-w-[18px] text-center">
-            {count}
-          </span>
-        )}
+
         <Select.Icon className={styles.Icon()}>
           <ChevronDown size={12} />
         </Select.Icon>

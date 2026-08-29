@@ -14,8 +14,8 @@
     "supplierId": "Supplier",
     "paymentTerm": "Payment term",
     "validUntil": "Valid until",
-    "requestFrom": "Angebot vom",
-    "language": "Sprache",
+    "requestFrom": "Offer from",
+    "language": "Language",
     "workload_section": "Workloads",
     "flatrate_section": "Flatrates",
     "discount_section": "Discounts"
