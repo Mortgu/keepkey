@@ -29,11 +29,11 @@ export function MultiDropdown({ label, options, values, onChange, className, siz
   const count = values.length;
 
   function renderValue(selected: string[]) {
-    if (selected.length === 0) { return 'Select languages'; }
-    const firstLanguage = selected[0];
-    const additionalLanguages = selected.length > 1 ? ` (+${selected.length - 1} more)` : '';
-
-    return `: ${firstLanguage + additionalLanguages}`;
+    if (selected.length === 0) return "";
+    const first = options.find((o) => o.value === selected[0]);
+    const label = first?.label ?? selected[0];
+    const more = selected.length > 1 ? ` (+${selected.length - 1})` : "";
+    return `: ${label}${more}`;
   }
 
   return (
