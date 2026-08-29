@@ -234,9 +234,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Download Button */}
                             {(document.status === "GENERATED" || document.status === "UPLOADED") && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger render={<Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />} className={menuStyles().Trigger()} />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
@@ -255,9 +253,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Menu Button */}
                             {(document.status !== "UPLOADING" && document.status !== "PROCESSING") && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger render={<Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />} className={menuStyles().Trigger()} />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>

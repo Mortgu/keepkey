@@ -22,6 +22,38 @@
       "notConfigured": "Nicht konfiguriert"
     },
     "retry": "Erneut pr\u00fcfen",
+    "activity": {
+      "title": "Aktivit\u00e4t",
+      "viewAll": "Alle ansehen",
+      "empty": "Noch keine Aktivit\u00e4t.",
+      "reload": "Neu laden",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "system": "System",
+      "types": {
+        "offer.created": "hat Angebot {{quoteId}} erstellt",
+        "offer.updated": "hat Angebot {{quoteId}} bearbeitet",
+        "offer.restored": "hat Angebot {{quoteId}} auf Version {{restoredVersion}} zur\u00fcckgesetzt",
+        "offer.renewed": "hat Angebot {{sourceQuoteId}} als {{quoteId}} verl\u00e4ngert",
+        "offer.extended": "hat Angebot {{sourceQuoteId}} als {{quoteId}} erweitert",
+        "offer.deleted": "hat Angebot {{quoteId}} gel\u00f6scht",
+        "order.created": "hat Bestellung {{orderId}} angelegt",
+        "order.updated": "hat Bestellung {{orderId}} bearbeitet",
+        "order.restored": "hat Bestellung {{orderId}} auf Version {{restoredVersion}} zur\u00fcckgesetzt",
+        "order.deleted": "hat Bestellung {{orderId}} gel\u00f6scht",
+        "document.generation.requested": "hat das Dokument zu {{quoteId}} erzeugt",
+        "document.uploaded": "hat {{displayName}} auf Nextcloud hochgeladen",
+        "document.replaced": "hat die {{format}}-Datei von {{displayName}} ersetzt",
+        "document.renamed": "hat {{from}} in {{to}} umbenannt",
+        "document.deleted": "hat {{displayName}} gel\u00f6scht",
+        "customer.created": "hat den Kunden {{companyName}} angelegt",
+        "customer.updated": "hat den Kunden {{companyName}} bearbeitet",
+        "customer.deleted": "hat den Kunden {{companyName}} gel\u00f6scht",
+        "tariff.version.created": "hat Tarif-Version {{version}} versiegelt",
+        "tariff.version.restored": "hat Tarif-Version {{version}} wiederhergestellt",
+        "unknown": "hat eine \u00c4nderung vorgenommen"
+      }
+    },
     "search": {
       "placeholder": "Angebote, Bestellungen, Kunden durchsuchen\u2026",
       "recent": "Zuletzt gesucht",

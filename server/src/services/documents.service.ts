@@ -23,6 +23,7 @@ import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentCapabilities, DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
+import { recordActivity, recordActivityStandalone } from "./activity.service.js";
 
 export type RenameDocumentInput = { displayName: string };
 
@@ -69,6 +70,10 @@ const toDocumentFormat = (format: DocumentFormatParam): DocumentFormat =>
 
 const scopeOf = (type: DocumentType): DocumentArtifactScope =>
     type === "offer" ? "offers" : "orders";
+
+/** Angebot bzw. Bestellung, zu der ein Dokument gehoert — fuer den Aktivitaets-Feed. */
+const parentIdOf = (type: DocumentType, document: object): string | null =>
+    (document as { offerId?: string; orderId?: string })[type === "offer" ? "offerId" : "orderId"] ?? null;
 
 /**
  * Präfix, unter dem ersetzte Dateien liegen.
@@ -219,6 +224,18 @@ export async function renameDocument(
                 data: { remotePath: movedPaths.docx },
             });
         }
+
+        await recordActivity(tx, {
+            type: "document.renamed",
+            entity: "DOCUMENT",
+            entityId: id,
+            payload: {
+                documentType: type,
+                parentId: parentIdOf(type, document),
+                from: document.displayName,
+                to: input.displayName,
+            },
+        });
     });
 
     return requireGeneratedDocument(type, id);
@@ -287,6 +304,17 @@ export async function deleteDocument(type: DocumentType, id: string): Promise<vo
             where: { id: { in: [pdf?.id, docx?.id].filter((value): value is string => Boolean(value)) } },
             data: { remotePath: null, remoteEtag: null, uploadedAt: null },
         });
+
+        await recordActivity(tx, {
+            type: "document.deleted",
+            entity: "DOCUMENT",
+            entityId: id,
+            payload: {
+                documentType: type,
+                parentId: parentIdOf(type, document),
+                displayName: document.displayName,
+            },
+        });
     });
 }
 
@@ -313,8 +341,22 @@ export async function downloadDocument(
     };
 }
 
-export function uploadDocument(type: DocumentType, id: string) {
-    return uploadGeneratedDocument(type, id);
+export async function uploadDocument(type: DocumentType, id: string) {
+    const result = await uploadGeneratedDocument(type, id);
+
+    const document = await findGeneratedDocument(type, id);
+    await recordActivityStandalone({
+        type: "document.uploaded",
+        entity: "DOCUMENT",
+        entityId: id,
+        payload: {
+            documentType: type,
+            parentId: document ? parentIdOf(type, document) : null,
+            displayName: document?.displayName ?? null,
+        },
+    });
+
+    return result;
 }
 
 /* ========== Erzeugte Datei durch eine eigene ersetzen ========== */
@@ -427,7 +469,7 @@ export async function confirmReplacementUpload(
     format: DocumentFormatParam,
     objectKey: string,
 ) {
-    const { artifact } = await requireReplaceableArtifact(type, id, format);
+    const { document, artifact } = await requireReplaceableArtifact(type, id, format);
 
     if (!objectKey.startsWith(replacementPrefix(type, id)) || !objectKey.endsWith(`.${format}`)) {
         throw new AppException(
@@ -484,6 +526,18 @@ export async function confirmReplacementUpload(
             });
         });
     }
+
+    await recordActivityStandalone({
+        type: "document.replaced",
+        entity: "DOCUMENT",
+        entityId: id,
+        payload: {
+            documentType: type,
+            parentId: parentIdOf(type, document),
+            displayName: document.displayName,
+            format,
+        },
+    });
 
     return requireGeneratedDocument(type, id);
 }

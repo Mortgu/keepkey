@@ -8,6 +8,7 @@ import { pickTranslation } from "../utils/i18n.js";
 import { loadTariffForPricing, selectPrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
 import { sealTariffVersion } from "./tariff.service.js";
+import { recordActivity, recordActivityStandalone } from "./activity.service.js";
 
 import {
     CreateOfferInput,
@@ -377,6 +378,12 @@ type OfferFields = {
     toCompare: string[];
 };
 
+const ACTIVITY_TYPE_BY_DERIVATION: Record<OfferDerivationType | "NONE", string> = {
+    NONE: "offer.created",
+    [OfferDerivationType.RENEWAL]: "offer.renewed",
+    [OfferDerivationType.LICENSE_EXTENSION]: "offer.extended",
+};
+
 /**
  * Schreibt ein Angebot mit bereits bepreisten Bestandteilen.
  *
@@ -422,6 +429,37 @@ async function persistOffer(
         }
 
         await replaceDiscounts(tx, offer.id, discounts);
+
+        /*
+         * Feed-Eintrag in derselben Transaktion: ein Rollback darf keine
+         * Aktivitaet hinterlassen. Der Typ folgt der Ableitung, damit
+         * Verlaengerung und Erweiterung im Feed als das erscheinen, was sie sind.
+         */
+        const [customer, source] = await Promise.all([
+            tx.customer.findUnique({
+                where: { id: fields.customerId },
+                select: { companyName: true },
+            }),
+            options?.renewedFromOfferId
+                ? tx.offer.findUnique({
+                    where: { id: options.renewedFromOfferId },
+                    select: { quoteId: true },
+                })
+                : Promise.resolve(null),
+        ]);
+
+        await recordActivity(tx, {
+            type: ACTIVITY_TYPE_BY_DERIVATION[options?.derivationType ?? "NONE"],
+            entity: "OFFER",
+            entityId: offer.id,
+            customerId: fields.customerId,
+            payload: {
+                quoteId: offer.quoteId,
+                customerName: customer?.companyName ?? null,
+                net_amount,
+                ...(source ? { sourceQuoteId: source.quoteId } : {}),
+            },
+        });
 
         return offer;
     });
@@ -526,6 +564,15 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
             data: { isCurrent: false },
         });
 
+        await recordActivity(tx, {
+            type: "offer.updated",
+            entity: "OFFER",
+            entityId: offerId,
+            actorId,
+            customerId: input.customerId,
+            payload: { quoteId: input.quoteId, version: offer.version, net_amount },
+        });
+
         return offer;
     });
 }
@@ -612,6 +659,15 @@ export async function restoreOfferRevision(
             data: { isCurrent: false },
         });
 
+        await recordActivity(tx, {
+            type: "offer.restored",
+            entity: "OFFER",
+            entityId: offerId,
+            actorId,
+            customerId: offer.customerId,
+            payload: { quoteId: offer.quoteId, restoredVersion: current.version },
+        });
+
         return offer;
     });
 }
@@ -693,12 +749,26 @@ export async function enqueueGeneration(offerId: string) {
         pickTranslation(op.product.translations, offer.language)?.name ?? ""
     ).replaceAll(" ", "").trim());
 
-    return requestOfferGeneration(offerId, (version) => generateOfferDisplayName(
+    const task = await requestOfferGeneration(offerId, (version) => generateOfferDisplayName(
         offer.quoteId,
         offer.customer.companyName,
         formatedWorkloads,
         version,
     ));
+
+    /*
+     * Beim Anfordern geloggt, nicht beim Fertigwerden: die Generierung laeuft im
+     * Task-Worker, dort gibt es keinen Request-Kontext und damit keinen Actor.
+     */
+    await recordActivityStandalone({
+        type: "document.generation.requested",
+        entity: "OFFER",
+        entityId: offerId,
+        customerId: offer.customerId,
+        payload: { quoteId: offer.quoteId, customerName: offer.customer.companyName },
+    });
+
+    return task;
 }
 
 /* ========== Deletes ========== */
@@ -707,7 +777,7 @@ export async function deleteOffer(id: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
 
-        await tx.offer.findUniqueOrThrow({ where: { id } });
+        const offer = await tx.offer.findUniqueOrThrow({ where: { id } });
 
         if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
             throw new AppException(
@@ -718,6 +788,14 @@ export async function deleteOffer(id: string): Promise<void> {
         }
 
         await tx.offer.delete({ where: { id } });
+
+        await recordActivity(tx, {
+            type: "offer.deleted",
+            entity: "OFFER",
+            entityId: id,
+            customerId: offer.customerId,
+            payload: { quoteId: offer.quoteId },
+        });
     });
 }
 

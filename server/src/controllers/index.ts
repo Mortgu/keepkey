@@ -1,3 +1,4 @@
+export * from './activity.controller.js';
 export * from './contact.controller.js';
 export * from './contract.controller.js';
 export * from './customer.controller.js';

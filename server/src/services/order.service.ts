@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
+import { recordActivity } from "./activity.service.js";
 import { toDate } from "../utils/utils.js";
 import {
     CreateOrderInput,
@@ -193,6 +194,24 @@ export async function createOrder(input: CreateOrderInput) {
             })),
         });
 
+        const customer = await tx.customer.findUnique({
+            where: { id: order.customerId },
+            select: { companyName: true },
+        });
+
+        await recordActivity(tx, {
+            type: "order.created",
+            entity: "ORDER",
+            entityId: order.id,
+            customerId: order.customerId,
+            payload: {
+                orderId: order.orderId,
+                customerName: customer?.companyName ?? null,
+                net_amount: order.net_amount,
+                quoteId: existingOffer.quoteId,
+            },
+        });
+
         return order;
     });
 }
@@ -269,6 +288,15 @@ export async function updateOrder(orderId: string, input: UpdateOrderInput, acto
         await tx.orderDocument.updateMany({
             where: { orderId, isCurrent: true },
             data: { isCurrent: false },
+        });
+
+        await recordActivity(tx, {
+            type: "order.updated",
+            entity: "ORDER",
+            entityId: orderId,
+            actorId,
+            customerId: order.customerId,
+            payload: { orderId: order.orderId, version: order.version, net_amount },
         });
 
         return order;
@@ -354,6 +382,15 @@ export async function restoreOrderRevision(
             data: { isCurrent: false },
         });
 
+        await recordActivity(tx, {
+            type: "order.restored",
+            entity: "ORDER",
+            entityId: orderId,
+            actorId,
+            customerId: order.customerId,
+            payload: { orderId: order.orderId, restoredVersion: current.version },
+        });
+
         return order;
     });
 }
@@ -384,7 +421,7 @@ export async function generateOrderDocument(orderId: string) {
 export async function deleteOrderById(id: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-generation:${id}`}))::text AS "lock"`;
-        await tx.order.findUniqueOrThrow({ where: { id } });
+        const order = await tx.order.findUniqueOrThrow({ where: { id } });
         if (await tx.orderDocument.count({ where: { orderId: id } }) > 0) {
             throw new AppException(
                 "Orders with document history cannot be deleted.",
@@ -393,5 +430,13 @@ export async function deleteOrderById(id: string): Promise<void> {
             );
         }
         await tx.order.delete({ where: { id } });
+
+        await recordActivity(tx, {
+            type: "order.deleted",
+            entity: "ORDER",
+            entityId: id,
+            customerId: order.customerId,
+            payload: { orderId: order.orderId },
+        });
     });
 }

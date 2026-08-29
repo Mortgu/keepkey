@@ -22,6 +22,38 @@
       "notConfigured": "Not configured"
     },
     "retry": "Retry",
+    "activity": {
+      "title": "Activity",
+      "viewAll": "View all",
+      "empty": "No activity yet.",
+      "reload": "Reload",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "system": "System",
+      "types": {
+        "offer.created": "created offer {{quoteId}}",
+        "offer.updated": "edited offer {{quoteId}}",
+        "offer.restored": "restored offer {{quoteId}} to version {{restoredVersion}}",
+        "offer.renewed": "renewed offer {{sourceQuoteId}} as {{quoteId}}",
+        "offer.extended": "extended offer {{sourceQuoteId}} as {{quoteId}}",
+        "offer.deleted": "deleted offer {{quoteId}}",
+        "order.created": "created order {{orderId}}",
+        "order.updated": "edited order {{orderId}}",
+        "order.restored": "restored order {{orderId}} to version {{restoredVersion}}",
+        "order.deleted": "deleted order {{orderId}}",
+        "document.generation.requested": "generated the document for {{quoteId}}",
+        "document.uploaded": "uploaded {{displayName}} to Nextcloud",
+        "document.replaced": "replaced the {{format}} file of {{displayName}}",
+        "document.renamed": "renamed {{from}} to {{to}}",
+        "document.deleted": "deleted {{displayName}}",
+        "customer.created": "created customer {{companyName}}",
+        "customer.updated": "edited customer {{companyName}}",
+        "customer.deleted": "deleted customer {{companyName}}",
+        "tariff.version.created": "sealed tariff version {{version}}",
+        "tariff.version.restored": "restored tariff version {{version}}",
+        "unknown": "made a change"
+      }
+    },
     "search": {
       "placeholder": "Search offers, orders, customers\u2026",
       "recent": "Recent searches",

@@ -1,5 +1,6 @@
 import { Prisma, prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
+import { recordActivity } from "./activity.service.js";
 import {
     CreateCustomerInput,
     UpdateCustomerInput,
@@ -83,17 +84,37 @@ export async function getCustomerContacts(customerId: string) {
 /* ========== Mutations ========== */
 
 export async function createCustomer(input: CreateCustomerInput) {
-    const customer = await prisma.customer.create({
-        data: input,
-    });
+    return prisma.$transaction(async (tx) => {
+        const customer = await tx.customer.create({
+            data: input,
+        });
 
-    return customer;
+        await recordActivity(tx, {
+            type: "customer.created",
+            entity: "CUSTOMER",
+            entityId: customer.id,
+            customerId: customer.id,
+            payload: { companyName: customer.companyName },
+        });
+
+        return customer;
+    });
 }
 
 export async function updateCustomer(id: string, input: UpdateCustomerInput): Promise<void> {
-    await prisma.customer.update({
-        where: { id },
-        data: input,
+    await prisma.$transaction(async (tx) => {
+        const customer = await tx.customer.update({
+            where: { id },
+            data: input,
+        });
+
+        await recordActivity(tx, {
+            type: "customer.updated",
+            entity: "CUSTOMER",
+            entityId: id,
+            customerId: id,
+            payload: { companyName: customer.companyName },
+        });
     });
 }
 
@@ -119,8 +140,17 @@ export async function updateCustomerContact(contactId: string, input: UpdateCont
 /* ========== Deletes ========== */
 
 export async function deleteCustomer(id: string): Promise<void> {
-    await prisma.customer.delete({
-        where: { id },
+    await prisma.$transaction(async (tx) => {
+        const customer = await tx.customer.delete({
+            where: { id },
+        });
+
+        await recordActivity(tx, {
+            type: "customer.deleted",
+            entity: "CUSTOMER",
+            entityId: id,
+            payload: { companyName: customer.companyName },
+        });
     });
 }
 

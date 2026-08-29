@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { requireSession } from "@/middlewares/auth.middleware.js";
 
+import activityRouter from "./activity.route.js";
 import contactPersonRouter from "./contact.route.js";
 import contractRouter from "./contract.route.js";
 import customerRouter from "./customer.route.js";
@@ -64,5 +65,8 @@ router.use('/integrations', requireSession, integrationsRouter);
 
 /* /api/search */
 router.use('/search', requireSession, searchRouter);
+
+/* /api/activities */
+router.use('/activities', requireSession, activityRouter);
 
 export default router;

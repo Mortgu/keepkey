@@ -3,6 +3,7 @@ import { type PositionPrice } from "@keepit/schemas";
 
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
+import { recordActivity } from "./activity.service.js";
 import {
     buildTariffVersionSnapshot,
     hashTariffSnapshot,
@@ -268,7 +269,7 @@ export async function sealTariffVersion(
         _max: { version: true },
     });
 
-    return tx.tariffVersion.create({
+    const created = await tx.tariffVersion.create({
         data: {
             tariffId,
             version: (latest._max.version ?? 0) + 1,
@@ -278,6 +279,23 @@ export async function sealTariffVersion(
             createdById: actorId,
         },
     });
+
+    /*
+     * Nur explizite Versiegelungen landen im Feed. OFFER und RESTORE sind
+     * Nebenwirkungen anderer Aktionen, die dort schon ihren eigenen Eintrag
+     * haben — sonst steht jede Angebotserstellung doppelt im Feed.
+     */
+    if (reason === TariffVersionReason.MANUAL) {
+        await recordActivity(tx, {
+            type: "tariff.version.created",
+            entity: "TARIFF",
+            entityId: tariffId,
+            actorId,
+            payload: { version: created.version },
+        });
+    }
+
+    return created;
 }
 
 /**
@@ -650,6 +668,14 @@ export async function restoreTariffVersion(tariffId: string, versionId: string, 
         if (defaults.length > 0) {
             await tx.tariffCellDefault.createMany({ data: defaults });
         }
+
+        await recordActivity(tx, {
+            type: "tariff.version.restored",
+            entity: "TARIFF",
+            entityId: tariffId,
+            actorId,
+            payload: { version: version.version },
+        });
 
         return tx.tariff.findUniqueOrThrow({
             where: { id: tariffId },

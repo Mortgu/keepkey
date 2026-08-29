@@ -3,6 +3,7 @@ import { fromNodeHeaders } from "better-auth/node";
 import type { User } from "@prisma/client";
 
 import { auth } from "@/lib/auth.js";
+import { runWithRequestContext } from "@/lib/request-context.js";
 
 declare global {
     namespace Express {
@@ -26,7 +27,7 @@ export async function requireSession(req: Request, res: Response, next: NextFunc
         }
 
         req.user = session.user as User;
-        return next();
+        return runWithRequestContext({ actorId: req.user.id }, () => next());
     } catch (exception) {
         return res.status(401).send({
             success: false,

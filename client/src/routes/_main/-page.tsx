@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import IntegrationCard from "./-components/integration-card";
 import GlobalSearch from "./-components/global-search";
 import StatCard from "./-components/stat-card";
+import ActivityFeed from "./-components/activity/activity-feed";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@/data/integrations";
 import { PageWidth, RouteError } from "@/components";
@@ -66,6 +67,10 @@ export default function DashboardPage() {
                     total={stats.orders.total}
                     volume={stats.orders.volume}
                 />
+            </div>
+
+            <div className="overflow-y-scroll">
+                <ActivityFeed />
             </div>
 
         </PageWidth>

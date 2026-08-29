@@ -1,0 +1,28 @@
+enum ActivityEntity {
+    OFFER
+    ORDER
+    DOCUMENT
+    CUSTOMER
+    TARIFF
+}
+
+model Activity {
+    id String @id @default(cuid())
+
+    type String
+    entity ActivityEntity
+    entityId String
+
+    actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+    actorId String?
+
+    payload Json @default("{}")
+
+    customerId String?
+
+    createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+    @@index([createdAt(sort: Desc), id(sort: Desc)])
+    @@index([entity, entityId, createdAt(sort: Desc)])
+    @@map("activity")
+}
