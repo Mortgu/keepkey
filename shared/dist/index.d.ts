@@ -16,4 +16,6 @@ export * from "./supplier.schema.js";
 export * from "./tariff.schema.js";
 export * from "./pricing.schema.js";
 export * from "./integration.schema.js";
+export * from "./nextcloud.schema.js";
+export * from "./search.schema.js";
 //# sourceMappingURL=index.d.ts.map

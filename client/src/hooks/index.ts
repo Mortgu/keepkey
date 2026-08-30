@@ -2,7 +2,7 @@ export * from './use-block-file-drop';
 export * from './use-modal';
 export * from './use-locale';
 export * from './use-debounce';
-export * from './use-search';
+export * from './search/search-hooks';
 export * from './contracts/contract-hooks';
 export * from './contracts/contract-mutations';
 export * from './customers/customer-hooks';

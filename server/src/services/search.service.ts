@@ -1,27 +1,6 @@
 import { prisma } from "../lib/prismaClient.js";
 import { formatCentsToEur } from "../utils/utils.js";
-
-export type SearchType = "offer" | "order" | "customer";
-
-export type SearchResultItem = {
-    id: string;
-    type: SearchType;
-    title: string;
-    /** Raw value to pass as the list filter's search param (e.g. quoteId, orderId, companyName). */
-    searchValue: string;
-    meta: string;
-    updatedAt: string;
-};
-
-export type SearchResponse = {
-    items: Array<SearchResultItem>;
-    counts: {
-        all: number;
-        offer: number;
-        order: number;
-        customer: number;
-    };
-};
+import type { SearchResponse, SearchResultItem, SearchType } from "@keepit/schemas";
 
 const LIMIT_PER_TYPE = 10;
 

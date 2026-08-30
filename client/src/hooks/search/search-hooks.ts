@@ -1,12 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
-import type {SearchResponse, SearchType} from "@/data/search";
-import {   searchAction } from "@/data/search";
-
-export const searchKeys = {
-    all: ["search"] as const,
-    query: (term: string, type?: SearchType) =>
-        [...searchKeys.all, term, type ?? "all"] as const,
-};
+import { searchAction } from "./search-api";
+import { searchKeys } from "./search-keys";
+import type { SearchResponse, SearchType } from "@keepit/schemas";
 
 type UseSearchOptions = {
     enabled?: boolean;

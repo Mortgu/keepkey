@@ -1,5 +1,4 @@
-import type { CloudFile } from "@keepit/schemas";
-import type { FindFilesByIdResult } from "@/data/nextcloud";
+import type { CloudFile, FindFilesByIdResult } from "@keepit/schemas";
 import { BASE_URL, api } from "@/lib/api-client";
 
 export const findFilesById = (id: string) =>

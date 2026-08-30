@@ -3,6 +3,7 @@ import { Readable } from "stream";
 import env from "./env.js";
 import logger from "@/utils/logger.js";
 import { AppException } from "./exceptions.js";
+import type { CloudFileMetadata, FindFilesByIdResult } from "@keepit/schemas";
 
 let client: WebDAVClient | null = null;
 export let isNextcloudAvailable = false;
@@ -15,20 +16,6 @@ type DirectoryCache = {
 
 const directoryCache = new Map<string, DirectoryCache>();
 const CACHE_TTL = 60_000;
-
-export type NextcloudFileMetadata = {
-    basename: string;
-    filename: string;
-    size: number;
-    lastmod: string;
-    mime: string | null;
-};
-
-export type FindFilesByIdResult = {
-    id: string;
-    found: boolean;
-    files: Record<string, NextcloudFileMetadata[]>;
-};
 
 type DirectoryConfig = {
     path: string;
@@ -59,7 +46,7 @@ export async function findFilesById(
     id: string,
     directories: DirectoryConfig[]
 ): Promise<FindFilesByIdResult> {
-    const files: Record<string, NextcloudFileMetadata[]> = {};
+    const files: Record<string, CloudFileMetadata[]> = {};
     let anyFound = false;
 
     const results = await Promise.all(

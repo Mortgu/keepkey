@@ -9,7 +9,11 @@ export const cloudFileMetadataSchema = z.object({
 });
 export type CloudFileMetadata = z.infer<typeof cloudFileMetadataSchema>;
 
-export const cloudFileSchema = z.object({
-
+/* Treffer einer Suche nach der Dokument-ID: pro Verzeichnis-Label die dort
+   gefundenen Dateien. `found` ist false, wenn kein Verzeichnis etwas geliefert hat. */
+export const findFilesByIdResultSchema = z.object({
+    id: z.string(),
+    found: z.boolean(),
+    files: z.record(z.string(), z.array(cloudFileMetadataSchema)),
 });
-export type CloudFile = z.infer<typeof cloudFileSchema>;
+export type FindFilesByIdResult = z.infer<typeof findFilesByIdResultSchema>;

@@ -3,9 +3,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Clock, FileText, Search, ShoppingCart, Users, X } from "lucide-react";
 import { tv } from "tailwind-variants";
-import type { SearchResultItem, SearchType } from "@/data/search";
+import type { SearchResultItem, SearchType } from "@keepit/schemas";
 import { useDebouncedValue } from "@/hooks/use-debounce";
-import { useSearch } from "@/hooks/use-search";
+import { useSearch } from "@/hooks/search/search-hooks";
 
 const RECENT_KEY = "keepit:recent-searches";
 const RECENT_MAX = 5;
