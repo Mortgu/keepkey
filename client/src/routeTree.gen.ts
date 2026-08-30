@@ -11,24 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainSettingsRouteRouteImport } from './routes/_main/settings/route'
-import { Route as DevComponentsRouteImport } from './routes/dev/components'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
-import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
-import { Route as MainCustomersIndexRouteImport } from './routes/_main/customers/index'
-import { Route as MainEmployeesIndexRouteImport } from './routes/_main/employees/index'
-import { Route as MainFlatratesIndexRouteImport } from './routes/_main/flatrates/index'
-import { Route as MainInvoicesIndexRouteImport } from './routes/_main/invoices/index'
-import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
-import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
-import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
-import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
-import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
-import { Route as MainCustomersCustomerIdIndexRouteImport } from './routes/_main/customers/$customerId/index'
-import { Route as MainSettingsAccountIndexRouteImport } from './routes/_main/settings/account/index'
-import { Route as MainSettingsSecurityIndexRouteImport } from './routes/_main/settings/security/index'
-import { Route as MainSettingsTemplatesIndexRouteImport } from './routes/_main/settings/templates/index'
-import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
   id: '/_main',
@@ -39,235 +22,36 @@ const MainIndexRoute = MainIndexRouteImport.update({
   path: '/',
   getParentRoute: () => MainRouteRoute,
 } as any)
-const MainSettingsRouteRoute = MainSettingsRouteRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const DevComponentsRoute = DevComponentsRouteImport.update({
-  id: '/dev/components',
-  path: '/dev/components',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginIndexRoute = LoginIndexRouteImport.update({
   id: '/login/',
   path: '/login/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MainContractsIndexRoute = MainContractsIndexRouteImport.update({
-  id: '/contracts/',
-  path: '/contracts/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainCustomersIndexRoute = MainCustomersIndexRouteImport.update({
-  id: '/customers/',
-  path: '/customers/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainEmployeesIndexRoute = MainEmployeesIndexRouteImport.update({
-  id: '/employees/',
-  path: '/employees/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainFlatratesIndexRoute = MainFlatratesIndexRouteImport.update({
-  id: '/flatrates/',
-  path: '/flatrates/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainInvoicesIndexRoute = MainInvoicesIndexRouteImport.update({
-  id: '/invoices/',
-  path: '/invoices/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainOffersIndexRoute = MainOffersIndexRouteImport.update({
-  id: '/offers/',
-  path: '/offers/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainOrdersIndexRoute = MainOrdersIndexRouteImport.update({
-  id: '/orders/',
-  path: '/orders/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MainSettingsRouteRoute,
-} as any)
-const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
-  id: '/suppliers/',
-  path: '/suppliers/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainWorkloadsIndexRoute = MainWorkloadsIndexRouteImport.update({
-  id: '/workloads/',
-  path: '/workloads/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainCustomersCustomerIdIndexRoute =
-  MainCustomersCustomerIdIndexRouteImport.update({
-    id: '/customers/$customerId/',
-    path: '/customers/$customerId/',
-    getParentRoute: () => MainRouteRoute,
-  } as any)
-const MainSettingsAccountIndexRoute =
-  MainSettingsAccountIndexRouteImport.update({
-    id: '/account/',
-    path: '/account/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
-const MainSettingsSecurityIndexRoute =
-  MainSettingsSecurityIndexRouteImport.update({
-    id: '/security/',
-    path: '/security/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
-const MainSettingsTemplatesIndexRoute =
-  MainSettingsTemplatesIndexRouteImport.update({
-    id: '/templates/',
-    path: '/templates/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
-const MainWorkloadsPricingIndexRoute =
-  MainWorkloadsPricingIndexRouteImport.update({
-    id: '/workloads/pricing/',
-    path: '/workloads/pricing/',
-    getParentRoute: () => MainRouteRoute,
-  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
-  '/settings': typeof MainSettingsRouteRouteWithChildren
-  '/dev/components': typeof DevComponentsRoute
   '/login/': typeof LoginIndexRoute
-  '/contracts/': typeof MainContractsIndexRoute
-  '/customers/': typeof MainCustomersIndexRoute
-  '/employees/': typeof MainEmployeesIndexRoute
-  '/flatrates/': typeof MainFlatratesIndexRoute
-  '/invoices/': typeof MainInvoicesIndexRoute
-  '/offers/': typeof MainOffersIndexRoute
-  '/orders/': typeof MainOrdersIndexRoute
-  '/settings/': typeof MainSettingsIndexRoute
-  '/suppliers/': typeof MainSuppliersIndexRoute
-  '/workloads/': typeof MainWorkloadsIndexRoute
-  '/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/settings/account/': typeof MainSettingsAccountIndexRoute
-  '/settings/security/': typeof MainSettingsSecurityIndexRoute
-  '/settings/templates/': typeof MainSettingsTemplatesIndexRoute
-  '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
-  '/dev/components': typeof DevComponentsRoute
   '/': typeof MainIndexRoute
   '/login': typeof LoginIndexRoute
-  '/contracts': typeof MainContractsIndexRoute
-  '/customers': typeof MainCustomersIndexRoute
-  '/employees': typeof MainEmployeesIndexRoute
-  '/flatrates': typeof MainFlatratesIndexRoute
-  '/invoices': typeof MainInvoicesIndexRoute
-  '/offers': typeof MainOffersIndexRoute
-  '/orders': typeof MainOrdersIndexRoute
-  '/settings': typeof MainSettingsIndexRoute
-  '/suppliers': typeof MainSuppliersIndexRoute
-  '/workloads': typeof MainWorkloadsIndexRoute
-  '/customers/$customerId': typeof MainCustomersCustomerIdIndexRoute
-  '/settings/account': typeof MainSettingsAccountIndexRoute
-  '/settings/security': typeof MainSettingsSecurityIndexRoute
-  '/settings/templates': typeof MainSettingsTemplatesIndexRoute
-  '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
-  '/_main/settings': typeof MainSettingsRouteRouteWithChildren
-  '/dev/components': typeof DevComponentsRoute
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
-  '/_main/contracts/': typeof MainContractsIndexRoute
-  '/_main/customers/': typeof MainCustomersIndexRoute
-  '/_main/employees/': typeof MainEmployeesIndexRoute
-  '/_main/flatrates/': typeof MainFlatratesIndexRoute
-  '/_main/invoices/': typeof MainInvoicesIndexRoute
-  '/_main/offers/': typeof MainOffersIndexRoute
-  '/_main/orders/': typeof MainOrdersIndexRoute
-  '/_main/settings/': typeof MainSettingsIndexRoute
-  '/_main/suppliers/': typeof MainSuppliersIndexRoute
-  '/_main/workloads/': typeof MainWorkloadsIndexRoute
-  '/_main/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/_main/settings/account/': typeof MainSettingsAccountIndexRoute
-  '/_main/settings/security/': typeof MainSettingsSecurityIndexRoute
-  '/_main/settings/templates/': typeof MainSettingsTemplatesIndexRoute
-  '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/settings'
-    | '/dev/components'
-    | '/login/'
-    | '/contracts/'
-    | '/customers/'
-    | '/employees/'
-    | '/flatrates/'
-    | '/invoices/'
-    | '/offers/'
-    | '/orders/'
-    | '/settings/'
-    | '/suppliers/'
-    | '/workloads/'
-    | '/customers/$customerId/'
-    | '/settings/account/'
-    | '/settings/security/'
-    | '/settings/templates/'
-    | '/workloads/pricing/'
+  fullPaths: '/' | '/login/'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/dev/components'
-    | '/'
-    | '/login'
-    | '/contracts'
-    | '/customers'
-    | '/employees'
-    | '/flatrates'
-    | '/invoices'
-    | '/offers'
-    | '/orders'
-    | '/settings'
-    | '/suppliers'
-    | '/workloads'
-    | '/customers/$customerId'
-    | '/settings/account'
-    | '/settings/security'
-    | '/settings/templates'
-    | '/workloads/pricing'
-  id:
-    | '__root__'
-    | '/_main'
-    | '/_main/settings'
-    | '/dev/components'
-    | '/_main/'
-    | '/login/'
-    | '/_main/contracts/'
-    | '/_main/customers/'
-    | '/_main/employees/'
-    | '/_main/flatrates/'
-    | '/_main/invoices/'
-    | '/_main/offers/'
-    | '/_main/orders/'
-    | '/_main/settings/'
-    | '/_main/suppliers/'
-    | '/_main/workloads/'
-    | '/_main/customers/$customerId/'
-    | '/_main/settings/account/'
-    | '/_main/settings/security/'
-    | '/_main/settings/templates/'
-    | '/_main/workloads/pricing/'
+  to: '/' | '/login'
+  id: '__root__' | '/_main' | '/_main/' | '/login/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   MainRouteRoute: typeof MainRouteRouteWithChildren
-  DevComponentsRoute: typeof DevComponentsRoute
   LoginIndexRoute: typeof LoginIndexRoute
 }
 
@@ -287,20 +71,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/settings': {
-      id: '/_main/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof MainSettingsRouteRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/dev/components': {
-      id: '/dev/components'
-      path: '/dev/components'
-      fullPath: '/dev/components'
-      preLoaderRoute: typeof DevComponentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login/': {
       id: '/login/'
       path: '/login'
@@ -308,161 +78,15 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_main/contracts/': {
-      id: '/_main/contracts/'
-      path: '/contracts'
-      fullPath: '/contracts/'
-      preLoaderRoute: typeof MainContractsIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/customers/': {
-      id: '/_main/customers/'
-      path: '/customers'
-      fullPath: '/customers/'
-      preLoaderRoute: typeof MainCustomersIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/employees/': {
-      id: '/_main/employees/'
-      path: '/employees'
-      fullPath: '/employees/'
-      preLoaderRoute: typeof MainEmployeesIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/flatrates/': {
-      id: '/_main/flatrates/'
-      path: '/flatrates'
-      fullPath: '/flatrates/'
-      preLoaderRoute: typeof MainFlatratesIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/invoices/': {
-      id: '/_main/invoices/'
-      path: '/invoices'
-      fullPath: '/invoices/'
-      preLoaderRoute: typeof MainInvoicesIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/offers/': {
-      id: '/_main/offers/'
-      path: '/offers'
-      fullPath: '/offers/'
-      preLoaderRoute: typeof MainOffersIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/orders/': {
-      id: '/_main/orders/'
-      path: '/orders'
-      fullPath: '/orders/'
-      preLoaderRoute: typeof MainOrdersIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/settings/': {
-      id: '/_main/settings/'
-      path: '/'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof MainSettingsIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/suppliers/': {
-      id: '/_main/suppliers/'
-      path: '/suppliers'
-      fullPath: '/suppliers/'
-      preLoaderRoute: typeof MainSuppliersIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/workloads/': {
-      id: '/_main/workloads/'
-      path: '/workloads'
-      fullPath: '/workloads/'
-      preLoaderRoute: typeof MainWorkloadsIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/customers/$customerId/': {
-      id: '/_main/customers/$customerId/'
-      path: '/customers/$customerId'
-      fullPath: '/customers/$customerId/'
-      preLoaderRoute: typeof MainCustomersCustomerIdIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/settings/account/': {
-      id: '/_main/settings/account/'
-      path: '/account'
-      fullPath: '/settings/account/'
-      preLoaderRoute: typeof MainSettingsAccountIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/settings/security/': {
-      id: '/_main/settings/security/'
-      path: '/security'
-      fullPath: '/settings/security/'
-      preLoaderRoute: typeof MainSettingsSecurityIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/settings/templates/': {
-      id: '/_main/settings/templates/'
-      path: '/templates'
-      fullPath: '/settings/templates/'
-      preLoaderRoute: typeof MainSettingsTemplatesIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/workloads/pricing/': {
-      id: '/_main/workloads/pricing/'
-      path: '/workloads/pricing'
-      fullPath: '/workloads/pricing/'
-      preLoaderRoute: typeof MainWorkloadsPricingIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
   }
 }
 
-interface MainSettingsRouteRouteChildren {
-  MainSettingsIndexRoute: typeof MainSettingsIndexRoute
-  MainSettingsAccountIndexRoute: typeof MainSettingsAccountIndexRoute
-  MainSettingsSecurityIndexRoute: typeof MainSettingsSecurityIndexRoute
-  MainSettingsTemplatesIndexRoute: typeof MainSettingsTemplatesIndexRoute
-}
-
-const MainSettingsRouteRouteChildren: MainSettingsRouteRouteChildren = {
-  MainSettingsIndexRoute: MainSettingsIndexRoute,
-  MainSettingsAccountIndexRoute: MainSettingsAccountIndexRoute,
-  MainSettingsSecurityIndexRoute: MainSettingsSecurityIndexRoute,
-  MainSettingsTemplatesIndexRoute: MainSettingsTemplatesIndexRoute,
-}
-
-const MainSettingsRouteRouteWithChildren =
-  MainSettingsRouteRoute._addFileChildren(MainSettingsRouteRouteChildren)
-
 interface MainRouteRouteChildren {
-  MainSettingsRouteRoute: typeof MainSettingsRouteRouteWithChildren
   MainIndexRoute: typeof MainIndexRoute
-  MainContractsIndexRoute: typeof MainContractsIndexRoute
-  MainCustomersIndexRoute: typeof MainCustomersIndexRoute
-  MainEmployeesIndexRoute: typeof MainEmployeesIndexRoute
-  MainFlatratesIndexRoute: typeof MainFlatratesIndexRoute
-  MainInvoicesIndexRoute: typeof MainInvoicesIndexRoute
-  MainOffersIndexRoute: typeof MainOffersIndexRoute
-  MainOrdersIndexRoute: typeof MainOrdersIndexRoute
-  MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
-  MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
-  MainCustomersCustomerIdIndexRoute: typeof MainCustomersCustomerIdIndexRoute
-  MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
-  MainSettingsRouteRoute: MainSettingsRouteRouteWithChildren,
   MainIndexRoute: MainIndexRoute,
-  MainContractsIndexRoute: MainContractsIndexRoute,
-  MainCustomersIndexRoute: MainCustomersIndexRoute,
-  MainEmployeesIndexRoute: MainEmployeesIndexRoute,
-  MainFlatratesIndexRoute: MainFlatratesIndexRoute,
-  MainInvoicesIndexRoute: MainInvoicesIndexRoute,
-  MainOffersIndexRoute: MainOffersIndexRoute,
-  MainOrdersIndexRoute: MainOrdersIndexRoute,
-  MainSuppliersIndexRoute: MainSuppliersIndexRoute,
-  MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
-  MainCustomersCustomerIdIndexRoute: MainCustomersCustomerIdIndexRoute,
-  MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,
 }
 
 const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
@@ -471,7 +95,6 @@ const MainRouteRouteWithChildren = MainRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   MainRouteRoute: MainRouteRouteWithChildren,
-  DevComponentsRoute: DevComponentsRoute,
   LoginIndexRoute: LoginIndexRoute,
 }
 export const routeTree = rootRouteImport

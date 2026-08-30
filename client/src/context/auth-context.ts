@@ -1,8 +1,8 @@
 import { createContext, useContext } from "react";
-import type { User } from "@keepit/schemas";
+import type { SessionUser } from "@keepit/schemas";
 
 type AuthContextType = {
-    user: User | null | undefined;
+    user: SessionUser | null | undefined;
     isLoading: boolean;
     refetch: () => void;
     logout: () => void;

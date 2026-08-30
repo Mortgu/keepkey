@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
 
 import useLoginForm from "../-hooks/use-login-form";
-import { Button, Input } from "@/components";
-import { getFormError } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
+import Input from "@/components/input";
 
 export function LoginFormComponent() {
     const [showPassword, setShowPassword] = useState(false);
@@ -44,6 +42,10 @@ export function LoginFormComponent() {
                         <p className="text-sm text-gray-400 mt-1">Willkommen zurück</p>
                     </div>
 
+                    <Input prefix={<p className="font-medium text-sm">AG</p>} />
+                    <br />
+                    <Input size="sm" prefix={<p className="font-medium text-sm">AG</p>} />
+
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                         {/* Error banner */}
                         {error && (
@@ -77,7 +79,7 @@ export function LoginFormComponent() {
                                     >
                                         E-Mail
                                     </label>
-                                    <Input
+                                    <input
                                         id={field.name}
                                         name={field.name}
                                         value={field.state.value}
@@ -95,7 +97,6 @@ export function LoginFormComponent() {
                                     />
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
-                                            {getFormError(field.state.meta.errors)}
                                         </span>
                                     )}
                                 </div>
@@ -112,7 +113,7 @@ export function LoginFormComponent() {
                                     >
                                         Passwort
                                     </label>
-                                    <Input
+                                    <input
                                         id={field.name}
                                         name={field.name}
                                         value={field.state.value}
@@ -126,16 +127,10 @@ export function LoginFormComponent() {
                                                 ? "border-red-400!"
                                                 : ""
                                         }
-                                        rightButton={{
-                                            variant: "ghost",
-                                            onClick: () => setShowPassword((v) => !v),
-                                            "aria-label": showPassword ? "Passwort verbergen" : "Passwort anzeigen",
-                                            icon: showPassword ? <EyeOff size={15} /> : <Eye size={15} />,
-                                        }}
+
                                     />
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
-                                            {getFormError(field.state.meta.errors)}
                                         </span>
                                     )}
                                 </div>
@@ -178,14 +173,13 @@ export function LoginFormComponent() {
                         {/* Submit */}
                         <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]}>
                             {([canSubmit, isSubmitting]) => (
-                                <Button
+                                <button
                                     type="submit"
                                     disabled={!canSubmit}
-                                    loading={isSubmitting}
                                     className="w-full mt-1"
                                 >
                                     {!(isSubmitting) && "Anmelden"}
-                                </Button>
+                                </button>
                             )}
                         </form.Subscribe>
                     </form>
@@ -198,16 +192,14 @@ export function LoginFormComponent() {
                     </div>
 
                     {/* Passkey sign-in */}
-                    <Button
+                    <button
                         type="button"
-                        variant="secondary"
-                        icon={<KeyRound size={16} />}
-                        loading={passkeyLoading}
+                        disabled={passkeyLoading}
                         onClick={handlePasskeySignIn}
                         className="w-full"
                     >
                         {!passkeyLoading && "Mit Passkey anmelden"}
-                    </Button>
+                    </button>
                 </div>
             </div>
         </div>

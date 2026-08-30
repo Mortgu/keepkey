@@ -13,6 +13,13 @@ export const createUserSchema = z.object({
     password: z.string(),
 });
 export const updateUserSchema = createUserSchema.partial();
+export const sessionUserSchema = z.object({
+    id: z.string(),
+    email: z.string(),
+    emailVerified: z.boolean(),
+    name: z.string(),
+    image: z.string().nullish(),
+});
 export const userSchema = z.object({
     id: z.string(),
     name: z.string(),

@@ -1,10 +1,7 @@
-import { Outlet } from "@tanstack/react-router";
 import { AuthProvider } from "@/context/auth.tsx";
-import { useBlockFileDrop } from "@/hooks";
+import { Outlet } from "@tanstack/react-router";
 
 export function RootComponent() {
-    useBlockFileDrop();
-
     return (
         <AuthProvider>
             <Outlet />
