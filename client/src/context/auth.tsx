@@ -3,15 +3,22 @@ import { Loader } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthContext } from "./auth-context.ts";
 import type { ReactNode } from "react";
-import { getSessionUser } from "@/data/user.ts";
 import { authClient } from "@/lib/auth-client.ts";
+import { api } from "@/lib/api-client.ts";
+import type { User } from "better-auth";
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+interface Props {
+    children: ReactNode;
+}
+
+export function AuthProvider({ children }: Props) {
     const navigate = useNavigate();
 
     const { data: user = null, isLoading, refetch } = useQuery({
         queryKey: ["session"],
-        queryFn: getSessionUser,
+        queryFn: () => api<User>("/api/users/session", {
+            method: "GET"
+        }),
         retry: false,
     });
 
@@ -29,7 +36,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return (
-        <AuthContext.Provider value={{ user: user ? user : null, logout, isLoading, refetch }}>
+        <AuthContext.Provider value={{ user, logout, isLoading, refetch }}>
             {children}
         </AuthContext.Provider>
     );

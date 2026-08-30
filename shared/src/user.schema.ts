@@ -20,6 +20,16 @@ export type CreateUserInput = z.infer<typeof createUserSchema>;
 export const updateUserSchema = createUserSchema.partial();
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
 
+export const sessionUserSchema = z.object({
+    id: z.string(),
+
+    email: z.string(),
+    emailVerified: z.boolean(),
+    name: z.string(),
+    image: z.string().nullish(),
+});
+export type SessionUser = z.infer<typeof sessionUserSchema>;
+
 export const userSchema = z.object({
     id: z.string(),
     name: z.string(),

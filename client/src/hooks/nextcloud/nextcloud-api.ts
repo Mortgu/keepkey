@@ -1,9 +1,6 @@
 import type { CloudFile } from "@keepit/schemas";
-import type { FindFilesByIdResult, NextcloudStatus } from "@/data/nextcloud";
+import type { FindFilesByIdResult } from "@/data/nextcloud";
 import { BASE_URL, api } from "@/lib/api-client";
-
-export const getNextcloudStatus = () =>
-    api<NextcloudStatus>("/api/cloud/status", { method: "GET" });
 
 export const findFilesById = (id: string) =>
     api<FindFilesByIdResult>(`/api/cloud/${id}`, { method: "GET" });

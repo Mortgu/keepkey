@@ -1,16 +1,10 @@
 import { queryOptions } from "@tanstack/react-query";
-import { findFilesById, findOfferFilesById, findOrderFilesById, getCloudDirectory, getNextcloudStatus, getTemplates } from "./nextcloud-api";
+import { findFilesById, findOfferFilesById, findOrderFilesById, getCloudDirectory, getTemplates } from "./nextcloud-api";
 import { nextcloudKeys } from "./nextcloud-keys";
 import type { CloudFile } from "@keepit/schemas";
 import type { FindFilesByIdResult } from "@/data/nextcloud";
 
 export const nextcloudQueries = {
-    status: () => queryOptions({
-        queryKey: nextcloudKeys.status(),
-        queryFn: getNextcloudStatus,
-        staleTime: 30_000,
-        refetchOnWindowFocus: false,
-    }),
     files: (id: string) => queryOptions<FindFilesByIdResult>({
         queryKey: nextcloudKeys.files(id),
         queryFn: () => findFilesById(id),

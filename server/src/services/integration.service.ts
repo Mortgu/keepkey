@@ -2,20 +2,11 @@ import env from "../lib/env.js";
 import connection from "../lib/redis.js";
 import { getCloudStatus } from "./nextcloud.service.js";
 import { isS3Available } from "../lib/document-artifact-store.js";
-
-export type IntegrationStatus = "connected" | "failed" | "not_configured";
-
-export type IntegrationEntry = {
-    status: IntegrationStatus;
-    detail?: string;
-    meta?: Record<string, string>;
-};
-
-export type IntegrationStatusResponse = {
-    nextcloud: IntegrationEntry;
-    redis: IntegrationEntry;
-    s3: IntegrationEntry;
-};
+import {
+    IntegrationEntry,
+    IntegrationStatus,
+    IntegrationStatusResponse
+} from "@keepit/schemas";
 
 function mapStatus(configured: boolean, available: boolean): IntegrationStatus {
     if (!configured) return "not_configured";
@@ -69,6 +60,11 @@ async function s3Status(): Promise<IntegrationEntry> {
 }
 
 export async function getIntegrationStatus(): Promise<IntegrationStatusResponse> {
-    const [nextcloud, redis, s3] = await Promise.all([nextcloudStatus(), redisStatus(), s3Status()]);
+    const [nextcloud, redis, s3] = await Promise.all([
+        nextcloudStatus(),
+        redisStatus(),
+        s3Status()
+    ]);
+
     return { nextcloud, redis, s3 };
 }

@@ -22,6 +22,14 @@ export declare const updateUserSchema: z.ZodObject<{
     password: z.ZodOptional<z.ZodString>;
 }, z.core.$strip>;
 export type UpdateUserInput = z.infer<typeof updateUserSchema>;
+export declare const sessionUserSchema: z.ZodObject<{
+    id: z.ZodString;
+    email: z.ZodString;
+    emailVerified: z.ZodBoolean;
+    name: z.ZodString;
+    image: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, z.core.$strip>;
+export type SessionUser = z.infer<typeof sessionUserSchema>;
 export declare const userSchema: z.ZodObject<{
     id: z.ZodString;
     name: z.ZodString;
