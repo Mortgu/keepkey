@@ -1,6 +1,5 @@
 export const nextcloudKeys = {
     all: ["nextcloud"] as const,
-    status: () => [...nextcloudKeys.all, "status"] as const,
     files: (id: string) => [...nextcloudKeys.all, "files", id] as const,
     offerFiles: (id: string) => [...nextcloudKeys.all, "offer", id] as const,
     orderFiles: (id: string) => [...nextcloudKeys.all, "order", id] as const,
