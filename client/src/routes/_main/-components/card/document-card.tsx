@@ -1,4 +1,4 @@
-import {    findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
+import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
 import { Dot, Download, EllipsisVertical, ExternalLink, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
@@ -8,11 +8,12 @@ import '@docx-editor.dev/core/styles/editor.css';
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
 import DocumentDocxEditor from "./docx-editor";
-import type {DocxEditorRef} from "@docx-editor.dev/react";
-import type {DocumentType, OfferDocument, OrderDocument} from "@keepit/schemas";
+import type { DocxEditorRef } from "@docx-editor.dev/react";
+import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
 import { Badge, Button, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
 import {
-    documentDownloadUrl, useDocumentCapabilities,
+    documentDownloadUrl,
+    useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
     useLocale,
