@@ -15,6 +15,7 @@ import {
     SegmentedLanguageToggle,
 } from "@/components";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
+import { centsToEur, eurToCents } from "@/utils/utils";
 
 interface Props {
 	currentFlatrate?: Flatrate | null;
@@ -98,14 +99,18 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 						)}
 					</form.Field>
 
+					{/* Gespeichert wird in Cent, eingegeben in Euro — die Umrechnung
+					    läuft über die zentralen Helfer, nicht über eigene /100. */}
 					<form.Field name="total_cents">
 						{(field) => (
 							<NumberField
-								min={1}
-								label="Preis (€)"
-								value={field.state.value}
-								onValueChange={(value) => field.handleChange(value ?? 0)}
-								step={1}
+								min={0.01}
+								step={0.01}
+								format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
+								label="Preis"
+								suffix="€"
+								value={centsToEur(field.state.value)}
+								onValueChange={(value) => field.handleChange(value === null ? 0 : eurToCents(value))}
 							/>
 						)}
 					</form.Field>
