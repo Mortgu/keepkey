@@ -24,6 +24,11 @@ export const getTariffVersions = async (request: Request, response: Response) =>
     return response.status(200).json(versions);
 };
 
+export const getStandardDurations = async (request: Request, response: Response) => {
+    const durations = await tariffService.getStandardDurations();
+    return response.status(200).json(durations);
+};
+
 export const getTariffDurations = async (request: Request, response: Response) => {
     const durations = await tariffService.getTariffDurations(
         request.params.productId as string,
@@ -48,6 +53,11 @@ export const getTariffPrice = async (request: Request, response: Response) => {
 };
 
 /* ========== POST ========== */
+
+export const createStandardDuration = async (request: Request, response: Response) => {
+    const duration = await tariffService.createStandardDuration(request.body);
+    return response.status(201).json(duration);
+};
 
 export const createTariffGroup = async (request: Request, response: Response) => {
     const group = await tariffService.createTariffGroup(request.body);
@@ -124,6 +134,11 @@ export const upsertCustomerPrice = async (request: Request, response: Response) 
 };
 
 /* ========== DELETE ========== */
+
+export const deleteStandardDuration = async (request: Request, response: Response) => {
+    await tariffService.deleteStandardDuration(request.params.id as string);
+    return response.status(204).send();
+};
 
 export const deleteTariffGroup = async (request: Request, response: Response) => {
     await tariffService.deleteTariffGroup(request.params.id as string);

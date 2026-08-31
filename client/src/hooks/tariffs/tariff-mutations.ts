@@ -1,10 +1,12 @@
 import {  useMutation, useQueryClient } from "@tanstack/react-query";
 import { tariffKeys } from "./tariff-keys";
 import {
+    createStandardDuration,
     createTariff,
     createTariffColumn,
     createTariffGroup,
     createTariffRow,
+    deleteStandardDuration,
     deleteTariff,
     deleteTariffColumn,
     deleteTariffGroup,
@@ -57,6 +59,30 @@ function useTariffMutation<TArgs, TResult>(
 ) {
     const queryClient = useQueryClient();
     return useMutation({ mutationFn, onSuccess: () => invalidate(queryClient) });
+}
+
+/* ───────────────────────────────
+   Standardlaufzeiten
+   ─────────────────────────────── */
+
+/**
+ * `tariffKeys.all`, weil die Liste unterhalb davon hängt — und weil sie in
+ * Abschnitt 2 die Spaltenachse jeder Preistabelle wird.
+ */
+export function useCreateStandardDuration() {
+    const { mutate, isPending, error } = useTariffMutation(
+        (months: number) => createStandardDuration(months),
+        invalidateAll,
+    );
+    return { createStandardDuration: mutate, isPending, error };
+}
+
+export function useDeleteStandardDuration() {
+    const { mutate, isPending, error } = useTariffMutation(
+        (id: string) => deleteStandardDuration(id),
+        invalidateAll,
+    );
+    return { deleteStandardDuration: mutate, isPending, error };
 }
 
 /* ───────────────────────────────

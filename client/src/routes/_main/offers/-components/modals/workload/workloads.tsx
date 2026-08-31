@@ -66,7 +66,6 @@ export default function WorkloadSection() {
                         label: localized(ctr.translations, locale, "name"),
                     }))}
                 />
-
             </div>
 
             {/* Head */}

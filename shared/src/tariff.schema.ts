@@ -16,6 +16,34 @@ export const tariffRowSchema = z.object({
 });
 export type TariffRow = z.infer<typeof tariffRowSchema>;
 
+/**
+ * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
+ * nur weil sie nicht am Tarif hängt, steht die Laufzeit eines Angebots fest,
+ * bevor ein Produkt und damit eine Tarifgruppe gewählt ist.
+ */
+export const standardDurationSchema = z.object({
+    id: z.string(),
+
+    /** Laufzeit in Monaten. == TariffColumn.duration */
+    months: z.number().int(),
+
+    createdAt: z.string(),
+    updatedAt: z.string(),
+});
+export type StandardDuration = z.infer<typeof standardDurationSchema>;
+
+export const standardDurationListSchema = z.array(standardDurationSchema);
+export type StandardDurationList = z.infer<typeof standardDurationListSchema>;
+
+/**
+ * Dieselbe Schranke wie {@link createTariffColumnSchema}: eine Laufzeit 0 ließe
+ * jedes Versiegeln einer Tarif-Version scheitern.
+ */
+export const createStandardDurationSchema = z.object({
+    months: z.int().positive(),
+});
+export type CreateStandardDurationInput = z.infer<typeof createStandardDurationSchema>;
+
 /* Column */
 export const tariffColumnSchema = z.object({
     id: z.string(),

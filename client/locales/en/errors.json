@@ -25,6 +25,8 @@
   "TARIFF_GROUP_NOT_FOUND": "Tariff group not found.",
   "TARIFF_NOT_FOUND": "Tariff not found.",
   "MISSING_PRICE": "Missing price data.",
+  "DURATION_ALREADY_EXISTS": "This duration already exists.",
+  "DURATION_NOT_FOUND": "Duration not found.",
   "NO_TARIFF": "No tariff found for this product and contract.",
   "NO_CELL": "No cell configured for the selected row and column.",
   "NO_DEFAULT": "No default price configured for this cell.",

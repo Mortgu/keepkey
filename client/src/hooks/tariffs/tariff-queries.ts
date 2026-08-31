@@ -1,6 +1,7 @@
 import {queryOptions} from "@tanstack/react-query";
 import {tariffKeys} from "./tariff-keys";
 import {
+    getStandardDurations,
     getTariffDurations,
     getTariffGroups,
     getTariffVersions,
@@ -19,6 +20,13 @@ export const tariffQueries = {
             queryKey: tariffKeys.versions(tariffId),
             queryFn: () => getTariffVersions(groupId, tariffId),
             enabled: Boolean(groupId) && Boolean(tariffId),
+        });
+    },
+
+    standardDurations: () => {
+        return queryOptions({
+            queryKey: tariffKeys.standardDurations(),
+            queryFn: getStandardDurations,
         });
     },
 

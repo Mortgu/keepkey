@@ -25,6 +25,8 @@
   "TARIFF_GROUP_NOT_FOUND": "Tarifgruppe nicht gefunden.",
   "TARIFF_NOT_FOUND": "Tarif nicht gefunden.",
   "MISSING_PRICE": "Preisdaten fehlen.",
+  "DURATION_ALREADY_EXISTS": "Diese Laufzeit ist bereits hinterlegt.",
+  "DURATION_NOT_FOUND": "Laufzeit nicht gefunden.",
   "NO_TARIFF": "Kein Tarif f\u00fcr dieses Produkt und diesen Vertrag gefunden.",
   "NO_CELL": "Keine Zelle f\u00fcr die gew\u00e4hlte Zeile/Spalte konfiguriert.",
   "NO_DEFAULT": "Kein Default-Preis f\u00fcr diese Zelle hinterlegt.",

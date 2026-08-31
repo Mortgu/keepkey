@@ -12,6 +12,9 @@ export const tariffKeys = {
     allVersions: () => [...tariffKeys.all, "versions"] as const,
     versions: (tariffId: string) => [...tariffKeys.allVersions(), tariffId] as const,
 
+    /** Global gepflegte Laufzeiten — unabhängig von Produkt und Vertrag. */
+    standardDurations: () => [...tariffKeys.all, "standard-durations"] as const,
+
     durations: (productId: string, contractId: string) =>
         [...tariffKeys.all, "durations", productId, contractId] as const,
 };

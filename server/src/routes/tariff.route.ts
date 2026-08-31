@@ -1,14 +1,17 @@
 import { Router } from "express";
 import {
+    createStandardDuration,
     createTariff,
     createTariffColumn,
     createTariffGroup,
     createTariffRow,
     deleteCustomerPrice,
+    deleteStandardDuration,
     deleteTariff,
     deleteTariffColumn,
     deleteTariffGroup,
     deleteTariffRow,
+    getStandardDurations,
     getTariff,
     getTariffDurations,
     getTariffGroup,
@@ -25,6 +28,7 @@ import {
 } from "@/controllers/index.js";
 import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
+    createStandardDurationSchema,
     createTariffColumnSchema,
     createTariffGroupSchema,
     createTariffRowSchema,
@@ -53,6 +57,15 @@ router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustome
 
 /* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
 router.delete("/customer-price", validateQuery(deleteCustomerPriceSchema), deleteCustomerPrice);
+
+/* [GET] /api/tariffs/standard-durations — global gepflegte Laufzeiten */
+router.get('/standard-durations', getStandardDurations);
+
+/* [POST] /api/tariffs/standard-durations */
+router.post('/standard-durations', validate(createStandardDurationSchema), createStandardDuration);
+
+/* [DELETE] /api/tariffs/standard-durations/:id */
+router.delete('/standard-durations/:id', deleteStandardDuration);
 
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);

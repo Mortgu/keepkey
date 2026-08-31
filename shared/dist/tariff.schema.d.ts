@@ -8,6 +8,33 @@ export declare const tariffRowSchema: z.ZodObject<{
     updatedAt: z.ZodString;
 }, z.core.$strip>;
 export type TariffRow = z.infer<typeof tariffRowSchema>;
+/**
+ * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
+ * nur weil sie nicht am Tarif hängt, steht die Laufzeit eines Angebots fest,
+ * bevor ein Produkt und damit eine Tarifgruppe gewählt ist.
+ */
+export declare const standardDurationSchema: z.ZodObject<{
+    id: z.ZodString;
+    months: z.ZodNumber;
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+}, z.core.$strip>;
+export type StandardDuration = z.infer<typeof standardDurationSchema>;
+export declare const standardDurationListSchema: z.ZodArray<z.ZodObject<{
+    id: z.ZodString;
+    months: z.ZodNumber;
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+}, z.core.$strip>>;
+export type StandardDurationList = z.infer<typeof standardDurationListSchema>;
+/**
+ * Dieselbe Schranke wie {@link createTariffColumnSchema}: eine Laufzeit 0 ließe
+ * jedes Versiegeln einer Tarif-Version scheitern.
+ */
+export declare const createStandardDurationSchema: z.ZodObject<{
+    months: z.ZodInt;
+}, z.core.$strip>;
+export type CreateStandardDurationInput = z.infer<typeof createStandardDurationSchema>;
 export declare const tariffColumnSchema: z.ZodObject<{
     id: z.ZodString;
     tariffId: z.ZodString;

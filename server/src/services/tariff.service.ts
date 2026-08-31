@@ -25,6 +25,7 @@ import type {
     UpdateTariffCellInput,
     UpsertCustomerPriceInput,
     DeleteCustomerPriceInput,
+    CreateStandardDurationInput,
 } from '@keepit/schemas';
 
 /* ========== Types ========== */
@@ -912,4 +913,48 @@ export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
         { productId, contractId, duration, quantity, customerId },
         "Override gelöscht, aber Default-Preis konnte nicht berechnet werden.",
     );
+}
+
+
+/* ========== Standardlaufzeiten ========== */
+
+/**
+ * Die global gepflegten Laufzeiten. Sie sind die Spaltenachse aller
+ * Preistabellen — im Gegensatz zu {@link getTariffDurations} braucht diese
+ * Liste weder Produkt noch Vertrag und steht damit fest, bevor im Angebot
+ * eine Position existiert.
+ */
+export async function getStandardDurations() {
+    return prisma.standardDuration.findMany({ orderBy: { months: "asc" } });
+}
+
+export async function createStandardDuration(input: CreateStandardDurationInput) {
+    const { months } = input;
+
+    const existing = await prisma.standardDuration.findUnique({ where: { months } });
+
+    if (existing) {
+        throw new AppException(
+            `Die Laufzeit ${months} steht bereits in der Liste.`,
+            422,
+            "DURATION_ALREADY_EXISTS",
+        );
+    }
+
+    return prisma.standardDuration.create({ data: { months } });
+}
+
+/**
+ * Entfernt nur den Listeneintrag. Bereits konfigurierte Tarifspalten und die
+ * darin hinterlegten Preise bleiben unangetastet — ein Löschen, das sie
+ * mitnimmt, wäre stiller Datenverlust.
+ */
+export async function deleteStandardDuration(id: string): Promise<void> {
+    const existing = await prisma.standardDuration.findUnique({ where: { id } });
+
+    if (!existing) {
+        throw new AppException("Laufzeit nicht gefunden.", 404, "DURATION_NOT_FOUND");
+    }
+
+    await prisma.standardDuration.delete({ where: { id } });
 }

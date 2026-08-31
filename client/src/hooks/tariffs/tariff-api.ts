@@ -1,6 +1,7 @@
 import type {
     CreateTariffGroupInput,
     CreateTariffInput,
+    StandardDuration,
     Tariff,
     TariffCell,
     TariffGroup,
@@ -61,6 +62,22 @@ export const sealTariffVersion = (groupId: string, tariffId: string) =>
 
 export const restoreTariffVersion = (groupId: string, tariffId: string, versionId: string) =>
     api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/versions/${versionId}/restore`, { method: "POST" });
+
+/* ───────────────────────────────
+   Standardlaufzeiten
+   ─────────────────────────────── */
+
+export const getStandardDurations = () =>
+    api<Array<StandardDuration>>("/api/tariffs/standard-durations", { method: "GET" });
+
+export const createStandardDuration = (months: number) =>
+    api<StandardDuration>("/api/tariffs/standard-durations", {
+        method: "POST",
+        body: JSON.stringify({ months }),
+    });
+
+export const deleteStandardDuration = (id: string) =>
+    api<void>(`/api/tariffs/standard-durations/${id}`, { method: "DELETE" });
 
 export const getTariffDurations = (productId: string, contractId: string) =>
     api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });

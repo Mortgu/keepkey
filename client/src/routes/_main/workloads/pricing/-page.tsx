@@ -3,6 +3,7 @@ import { LoaderCircle, Plus } from "lucide-react";
 import { toast } from "react-toastify";
 import { useEffect, useMemo } from "react";
 import PricingTable from "./-components/pricing-table";
+import StandardDurations from "./-components/standard-durations";
 import TariffGroupModal from "./-components/tariff-group-modal";
 import { useModal, useProducts, useTariffGroups } from "@/hooks";
 import { useCreateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
@@ -58,6 +59,8 @@ export default function PricingPage() {
             </div>
 
             <div className="grid gap-4 px-8 py-6">
+                <StandardDurations />
+
                 {groups.map(group => (
                     <PricingTable key={group.id} group={group} />
                 ))}
