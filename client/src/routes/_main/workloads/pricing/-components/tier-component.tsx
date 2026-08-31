@@ -1,27 +1,25 @@
-import { Trash } from "lucide-react";
 import { useState } from "react";
-import { Button, NumberField } from "@/components";
-import { useDeleteTariffTier, useUpdateTariffTier } from "@/hooks/tariffs/tariff-mutations";
+import { NumberField } from "@/components";
+import { useDeleteStandardTier, useUpdateStandardTier } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
-    groupId: string;
     tierId: string;
     minQty: number;
     maxQty: number | null;
 }
 
 /**
- * Eine Mengenstaffel gehört der Tarifgruppe: Ändern oder Löschen wirkt auf die
- * Preistabellen *aller* Verträge dieser Gruppe, nicht nur auf die angezeigte.
+ * Mengenstaffeln gelten global: Ändern oder Löschen wirkt auf *jede*
+ * Preistabelle, nicht nur auf die angezeigte.
  */
-export default function TariffTierComponent({ groupId, tierId, minQty, maxQty }: Props) {
+export default function TariffTierComponent({ tierId, minQty, maxQty }: Props) {
     const [editMin, setEditMin] = useState(false);
     const [editMax, setEditMax] = useState(false);
     const [min, setMin] = useState(minQty);
     const [max, setMax] = useState(maxQty);
 
-    const { deleteTier } = useDeleteTariffTier();
-    const { updateTier } = useUpdateTariffTier();
+    const { deleteTier } = useDeleteStandardTier();
+    const { updateTier } = useUpdateStandardTier();
 
     // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui
     // parst den getippten Text erst in seinem eigenen Blur-Handler, der nach dem
@@ -30,7 +28,7 @@ export default function TariffTierComponent({ groupId, tierId, minQty, maxQty }:
         if (committed === null || committed === minQty) return;
 
         setMin(committed);
-        await updateTier({ groupId, tierId, min_quantity: committed, max_quantity: max });
+        await updateTier({ id: tierId, min_quantity: committed, max_quantity: max });
     };
 
     // Ein leeres Feld ist hier kein Fehler, sondern die offene Staffel ("∞").
@@ -38,11 +36,11 @@ export default function TariffTierComponent({ groupId, tierId, minQty, maxQty }:
         if (committed === maxQty) return;
 
         setMax(committed);
-        await updateTier({ groupId, tierId, min_quantity: min, max_quantity: committed });
+        await updateTier({ id: tierId, min_quantity: min, max_quantity: committed });
     };
 
     return (
-        <td className="border-b border-r border-(--border)">
+        <td className="">
             <div className="flex-1 min-w-fit w-full flex flex-wrap items-center px-3 py-1">
                 <div className="flex-1 flex items-center gap-3">
                     <div className="relative max-w-fit box-border">
@@ -68,9 +66,6 @@ export default function TariffTierComponent({ groupId, tierId, minQty, maxQty }:
                         )}
                     </div>
                 </div>
-                <Button variant="link" size="xs" icon={<Trash className="size-3" />} iconOnly
-                    title="Staffel in allen Verträgen dieser Gruppe entfernen"
-                    onClick={() => deleteTier({ groupId, tierId })} />
             </div>
         </td>
     );

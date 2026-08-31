@@ -2,10 +2,10 @@ import type {
     CreateTariffGroupInput,
     CreateTariffInput,
     StandardDuration,
+    StandardTier,
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffTier,
     TariffVersion,
     UpdateTariffGroupInput,
 } from '@keepit/schemas';
@@ -79,27 +79,30 @@ export const createStandardDuration = (months: number) =>
 export const deleteStandardDuration = (id: string) =>
     api<void>(`/api/tariffs/standard-durations/${id}`, { method: "DELETE" });
 
-export const getTariffDurations = (productId: string, contractId: string) =>
-    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });
-
 /* ───────────────────────────────
-   Mengenstaffel — gehört der Gruppe, nicht dem einzelnen Tarif
+   Standard-Mengenstaffeln
    ─────────────────────────────── */
 
-export const createTariffTier = (groupId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffGroup>(`/api/tariffs/${groupId}/tiers`, {
+export const getStandardTiers = () =>
+    api<Array<StandardTier>>("/api/tariffs/standard-tiers", { method: "GET" });
+
+export const createStandardTier = (min_quantity: number, max_quantity: number | null) =>
+    api<StandardTier>("/api/tariffs/standard-tiers", {
         method: "POST",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
-export const updateTariffTier = (groupId: string, tierId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffTier>(`/api/tariffs/${groupId}/tiers/${tierId}`, {
+export const updateStandardTier = (id: string, min_quantity: number, max_quantity: number | null) =>
+    api<StandardTier>(`/api/tariffs/standard-tiers/${id}`, {
         method: "PATCH",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
-export const deleteTariffTier = (groupId: string, tierId: string) =>
-    api<void>(`/api/tariffs/${groupId}/tiers/${tierId}`, { method: "DELETE" });
+export const deleteStandardTier = (id: string) =>
+    api<void>(`/api/tariffs/standard-tiers/${id}`, { method: "DELETE" });
+
+export const getTariffDurations = (productId: string, contractId: string) =>
+    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });
 
 /* ───────────────────────────────
    Zelle — adressiert über ihre Koordinate, nicht über eine Id

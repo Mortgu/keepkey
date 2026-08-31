@@ -4,13 +4,12 @@ import { contractSchema } from './contract.schema.js';
 
 
 /**
- * Mengenstaffel. Hängt an der Tarifgruppe, nicht am einzelnen Tarif: alle
- * Verträge einer Gruppe teilen sich dieselben Staffeln, nur die Preise darin
- * unterscheiden sich.
+ * Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+ * Zusammen mit {@link standardDurationSchema} spannt sie das Raster auf; ein
+ * Tarif trägt nur noch die Preise an diesen Koordinaten.
  */
-export const tariffTierSchema = z.object({
+export const standardTierSchema = z.object({
     id: z.string(),
-    tariffGroupId: z.string(),
 
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
@@ -18,7 +17,10 @@ export const tariffTierSchema = z.object({
     createdAt: z.string(),
     updatedAt: z.string(),
 });
-export type TariffTier = z.infer<typeof tariffTierSchema>;
+export type StandardTier = z.infer<typeof standardTierSchema>;
+
+export const standardTierListSchema = z.array(standardTierSchema);
+export type StandardTierList = z.infer<typeof standardTierListSchema>;
 
 /**
  * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
@@ -138,7 +140,6 @@ const tariffGroupSlimSchema = z.object({
     id: z.string(),
 
     products: z.array(tariffGroupProductSchema),
-    tiers: z.array(tariffTierSchema),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -161,18 +162,18 @@ export const createTariffSchema = z.object({
 });
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
-/** Mengenstaffel (create) — an der Tarifgruppe, nicht am Tarif. */
-export const createTariffTierSchema = z.object({
-    min_quantity: z.int(),
-    max_quantity: z.int().nullable(),
+/** Mengenstaffel (create) — gilt global, nicht je Gruppe. */
+export const createStandardTierSchema = z.object({
+    min_quantity: z.int().positive(),
+    max_quantity: z.int().positive().nullable(),
 });
-export type CreateTariffTierInput = z.infer<typeof createTariffTierSchema>;
+export type CreateStandardTierInput = z.infer<typeof createStandardTierSchema>;
 
-export const updateTariffTierSchema = z.object({
-    min_quantity: z.int().optional(),
-    max_quantity: z.int().nullable().optional(),
+export const updateStandardTierSchema = z.object({
+    min_quantity: z.int().positive().optional(),
+    max_quantity: z.int().positive().nullable().optional(),
 });
-export type UpdateTariffTierInput = z.infer<typeof updateTariffTierSchema>;
+export type UpdateStandardTierInput = z.infer<typeof updateStandardTierSchema>;
 
 /**
  * TariffCell (update) — setzt den Listenpreis der Zelle.
@@ -239,7 +240,6 @@ export const tariffGroupSchema = z.object({
     id: z.string(),
 
     products: z.array(tariffGroupProductSchema),
-    tiers: z.array(tariffTierSchema),
     tariffs: z.array(tariffBaseSchema),
 
     createdAt: z.string(),

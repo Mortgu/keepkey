@@ -4,10 +4,6 @@ model TariffGroup {
   products TariffGroupProduct[]
   tariffs  Tariff[]
 
-  /// Die Mengenachse aller Preistabellen dieser Gruppe. Alle Vertraege einer
-  /// Gruppe teilen sich dieselben Staffeln — nur die Preise unterscheiden sich.
-  tiers TariffTier[]
-
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -50,23 +46,21 @@ model Tariff {
   @@map("tariff")
 }
 
-/// Mengenstaffel einer Tarifgruppe.
-model TariffTier {
+/// Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+/// Zusammen mit StandardDuration spannt sie das Raster auf; ein Tarif traegt
+/// nur noch die Preise an diesen Koordinaten.
+model StandardTier {
   id String @id @default(cuid())
 
-  tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id], onDelete: Cascade)
-  tariffGroupId String
-
   /// Zugleich Sortierschluessel: Staffeln ueberschneiden sich nicht (siehe
-  /// assertNoOverlap), die Untergrenze ist innerhalb einer Gruppe eindeutig.
-  min_quantity Int
+  /// assertNoOverlap), die Untergrenze ist damit eindeutig.
+  min_quantity Int  @unique
   max_quantity Int?
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([tariffGroupId, min_quantity])
-  @@map("tariff_tier")
+  @@map("standard_tier")
 }
 
 /// Ein Preis an seiner Koordinate — dieselbe Schluesselform wie
@@ -80,7 +74,7 @@ model TariffCell {
 
   /// == StandardDuration.months
   duration     Int
-  /// == TariffTier.min_quantity
+  /// == StandardTier.min_quantity
   min_quantity Int
 
   price Int

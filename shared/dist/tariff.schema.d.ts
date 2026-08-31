@@ -1,18 +1,25 @@
 import { z } from 'zod';
 /**
- * Mengenstaffel. Hängt an der Tarifgruppe, nicht am einzelnen Tarif: alle
- * Verträge einer Gruppe teilen sich dieselben Staffeln, nur die Preise darin
- * unterscheiden sich.
+ * Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+ * Zusammen mit {@link standardDurationSchema} spannt sie das Raster auf; ein
+ * Tarif trägt nur noch die Preise an diesen Koordinaten.
  */
-export declare const tariffTierSchema: z.ZodObject<{
+export declare const standardTierSchema: z.ZodObject<{
     id: z.ZodString;
-    tariffGroupId: z.ZodString;
     min_quantity: z.ZodNumber;
     max_quantity: z.ZodNullable<z.ZodNumber>;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
-export type TariffTier = z.infer<typeof tariffTierSchema>;
+export type StandardTier = z.infer<typeof standardTierSchema>;
+export declare const standardTierListSchema: z.ZodArray<z.ZodObject<{
+    id: z.ZodString;
+    min_quantity: z.ZodNumber;
+    max_quantity: z.ZodNullable<z.ZodNumber>;
+    createdAt: z.ZodString;
+    updatedAt: z.ZodString;
+}, z.core.$strip>>;
+export type StandardTierList = z.infer<typeof standardTierListSchema>;
 /**
  * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
  * nur weil sie nicht am Tarif hängt, steht die Laufzeit eines Angebots fest,
@@ -170,17 +177,17 @@ export declare const createTariffSchema: z.ZodObject<{
     contractId: z.ZodString;
 }, z.core.$strip>;
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
-/** Mengenstaffel (create) — an der Tarifgruppe, nicht am Tarif. */
-export declare const createTariffTierSchema: z.ZodObject<{
+/** Mengenstaffel (create) — gilt global, nicht je Gruppe. */
+export declare const createStandardTierSchema: z.ZodObject<{
     min_quantity: z.ZodInt;
     max_quantity: z.ZodNullable<z.ZodInt>;
 }, z.core.$strip>;
-export type CreateTariffTierInput = z.infer<typeof createTariffTierSchema>;
-export declare const updateTariffTierSchema: z.ZodObject<{
+export type CreateStandardTierInput = z.infer<typeof createStandardTierSchema>;
+export declare const updateStandardTierSchema: z.ZodObject<{
     min_quantity: z.ZodOptional<z.ZodInt>;
     max_quantity: z.ZodOptional<z.ZodNullable<z.ZodInt>>;
 }, z.core.$strip>;
-export type UpdateTariffTierInput = z.infer<typeof updateTariffTierSchema>;
+export type UpdateStandardTierInput = z.infer<typeof updateStandardTierSchema>;
 /**
  * TariffCell (update) — setzt den Listenpreis der Zelle.
  *
@@ -292,14 +299,6 @@ export declare const tariffSchema: z.ZodObject<{
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;
-        tiers: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            tariffGroupId: z.ZodString;
-            min_quantity: z.ZodNumber;
-            max_quantity: z.ZodNullable<z.ZodNumber>;
-            createdAt: z.ZodString;
-            updatedAt: z.ZodString;
-        }, z.core.$strip>>;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>;
@@ -329,14 +328,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
         productId: z.ZodString;
-        createdAt: z.ZodString;
-        updatedAt: z.ZodString;
-    }, z.core.$strip>>;
-    tiers: z.ZodArray<z.ZodObject<{
-        id: z.ZodString;
-        tariffGroupId: z.ZodString;
-        min_quantity: z.ZodNumber;
-        max_quantity: z.ZodNullable<z.ZodNumber>;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;

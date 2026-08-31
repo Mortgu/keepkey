@@ -24,6 +24,11 @@ export const getTariffVersions = async (request: Request, response: Response) =>
     return response.status(200).json(versions);
 };
 
+export const getStandardTiers = async (request: Request, response: Response) => {
+    const tiers = await tariffService.getStandardTiers();
+    return response.status(200).json(tiers);
+};
+
 export const getStandardDurations = async (request: Request, response: Response) => {
     const durations = await tariffService.getStandardDurations();
     return response.status(200).json(durations);
@@ -88,9 +93,9 @@ export const restoreTariffVersion = async (request: Request, response: Response)
     return response.status(200).json(tariff);
 };
 
-export const createTariffTier = async (request: Request, response: Response) => {
-    const group = await tariffService.createTariffTier(request.params.id as string, request.body);
-    return response.status(201).json(group);
+export const createStandardTier = async (request: Request, response: Response) => {
+    const tier = await tariffService.createStandardTier(request.body);
+    return response.status(201).json(tier);
 };
 
 /* ========== UPDATE ========== */
@@ -103,8 +108,8 @@ export const updateTariffGroup = async (request: Request, response: Response) =>
     return response.status(200).json(group);
 };
 
-export const updateTariffTier = async (request: Request, response: Response) => {
-    const tier = await tariffService.updateTariffTier(request.params.tierId as string, request.body);
+export const updateStandardTier = async (request: Request, response: Response) => {
+    const tier = await tariffService.updateStandardTier(request.params.id as string, request.body);
     return response.status(200).json(tier);
 };
 
@@ -136,8 +141,8 @@ export const deleteTariff = async (request: Request, response: Response) => {
     return response.status(200).json({ success: true, message: "Tariff deleted." });
 };
 
-export const deleteTariffTier = async (request: Request, response: Response) => {
-    await tariffService.deleteTariffTier(request.params.tierId as string);
+export const deleteStandardTier = async (request: Request, response: Response) => {
+    await tariffService.deleteStandardTier(request.params.id as string);
     return response.status(204).send();
 };
 

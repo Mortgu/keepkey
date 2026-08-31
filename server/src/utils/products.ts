@@ -155,8 +155,8 @@ export function selectPrice(
 
 /**
  * Laedt den Tarif zu einer Produkt/Vertrags-Kombination und bringt ihn in die
- * Form, die {@link selectPrice} erwartet. Die Tarifgruppe wird nur wegen ihrer
- * Mengenstaffeln mitgeladen — die Staffeln gehoeren ihr, nicht dem Tarif.
+ * Form, die {@link selectPrice} erwartet. Die Mengenstaffeln kommen aus der
+ * globalen Liste — sie sind die Zeilenachse aller Preistabellen.
  *
  * `customerId` verengt die geladenen Overrides auf einen Kunden, damit fremde
  * Kundenpreise die Datenbank nie verlassen.
@@ -173,15 +173,14 @@ export async function loadTariffForPricing(productId: string, contractId: string
         include: {
             cells: { orderBy: [{ duration: 'asc' }, { min_quantity: 'asc' }] },
             customerPrices: customerId ? { where: { customerId } } : true,
-            tariffGroup: {
-                select: { tiers: { orderBy: { min_quantity: 'asc' } } },
-            },
         },
     });
 
     if (!tariff) return null;
 
-    return { ...tariff, tiers: tariff.tariffGroup.tiers };
+    const tiers = await prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
+
+    return { ...tariff, tiers };
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {

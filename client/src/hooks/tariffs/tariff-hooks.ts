@@ -22,6 +22,13 @@ export function useStandardDurations() {
     return { durations, isPending, error };
 }
 
+/** Die global gepflegten Mengenstaffeln — die Zeilenachse jeder Preistabelle. */
+export function useStandardTiers() {
+    const { data: tiers = [], isPending, error } = useQuery(tariffQueries.standardTiers());
+
+    return { tiers, isPending, error };
+}
+
 export function useTariffDurationsHook(productId: string, contractId: string) {
     const { data: durations = [], isPending, error } = useQuery(tariffQueries.durations(productId, contractId));
 

@@ -2,18 +2,18 @@ import {  useMutation, useQueryClient } from "@tanstack/react-query";
 import { tariffKeys } from "./tariff-keys";
 import {
     createStandardDuration,
+    createStandardTier,
     createTariff,
     createTariffGroup,
-    createTariffTier,
     deleteStandardDuration,
+    deleteStandardTier,
     deleteTariff,
     deleteTariffGroup,
-    deleteTariffTier,
     restoreTariffVersion,
     sealTariffVersion,
+    updateStandardTier,
     updateTariffCell,
     updateTariffGroup,
-    updateTariffTier,
 } from "./tariff-api";
 import type {QueryClient} from "@tanstack/react-query";
 import type {
@@ -154,33 +154,31 @@ export function useRestoreTariffVersion() {
 }
 
 /* ───────────────────────────────
-   Mengenstaffel — wirkt auf alle Tarife der Gruppe
+   Standard-Mengenstaffeln — wirken auf jede Preistabelle
    ─────────────────────────────── */
 
-export function useCreateTariffTier() {
+export function useCreateStandardTier() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, min_quantity, max_quantity }: {
-            groupId: string; min_quantity: number; max_quantity: number | null;
-        }) => createTariffTier(groupId, min_quantity, max_quantity),
-        invalidateStructure,
+        ({ min_quantity, max_quantity }: { min_quantity: number; max_quantity: number | null }) =>
+            createStandardTier(min_quantity, max_quantity),
+        invalidateAll,
     );
     return { createTier: mutateAsync, isPending, error };
 }
 
-export function useUpdateTariffTier() {
+export function useUpdateStandardTier() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tierId, min_quantity, max_quantity }: {
-            groupId: string; tierId: string; min_quantity: number; max_quantity: number | null;
-        }) => updateTariffTier(groupId, tierId, min_quantity, max_quantity),
-        invalidateStructure,
+        ({ id, min_quantity, max_quantity }: { id: string; min_quantity: number; max_quantity: number | null }) =>
+            updateStandardTier(id, min_quantity, max_quantity),
+        invalidateAll,
     );
     return { updateTier: mutateAsync, isPending, error };
 }
 
-export function useDeleteTariffTier() {
+export function useDeleteStandardTier() {
     const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tierId }: { groupId: string; tierId: string }) => deleteTariffTier(groupId, tierId),
-        invalidateStructure,
+        (id: string) => deleteStandardTier(id),
+        invalidateAll,
     );
     return { deleteTier: mutate, isPending, error };
 }

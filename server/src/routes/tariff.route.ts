@@ -1,15 +1,16 @@
 import { Router } from "express";
 import {
     createStandardDuration,
+    createStandardTier,
     createTariff,
     createTariffGroup,
-    createTariffTier,
     deleteCustomerPrice,
     deleteStandardDuration,
+    deleteStandardTier,
     deleteTariff,
     deleteTariffGroup,
-    deleteTariffTier,
     getStandardDurations,
+    getStandardTiers,
     getTariff,
     getTariffDurations,
     getTariffGroup,
@@ -18,21 +19,21 @@ import {
     getTariffVersions,
     restoreTariffVersion,
     sealTariffVersion,
+    updateStandardTier,
     updateTariffCell,
     updateTariffGroup,
-    updateTariffTier,
     upsertCustomerPrice
 } from "@/controllers/index.js";
 import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
     createStandardDurationSchema,
+    createStandardTierSchema,
     createTariffGroupSchema,
     createTariffSchema,
-    createTariffTierSchema,
     deleteCustomerPriceSchema,
+    updateStandardTierSchema,
     updateTariffCellSchema,
     updateTariffGroupSchema,
-    updateTariffTierSchema,
     upsertCustomerPriceSchema,
 } from "@keepit/schemas";
 
@@ -61,6 +62,18 @@ router.post('/standard-durations', validate(createStandardDurationSchema), creat
 
 /* [DELETE] /api/tariffs/standard-durations/:id */
 router.delete('/standard-durations/:id', deleteStandardDuration);
+
+/* [GET] /api/tariffs/standard-tiers — global gepflegte Mengenstaffeln */
+router.get('/standard-tiers', getStandardTiers);
+
+/* [POST] /api/tariffs/standard-tiers */
+router.post('/standard-tiers', validate(createStandardTierSchema), createStandardTier);
+
+/* [PATCH] /api/tariffs/standard-tiers/:id */
+router.patch('/standard-tiers/:id', validate(updateStandardTierSchema), updateStandardTier);
+
+/* [DELETE] /api/tariffs/standard-tiers/:id */
+router.delete('/standard-tiers/:id', deleteStandardTier);
 
 /* [GET] /api/tariffs/durations/:productId/:contractId */
 router.get('/durations/:productId/:contractId', getTariffDurations);
@@ -91,15 +104,6 @@ router.post('/:id/:tariffId/versions', sealTariffVersion);
 
 /* [POST] /api/tariffs/:id/:tariffId/versions/:versionId/restore */
 router.post('/:id/:tariffId/versions/:versionId/restore', restoreTariffVersion);
-
-/* [POST] /api/tariffs/:id/tiers — Mengenstaffel der Gruppe */
-router.post('/:id/tiers', validate(createTariffTierSchema), createTariffTier);
-
-/* [PATCH] /api/tariffs/:id/tiers/:tierId */
-router.patch('/:id/tiers/:tierId', validate(updateTariffTierSchema), updateTariffTier);
-
-/* [DELETE] /api/tariffs/:id/tiers/:tierId */
-router.delete('/:id/tiers/:tierId', deleteTariffTier);
 
 /* [PATCH] /api/tariffs/:id/:tariffId/cell — Preis an einer Koordinate setzen */
 router.patch('/:id/:tariffId/cell', validate(updateTariffCellSchema), updateTariffCell);

@@ -77,18 +77,39 @@ export default function PricingTable({ group }: Props) {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button size="sm" variant="border" icon={<Plus className="size-3.5" />} iconOnly
-                        onClick={() => modal.open()} />
-                    <Button size="sm" variant="border" icon={<Pen className="size-3.5" />} iconOnly
-                        onClick={() => editModal.open()} loading={updateTariffGroupPending} disabled={updateTariffGroupPending} />
-                    <Button size="sm" variant="border" icon={<Trash className="size-3.5" />} iconOnly
-                        onClick={() => deleteTariffGroup({ id: group.id })} loading={deleteTariffGroupPending} disabled={deleteTariffGroupPending} />
+                    <Button
+                        size="sm"
+                        variant="border"
+                        icon={<Plus className="size-3.5" />}
+                        iconOnly
+                        onClick={() => modal.open()}
+                    />
+
+                    <Button
+                        size="sm"
+                        variant="border"
+                        icon={<Pen className="size-3.5" />}
+                        iconOnly
+                        onClick={() => editModal.open()}
+                        loading={updateTariffGroupPending}
+                        disabled={updateTariffGroupPending}
+                    />
+
+                    <Button
+                        size="sm"
+                        variant="border"
+                        icon={<Trash className="size-3.5" />}
+                        iconOnly
+                        onClick={() => deleteTariffGroup({ id: group.id })}
+                        loading={deleteTariffGroupPending}
+                        disabled={deleteTariffGroupPending}
+                    />
                 </div>
             </div>
 
             <div className="grid">
                 {group.tariffs.map(tariff => (
-                    <PricingTableItem key={tariff.id} tariff={tariff} tiers={group.tiers} />
+                    <PricingTableItem key={tariff.id} tariff={tariff} />
                 ))}
             </div>
 

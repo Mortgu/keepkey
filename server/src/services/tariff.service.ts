@@ -18,8 +18,8 @@ import type {
     CreateTariffInput,
     CreateTariffGroupInput,
     UpdateTariffGroupInput,
-    CreateTariffTierInput,
-    UpdateTariffTierInput,
+    CreateStandardTierInput,
+    UpdateStandardTierInput,
     UpdateTariffCellInput,
     UpsertCustomerPriceInput,
     DeleteCustomerPriceInput,
@@ -44,9 +44,6 @@ const TARIFF_INCLUDE = {
                         }
                     }
                 }
-            },
-            tiers: {
-                orderBy: { min_quantity: 'asc' },
             },
         }
     },
@@ -78,9 +75,6 @@ const TARIFF_GROUP_INCLUDE = {
             },
             customerPrices: true,
         },
-    },
-    tiers: {
-        orderBy: { min_quantity: 'asc' },
     },
 } as const;
 
@@ -211,7 +205,6 @@ function assertNoOverlap(
 /** Genau die Felder, die in einen Versions-Snapshot einfließen. */
 const TARIFF_STRUCTURE_INCLUDE = {
     cells: true,
-    tariffGroup: { select: { tiers: { orderBy: { min_quantity: 'asc' } } } },
 } as const satisfies Prisma.TariffInclude;
 
 /**
@@ -243,7 +236,8 @@ export async function sealTariffVersion(
         include: TARIFF_STRUCTURE_INCLUDE,
     });
 
-    const snapshot = buildTariffVersionSnapshot({ ...tariff, tiers: tariff.tariffGroup.tiers });
+    const tiers = await tx.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
+    const snapshot = buildTariffVersionSnapshot({ ...tariff, tiers });
     const hash = hashTariffSnapshot(snapshot);
 
     const existing = await tx.tariffVersion.findFirst({ where: { tariffId, hash } });
@@ -336,9 +330,8 @@ export async function getTariffVersions(tariffId: string) {
         throw new AppException("Tariff not found.", 404, "TARIFF_NOT_FOUND");
     }
 
-    const currentHash = hashTariffSnapshot(
-        buildTariffVersionSnapshot({ ...tariff, tiers: tariff.tariffGroup.tiers }),
-    );
+    const tiers = await prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
+    const currentHash = hashTariffSnapshot(buildTariffVersionSnapshot({ ...tariff, tiers }));
 
     const versions = await prisma.tariffVersion.findMany({
         where: { tariffId },
@@ -611,37 +604,29 @@ export async function restoreTariffVersion(tariffId: string, versionId: string, 
 }
 
 /**
- * Legt eine Mengenstaffel an der Tarifgruppe an. Sie gilt damit für alle
- * Verträge der Gruppe — Zellen entstehen erst, wenn ein Preis eingetragen wird.
+ * Legt eine Mengenstaffel an. Sie gilt für *alle* Preistabellen — Zellen
+ * entstehen erst, wenn ein Preis eingetragen wird.
  */
-export async function createTariffTier(tariffGroupId: string, input: CreateTariffTierInput) {
+export async function createStandardTier(input: CreateStandardTierInput) {
     const { min_quantity, max_quantity } = input;
 
-    const group = await prisma.tariffGroup.findUniqueOrThrow({
-        where: { id: tariffGroupId },
-        include: { tiers: { select: { id: true, min_quantity: true, max_quantity: true } } },
-    });
-
     assertQuantityRange({ min_quantity, max_quantity });
-    assertNoOverlap(group.tiers, { min_quantity, max_quantity });
 
-    await prisma.tariffTier.create({
-        data: { tariffGroupId, min_quantity, max_quantity },
+    const existing = await prisma.standardTier.findMany({
+        select: { id: true, min_quantity: true, max_quantity: true },
     });
+    assertNoOverlap(existing, { min_quantity, max_quantity });
 
-    return prisma.tariffGroup.findUniqueOrThrow({
-        where: { id: tariffGroupId },
-        include: TARIFF_GROUP_INCLUDE,
-    });
+    return prisma.standardTier.create({ data: { min_quantity, max_quantity } });
 }
 
-export async function updateTariffTier(tierId: string, input: UpdateTariffTierInput) {
+export async function updateStandardTier(tierId: string, input: UpdateStandardTierInput) {
     const { min_quantity, max_quantity } = input;
 
     return prisma.$transaction(async (tx) => {
-        const current = await tx.tariffTier.findUnique({
+        const current = await tx.standardTier.findUnique({
             where: { id: tierId },
-            select: { id: true, tariffGroupId: true, min_quantity: true, max_quantity: true },
+            select: { id: true, min_quantity: true, max_quantity: true },
         });
 
         if (!current) {
@@ -655,20 +640,17 @@ export async function updateTariffTier(tierId: string, input: UpdateTariffTierIn
 
         assertQuantityRange(next);
 
-        const siblings = await tx.tariffTier.findMany({
-            where: { tariffGroupId: current.tariffGroupId },
+        const siblings = await tx.standardTier.findMany({
             select: { id: true, min_quantity: true, max_quantity: true },
         });
-
         assertNoOverlap(siblings, next, tierId);
 
-        // Zellen und Kundenpreise hängen an der Untergrenze, nicht an der
-        // Staffel-Id — beide müssen mitwandern, sonst zeigen sie ins Leere.
+        // Beim Verschieben der Untergrenze wandern Zellen und Kundenpreise mit:
+        // sie hängen an der Koordinate, nicht an der Staffel-Id, und zeigten
+        // sonst auf eine Zeile, die es nicht mehr gibt. (Beim *Löschen* bleiben
+        // sie dagegen liegen — siehe deleteStandardTier.)
         if (next.min_quantity !== current.min_quantity) {
-            const tariffs = await tx.tariff.findMany({
-                where: { tariffGroupId: current.tariffGroupId },
-                select: { id: true },
-            });
+            const tariffs = await tx.tariff.findMany({ select: { id: true } });
 
             for (const tariff of tariffs) {
                 await tx.tariffCell.deleteMany({
@@ -684,32 +666,28 @@ export async function updateTariffTier(tierId: string, input: UpdateTariffTierIn
             }
         }
 
-        return tx.tariffTier.update({ where: { id: tierId }, data: next });
+        return tx.standardTier.update({ where: { id: tierId }, data: next });
     });
 }
 
-export async function deleteTariffTier(tierId: string) {
-    return prisma.$transaction(async (tx) => {
-        const tier = await tx.tariffTier.delete({ where: { id: tierId } });
+/**
+ * Entfernt nur den Listeneintrag. Hinterlegte Preise auf dieser Mengenstufe
+ * bleiben stehen — genau wie bei {@link deleteStandardDuration}. Sie sind nicht
+ * mehr erreichbar und kommen vollständig zurück, sobald die Staffel wieder
+ * angelegt wird; ein Klick soll keine Preise in jeder Gruppe vernichten.
+ */
+export async function deleteStandardTier(tierId: string): Promise<void> {
+    const existing = await prisma.standardTier.findUnique({ where: { id: tierId } });
 
-        const tariffs = await tx.tariff.findMany({
-            where: { tariffGroupId: tier.tariffGroupId },
-            select: { id: true },
-        });
+    if (!existing) {
+        throw new AppException("Mengenstaffel nicht gefunden.", 404, "NO_ROW");
+    }
 
-        // Ohne dieses Aufräumen blieben Zelle und Kundenpreis als Waisen liegen
-        // und wachten wieder auf, sobald jemand dieselbe Untergrenze anlegt.
-        for (const tariff of tariffs) {
-            await tx.tariffCell.deleteMany({
-                where: { tariffId: tariff.id, min_quantity: tier.min_quantity },
-            });
-            await tx.tariffCustomerPrice.deleteMany({
-                where: { tariffId: tariff.id, min_quantity: tier.min_quantity },
-            });
-        }
+    await prisma.standardTier.delete({ where: { id: tierId } });
+}
 
-        return tier;
-    });
+export async function getStandardTiers() {
+    return prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
 }
 
 /**

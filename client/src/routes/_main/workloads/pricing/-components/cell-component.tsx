@@ -48,14 +48,21 @@ export default function TariffCellComponent({ groupId, tariffId, duration, minQu
     };
 
     return (
-        <td className="relative border border-(--border) px-3 py-1" onClick={startEdit}>
+        <td className="relative border-b border-l border-r px-3 py-1 last:border-r-0 last:border-r-red-500 border-(--border)" onClick={startEdit}>
             {edit && (
                 <div className="absolute inset-0 flex items-center px-1">
-                    <NumberField size="xs" hideSteppers autoFocus min={0} step={0.01}
+                    <NumberField
+                        size="xs"
+                        autoFocus
+                        min={0}
+                        step={0.01}
                         format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
                         suffix="€"
-                        value={draft} onValueChange={(v) => setDraft(v)}
-                        onValueCommitted={handleCommit} onBlur={() => setEdit(false)} />
+                        value={draft}
+                        onValueChange={(v) => setDraft(v)}
+                        onValueCommitted={handleCommit}
+                        onBlur={() => setEdit(false)}
+                    />
                 </div>
             )}
             {!edit && price !== null && (

@@ -2,18 +2,18 @@ import { z } from 'zod';
 import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
 /**
- * Mengenstaffel. Hängt an der Tarifgruppe, nicht am einzelnen Tarif: alle
- * Verträge einer Gruppe teilen sich dieselben Staffeln, nur die Preise darin
- * unterscheiden sich.
+ * Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+ * Zusammen mit {@link standardDurationSchema} spannt sie das Raster auf; ein
+ * Tarif trägt nur noch die Preise an diesen Koordinaten.
  */
-export const tariffTierSchema = z.object({
+export const standardTierSchema = z.object({
     id: z.string(),
-    tariffGroupId: z.string(),
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
+export const standardTierListSchema = z.array(standardTierSchema);
 /**
  * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
  * nur weil sie nicht am Tarif hängt, steht die Laufzeit eines Angebots fest,
@@ -101,7 +101,6 @@ const tariffBaseSchema = z.object({
 const tariffGroupSlimSchema = z.object({
     id: z.string(),
     products: z.array(tariffGroupProductSchema),
-    tiers: z.array(tariffTierSchema),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -116,14 +115,14 @@ export const updateTariffGroupSchema = z.object({
 export const createTariffSchema = z.object({
     contractId: z.string().min(1),
 });
-/** Mengenstaffel (create) — an der Tarifgruppe, nicht am Tarif. */
-export const createTariffTierSchema = z.object({
-    min_quantity: z.int(),
-    max_quantity: z.int().nullable(),
+/** Mengenstaffel (create) — gilt global, nicht je Gruppe. */
+export const createStandardTierSchema = z.object({
+    min_quantity: z.int().positive(),
+    max_quantity: z.int().positive().nullable(),
 });
-export const updateTariffTierSchema = z.object({
-    min_quantity: z.int().optional(),
-    max_quantity: z.int().nullable().optional(),
+export const updateStandardTierSchema = z.object({
+    min_quantity: z.int().positive().optional(),
+    max_quantity: z.int().positive().nullable().optional(),
 });
 /**
  * TariffCell (update) — setzt den Listenpreis der Zelle.
@@ -175,7 +174,6 @@ export const tariffSchema = tariffBaseSchema.extend({
 export const tariffGroupSchema = z.object({
     id: z.string(),
     products: z.array(tariffGroupProductSchema),
-    tiers: z.array(tariffTierSchema),
     tariffs: z.array(tariffBaseSchema),
     createdAt: z.string(),
     updatedAt: z.string(),

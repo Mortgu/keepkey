@@ -1,16 +1,12 @@
-import { Plus } from "lucide-react";
 import { useMemo } from "react";
 import TariffCellComponent from "./cell-component";
 import TariffTierComponent from "./tier-component";
-import type { TariffBase, TariffTier } from "@keepit/schemas";
-import { useCreateTariffTier } from "@/hooks/tariffs/tariff-mutations";
-import { useStandardDurations } from "@/hooks";
-import { Button } from "@/components";
+import type { StandardTier, TariffBase } from "@keepit/schemas";
+import { useCreateStandardTier } from "@/hooks/tariffs/tariff-mutations";
+import { useStandardDurations, useStandardTiers } from "@/hooks";
 
 type Props = {
     tariff: TariffBase;
-    /** Die Mengenstaffeln der Gruppe — sie gehören nicht dem einzelnen Tarif. */
-    tiers: Array<TariffTier>;
 };
 
 /**
@@ -18,7 +14,7 @@ type Props = {
  * nach oben offen, gibt es hinter ihr keinen Platz — sie wird deshalb zuerst
  * begrenzt und die neue übernimmt den offenen Rest.
  */
-function nextTier(tiers: Array<TariffTier>) {
+function nextTier(tiers: Array<StandardTier>) {
     const sorted = [...tiers].sort((a, b) => a.min_quantity - b.min_quantity);
     const last = sorted.at(-1);
 
@@ -30,9 +26,10 @@ function nextTier(tiers: Array<TariffTier>) {
     return { min_quantity: last.max_quantity + 1, max_quantity: null, boundFor: null };
 }
 
-export default function TariffComponent({ tariff, tiers }: Props) {
-    const { createTier } = useCreateTariffTier();
+export default function TariffComponent({ tariff }: Props) {
+    const { createTier } = useCreateStandardTier();
     const { durations: standardDurations } = useStandardDurations();
+    const { tiers } = useStandardTiers();
 
     const groupId = tariff.tariffGroupId;
 
@@ -67,44 +64,40 @@ export default function TariffComponent({ tariff, tiers }: Props) {
     const handleAddTier = async () => {
         const next = nextTier(tiers);
 
-        if (next.boundFor) {
-            await createTier({ groupId, min_quantity: next.min_quantity, max_quantity: null });
-            return;
-        }
-
-        await createTier({ groupId, min_quantity: next.min_quantity, max_quantity: next.max_quantity });
+        await createTier({ min_quantity: next.min_quantity, max_quantity: next.max_quantity });
     };
 
     return (
-        <div className="border-b border-(--border)">
+        <div className="">
             <div className="flex items-center">
                 <table className="w-full">
-                    <thead className="h-fit">
-                        <tr className="border-b border-(--border) bg-(--subtle-50)">
+                    <thead className="h-[41px] border-b border-(--border)">
+                        <tr className="">
                             <th className="border-r border-(--border)" />
 
                             {columns.map(column => (
-                                <th key={column.duration} className="border-r border-(--border) px-3 py-1">
+                                <th key={column.duration} className="px-3 py-1 last:border-r-0 border-r border-(--border)">
                                     <div
                                         className={column.orphan ? "text-(--text-secondary)" : undefined}
                                         title={column.orphan
                                             ? "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar."
                                             : undefined}
                                     >
-                                        {column.duration} Monate
+                                        <p className="font-medium text-md">{column.duration} Monate</p>
                                     </div>
                                 </th>
                             ))}
-
-                            <th />
                         </tr>
                     </thead>
 
                     <tbody>
                         {sortedTiers.map(tier => (
-                            <tr key={tier.id}>
-                                <TariffTierComponent groupId={groupId} tierId={tier.id}
-                                    minQty={tier.min_quantity} maxQty={tier.max_quantity} />
+                            <tr key={tier.id} className="h-[41px] border-b border-(--border)">
+                                <TariffTierComponent
+                                    tierId={tier.id}
+                                    minQty={tier.min_quantity}
+                                    maxQty={tier.max_quantity}
+                                />
 
                                 {columns.map(column => (
                                     <TariffCellComponent
@@ -116,19 +109,8 @@ export default function TariffComponent({ tariff, tiers }: Props) {
                                         price={priceAt(column.duration, tier.min_quantity)}
                                     />
                                 ))}
-
-                                <td />
                             </tr>
                         ))}
-
-                        <tr>
-                            <td className="border-b border-r border-(--border)">
-                                <Button variant="secondary" size="xs" className="w-full px-4 py-1 border-none rounded-none"
-                                    title="Mengenstaffel hinzufügen — gilt für alle Verträge dieser Gruppe"
-                                    onClick={handleAddTier}
-                                    icon={<Plus className="size-4" />} iconOnly />
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
             </div>
