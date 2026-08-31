@@ -74,11 +74,11 @@ export function toTemplateItem(
         total: formatCentsToEur(price.total_cents),
         contract: context.contractName,
         optional: position.optional ?? false,
-        discount: {
+        discount: position.free_months > 0 ? {
             free_months: position.free_months,
             valid_until: formatDate(context.validUntil),
             total: formatCentsToEur(-price.discount_cents),
-        },
+        } : null,
     };
 }
 

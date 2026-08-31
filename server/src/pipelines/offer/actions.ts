@@ -306,6 +306,7 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
 
     try {
         const formated = await formatOfferData(context.fetchedData);
+        //console.dir(formated, { depth: null });
         context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
         if (exception instanceof z.ZodError) {

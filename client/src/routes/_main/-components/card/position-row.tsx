@@ -13,7 +13,7 @@ type Props = {
  * `OfferPosition` ohne Freimonate — der Rabattblock entfällt dort deshalb.
  */
 export default function PositionRow({ position }: Props) {
-    const { product, contract, quantity, duration_months, total_cents } = position;
+    const { product, contract, quantity, duration_months, total_cents, eur_user_month } = position;
 
     const locale = useLocale();
 
@@ -36,6 +36,10 @@ export default function PositionRow({ position }: Props) {
                         <div className="flex gap-1 text-sm font-light">
                             <span className="text-(--text-secondary)">Seats:</span>
                             <p>{quantity}</p>
+                        </div>
+                        <div className="flex gap-1 text-sm font-light">
+                            <span className="text-(--text-secondary)">Stückpreis:</span>
+                            <p>{formatEur(eur_user_month)}</p>
                         </div>
                         <div className="flex gap-1 text-sm font-light">
                             <span className="text-(--text-secondary)">Laufzeit:</span>
