@@ -55,41 +55,40 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
             },
         });
 
-        // 3. Columns (Laufzeiten): 12 und 24 Monate
-        const column12 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 12 },
-        });
-        const column24 = await prisma.tariffColumn.create({
-            data: { tariffId: tariff.id, duration: 24 },
-        });
+        // 3. Standardlaufzeiten — die Spaltenachse ist global, nicht am Tarif.
+        for (const months of [12, 24]) {
+            await prisma.standardDuration.upsert({
+                where: { months },
+                create: { months },
+                update: {},
+            });
+        }
 
-        // 4. Rows (Mengenbereiche)
-        const rowSmall = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 1, max_quantity: 10 },
-        });
-        const rowLarge = await prisma.tariffRow.create({
-            data: { tariffId: tariff.id, min_quantity: 11, max_quantity: null },
-        });
+        // 4. Mengenstaffeln an der Gruppe (idempotent — alle Tarife teilen sie)
+        for (const tier of [{ min_quantity: 1, max_quantity: 10 }, { min_quantity: 11, max_quantity: null }]) {
+            await prisma.tariffTier.upsert({
+                where: { tariffGroupId_min_quantity: { tariffGroupId, min_quantity: tier.min_quantity } },
+                create: { tariffGroupId, ...tier },
+                update: {},
+            });
+        }
 
-        // 5. Cells + Default-Preise
+        // 5. Zellen — eine Zelle ist ihre Koordinate plus Preis.
         const cells = [
-            { rowId: rowSmall.id, columnId: column12.id, duration: 12, min_quantity: 1, price: 10 },
-            { rowId: rowSmall.id, columnId: column24.id, duration: 24, min_quantity: 1, price: 9 },
-            { rowId: rowLarge.id, columnId: column12.id, duration: 12, min_quantity: 11, price: 5 },
-            { rowId: rowLarge.id, columnId: column24.id, duration: 24, min_quantity: 11, price: 4 },
+            { duration: 12, min_quantity: 1, price: 10 },
+            { duration: 24, min_quantity: 1, price: 9 },
+            { duration: 12, min_quantity: 11, price: 5 },
+            { duration: 24, min_quantity: 11, price: 4 },
         ];
 
         for (const cellData of cells) {
-            const cell = await prisma.tariffCell.create({
+            await prisma.tariffCell.create({
                 data: {
                     tariffId: tariff.id,
-                    rowId: cellData.rowId,
-                    columnId: cellData.columnId,
+                    duration: cellData.duration,
+                    min_quantity: cellData.min_quantity,
+                    price: cellData.price,
                 },
-            });
-
-            await prisma.tariffCellDefault.create({
-                data: { cellId: cell.id, price: cellData.price },
             });
 
             // 6. Kunden-spezifischer Override für den ersten Kunden

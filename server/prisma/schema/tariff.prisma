@@ -4,6 +4,10 @@ model TariffGroup {
   products TariffGroupProduct[]
   tariffs  Tariff[]
 
+  /// Die Mengenachse aller Preistabellen dieser Gruppe. Alle Vertraege einer
+  /// Gruppe teilen sich dieselben Staffeln — nur die Preise unterscheiden sich.
+  tiers TariffTier[]
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -34,9 +38,7 @@ model Tariff {
   tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id], onDelete: Cascade)
   tariffGroupId String
 
-  rows    TariffRow[]
-  columns TariffColumn[]
-  cells   TariffCell[]
+  cells TariffCell[]
 
   versions       TariffVersion[]
   customerPrices TariffCustomerPrice[]
@@ -48,77 +50,46 @@ model Tariff {
   @@map("tariff")
 }
 
-model TariffRow {
+/// Mengenstaffel einer Tarifgruppe.
+model TariffTier {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
+  tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id], onDelete: Cascade)
+  tariffGroupId String
 
-  /// Zugleich Sortierschlüssel: Mengenstaffeln überschneiden sich nicht
-  /// (siehe assertNoOverlap), die Untergrenze ist innerhalb eines Tarifs
-  /// also eindeutig und ordnet die Zeilen fachlich richtig.
+  /// Zugleich Sortierschluessel: Staffeln ueberschneiden sich nicht (siehe
+  /// assertNoOverlap), die Untergrenze ist innerhalb einer Gruppe eindeutig.
   min_quantity Int
   max_quantity Int?
 
-  cells TariffCell[]
-
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@map("tariff_row")
+  @@unique([tariffGroupId, min_quantity])
+  @@map("tariff_tier")
 }
 
-model TariffColumn {
-  id String @id @default(cuid())
-
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
-
-  /// Zugleich Sortierschlüssel: doppelte Laufzeiten werden abgelehnt, die
-  /// Laufzeit ist innerhalb eines Tarifs also eindeutig.
-  duration Int
-
-  cells TariffCell[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@map("tariff_column")
-}
-
+/// Ein Preis an seiner Koordinate — dieselbe Schluesselform wie
+/// TariffCustomerPrice und wie der Versions-Snapshot. Eine Zelle ohne Preis
+/// gibt es nicht: "nicht konfiguriert" heisst, dass keine Zeile existiert.
 model TariffCell {
   id String @id @default(cuid())
 
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  row   TariffRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
-  rowId String
-
-  column   TariffColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  columnId String
-
-  default_cells TariffCellDefault[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@unique([rowId, columnId])
-  @@map("tariff_cell")
-}
-
-model TariffCellDefault {
-  id String @id @default(cuid())
-
-  cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
-  cellId String     @unique
+  /// == StandardDuration.months
+  duration     Int
+  /// == TariffTier.min_quantity
+  min_quantity Int
 
   price Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@map("tariff_cell_default")
+  @@unique([tariffId, duration, min_quantity])
+  @@map("tariff_cell")
 }
 
 /// Kundenspezifischer Stueckpreis. Haengt an den stabilen Koordinaten

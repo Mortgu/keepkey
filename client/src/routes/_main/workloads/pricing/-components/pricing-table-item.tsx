@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import TariffComponent from "./tariff-component";
 import { TariffVersionList } from "./tariff-version-list";
-import type { TariffBase } from "@keepit/schemas";
+import type { TariffBase, TariffTier } from "@keepit/schemas";
 import { Button, Drawer } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
@@ -12,9 +12,11 @@ import { useSealTariffVersion } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
     tariff: TariffBase;
+    /** Die Staffeln der Gruppe — die Mengenachse gehört ihr, nicht dem Tarif. */
+    tiers: Array<TariffTier>;
 }
 
-export default function PricingTableItem({ tariff }: Props) {
+export default function PricingTableItem({ tariff, tiers }: Props) {
     const locale = useLocale();
 
     const [open, setOpen] = useState<boolean>(false);
@@ -62,7 +64,7 @@ export default function PricingTableItem({ tariff }: Props) {
             </div>
 
             {open && (
-                <TariffComponent tariff={tariff} />
+                <TariffComponent tariff={tariff} tiers={tiers} />
             )}
 
             <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>

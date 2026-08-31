@@ -15,16 +15,17 @@ interface SelectPriceParams {
     customerId?: string;
 }
 
-/** Minimal tariff shape required by {@link selectPrice}. */
+/**
+ * Minimal tariff shape required by {@link selectPrice}.
+ *
+ * Koordinatenbasiert — dieselbe Form wie der Versions-Snapshot und wie
+ * {@link TariffForPricing.customerPrices}. Die Laufzeitachse steckt in den
+ * Zellen selbst; die Staffeln kommen von der Tarifgruppe, weil nur sie die
+ * Obergrenze eines Mengenbereichs kennen.
+ */
 export interface TariffForPricing {
-    columns: Array<{ id: string; duration: number }>;
-    rows: Array<{ id: string; min_quantity: number; max_quantity: number | null }>;
-    cells: Array<{
-        id: string;
-        rowId: string;
-        columnId: string;
-        default_cells: Array<{ price: number }>;
-    }>;
+    tiers: Array<{ min_quantity: number; max_quantity: number | null }>;
+    cells: Array<{ duration: number; min_quantity: number; price: number }>;
     /**
      * Kundenspezifische Stückpreise, adressiert über die stabilen Koordinaten
      * (duration, min_quantity) statt über eine cellId.
@@ -43,7 +44,6 @@ export type PriceFailureReason =
     | 'NO_COLUMN'
     | 'NO_ROW'
     | 'NO_CELL'
-    | 'NO_DEFAULT'
     | 'INVALID_INPUT';
 
 export type PriceResult =
@@ -59,7 +59,7 @@ export class PriceError extends Error {
 
 /**
  * Resolve the concrete cell for a given tariff, duration and quantity.
- * Returns the matching column, row and cell, or a {@link PriceFailureReason}
+ * Returns the matching tier and cell, or a {@link PriceFailureReason}
  * describing why no cell matched. Shared between {@link selectPrice} and
  * customer-price upsert/delete so both use the same resolution rules.
  */
@@ -67,29 +67,33 @@ export function resolveCell(
     tariff: TariffForPricing | null | undefined,
     { duration, quantity }: { duration: number; quantity: number },
 ):
-    | { ok: true; column: TariffForPricing['columns'][number]; row: TariffForPricing['rows'][number]; cell: TariffForPricing['cells'][number] }
+    | { ok: true; tier: TariffForPricing['tiers'][number]; cell: TariffForPricing['cells'][number] }
     | { ok: false; reason: Exclude<PriceFailureReason, 'INVALID_INPUT'> } {
 
-    const column = tariff?.columns.find(c => c.duration === duration);
-    if (!column) return { ok: false, reason: 'NO_COLUMN' };
+    // Reihenfolge wie bisher — Laufzeit, dann Menge, dann Zelle —, damit die
+    // gemeldete Ursache dieselbe bleibt. Eine Laufzeit "existiert", wenn
+    // irgendeine Zelle des Tarifs sie trägt; eine eigene Spaltentabelle, die
+    // das getrennt festhielte, gibt es nicht mehr.
+    const hasDuration = tariff?.cells.some(c => c.duration === duration) ?? false;
+    if (!hasDuration) return { ok: false, reason: 'NO_COLUMN' };
 
-    const row = tariff?.rows.find(r => {
-        const withinMin = quantity >= r.min_quantity;
-        const noUpperLimit = r.max_quantity === null;
-        const withinMax = noUpperLimit || quantity <= r.max_quantity!;
+    const tier = tariff?.tiers.find(t => {
+        const withinMin = quantity >= t.min_quantity;
+        const noUpperLimit = t.max_quantity === null;
+        const withinMax = noUpperLimit || quantity <= t.max_quantity!;
         return withinMin && withinMax;
     });
-    if (!row) return { ok: false, reason: 'NO_ROW' };
+    if (!tier) return { ok: false, reason: 'NO_ROW' };
 
-    const cell = tariff?.cells.find(c => c.rowId === row.id && c.columnId === column.id);
+    const cell = tariff?.cells.find(c => c.duration === duration && c.min_quantity === tier.min_quantity);
     if (!cell) return { ok: false, reason: 'NO_CELL' };
 
-    return { ok: true, column, row, cell };
+    return { ok: true, tier, cell };
 }
 
 /**
  * Pure pricing logic: given an already-loaded tariff, selects the matching
- * column (by duration), row (by quantity range) and cell, applies an optional
+ * tier (by quantity range) and cell (by duration), applies an optional
  * customer-specific override and returns the total price.
  *
  * `price` is the unit price per piece per time unit (Stückpreis pro
@@ -125,18 +129,13 @@ export function selectPrice(
     const resolved = resolveCell(tariff, { duration, quantity });
     if (!resolved.ok) return { ok: false, reason: resolved.reason };
 
-    const cell = resolved.cell;
-
-    const defaultCell = cell.default_cells[0];
-    if (!defaultCell) return { ok: false, reason: 'NO_DEFAULT' };
-
-    let unitPrice = defaultCell.price;
+    let unitPrice = resolved.cell.price;
 
     if (customerId !== undefined && customerId !== '') {
         const overrides = tariff.customerPrices.filter(cp =>
             cp.customerId === customerId
-            && cp.duration === resolved.column.duration
-            && cp.min_quantity === resolved.row.min_quantity
+            && cp.duration === resolved.cell.duration
+            && cp.min_quantity === resolved.tier.min_quantity
         );
         const productSpecific = overrides.find(cp => cp.productId === productId);
         // Altbestand: gruppenweite Overrides (productId === null) stammen aus der
@@ -154,29 +153,13 @@ export function selectPrice(
     };
 }
 
-const CALCULATE_PRICE_INCLUDE = {
-    rows: {
-        orderBy: { min_quantity: 'asc' },
-    },
-    columns: {
-        orderBy: { duration: 'asc' },
-    },
-    cells: {
-        orderBy: { createdAt: 'asc' },
-        include: {
-            default_cells: true,
-        },
-    },
-} as const;
-
 /**
- * Loads the tariff (with default prices and customer-specific overrides) for a
- * product/contract combination, resolving the tariff group via
- * {@link TariffGroupProduct}. Returns `null` when no tariff is configured.
+ * Laedt den Tarif zu einer Produkt/Vertrags-Kombination und bringt ihn in die
+ * Form, die {@link selectPrice} erwartet. Die Tarifgruppe wird nur wegen ihrer
+ * Mengenstaffeln mitgeladen — die Staffeln gehoeren ihr, nicht dem Tarif.
  *
- * `customerId` narrows the loaded overrides to a single customer — pass it
- * whenever the caller prices for a known customer, so foreign customers' prices
- * never leave the database.
+ * `customerId` verengt die geladenen Overrides auf einen Kunden, damit fremde
+ * Kundenpreise die Datenbank nie verlassen.
  */
 export async function loadTariffForPricing(productId: string, contractId: string, customerId?: string) {
     const groupProduct = await prisma.tariffGroupProduct.findUnique({
@@ -185,13 +168,20 @@ export async function loadTariffForPricing(productId: string, contractId: string
 
     if (!groupProduct) return null;
 
-    return prisma.tariff.findUnique({
+    const tariff = await prisma.tariff.findUnique({
         where: { tariffGroupId_contractId: { tariffGroupId: groupProduct.tariffGroupId, contractId } },
         include: {
-            ...CALCULATE_PRICE_INCLUDE,
+            cells: { orderBy: [{ duration: 'asc' }, { min_quantity: 'asc' }] },
             customerPrices: customerId ? { where: { customerId } } : true,
+            tariffGroup: {
+                select: { tiers: { orderBy: { min_quantity: 'asc' } } },
+            },
         },
     });
+
+    if (!tariff) return null;
+
+    return { ...tariff, tiers: tariff.tariffGroup.tiers };
 }
 
 export async function calculatePrice(props: PriceCalculatorProps): Promise<PriceResult> {

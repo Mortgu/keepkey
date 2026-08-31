@@ -1,10 +1,14 @@
 import { z } from 'zod';
 import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
-/* Row */
-export const tariffRowSchema = z.object({
+/**
+ * Mengenstaffel. Hängt an der Tarifgruppe, nicht am einzelnen Tarif: alle
+ * Verträge einer Gruppe teilen sich dieselben Staffeln, nur die Preise darin
+ * unterscheiden sich.
+ */
+export const tariffTierSchema = z.object({
     id: z.string(),
-    tariffId: z.string(),
+    tariffGroupId: z.string(),
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
     createdAt: z.string(),
@@ -17,34 +21,18 @@ export const tariffRowSchema = z.object({
  */
 export const standardDurationSchema = z.object({
     id: z.string(),
-    /** Laufzeit in Monaten. == TariffColumn.duration */
+    /** Laufzeit in Monaten. == TariffCell.duration */
     months: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
 export const standardDurationListSchema = z.array(standardDurationSchema);
 /**
- * Dieselbe Schranke wie {@link createTariffColumnSchema}: eine Laufzeit 0 ließe
- * jedes Versiegeln einer Tarif-Version scheitern.
+ * Dieselbe Schranke wie im Versions-Snapshot: eine Laufzeit 0 ließe jedes
+ * Versiegeln einer Tarif-Version scheitern.
  */
 export const createStandardDurationSchema = z.object({
     months: z.int().positive(),
-});
-/* Column */
-export const tariffColumnSchema = z.object({
-    id: z.string(),
-    tariffId: z.string(),
-    duration: z.number().int(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
-});
-/* TariffCellDefault */
-export const tariffCellDefaultSchema = z.object({
-    id: z.string(),
-    cellId: z.string(),
-    price: z.number().int(),
-    createdAt: z.string(),
-    updatedAt: z.string(),
 });
 /**
  * TariffCustomerPrice — kundenspezifischer Stückpreis.
@@ -64,13 +52,20 @@ export const tariffCustomerPriceSchema = z.object({
     createdAt: z.string(),
     updatedAt: z.string(),
 });
-/* TariffCell */
+/**
+ * Ein Preis an seiner Koordinate. Dieselbe Schlüsselform wie
+ * {@link tariffCustomerPriceSchema} und wie der Versions-Snapshot — es gibt
+ * keine zweite Darstellung derselben Tabelle mehr.
+ *
+ * Eine Zelle ohne Preis gibt es nicht: „nicht konfiguriert" heißt, dass für
+ * diese Koordinate keine Zeile existiert.
+ */
 export const tariffCellSchema = z.object({
     id: z.string(),
     tariffId: z.string(),
-    rowId: z.string(),
-    columnId: z.string(),
-    default_cells: z.array(tariffCellDefaultSchema),
+    duration: z.number().int(),
+    min_quantity: z.number().int(),
+    price: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -94,8 +89,6 @@ const tariffBaseSchema = z.object({
     contract: contractSchema,
     contractId: z.string(),
     tariffGroupId: z.string(),
-    rows: z.array(tariffRowSchema),
-    columns: z.array(tariffColumnSchema),
     cells: z.array(tariffCellSchema),
     customerPrices: z.array(tariffCustomerPriceSchema).default([]),
     createdAt: z.string(),
@@ -108,6 +101,7 @@ const tariffBaseSchema = z.object({
 const tariffGroupSlimSchema = z.object({
     id: z.string(),
     products: z.array(tariffGroupProductSchema),
+    tiers: z.array(tariffTierSchema),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -122,25 +116,12 @@ export const updateTariffGroupSchema = z.object({
 export const createTariffSchema = z.object({
     contractId: z.string().min(1),
 });
-/**
- * Die Laufzeit muss positiv sein — deckungsgleich mit
- * {@link tariffVersionSnapshotSchema}. Ohne diese Schranke ließe sich eine
- * Spalte mit Laufzeit 0 anlegen, an der anschließend jedes Versiegeln einer
- * Version scheitert. Damit wäre die ganze Preistabelle blockiert, inklusive
- * der Angebotserstellung.
- */
-export const createTariffColumnSchema = z.object({
-    duration: z.int().positive(),
-});
-export const updateTariffColumnSchema = z.object({
-    duration: z.int().positive().optional(),
-});
-/** TariffRow (create) */
-export const createTariffRowSchema = z.object({
+/** Mengenstaffel (create) — an der Tarifgruppe, nicht am Tarif. */
+export const createTariffTierSchema = z.object({
     min_quantity: z.int(),
     max_quantity: z.int().nullable(),
 });
-export const updateTariffRowSchema = z.object({
+export const updateTariffTierSchema = z.object({
     min_quantity: z.int().optional(),
     max_quantity: z.int().nullable().optional(),
 });
@@ -152,6 +133,8 @@ export const updateTariffRowSchema = z.object({
  * (duration, min_quantity), nicht an einer cellId.
  */
 export const updateTariffCellSchema = z.object({
+    duration: z.int().positive(),
+    min_quantity: z.int().positive(),
     default_price: z.int(),
 });
 /** Kundenspezifischen Stückpreis upserten. */
@@ -192,6 +175,7 @@ export const tariffSchema = tariffBaseSchema.extend({
 export const tariffGroupSchema = z.object({
     id: z.string(),
     products: z.array(tariffGroupProductSchema),
+    tiers: z.array(tariffTierSchema),
     tariffs: z.array(tariffBaseSchema),
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -210,7 +194,10 @@ export const tariffGroupSchema = z.object({
  * Spalte erzeugen, die keine Preisabfrage mehr trifft.
  */
 export const tariffVersionSnapshotSchema = z.object({
-    columns: z.array(createTariffColumnSchema),
+    /* Inline statt aus einem Input-Schema: die Snapshot-Form darf sich nicht
+       mitbewegen, wenn sich die Eingabeschemata ändern — sonst kippt der Hash
+       und mit ihm die Preisgrundlage jeder angepinnten Position. */
+    columns: z.array(z.object({ duration: z.int().positive() })),
     rows: z.array(z.object({
         min_quantity: z.int().positive(),
         max_quantity: z.int().positive().nullable(),

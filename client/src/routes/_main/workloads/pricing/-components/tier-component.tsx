@@ -1,26 +1,27 @@
 import { Trash } from "lucide-react";
 import { useState } from "react";
 import { Button, NumberField } from "@/components";
-import { useDeleteTariffRow, useUpdateTariffRow } from "@/hooks/tariffs/tariff-mutations";
+import { useDeleteTariffTier, useUpdateTariffTier } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
     groupId: string;
-    tariffId: string;
-    rowId: string;
+    tierId: string;
     minQty: number;
     maxQty: number | null;
 }
 
-export default function TariffRowComponent(props: Props) {
-    const { groupId, tariffId, rowId, minQty, maxQty } = props;
-
+/**
+ * Eine Mengenstaffel gehört der Tarifgruppe: Ändern oder Löschen wirkt auf die
+ * Preistabellen *aller* Verträge dieser Gruppe, nicht nur auf die angezeigte.
+ */
+export default function TariffTierComponent({ groupId, tierId, minQty, maxQty }: Props) {
     const [editMin, setEditMin] = useState(false);
     const [editMax, setEditMax] = useState(false);
     const [min, setMin] = useState(minQty);
     const [max, setMax] = useState(maxQty);
 
-    const { deleteRow } = useDeleteTariffRow();
-    const { updateRow } = useUpdateTariffRow();
+    const { deleteTier } = useDeleteTariffTier();
+    const { updateTier } = useUpdateTariffTier();
 
     // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui
     // parst den getippten Text erst in seinem eigenen Blur-Handler, der nach dem
@@ -29,16 +30,15 @@ export default function TariffRowComponent(props: Props) {
         if (committed === null || committed === minQty) return;
 
         setMin(committed);
-        await updateRow({ groupId, tariffId, rowId, min_quantity: committed, max_quantity: max });
+        await updateTier({ groupId, tierId, min_quantity: committed, max_quantity: max });
     };
 
-    // Ein leeres Feld ist hier kein Fehler, sondern die offene Staffel ("∞") —
-    // `NumberField` liefert dafür `null`.
+    // Ein leeres Feld ist hier kein Fehler, sondern die offene Staffel ("∞").
     const handleMaxCommit = async (committed: number | null) => {
         if (committed === maxQty) return;
 
         setMax(committed);
-        await updateRow({ groupId, tariffId, rowId, min_quantity: min, max_quantity: committed });
+        await updateTier({ groupId, tierId, min_quantity: min, max_quantity: committed });
     };
 
     return (
@@ -69,7 +69,8 @@ export default function TariffRowComponent(props: Props) {
                     </div>
                 </div>
                 <Button variant="link" size="xs" icon={<Trash className="size-3" />} iconOnly
-                    onClick={() => deleteRow({ groupId, tariffId, rowId })} />
+                    title="Staffel in allen Verträgen dieser Gruppe entfernen"
+                    onClick={() => deleteTier({ groupId, tierId })} />
             </div>
         </td>
     );

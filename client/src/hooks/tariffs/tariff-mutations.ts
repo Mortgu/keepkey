@@ -3,20 +3,17 @@ import { tariffKeys } from "./tariff-keys";
 import {
     createStandardDuration,
     createTariff,
-    createTariffColumn,
     createTariffGroup,
-    createTariffRow,
+    createTariffTier,
     deleteStandardDuration,
     deleteTariff,
-    deleteTariffColumn,
     deleteTariffGroup,
-    deleteTariffRow,
+    deleteTariffTier,
     restoreTariffVersion,
     sealTariffVersion,
     updateTariffCell,
-    updateTariffColumn,
     updateTariffGroup,
-    updateTariffRow,
+    updateTariffTier,
 } from "./tariff-api";
 import type {QueryClient} from "@tanstack/react-query";
 import type {
@@ -26,7 +23,7 @@ import type {
 } from "@keepit/schemas";
 
 /**
- * Strukturänderungen an Zeilen, Spalten oder Zellen.
+ * Strukturänderungen an Staffeln oder Zellen.
  *
  * Die Versionsliste muss mit invalidiert werden: Sie hängt unterhalb von `all`
  * und wird von `lists()` nicht erfasst — ohne das bliebe die `isCurrent`-Markierung
@@ -157,79 +154,46 @@ export function useRestoreTariffVersion() {
 }
 
 /* ───────────────────────────────
-   Column
+   Mengenstaffel — wirkt auf alle Tarife der Gruppe
    ─────────────────────────────── */
 
-export function useCreateTariffColumn() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, duration }: { groupId: string; tariffId: string; duration: number }) =>
-            createTariffColumn(groupId, tariffId, duration),
-        invalidateStructure,
-    );
-    return { createColumn: mutate, isPending, error };
-}
-
-export function useDeleteTariffColumn() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, columnId }: { groupId: string; tariffId: string; columnId: string }) =>
-            deleteTariffColumn(groupId, tariffId, columnId),
-        invalidateStructure,
-    );
-    return { deleteColumn: mutate, isPending, error };
-}
-
-export function useUpdateTariffColumn() {
+export function useCreateTariffTier() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, columnId, duration }: {
-            groupId: string; tariffId: string; columnId: string; duration: number;
-        }) => updateTariffColumn(groupId, tariffId, columnId, duration),
+        ({ groupId, min_quantity, max_quantity }: {
+            groupId: string; min_quantity: number; max_quantity: number | null;
+        }) => createTariffTier(groupId, min_quantity, max_quantity),
         invalidateStructure,
     );
-    return { updateColumn: mutateAsync, isPending, error };
+    return { createTier: mutateAsync, isPending, error };
+}
+
+export function useUpdateTariffTier() {
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tierId, min_quantity, max_quantity }: {
+            groupId: string; tierId: string; min_quantity: number; max_quantity: number | null;
+        }) => updateTariffTier(groupId, tierId, min_quantity, max_quantity),
+        invalidateStructure,
+    );
+    return { updateTier: mutateAsync, isPending, error };
+}
+
+export function useDeleteTariffTier() {
+    const { mutate, isPending, error } = useTariffMutation(
+        ({ groupId, tierId }: { groupId: string; tierId: string }) => deleteTariffTier(groupId, tierId),
+        invalidateStructure,
+    );
+    return { deleteTier: mutate, isPending, error };
 }
 
 /* ───────────────────────────────
-   Row
-   ─────────────────────────────── */
-
-export function useCreateTariffRow() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, min_quantity, max_quantity }: {
-            groupId: string; tariffId: string; min_quantity: number; max_quantity: number | null;
-        }) => createTariffRow(groupId, tariffId, min_quantity, max_quantity),
-        invalidateStructure,
-    );
-    return { createRow: mutateAsync, isPending, error };
-}
-
-export function useDeleteTariffRow() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, rowId }: { groupId: string; tariffId: string; rowId: string }) =>
-            deleteTariffRow(groupId, tariffId, rowId),
-        invalidateStructure,
-    );
-    return { deleteRow: mutate, isPending, error };
-}
-
-export function useUpdateTariffRow() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, rowId, min_quantity, max_quantity }: {
-            groupId: string; tariffId: string; rowId: string; min_quantity: number; max_quantity: number | null;
-        }) => updateTariffRow(groupId, tariffId, rowId, min_quantity, max_quantity),
-        invalidateStructure,
-    );
-    return { updateRow: mutateAsync, isPending, error };
-}
-
-/* ───────────────────────────────
-   Cell
+   Zelle
    ─────────────────────────────── */
 
 export function useUpdateTariffCell() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, cellId, default_price }: {
-            groupId: string; tariffId: string; cellId: string; default_price: number;
-        }) => updateTariffCell(groupId, tariffId, cellId, default_price),
+        ({ groupId, tariffId, duration, min_quantity, default_price }: {
+            groupId: string; tariffId: string; duration: number; min_quantity: number; default_price: number;
+        }) => updateTariffCell(groupId, tariffId, duration, min_quantity, default_price),
         invalidateStructure,
     );
     return { updateCell: mutateAsync, isPending, error };

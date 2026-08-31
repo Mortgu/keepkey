@@ -5,7 +5,7 @@ import type {
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffRow,
+    TariffTier,
     TariffVersion,
     UpdateTariffGroupInput,
 } from '@keepit/schemas';
@@ -83,55 +83,38 @@ export const getTariffDurations = (productId: string, contractId: string) =>
     api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });
 
 /* ───────────────────────────────
-   Tariff Column
+   Mengenstaffel — gehört der Gruppe, nicht dem einzelnen Tarif
    ─────────────────────────────── */
 
-export const createTariffColumn = (groupId: string, tariffId: string, duration: number) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column`, {
-        method: "POST",
-        body: JSON.stringify({ duration }),
-    });
-
-export const deleteTariffColumn = (groupId: string, tariffId: string, columnId: string) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column/${columnId}`, {
-        method: "DELETE",
-    });
-
-export const updateTariffColumn = (groupId: string, tariffId: string, columnId: string, duration: number) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column/${columnId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ duration }),
-    });
-
-/* ───────────────────────────────
-   Tariff Row
-   ─────────────────────────────── */
-
-export const createTariffRow = (groupId: string, tariffId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row`, {
+export const createTariffTier = (groupId: string, min_quantity: number, max_quantity: number | null) =>
+    api<TariffGroup>(`/api/tariffs/${groupId}/tiers`, {
         method: "POST",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
-export const deleteTariffRow = (groupId: string, tariffId: string, rowId: string) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
-        method: "DELETE",
-    });
-
-export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
+export const updateTariffTier = (groupId: string, tierId: string, min_quantity: number, max_quantity: number | null) =>
+    api<TariffTier>(`/api/tariffs/${groupId}/tiers/${tierId}`, {
         method: "PATCH",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
+export const deleteTariffTier = (groupId: string, tierId: string) =>
+    api<void>(`/api/tariffs/${groupId}/tiers/${tierId}`, { method: "DELETE" });
+
 /* ───────────────────────────────
-   Tariff Cell
+   Zelle — adressiert über ihre Koordinate, nicht über eine Id
    ─────────────────────────────── */
 
-export const updateTariffCell = (groupId: string, tariffId: string, cellId: string, default_price: number) =>
-    api<TariffCell>(`/api/tariffs/${groupId}/${tariffId}/cell/${cellId}`, {
+export const updateTariffCell = (
+    groupId: string,
+    tariffId: string,
+    duration: number,
+    min_quantity: number,
+    default_price: number,
+) =>
+    api<TariffCell>(`/api/tariffs/${groupId}/${tariffId}/cell`, {
         method: "PATCH",
-        body: JSON.stringify({ default_price }),
+        body: JSON.stringify({ duration, min_quantity, default_price }),
     });
 
 /* ───────────────────────────────

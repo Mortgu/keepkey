@@ -88,16 +88,9 @@ export const restoreTariffVersion = async (request: Request, response: Response)
     return response.status(200).json(tariff);
 };
 
-export const createTariffColumn = async (request: Request, response: Response) => {
-    const tariffId = request.params.tariffId as string;
-    const updated = await tariffService.createTariffColumn(tariffId, request.body);
-    return response.status(201).json(updated);
-};
-
-export const createTariffRow = async (request: Request, response: Response) => {
-    const tariffId = request.params.tariffId as string;
-    const updated = await tariffService.createTariffRow(tariffId, request.body);
-    return response.status(201).json(updated);
+export const createTariffTier = async (request: Request, response: Response) => {
+    const group = await tariffService.createTariffTier(request.params.id as string, request.body);
+    return response.status(201).json(group);
 };
 
 /* ========== UPDATE ========== */
@@ -110,21 +103,14 @@ export const updateTariffGroup = async (request: Request, response: Response) =>
     return response.status(200).json(group);
 };
 
-export const updateTariffColumn = async (request: Request, response: Response) => {
-    const columnId = request.params.columnId as string;
-    const updated = await tariffService.updateTariffColumn(columnId, request.body);
-    return response.status(200).json({ message: 'Column updated successfully!', updated });
-};
-
-export const updateTariffRow = async (request: Request, response: Response) => {
-    const rowId = request.params.rowId as string;
-    const updated = await tariffService.updateTariffRow(rowId, request.body);
-    return response.status(200).json({ message: 'Row updated successfully!', updated });
+export const updateTariffTier = async (request: Request, response: Response) => {
+    const tier = await tariffService.updateTariffTier(request.params.tierId as string, request.body);
+    return response.status(200).json(tier);
 };
 
 export const updateTariffCell = async (request: Request, response: Response) => {
-    const cellId = request.params.cellId as string;
-    const updated = await tariffService.updateTariffCell(cellId, request.body);
+    const tariffId = request.params.tariffId as string;
+    const updated = await tariffService.updateTariffCell(tariffId, request.body);
     return response.status(200).json({ message: 'Cell updated successfully!', updated });
 };
 
@@ -150,14 +136,9 @@ export const deleteTariff = async (request: Request, response: Response) => {
     return response.status(200).json({ success: true, message: "Tariff deleted." });
 };
 
-export const deleteTariffColumn = async (request: Request, response: Response) => {
-    const column = await tariffService.deleteTariffColumn(request.params.columnId as string);
-    return response.status(200).json({ message: 'Column deleted successfully!', column });
-};
-
-export const deleteTariffRow = async (request: Request, response: Response) => {
-    const row = await tariffService.deleteTariffRow(request.params.rowId as string);
-    return response.status(200).json({ message: "Successfully deleted row!", row });
+export const deleteTariffTier = async (request: Request, response: Response) => {
+    await tariffService.deleteTariffTier(request.params.tierId as string);
+    return response.status(204).send();
 };
 
 export const deleteCustomerPrice = async (request: Request, response: Response) => {

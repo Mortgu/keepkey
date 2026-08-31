@@ -88,7 +88,7 @@ export default function PricingTable({ group }: Props) {
 
             <div className="grid">
                 {group.tariffs.map(tariff => (
-                    <PricingTableItem key={tariff.id} tariff={tariff} />
+                    <PricingTableItem key={tariff.id} tariff={tariff} tiers={group.tiers} />
                 ))}
             </div>
 

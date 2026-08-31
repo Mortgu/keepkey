@@ -1,29 +1,27 @@
 import { useState } from "react";
-import type { TariffCell } from "@keepit/schemas";
-import { NumberField } from "@/components";
 import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
+import { NumberField } from "@/components";
 import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
 
 interface Props {
     groupId: string;
     tariffId: string;
-    cell: TariffCell;
+    duration: number;
+    minQuantity: number;
+    /** `null`, solange für diese Koordinate kein Preis hinterlegt ist. */
+    price: number | null;
 }
 
-export default function TariffCellComponent({ groupId, tariffId, cell }: Props) {
-    // Neue Zellen entstehen ohne Default-Preis und bleiben unkonfiguriert,
-    // bis hier ein Wert eingetragen wird. `.at(0)` statt `[0]`, weil das Array
-    // tatsächlich leer sein kann — Index-Zugriff würde das wegtypisieren.
-    const defaultCell = cell.default_cells.at(0);
-    const serverPrice = defaultCell === undefined ? null : defaultCell.price;
-
+/**
+ * Ein Preis an seiner Koordinate. Es gibt keine „leere Zelle" mehr als Datensatz —
+ * fehlt der Preis, existiert schlicht keine Zeile, und das Eintragen legt sie an.
+ */
+export default function TariffCellComponent({ groupId, tariffId, duration, minQuantity, price }: Props) {
     const [edit, setEdit] = useState<boolean>(false);
     const [draft, setDraft] = useState<number | null>(null);
 
     const { updateCell } = useUpdateTariffCell();
 
-    // Der angezeigte Wert kommt aus den Props, nicht aus lokalem State — sonst
-    // zeigt das Grid nach einem Restore weiterhin die alten Preise.
     // Eingegeben wird in Euro, gespeichert in Cent — dieselbe Richtung wie im
     // Angebotsformular. Die Zelle zeigt den Preis über formatEur ohnehin in
     // Euro an; eine Eingabe in Cent hätte hier bedeutet, dass man auf "1,00 €"
@@ -33,26 +31,20 @@ export default function TariffCellComponent({ groupId, tariffId, cell }: Props) 
         // Guard würde jeder Klick ins Feld den Entwurf zurücksetzen.
         if (edit) return;
 
-        setDraft(serverPrice === null ? null : centsToEur(serverPrice));
+        setDraft(price === null ? null : centsToEur(price));
         setEdit(true);
     };
 
     // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui
     // parst den getippten Text erst in seinem eigenen Blur-Handler, der nach dem
-    // externen läuft — der externe Handler läse also noch den alten Wert.
-    // Das Dezimalkomma übernimmt `NumberField` selbst über die UI-Sprache.
+    // externen läuft. Das Dezimalkomma übernimmt `NumberField` über die UI-Sprache.
     const handleCommit = async (committed: number | null) => {
         if (committed === null || committed < 0) return;
 
         const cents = eurToCents(committed);
-        if (cents === serverPrice) return;
+        if (cents === price) return;
 
-        await updateCell({
-            groupId,
-            tariffId,
-            cellId: cell.id,
-            default_price: cents,
-        });
+        await updateCell({ groupId, tariffId, duration, min_quantity: minQuantity, default_price: cents });
     };
 
     return (
@@ -66,11 +58,11 @@ export default function TariffCellComponent({ groupId, tariffId, cell }: Props) 
                         onValueCommitted={handleCommit} onBlur={() => setEdit(false)} />
                 </div>
             )}
-            {!edit && serverPrice !== null && (
-                <p className="text-sm font-normal">{formatEur(serverPrice)}</p>
+            {!edit && price !== null && (
+                <p className="text-sm font-normal">{formatEur(price)}</p>
             )}
-            {!edit && serverPrice === null && (
-                <p className="text-sm font-normal text-gray-400" title="Kein Preis hinterlegt">–</p>
+            {!edit && price === null && (
+                <p className="text-sm font-normal text-(--text-secondary)" title="Kein Preis hinterlegt">–</p>
             )}
         </td>
     )
