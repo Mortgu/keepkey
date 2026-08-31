@@ -8,6 +8,7 @@ import {
     deleteStandardDuration,
     deleteStandardTier,
     deleteTariff,
+    deleteTariffCell,
     deleteTariffGroup,
     getStandardDurations,
     getStandardTiers,
@@ -31,6 +32,7 @@ import {
     createTariffGroupSchema,
     createTariffSchema,
     deleteCustomerPriceSchema,
+    deleteTariffCellSchema,
     updateStandardTierSchema,
     updateTariffCellSchema,
     updateTariffGroupSchema,
@@ -107,5 +109,9 @@ router.post('/:id/:tariffId/versions/:versionId/restore', restoreTariffVersion);
 
 /* [PATCH] /api/tariffs/:id/:tariffId/cell — Preis an einer Koordinate setzen */
 router.patch('/:id/:tariffId/cell', validate(updateTariffCellSchema), updateTariffCell);
+
+/* [DELETE] /api/tariffs/:id/:tariffId/cell — Preis(e) an einer Koordinate entfernen.
+   Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. */
+router.delete('/:id/:tariffId/cell', validateQuery(deleteTariffCellSchema), deleteTariffCell);
 
 export default router;

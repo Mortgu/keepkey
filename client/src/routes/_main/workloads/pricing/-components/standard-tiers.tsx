@@ -11,7 +11,7 @@ import { useCreateStandardTier, useDeleteStandardTier } from "@/hooks/tariffs/ta
 export default function StandardTiers() {
     const { tiers, isPending, error } = useStandardTiers();
     const { createTier, isPending: creating, error: createError } = useCreateStandardTier();
-    const { deleteTier, isPending: deleting } = useDeleteStandardTier();
+    const { deleteTier, isPending: deleting, error: deleteError } = useDeleteStandardTier();
 
     const [min, setMin] = useState<number | null>(null);
     const [max, setMax] = useState<number | null>(null);
@@ -36,6 +36,7 @@ export default function StandardTiers() {
 
             {error && <RouteError error={error} />}
             {createError && <RouteError error={createError} />}
+            {deleteError && <RouteError error={deleteError} />}
 
             <div className="flex flex-wrap items-center gap-2">
                 {isPending && <Skeleton className="h-[32px] w-40" />}
@@ -50,12 +51,24 @@ export default function StandardTiers() {
                         className="flex items-center gap-1 border border-(--border) rounded-md pl-3 pr-1 py-1 text-sm tabular-nums"
                     >
                         {tier.min_quantity} – {tier.max_quantity ?? "∞"}
+
+                        {/* Was auf der Stufe liegt, muss *vor* dem Klick zu sehen
+                            sein: entfernt wird ohne Rückfrage, und die Preise
+                            werden danach von der Nachbarstaffel überdeckt. */}
+                        {tier.priceCount > 0 && (
+                            <span className="text-(--text-secondary)">
+                                · {tier.priceCount} {tier.priceCount === 1 ? "Preis" : "Preise"}
+                            </span>
+                        )}
+
                         <Button
                             variant="link"
                             size="xs"
                             iconOnly
                             icon={<Trash className="size-3" />}
-                            title="Staffel aus der Liste entfernen"
+                            title={tier.priceCount > 0
+                                ? `Staffel entfernen. Die ${tier.priceCount} Preise auf dieser Stufe bleiben erhalten, gelten aber nicht mehr — die dann greifende Nachbarstaffel liefert ihren eigenen Preis.`
+                                : "Staffel aus der Liste entfernen"}
                             disabled={deleting}
                             onClick={() => deleteTier(tier.id)}
                         />

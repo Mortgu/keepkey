@@ -8,6 +8,7 @@ export declare const standardTierSchema: z.ZodObject<{
     id: z.ZodString;
     min_quantity: z.ZodNumber;
     max_quantity: z.ZodNullable<z.ZodNumber>;
+    priceCount: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -16,6 +17,7 @@ export declare const standardTierListSchema: z.ZodArray<z.ZodObject<{
     id: z.ZodString;
     min_quantity: z.ZodNumber;
     max_quantity: z.ZodNullable<z.ZodNumber>;
+    priceCount: z.ZodNumber;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>>;
@@ -201,6 +203,22 @@ export declare const updateTariffCellSchema: z.ZodObject<{
     default_price: z.ZodInt;
 }, z.core.$strip>;
 export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
+/**
+ * TariffCell (delete) — entfernt den Preis an einer Koordinate.
+ *
+ * Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. Gebraucht wird
+ * das für verwaiste Zeilen: eine Mengenstufe, die nicht mehr in den
+ * Standard-Staffeln steht, trägt weiterhin Preise, und ohne Gegenstück zum
+ * Upsert gäbe es keinen Weg, sie loszuwerden.
+ *
+ * `coerce` wie bei {@link deleteCustomerPriceSchema} — überträgt wird als
+ * Query-String, dort kommt alles als String an.
+ */
+export declare const deleteTariffCellSchema: z.ZodObject<{
+    min_quantity: z.ZodCoercedNumber<unknown>;
+    duration: z.ZodOptional<z.ZodCoercedNumber<unknown>>;
+}, z.core.$strip>;
+export type DeleteTariffCellInput = z.infer<typeof deleteTariffCellSchema>;
 /** Kundenspezifischen Stückpreis upserten. */
 export declare const upsertCustomerPriceSchema: z.ZodObject<{
     productId: z.ZodString;

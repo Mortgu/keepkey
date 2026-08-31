@@ -1,33 +1,24 @@
 import { useMemo } from "react";
+import { Trash } from "lucide-react";
 import TariffCellComponent from "./cell-component";
 import TariffTierComponent from "./tier-component";
-import type { StandardTier, TariffBase } from "@keepit/schemas";
-import { useCreateStandardTier } from "@/hooks/tariffs/tariff-mutations";
+import type { TariffBase } from "@keepit/schemas";
+import { useDeleteTariffCell } from "@/hooks/tariffs/tariff-mutations";
 import { useStandardDurations, useStandardTiers } from "@/hooks";
+import { Button } from "@/components";
 
 type Props = {
     tariff: TariffBase;
 };
 
-/**
- * Nächste freie Mengenstaffel: hängt lückenlos hinten an. Ist die letzte Staffel
- * nach oben offen, gibt es hinter ihr keinen Platz — sie wird deshalb zuerst
- * begrenzt und die neue übernimmt den offenen Rest.
- */
-function nextTier(tiers: Array<StandardTier>) {
-    const sorted = [...tiers].sort((a, b) => a.min_quantity - b.min_quantity);
-    const last = sorted.at(-1);
+const ORPHAN_COLUMN_HINT =
+    "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar.";
 
-    if (!last) return { min_quantity: 1, max_quantity: null, boundFor: null };
-    if (last.max_quantity === null) {
-        const boundary = last.min_quantity + 9;
-        return { min_quantity: boundary + 1, max_quantity: null, boundFor: { tier: last, boundary } };
-    }
-    return { min_quantity: last.max_quantity + 1, max_quantity: null, boundFor: null };
-}
+const ORPHAN_ROW_HINT =
+    "Diese Mengenstufe steht nicht in den Standard-Staffeln. Die Preise bleiben erhalten, werden aber von der Staffel überdeckt, die diese Menge jetzt abdeckt — sie gelten also nicht mehr.";
 
 export default function TariffComponent({ tariff }: Props) {
-    const { createTier } = useCreateStandardTier();
+    const { deleteCell } = useDeleteTariffCell();
     const { durations: standardDurations } = useStandardDurations();
     const { tiers } = useStandardTiers();
 
@@ -51,21 +42,41 @@ export default function TariffComponent({ tariff }: Props) {
         ];
     }, [standardDurations, tariff.cells]);
 
+    /**
+     * Dasselbe für die Mengenachse — und hier wiegt es schwerer als bei den
+     * Spalten. Eine Spalte wird über die Laufzeit exakt getroffen; eine Zeile
+     * über einen *Bereich*. Fällt eine Mengenstufe aus der Staffelliste, decken
+     * die Nachbarstaffeln ihren Bereich mit ab und liefern ab dann deren Preis.
+     * Ohne diese Zeile passierte das unsichtbar.
+     */
+    const rows = useMemo(() => {
+        const standard = [...tiers]
+            .sort((a, b) => a.min_quantity - b.min_quantity)
+            .map(tier => ({
+                key: tier.id,
+                tierId: tier.id,
+                min_quantity: tier.min_quantity,
+                max_quantity: tier.max_quantity,
+            }));
+
+        const standardSet = new Set(tiers.map(t => t.min_quantity));
+        const orphans = [...new Set(tariff.cells.map(c => c.min_quantity))]
+            .filter(min_quantity => !standardSet.has(min_quantity))
+            .sort((a, b) => a - b)
+            .map(min_quantity => ({
+                key: `orphan:${min_quantity}`,
+                tierId: null,
+                min_quantity,
+                max_quantity: null,
+            }));
+
+        return [...standard, ...orphans];
+    }, [tiers, tariff.cells]);
+
     const priceAt = useMemo(() => {
         const map = new Map(tariff.cells.map(cell => [`${cell.duration}:${cell.min_quantity}`, cell.price]));
         return (duration: number, min_quantity: number) => map.get(`${duration}:${min_quantity}`) ?? null;
     }, [tariff.cells]);
-
-    const sortedTiers = useMemo(
-        () => [...tiers].sort((a, b) => a.min_quantity - b.min_quantity),
-        [tiers],
-    );
-
-    const handleAddTier = async () => {
-        const next = nextTier(tiers);
-
-        await createTier({ min_quantity: next.min_quantity, max_quantity: next.max_quantity });
-    };
 
     return (
         <div className="">
@@ -79,9 +90,7 @@ export default function TariffComponent({ tariff }: Props) {
                                 <th key={column.duration} className="px-3 py-1 last:border-r-0 border-r border-(--border)">
                                     <div
                                         className={column.orphan ? "text-(--text-secondary)" : undefined}
-                                        title={column.orphan
-                                            ? "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar."
-                                            : undefined}
+                                        title={column.orphan ? ORPHAN_COLUMN_HINT : undefined}
                                     >
                                         <p className="font-medium text-md">{column.duration} Monate</p>
                                     </div>
@@ -91,22 +100,49 @@ export default function TariffComponent({ tariff }: Props) {
                     </thead>
 
                     <tbody>
-                        {sortedTiers.map(tier => (
-                            <tr key={tier.id} className="h-[41px] border-b border-(--border)">
-                                <TariffTierComponent
-                                    tierId={tier.id}
-                                    minQty={tier.min_quantity}
-                                    maxQty={tier.max_quantity}
-                                />
+                        {rows.map(row => (
+                            <tr
+                                key={row.key}
+                                className={`h-[41px] border-b border-(--border) ${row.tierId === null ? "text-(--text-secondary)" : ""}`}
+                            >
+                                {row.tierId !== null ? (
+                                    <TariffTierComponent
+                                        tierId={row.tierId}
+                                        minQty={row.min_quantity}
+                                        maxQty={row.max_quantity}
+                                    />
+                                ) : (
+                                    <td>
+                                        <div
+                                            className="flex items-center gap-2 px-3 py-1"
+                                            title={ORPHAN_ROW_HINT}
+                                        >
+                                            <span className="flex-1 tabular-nums">ab {row.min_quantity}</span>
+                                            <span className="text-xs">nicht in der Staffelliste</span>
+                                            <Button
+                                                variant="link"
+                                                size="xs"
+                                                iconOnly
+                                                icon={<Trash className="size-3" />}
+                                                title={`Alle Preise auf Mengenstufe ${row.min_quantity} in dieser Preistabelle entfernen`}
+                                                onClick={() => deleteCell({
+                                                    groupId,
+                                                    tariffId: tariff.id,
+                                                    min_quantity: row.min_quantity,
+                                                })}
+                                            />
+                                        </div>
+                                    </td>
+                                )}
 
                                 {columns.map(column => (
                                     <TariffCellComponent
-                                        key={`${column.duration}:${tier.min_quantity}`}
+                                        key={`${column.duration}:${row.min_quantity}`}
                                         groupId={groupId}
                                         tariffId={tariff.id}
                                         duration={column.duration}
-                                        minQuantity={tier.min_quantity}
-                                        price={priceAt(column.duration, tier.min_quantity)}
+                                        minQuantity={row.min_quantity}
+                                        price={priceAt(column.duration, row.min_quantity)}
                                     />
                                 ))}
                             </tr>

@@ -10,6 +10,14 @@ export const standardTierSchema = z.object({
     id: z.string(),
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
+    /**
+     * Wie viele Preise auf dieser Mengenstufe liegen — über alle Tarife hinweg.
+     *
+     * Rein abgeleitet, nur damit sichtbar ist, was eine Staffel trägt, *bevor*
+     * jemand sie entfernt: die Preise bleiben dann stehen, werden aber von der
+     * dann greifenden Nachbarstaffel überdeckt.
+     */
+    priceCount: z.number().int(),
     createdAt: z.string(),
     updatedAt: z.string(),
 });
@@ -135,6 +143,21 @@ export const updateTariffCellSchema = z.object({
     duration: z.int().positive(),
     min_quantity: z.int().positive(),
     default_price: z.int(),
+});
+/**
+ * TariffCell (delete) — entfernt den Preis an einer Koordinate.
+ *
+ * Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. Gebraucht wird
+ * das für verwaiste Zeilen: eine Mengenstufe, die nicht mehr in den
+ * Standard-Staffeln steht, trägt weiterhin Preise, und ohne Gegenstück zum
+ * Upsert gäbe es keinen Weg, sie loszuwerden.
+ *
+ * `coerce` wie bei {@link deleteCustomerPriceSchema} — überträgt wird als
+ * Query-String, dort kommt alles als String an.
+ */
+export const deleteTariffCellSchema = z.object({
+    min_quantity: z.coerce.number().int().positive(),
+    duration: z.coerce.number().int().positive().optional(),
 });
 /** Kundenspezifischen Stückpreis upserten. */
 export const upsertCustomerPriceSchema = z.object({

@@ -21,6 +21,7 @@ import type {
     CreateStandardTierInput,
     UpdateStandardTierInput,
     UpdateTariffCellInput,
+    DeleteTariffCellInput,
     UpsertCustomerPriceInput,
     DeleteCustomerPriceInput,
     CreateStandardDurationInput,
@@ -91,8 +92,8 @@ const TARIFF_GROUP_INCLUDE = {
  * abgelehnt —, es handelt sich also um Waisen aus der Zeit vor dieser Pflege.
  * Ohne dieses Aufräumen bräche der Unique-Index beim Verschieben.
  *
- * Beide Funktionen erwarten eine Transaktion: Verschieben und Strukturänderung
- * müssen gemeinsam gelten oder gemeinsam ausbleiben.
+ * Erwartet eine Transaktion: Verschieben und Strukturänderung müssen gemeinsam
+ * gelten oder gemeinsam ausbleiben.
  */
 async function moveCustomerPricesToMinQuantity(
     tx: Prisma.TransactionClient,
@@ -106,22 +107,6 @@ async function moveCustomerPricesToMinQuantity(
     await tx.tariffCustomerPrice.updateMany({
         where: { tariffId, min_quantity: from },
         data: { min_quantity: to },
-    });
-}
-
-/** Siehe {@link moveCustomerPricesToMinQuantity}. */
-async function moveCustomerPricesToDuration(
-    tx: Prisma.TransactionClient,
-    tariffId: string,
-    from: number,
-    to: number,
-) {
-    if (from === to) return;
-
-    await tx.tariffCustomerPrice.deleteMany({ where: { tariffId, duration: to } });
-    await tx.tariffCustomerPrice.updateMany({
-        where: { tariffId, duration: from },
-        data: { duration: to },
     });
 }
 
@@ -686,8 +671,26 @@ export async function deleteStandardTier(tierId: string): Promise<void> {
     await prisma.standardTier.delete({ where: { id: tierId } });
 }
 
+/**
+ * Die Mengenachse samt der Anzahl Preise, die auf jeder Stufe liegen.
+ *
+ * Der Zähler geht über *alle* Tarife: die Staffel gilt global, ihr Entfernen
+ * wirkt also überall zugleich. Er ist die einzige Stelle, an der vor dem Klick
+ * sichtbar ist, was eine Staffel trägt — entfernt wird sie ohne Rückfrage, die
+ * Preise bleiben stehen und werden von der Nachbarstaffel überdeckt.
+ */
 export async function getStandardTiers() {
-    return prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
+    const [tiers, counts] = await Promise.all([
+        prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } }),
+        prisma.tariffCell.groupBy({ by: ['min_quantity'], _count: { _all: true } }),
+    ]);
+
+    const countByMinQuantity = new Map(counts.map(c => [c.min_quantity, c._count._all]));
+
+    return tiers.map(tier => ({
+        ...tier,
+        priceCount: countByMinQuantity.get(tier.min_quantity) ?? 0,
+    }));
 }
 
 /**
@@ -705,6 +708,27 @@ export async function updateTariffCell(tariffId: string, input: UpdateTariffCell
         },
         create: { tariffId, duration, min_quantity, price: default_price },
         update: { price: default_price },
+    });
+}
+
+/**
+ * Entfernt Preise an einer Koordinate — das Gegenstück zu
+ * {@link updateTariffCell}. Ohne `duration` fällt die ganze Mengenstufe dieses
+ * Tarifs weg.
+ *
+ * Gebraucht für verwaiste Zeilen: eine Mengenstufe, die nicht (mehr) in den
+ * Standard-Staffeln steht, behält ihre Preise — beabsichtigt, damit ein Klick
+ * keine Preise vernichtet —, und ohne diesen Weg wären sie nicht mehr
+ * loszuwerden.
+ *
+ * `deleteMany` statt `delete`: der Aufruf soll idempotent sein, eine bereits
+ * geleerte Koordinate ist kein Fehler.
+ */
+export async function deleteTariffCell(tariffId: string, input: DeleteTariffCellInput): Promise<void> {
+    const { min_quantity, duration } = input;
+
+    await prisma.tariffCell.deleteMany({
+        where: { tariffId, min_quantity, ...(duration !== undefined ? { duration } : {}) },
     });
 }
 

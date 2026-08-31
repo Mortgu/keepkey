@@ -8,6 +8,7 @@ import {
     deleteStandardDuration,
     deleteStandardTier,
     deleteTariff,
+    deleteTariffCell,
     deleteTariffGroup,
     restoreTariffVersion,
     sealTariffVersion,
@@ -195,4 +196,18 @@ export function useUpdateTariffCell() {
         invalidateStructure,
     );
     return { updateCell: mutateAsync, isPending, error };
+}
+
+/**
+ * `invalidateStructure` statt `invalidateAll`: es fallen Preise weg, keine
+ * Achse — die Staffel- und Laufzeitlisten bleiben unberührt.
+ */
+export function useDeleteTariffCell() {
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, min_quantity, duration }: {
+            groupId: string; tariffId: string; min_quantity: number; duration?: number;
+        }) => deleteTariffCell(groupId, tariffId, min_quantity, duration),
+        invalidateStructure,
+    );
+    return { deleteCell: mutateAsync, isPending, error };
 }

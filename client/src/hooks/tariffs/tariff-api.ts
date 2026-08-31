@@ -120,6 +120,21 @@ export const updateTariffCell = (
         body: JSON.stringify({ duration, min_quantity, default_price }),
     });
 
+/** Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. */
+export const deleteTariffCell = (
+    groupId: string,
+    tariffId: string,
+    min_quantity: number,
+    duration?: number,
+) => {
+    const query = new URLSearchParams({ min_quantity: String(min_quantity) });
+    if (duration !== undefined) query.set("duration", String(duration));
+
+    return api<void>(`/api/tariffs/${groupId}/${tariffId}/cell?${query.toString()}`, {
+        method: "DELETE",
+    });
+};
+
 /* ───────────────────────────────
    Price
 

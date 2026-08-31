@@ -8,6 +8,13 @@ interface SeedTariffParams {
     customers: Customer[];
 }
 
+/** Die Achsen des Preisrasters. Sie gelten global, nicht je Tarif. */
+const STANDARD_DURATIONS = [12, 24];
+const STANDARD_TIERS = [
+    { min_quantity: 1, max_quantity: 10 },
+    { min_quantity: 11, max_quantity: null },
+];
+
 export async function seedTariffs(prisma: PrismaClient, { products, contracts, customers }: SeedTariffParams) {
     const productIds = products.map(p => p.id);
     if (productIds.length < 2) {
@@ -15,7 +22,42 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
         return;
     }
 
-    // 1. TariffGroup anlegen (falls noch nicht vorhanden)
+    // 1. Die beiden Achsen zuerst und genau einmal — sie hängen an keinem Tarif.
+    //    Vorher lief das je Vertrag mit und war nur zufällig idempotent.
+    for (const months of STANDARD_DURATIONS) {
+        await prisma.standardDuration.upsert({
+            where: { months },
+            create: { months },
+            update: {},
+        });
+    }
+
+    // Staffeln gelten global, seit die Zeilenachse nicht mehr an der Gruppe
+    // hängt. Ein Upsert auf `min_quantity` allein legte deshalb in einer
+    // gepflegten Datenbank Staffeln an, die sich mit den vorhandenen
+    // überschneiden — ein Zustand, den `createStandardTier` über
+    // `assertNoOverlap` nie zuließe. Wer schon eine Staffelung hat, behält sie.
+    const existingTiers = await prisma.standardTier.findMany();
+
+    for (const tier of STANDARD_TIERS) {
+        const tierMax = tier.max_quantity ?? Number.POSITIVE_INFINITY;
+        const overlapping = existingTiers.find((existing) => {
+            const existingMax = existing.max_quantity ?? Number.POSITIVE_INFINITY;
+            return tier.min_quantity <= existingMax && existing.min_quantity <= tierMax;
+        });
+
+        if (overlapping) {
+            console.log(
+                `Standard tier ${tier.min_quantity}-${tier.max_quantity ?? "∞"} overlaps `
+                + `${overlapping.min_quantity}-${overlapping.max_quantity ?? "∞"}, skipping.`,
+            );
+            continue;
+        }
+
+        await prisma.standardTier.create({ data: tier });
+    }
+
+    // 2. TariffGroup anlegen (falls noch nicht vorhanden)
     let tariffGroup = await prisma.tariffGroup.findFirst({
         where: { products: { some: { productId: productIds[0] } } },
         include: { products: true },
@@ -37,7 +79,7 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
 
     const tariffGroupId = tariffGroup.id;
 
-    // 2. Pro Contract einen Tariff anlegen (falls noch nicht vorhanden)
+    // 3. Pro Contract einen Tariff anlegen (falls noch nicht vorhanden)
     for (const contract of contracts) {
         const existingTariff = await prisma.tariff.findUnique({
             where: { tariffGroupId_contractId: { tariffGroupId, contractId: contract.id } },
@@ -55,25 +97,9 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
             },
         });
 
-        // 3. Standardlaufzeiten — die Spaltenachse ist global, nicht am Tarif.
-        for (const months of [12, 24]) {
-            await prisma.standardDuration.upsert({
-                where: { months },
-                create: { months },
-                update: {},
-            });
-        }
-
-        // 4. Mengenstaffeln an der Gruppe (idempotent — alle Tarife teilen sie)
-        for (const tier of [{ min_quantity: 1, max_quantity: 10 }, { min_quantity: 11, max_quantity: null }]) {
-            await prisma.tariffTier.upsert({
-                where: { tariffGroupId_min_quantity: { tariffGroupId, min_quantity: tier.min_quantity } },
-                create: { tariffGroupId, ...tier },
-                update: {},
-            });
-        }
-
-        // 5. Zellen — eine Zelle ist ihre Koordinate plus Preis.
+        // 4. Zellen — eine Zelle ist ihre Koordinate plus Preis. Die Koordinaten
+        //    müssen auf den Achsen oben liegen, sonst ist der Preis nicht
+        //    erreichbar.
         const cells = [
             { duration: 12, min_quantity: 1, price: 10 },
             { duration: 24, min_quantity: 1, price: 9 },
@@ -91,7 +117,11 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
                 },
             });
 
-            // 6. Kunden-spezifischer Override für den ersten Kunden
+            // 5. Kunden-spezifischer Override für den ersten Kunden.
+            //    `create`, kein Upsert: der zusammengesetzte Unique-Key enthält
+            //    das nullbare `productId` und ist als Where-Eingabe deshalb
+            //    nicht ausdrückbar. Nötig ist er hier auch nicht — der Zweig
+            //    läuft nur für einen frisch angelegten Tarif.
             const firstCustomer = customers[0];
             if (firstCustomer) {
                 await prisma.tariffCustomerPrice.create({
@@ -107,6 +137,6 @@ export async function seedTariffs(prisma: PrismaClient, { products, contracts, c
             }
         }
 
-        console.log(`Tariff created for contract "${contract.translations[0]?.name}" with 2 columns, 2 rows and cells.`);
+        console.log(`Tariff created for contract "${contract.translations[0]?.name}" with ${cells.length} cells.`);
     }
 }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NumberField } from "@/components";
-import { useDeleteStandardTier, useUpdateStandardTier } from "@/hooks/tariffs/tariff-mutations";
+import { useUpdateStandardTier } from "@/hooks/tariffs/tariff-mutations";
 
 interface Props {
     tierId: string;
@@ -18,7 +18,6 @@ export default function TariffTierComponent({ tierId, minQty, maxQty }: Props) {
     const [min, setMin] = useState(minQty);
     const [max, setMax] = useState(maxQty);
 
-    const { deleteTier } = useDeleteStandardTier();
     const { updateTier } = useUpdateStandardTier();
 
     // Gespeichert wird über `onValueCommitted`, nicht im Blur-Handler: base-ui

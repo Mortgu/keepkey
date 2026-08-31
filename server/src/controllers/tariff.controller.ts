@@ -146,6 +146,23 @@ export const deleteStandardTier = async (request: Request, response: Response) =
     return response.status(204).send();
 };
 
+/**
+ * Die Werte werden hier von Hand konvertiert, weil `validateQuery` das Ergebnis
+ * bewusst nicht zurückschreibt — siehe dort. Geprüft sind sie zu diesem
+ * Zeitpunkt bereits.
+ */
+export const deleteTariffCell = async (request: Request, response: Response) => {
+    const tariffId = request.params.tariffId as string;
+    const duration = request.query.duration;
+
+    await tariffService.deleteTariffCell(tariffId, {
+        min_quantity: Number(request.query.min_quantity),
+        duration: duration === undefined ? undefined : Number(duration),
+    });
+
+    return response.status(204).send();
+};
+
 export const deleteCustomerPrice = async (request: Request, response: Response) => {
     const result = await tariffService.deleteCustomerPrice({
         productId: request.query.productId as string,
