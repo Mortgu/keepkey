@@ -1,28 +1,27 @@
-import { User } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import ContactModal from "./contact-modal";
 import ContactCard from "./contact-card";
 import type { Contact } from "@keepit/schemas";
 import { Button, Dialog, SearchBar } from "@/components";
+import { useModal } from "@/hooks";
 
 interface Props {
     customerId: string;
     contacts: Array<Contact>;
+    onClose: () => void;
 }
 
-export default function ContactsModal({ customerId, contacts }: Props) {
+export default function ContactsModal({ customerId, contacts, onClose }: Props) {
     const { t } = useTranslation();
+    const contactModal = useModal();
 
     return (
-        <Dialog trigger={<Button variant="border" size="xs" icon={<User size={14} />} iconOnly />}>
+        <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
             <Dialog.Header title="Kunden Kontaktpersonen" />
 
             <Dialog.Toolbar>
                 <SearchBar value="" onChange={() => { }} />
-                <ContactModal
-                    customerId={customerId}
-                    trigger={<Button size="sm">Kunden anlegen</Button>}
-                />
+                <Button size="sm" onClick={() => contactModal.open()}>Kunden anlegen</Button>
             </Dialog.Toolbar>
 
             <Dialog.Body className="gap-4">
@@ -38,6 +37,14 @@ export default function ContactsModal({ customerId, contacts }: Props) {
             <Dialog.Footer>
                 <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
             </Dialog.Footer>
+
+            {contactModal.isOpen && (
+                <ContactModal
+                    key={contactModal.key}
+                    customerId={customerId}
+                    onClose={contactModal.close}
+                />
+            )}
         </Dialog>
     );
 }

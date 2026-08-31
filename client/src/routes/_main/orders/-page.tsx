@@ -3,7 +3,6 @@ import OrderList from "./-components/order-list";
 import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
 import { useModal } from "@/hooks";
-import type { Order } from "@keepit/schemas";
 import OrderModal from "./-components/order-select-modal";
 import OrderFilters from "./-components/order-filters";
 import useOrderFilters from "./-hooks/use-order-filters";
@@ -11,7 +10,7 @@ import useOrderFilters from "./-hooks/use-order-filters";
 export function OrderPage() {
     const { t } = useTranslation();
 
-    const modal = useModal<Order>();
+    const modal = useModal();
     const filters = useOrderFilters();
 
     return (
@@ -32,8 +31,6 @@ export function OrderPage() {
                             onClick={() => modal.open()}>
                             {t("button.create")}
                         </Button>
-
-                        <OrderModal />
                     </div>
                 </div>
             </div>
@@ -46,6 +43,9 @@ export function OrderPage() {
                 <OrderList filters={filters} />
             </div>
 
+            {modal.isOpen && (
+                <OrderModal key={modal.key} onClose={modal.close} />
+            )}
         </PageWidth>
     );
 }

@@ -5,13 +5,21 @@ import { useStore } from "@tanstack/react-form";
 import { useOfferModalContext } from "../offer-modal-context";
 import WorkloadForm from "./workload-form";
 import WorkloadItem from "./workload-item";
-import { Button, Checkbox, MultiSelectList } from "@/components";
+import { Button, Checkbox, MultiSelectList, Select } from "@/components";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
+import { useContracts, useLocale } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 
 export default function WorkloadSection() {
     const { t } = useTranslation();
+    const locale = useLocale();
+
+    const { contracts } = useContracts();
+
     const { form, policy, sourceOffer, customerId } = useOfferModalContext();
+
+    const [contract, setContract] = useState<string>(contracts[0].id);
 
     const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
     const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
@@ -38,6 +46,28 @@ export default function WorkloadSection() {
 
     return (
         <div className="grid gap-4">
+
+            {/* */}
+            <div className="flex items-center justify-center gap-2">
+                <Select
+                    value={contract}
+                    onValueChange={setContract}
+                    options={contracts.map(ctr => ({
+                        value: ctr.id,
+                        label: localized(ctr.translations, locale, "name"),
+                    }))}
+                />
+
+                <Select
+                    value={contract}
+                    onValueChange={setContract}
+                    options={contracts.map(ctr => ({
+                        value: ctr.id,
+                        label: localized(ctr.translations, locale, "name"),
+                    }))}
+                />
+
+            </div>
 
             {/* Head */}
             <div className="flex items-center justify-between">

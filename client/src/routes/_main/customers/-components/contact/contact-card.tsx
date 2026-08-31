@@ -2,7 +2,7 @@ import { Pen, Trash } from "lucide-react";
 import ContactModal from "./contact-modal";
 import type { Contact } from "@keepit/schemas";
 import { Button } from "@/components";
-import { useDeleteCustomerContact } from "@/hooks";
+import { useDeleteCustomerContact, useModal } from "@/hooks";
 
 interface Props {
     customerId: string;
@@ -11,6 +11,7 @@ interface Props {
 
 export default function ContactCard({ customerId, contact }: Props) {
     const { deleteCustomerContact, isDeletingCustomerContact } = useDeleteCustomerContact();
+    const editModal = useModal();
 
     return (
         <div className="border border-(--border) rounded-md overflow-hidden px-3 py-2 bg-white">
@@ -23,14 +24,13 @@ export default function ContactCard({ customerId, contact }: Props) {
                 </div>
 
                 <div className="flex items-center justify-center gap-2">
-                    <ContactModal customerId={customerId} contact={contact} trigger={
-                        <Button
-                            variant="border"
-                            size="sm"
-                            icon={<Pen size={14} />}
-                            iconOnly
-                        />
-                    } />
+                    <Button
+                        variant="border"
+                        size="sm"
+                        icon={<Pen size={14} />}
+                        iconOnly
+                        onClick={() => editModal.open()}
+                    />
 
                     <Button
                         variant="secondary"
@@ -45,6 +45,15 @@ export default function ContactCard({ customerId, contact }: Props) {
                     />
                 </div>
             </div>
+
+            {editModal.isOpen && (
+                <ContactModal
+                    key={editModal.key}
+                    customerId={customerId}
+                    contact={contact}
+                    onClose={editModal.close}
+                />
+            )}
         </div>
     )
 }

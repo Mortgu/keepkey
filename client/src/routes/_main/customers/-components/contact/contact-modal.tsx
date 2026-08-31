@@ -1,9 +1,7 @@
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
-import { useState } from "react";
 import type { Contact } from "@keepit/schemas";
-import type { ReactElement } from "react";
 import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
 import { Button, Dialog, FieldInput } from "@/components";
 
@@ -17,16 +15,13 @@ const contactPersonSchema = z.object({
 interface Props {
     customerId: string;
     contact?: Contact | null;
-    /** Element, das den Dialog öffnet. */
-    trigger: ReactElement;
+    onClose: () => void;
 }
 
-export default function ContactModal({ customerId, contact, trigger }: Props) {
+export default function ContactModal({ customerId, contact, onClose }: Props) {
     const { t } = useTranslation();
     const { createCustomerContact } = useCreateCustomerContact();
     const { updateCustomerContact } = useUpdateCustomerContact();
-
-    const [open, setOpen] = useState(false);
 
     const contactForm = useForm({
         defaultValues: {
@@ -54,7 +49,7 @@ export default function ContactModal({ customerId, contact, trigger }: Props) {
                 createCustomerContact({ id: customerId, input });
             }
 
-            setOpen(false);
+            onClose();
         },
     });
 
@@ -71,10 +66,9 @@ export default function ContactModal({ customerId, contact, trigger }: Props) {
 
     return (
         <Dialog
-            trigger={trigger}
-            open={open}
+            defaultOpen
             size="md"
-            onOpenChange={setOpen}
+            onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
             <Dialog.Header title={contact ? "Kontaktperson bearbeiten" : "Kontaktperson hinzufügen"} />
             <Dialog.Body>

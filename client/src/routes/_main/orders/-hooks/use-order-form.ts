@@ -5,10 +5,11 @@ import { useForm } from "@tanstack/react-form";
 interface Props {
     currentOrder?: Order;
     currentOfferId: string;
-    setOpen: (value: boolean) => void;
+    /** Läuft, sobald die Bestellung angelegt ist. */
+    onDone: () => void;
 }
 
-export default function useOrderForm({ currentOrder, currentOfferId, setOpen }: Props) {
+export default function useOrderForm({ currentOrder, currentOfferId, onDone }: Props) {
     const { createOrder } = useCreateOrder();
     const { updateOrder } = useUpdateOrder();
 
@@ -27,7 +28,7 @@ export default function useOrderForm({ currentOrder, currentOfferId, setOpen }: 
 
             console.log(value)
 
-            setOpen(false);
+            onDone();
         }
     });
 

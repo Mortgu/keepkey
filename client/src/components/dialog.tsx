@@ -3,7 +3,7 @@ import { Dialog as BaseDialog, ScrollArea } from "@base-ui/react";
 import { X } from "lucide-react";
 import { Button } from "./button";
 import { dialogStyles } from "./dialog-styles";
-import type { ReactElement, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type DialogSize = "sm" | "md" | "lg";
 
@@ -21,13 +21,7 @@ function useDialogStyles(): DialogSlots {
 }
 
 export interface DialogProps {
-    /**
-     * Element, das den Dialog öffnet. Wird als base-ui `Dialog.Trigger` gerendert,
-     * behält also sein eigenes Aussehen. Weglassen, wenn der Dialog von außen
-     * über `open` gesteuert wird.
-     */
-    trigger?: ReactElement;
-    /** Controlled-Modus — z.B. für `useModal()` oder einen Trigger außerhalb des Dialogs. */
+    /** Controlled-Modus — der Regelfall, siehe `useModal()`. */
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     /** Initial geöffnet (nur uncontrolled). */
@@ -109,12 +103,11 @@ function DialogFooter({ children, className }: DialogSectionProps) {
  * Dialog auf Basis von base-ui. Kapselt Portal / Backdrop / Viewport / Popup,
  * damit Call-Sites nur noch Header, Body und Footer schreiben.
  *
- * `trigger` und `open`/`onOpenChange` sind unabhängig voneinander: ein Dialog
- * kann seinen Trigger selbst mitbringen, von außen gesteuert werden — oder
- * beides zugleich.
+ * Der Dialog kennt seinen Öffner bewusst nicht: Wer ihn öffnet, hält den Zustand
+ * (`useModal()`) und rendert ihn. Ein Modal, das seinen Trigger selbst mitbringt,
+ * wäre ein zweiter Weg, dasselbe zu tun.
  */
 function Dialog({
-    trigger,
     open,
     onOpenChange,
     defaultOpen,
@@ -132,7 +125,6 @@ function Dialog({
             onOpenChange={(nextOpen) => onOpenChange?.(nextOpen)}
             disablePointerDismissal={!dismissible}
         >
-            {trigger && <BaseDialog.Trigger render={trigger} />}
             <BaseDialog.Portal>
                 <BaseDialog.Backdrop className={styles.Backdrop()} />
                 <BaseDialog.Viewport className={styles.Viewport()}>

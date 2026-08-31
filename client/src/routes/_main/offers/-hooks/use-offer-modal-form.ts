@@ -12,7 +12,7 @@ interface Props {
     mode: OfferModalMode;
     /** Beim Bearbeiten die Vorlage, bei abgeleiteten Angeboten das Quellangebot. */
     sourceOffer?: Offer;
-    closeFn: () => void;
+    onClose: () => void;
     preselectedCustomerId?: string;
 }
 
@@ -66,7 +66,7 @@ function toExtendInput(values: OfferModalValues): ExtendOfferInput {
  * identisch; verschieden sind nur die Startwerte (siehe Policy) und die
  * Mutation beim Speichern.
  */
-export default function useOfferModalForm({ mode, sourceOffer, closeFn, preselectedCustomerId }: Props) {
+export default function useOfferModalForm({ mode, sourceOffer, onClose, preselectedCustomerId }: Props) {
     const policy = OFFER_MODAL_POLICIES[mode];
 
     const { defaultValues } = useOfferModal({ currentOffer: sourceOffer, preselectedCustomerId });
@@ -103,7 +103,7 @@ export default function useOfferModalForm({ mode, sourceOffer, closeFn, preselec
                 await createOffer(toCreateInput(value));
             }
 
-            closeFn();
+            onClose();
         },
     });
 

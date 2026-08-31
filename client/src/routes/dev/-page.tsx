@@ -14,6 +14,7 @@ import {
     SortDropdown,
     Textarea,
 } from "@/components";
+import { useModal } from "@/hooks";
 
 const SIZES = ["xs", "sm", "md"] as const satisfies ReadonlyArray<ComponentSize>;
 const VARIANTS = [
@@ -56,6 +57,41 @@ function Section({ title, hint, children }: { title: string; hint?: string; chil
             </div>
             <div className="rounded-md border border-(--border) bg-white px-4">{children}</div>
         </section>
+    );
+}
+
+/**
+ * Das eine Modal-Muster der App: Ein Button hält den Zustand über `useModal()`
+ * und mountet den Dialog erst beim Öffnen. Ein Dialog bringt seinen Öffner nie
+ * selbst mit — genau deshalb kennt `Dialog` kein `trigger` mehr.
+ */
+function DemoDialog({
+    label,
+    size,
+    dismissible,
+    children,
+}: {
+    label: string;
+    size?: "sm" | "md" | "lg";
+    dismissible?: boolean;
+    children: ReactNode;
+}) {
+    const modal = useModal();
+
+    return (
+        <>
+            <Button size="sm" variant="border" onClick={() => modal.open()}>{label}</Button>
+            {modal.isOpen && (
+                <Dialog
+                    defaultOpen
+                    size={size}
+                    dismissible={dismissible}
+                    onOpenChange={(nextOpen) => { if (!nextOpen) modal.close(); }}
+                >
+                    {children}
+                </Dialog>
+            )}
+        </>
     );
 }
 
@@ -186,16 +222,16 @@ export function ComponentMatrix() {
                 title="Dialog"
                 hint="Alle Varianten teilen sich Header, Body und Footer aus dialog-styles.ts. Escape schließt; ein Klick auf den Backdrop schließt nur mit `dismissible`."
             >
-                <Row label="Trigger innen">
-                    <Dialog trigger={<Button size="sm">Öffnen (uncontrolled)</Button>}>
-                        <Dialog.Header title="Dialog mit eigenem Trigger" description="Der Trigger steckt in der Dialog-Komponente." />
+                <Row label="useModal()">
+                    <DemoDialog label="Öffnen">
+                        <Dialog.Header title="Der Regelfall" description="Die Call-Site hält den Zustand und mountet den Dialog beim Öffnen." />
                         <Dialog.Body>
-                            <p className="text-body">Kein `open`-State an der Call-Site nötig.</p>
+                            <p className="text-body">{"useModal() + {modal.isOpen && <Dialog defaultOpen …>} — so wird jedes Modal der App geöffnet."}</p>
                         </Dialog.Body>
                         <Dialog.Footer>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
                         </Dialog.Footer>
-                    </Dialog>
+                    </DemoDialog>
                 </Row>
 
                 <Row label="Controlled">
@@ -205,7 +241,7 @@ export function ComponentMatrix() {
                     <Dialog open={controlledOpen} onOpenChange={setControlledOpen}>
                         <Dialog.Header title="Von außen gesteuert" />
                         <Dialog.Body>
-                            <p className="text-body">`open` / `onOpenChange` — für useModal() oder Trigger außerhalb des Dialogs.</p>
+                            <p className="text-body">`open` / `onOpenChange` — wenn der Zustand schon woanders lebt.</p>
                         </Dialog.Body>
                         <Dialog.Footer>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
@@ -214,16 +250,16 @@ export function ComponentMatrix() {
                 </Row>
 
                 <Row label="dismissible">
-                    <Dialog dismissible size="sm" trigger={<Button size="sm" variant="border">Backdrop-Klick schließt</Button>}>
+                    <DemoDialog label="Backdrop-Klick schließt" dismissible size="sm">
                         <Dialog.Header title="Dismissible" />
                         <Dialog.Body>
                             <p className="text-body">Klick außerhalb schließt diesen Dialog — Standard ist das Gegenteil.</p>
                         </Dialog.Body>
-                    </Dialog>
+                    </DemoDialog>
                 </Row>
 
                 <Row label="Toolbar">
-                    <Dialog trigger={<Button size="sm" variant="border">Mit Toolbar</Button>}>
+                    <DemoDialog label="Mit Toolbar">
                         <Dialog.Header title="Liste mit Filterzeile" />
                         <Dialog.Toolbar>
                             <div className="w-52"><Input size="sm" placeholder="Suchen" /></div>
@@ -235,11 +271,11 @@ export function ComponentMatrix() {
                         <Dialog.Footer>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
                         </Dialog.Footer>
-                    </Dialog>
+                    </DemoDialog>
                 </Row>
 
                 <Row label="Scroll + nested">
-                    <Dialog trigger={<Button size="sm" variant="border">Langer Inhalt</Button>}>
+                    <DemoDialog label="Langer Inhalt">
                         <Dialog.Header title="Body scrollt, Header und Footer bleiben stehen" />
                         <Dialog.Body className="gap-2">
                             {Array.from({ length: 40 }, (_, i) => (
@@ -247,25 +283,25 @@ export function ComponentMatrix() {
                             ))}
                         </Dialog.Body>
                         <Dialog.Footer>
-                            <Dialog trigger={<Button size="sm" variant="border">Verschachtelt öffnen</Button>} size="sm">
+                            <DemoDialog label="Verschachtelt öffnen" size="sm">
                                 <Dialog.Header title="Verschachtelter Dialog" />
                                 <Dialog.Body>
                                     <p className="text-body">Der Eltern-Dialog skaliert zurück (data-nested-dialog-open).</p>
                                 </Dialog.Body>
-                            </Dialog>
+                            </DemoDialog>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
                         </Dialog.Footer>
-                    </Dialog>
+                    </DemoDialog>
                 </Row>
 
                 <Row label="Größen">
                     {(["sm", "md", "lg"] as const).map((size) => (
-                        <Dialog key={size} size={size} trigger={<Button size="sm" variant="border">{size}</Button>}>
+                        <DemoDialog key={size} label={size} size={size}>
                             <Dialog.Header title={`Größe ${size}`} />
                             <Dialog.Body>
                                 <p className="text-body">Breite kommt aus der size-Variante in dialog-styles.ts.</p>
                             </Dialog.Body>
-                        </Dialog>
+                        </DemoDialog>
                     ))}
                 </Row>
             </Section>
@@ -294,7 +330,7 @@ export function ComponentMatrix() {
                 </Row>
 
                 <Row label="Im Dialog">
-                    <Dialog trigger={<Button size="sm" variant="border">Dialog mit Select</Button>}>
+                    <DemoDialog label="Dialog mit Select">
                         <Dialog.Header title="Popup darf über den Dialogrand hinaus" />
                         <Dialog.Body className="gap-4">
                             <Select label="Select" options={LONG_OPTIONS} placeholder="Wählen" />
@@ -303,7 +339,7 @@ export function ComponentMatrix() {
                         <Dialog.Footer>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
                         </Dialog.Footer>
-                    </Dialog>
+                    </DemoDialog>
                 </Row>
             </Section>
         </div>

@@ -16,19 +16,19 @@ interface OfferModalProps {
     mode?: OfferModalMode;
     /** Beim Bearbeiten die Vorlage, bei abgeleiteten Angeboten das Quellangebot. */
     sourceOffer?: Offer;
-    closeFn: () => void;
+    onClose: () => void;
     preselectedCustomerId?: string;
 }
 
 export default function OfferModal(props: OfferModalProps) {
-    const { mode = "offer", sourceOffer, closeFn, preselectedCustomerId } = props;
+    const { mode = "offer", sourceOffer, onClose, preselectedCustomerId } = props;
 
     const { t } = useTranslation();
 
     const { form, policy, customerId } = useOfferModalForm({
         mode,
         sourceOffer,
-        closeFn,
+        onClose,
         preselectedCustomerId,
     });
 
@@ -47,7 +47,7 @@ export default function OfferModal(props: OfferModalProps) {
         <OfferModalProvider value={{ mode, policy, form, sourceOffer, customerId }}>
             <Dialog
                 defaultOpen
-                onOpenChange={(nextOpen) => { if (!nextOpen) closeFn(); }}
+                onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
             >
                 <Dialog.Header title={title()} />
                 <Dialog.Body>

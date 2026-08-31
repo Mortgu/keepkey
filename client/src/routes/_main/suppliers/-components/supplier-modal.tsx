@@ -16,7 +16,7 @@ const supplierSchema = z.object({
 
 export default function SupplierModal({ onClose, currentSupplier }: Props) {
     const { t } = useTranslation();
-    const { form, formId, handleSubmit } = useSupplierForm({ currentSupplier: currentSupplier, closeFn: onClose });
+    const { form, formId, handleSubmit } = useSupplierForm({ currentSupplier: currentSupplier, onClose });
 
     return (
         <Dialog

@@ -1,6 +1,6 @@
 import type { Customer } from "@keepit/schemas";
-import { useCustomerContacts, useProducts } from "@/hooks";
-import { useModals } from "@/context/modal-context";
+import { useCustomerContacts, useModal, useProducts } from "@/hooks";
+import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
 import OfferFilters from "@/routes/_main/offers/-components/offer-filters";
 import OfferList from "@/routes/_main/offers/-components/offer-list";
 import useOfferFilters from "@/routes/_main/offers/-hooks/use-offer-filters";
@@ -14,7 +14,7 @@ export default function CustomerOffersTab({ customer }: Props) {
     const { products } = useProducts();
     const { contacts } = useCustomerContacts(customer.id);
 
-    const { openModal } = useModals();
+    const modal = useModal();
     const filters = useOfferFilters({ customerId: customer.id });
 
     return (
@@ -26,10 +26,18 @@ export default function CustomerOffersTab({ customer }: Props) {
                     contacts={contacts}
                 />
 
-                <Button size="sm" className="whitespace-nowrap" onClick={() => openModal("offer", { preselectedCustomerId: customer.id })}>Angebot erstellen</Button>
+                <Button size="sm" className="whitespace-nowrap" onClick={() => modal.open()}>Angebot erstellen</Button>
             </div>
 
             <OfferList filters={filters} />
+
+            {modal.isOpen && (
+                <OfferModal
+                    key={modal.key}
+                    preselectedCustomerId={customer.id}
+                    onClose={modal.close}
+                />
+            )}
         </div>
     )
 }

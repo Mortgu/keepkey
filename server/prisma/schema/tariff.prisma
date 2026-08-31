@@ -187,3 +187,18 @@ model TariffVersion {
   @@index([tariffId, hash])
   @@map("tariff_version")
 }
+
+/// Global gepflegte Laufzeiten. Sie sind die Spaltenachse *aller* Preistabellen:
+/// nur weil sie nicht am Tarif haengen, steht die Laufzeit eines Angebots fest,
+/// bevor ein Produkt — und damit eine Tarifgruppe — gewaehlt ist.
+model StandardDuration {
+  id String @id @default(cuid())
+
+  /// Laufzeit in Monaten. == TariffColumn.duration
+  months Int @unique
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("standard_duration")
+}

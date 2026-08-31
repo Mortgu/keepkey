@@ -2,19 +2,20 @@ import { Dot } from "lucide-react";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
 import type { Offer } from "@keepit/schemas";
-import { formatDate } from "@/lib/format";
 import { Button, Dialog, Input, Textarea } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 interface Props {
     offer: Offer;
-    /** Schließt den übergeordneten Auswahl-Dialog, sobald die Bestellung angelegt ist. */
-    setOpen: (value: boolean) => void;
+    /** Abbrechen — schließt nur diesen Dialog. */
+    onClose: () => void;
+    /** Bestellung angelegt — schließt zusätzlich die darüberliegende Auswahl. */
+    onCreated: () => void;
 }
 
-export default function OrderCreateModal({ offer, setOpen }: Props) {
+export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
     const { form } = useOrderForm({
-        setOpen: setOpen,
+        onDone: onCreated,
         currentOfferId: offer.id,
     });
 
@@ -30,24 +31,7 @@ export default function OrderCreateModal({ offer, setOpen }: Props) {
 
 
     return (
-        <Dialog
-            trigger={
-                <button
-                    type="button"
-                    className="w-full text-left border border-(--border) py-3 px-4 rounded-md cursor-pointer hover:bg-(--page-bg)"
-                >
-                    <span className="flex items-center gap-1">
-                        <span className="text-md">[AG{offer.quoteId}]</span>
-                        <span className="text-md">{offer.customer.companyName}</span>
-                    </span>
-                    <span className="flex items-center gap-0.5 text-sm">
-                        <span>{offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}</span>
-                        <Dot size={18} />
-                        <span className="text-md">{formatDate(offer.createdAt)}</span>
-                    </span>
-                </button>
-            }
-        >
+        <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
             <Dialog.Header title={`Bestellung für ${offer.quoteId}`} description={
                 <>
                     {offer.customer.companyName}

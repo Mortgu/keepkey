@@ -4,13 +4,13 @@ import { Plus } from "lucide-react";
 import OfferList from "./-components/offer-list";
 import useOfferFilters from "./-hooks/use-offer-filters";
 import OfferFilters from "./-components/offer-filters";
-import { useContacts, useCustomers, useProducts } from "@/hooks";
-import { useModals } from "@/context/modal-context";
+import OfferModal from "./-components/modals/offer-modal";
+import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
 import { Button, PageWidth } from "@/components";
 
 export function OfferPage() {
   const { t } = useTranslation();
-  const { openModal } = useModals();
+  const modal = useModal();
 
   const filters = useOfferFilters();
 
@@ -33,7 +33,7 @@ export function OfferPage() {
             {/* <Button icon={<Download size={14} />} variant="border" size="sm">Export</Button>*/}
             {/* Create Customer Button */}
             <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-              onClick={() => openModal("offer")}>Angebot erstellen</Button>
+              onClick={() => modal.open()}>Angebot erstellen</Button>
           </div>
         </div>
 
@@ -52,10 +52,11 @@ export function OfferPage() {
         <div className="px-8 py-6">
           <OfferList filters={filters} />
         </div>
-
-
-
       </div>
+
+      {modal.isOpen && (
+        <OfferModal key={modal.key} onClose={modal.close} />
+      )}
     </PageWidth>
   );
 }

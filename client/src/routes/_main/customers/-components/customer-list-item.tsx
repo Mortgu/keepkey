@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { Pen, Trash } from "lucide-react";
+import { Pen, Trash, User } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
 import { type SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
-import { useDeleteCustomer } from "@/hooks";
+import { useDeleteCustomer, useModal } from "@/hooks";
 import { Button } from "@/components";
 import ContactsModal from "./contact/contacts-modal";
 
@@ -16,6 +16,7 @@ interface Props {
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
+    const contactsModal = useModal();
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -81,7 +82,13 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                         onClick={() => onEdit(customer)}
                     />
 
-                    <ContactsModal customerId={customer.id} contacts={customer.contactPersons ?? []} />
+                    <Button
+                        variant="border"
+                        size="xs"
+                        icon={<User size={14} />}
+                        iconOnly
+                        onClick={() => contactsModal.open()}
+                    />
 
                     <Button
                         variant="border"
@@ -93,6 +100,15 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     />
                 </div>
             </div>
+
+            {contactsModal.isOpen && (
+                <ContactsModal
+                    key={contactsModal.key}
+                    customerId={customer.id}
+                    contacts={customer.contactPersons ?? []}
+                    onClose={contactsModal.close}
+                />
+            )}
         </div>
     );
 }
