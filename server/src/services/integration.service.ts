@@ -52,7 +52,6 @@ async function redisStatus(): Promise<IntegrationEntry> {
 async function s3Status(): Promise<IntegrationEntry> {
     const meta: Record<string, string> = {
         endpoint: sanitizeUrl(env.S3_ENDPOINT),
-        bucket: env.S3_BUCKET,
     };
 
     const available = await isS3Available();

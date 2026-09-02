@@ -1,11 +1,12 @@
-import { useTranslation } from "react-i18next";
+import OfferVolumeChart from "./-components/charts/offer-volume-chart";
+import GlobalSearch from "./-components/global-search";
 import IntegrationCard from "./-components/integration-card";
+import OffersOrdersChart from "./-components/charts/offers-orders-chart";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@keepit/schemas";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
-import GlobalSearch from "./-components/global-search";
-import { Button, RouteError } from "@/components";
+import { Button, RouteError, Skeleton } from "@/components";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 
@@ -15,8 +16,7 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 }
 
 export default function DashboardPage() {
-    const { t } = useTranslation();
-    const { stats } = useDashboardStats();
+    const { months, isPending: statsPending, error: statsError } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
     const renderCard = (
@@ -64,11 +64,28 @@ export default function DashboardPage() {
             </div>
 
             {/* Integrations (Status + Infos) */}
-            <div className='flex items-start gap-4 mb-4'>
+            <div className='flex flex-wrap items-start gap-4 mb-4'>
                 {renderCard("NextCloud", data?.nextcloud)}
                 {renderCard("Redis", data?.redis)}
                 {renderCard("S3 Storage", data?.s3)}
             </div>
+
+            {/* Kennzahlen der letzten 12 Monate */}
+            {statsError && <RouteError error={statsError} />}
+
+            {statsPending && (
+                <div className='flex flex-wrap gap-4 mb-6'>
+                    <Skeleton className="flex-1 h-80 min-w-[420px]" />
+                    <Skeleton className="flex-1 h-80 min-w-[420px]" />
+                </div>
+            )}
+
+            {!statsPending && !statsError && (
+                <div className='flex flex-wrap items-stretch gap-4 mb-6'>
+                    <OfferVolumeChart months={months} />
+                    <OffersOrdersChart months={months} />
+                </div>
+            )}
 
         </div>
     );

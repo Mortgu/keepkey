@@ -1,6 +1,7 @@
 export * from './contact.controller.js';
 export * from './contract.controller.js';
 export * from './customer.controller.js';
+export * from './dashboard.controller.js';
 export * from './documents.controller.js';
 export * from './flat-rate.controller.js';
 export * from './integrations.controller.js';

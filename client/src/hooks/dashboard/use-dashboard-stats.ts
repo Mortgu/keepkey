@@ -1,48 +1,24 @@
-import { useMemo } from "react";
-import { useOffers } from "@/hooks/offers/offer-hooks";
-import { useOrders } from "@/hooks/orders/order-hooks";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardQueries } from "./dashboard-queries";
+import type { DashboardStats } from "@keepit/schemas";
 
-export type DashboardStats = {
-    offers: {
-        total: number;
-        volume: number;
+const EMPTY: DashboardStats = {
+    totals: {
+        offers: { count: 0, volume_cents: 0 },
+        orders: { count: 0, volume_cents: 0 },
     },
-    orders: {
-        total: number;
-        volume: number;
-    },
+    months: [],
 };
 
+/**
+ * Kennzahlen des Dashboards.
+ *
+ * Kommt vom Server, nicht aus den geladenen Listen: die Angebotsliste ist auf
+ * 50 Einträge begrenzt, und die frühere client-seitige Summe darüber wäre ab
+ * dem 51. Angebot stillschweigend zu niedrig gewesen.
+ */
 export function useDashboardStats() {
-    const { items: offers } = useOffers();
-    const { orders, isPending: ordersPending } = useOrders();
+    const { data = EMPTY, isPending, error } = useQuery(dashboardQueries.stats());
 
-    const stats = useMemo<DashboardStats>(() => {
-        const openOffers = offers.filter(
-            (offer) => !orders.some((order) => order.offerId === offer.id),
-        );
-
-        const openOfferVolumeCents = openOffers.reduce(
-            (sum, offer) => sum + offer.net_amount,
-            0,
-        );
-
-        const orderVolumeCents = orders.reduce(
-            (sum, order) => sum + order.net_amount,
-            0,
-        );
-
-        return {
-            offers: {
-                total: offers.length,
-                volume: openOfferVolumeCents,
-            },
-            orders: {
-                total: orders.length,
-                volume: orderVolumeCents,
-            }
-        };
-    }, [offers, orders]);
-
-    return { stats, isPending: ordersPending };
+    return { stats: data.totals, months: data.months, isPending, error };
 }

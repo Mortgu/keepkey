@@ -4,12 +4,26 @@
     "recentOrders": "Letzte Bestellungen",
     "integrations": "Integrationen",
     "viewAll": "Alle ansehen",
-    "noActivity": "Noch keine Aktivit\u00e4t.",
+    "noActivity": "Noch keine Aktivität.",
     "stats": {
       "offerVolume": "Offenes Angebotsvolumen",
       "openOffers": "Offene Angebote",
       "orders": "Bestellungen",
       "conversion": "Conversion-Rate"
+    },
+    "charts": {
+      "offerVolume": {
+        "title": "Angebotsvolumen",
+        "description": "Summe der Angebote je Monat, netto.",
+        "valueLabel": "Gesamt in den letzten 12 Monaten"
+      },
+      "offersOrders": {
+        "title": "Angebote und Bestellungen",
+        "description": "Wie viele Angebote geschrieben und wie viele bestellt wurden.",
+        "valueLabel": "Bestellungen je Angebote in den letzten 12 Monaten",
+        "offers": "Angebote",
+        "orders": "Bestellungen"
+      }
     },
     "badge": {
       "reserved": "Reserviert",
@@ -17,18 +31,18 @@
     },
     "status": {
       "connected": "Verbunden",
-      "checking": "Verbindung wird gepr\u00fcft\u2026",
+      "checking": "Verbindung wird geprüft…",
       "failed": "Verbindung fehlgeschlagen",
       "notConfigured": "Nicht konfiguriert"
     },
-    "retry": "Erneut pr\u00fcfen",
+    "retry": "Erneut prüfen",
     "search": {
-      "placeholder": "Angebote, Bestellungen, Kunden durchsuchen\u2026",
+      "placeholder": "Angebote, Bestellungen, Kunden durchsuchen…",
       "recent": "Zuletzt gesucht",
       "recentEmpty": "Noch keine Suchen.",
-      "empty": "Keine Ergebnisse f\u00fcr \u201e{{query}}\u201c",
+      "empty": "Keine Ergebnisse für „{{query}}“",
       "results": "{{count}} Ergebnis(se)",
-      "hints": "\u21b5 \u00f6ffnen \u00b7 Esc schlie\u00dfen",
+      "hints": "↵ öffnen · Esc schließen",
       "justNow": "gerade eben",
       "minutesAgo": "vor {{count}} Min.",
       "hoursAgo": "vor {{count}} Std.",
