@@ -1,4 +1,4 @@
-import { Pen } from "lucide-react";
+import { Check, Pen, Tag } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { coordinatesFrom } from "@keepit/schemas";
@@ -15,6 +15,7 @@ import {
     useProducts,
 } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { ApiError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/errors";
 import { eurToCents, formatEur } from "@/utils/utils";
 
@@ -36,7 +37,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
     const { t } = useTranslation();
     const { policy, sourceOffer, header } = useOfferModalContext();
     const { products } = useProducts();
-    const { setOverride } = useCustomerPriceOverride();
+    const { setOverride, clearOverride, isPending: overridePending } = useCustomerPriceOverride();
 
     const shows = (field: PositionField) => policy.positions.fields[field] !== "hidden";
     const locked = (field: PositionField) => policy.positions.fields[field] === "readonly";
@@ -59,7 +60,10 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
         free_months: freeMonths,
     });
 
-    const { unitCents, isLoading: pricePending, error: priceError } = usePositionPrice({
+    const {
+        unitCents, isCustomerPrice, listUnitCents,
+        isLoading: pricePending, error: priceError,
+    } = usePositionPrice({
         source: policy.priceSource,
         coordinates,
         pin: sourceOffer
@@ -67,10 +71,20 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
             : undefined,
     });
 
-    const canOverride = Boolean(header.customerId) && !locked("unitPrice");
+    // Ohne hinterlegten Preis zeigt das Feld die Ursache statt "0,00 €" — ein
+    // Nullpreis saehe aus wie ein Ergebnis.
+    const priceMessage = priceError ? getErrorMessage(priceError) : null;
+
+    /**
+     * Ein Kundenpreis haengt an einem Tarif. Fehlt der ganz (Produkt in keiner
+     * Tarifgruppe), gibt es nichts zu ueberschreiben — bei jeder anderen Ursache
+     * behebt das Setzen den Fehler, weil ein Kundenpreis selbst ein Preis ist.
+     */
+    const noTariff = priceError instanceof ApiError && priceError.code === "NO_TARIFF";
+    const canOverride = Boolean(header.customerId) && !locked("unitPrice") && !noTariff;
 
     const startEditPrice = () => {
-        setOverrideEur((unitCents / 100).toString());
+        setOverrideEur(priceMessage ? "" : (unitCents / 100).toString());
         setEditingPrice(true);
     };
 
@@ -82,7 +96,42 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
         }
     };
 
-    const handleSave = async (event: SyntheticEvent<HTMLButtonElement>) => {
+    /**
+     * Der Kundenpreis wird sofort geschrieben, nicht erst mit der Position: er
+     * ist eine eigene, dauerhafte Groesse und haengt nicht am Angebot. Frueher
+     * lief er ueber `handleSave` mit — und war damit genau dann unerreichbar,
+     * wenn er gebraucht wurde, weil ein fehlender Preis das Uebernehmen sperrt.
+     */
+    const commitOverride = async () => {
+        const parsed = Number(overrideEur.replace(",", "."));
+
+        if (isNaN(parsed) || parsed < 0) {
+            setError("Ungültiger Preis.");
+            return;
+        }
+
+        setError("");
+
+        try {
+            await setOverride({ coordinates, unitPriceCents: eurToCents(parsed) });
+            setEditingPrice(false);
+        } catch (exception: unknown) {
+            setError(getErrorMessage(exception));
+        }
+    };
+
+    const resetOverride = async () => {
+        setError("");
+
+        try {
+            await clearOverride(coordinates);
+            setEditingPrice(false);
+        } catch (exception: unknown) {
+            setError(getErrorMessage(exception));
+        }
+    };
+
+    const handleSave = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
         const data: CreateOfferPositionInput = {
@@ -95,26 +144,9 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
             discount_cents: 0,
         };
 
-        try {
-            if (editingPrice && canOverride) {
-                const parsed = Number(overrideEur.replace(",", "."));
-                if (isNaN(parsed) || parsed < 0) {
-                    setError("Ungültiger Preis.");
-                    return;
-                }
-                await setOverride({ coordinates, unitPriceCents: eurToCents(parsed) });
-            }
-
-            saveFn(data);
-            cancelFn();
-        } catch (exception: unknown) {
-            setError(exception instanceof Error ? exception.message : "Preis konnte nicht gespeichert werden.");
-        }
+        saveFn(data);
+        cancelFn();
     };
-
-    // Ohne hinterlegten Preis zeigt das Feld die Ursache statt "0,00 €" — ein
-    // Nullpreis saehe aus wie ein Ergebnis. Uebernehmen ist dann gesperrt.
-    const priceMessage = priceError ? getErrorMessage(priceError) : null;
 
     const displayUnitPrice = editingPrice
         ? overrideEur
@@ -155,24 +187,60 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
             <div className="flex items-end gap-3">
                 {shows("unitPrice") && (
-                    <Input
-                        label={t("offerModal.unit_price")}
-                        error={priceMessage ? t("offerModal.no_price") : undefined}
-                        errorTooltip={priceMessage ?? undefined}
-                        loading={pricePending}
-                        type={editingPrice ? "number" : "text"}
-                        step={editingPrice ? "0.01" : undefined}
-                        min={editingPrice ? "0" : undefined}
-                        value={displayUnitPrice}
-                        disabled={!editingPrice}
-                        onChange={(e) => setOverrideEur(e.target.value)}
-                        rightButton={canOverride ? {
-                            icon: <Pen size={12} />,
-                            variant: "border",
-                            type: "button",
-                            onClick: toggleEditPrice,
-                        } : undefined}
-                    />
+                    <div className="grid gap-1">
+                        <Input
+                            label={t("offerModal.unit_price")}
+                            error={priceMessage ? t("offerModal.no_price") : undefined}
+                            errorTooltip={priceMessage ?? undefined}
+                            loading={pricePending}
+                            type={editingPrice ? "number" : "text"}
+                            step={editingPrice ? "0.01" : undefined}
+                            min={editingPrice ? "0" : undefined}
+                            value={displayUnitPrice}
+                            disabled={!editingPrice}
+                            onChange={(e) => setOverrideEur(e.target.value)}
+                            /* Im Bearbeiten bestaetigt der Haken und schreibt
+                               sofort; sonst oeffnet der Stift. Ohne Tarif gibt
+                               es nichts zu ueberschreiben. */
+                            rightButton={canOverride ? (editingPrice ? {
+                                icon: <Check size={12} />,
+                                variant: "primary",
+                                type: "button",
+                                onClick: () => void commitOverride(),
+                            } : {
+                                icon: <Pen size={12} />,
+                                variant: "border",
+                                type: "button",
+                                onClick: toggleEditPrice,
+                            }) : undefined}
+                        />
+
+                        {/* Herkunft des Betrags. Ohne sie ist einem Preis nicht
+                            anzusehen, ob er ausgehandelt oder Listenpreis ist. */}
+                        {!editingPrice && isCustomerPrice && (
+                            <p className="flex items-center gap-1.5 text-xs text-(--text-secondary)">
+                                <Tag size={11} />
+                                {t("offerModal.customer_price")}
+                                {listUnitCents !== null && (
+                                    <span>({t("offerModal.list_price")} {formatEur(listUnitCents)})</span>
+                                )}
+                                <Button
+                                    variant="link"
+                                    size="xs"
+                                    disabled={overridePending}
+                                    onClick={() => void resetOverride()}
+                                >
+                                    {t("offerModal.reset_price")}
+                                </Button>
+                            </p>
+                        )}
+
+                        {!editingPrice && !isCustomerPrice && noTariff && (
+                            <p className="text-xs text-(--text-secondary)">
+                                {t("offerModal.no_tariff_hint")}
+                            </p>
+                        )}
+                    </div>
                 )}
 
                 {shows("free_months") && (

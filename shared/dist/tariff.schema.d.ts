@@ -151,17 +151,6 @@ declare const tariffBaseSchema: z.ZodObject<{
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
-    customerPrices: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        id: z.ZodString;
-        tariffId: z.ZodString;
-        customerId: z.ZodString;
-        productId: z.ZodNullable<z.ZodString>;
-        duration: z.ZodNumber;
-        min_quantity: z.ZodNumber;
-        price: z.ZodNumber;
-        createdAt: z.ZodString;
-        updatedAt: z.ZodString;
-    }, z.core.$strip>>>;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
 }, z.core.$strip>;
@@ -246,6 +235,102 @@ export declare const deleteCustomerPriceSchema: z.ZodObject<{
 }, z.core.$strip>;
 export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
 /**
+ * Ein Kundenpreis, wie ihn die Kundenübersicht braucht — angereichert um alles,
+ * was ihn ohne Kenntnis der Preistabelle lesbar macht.
+ *
+ * `list_price` ist der Listenpreis derselben Koordinate und `null`, wenn dort
+ * keiner hinterlegt ist; der Kundenpreis steht dann allein. `reachable` sagt, ob
+ * die Mengenstufe noch in den Standard-Staffeln steht — ist sie es nicht, bleibt
+ * der Preis erhalten, greift aber nicht mehr, weil keine Menge ihn trifft.
+ */
+export declare const customerPriceRowSchema: z.ZodObject<{
+    id: z.ZodString;
+    tariffId: z.ZodString;
+    contractId: z.ZodString;
+    contract: z.ZodObject<{
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            features: z.ZodArray<z.ZodString>;
+            table: z.ZodString;
+        }, z.core.$strip>>;
+        id: z.ZodString;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>;
+    productId: z.ZodNullable<z.ZodString>;
+    product: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+            table: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+        }, z.core.$strip>>;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>>;
+    duration: z.ZodNumber;
+    min_quantity: z.ZodNumber;
+    max_quantity: z.ZodNullable<z.ZodNumber>;
+    reachable: z.ZodBoolean;
+    price: z.ZodNumber;
+    list_price: z.ZodNullable<z.ZodNumber>;
+}, z.core.$strip>;
+export type CustomerPriceRow = z.infer<typeof customerPriceRowSchema>;
+export declare const customerPriceRowListSchema: z.ZodArray<z.ZodObject<{
+    id: z.ZodString;
+    tariffId: z.ZodString;
+    contractId: z.ZodString;
+    contract: z.ZodObject<{
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            features: z.ZodArray<z.ZodString>;
+            table: z.ZodString;
+        }, z.core.$strip>>;
+        id: z.ZodString;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>;
+    productId: z.ZodNullable<z.ZodString>;
+    product: z.ZodNullable<z.ZodObject<{
+        id: z.ZodString;
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+            table: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
+        }, z.core.$strip>>;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>>;
+    duration: z.ZodNumber;
+    min_quantity: z.ZodNumber;
+    max_quantity: z.ZodNullable<z.ZodNumber>;
+    reachable: z.ZodBoolean;
+    price: z.ZodNumber;
+    list_price: z.ZodNullable<z.ZodNumber>;
+}, z.core.$strip>>;
+export type CustomerPriceRowList = z.infer<typeof customerPriceRowListSchema>;
+/** Kundenpreise eines Kunden lesen. */
+export declare const listCustomerPricesSchema: z.ZodObject<{
+    customerId: z.ZodString;
+}, z.core.$strip>;
+export type ListCustomerPricesInput = z.infer<typeof listCustomerPricesSchema>;
+/**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
  */
@@ -281,17 +366,6 @@ export declare const tariffSchema: z.ZodObject<{
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;
-    customerPrices: z.ZodDefault<z.ZodArray<z.ZodObject<{
-        id: z.ZodString;
-        tariffId: z.ZodString;
-        customerId: z.ZodString;
-        productId: z.ZodNullable<z.ZodString>;
-        duration: z.ZodNumber;
-        min_quantity: z.ZodNumber;
-        price: z.ZodNumber;
-        createdAt: z.ZodString;
-        updatedAt: z.ZodString;
-    }, z.core.$strip>>>;
     createdAt: z.ZodString;
     updatedAt: z.ZodString;
     tariffGroup: z.ZodObject<{
@@ -376,17 +450,6 @@ export declare const tariffGroupSchema: z.ZodObject<{
             createdAt: z.ZodString;
             updatedAt: z.ZodString;
         }, z.core.$strip>>;
-        customerPrices: z.ZodDefault<z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            tariffId: z.ZodString;
-            customerId: z.ZodString;
-            productId: z.ZodNullable<z.ZodString>;
-            duration: z.ZodNumber;
-            min_quantity: z.ZodNumber;
-            price: z.ZodNumber;
-            createdAt: z.ZodString;
-            updatedAt: z.ZodString;
-        }, z.core.$strip>>>;
         createdAt: z.ZodString;
         updatedAt: z.ZodString;
     }, z.core.$strip>>;

@@ -1,5 +1,6 @@
-import { CircleAlert, LoaderCircle, Pen, Trash, X } from "lucide-react";
+import { CircleAlert, LoaderCircle, Pen, Tag, Trash, X } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {  coordinatesFrom } from "@keepit/schemas";
 import { useOfferModalContext } from "../offer-modal-context";
 import WorkloadForm from "./workload-form";
@@ -20,6 +21,7 @@ interface Props {
 }
 
 export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Props) {
+    const { t } = useTranslation();
     const locale = useLocale();
     const { policy, sourceOffer, header, pricing } = useOfferModalContext();
 
@@ -31,7 +33,7 @@ export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Pr
     // Vertrag und Laufzeit gehoeren dem Angebot, nicht der Position — angezeigt
     // werden sie hier trotzdem, weil die Zeile sonst nicht fuer sich steht.
     const { contract, isPending: contractPending } = useContract(header.contractId);
-    const { totalCents, unitCents, isLoading: pricePending } = usePositionPrice({
+    const { totalCents, unitCents, isCustomerPrice, isLoading: pricePending } = usePositionPrice({
         source: policy.priceSource,
         coordinates: coordinatesFrom(header, workload),
         pin: sourceOffer
@@ -79,9 +81,21 @@ export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Pr
                             </div>
 
                             <div className="grid">
-                                <p className="text-xs text-(--text-secondary)">Price per unit</p>
+                                {/* Ein Kundenpreis wird hier markiert, damit die
+                                    Abweichung nicht erst beim Aufklappen auffaellt. */}
+                                <p className="flex items-center gap-1 text-xs text-(--text-secondary)">
+                                    Price per unit
+                                    {!pricePending && isCustomerPrice && (
+                                        <Tag size={10} aria-label={t("offerModal.customer_price")} />
+                                    )}
+                                </p>
                                 {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                                {!pricePending && <p className="text-sm font-semibold">{formatEur(unitCents)}</p>}
+                                {!pricePending && (
+                                    <p className={`text-sm font-semibold ${isCustomerPrice ? "text-(--info)" : ""}`}
+                                        title={isCustomerPrice ? t("offerModal.customer_price") : undefined}>
+                                        {formatEur(unitCents)}
+                                    </p>
+                                )}
                             </div>
                         </div>
                     )}

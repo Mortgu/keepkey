@@ -135,7 +135,6 @@ const tariffBaseSchema = z.object({
     tariffGroupId: z.string(),
 
     cells: z.array(tariffCellSchema),
-    customerPrices: z.array(tariffCustomerPriceSchema).default([]),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -242,6 +241,47 @@ export const deleteCustomerPriceSchema = z.object({
     customerId: z.string().min(1),
 });
 export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
+
+/**
+ * Ein Kundenpreis, wie ihn die Kundenübersicht braucht — angereichert um alles,
+ * was ihn ohne Kenntnis der Preistabelle lesbar macht.
+ *
+ * `list_price` ist der Listenpreis derselben Koordinate und `null`, wenn dort
+ * keiner hinterlegt ist; der Kundenpreis steht dann allein. `reachable` sagt, ob
+ * die Mengenstufe noch in den Standard-Staffeln steht — ist sie es nicht, bleibt
+ * der Preis erhalten, greift aber nicht mehr, weil keine Menge ihn trifft.
+ */
+export const customerPriceRowSchema = z.object({
+    id: z.string(),
+    tariffId: z.string(),
+
+    contractId: z.string(),
+    contract: contractSchema,
+
+    /** `null` beim gruppenweiten Altbestand: gilt für jedes Produkt der Gruppe. */
+    productId: z.string().nullable(),
+    product: productSchema.nullable(),
+
+    duration: z.number().int(),
+
+    min_quantity: z.number().int(),
+    /** Obergrenze der Staffel; `null` bei offener Staffel **und** bei verwaister. */
+    max_quantity: z.number().int().nullable(),
+    reachable: z.boolean(),
+
+    price: z.number().int(),
+    list_price: z.number().int().nullable(),
+});
+export type CustomerPriceRow = z.infer<typeof customerPriceRowSchema>;
+
+export const customerPriceRowListSchema = z.array(customerPriceRowSchema);
+export type CustomerPriceRowList = z.infer<typeof customerPriceRowListSchema>;
+
+/** Kundenpreise eines Kunden lesen. */
+export const listCustomerPricesSchema = z.object({
+    customerId: z.string().min(1),
+});
+export type ListCustomerPricesInput = z.infer<typeof listCustomerPricesSchema>;
 
 /**
  * Base tariff shape — without `tariffGroup`.

@@ -3,15 +3,16 @@ import CustomerModal from "../-components/customer-modal";
 import CustomerDetailPageHeader from "./-components/header";
 import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
+import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
 import { Route } from "./index";
 import type { Customer } from "@keepit/schemas";
-import { PageWidth, RouteError } from "@/components";
+import { PageWidth, RouteError, Tabs } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
-import { Tabs } from "@/components";
 
 const TABS = [
     { value: "general", label: "Allgemein" },
     { value: "offers", label: "Angebote" },
+    { value: "prices", label: "Preise" },
     { value: "orders", label: "Bestellungen" },
     { value: "invoices", label: "Rechnungen" },
 ];
@@ -43,6 +44,10 @@ export default function CustomerDetailPage() {
 
                         {tab === "offers" && (
                             <CustomerOffersTab customer={customer} />
+                        )}
+
+                        {tab === "prices" && (
+                            <CustomerPricesTab customer={customer} />
                         )}
                     </div>
                 </div>

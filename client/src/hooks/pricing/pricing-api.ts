@@ -1,4 +1,4 @@
-import type { PositionPrice, PriceCoordinates } from "@keepit/schemas";
+import type { CustomerPriceRow, PositionPrice, PriceCoordinates } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 
 /**
@@ -29,6 +29,28 @@ export const getPinnedPrice = (offerId: string, positionId: string, quantity: nu
         `/api/offers/${offerId}/positions/${positionId}/extension-price?quantity=${quantity}`,
         { method: "GET" },
     );
+
+/**
+ * Alle für einen Kunden hinterlegten Preise, über alle Tarife hinweg.
+ *
+ * Die Preistabelle liefert sie nicht mehr mit — fremde Kundenpreise gehören
+ * nicht in eine Seite, die jeder öffnet.
+ */
+export const getCustomerPrices = (customerId: string) =>
+    api<Array<CustomerPriceRow>>(
+        `/api/tariffs/customer-prices?customerId=${encodeURIComponent(customerId)}`,
+        { method: "GET" },
+    );
+
+/**
+ * Entfernt einen Kundenpreis über seine Id.
+ *
+ * Der koordinatenbasierte Weg unten trifft eine Mengenstufe nicht mehr, sobald
+ * sie aus den Standard-Staffeln genommen wurde; über die Id bleibt auch dieser
+ * Altbestand löschbar.
+ */
+export const deleteCustomerPriceById = (id: string) =>
+    api<void>(`/api/tariffs/customer-prices/${id}`, { method: "DELETE" });
 
 /** Schreibt einen kundenspezifischen Stückpreis und gibt den neuen Preis zurück. */
 export const upsertCustomerPrice = (coordinates: PriceCoordinates, unitPriceCents: number) =>

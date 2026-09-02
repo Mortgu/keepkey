@@ -29,6 +29,7 @@
   "DURATION_NOT_FOUND": "Laufzeit nicht gefunden.",
   "DURATION_NOT_STANDARD": "Diese Laufzeit steht nicht in den Standardlaufzeiten.",
   "NO_TARIFF": "Kein Tarif für dieses Produkt und diesen Vertrag gefunden.",
+  "CUSTOMER_PRICE_NOT_FOUND": "Kundenpreis nicht gefunden.",
   "NO_CELL": "Keine Zelle für die gewählte Zeile/Spalte konfiguriert.",
   "NO_DEFAULT": "Kein Default-Preis für diese Zelle hinterlegt.",
   "NO_COLUMN": "Laufzeit ist in keiner Tarif-Spalte konfiguriert.",

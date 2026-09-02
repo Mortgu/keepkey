@@ -15,6 +15,9 @@ import { z } from "zod";
  * ist dieselbe, in der eine Position gespeichert wird — Vorschau und
  * gespeichertes Angebot zeigen dadurch dieselben Zahlen.
  */
+export const priceOriginSchema = z.enum(["list", "customer"]);
+export type PriceOrigin = z.infer<typeof priceOriginSchema>;
+
 export const positionPriceSchema = z.object({
     /** Stückpreis pro Einheit und Monat. */
     eur_user_month: z.number().int(),
@@ -31,6 +34,23 @@ export const positionPriceSchema = z.object({
      * nicht mehr.
      */
     fromSnapshot: z.boolean(),
+
+    /**
+     * Woher der Stückpreis stammt: aus der Preistabelle (`list`) oder aus einem
+     * für diesen Kunden hinterlegten Preis (`customer`).
+     *
+     * Ohne diese Angabe ist einem Betrag nicht anzusehen, ob er ausgehandelt
+     * oder Listenpreis ist — ein Sonderpreis blieb dadurch unsichtbar und war
+     * über die Oberfläche weder erkennbar noch zurückzunehmen.
+     */
+    origin: priceOriginSchema,
+
+    /**
+     * Der Listenpreis an derselben Koordinate — `null`, wenn dort keiner
+     * hinterlegt ist. Erst dadurch ist sichtbar, *wovon* ein Kundenpreis
+     * abweicht.
+     */
+    list_eur_user_month: z.number().int().nullable(),
 });
 export type PositionPrice = z.infer<typeof positionPriceSchema>;
 

@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { deleteCustomerPrice, upsertCustomerPrice } from "./pricing-api";
+import { deleteCustomerPrice, deleteCustomerPriceById, upsertCustomerPrice } from "./pricing-api";
 import { pricingKeys } from "./pricing-keys";
 import type { PriceCoordinates } from "@keepit/schemas";
 
@@ -31,4 +31,20 @@ export function useCustomerPriceOverride() {
         isPending: isSaving || isClearing,
         error: saveError ?? clearError,
     };
+}
+
+/**
+ * Löschen über die Id — der einzige Weg zu einem Kundenpreis auf einer
+ * Mengenstufe, die nicht mehr in den Standard-Staffeln steht: über Koordinaten
+ * ist er von keiner Menge mehr zu treffen.
+ */
+export function useDeleteCustomerPrice() {
+    const queryClient = useQueryClient();
+
+    const { mutateAsync, isPending, error } = useMutation({
+        mutationFn: (id: string) => deleteCustomerPriceById(id),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: pricingKeys.all }),
+    });
+
+    return { deleteCustomerPrice: mutateAsync, isPending, error };
 }

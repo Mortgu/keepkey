@@ -792,7 +792,9 @@ type SourcePosition = {
  *
  * Ohne Pin (Positionen aus der Zeit vor der Tarif-Versionierung) bleibt nur der
  * flache Rückfall auf den gespeicherten Stückpreis — Mengenstaffeln lassen sich
- * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet.
+ * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet. Ob
+ * jener Betrag damals ein Kundenpreis war, ist an der Position nicht vermerkt;
+ * er wird deshalb als `list` ohne Vergleichswert gemeldet.
  */
 async function priceFromPin(
     source: SourcePosition,
@@ -806,6 +808,8 @@ async function priceFromPin(
         discount_cents: eur_user_month * quantity * source.free_months,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot,
+        origin: "list" as const,
+        list_eur_user_month: null,
     });
 
     if (!source.tariffVersionId) {
@@ -858,6 +862,10 @@ async function priceFromPin(
         discount_cents: eur_user_month * quantity * source.free_months,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot: true,
+        // Der Kundenpreis wird aktuell gelesen, nicht aus dem Snapshot — die
+        // Herkunft gilt also für heute und ist deshalb aussagekräftig.
+        origin: result.breakdown.origin,
+        list_eur_user_month: result.breakdown.listUnitPrice,
     };
 }
 
@@ -898,10 +906,10 @@ export async function getExtensionPrice(
     }
 
     const source = await loadSourcePosition(offerId, positionId);
-    const { eur_user_month, total_cents, discount_cents, fromSnapshot } =
+    const { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month } =
         await priceFromPin(source, offer.duration_months, quantity, offer.customerId);
 
-    return { eur_user_month, total_cents, discount_cents, fromSnapshot };
+    return { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month };
 }
 
 /**

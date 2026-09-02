@@ -5,11 +5,13 @@ import {
     createTariff,
     createTariffGroup,
     deleteCustomerPrice,
+    deleteCustomerPriceById,
     deleteStandardDuration,
     deleteStandardTier,
     deleteTariff,
     deleteTariffCell,
     deleteTariffGroup,
+    getCustomerPrices,
     getStandardDurations,
     getStandardTiers,
     getTariff,
@@ -31,6 +33,7 @@ import {
     createTariffGroupSchema,
     createTariffSchema,
     deleteCustomerPriceSchema,
+    listCustomerPricesSchema,
     deleteTariffCellSchema,
     updateStandardTierSchema,
     updateTariffCellSchema,
@@ -54,6 +57,13 @@ router.put("/customer-price", validate(upsertCustomerPriceSchema), upsertCustome
 
 /* [DELETE] /api/tariffs/customer-price — kundenspezifischen Stückpreis entfernen */
 router.delete("/customer-price", validateQuery(deleteCustomerPriceSchema), deleteCustomerPrice);
+
+/* [GET] /api/tariffs/customer-prices?customerId= — alle Preise eines Kunden */
+router.get("/customer-prices", validateQuery(listCustomerPricesSchema), getCustomerPrices);
+
+/* [DELETE] /api/tariffs/customer-prices/:id — über die Id, damit auch eine
+   Mengenstufe erreichbar bleibt, die keine Menge mehr trifft */
+router.delete("/customer-prices/:id", deleteCustomerPriceById);
 
 /* [GET] /api/tariffs/standard-durations — global gepflegte Laufzeiten */
 router.get('/standard-durations', getStandardDurations);

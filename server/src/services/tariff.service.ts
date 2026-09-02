@@ -11,7 +11,7 @@ import {
 import {
     calculatePrice,
     loadTariffForPricing,
-    resolveCell, type PriceFailureReason
+    resolveTier, type PriceFailureReason
 } from "../utils/products.js";
 
 import type {
@@ -51,7 +51,6 @@ const TARIFF_INCLUDE = {
     cells: {
         orderBy: { duration: 'asc' },
     },
-    customerPrices: true,
 } as const;
 
 const TARIFF_GROUP_INCLUDE = {
@@ -74,7 +73,6 @@ const TARIFF_GROUP_INCLUDE = {
             cells: {
                 orderBy: { duration: 'asc' },
             },
-            customerPrices: true,
         },
     },
 } as const;
@@ -128,13 +126,15 @@ async function recalculateAfterOverrideChange(
         throw new AppException(failureMessage, 500, result.reason);
     }
 
-    // Ein Override adressiert eine Tarif-Zelle, keine Angebotsposition — es gibt
-    // hier keine Freimonate, die abzuziehen wären.
+    // Ein Kundenpreis adressiert eine Tarif-Koordinate, keine Angebotsposition —
+    // es gibt hier keine Freimonate, die abzuziehen wären.
     return {
         eur_user_month: result.breakdown.unitPrice,
         total_cents: result.price,
         discount_cents: 0,
         fromSnapshot: false,
+        origin: result.breakdown.origin,
+        list_eur_user_month: result.breakdown.listUnitPrice,
     };
 }
 
@@ -160,7 +160,7 @@ function assertQuantityRange({ min_quantity, max_quantity }: QuantityRange) {
 
 /**
  * Verhindert überlappende Mengenstaffeln. Ohne diese Prüfung nimmt
- * {@link resolveCell} bei Überschneidung einfach den ersten Treffer — welcher
+ * {@link resolvePrice} bei Überschneidung einfach den ersten Treffer — welcher
  * Preis gilt, wäre dann von der Zeilenreihenfolge abhängig. Die Prüfung hält
  * zugleich `min_quantity` innerhalb eines Tarifs eindeutig und macht sie damit
  * zum tragfähigen Sortierschlüssel.
@@ -390,6 +390,8 @@ export async function getTariffPrice(
         total_cents: result.price,
         discount_cents: eur_user_month * quantity * free_months,
         fromSnapshot: false,
+        origin: result.breakdown.origin,
+        list_eur_user_month: result.breakdown.listUnitPrice,
     };
 }
 
@@ -671,7 +673,7 @@ export async function deleteStandardTier(tierId: string): Promise<void> {
 /**
  * Stellt sicher, dass eine Laufzeit in der Standardliste steht.
  *
- * `resolveCell` leitet die Spalte aus den vorhandenen Zellen ab und akzeptiert
+ * `resolvePrice` leitet die Spalte aus den vorhandenen Preisen ab und akzeptiert
  * deshalb auch eine Laufzeit, die aus der Liste genommen wurde — im Raster ist
  * sie dann als verwaiste Spalte sichtbar, im Angebot darf sie aber nicht mehr
  * gewaehlt werden. Am Angebotskopf ist die Liste die Auswahl, also ist sie hier
@@ -742,13 +744,25 @@ export async function deleteTariffCell(tariffId: string, input: DeleteTariffCell
     });
 }
 
+/**
+ * Legt einen kundenspezifischen Stückpreis an oder ändert ihn.
+ *
+ * Verlangt **keinen** Listenpreis an dieser Koordinate: ein Kundenpreis ist
+ * selbst ein Preis (siehe {@link resolvePrice}). Gebraucht wird nur die
+ * Mengenstaffel — sie bestimmt, an welcher Koordinate er abgelegt wird.
+ *
+ * Die Laufzeit muss eine Standardlaufzeit sein, sonst entstünde ein Preis an
+ * einer Koordinate, die im Angebotskopf nie wählbar ist.
+ */
 export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
     const { productId, contractId, duration, quantity, customerId, price } = input;
+
+    await assertStandardDuration(duration);
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
     if (!tariff) throw priceFailure("NO_TARIFF");
 
-    const resolved = resolveCell(tariff, { duration, quantity });
+    const resolved = resolveTier(tariff, quantity);
     if (!resolved.ok) throw priceFailure(resolved.reason);
 
     await prisma.tariffCustomerPrice.upsert({
@@ -757,7 +771,7 @@ export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
                 tariffId: tariff.id,
                 customerId,
                 productId,
-                duration: resolved.cell.duration,
+                duration,
                 min_quantity: resolved.tier.min_quantity,
             },
         },
@@ -765,7 +779,7 @@ export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
             tariffId: tariff.id,
             customerId,
             productId,
-            duration: resolved.cell.duration,
+            duration,
             min_quantity: resolved.tier.min_quantity,
             price,
         },
@@ -778,13 +792,100 @@ export async function upsertCustomerPrice(input: UpsertCustomerPriceInput) {
     );
 }
 
+/**
+ * Entfernt einen Kundenpreis über seine Koordinate — der Weg für das
+ * Zurücksetzen im Angebot, wo Produkt, Vertrag, Laufzeit und Menge bekannt sind.
+ *
+ * Wie beim Schreiben genügt die Staffel. Eine Mengenstufe, die nicht mehr in
+ * {@link StandardTier} steht, ist über diesen Weg allerdings von keiner Menge
+ * mehr zu treffen — dafür gibt es {@link deleteCustomerPriceById}.
+ */
+/**
+ * Alle Kundenpreise eines Kunden, über alle Tarife hinweg.
+ *
+ * Der einzige Weg, ausgehandelte Preise überhaupt zu sehen: der Tarif liefert
+ * sie nicht mehr mit (fremde Kundenpreise gehören nicht in eine Preistabelle,
+ * die jeder öffnet), und im Angebot ist immer nur eine Koordinate sichtbar.
+ *
+ * Angereichert um Listenpreis und Staffelgrenzen, damit eine Zeile für sich
+ * lesbar ist — inklusive der Stufen, die es nicht mehr gibt: die bleiben
+ * erhalten, greifen aber nicht, weil keine Menge sie trifft.
+ *
+ * Die Form entspricht `customerPriceRowSchema` in `@keepit/schemas`, dort nach
+ * der JSON-Serialisierung beschrieben (Zeitstempel als String).
+ */
+export async function getCustomerPrices(customerId: string) {
+    const [prices, tiers] = await Promise.all([
+        prisma.tariffCustomerPrice.findMany({
+            where: { customerId },
+            include: {
+                tariff: {
+                    include: {
+                        contract: { include: { translations: true } },
+                        cells: true,
+                    },
+                },
+                product: { include: { translations: true } },
+            },
+            orderBy: [{ tariffId: 'asc' }, { duration: 'asc' }, { min_quantity: 'asc' }],
+        }),
+        prisma.standardTier.findMany(),
+    ]);
+
+    const tierByMin = new Map(tiers.map(t => [t.min_quantity, t]));
+
+    return prices.map((price) => {
+        const tier = tierByMin.get(price.min_quantity);
+        const cell = price.tariff.cells.find(
+            c => c.duration === price.duration && c.min_quantity === price.min_quantity,
+        );
+
+        return {
+            id: price.id,
+            tariffId: price.tariffId,
+
+            contractId: price.tariff.contractId,
+            contract: price.tariff.contract,
+
+            productId: price.productId,
+            product: price.product,
+
+            duration: price.duration,
+
+            min_quantity: price.min_quantity,
+            max_quantity: tier?.max_quantity ?? null,
+            reachable: tier !== undefined,
+
+            price: price.price,
+            list_price: cell?.price ?? null,
+        };
+    });
+}
+
+/**
+ * Entfernt einen Kundenpreis über seine Id.
+ *
+ * Nötig neben {@link deleteCustomerPrice}: jener adressiert über eine Menge und
+ * kann eine Mengenstufe, die nicht mehr in den Standard-Staffeln steht, gar
+ * nicht mehr treffen. Über die Id ist auch dieser Altbestand erreichbar.
+ */
+export async function deleteCustomerPriceById(id: string): Promise<void> {
+    const existing = await prisma.tariffCustomerPrice.findUnique({ where: { id } });
+
+    if (!existing) {
+        throw new AppException("Kundenpreis nicht gefunden.", 404, "CUSTOMER_PRICE_NOT_FOUND");
+    }
+
+    await prisma.tariffCustomerPrice.delete({ where: { id } });
+}
+
 export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
     const { productId, contractId, duration, quantity, customerId } = input;
 
     const tariff = await loadTariffForPricing(productId, contractId, customerId);
     if (!tariff) throw priceFailure("NO_TARIFF");
 
-    const resolved = resolveCell(tariff, { duration, quantity });
+    const resolved = resolveTier(tariff, quantity);
     if (!resolved.ok) throw priceFailure(resolved.reason);
 
     await prisma.tariffCustomerPrice.deleteMany({
@@ -792,7 +893,7 @@ export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
             tariffId: tariff.id,
             customerId,
             productId,
-            duration: resolved.cell.duration,
+            duration,
             min_quantity: resolved.tier.min_quantity,
         },
     });

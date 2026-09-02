@@ -46,8 +46,26 @@ export type PriceFailureReason =
     | 'NO_CELL'
     | 'INVALID_INPUT';
 
+/** Woher der Stückpreis stammt. */
+export type PriceOrigin = 'list' | 'customer';
+
 export type PriceResult =
-    | { ok: true; price: number; breakdown: { unitPrice: number; quantity: number; duration: number } }
+    | {
+        ok: true;
+        price: number;
+        breakdown: {
+            unitPrice: number;
+            quantity: number;
+            duration: number;
+            origin: PriceOrigin;
+            /**
+             * Listenpreis an derselben Koordinate — `null`, wenn dort keine
+             * Zelle hinterlegt ist. Erst dadurch ist sichtbar, *wovon* ein
+             * Kundenpreis abweicht.
+             */
+            listUnitPrice: number | null;
+        };
+    }
     | { ok: false; reason: PriceFailureReason };
 
 export class PriceError extends Error {
@@ -57,44 +75,115 @@ export class PriceError extends Error {
     }
 }
 
-/**
- * Resolve the concrete cell for a given tariff, duration and quantity.
- * Returns the matching tier and cell, or a {@link PriceFailureReason}
- * describing why no cell matched. Shared between {@link selectPrice} and
- * customer-price upsert/delete so both use the same resolution rules.
- */
-export function resolveCell(
-    tariff: TariffForPricing | null | undefined,
-    { duration, quantity }: { duration: number; quantity: number },
-):
-    | { ok: true; tier: TariffForPricing['tiers'][number]; cell: TariffForPricing['cells'][number] }
-    | { ok: false; reason: Exclude<PriceFailureReason, 'INVALID_INPUT'> } {
+type Tier = TariffForPricing['tiers'][number];
+type CustomerPrice = TariffForPricing['customerPrices'][number];
 
-    // Reihenfolge wie bisher — Laufzeit, dann Menge, dann Zelle —, damit die
-    // gemeldete Ursache dieselbe bleibt. Eine Laufzeit "existiert", wenn
-    // irgendeine Zelle des Tarifs sie trägt; eine eigene Spaltentabelle, die
-    // das getrennt festhielte, gibt es nicht mehr.
-    const hasDuration = tariff?.cells.some(c => c.duration === duration) ?? false;
-    if (!hasDuration) return { ok: false, reason: 'NO_COLUMN' };
-
-    const tier = tariff?.tiers.find(t => {
+/** Die Mengenstaffel, die eine Menge abdeckt. */
+function findTier(tariff: TariffForPricing, quantity: number): Tier | undefined {
+    return tariff.tiers.find(t => {
         const withinMin = quantity >= t.min_quantity;
-        const noUpperLimit = t.max_quantity === null;
-        const withinMax = noUpperLimit || quantity <= t.max_quantity!;
+        const withinMax = t.max_quantity === null || quantity <= t.max_quantity;
         return withinMin && withinMax;
     });
-    if (!tier) return { ok: false, reason: 'NO_ROW' };
-
-    const cell = tariff?.cells.find(c => c.duration === duration && c.min_quantity === tier.min_quantity);
-    if (!cell) return { ok: false, reason: 'NO_CELL' };
-
-    return { ok: true, tier, cell };
 }
 
 /**
- * Pure pricing logic: given an already-loaded tariff, selects the matching
- * tier (by quantity range) and cell (by duration), applies an optional
- * customer-specific override and returns the total price.
+ * Der Kundenpreis an einer Koordinate.
+ *
+ * Produktspezifisch geht vor gruppenweit: Letztere (`productId === null`)
+ * stammen aus der Zeit vor der Migration 20260803120000 und werden nur noch
+ * gelesen — es gibt keinen Schreibpfad mehr, der sie erzeugt.
+ */
+function findCustomerPrice(
+    tariff: TariffForPricing,
+    { productId, customerId, duration, min_quantity }: {
+        productId?: string; customerId?: string; duration: number; min_quantity: number;
+    },
+): CustomerPrice | undefined {
+    if (customerId === undefined || customerId === '') return undefined;
+
+    const candidates = tariff.customerPrices.filter(cp =>
+        cp.customerId === customerId && cp.duration === duration && cp.min_quantity === min_quantity
+    );
+
+    return candidates.find(cp => cp.productId === productId)
+        ?? candidates.find(cp => cp.productId === null);
+}
+
+/**
+ * Ermittelt den Stückpreis für Laufzeit und Menge.
+ *
+ * **Ein Kundenpreis ist selbst ein Preis, kein blosses Überschreiben.** Er gilt
+ * deshalb auch an einer Koordinate, für die kein Listenpreis hinterlegt ist —
+ * vorher lief die Auflösung erst über die Zelle und schaute danach nach
+ * Overrides, wodurch ein Kundenpreis ohne Zelle nie gelesen wurde und sich ein
+ * fehlender Preis nicht durch Überschreiben beheben liess.
+ *
+ * Die Reihenfolge der gemeldeten Ursache bleibt dieselbe wie zuvor — Laufzeit,
+ * dann Menge, dann Preis —, damit bestehende Fehlermeldungen unverändert
+ * bleiben. Neu ist nur, dass ein Kundenpreis die Laufzeit ebenso „existieren
+ * lässt" wie eine Zelle.
+ *
+ * Geteilt mit dem Schreiben und Löschen von Kundenpreisen, damit dort dieselben
+ * Regeln gelten.
+ */
+export function resolvePrice(
+    tariff: TariffForPricing | null | undefined,
+    { productId, customerId, duration, quantity }: {
+        productId?: string; customerId?: string; duration: number; quantity: number;
+    },
+):
+    | { ok: true; tier: Tier; unitPrice: number; origin: PriceOrigin; listUnitPrice: number | null }
+    | { ok: false; reason: Exclude<PriceFailureReason, 'INVALID_INPUT'> } {
+
+    if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
+
+    const hasDuration = tariff.cells.some(c => c.duration === duration)
+        || tariff.customerPrices.some(cp => cp.duration === duration && cp.customerId === customerId);
+    if (!hasDuration) return { ok: false, reason: 'NO_COLUMN' };
+
+    const tier = findTier(tariff, quantity);
+    if (!tier) return { ok: false, reason: 'NO_ROW' };
+
+    const cell = tariff.cells.find(c => c.duration === duration && c.min_quantity === tier.min_quantity);
+    const listUnitPrice = cell?.price ?? null;
+
+    const customerPrice = findCustomerPrice(tariff, {
+        productId, customerId, duration, min_quantity: tier.min_quantity,
+    });
+
+    if (customerPrice) {
+        return { ok: true, tier, unitPrice: customerPrice.price, origin: 'customer', listUnitPrice };
+    }
+
+    if (listUnitPrice === null) return { ok: false, reason: 'NO_CELL' };
+
+    return { ok: true, tier, unitPrice: listUnitPrice, origin: 'list', listUnitPrice };
+}
+
+/**
+ * Nur die Mengenstaffel — ohne jede Anforderung an einen vorhandenen Preis.
+ *
+ * Das Schreiben eines Kundenpreises braucht genau das: die Staffel bestimmt die
+ * Koordinate, an der er abgelegt wird. Über {@link resolvePrice} zu gehen hiesse
+ * einen Preis zu verlangen, um einen Preis setzen zu dürfen.
+ */
+export function resolveTier(
+    tariff: TariffForPricing | null | undefined,
+    quantity: number,
+): { ok: true; tier: Tier } | { ok: false; reason: Exclude<PriceFailureReason, 'INVALID_INPUT'> } {
+    if (!tariff) return { ok: false, reason: 'NO_TARIFF' };
+
+    const tier = findTier(tariff, quantity);
+    if (!tier) return { ok: false, reason: 'NO_ROW' };
+
+    return { ok: true, tier };
+}
+
+/**
+ * Pure pricing logic: given an already-loaded tariff, resolves the unit price
+ * via {@link resolvePrice} and multiplies it out. Alles Auflösen liegt dort;
+ * hier bleibt nur die Rechnung.
  *
  * `price` is the unit price per piece per time unit (Stückpreis pro
  * Zeiteinheit). Total = unitPrice * quantity * duration. The `duration`
@@ -126,30 +215,15 @@ export function selectPrice(
         return { ok: false, reason: 'INVALID_INPUT' };
     }
 
-    const resolved = resolveCell(tariff, { duration, quantity });
+    const resolved = resolvePrice(tariff, { productId, customerId, duration, quantity });
     if (!resolved.ok) return { ok: false, reason: resolved.reason };
 
-    let unitPrice = resolved.cell.price;
-
-    if (customerId !== undefined && customerId !== '') {
-        const overrides = tariff.customerPrices.filter(cp =>
-            cp.customerId === customerId
-            && cp.duration === resolved.cell.duration
-            && cp.min_quantity === resolved.tier.min_quantity
-        );
-        const productSpecific = overrides.find(cp => cp.productId === productId);
-        // Altbestand: gruppenweite Overrides (productId === null) stammen aus der
-        // Zeit vor der Migration 20260803120000. Es gibt keinen Schreibpfad mehr,
-        // der sie erzeugt — gelesen werden sie weiterhin.
-        const groupWide = overrides.find(cp => cp.productId === null);
-        const override = productSpecific ?? groupWide;
-        if (override) unitPrice = override.price;
-    }
+    const { unitPrice, origin, listUnitPrice } = resolved;
 
     return {
         ok: true,
         price: unitPrice * quantity * duration,
-        breakdown: { unitPrice, quantity, duration },
+        breakdown: { unitPrice, quantity, duration, origin, listUnitPrice },
     };
 }
 

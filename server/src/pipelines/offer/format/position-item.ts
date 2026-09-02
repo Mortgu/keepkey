@@ -1,6 +1,17 @@
 import type { Language } from "@prisma/client";
 import type { PositionPrice } from "@keepit/schemas";
 
+/**
+ * Was das Dokument von einem Preis braucht.
+ *
+ * Bewusst schmaler als {@link PositionPrice}: dessen `origin` sagt, ob ein
+ * Betrag ein Kundenpreis ist — bei einem beim Anlegen festgeschriebenen Preis
+ * ist das nirgends vermerkt, und das Dokument zeigt es ohnehin nicht. Der
+ * schmale Typ erspart es diesen beiden Helfern, eine Herkunft zu behaupten, die
+ * sie nicht kennen.
+ */
+type TemplatePrice = Pick<PositionPrice, "eur_user_month" | "total_cents" | "discount_cents">;
+
 import type { OfferTemplateItem } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import { formatCentsToEur, formatDate } from "@/utils/utils.js";
@@ -58,7 +69,7 @@ export interface TemplateItemContext {
  */
 export function toTemplateItem(
     position: PositionForTemplate,
-    price: PositionPrice,
+    price: TemplatePrice,
     context: TemplateItemContext,
 ): OfferTemplateItem {
     const translation = pickTranslation(position.product.translations, context.language);
@@ -93,11 +104,10 @@ export const storedPrice = (position: {
     eur_user_month: number;
     total_cents: number;
     discount_cents: number;
-}): PositionPrice => ({
+}): TemplatePrice => ({
     eur_user_month: position.eur_user_month,
     total_cents: position.total_cents,
     discount_cents: position.discount_cents,
-    fromSnapshot: true,
 });
 
 /**
@@ -115,9 +125,8 @@ export const livePrice = (
     unitPrice: number,
     position: { quantity: number; free_months: number },
     duration_months: number,
-): PositionPrice => ({
+): TemplatePrice => ({
     eur_user_month: unitPrice,
     total_cents: unitPrice * position.quantity * duration_months,
     discount_cents: unitPrice * position.quantity * position.free_months,
-    fromSnapshot: false,
 });

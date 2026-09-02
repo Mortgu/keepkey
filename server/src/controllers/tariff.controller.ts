@@ -111,6 +111,11 @@ export const updateTariffCell = async (request: Request, response: Response) => 
     return response.status(200).json({ message: 'Cell updated successfully!', updated });
 };
 
+export const getCustomerPrices = async (request: Request, response: Response) => {
+    const prices = await tariffService.getCustomerPrices(request.query.customerId as string);
+    return response.status(200).json(prices);
+};
+
 export const upsertCustomerPrice = async (request: Request, response: Response) => {
     const result = await tariffService.upsertCustomerPrice(request.body);
     return response.status(200).json(result);
@@ -152,6 +157,11 @@ export const deleteTariffCell = async (request: Request, response: Response) => 
         duration: duration === undefined ? undefined : Number(duration),
     });
 
+    return response.status(204).send();
+};
+
+export const deleteCustomerPriceById = async (request: Request, response: Response) => {
+    await tariffService.deleteCustomerPriceById(request.params.id as string);
     return response.status(204).send();
 };
 
