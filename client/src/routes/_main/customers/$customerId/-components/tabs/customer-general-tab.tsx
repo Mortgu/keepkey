@@ -8,11 +8,10 @@ interface Props {
 }
 
 const styles = tv({
-    base: 'text-sm bg-(--page-bg) border-(--border) px-4 py-2',
     slots: {
-        base: 'text-sm bg-(--page-bg) border-(--border) px-4 py-2',
-        dt: 'border-t border-b border-l rounded-tl-md rounded-bl-md text-gray-500',
-        dd: 'border-t border-r border-b rounded-tr-md rounded-br-md text-right text-(--text) font-medium'
+        base: 'text-sm  border-(--border) px-4 py-2 border-b nth-last-1:border-none nth-last-2:border-none',
+        dt: '',
+        dd: 'text-right text-(--text) font-medium'
     }
 })
 
@@ -21,9 +20,9 @@ export default function CustomerGeneralTab({ customer }: Props) {
     console.log(customer)
 
     return (
-        <div>
+        <div className="border border-(--border) rounded-md">
 
-            <dl className="grid grid-cols-[auto_1fr] gap-y-2.5 items-baseline">
+            <dl className="grid grid-cols-[auto_1fr] items-baseline">
                 <dt className={cn(css.base(), css.dt())}>Kunden-Nr.</dt>
                 <dd className={cn(css.base(), css.dd())}>
                     {customer.customerId ?? '-'}

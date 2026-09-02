@@ -23,6 +23,7 @@ import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
+import { Route as MainTestIndexRouteImport } from './routes/_main/test/index'
 import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
 import { Route as MainCustomersCustomerIdIndexRouteImport } from './routes/_main/customers/$customerId/index'
 import { Route as MainSettingsAccountIndexRouteImport } from './routes/_main/settings/account/index'
@@ -99,6 +100,11 @@ const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
   path: '/suppliers/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainTestIndexRoute = MainTestIndexRouteImport.update({
+  id: '/test/',
+  path: '/test/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainWorkloadsIndexRoute = MainWorkloadsIndexRouteImport.update({
   id: '/workloads/',
   path: '/workloads/',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/orders/': typeof MainOrdersIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
+  '/test/': typeof MainTestIndexRoute
   '/workloads/': typeof MainWorkloadsIndexRoute
   '/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
   '/settings/account/': typeof MainSettingsAccountIndexRoute
@@ -169,6 +176,7 @@ export interface FileRoutesByTo {
   '/orders': typeof MainOrdersIndexRoute
   '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
+  '/test': typeof MainTestIndexRoute
   '/workloads': typeof MainWorkloadsIndexRoute
   '/customers/$customerId': typeof MainCustomersCustomerIdIndexRoute
   '/settings/account': typeof MainSettingsAccountIndexRoute
@@ -192,6 +200,7 @@ export interface FileRoutesById {
   '/_main/orders/': typeof MainOrdersIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
+  '/_main/test/': typeof MainTestIndexRoute
   '/_main/workloads/': typeof MainWorkloadsIndexRoute
   '/_main/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
   '/_main/settings/account/': typeof MainSettingsAccountIndexRoute
@@ -215,6 +224,7 @@ export interface FileRouteTypes {
     | '/orders/'
     | '/settings/'
     | '/suppliers/'
+    | '/test/'
     | '/workloads/'
     | '/customers/$customerId/'
     | '/settings/account/'
@@ -235,6 +245,7 @@ export interface FileRouteTypes {
     | '/orders'
     | '/settings'
     | '/suppliers'
+    | '/test'
     | '/workloads'
     | '/customers/$customerId'
     | '/settings/account'
@@ -257,6 +268,7 @@ export interface FileRouteTypes {
     | '/_main/orders/'
     | '/_main/settings/'
     | '/_main/suppliers/'
+    | '/_main/test/'
     | '/_main/workloads/'
     | '/_main/customers/$customerId/'
     | '/_main/settings/account/'
@@ -371,6 +383,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainSuppliersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/test/': {
+      id: '/_main/test/'
+      path: '/test'
+      fullPath: '/test/'
+      preLoaderRoute: typeof MainTestIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/workloads/': {
       id: '/_main/workloads/'
       path: '/workloads'
@@ -444,6 +463,7 @@ interface MainRouteRouteChildren {
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
+  MainTestIndexRoute: typeof MainTestIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
   MainCustomersCustomerIdIndexRoute: typeof MainCustomersCustomerIdIndexRoute
   MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
@@ -460,6 +480,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
+  MainTestIndexRoute: MainTestIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
   MainCustomersCustomerIdIndexRoute: MainCustomersCustomerIdIndexRoute,
   MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,

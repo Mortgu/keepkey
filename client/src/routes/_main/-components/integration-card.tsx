@@ -1,6 +1,6 @@
 import { tv } from "tailwind-variants";
-import { RotateCcw, Settings } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { RotateCcw, Settings } from "lucide-react";
 import { Button } from "@/components";
 
 export type IntegrationStatus =
@@ -20,13 +20,25 @@ type Props = {
     isRetrying?: boolean;
 };
 
-const statusText = tv({
-    base: "text-md font-light",
+const styles = tv({
+    base: 'flex-1 grid rounded-lg bg-(--page-bg) border border-t-3 border-(--border)',
     variants: {
         status: {
-            connected: "text-green-800",
-            checking: "text-blue-700",
-            failed: "text-red-700",
+            connected: "border-t-(--primary-400)",
+            checking: "border-t-(--warning)",
+            failed: "border-t-(--destructive)",
+            not_configured: "border-t-gray-500",
+        }
+    }
+});
+
+const statusText = tv({
+    base: "text-sm",
+    variants: {
+        status: {
+            connected: "text-(--primary)",
+            checking: "text-(--warning)",
+            failed: "text-(--destructive)",
             not_configured: "text-gray-500",
         },
     },
@@ -39,48 +51,46 @@ const STATUS_LABEL_KEYS: Record<IntegrationStatus, string> = {
     not_configured: "dashboard.status.notConfigured",
 };
 
-export default function IntegrationCard({
-    name,
-    status,
-    meta,
-    onRetry,
-    onConfigure,
-    isRetrying = false,
-}: Props) {
+export default function IntegrationCard(props: Props) {
+    const {
+        name,
+        status,
+        meta,
+        onRetry,
+        onConfigure,
+        isRetrying = false,
+    } = props;
+
     const { t } = useTranslation();
 
     const showMeta = Boolean(meta && meta.length > 0);
     const retrying = isRetrying || status === "checking";
 
     return (
-        <div className="grid">
-            <div className="w-full flex items-start justify-between px-4 pt-4 pb-2">
-                <div className="w-fit flex items-center justify-center gap-2">
-                    <div className="grid">
-                        <p className="text-lg">{name}</p>
-                        <p className={statusText({ status })}>
-                            {t(STATUS_LABEL_KEYS[status])}
-                        </p>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2">
+        <div className={styles({ status })}>
+            <div className='flex items-center justify-between px-4 py-3'>
+                <p className='text-lg font-medium'>{name}</p>
+                <div className='flex items-center gap-4'>
+                    <p className={statusText({ status })}>{t(STATUS_LABEL_KEYS[status])}</p>
                     {onRetry && (
                         <Button
-                            variant="secondary"
                             size="xs"
-                            icon={<RotateCcw size={14} />}
+                            variant="border"
+                            icon={<RotateCcw />}
                             iconOnly
+
                             onClick={onRetry}
                             loading={retrying}
                         />
                     )}
+
                     {onConfigure && (
                         <Button
-                            variant="secondary"
                             size="xs"
-                            icon={<Settings size={14} />}
+                            variant="border"
+                            icon={<Settings />}
                             iconOnly
+
                             onClick={onConfigure}
                         />
                     )}
@@ -88,13 +98,10 @@ export default function IntegrationCard({
             </div>
 
             {showMeta && (
-                <div className="flex gap-x-4 flex-wrap items-start px-4 pb-4 font-light ">
-                    {meta!.map((item) => (
-                        <p
-                            key={item.label}
-                            className="flex gap-1  min-w-fit text-sm text-gray-500"
-                        >
-                            <span className="text-gray-400">{item.label}:</span>{" "}
+                <div className='flex items-center gap-4 bg-white px-4 py-2 rounded-lg border-t border-(--border)'>
+                    {meta?.map((item) => (
+                        <p key={item.label}>
+                            <span className='text-gray-500'>{item.label}: </span>
                             {item.value}
                         </p>
                     ))}

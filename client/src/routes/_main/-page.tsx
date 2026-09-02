@@ -1,12 +1,11 @@
 import { useTranslation } from "react-i18next";
 import IntegrationCard from "./-components/integration-card";
-import GlobalSearch from "./-components/global-search";
-import StatCard from "./-components/stat-card";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@keepit/schemas";
-import { PageWidth, RouteError } from "@/components";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
+import GlobalSearch from "./-components/global-search";
+import { Button, RouteError } from "@/components";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 
@@ -38,36 +37,39 @@ export default function DashboardPage() {
         );
     };
 
+    if (error) {
+        return <RouteError error={error} onRetry={refetch} />
+    }
+
     return (
-        <PageWidth variant="none">
-            <div className="w-full bg-(--page-bg) border-b border-(--border) p-4">
+        <div className="mx-4">
+            {/* Global Page Header with Global Search + Breadcrumbs */}
+            <div className="flex items-center justify-between border-b border-(--border) h-16">
                 <GlobalSearch />
             </div>
 
-            {error ? (
-                <RouteError error={error} onRetry={refetch} />
-            ) : (
-                <div className="grid grid-cols-3 border-b border-(--border) [&>*:not(:last-child)]:border-r [&>*:not(:last-child)]:border-(--border)">
-                    {renderCard("NextCloud", data?.nextcloud)}
-                    {renderCard("Redis", data?.redis)}
-                    {renderCard("S3 Storage", data?.s3)}
+            {/* Page Header with Title + Actions */}
+            <div className="flex items-center justify-between my-6">
+                {/* Title + Description */}
+                <div className="grid gap-1">
+                    <h1 className="text-xl font-medium">Overview</h1>
+                    <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
                 </div>
-            )}
 
-            <div className="flex border-b border-(--border) [&>*:not(:last-child)]:border-r [&>*:not(:last-child)]:border-(--border) overflow-y-scroll">
-                <StatCard
-                    title={t("section.offers")}
-                    total={stats.offers.total}
-                    volume={stats.offers.volume}
-                />
-
-                <StatCard
-                    title={t("section.orders")}
-                    total={stats.orders.total}
-                    volume={stats.orders.volume}
-                />
+                {/* Actions */}
+                <div className="flex items-center gap-4">
+                    {/* Example Button */}
+                    <Button size="sm">Angebot erstellen</Button>
+                </div>
             </div>
 
-        </PageWidth>
+            {/* Integrations (Status + Infos) */}
+            <div className='flex items-start gap-4 mb-4'>
+                {renderCard("NextCloud", data?.nextcloud)}
+                {renderCard("Redis", data?.redis)}
+                {renderCard("S3 Storage", data?.s3)}
+            </div>
+
+        </div>
     );
 }

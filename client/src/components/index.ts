@@ -2,6 +2,7 @@ export * from './tokens';
 
 export * from './accordion';
 export * from './badge';
+export * from './breadcrumbs';
 export * from './button';
 export * from './checkbox';
 export * from './dialog';

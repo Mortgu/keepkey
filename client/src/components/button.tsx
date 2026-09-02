@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import { LoaderCircle } from 'lucide-react';
-import { ACTION_FOCUS, ACTION_SIZE } from './tokens';
+import { ACTION_FOCUS, ACTION_ICON, ACTION_SIZE } from './tokens';
 import type { ComponentSize, ComponentVariant } from './tokens';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
@@ -10,6 +10,11 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
     size?: ComponentSize | 'fit_xs' | 'fit_sm' | 'fit_md';
     active?: boolean;
     danger?: boolean;
+    /**
+     * Die Icon-Größe kommt aus der Button-`size` — am Icon selbst muss nichts
+     * gesetzt werden. Wer eine abweichende Größe braucht, setzt sie als Klasse:
+     * `<Plus className="size-5" />` (siehe ACTION_ICON in tokens.ts).
+     */
     icon?: ReactNode;
     iconPosition?: 'left' | 'right';
     iconOnly?: boolean;
@@ -19,6 +24,7 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
 
 export const buttonStyles = tv({
     base: [
+        'loading-none',
         'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-md',
         'transition-all duration-200 font-medium',
         ACTION_FOCUS,
@@ -60,13 +66,13 @@ export const buttonStyles = tv({
             false: ''
         },
         size: {
-            fit_xs: 'h-fit p-0 w-fit text-xs',
-            fit_sm: 'h-fit p-0 w-fit text-sm',
-            fit_md: 'h-fit p-0 w-fit text-md',
+            fit_xs: `h-fit p-0 w-fit text-xs ${ACTION_ICON.xs}`,
+            fit_sm: `h-fit p-0 w-fit text-sm ${ACTION_ICON.sm}`,
+            fit_md: `h-fit p-0 w-fit text-md ${ACTION_ICON.md}`,
 
-            md: ACTION_SIZE.md,
-            sm: ACTION_SIZE.sm,
-            xs: ACTION_SIZE.xs,
+            md: `${ACTION_SIZE.md} ${ACTION_ICON.md}`,
+            sm: `${ACTION_SIZE.sm} ${ACTION_ICON.sm}`,
+            xs: `${ACTION_SIZE.xs} ${ACTION_ICON.xs}`,
         },
         iconOnly: {
             true: 'aspect-square px-0',
@@ -114,7 +120,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
         children,
         ...rest
     }, ref) => {
-        const resolvedIcon = loading ? <LoaderCircle className="size-4 animate-spin" /> : icon;
+        const resolvedIcon = loading ? <LoaderCircle className="animate-spin" /> : icon;
         return (
             <button
                 ref={ref}

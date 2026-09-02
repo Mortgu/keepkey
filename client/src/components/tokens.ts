@@ -49,6 +49,22 @@ export const ACTION_SIZE = {
     md: `${ACTION_PADDING.md} ${CONTROL_HEIGHT.md} ${CONTROL_TEXT.md}`,
 } as const satisfies Record<ComponentSize, string>;
 
+/**
+ * Icon-Größe innerhalb einer Aktionsfläche — leitet sich aus der Kontrollgröße
+ * ab, damit Aufrufer an ihren Icons kein `size` mehr setzen müssen:
+ * `<Button size="sm" icon={<Plus />} />` reicht.
+ *
+ * Wirkt per CSS auf jedes `svg` in der Fläche und schlägt damit auch die
+ * `width`/`height`-Attribute, die Lucide aus `size={14}` erzeugt. Der
+ * `:not([class*='size-'])`-Teil ist die Ausnahme davon: eine bewusst gesetzte
+ * Klasse gewinnt, `<Plus className="size-5" />` bleibt also 20px.
+ */
+export const ACTION_ICON = {
+    xs: "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-3.5",
+    sm: "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    md: "[&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4.5",
+} as const satisfies Record<ComponentSize, string>;
+
 /** Vollständige Größenklasse für Eingabefelder (Input, Select, NumberField). */
 export const FIELD_SIZE = {
     xs: `${FIELD_PADDING.xs} ${CONTROL_HEIGHT.xs} ${CONTROL_TEXT.xs}`,
