@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
-import { Fragment } from "react";
 import ProductModal from "./-components/product-modal";
-import ProductList from "./-components/product-list";
-import { Button, PageWidth } from "@/components";
+import { Breadcrumbs, Button } from "@/components";
 import { useModal, useProductManager } from "@/hooks";
+import GlobalSearch from "../-components/global-search";
+import ProductList from "./-components/product-list";
 
 export default function ProductPage() {
     const { t } = useTranslation()
@@ -13,32 +12,43 @@ export default function ProductPage() {
     const modal = useModal();
 
     return (
-        <Fragment>
-            <PageWidth variant="none">
-                {/* Header */}
-                <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
-                    <div className="flex items-center justify-between">
-                        <div className="flex-1 grid gap-1">
-                            <h1 className="font-medium text-xl">{t('section.workloads')}</h1>
-                            <p className="font-light text-sm text-gray-400">
-                                Zentrale Workload verwaltung
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Button
-                                icon={<Plus size={14} strokeWidth={3} />}
-                                variant="primary"
-                                size="sm"
-                                onClick={() => modal.open()}
-                            >
-                                {t("button.create")}
-                            </Button>
-                        </div>
-                    </div>
+        <div className="mx-4">
+
+            {/* Global Page Header with Global Search + Breadcrumbs */}
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-16">
+                <GlobalSearch />
+            </div>
+
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-10">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Startseite", to: "/" },
+                        { label: "Workloads", to: "/workloads" },
+                    ]}
+                />
+
+            </div>
+
+            {/* Page Header with Title + Actions */}
+            <div className="flex items-center justify-between my-6">
+                {/* Title + Description */}
+                <div className="grid gap-1">
+                    <h1 className="text-xl font-medium">Workloads</h1>
+                    <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
                 </div>
 
-                <ProductList />
-            </PageWidth>
+                {/* Actions */}
+                <div className="flex items-center gap-4">
+                    {/* Create Workload Action */}
+                    <Button size="sm" onClick={() => modal.open()} disabled={modal.isOpen}>
+                        {t("button.create")}
+                    </Button>
+                </div>
+            </div>
+
+            <ProductList />
 
             {modal.isOpen && (
                 <ProductModal
@@ -48,6 +58,6 @@ export default function ProductPage() {
                     currentItem={modal.data}
                 />
             )}
-        </Fragment>
+        </div>
     )
 }

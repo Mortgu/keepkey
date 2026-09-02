@@ -14,7 +14,7 @@ export default function ProductList() {
 
     return (
         <div>
-            <div className="px-8 py-4 border-b border-(--border)">
+            <div className="">
                 <div className="flex items-center w-full gap-2">
                     <SortDropdown
                         value={filters.sort}
@@ -32,7 +32,7 @@ export default function ProductList() {
                 </div>
             </div>
 
-            <div className="grid gap-4 px-8 py-6">
+            <div className="grid gap-4 py-6">
                 {products.map((product: Product) => (
                     <ProductItem key={product.id} product={product} />
                 ))}

@@ -24,49 +24,38 @@ export default function ProductItem({ product }: Props) {
 
   return (
     <>
-      <div className="border border-(--border) rounded-md overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
-        <div className="flex items-center justify-between px-4 py-3 gap-8 bg-(--page-bg) border-b border-(--border)">
-          <div>
-            <p className="text-md text-gray-900">
-              {name}
-            </p>
-            <p className="text-xs text-gray-400">
-              {formatDate(product.createdAt || "")}
-            </p>
+      <div className="border border-(--border) rounded-md overflow-hidden  p-4">
+        <div className="grid gap-2">
+          <div className="flex items-center justify-between gap-4">
+            <div className="grid gap-0.5">
+              <p className="text-md font-medium">{name}</p>
+              <p className="text-xs text-gray-400">
+                {formatDate(product.createdAt || "")}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Button
+                variant="border"
+                icon={<Pen size={14} />}
+                iconOnly
+                onClick={() => modal.open(product)}
+                size="xs"
+              />
+              <Button
+                variant="secondary"
+                loading={isDeletingProduct}
+                danger
+                icon={<Trash size={14} />}
+                iconOnly
+                onClick={() => deleteProduct(product.id)}
+                size="xs"
+              />
+            </div>
           </div>
-        </div>
-
-        <div className="px-4 py-2">
-
           <p className="text-md font-light text-gray-800 mt-0.5">
             {description}
           </p>
-        </div>
-
-
-        <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
-          {/* Actions left */}
-          <div className="flex items-center gap-2"></div>
-
-          {/* Actions right */}
-          <div className="flex items-center gap-2">
-            <Button
-              variant="border"
-              icon={<Pen size={14} />}
-              iconOnly
-              onClick={() => modal.open(product)}
-              size="xs"
-            />
-            <Button
-              variant="secondary"
-              loading={isDeletingProduct}
-              danger
-              icon={<Trash size={14} />}
-              iconOnly
-              onClick={() => deleteProduct(product.id)}
-              size="xs"
-            />
-          </div>
         </div>
       </div>
 
