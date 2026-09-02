@@ -107,7 +107,12 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             <Accordion>
                 <Accordion.Section value="products" label="Produkte">
                     {offerPositions.map((position) => (
-                        <PositionRow key={position.id} position={position} />
+                        <PositionRow
+                            key={position.id}
+                            position={position}
+                            contract={offer.contract}
+                            durationMonths={offer.duration_months}
+                        />
                     ))}
 
                     {offerFlatRates.map((flatrate) => (

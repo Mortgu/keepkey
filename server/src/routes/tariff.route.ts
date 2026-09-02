@@ -13,7 +13,6 @@ import {
     getStandardDurations,
     getStandardTiers,
     getTariff,
-    getTariffDurations,
     getTariffGroup,
     getTariffGroups,
     getTariffPrice,
@@ -76,9 +75,6 @@ router.patch('/standard-tiers/:id', validate(updateStandardTierSchema), updateSt
 
 /* [DELETE] /api/tariffs/standard-tiers/:id */
 router.delete('/standard-tiers/:id', deleteStandardTier);
-
-/* [GET] /api/tariffs/durations/:productId/:contractId */
-router.get('/durations/:productId/:contractId', getTariffDurations);
 
 /* [GET] /api/tariffs/:id — eine TariffGroup */
 router.get('/:id', getTariffGroup);

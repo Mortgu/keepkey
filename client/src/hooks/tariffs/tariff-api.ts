@@ -101,9 +101,6 @@ export const updateStandardTier = (id: string, min_quantity: number, max_quantit
 export const deleteStandardTier = (id: string) =>
     api<void>(`/api/tariffs/standard-tiers/${id}`, { method: "DELETE" });
 
-export const getTariffDurations = (productId: string, contractId: string) =>
-    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });
-
 /* ───────────────────────────────
    Zelle — adressiert über ihre Koordinate, nicht über eine Id
    ─────────────────────────────── */

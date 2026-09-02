@@ -27,10 +27,10 @@ export const fetchOfferData = async (offerId: string) => {
                 customer: true,
                 customerContactPerson: true,
                 user: true,
+                contract: { include: { translations: true } },
                 offerPositions: {
                     include: {
                         product: { include: { translations: true } },
-                        contract: { include: { translations: true } },
                     },
                 },
                 offerFlatRates: {
@@ -72,55 +72,50 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     const language = offer.language;
     const customerId = offer.customerId;
 
+    // Vertrag und Laufzeit stehen am Angebot. Die frühere Gruppierung nach
+    // `contractId_duration_months` konnte deshalb entfallen: sie zerlegte eine
+    // Menge, die per Modell nur noch eine Gruppe hat.
+    const duration = offer.duration_months;
+    const contractName = pickTranslation(offer.contract.translations, language)!.name;
+
     const products = offer.offerPositions.map(pos => toTemplateItem(
         pos,
         storedPrice(pos),
         {
             language,
-            contractName: pickTranslation(pos.contract.translations, language)!.name,
+            contractName,
             validUntil: offer.validUntil,
-            durationLabel: `${pos.duration_months} Monate`,
+            durationLabel: `${duration} Monate`,
         },
     ));
 
-    const groupMap = new Map<string, typeof offer.offerPositions>();
-    for (const pos of offer.offerPositions) {
-        const key = `${pos.contractId}_${pos.duration_months}`;
-        if (!groupMap.has(key)) groupMap.set(key, []);
-        groupMap.get(key)!.push(pos);
-    }
+    const otherContracts = contracts.filter(c => c.id !== offer.contractId);
 
-    const originalContractIds = new Set(offer.offerPositions.map(p => p.contractId));
-    const otherContracts = contracts.filter(c => !originalContractIds.has(c.id));
+    const productNames = offer.offerPositions
+        .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+        .join(" & ");
 
     const groups: OfferTemplate["groups"] = [];
+    const offerContractT = pickTranslation(offer.contract.translations, language)!;
 
-    for (const [, positions] of groupMap) {
-        const firstPos = positions[0];
-        const contractT = pickTranslation(firstPos.contract.translations, language)!;
-        const productNames = positions
-            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
-            .join(" & ");
+    groups.push({
+        names: productNames,
+        contract: offerContractT.name,
+        features: offerContractT.features,
+        _duration: duration,
+        duration: `${duration} Monate`,
+    });
 
-        groups.push({
-            names: productNames,
-            contract: contractT.name,
-            features: contractT.features,
-            _duration: firstPos.duration_months,
-            duration: `${firstPos.duration_months} Monate`,
-        });
-
-        if (offer.featureComparison) {
-            for (const otherContract of otherContracts) {
-                const otherContractT = pickTranslation(otherContract.translations, language)!;
-                groups.push({
-                    names: productNames,
-                    contract: otherContractT.name,
-                    features: otherContractT.features,
-                    _duration: firstPos.duration_months,
-                    duration: `${firstPos.duration_months} Monate`,
-                });
-            }
+    if (offer.featureComparison) {
+        for (const otherContract of otherContracts) {
+            const otherContractT = pickTranslation(otherContract.translations, language)!;
+            groups.push({
+                names: productNames,
+                contract: otherContractT.name,
+                features: otherContractT.features,
+                _duration: duration,
+                duration: `${duration} Monate`,
+            });
         }
     }
 
@@ -166,11 +161,9 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
      */
     const buildTableForContract = async (
         contractId: string,
-        productNames: string,
-        positions: typeof offer.offerPositions,
         options: { live: boolean; withOfferWideTotals: boolean },
     ): Promise<OfferTemplate["tables"][number] | null> => {
-        const contractName = pickTranslation(
+        const tableContractName = pickTranslation(
             contracts.find(c => c.id === contractId)!.translations,
             language,
         )!.name;
@@ -178,20 +171,20 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
         const items: OfferTemplate["products"] = [];
         let itemsNetCents = 0;
 
-        for (const pos of positions) {
+        for (const pos of offer.offerPositions) {
             let price;
 
             if (options.live) {
                 const result = await calculatePrice({
                     productId: pos.productId,
                     contractId,
-                    duration: pos.duration_months,
+                    duration,
                     quantity: pos.quantity,
                     customerId,
                 });
 
                 if (!result.ok) return null;
-                price = livePrice(result.breakdown.unitPrice, pos);
+                price = livePrice(result.breakdown.unitPrice, pos, duration);
             } else {
                 price = storedPrice(pos);
             }
@@ -202,9 +195,9 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
             items.push(toTemplateItem(pos, price, {
                 language,
-                contractName,
+                contractName: tableContractName,
                 validUntil: offer.validUntil,
-                durationLabel: String(pos.duration_months),
+                durationLabel: String(duration),
             }));
         }
 
@@ -214,49 +207,31 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 
         return {
             products: productNames,
-            contract: contractName,
-            duration: `${positions[0].duration_months} Monaten`,
+            contract: tableContractName,
+            duration: `${duration} Monaten`,
             items,
             flatrates: options.withOfferWideTotals ? flatrates : [],
             total: formatCentsToEur(tableTotalCents),
         };
     };
 
-    let isFirstGroup = true;
+    const table = await buildTableForContract(
+        offer.contractId, { live: false, withOfferWideTotals: true },
+    );
+    if (table) tables.push(table);
 
-    for (const [, positions] of groupMap) {
-        const firstPos = positions[0];
-        const productNames = positions
-            .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
-            .join(" & ");
-
-        const options = { live: false, withOfferWideTotals: isFirstGroup };
-
-        const table = await buildTableForContract(
-            firstPos.contractId, productNames, positions, options,
-        );
-        if (table) tables.push(table);
-
-        if (offer.featureComparison) {
-            for (const otherContract of otherContracts) {
-                const comparison = await buildTableForContract(
-                    otherContract.id, productNames, positions,
-                    { ...options, live: true },
-                );
-                if (comparison) tables.push(comparison);
-            }
+    if (offer.featureComparison) {
+        for (const otherContract of otherContracts) {
+            const comparison = await buildTableForContract(
+                otherContract.id, { live: true, withOfferWideTotals: true },
+            );
+            if (comparison) tables.push(comparison);
         }
-
-        isFirstGroup = false;
     }
 
     const cp = offer.customerContactPerson;
     const customer = offer.customer;
     const employee = offer.user;
-
-    const productNames = offer.offerPositions
-        .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
-        .join(" & ");
 
     return {
         quoteId: offer.quoteId,

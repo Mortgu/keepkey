@@ -19,8 +19,8 @@ enum TaskType {
 }
 
 model Task {
-  id    String  @id @default(cuid())
-  jobId String?
+  id       String  @id @default(cuid())
+  jobId    String?
   /// @openapi.ignore
   runToken String?
 

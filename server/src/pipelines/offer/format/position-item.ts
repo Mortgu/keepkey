@@ -12,7 +12,6 @@ import { formatCentsToEur, formatDate } from "@/utils/utils.js";
  */
 export interface PositionForTemplate {
     quantity: number;
-    duration_months: number;
     free_months: number;
     optional: boolean | null;
     product: {
@@ -109,14 +108,16 @@ export const storedPrice = (position: {
  *
  * Die Aufteilung ist dieselbe wie beim Speichern einer Position
  * (`pricePositions` in offer.service): `total_cents` brutto über die volle
- * Laufzeit, die Freimonate getrennt in `discount_cents`.
+ * Laufzeit, die Freimonate getrennt in `discount_cents`. Die Laufzeit kommt vom
+ * Angebot, nicht von der Position — sie gilt für alle Positionen gemeinsam.
  */
 export const livePrice = (
     unitPrice: number,
-    position: { quantity: number; duration_months: number; free_months: number },
+    position: { quantity: number; free_months: number },
+    duration_months: number,
 ): PositionPrice => ({
     eur_user_month: unitPrice,
-    total_cents: unitPrice * position.quantity * position.duration_months,
+    total_cents: unitPrice * position.quantity * duration_months,
     discount_cents: unitPrice * position.quantity * position.free_months,
     fromSnapshot: false,
 });

@@ -16,6 +16,14 @@ model Order {
   offer   Offer  @relation(fields: [offerId], references: [id])
   offerId String @unique // One-to-one relation
 
+  /// Vertrag und Laufzeit der Bestellung — übernommen aus dem Angebot und dort
+  /// aus demselben Grund am Kopf statt an der Position. Sie sind die Grundlage
+  /// jeder Aussage über die Restlaufzeit dieser Bestellung.
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration_months Int
+
   orderId String // Beleg-Nr.
 
   /// @openapi.ignore
@@ -75,11 +83,8 @@ model OrderPosition {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration_months Int
-  quantity        Int
+  /// Vertrag und Laufzeit stehen an der Bestellung — siehe {@link Order}.
+  quantity Int
 
   optional Boolean? @default(false)
 

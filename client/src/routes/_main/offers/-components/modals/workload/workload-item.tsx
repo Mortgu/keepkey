@@ -19,15 +19,17 @@ interface Props {
 
 export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
     const locale = useLocale();
-    const { policy, sourceOffer, customerId } = useOfferModalContext();
+    const { policy, sourceOffer, header } = useOfferModalContext();
 
     const [isEdit, setEdit] = useState<boolean>(false);
 
     const { product, isPending: productsPending } = useProduct(workload.productId);
-    const { contract, isPending: contractPending } = useContract(workload.contractId);
+    // Vertrag und Laufzeit gehoeren dem Angebot, nicht der Position — angezeigt
+    // werden sie hier trotzdem, weil die Zeile sonst nicht fuer sich steht.
+    const { contract, isPending: contractPending } = useContract(header.contractId);
     const { totalCents, unitCents, isLoading: pricePending } = usePositionPrice({
         source: policy.priceSource,
-        coordinates: coordinatesFrom(customerId, workload),
+        coordinates: coordinatesFrom(header, workload),
         pin: sourceOffer
             ? { offerId: sourceOffer.id, positionId: workload.sourcePositionId ?? null }
             : undefined,
@@ -52,7 +54,7 @@ export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
                         {workload.quantity} <X size={14} /> {localized(product.translations, locale, "name")}
                     </p>
                     <p className="text-sm text-(--text-secondary)">
-                        {localized(contract.translations, locale, "name")} | {workload.duration_months} Months
+                        {localized(contract.translations, locale, "name")} | {header.duration_months} Months
                     </p>
                 </div>
 

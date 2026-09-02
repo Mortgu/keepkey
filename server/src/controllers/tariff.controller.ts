@@ -34,14 +34,6 @@ export const getStandardDurations = async (request: Request, response: Response)
     return response.status(200).json(durations);
 };
 
-export const getTariffDurations = async (request: Request, response: Response) => {
-    const durations = await tariffService.getTariffDurations(
-        request.params.productId as string,
-        request.params.contractId as string
-    );
-    return response.status(200).json(durations);
-};
-
 export const getTariffPrice = async (request: Request, response: Response) => {
     const { productId, contractId, duration, quantity, customerId, freeMonths } = request.query;
 

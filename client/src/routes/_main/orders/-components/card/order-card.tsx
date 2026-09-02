@@ -67,7 +67,12 @@ export default function OrderCard({ order }: Props) {
             <Accordion>
                 <Accordion.Section value="products" label="Produkte">
                     {orderPositions.map((position) => (
-                        <PositionRow key={position.id} position={position} />
+                        <PositionRow
+                            key={position.id}
+                            position={position}
+                            contract={order.contract}
+                            durationMonths={order.duration_months}
+                        />
                     ))}
 
                     {flatRates.map((flatrate) => (

@@ -1,4 +1,4 @@
-import type { OfferPosition, OrderPosition } from "@keepit/schemas";
+import type { Contract, OfferPosition, OrderPosition } from "@keepit/schemas";
 import { Badge } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
@@ -6,19 +6,27 @@ import { formatEur } from "@/utils/utils";
 
 type Props = {
     position: OfferPosition | OrderPosition;
+    /**
+     * Vertrag und Laufzeit gehören dem Beleg, nicht der Position — alle
+     * Positionen eines Angebots teilen sie. Die Zeile zeigt sie trotzdem, damit
+     * sie für sich lesbar bleibt.
+     */
+    contract: Contract;
+    durationMonths: number;
 };
 
 /**
  * Eine Produktzeile in Angebots- und Bestellkarte. `OrderPosition` ist
  * `OfferPosition` ohne Freimonate — der Rabattblock entfällt dort deshalb.
  */
-export default function PositionRow({ position }: Props) {
-    const { product, contract, quantity, duration_months, total_cents, eur_user_month } = position;
+export default function PositionRow({ position, contract, durationMonths }: Props) {
+    const { product, quantity, total_cents } = position;
 
     const locale = useLocale();
 
     const freeMonths = "free_months" in position ? position.free_months : 0;
     const discountCents = "discount_cents" in position ? position.discount_cents : 0;
+    const unitCents = "eur_user_month" in position ? position.eur_user_month : 0;
 
     return (
         <div className="grid gap-4 border-b border-(--border) py-3 last:border-0">
@@ -39,11 +47,11 @@ export default function PositionRow({ position }: Props) {
                         </div>
                         <div className="flex gap-1 text-sm font-light">
                             <span className="text-(--text-secondary)">Stückpreis:</span>
-                            <p>{formatEur(eur_user_month)}</p>
+                            <p>{formatEur(unitCents)}</p>
                         </div>
                         <div className="flex gap-1 text-sm font-light">
                             <span className="text-(--text-secondary)">Laufzeit:</span>
-                            <p>{duration_months} Monate</p>
+                            <p>{durationMonths} Monate</p>
                         </div>
                     </div>
                 </div>

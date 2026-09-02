@@ -5,7 +5,8 @@ import type { HeaderField } from "./offer-modal-policy";
 import type { SyntheticEvent } from "react";
 import type { Language } from "@keepit/schemas";
 import { getFormError } from "@/lib/utils";
-import { useCustomers, useSuppliers, useUsers } from "@/hooks";
+import { useContracts, useCustomers, useLocale, useStandardDurations, useSuppliers, useUsers } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 import { Input, Select } from "@/components";
 
 /** Der Datumsteil eines ISO-Zeitstempels, wie ihn `<input type="date">` erwartet. */
@@ -21,11 +22,16 @@ const fromDateInput = (value: string) => (value ? `${value}T00:00:00.000Z` : nul
  */
 export default function HeaderForm() {
     const { t } = useTranslation();
+    const locale = useLocale();
     const { form, policy } = useOfferModalContext();
 
     const { customers } = useCustomers();
     const { users } = useUsers();
     const { suppliers } = useSuppliers();
+    const { contracts } = useContracts();
+    const { durations } = useStandardDurations();
+
+    const sortedDurations = [...durations].sort((a, b) => a.months - b.months);
 
     const shows = (field: HeaderField) => policy.header[field] !== "hidden";
     const locked = (field: HeaderField) => policy.header[field] === "readonly";
@@ -120,6 +126,58 @@ export default function HeaderForm() {
 
                 </div>
 
+
+                {/* Vertrag und Laufzeit gelten für alle Positionen gemeinsam.
+                    Beide sind hier wählbar, *bevor* eine Position existiert —
+                    das ist erst möglich, seit die Laufzeiten global gepflegt
+                    werden und nicht mehr am Tarif des Produkts hängen. */}
+                <div className="flex items-center gap-4">
+                    {shows("contractId") && (
+                        <form.Field name="contractId" children={(field) => (
+                            <Select
+                                label={t("offerModal.contract")}
+                                value={field.state.value}
+                                disabled={locked("contractId")}
+                                error={getFormError(field.state.meta.errors)}
+                                options={contracts.length > 0
+                                    ? contracts.map(contract => ({
+                                        value: contract.id,
+                                        label: localized(contract.translations, locale, "name"),
+                                    }))
+                                    : [{ value: "", label: "-" }]}
+                                onValueChange={field.handleChange}
+                            />
+                        )} />
+                    )}
+
+                    {/* Gesperrt als Klartext: die Laufzeit einer Erweiterung
+                        muss nicht in den heutigen Standardlaufzeiten stehen. */}
+                    {shows("duration_months") && (
+                        <form.Field name="duration_months" children={(field) => (
+                            locked("duration_months") ? (
+                                <Input
+                                    label={t("offerModal.duration")}
+                                    value={`${field.state.value} ${t("common.months")}`}
+                                    disabled
+                                    readOnly
+                                />
+                            ) : (
+                                <Select<number>
+                                    label={t("offerModal.duration")}
+                                    value={field.state.value}
+                                    error={getFormError(field.state.meta.errors)}
+                                    options={sortedDurations.length > 0
+                                        ? sortedDurations.map(duration => ({
+                                            value: duration.months,
+                                            label: `${duration.months} ${t("common.months")}`,
+                                        }))
+                                        : [{ value: 0, label: "Keine Standardlaufzeit definiert!" }]}
+                                    onValueChange={field.handleChange}
+                                />
+                            )
+                        )} />
+                    )}
+                </div>
 
                 <div className="flex items-center gap-4">
                     {/* QuoteId */}

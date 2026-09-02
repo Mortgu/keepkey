@@ -25,7 +25,7 @@ export default function OfferModal(props: OfferModalProps) {
 
     const { t } = useTranslation();
 
-    const { form, policy, customerId } = useOfferModalForm({
+    const { form, policy, header } = useOfferModalForm({
         mode,
         sourceOffer,
         onClose,
@@ -44,7 +44,7 @@ export default function OfferModal(props: OfferModalProps) {
     };
 
     return (
-        <OfferModalProvider value={{ mode, policy, form, sourceOffer, customerId }}>
+        <OfferModalProvider value={{ mode, policy, form, sourceOffer, header }}>
             <Dialog
                 defaultOpen
                 onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}

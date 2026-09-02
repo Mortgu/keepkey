@@ -18,6 +18,4 @@ export const tariffKeys = {
     /** Global gepflegte Mengenstaffeln — die Zeilenachse aller Preistabellen. */
     standardTiers: () => [...tariffKeys.all, "standard-tiers"] as const,
 
-    durations: (productId: string, contractId: string) =>
-        [...tariffKeys.all, "durations", productId, contractId] as const,
 };

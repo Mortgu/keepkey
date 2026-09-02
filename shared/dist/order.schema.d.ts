@@ -1,9 +1,9 @@
 import { z } from 'zod';
+/** Vertrag und Laufzeit stehen an der Bestellung, nicht hier — siehe {@link orderSchema}. */
 export declare const orderPositionSchema: z.ZodObject<{
     id: z.ZodString;
     orderId: z.ZodString;
     productId: z.ZodString;
-    contractId: z.ZodString;
     product: z.ZodObject<{
         id: z.ZodString;
         translations: z.ZodArray<z.ZodObject<{
@@ -18,21 +18,6 @@ export declare const orderPositionSchema: z.ZodObject<{
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
-    contract: z.ZodObject<{
-        translations: z.ZodArray<z.ZodObject<{
-            language: z.ZodEnum<{
-                DE: "DE";
-                EN: "EN";
-            }>;
-            name: z.ZodString;
-            features: z.ZodArray<z.ZodString>;
-            table: z.ZodString;
-        }, z.core.$strip>>;
-        id: z.ZodString;
-        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-    }, z.core.$strip>;
-    duration_months: z.ZodNumber;
     quantity: z.ZodNumber;
     optional: z.ZodOptional<z.ZodBoolean>;
     total_cents: z.ZodNumber;
@@ -127,6 +112,8 @@ export declare const updateOrderSchema: z.ZodObject<{
         customerId: z.ZodString;
         contactPersonId: z.ZodString;
         employeeId: z.ZodString;
+        contractId: z.ZodString;
+        duration_months: z.ZodNumber;
         orderId: z.ZodString;
         paymentTerm: z.ZodString;
         projectNumber: z.ZodNullable<z.ZodString>;
@@ -138,8 +125,6 @@ export declare const updateOrderSchema: z.ZodObject<{
     }, z.core.$strip>;
     positions: z.ZodArray<z.ZodObject<{
         productId: z.ZodString;
-        contractId: z.ZodString;
-        duration_months: z.ZodNumber;
         quantity: z.ZodNumber;
         optional: z.ZodNullable<z.ZodBoolean>;
         total_cents: z.ZodNumber;
@@ -162,6 +147,22 @@ export declare const orderSchema: z.ZodObject<{
     employeeId: z.ZodString;
     offerId: z.ZodString;
     orderId: z.ZodString;
+    contractId: z.ZodString;
+    contract: z.ZodObject<{
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            features: z.ZodArray<z.ZodString>;
+            table: z.ZodString;
+        }, z.core.$strip>>;
+        id: z.ZodString;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>;
+    duration_months: z.ZodNumber;
     paymentTerm: z.ZodString;
     projectNumber: z.ZodOptional<z.ZodString>;
     projectDescription: z.ZodOptional<z.ZodString>;
@@ -187,6 +188,22 @@ export declare const orderSchema: z.ZodObject<{
         contactPersonId: z.ZodString;
         userId: z.ZodString;
         supplierId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        contractId: z.ZodString;
+        contract: z.ZodObject<{
+            translations: z.ZodArray<z.ZodObject<{
+                language: z.ZodEnum<{
+                    DE: "DE";
+                    EN: "EN";
+                }>;
+                name: z.ZodString;
+                features: z.ZodArray<z.ZodString>;
+                table: z.ZodString;
+            }, z.core.$strip>>;
+            id: z.ZodString;
+            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        }, z.core.$strip>;
+        duration_months: z.ZodNumber;
         quoteId: z.ZodString;
         paymentTerm: z.ZodString;
         validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -199,30 +216,14 @@ export declare const orderSchema: z.ZodObject<{
         toCompare: z.ZodArray<z.ZodString>;
         offerPositions: z.ZodArray<z.ZodObject<{
             productId: z.ZodString;
-            contractId: z.ZodString;
             free_months: z.ZodNumber;
             optional: z.ZodBoolean;
             quantity: z.ZodNumber;
             total_cents: z.ZodNumber;
-            duration_months: z.ZodNumber;
             discount_cents: z.ZodNumber;
             eur_user_month: z.ZodNumber;
             id: z.ZodString;
             offerId: z.ZodString;
-            contract: z.ZodObject<{
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    features: z.ZodArray<z.ZodString>;
-                    table: z.ZodString;
-                }, z.core.$strip>>;
-                id: z.ZodString;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
             product: z.ZodObject<{
                 id: z.ZodString;
                 translations: z.ZodArray<z.ZodObject<{
@@ -423,7 +424,6 @@ export declare const orderSchema: z.ZodObject<{
         id: z.ZodString;
         orderId: z.ZodString;
         productId: z.ZodString;
-        contractId: z.ZodString;
         product: z.ZodObject<{
             id: z.ZodString;
             translations: z.ZodArray<z.ZodObject<{
@@ -438,21 +438,6 @@ export declare const orderSchema: z.ZodObject<{
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
-        contract: z.ZodObject<{
-            translations: z.ZodArray<z.ZodObject<{
-                language: z.ZodEnum<{
-                    DE: "DE";
-                    EN: "EN";
-                }>;
-                name: z.ZodString;
-                features: z.ZodArray<z.ZodString>;
-                table: z.ZodString;
-            }, z.core.$strip>>;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        duration_months: z.ZodNumber;
         quantity: z.ZodNumber;
         optional: z.ZodOptional<z.ZodBoolean>;
         total_cents: z.ZodNumber;
@@ -491,6 +476,22 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
     employeeId: z.ZodString;
     offerId: z.ZodString;
     orderId: z.ZodString;
+    contractId: z.ZodString;
+    contract: z.ZodObject<{
+        translations: z.ZodArray<z.ZodObject<{
+            language: z.ZodEnum<{
+                DE: "DE";
+                EN: "EN";
+            }>;
+            name: z.ZodString;
+            features: z.ZodArray<z.ZodString>;
+            table: z.ZodString;
+        }, z.core.$strip>>;
+        id: z.ZodString;
+        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+    }, z.core.$strip>;
+    duration_months: z.ZodNumber;
     paymentTerm: z.ZodString;
     projectNumber: z.ZodOptional<z.ZodString>;
     projectDescription: z.ZodOptional<z.ZodString>;
@@ -516,6 +517,22 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
         contactPersonId: z.ZodString;
         userId: z.ZodString;
         supplierId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+        contractId: z.ZodString;
+        contract: z.ZodObject<{
+            translations: z.ZodArray<z.ZodObject<{
+                language: z.ZodEnum<{
+                    DE: "DE";
+                    EN: "EN";
+                }>;
+                name: z.ZodString;
+                features: z.ZodArray<z.ZodString>;
+                table: z.ZodString;
+            }, z.core.$strip>>;
+            id: z.ZodString;
+            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        }, z.core.$strip>;
+        duration_months: z.ZodNumber;
         quoteId: z.ZodString;
         paymentTerm: z.ZodString;
         validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
@@ -528,30 +545,14 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
         toCompare: z.ZodArray<z.ZodString>;
         offerPositions: z.ZodArray<z.ZodObject<{
             productId: z.ZodString;
-            contractId: z.ZodString;
             free_months: z.ZodNumber;
             optional: z.ZodBoolean;
             quantity: z.ZodNumber;
             total_cents: z.ZodNumber;
-            duration_months: z.ZodNumber;
             discount_cents: z.ZodNumber;
             eur_user_month: z.ZodNumber;
             id: z.ZodString;
             offerId: z.ZodString;
-            contract: z.ZodObject<{
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    features: z.ZodArray<z.ZodString>;
-                    table: z.ZodString;
-                }, z.core.$strip>>;
-                id: z.ZodString;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
             product: z.ZodObject<{
                 id: z.ZodString;
                 translations: z.ZodArray<z.ZodObject<{
@@ -752,7 +753,6 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         orderId: z.ZodString;
         productId: z.ZodString;
-        contractId: z.ZodString;
         product: z.ZodObject<{
             id: z.ZodString;
             translations: z.ZodArray<z.ZodObject<{
@@ -767,21 +767,6 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
-        contract: z.ZodObject<{
-            translations: z.ZodArray<z.ZodObject<{
-                language: z.ZodEnum<{
-                    DE: "DE";
-                    EN: "EN";
-                }>;
-                name: z.ZodString;
-                features: z.ZodArray<z.ZodString>;
-                table: z.ZodString;
-            }, z.core.$strip>>;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        duration_months: z.ZodNumber;
         quantity: z.ZodNumber;
         optional: z.ZodOptional<z.ZodBoolean>;
         total_cents: z.ZodNumber;

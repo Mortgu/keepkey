@@ -1,5 +1,5 @@
 import { createContext, useContext } from "react";
-import type { Offer } from "@keepit/schemas";
+import type { Offer, PriceHeader } from "@keepit/schemas";
 import type { OfferModalMode, OfferModalPolicy } from "./offer-modal-policy";
 import type { OfferModalFormApi } from "@/routes/_main/offers/-hooks/use-offer-modal-form";
 
@@ -17,8 +17,12 @@ export interface OfferModalContextValue {
      * das Quellangebot. Undefined beim Anlegen.
      */
     sourceOffer: Offer | undefined;
-    /** Aktuell im Formular gewählter Kunde — Koordinate jeder Preisabfrage. */
-    customerId: string;
+    /**
+     * Kunde, Vertrag und Laufzeit aus dem Formularkopf — der Teil der
+     * Preiskoordinate, den alle Positionen teilen. Erst Produkt und Menge
+     * machen sie vollständig.
+     */
+    header: PriceHeader;
 }
 
 const OfferModalContext = createContext<OfferModalContextValue | null>(null);

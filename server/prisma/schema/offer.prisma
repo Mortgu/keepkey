@@ -24,6 +24,15 @@ model Offer {
 
   language Language @default(DE)
 
+  /// Vertrag und Laufzeit des Angebots. Sie gelten für alle Positionen
+  /// gemeinsam: fachlich hat ein Angebot genau einen Vertrag und genau eine
+  /// Laufzeit. Vorher hing beides an jeder Position, wodurch ein Angebot keine
+  /// eindeutige Laufzeit hatte — und damit keine bestimmbare Restlaufzeit.
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration_months Int
+
   quoteId         String // quoteId / voucherId
   /// @openapi.ignore
   documentVersion Int    @default(0)
@@ -89,18 +98,15 @@ model OfferPosition {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
   /// Eingefrorene Preisgrundlage dieser Position. Null bei Bestandspositionen,
   /// die vor Einfuehrung der Tarif-Versionierung angelegt wurden.
   tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
   tariffVersionId String?
 
-  duration_months Int
-  free_months     Int     @default(0)
-  quantity        Int
-  optional        Boolean @default(false)
+  /// Vertrag und Laufzeit stehen am Angebot — siehe {@link Offer}.
+  free_months Int     @default(0)
+  quantity    Int
+  optional    Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int

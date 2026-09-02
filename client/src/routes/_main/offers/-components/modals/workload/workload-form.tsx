@@ -9,12 +9,10 @@ import type { OfferModalPositionValues } from "@/routes/_main/offers/-schemas/of
 import type { SyntheticEvent } from "react";
 import { Button, Checkbox, Input, NumberField, Select } from "@/components";
 import {
-    useContracts,
     useCustomerPriceOverride,
     useLocale,
     usePositionPrice,
     useProducts,
-    useTariffDurationsHook,
 } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { eurToCents, formatEur } from "@/utils/utils";
@@ -28,37 +26,21 @@ interface Props {
 /**
  * Anlegen und Bearbeiten einer Position.
  *
- * Welche Felder offen sind, entscheidet die Policy: Im Angebot alle, in der
- * Verlängerung alles ausser Produkt und Vertrag, in der Erweiterung nur die
- * Menge — dort bestimmen Produkt, Vertrag und Laufzeit die Spalte in der
- * angepinnten Preistabelle und dürfen sich nicht verschieben.
+ * Vertrag und Laufzeit stehen hier nicht mehr: sie gelten für das ganze
+ * Angebot und werden im Kopf gewählt. Was hier offen ist, entscheidet die
+ * Policy — im Angebot alles, in der Verlängerung das Produkt nicht.
  */
 export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Props) {
     const locale = useLocale();
     const { t } = useTranslation();
-    const { policy, sourceOffer, customerId } = useOfferModalContext();
+    const { policy, sourceOffer, header } = useOfferModalContext();
     const { products } = useProducts();
-    const { contracts } = useContracts();
     const { setOverride } = useCustomerPriceOverride();
 
     const shows = (field: PositionField) => policy.positions.fields[field] !== "hidden";
     const locked = (field: PositionField) => policy.positions.fields[field] === "readonly";
 
     const [workload, setWorkload] = useState<string>(currentWorkload?.productId || products[0]?.id || "");
-    const [contract, setContract] = useState<string>(currentWorkload?.contractId || contracts[0]?.id || "");
-
-    const { durations } = useTariffDurationsHook(workload, contract);
-
-    const [duration, setDuration] = useState<number>(currentWorkload?.duration_months || 0);
-    // Reset duration when the available durations change (workload/contract switch).
-    // React-recommended render-phase reset instead of setState-in-effect.
-    const [prevDurations, setPrevDurations] = useState(durations);
-    if (!locked("duration_months") && durations !== prevDurations) {
-        setPrevDurations(durations);
-        setDuration(currentWorkload?.duration_months && durations.includes(currentWorkload.duration_months)
-            ? currentWorkload.duration_months
-            : durations[0] || 0);
-    }
 
     const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 1);
 
@@ -70,10 +52,8 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
     const [overrideEur, setOverrideEur] = useState<string>("");
     const [error, setError] = useState<string>("");
 
-    const coordinates = coordinatesFrom(customerId, {
+    const coordinates = coordinatesFrom(header, {
         productId: workload,
-        contractId: contract,
-        duration_months: duration,
         quantity,
         free_months: freeMonths,
     });
@@ -86,7 +66,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
             : undefined,
     });
 
-    const canOverride = Boolean(customerId) && !locked("unitPrice");
+    const canOverride = Boolean(header.customerId) && !locked("unitPrice");
 
     const startEditPrice = () => {
         setOverrideEur((unitCents / 100).toString());
@@ -106,8 +86,6 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
         const data: CreateOfferPositionInput = {
             productId: workload,
-            contractId: contract,
-            duration_months: duration,
             quantity,
             free_months: freeMonths,
             optional,
@@ -155,41 +133,6 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                     />
                 )}
 
-                {/* Contracts */}
-                {shows("contractId") && (
-                    <Select
-                        label="Contract"
-                        value={contract}
-                        disabled={locked("contractId")}
-                        onValueChange={setContract}
-                        options={contracts.map(ctr => ({
-                            value: ctr.id,
-                            label: localized(ctr.translations, locale, "name"),
-                        }))}
-                    />
-                )}
-
-                {/* Runtime — gesperrt als Klartext, weil die Laufzeit der
-                    Quellposition nicht zwingend in den heutigen Staffeln steht. */}
-                {shows("duration_months") && (
-                    locked("duration_months") ? (
-                        <Input label="Runtime" value={`${duration} ${t("common.months")}`} disabled readOnly />
-                    ) : (
-                        <Select<number>
-                            label="Runtime"
-                            value={duration}
-                            onValueChange={setDuration}
-                            disabled={durations.length === 0}
-                            options={durations.length > 0
-                                ? durations.map(dur => ({
-                                    value: dur,
-                                    label: `${dur} ${t("common.months")}`,
-                                }))
-                                : [{ value: 0, label: "Keine Laufzeit definiert!" }]}
-                        />
-                    )
-                )}
-
                 {/* Quantity */}
                 {shows("quantity") && (
                     <NumberField
@@ -227,7 +170,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                     <NumberField
                         step={1}
                         min={0}
-                        max={duration}
+                        max={header.duration_months}
                         label={t("offerModal.free_months")}
                         value={freeMonths}
                         disabled={locked("free_months")}

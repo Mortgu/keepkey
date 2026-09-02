@@ -1,7 +1,7 @@
 import type { DropdownOption } from "@/components";
 import type { Offer } from '@keepit/schemas';
 import type { OfferModalValues } from "../-schemas/offer-modal-schema";
-import { useContracts, useCustomers, useLocale, useSuppliers, useUsers } from "@/hooks";
+import { useContracts, useCustomers, useLocale, useStandardDurations, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 
@@ -17,6 +17,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
     const { users } = useUsers();
     const { suppliers } = useSuppliers();
     const { contracts } = useContracts();
+    const { durations } = useStandardDurations();
 
     const compareOptions: Array<DropdownOption> = contracts.map(contract => ({
         value: contract.id,
@@ -30,6 +31,15 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
         contactPersonId: currentOffer?.contactPersonId || preselected?.contactPersons[0]?.id || customers[0]?.contactPersons[0]?.id || "",
         userId: currentOffer?.userId || users[0]?.id || "",
         supplierId: currentOffer?.supplierId || suppliers[0]?.id || null,
+
+        // Vertrag und Laufzeit stehen am Angebot, nicht an der Position. Ohne
+        // Vorlage fällt die Wahl auf den ersten Vertrag und die kürzeste
+        // Standardlaufzeit — beide sind im Kopf sofort änderbar.
+        contractId: currentOffer?.contractId || contracts[0]?.id || "",
+        duration_months: currentOffer?.duration_months
+            || [...durations].sort((a, b) => a.months - b.months)[0]?.months
+            || 0,
+
         quoteId: currentOffer?.quoteId || "",
         paymentTerm: currentOffer?.paymentTerm || "30 Tage",
         validUntil: currentOffer?.validUntil || null,
@@ -44,8 +54,6 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
             // verweist darauf, statt die Positionsdaten selbst zu schicken.
             sourcePositionId: op.id,
             productId: op.productId,
-            contractId: op.contractId,
-            duration_months: op.duration_months,
             free_months: op.free_months,
             quantity: op.quantity,
             optional: op.optional,

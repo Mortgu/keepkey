@@ -7,7 +7,7 @@ import { generateOfferDisplayName } from "../utils/documents.js";
 import { pickTranslation } from "../utils/i18n.js";
 import { loadTariffForPricing, selectPrice } from "../utils/products.js";
 import { toDate } from "../utils/utils.js";
-import { sealTariffVersion } from "./tariff.service.js";
+import { assertStandardDuration, sealTariffVersion } from "./tariff.service.js";
 
 import {
     CreateOfferInput,
@@ -20,6 +20,7 @@ import {
 } from '@keepit/schemas';
 
 import {
+    OFFER_REVISION_SNAPSHOT_VERSION,
     buildOfferRevisionSnapshot,
     parseOfferRevisionSnapshot,
 } from "../schemas/revision-schemas.js";
@@ -36,6 +37,16 @@ type PricedPosition = CreateOfferPositionInput & {
     discount_cents: number;
     /** Angepinnte, unveränderliche Preisgrundlage dieser Position. */
     tariffVersionId: string | null;
+};
+
+/**
+ * Vertrag und Laufzeit des Angebots. Sie adressieren zusammen mit Produkt und
+ * Menge eine Zelle der Preistabelle — und stehen am Kopf, weil alle Positionen
+ * eines Angebots dieselbe Spalte derselben Tabelle treffen.
+ */
+type PriceHeader = {
+    contractId: string;
+    duration_months: number;
 };
 type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
 type PricedDiscount = {
@@ -58,6 +69,7 @@ type PricedDiscount = {
  */
 async function pricePositions(
     positions: CreateOfferPositionInput[],
+    header: PriceHeader,
     customerId: string | undefined,
     actorId: string | null,
 ): Promise<PricedPosition[]> {
@@ -65,7 +77,7 @@ async function pricePositions(
 
     for (const position of positions) {
         try {
-            const tariff = await loadTariffForPricing(position.productId, position.contractId, customerId);
+            const tariff = await loadTariffForPricing(position.productId, header.contractId, customerId);
 
             if (!tariff) {
                 throw new AppException(
@@ -77,7 +89,7 @@ async function pricePositions(
 
             const result = selectPrice(tariff, {
                 productId: position.productId,
-                duration: position.duration_months,
+                duration: header.duration_months,
                 quantity: position.quantity,
                 customerId,
             });
@@ -187,8 +199,8 @@ async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string)
 async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-            offerId, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+        data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+            offerId, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
             tariffVersionId: tariffVersionId ?? null,
         })),
     });
@@ -265,6 +277,7 @@ export async function getOffers(query: OfferFilterParams) {
         include: {
             user: true,
             supplier: true,
+            contract: { include: { translations: true } },
             customer: { select: { id: true, companyName: true } },
             customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             offerDocuments: {
@@ -276,9 +289,6 @@ export async function getOffers(query: OfferFilterParams) {
             offerPositions: {
                 include: {
                     product: {
-                        include: { translations: true }
-                    },
-                    contract: {
                         include: { translations: true }
                     }
                 }
@@ -305,6 +315,7 @@ export async function getOfferById(id: string) {
         include: {
             user: true,
             supplier: true,
+            contract: { include: { translations: true } },
             customer: true,
             customerContactPerson: true,
             offerDocuments: {
@@ -318,9 +329,6 @@ export async function getOfferById(id: string) {
             offerPositions: {
                 include: {
                     product: {
-                        include: { translations: true }
-                    },
-                    contract: {
                         include: { translations: true }
                     }
                 }
@@ -363,7 +371,7 @@ export async function getNextQuoteId(): Promise<number> {
 /* ========== Mutations ========== */
 
 /** Skalarfelder eines Angebots — alles ausser Positionen, Flatrates und Rabatten. */
-type OfferFields = {
+type OfferFields = PriceHeader & {
     customerId: string;
     contactPersonId: string;
     userId: string;
@@ -407,8 +415,8 @@ async function persistOffer(
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, contractId, duration_months, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-                offerId: offer.id, productId, contractId, duration_months, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+            data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+                offerId: offer.id, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
                 tariffVersionId,
             })),
         });
@@ -431,11 +439,16 @@ export async function createOffer(
     input: CreateOfferInput,
     options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType; actorId?: string | null },
 ) {
-    const positions = await pricePositions(input.offerPositions, input.customerId, options?.actorId ?? null);
+    await assertStandardDuration(input.duration_months);
+
+    const header = { contractId: input.contractId, duration_months: input.duration_months };
+
+    const positions = await pricePositions(input.offerPositions, header, input.customerId, options?.actorId ?? null);
     const flatrates = await priceFlatrates(input.flatrates);
 
     return persistOffer(
         {
+            ...header,
             customerId: input.customerId,
             contactPersonId: input.contactPersonId,
             userId: input.userId,
@@ -458,7 +471,11 @@ export async function createOffer(
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
     const { offerPositions: rawPositions, flatrates: rawFlatrates, discounts, expectedVersion } = input;
 
-    const positions = await pricePositions(rawPositions, input.customerId, actorId);
+    await assertStandardDuration(input.duration_months);
+
+    const header = { contractId: input.contractId, duration_months: input.duration_months };
+
+    const positions = await pricePositions(rawPositions, header, input.customerId, actorId);
     const flatrates = await priceFlatrates(rawFlatrates);
 
     return prisma.$transaction(async (tx) => {
@@ -493,7 +510,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 offerId,
                 version: current.version,
                 changedById: actorId,
-                snapshotVersion: 1,
+                snapshotVersion: OFFER_REVISION_SNAPSHOT_VERSION,
                 snapshot: snapshot as Prisma.InputJsonValue,
             },
         });
@@ -501,6 +518,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         const [offer] = await tx.offer.updateManyAndReturn({
             where: { id: offerId },
             data: {
+                ...header,
                 customerId: input.customerId,
                 contactPersonId: input.contactPersonId,
                 userId: input.userId,
@@ -561,7 +579,10 @@ export async function restoreOfferRevision(
         if (!revision) {
             throw new AppException("Offer revision not found!", 404, "OFFER_REVISION_NOT_FOUND");
         }
-        if (revision.snapshotVersion !== 1) {
+        // Version 1 bleibt lesbar: dort hingen Vertrag und Laufzeit an der
+        // Position und werden beim Lesen an den Kopf gehoben. Ohne das waeren
+        // alle vor dieser Umstellung entstandenen Revisionen unwiederherstellbar.
+        if (revision.snapshotVersion > OFFER_REVISION_SNAPSHOT_VERSION) {
             throw new AppException(
                 `Offer revision snapshot version ${revision.snapshotVersion} is not supported.`,
                 422,
@@ -572,7 +593,7 @@ export async function restoreOfferRevision(
         let restored;
 
         try {
-            restored = parseOfferRevisionSnapshot(revision.snapshot);
+            restored = parseOfferRevisionSnapshot(revision.snapshot, revision.snapshotVersion);
         } catch {
             throw new AppException(
                 "The stored offer revision is invalid and cannot be restored.",
@@ -587,7 +608,7 @@ export async function restoreOfferRevision(
                 offerId,
                 version: current.version,
                 changedById: actorId,
-                snapshotVersion: 1,
+                snapshotVersion: OFFER_REVISION_SNAPSHOT_VERSION,
                 snapshot: currentSnapshot as Prisma.InputJsonValue,
             },
         });
@@ -621,18 +642,25 @@ export async function createOfferPositions(
     positions: CreateOfferPositionInput[],
     actorId: string | null,
 ) {
-    // Der Kunde stammt aus dem Angebot — ohne ihn würden kundenspezifische
-    // Preise auf diesem Pfad stillschweigend ignoriert.
+    // Kunde, Vertrag und Laufzeit stammen aus dem Angebot — der Kunde, weil
+    // sonst kundenspezifische Preise auf diesem Pfad stillschweigend ignoriert
+    // würden; Vertrag und Laufzeit, weil sie eine Eigenschaft des Angebots sind
+    // und eine neue Position sie nicht mitbringen kann.
     const offer = await prisma.offer.findUnique({
         where: { id: offerId },
-        select: { customerId: true },
+        select: { customerId: true, contractId: true, duration_months: true },
     });
 
     if (!offer) {
         throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
     }
 
-    const priced = await pricePositions(positions, offer.customerId, actorId);
+    const priced = await pricePositions(
+        positions,
+        { contractId: offer.contractId, duration_months: offer.duration_months },
+        offer.customerId,
+        actorId,
+    );
 
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
         const created = await tx.offerPosition.createManyAndReturn({
@@ -739,12 +767,15 @@ export async function renewOffer(sourceOfferId: string, input: CreateOfferInput,
     });
 }
 
-/** Quellposition in der Form, die {@link priceFromPin} benötigt. */
+/**
+ * Quellposition in der Form, die {@link priceFromPin} benötigt.
+ *
+ * Die Laufzeit steht nicht mehr an der Position, sondern am Quellangebot —
+ * sie wird deshalb getrennt hereingereicht.
+ */
 type SourcePosition = {
     id: string;
     productId: string;
-    contractId: string;
-    duration_months: number;
     free_months: number;
     eur_user_month: number;
     tariffVersionId: string | null;
@@ -763,9 +794,12 @@ type SourcePosition = {
  * flache Rückfall auf den gespeicherten Stückpreis — Mengenstaffeln lassen sich
  * dann nicht berücksichtigen, was `fromSnapshot: false` nach aussen meldet.
  */
-async function priceFromPin(source: SourcePosition, quantity: number, customerId: string) {
-    const duration = source.duration_months;
-
+async function priceFromPin(
+    source: SourcePosition,
+    duration: number,
+    quantity: number,
+    customerId: string,
+) {
     const flat = (eur_user_month: number, fromSnapshot: boolean) => ({
         eur_user_month,
         total_cents: eur_user_month * quantity * duration,
@@ -832,8 +866,8 @@ async function loadSourcePosition(offerId: string, positionId: string) {
     const position = await prisma.offerPosition.findUnique({
         where: { id: positionId },
         select: {
-            id: true, offerId: true, productId: true, contractId: true,
-            duration_months: true, free_months: true, eur_user_month: true, tariffVersionId: true,
+            id: true, offerId: true, productId: true,
+            free_months: true, eur_user_month: true, tariffVersionId: true,
         },
     });
 
@@ -856,7 +890,7 @@ export async function getExtensionPrice(
 
     const offer = await prisma.offer.findUnique({
         where: { id: offerId },
-        select: { customerId: true },
+        select: { customerId: true, duration_months: true },
     });
 
     if (!offer) {
@@ -865,7 +899,7 @@ export async function getExtensionPrice(
 
     const source = await loadSourcePosition(offerId, positionId);
     const { eur_user_month, total_cents, discount_cents, fromSnapshot } =
-        await priceFromPin(source, quantity, offer.customerId);
+        await priceFromPin(source, offer.duration_months, quantity, offer.customerId);
 
     return { eur_user_month, total_cents, discount_cents, fromSnapshot };
 }
@@ -902,12 +936,12 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
             );
         }
 
-        const priced = await priceFromPin(sourcePosition, requested.quantity, source.customerId);
+        const priced = await priceFromPin(
+            sourcePosition, source.duration_months, requested.quantity, source.customerId,
+        );
 
         positions.push({
             productId: sourcePosition.productId,
-            contractId: sourcePosition.contractId,
-            duration_months: sourcePosition.duration_months,
             free_months: sourcePosition.free_months,
             quantity: requested.quantity,
             optional: sourcePosition.optional,
@@ -922,6 +956,13 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
 
     return persistOffer(
         {
+            // Vertrag und Laufzeit werden unveraendert uebernommen: eine
+            // Erweiterung laeuft innerhalb des bestehenden Vertrags. Sie wird
+            // bewusst *nicht* gegen die Standardlaufzeiten geprueft — sonst
+            // liessen sich laufende Vertraege nicht mehr erweitern, sobald ihre
+            // Laufzeit aus der Liste genommen wird.
+            contractId: source.contractId,
+            duration_months: source.duration_months,
             customerId: source.customerId,
             contactPersonId: source.contactPersonId,
             userId: source.userId,

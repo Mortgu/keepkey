@@ -25,8 +25,6 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
         ...values,
         offerPositions: values.offerPositions.map((position) => ({
             productId: position.productId,
-            contractId: position.contractId,
-            duration_months: position.duration_months,
             free_months: position.free_months,
             quantity: position.quantity,
             optional: position.optional,
@@ -107,12 +105,19 @@ export default function useOfferModalForm({ mode, sourceOffer, onClose, preselec
         },
     });
 
-    const customerId = useStore(form.store, (s) => s.values.customerId);
+    // Der Teil der Preiskoordinate, den alle Positionen teilen. Als ein Wert,
+    // damit jede Position ihn unverändert weiterreicht, statt drei Felder
+    // einzeln durch den Baum zu tragen.
+    const header = useStore(form.store, (s) => ({
+        customerId: s.values.customerId,
+        contractId: s.values.contractId,
+        duration_months: s.values.duration_months,
+    }));
 
     return {
         form,
         policy,
-        customerId,
+        header,
     };
 }
 

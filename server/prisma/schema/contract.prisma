@@ -1,10 +1,13 @@
 model Contract {
   id String @id @default(uuid())
 
-  translations   ContractTranslation[]
-  orderPositions OrderPosition[]
-  offerPositions OfferPosition[]
-  tariffs        Tariff[]
+  translations ContractTranslation[]
+  tariffs      Tariff[]
+
+  /// Vertrag und Laufzeit gelten für das *ganze* Angebot bzw. die ganze
+  /// Bestellung, nicht je Position — alle Positionen eines Belegs teilen sie.
+  offers Offer[]
+  orders Order[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

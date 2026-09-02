@@ -29,9 +29,3 @@ export function useStandardTiers() {
     return { tiers, isPending, error };
 }
 
-export function useTariffDurationsHook(productId: string, contractId: string) {
-    const { data: durations = [], isPending, error } = useQuery(tariffQueries.durations(productId, contractId));
-
-    return { durations, isPending, error };
-}
-

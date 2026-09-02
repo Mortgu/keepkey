@@ -3,7 +3,6 @@ import {tariffKeys} from "./tariff-keys";
 import {
     getStandardDurations,
     getStandardTiers,
-    getTariffDurations,
     getTariffGroups,
     getTariffVersions,
 } from "./tariff-api";
@@ -35,14 +34,6 @@ export const tariffQueries = {
         return queryOptions({
             queryKey: tariffKeys.standardTiers(),
             queryFn: getStandardTiers,
-        });
-    },
-
-    durations: (productId: string, contractId: string) => {
-        return queryOptions({
-            queryKey: tariffKeys.durations(productId, contractId),
-            queryFn: () => getTariffDurations(productId, contractId),
-            enabled: Boolean(productId) && Boolean(contractId),
         });
     },
 };

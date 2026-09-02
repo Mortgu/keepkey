@@ -335,17 +335,6 @@ export async function getTariffVersions(tariffId: string) {
 }
 
 /**
- * Die wählbaren Laufzeiten. Seit die Spaltenachse global ist, hängen sie weder
- * am Produkt noch am Vertrag — die Parameter bleiben nur, damit der bestehende
- * Endpunkt unverändert weiterläuft, bis der Client auf
- * {@link getStandardDurations} umgestellt ist.
- */
-export async function getTariffDurations(_productId: string, _contractId: string): Promise<number[]> {
-    const durations = await getStandardDurations();
-    return durations.map((duration) => duration.months);
-}
-
-/**
  * Preis-Vorschau aus dem aktuell gültigen Tarif.
  *
  * `freeMonths` ist ein Parameter dieser Funktion, nicht der Preisrechnung:
@@ -679,6 +668,27 @@ export async function deleteStandardTier(tierId: string): Promise<void> {
  * sichtbar ist, was eine Staffel trägt — entfernt wird sie ohne Rückfrage, die
  * Preise bleiben stehen und werden von der Nachbarstaffel überdeckt.
  */
+/**
+ * Stellt sicher, dass eine Laufzeit in der Standardliste steht.
+ *
+ * `resolveCell` leitet die Spalte aus den vorhandenen Zellen ab und akzeptiert
+ * deshalb auch eine Laufzeit, die aus der Liste genommen wurde — im Raster ist
+ * sie dann als verwaiste Spalte sichtbar, im Angebot darf sie aber nicht mehr
+ * gewaehlt werden. Am Angebotskopf ist die Liste die Auswahl, also ist sie hier
+ * auch die Schranke.
+ */
+export async function assertStandardDuration(months: number): Promise<void> {
+    const duration = await prisma.standardDuration.findUnique({ where: { months } });
+
+    if (!duration) {
+        throw new AppException(
+            `Die Laufzeit ${months} Monate steht nicht in den Standardlaufzeiten.`,
+            422,
+            "DURATION_NOT_STANDARD",
+        );
+    }
+}
+
 export async function getStandardTiers() {
     const [tiers, counts] = await Promise.all([
         prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } }),
@@ -798,7 +808,7 @@ export async function deleteCustomerPrice(input: DeleteCustomerPriceInput) {
 
 /**
  * Die global gepflegten Laufzeiten. Sie sind die Spaltenachse aller
- * Preistabellen — im Gegensatz zu {@link getTariffDurations} braucht diese
+ * Preistabellen — im Gegensatz zu {@link getStandardDurations} braucht diese
  * Liste weder Produkt noch Vertrag und steht damit fest, bevor im Angebot
  * eine Position existiert.
  */
