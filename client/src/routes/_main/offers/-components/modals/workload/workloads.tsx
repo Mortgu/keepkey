@@ -90,6 +90,7 @@ export default function WorkloadSection() {
             {offerPositions.map((workload, index) => (
                 <WorkloadItem
                     key={workload.sourcePositionId ?? index}
+                    index={index}
                     workload={workload}
                     updateFn={(updatedWl) => updateWorkload(index, updatedWl)}
                     deleteFn={canRemove ? () => deleteWorkload(index) : undefined}

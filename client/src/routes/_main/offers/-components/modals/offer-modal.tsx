@@ -25,7 +25,7 @@ export default function OfferModal(props: OfferModalProps) {
 
     const { t } = useTranslation();
 
-    const { form, policy, header } = useOfferModalForm({
+    const { form, policy, header, pricing } = useOfferModalForm({
         mode,
         sourceOffer,
         onClose,
@@ -44,7 +44,7 @@ export default function OfferModal(props: OfferModalProps) {
     };
 
     return (
-        <OfferModalProvider value={{ mode, policy, form, sourceOffer, header }}>
+        <OfferModalProvider value={{ mode, policy, form, sourceOffer, header, pricing }}>
             <Dialog
                 defaultOpen
                 onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
@@ -68,7 +68,13 @@ export default function OfferModal(props: OfferModalProps) {
                                 type="submit"
                                 form={OFFER_MODAL_FORM_ID}
                                 size="sm"
-                                disabled={!canSubmit}
+                                /* Ohne Preis kein Angebot: eine Position, für
+                                   die keine Zelle hinterlegt ist, würde sonst
+                                   mit 0,00 € gespeichert. */
+                                disabled={!canSubmit || pricing.hasError}
+                                title={pricing.hasError
+                                    ? "Für mindestens eine Position ist kein Preis hinterlegt."
+                                    : undefined}
                                 loading={isSubmitting}
                             >
                                 {t("button.save")}

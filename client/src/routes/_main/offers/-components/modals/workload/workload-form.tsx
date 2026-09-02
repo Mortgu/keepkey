@@ -15,6 +15,7 @@ import {
     useProducts,
 } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { getErrorMessage } from "@/lib/errors";
 import { eurToCents, formatEur } from "@/utils/utils";
 
 interface Props {
@@ -58,7 +59,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
         free_months: freeMonths,
     });
 
-    const { unitCents, isLoading: pricePending } = usePositionPrice({
+    const { unitCents, isLoading: pricePending, error: priceError } = usePositionPrice({
         source: policy.priceSource,
         coordinates,
         pin: sourceOffer
@@ -111,9 +112,15 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
         }
     };
 
+    // Ohne hinterlegten Preis zeigt das Feld die Ursache statt "0,00 €" — ein
+    // Nullpreis saehe aus wie ein Ergebnis. Uebernehmen ist dann gesperrt.
+    const priceMessage = priceError ? getErrorMessage(priceError) : null;
+
     const displayUnitPrice = editingPrice
         ? overrideEur
-        : formatEur(unitCents);
+        : priceMessage
+            ? ""
+            : formatEur(unitCents);
 
     return (
         <div className="w-full grid gap-3 p-4">
@@ -150,6 +157,8 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                 {shows("unitPrice") && (
                     <Input
                         label={t("offerModal.unit_price")}
+                        error={priceMessage ? t("offerModal.no_price") : undefined}
+                        errorTooltip={priceMessage ?? undefined}
                         loading={pricePending}
                         type={editingPrice ? "number" : "text"}
                         step={editingPrice ? "0.01" : undefined}
@@ -198,7 +207,12 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                         {t("button.cancel")}
                     </Button>
 
-                    <Button type="button" variant="primary" size="sm" onClick={handleSave} disabled={pricePending}>
+                    {/* Eine Position, die sich nicht bepreisen laesst, wird gar
+                        nicht erst uebernommen — sonst stuende sie mit 0,00 €
+                        im Angebot. */}
+                    <Button type="button" variant="primary" size="sm" onClick={handleSave}
+                        disabled={pricePending || Boolean(priceMessage)}
+                        title={priceMessage ?? undefined}>
                         {t("button.save")}
                     </Button>
                 </div>

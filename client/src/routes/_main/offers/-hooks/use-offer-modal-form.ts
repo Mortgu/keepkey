@@ -3,6 +3,7 @@ import { useState } from "react";
 import { OFFER_MODAL_POLICIES } from "../-components/modals/offer-modal-policy";
 import { offerModalSchema } from "../-schemas/offer-modal-schema";
 import useOfferModal from "./use-offer.offer-modal";
+import usePricingStatus from "./use-pricing-status.offer-modal";
 import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "../-components/modals/offer-modal-policy";
 import type { OfferModalValues } from "../-schemas/offer-modal-schema";
@@ -114,10 +115,20 @@ export default function useOfferModalForm({ mode, sourceOffer, onClose, preselec
         duration_months: s.values.duration_months,
     }));
 
+    const positions = useStore(form.store, (s) => s.values.offerPositions);
+
+    const pricing = usePricingStatus({
+        header,
+        source: policy.priceSource,
+        sourceOfferId: sourceOffer?.id,
+        positions,
+    });
+
     return {
         form,
         policy,
         header,
+        pricing,
     };
 }
 

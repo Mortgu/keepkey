@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 import type { Offer, PriceHeader } from "@keepit/schemas";
 import type { OfferModalMode, OfferModalPolicy } from "./offer-modal-policy";
 import type { OfferModalFormApi } from "@/routes/_main/offers/-hooks/use-offer-modal-form";
+import type usePricingStatus from "@/routes/_main/offers/-hooks/use-pricing-status.offer-modal";
 
 /**
  * Modus, Policy und Quellangebot werden bis in die einzelnen Positionen hinein
@@ -23,6 +24,12 @@ export interface OfferModalContextValue {
      * machen sie vollständig.
      */
     header: PriceHeader;
+    /**
+     * Ob jede Position einen Preis hat. Eine Kombination ohne hinterlegten
+     * Preis wird an der Position gemeldet und sperrt das Speichern — sie darf
+     * nicht als 0,00 € durchgehen.
+     */
+    pricing: ReturnType<typeof usePricingStatus>;
 }
 
 const OfferModalContext = createContext<OfferModalContextValue | null>(null);

@@ -1,4 +1,4 @@
-import { LoaderCircle, Pen, Trash, X } from "lucide-react";
+import { CircleAlert, LoaderCircle, Pen, Trash, X } from "lucide-react";
 import { useState } from "react";
 import {  coordinatesFrom } from "@keepit/schemas";
 import { useOfferModalContext } from "../offer-modal-context";
@@ -11,15 +11,19 @@ import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 
 interface Props {
+    /** Stelle im Positionsarray — adressiert die Preismeldung zu dieser Zeile. */
+    index: number;
     workload: OfferModalPositionValues;
     updateFn: (workload: CreateOfferPositionInput) => void;
     /** Nicht gesetzt, wenn die Position nicht entfernt werden darf. */
     deleteFn?: () => void;
 }
 
-export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
+export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Props) {
     const locale = useLocale();
-    const { policy, sourceOffer, header } = useOfferModalContext();
+    const { policy, sourceOffer, header, pricing } = useOfferModalContext();
+
+    const priceError = pricing.errors[index] ?? null;
 
     const [isEdit, setEdit] = useState<boolean>(false);
 
@@ -46,7 +50,7 @@ export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
     }
 
     return (
-        <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
+        <div className={`grid bg-(--subtle-50) border rounded-md ${priceError ? "border-(--destructive-line)" : "border-(--border)"}`}>
             <div className="flex items-center justify-between px-4 py-3 gap-4">
 
                 <div className="grid gap-0.5">
@@ -59,19 +63,28 @@ export default function WorkloadItem({ workload, updateFn, deleteFn }: Props) {
                 </div>
 
                 <div className="flex items-center gap-12">
-                    <div className="flex items-center gap-8">
-                        <div className="grid">
-                            <p className="text-xs text-(--text-secondary)">Total</p>
-                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents)}</p>}
-                        </div>
+                    {/* Ohne Preis werden keine Betraege gezeigt: 0,00 € saehe
+                        aus wie ein Ergebnis, ist aber keins. */}
+                    {priceError ? (
+                        <p className="flex items-center gap-1.5 text-sm text-(--destructive)">
+                            <CircleAlert size={14} />
+                            {priceError}
+                        </p>
+                    ) : (
+                        <div className="flex items-center gap-8">
+                            <div className="grid">
+                                <p className="text-xs text-(--text-secondary)">Total</p>
+                                {pricePending && <LoaderCircle size={14} className="animate-spin" />}
+                                {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents)}</p>}
+                            </div>
 
-                        <div className="grid">
-                            <p className="text-xs text-(--text-secondary)">Price per unit</p>
-                            {pricePending && <LoaderCircle size={14} className="animate-spin" />}
-                            {!pricePending && <p className="text-sm font-semibold">{formatEur(unitCents)}</p>}
+                            <div className="grid">
+                                <p className="text-xs text-(--text-secondary)">Price per unit</p>
+                                {pricePending && <LoaderCircle size={14} className="animate-spin" />}
+                                {!pricePending && <p className="text-sm font-semibold">{formatEur(unitCents)}</p>}
+                            </div>
                         </div>
-                    </div>
+                    )}
 
                     {/* actions */}
                     <div className="flex items-center gap-2">

@@ -30,8 +30,13 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
                 ...offersEN,
                 ...versionHistoryEN,
                 ...dashboardEN,
-                ...errorsEN,
                 ...customerEN,
+                // Unter `errors` verschachtelt statt flach gespreadet: die
+                // Datei ist nach Fehlercode geschlüsselt, und `getErrorMessage`
+                // schlägt sie als `errors.<CODE>` nach. Flach eingehängt
+                // existierte dieser Pfad nicht — jeder API-Fehler fiel still
+                // auf die rohe Servermeldung zurück.
+                errors: errorsEN,
             }
         },
         de: {
@@ -40,8 +45,8 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
                 ...offersDE,
                 ...versionHistoryDE,
                 ...dashboardDE,
-                ...errorsDE,
-                ...customerDE
+                ...customerDE,
+                errors: errorsDE,
             }
         }
     }
