@@ -32,3 +32,13 @@ export const flatrateSchema = z.object({
 });
 
 export type Flatrate = z.infer<typeof flatrateSchema>;
+
+/**
+ * Filter der Pauschalen-Liste — dieselbe Form wie {@link workloadFilterSchema}.
+ * Gesucht wird über den übersetzten Namen, sortiert über das Anlagedatum.
+ */
+export const flatrateFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.enum(["createdAt:asc", "createdAt:desc"]).optional(),
+});
+export type FlatrateFilterParams = z.input<typeof flatrateFilterSchema>;

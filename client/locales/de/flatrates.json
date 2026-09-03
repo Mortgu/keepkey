@@ -1,3 +1,6 @@
 {
-    "flatrates.create": "Flatrate erstellen"
+    "flatrates": {
+        "create": "Flatrate erstellen",
+        "search": "Pauschalen durchsuchen…"
+    }
 }

@@ -1,15 +1,17 @@
 
-import { useFlatRates } from "@/hooks";
-import FlatRateItem from "./flatrate-item";
 import { LoaderCircle } from "lucide-react";
+import FlatRateItem from "./flatrate-item";
 import type { Flatrate } from "@keepit/schemas";
+import type { FlatrateFilters } from "../-hooks/use-flatrate-filters";
+import { useFlatRates } from "@/hooks";
 
 interface Props {
+  filters: FlatrateFilters;
   onEdit: (flatrate: Flatrate) => void;
 }
 
-export default function FlatRateList({ onEdit }: Props) {
-  const { flatRates, isPending, error } = useFlatRates();
+export default function FlatRateList({ filters, onEdit }: Props) {
+  const { flatRates, isPending, error } = useFlatRates(filters.params);
 
   return (
     <div className="grid gap-4">
@@ -26,7 +28,7 @@ export default function FlatRateList({ onEdit }: Props) {
         </div>
       )}
 
-      {flatRates.map((flatrate, _) => (
+      {flatRates.map((flatrate) => (
         <FlatRateItem key={flatrate.id} flatrate={flatrate} onEdit={onEdit} />
       ))}
     </div>

@@ -1,3 +1,6 @@
 {
-    "flatrates.create": "Create flatrate"
+    "flatrates": {
+        "create": "Create flatrate",
+        "search": "Search flat rates…"
+    }
 }

@@ -1,5 +1,9 @@
 {
-    "workloads.create": "Create workload",
-    "workloads.search": "Search workloads...",
-    "workloads.pricing.create": "Create pricing table"
+    "workloads": {
+        "create": "Create workload",
+        "search": "Search workloads...",
+        "pricing": {
+            "create": "Create pricing table"
+        }
+    }
 }

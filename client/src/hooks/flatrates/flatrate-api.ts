@@ -1,14 +1,16 @@
 import type {
     CreateFlatrateInput,
     Flatrate,
+    FlatrateFilterParams,
 
     UpdateFlatrateInput
 } from '@keepit/schemas';
 import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 
 
-export const getFlatRates = () =>
-    api<Array<Flatrate>>("/api/flatrates", { method: "GET" });
+export const getFlatRates = (filters: FlatrateFilterParams = {}) =>
+    api<Array<Flatrate>>(`/api/flatrates?${formatQueryString(filters)}`, { method: "GET" });
 
 export const getFlatrate = (id: string) =>
     api<Flatrate>(`/api/flatrates/${id}`, { method: 'GET' });

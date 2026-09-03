@@ -18,4 +18,12 @@ export const flatrateSchema = z.object({
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
 });
+/**
+ * Filter der Pauschalen-Liste — dieselbe Form wie {@link workloadFilterSchema}.
+ * Gesucht wird über den übersetzten Namen, sortiert über das Anlagedatum.
+ */
+export const flatrateFilterSchema = z.object({
+    search: z.string().optional(),
+    sort: z.enum(["createdAt:asc", "createdAt:desc"]).optional(),
+});
 //# sourceMappingURL=flatrate.schema.js.map
