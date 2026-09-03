@@ -1,5 +1,6 @@
 {
   "contracts": {
-    "description": "Zentrale Tarifverwaltung"
+    "description": "Zentrale Tarifverwaltung",
+    "create": "Tarif erstellen"
   }
 }

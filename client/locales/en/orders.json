@@ -1,5 +1,7 @@
 {
   "orders": {
-    "description": "Central management of orders"
+    "description": "Central management of orders",
+    "create": "Create order",
+    "search": "Search orders…"
   }
 }

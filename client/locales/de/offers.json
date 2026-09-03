@@ -70,6 +70,8 @@
       "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
       "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}",
       "renewalStub": "Angebot-Generierung aus Verlängerung folgt in einem kommenden Schritt."
-    }
+    },
+    "create": "Angebot erstellen",
+    "description": "Zentrale Verwaltung der Angebote"
   }
 }

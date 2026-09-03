@@ -1,21 +1,26 @@
 import { useTranslation } from "react-i18next";
 import InvoiceList from "./-components/invoice-list";
-import { PageWidth } from "@/components";
+import { Breadcrumbs } from "@/components";
 
 export function InvoicePage() {
     const { t } = useTranslation();
 
     return (
-        <PageWidth>
-            <div className="grid gap-4">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-medium flex items-center justify-center gap-4">
-                        {t("section.invoices")}
-                    </h1>
-                </div>
-
-                <InvoiceList />
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("section.invoices"), to: "/invoices" },
+                    ]}
+                />
             </div>
-        </PageWidth>
+
+            {/* Die Rechnungsliste bringt ihre Filterzeile und den Erstellen-Knopf
+                selbst mit — anders als die übrigen Listen. */}
+            <InvoiceList />
+        </div>
     );
 }

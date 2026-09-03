@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import OfferVolumeChart from "./-components/charts/offer-volume-chart";
 import IntegrationCard from "./-components/integration-card";
 import OffersOrdersChart from "./-components/charts/offers-orders-chart";
@@ -5,7 +6,7 @@ import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integ
 import type { IntegrationEntry } from "@keepit/schemas";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
-import { Button, RouteError, Skeleton } from "@/components";
+import { Breadcrumbs, RouteError, Skeleton } from "@/components";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 
@@ -15,6 +16,7 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 }
 
 export default function DashboardPage() {
+    const { t } = useTranslation();
     const { months, isPending: statsPending, error: statsError } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
@@ -41,19 +43,21 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="mx-4">
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[{ label: "Dashboard", to: "/" }]}
+                />
+            </div>
+
             {/* Page Header with Title + Actions */}
-            <div className="flex items-center justify-between my-6">
+            <div className="flex items-center justify-between mb-2">
                 {/* Title + Description */}
                 <div className="grid gap-1">
                     <h1 className="text-xl font-medium">Overview</h1>
                     <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-4">
-                    {/* Example Button */}
-                    <Button size="sm">Angebot erstellen</Button>
                 </div>
             </div>
 

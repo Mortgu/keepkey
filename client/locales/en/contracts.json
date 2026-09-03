@@ -1,5 +1,6 @@
 {
   "contracts": {
-    "description": "Central contract management"
+    "description": "Central contract management",
+    "create": "Create contract"
   }
 }

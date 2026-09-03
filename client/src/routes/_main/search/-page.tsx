@@ -7,7 +7,7 @@ import SearchResultRow from "./-components/search-result-row";
 import { loadRecent, saveRecent } from "./-search-recents";
 import { Route } from "./index";
 import type { SearchResultItem, SearchType } from "@keepit/schemas";
-import { PageWidth } from "@/components";
+import { Breadcrumbs } from "@/components";
 import { useDebouncedValue } from "@/hooks/use-debounce";
 import { useSearch } from "@/hooks/search/search-hooks";
 
@@ -105,14 +105,20 @@ export default function SearchPage() {
     ];
 
     return (
-        <PageWidth variant="none">
-            <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
-                <div className="grid gap-1">
-                    <h1 className="font-medium text-xl">{t("search.title")}</h1>
-                    <p className="font-light text-sm text-gray-400">{t("search.description")}</p>
-                </div>
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("search.title"), to: "/search" },
+                    ]}
+                />
+            </div>
 
-                <div className="flex items-center gap-2.5 px-3 py-2.5 bg-white rounded-md border border-(--border) focus-within:border-(--primary) focus-within:shadow-[0_0_0_3px_rgba(0,104,63,0.12)] transition-[border-color,box-shadow] duration-100">
+            <div className="flex items-center gap-4">
+                <div className="flex flex-1 items-center gap-2.5 px-3 py-2 bg-white rounded-md border border-(--border) focus-within:border-(--primary) focus-within:shadow-[0_0_0_3px_rgba(0,104,63,0.12)] transition-[border-color,box-shadow] duration-100">
                     <span className="flex text-(--text-secondary) shrink-0">
                         <Search size={16} />
                     </span>
@@ -141,8 +147,7 @@ export default function SearchPage() {
                 </div>
             </div>
 
-            <div className="px-8 py-6">
-                <div className="border border-(--border) rounded-md bg-white overflow-hidden">
+            <div className="border border-(--border) rounded-md bg-white overflow-hidden">
                     <div className="flex gap-1 px-3 border-b border-(--border)">
                         {tabs.map((entry) => (
                             <button
@@ -203,14 +208,13 @@ export default function SearchPage() {
                         )}
                     </div>
 
-                    {!showRecent && items.length > 0 && (
-                        <div className="border-t border-(--border) px-4 py-2 text-[11.5px] text-(--text-secondary) flex justify-between">
-                            <span>{t("search.results", { count: items.length })}</span>
-                            <span>{t("search.hints")}</span>
-                        </div>
-                    )}
-                </div>
+                {!showRecent && items.length > 0 && (
+                    <div className="border-t border-(--border) px-4 py-2 text-[11.5px] text-(--text-secondary) flex justify-between">
+                        <span>{t("search.results", { count: items.length })}</span>
+                        <span>{t("search.hints")}</span>
+                    </div>
+                )}
             </div>
-        </PageWidth>
+        </div>
     );
 }

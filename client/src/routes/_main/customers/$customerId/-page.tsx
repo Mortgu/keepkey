@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
 import CustomerDetailPageHeader from "./-components/header";
 import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
@@ -6,7 +7,7 @@ import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
 import { Route } from "./index";
 import type { Customer } from "@keepit/schemas";
-import { PageWidth, RouteError, Tabs } from "@/components";
+import { Breadcrumbs, RouteError, Tabs } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
 
 const TABS = [
@@ -18,17 +19,30 @@ const TABS = [
 ];
 
 export default function CustomerDetailPage() {
+    const { t } = useTranslation();
     const { customerId } = Route.useParams();
     const { customer, isPending, error } = useCustomer(customerId);
 
     const modal = useModal<Customer>();
     const [tab, setTab] = useState<string>(TABS[0].value);
 
-    if (error) return <PageWidth><RouteError error={error} /></PageWidth>;
-    if (isPending || !customer) return <PageWidth><div className="p-4">Lädt…</div></PageWidth>;
+    if (error) return <div className="mx-4"><RouteError error={error} /></div>;
+    if (isPending || !customer) return <div className="mx-4 p-4">Lädt…</div>;
 
     return (
-        <PageWidth variant="none">
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("section.customers"), to: "/customers" },
+                        { label: customer.companyName },
+                    ]}
+                />
+            </div>
+
             <CustomerDetailPageHeader customer={customer} onEdit={(c) => modal.open(c)} />
 
             <div className="w-full h-full flex">
@@ -62,6 +76,6 @@ export default function CustomerDetailPage() {
                     onClose={modal.close}
                 />
             )}
-        </PageWidth>
+        </div>
     );
 }

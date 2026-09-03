@@ -1,6 +1,7 @@
 {
   "employees": {
     "description": "Central management of employees",
-    "searchPlaceholder": "Search employees…"
+    "searchPlaceholder": "Search employees…",
+    "create": "Create employee"
   }
 }

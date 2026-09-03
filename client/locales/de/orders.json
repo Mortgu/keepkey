@@ -1,5 +1,7 @@
 {
   "orders": {
-    "description": "Zentrale Verwaltung der Bestellungen"
+    "description": "Zentrale Verwaltung der Bestellungen",
+    "create": "Bestellung erstellen",
+    "search": "Bestellungen durchsuchen…"
   }
 }

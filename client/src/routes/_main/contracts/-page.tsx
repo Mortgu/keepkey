@@ -1,43 +1,34 @@
-import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { Fragment } from "react/jsx-runtime";
 import ContractList from "./-components/contract-list";
 import ContractModal from "./-components/contract-modal";
 import type { Contract } from "@keepit/schemas";
+import { Breadcrumbs, Button } from "@/components";
 import { useModal } from "@/hooks";
-import { Button, PageWidth } from "@/components";
 
 export default function ContractPage() {
     const { t } = useTranslation();
     const modal = useModal<Contract>();
 
     return (
-        <Fragment>
-            <PageWidth variant="none">
-                {/* Header */}
-                <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
-                    <div className="flex items-center justify-between">
-                        <div className="flex-1 grid gap-1">
-                            <h1 className="font-medium text-xl">{t("section.contracts")}</h1>
-                            <p className="font-light text-sm text-gray-400">{t("contracts.description")}</p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Button
-                                icon={<Plus size={14} strokeWidth={3} />}
-                                variant="primary"
-                                size="sm"
-                                onClick={() => modal.open()}
-                            >
-                                {t("button.create")}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("section.contracts"), to: "/contracts" },
+                    ]}
+                />
+            </div>
 
-                <div className="px-8 py-6">
-                    <ContractList onEdit={(contract) => modal.open(contract)} />
-                </div>
-            </PageWidth>
+            <div className="flex items-center gap-2">
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("contracts.create")}
+                </Button>
+            </div>
+
+            <ContractList onEdit={(contract) => modal.open(contract)} />
 
             {modal.isOpen && (
                 <ContractModal
@@ -46,6 +37,6 @@ export default function ContractPage() {
                     currentContract={modal.data}
                 />
             )}
-        </Fragment>
+        </div>
     )
 }

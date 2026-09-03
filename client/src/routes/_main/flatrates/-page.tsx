@@ -28,7 +28,7 @@ export default function FlatratePage() {
 
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
                 <SortDropdown
                     value={filters.sort}
                     onChange={filters.setSort}

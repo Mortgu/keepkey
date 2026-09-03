@@ -1,6 +1,7 @@
 {
   "suppliers": {
     "description": "Central management of suppliers",
-    "searchPlaceholder": "Search suppliers…"
+    "searchPlaceholder": "Search suppliers…",
+    "create": "Create supplier"
   }
 }

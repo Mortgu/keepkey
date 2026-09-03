@@ -1,6 +1,7 @@
 {
   "suppliers": {
     "description": "Zentrale Verwaltung der Lieferanten",
-    "searchPlaceholder": "Lieferanten durchsuchen…"
+    "searchPlaceholder": "Lieferanten durchsuchen…",
+    "create": "Lieferant erstellen"
   }
 }

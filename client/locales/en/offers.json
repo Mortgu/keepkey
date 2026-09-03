@@ -70,6 +70,8 @@
       "documentRenameError": "Document could not be renamed: {{message}}",
       "restoreError": "Version could not be restored: {{message}}",
       "renewalStub": "Generating an offer from a renewal is coming in a later step."
-    }
+    },
+    "create": "Create offer",
+    "description": "Central management of offers"
   }
 }
