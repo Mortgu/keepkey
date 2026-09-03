@@ -9,10 +9,6 @@
   --font-mono: "Inter", monospace;
 }
 
-#root {
-  isolation: isolate;
-}
-
 :root {
   --viewport: 1280px;
   --viewport-padding: 3px;
@@ -106,11 +102,31 @@ body {
   display: none;
 }
 
-#root {
-  display: grid;
-  grid-template-columns: auto 1fr;
-}
-
 li {
   list-style: disc;
+}
+
+#root {
+  isolation: isolate;
+
+  display: grid;
+  grid-template-columns: auto 1fr;
+
+  /* Deckelt das Raster auf den Viewport. Ohne das könnte ein zu hohes Kind das
+     Dokument wachsen lassen — und dann scrollt die Navigation mit, weil sie ein
+     ganz gewöhnliches Rasterkind ist und nicht `fixed`. */
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Die Spalte des Inhalts scrollt selbst.
+   Vorher war sie nur auf 100vh gedeckelt, ohne `overflow` — längerer Inhalt
+   quoll aus der Box heraus und liess das Dokument scrollen. Seiten mit
+   `PageWidth` fiel das nicht auf, weil die Komponente ihren eigenen
+   Scrollbereich mitbringt; Seiten ohne sie (Dashboard, /workloads) nahmen die
+   Navigation beim Scrollen mit. */
+#app {
+  height: 100vh;
+  max-height: 100vh;
+  overflow-y: auto;
 }

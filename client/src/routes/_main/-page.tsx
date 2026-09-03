@@ -1,5 +1,4 @@
 import OfferVolumeChart from "./-components/charts/offer-volume-chart";
-import GlobalSearch from "./-components/global-search";
 import IntegrationCard from "./-components/integration-card";
 import OffersOrdersChart from "./-components/charts/offers-orders-chart";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
@@ -43,11 +42,6 @@ export default function DashboardPage() {
 
     return (
         <div className="mx-4">
-            {/* Global Page Header with Global Search + Breadcrumbs */}
-            <div className="flex items-center justify-between border-b border-(--border) h-16">
-                <GlobalSearch />
-            </div>
-
             {/* Page Header with Title + Actions */}
             <div className="flex items-center justify-between my-6">
                 {/* Title + Description */}

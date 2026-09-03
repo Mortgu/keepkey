@@ -8,6 +8,8 @@ import versionHistoryEN from '../locales/en/versionHistory.json';
 import dashboardEN from '../locales/en/dashboard.json';
 import errorsEN from '../locales/en/errors.json';
 import customerEN from '../locales/en/customer.json';
+import workloadsEN from '../locales/en/workloads.json';
+import flatratesEN from '../locales/en/flatrates.json';
 
 import commonDE from '../locales/de/common.json';
 import offersDE from '../locales/de/offers.json';
@@ -15,6 +17,8 @@ import versionHistoryDE from '../locales/de/versionHistory.json';
 import dashboardDE from '../locales/de/dashboard.json';
 import errorsDE from '../locales/de/errors.json';
 import customerDE from '../locales/de/customer.json';
+import workloadsDE from '../locales/de/workloads.json';
+import flatratesDE from '../locales/de/flatrates.json';
 
 i18n.use(LanguageDetector).use(initReactI18next).init({
     fallbackLng: 'en',
@@ -31,12 +35,10 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
                 ...versionHistoryEN,
                 ...dashboardEN,
                 ...customerEN,
-                // Unter `errors` verschachtelt statt flach gespreadet: die
-                // Datei ist nach Fehlercode geschlüsselt, und `getErrorMessage`
-                // schlägt sie als `errors.<CODE>` nach. Flach eingehängt
-                // existierte dieser Pfad nicht — jeder API-Fehler fiel still
-                // auf die rohe Servermeldung zurück.
                 errors: errorsEN,
+
+                ...workloadsEN,
+                ...flatratesEN,
             }
         },
         de: {
@@ -47,6 +49,9 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
                 ...dashboardDE,
                 ...customerDE,
                 errors: errorsDE,
+
+                ...workloadsDE,
+                ...flatratesDE
             }
         }
     }

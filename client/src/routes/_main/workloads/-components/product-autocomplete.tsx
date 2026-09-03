@@ -21,8 +21,8 @@ export default function ProductAutocomplete({ items, filters }: Props) {
     return (
         <Autocomplete.Root items={items} filter={fuzzyFilter} itemToStringValue={(item) => item.title} value={filters.searchInput} onValueChange={(val) => filters.setSearchInput(val)}>
             <div className="relative flex-1">
-                <Autocomplete.Input placeholder={t("common.search")} render={
-                    <Input rightIcon={<Search size={14} />} placeholder={t("common.search")} />
+                <Autocomplete.Input render={
+                    <Input rightIcon={<Search size={14} />} placeholder={t("workloads.search")} />
                 } />
             </div>
             <Autocomplete.Portal>

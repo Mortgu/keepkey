@@ -24,7 +24,7 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
 
 export const buttonStyles = tv({
     base: [
-        'loading-none',
+        'loading-none whitespace-pre',
         'w-fit cursor-pointer inline-flex items-center justify-center gap-2 rounded-md',
         'transition-all duration-200 font-medium',
         ACTION_FOCUS,
@@ -33,7 +33,7 @@ export const buttonStyles = tv({
     variants: {
         variant: {
             primary: [
-                'bg-(--primary-600) text-(--text-inv)',
+                'bg-(--primary-800) text-(--text-inv)',
                 'hover:opacity-90 active:opacity-80',
             ],
             secondary: [

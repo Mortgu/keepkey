@@ -13,7 +13,12 @@
     "overview": "Übersicht",
     "sales": "Vertrieb",
     "management": "Verwaltung",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "search": {
+    "title": "Suche",
+    "description": "Angebote, Bestellungen und Kunden durchsuchen."
   },
   "section": {
     "workloads": "Workloads",

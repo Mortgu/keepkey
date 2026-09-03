@@ -6,7 +6,6 @@ import {
     FileText,
     Languages,
     LayoutGrid,
-    LogOut,
     Package, Settings,
     ShoppingCart,
     Text,
@@ -17,9 +16,10 @@ import {
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { NavGroup, NavLink } from "./nav-link";
+import { NavSearch } from "./nav-search";
+import { NavUserMenu } from "./nav-user-menu";
 import type { ReactNode } from "react";
-import { Button, DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
-import { useAuth } from "@/context/auth-context";
+import { DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
 
 const ICON_SIZE = 14;
 
@@ -63,38 +63,22 @@ function Section({ title, collapsible = false, children }: SectionProps) {
     );
 }
 
-function UserFooter() {
+/**
+ * Im Fuss steht nur noch die Sprachwahl — der Nutzer ist mitsamt Abmelden nach
+ * oben in {@link NavUserMenu} gewandert.
+ */
+function LanguageFooter() {
     const { i18n } = useTranslation();
-    const { user, logout } = useAuth();
-
-    const displayName = user ? `${user.firstName} ${user.lastName}` : null;
 
     return (
-        <div>
-            {/* Language toggle */}
-            <div className="flex items-center justify-between mx-3.5 py-3.5 border-t border-(--fg-2)">
-                <Languages className="size-5 text-(--text-inv)" />
-                <SegmentedLanguageToggle
-                    className="bg-(--fg-2) text-white border-none"
-                    options={DEFAULT_LANGUAGE_OPTIONS}
-                    value={i18n.language.toUpperCase()}
-                    onChange={(lng) => i18n.changeLanguage(lng)}
-                />
-            </div>
-
-            {user && (
-                <div className="flex items-center gap-2.5 border-t border-(--fg-2) mx-3.5 py-3.5">
-                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-(--primary-100)">
-                        <UserCircle2 className="size-4" />
-                    </div>
-                    <div className="min-w-0 flex-1 text-white">
-                        <p className="text-[13px] font-semibold">{displayName}</p>
-                        <p className="text-[11px] text-(--fg-3)">{user.email}</p>
-                    </div>
-                    <Button variant='ghost' size='sm' onClick={logout}
-                        icon={<LogOut className="size-4 " />} iconOnly />
-                </div>
-            )}
+        <div className="flex items-center justify-between mx-3.5 py-3.5 border-t border-(--fg-2)">
+            <Languages className="size-5 text-(--text-inv)" />
+            <SegmentedLanguageToggle
+                className="bg-(--fg-2) text-white border-none"
+                options={DEFAULT_LANGUAGE_OPTIONS}
+                value={i18n.language.toUpperCase()}
+                onChange={(lng) => i18n.changeLanguage(lng)}
+            />
         </div>
     );
 }
@@ -104,10 +88,11 @@ export function Navigation() {
 
     return (
         <aside className="flex h-screen w-74 flex-col overflow-hidden bg-(--text)">
-            <div className="grid items-center justify-between gap-2 px-4 pb-2.5 pt-4">
-                <h1 className="text-lg font-semibold tracking-[-0.01em] text-(--text-inv)">
-                    dignum
-                </h1>
+            {/* Nutzer und Suche stehen oben: der Kontext, in dem man arbeitet,
+                und der schnellste Weg irgendwohin. */}
+            <div className="flex flex-col gap-2 px-2 pb-2.5 pt-3">
+                <NavUserMenu />
+                <NavSearch />
             </div>
 
             <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto pb-2">
@@ -176,7 +161,7 @@ export function Navigation() {
                 </Section>
             </nav>
 
-            <UserFooter />
+            <LanguageFooter />
         </aside>
     );
 }

@@ -1,54 +1,60 @@
 import { useTranslation } from "react-i18next";
 import ProductModal from "./-components/product-modal";
-import { Breadcrumbs, Button } from "@/components";
-import { useModal, useProductManager } from "@/hooks";
-import GlobalSearch from "../-components/global-search";
-import ProductList from "./-components/product-list";
+import { Breadcrumbs, Button, SortDropdown } from "@/components";
+import { useLocale, useModal, useProductManager } from "@/hooks";
+import useWorkloadFilters from "./-hooks/use-workload-filters";
+import ProductAutocomplete from "./-components/product-autocomplete";
+import { localized } from "@/lib/i18n-content";
+import type { Product } from "@keepit/schemas";
+import ProductItem from "./-components/product-item";
 
 export default function ProductPage() {
-    const { t } = useTranslation()
-    const { createProduct } = useProductManager();
+    const locale = useLocale();
+    const { t } = useTranslation();
+
+    const filters = useWorkloadFilters();
+
+    const { products, createProduct } = useProductManager(filters.params);
 
     const modal = useModal();
 
     return (
-        <div className="mx-4">
+        <div className="grid gap-4 mx-4">
 
-            {/* Global Page Header with Global Search + Breadcrumbs */}
-            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-16">
-                <GlobalSearch />
-            </div>
-
-            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-10">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
                 <Breadcrumbs
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Startseite", to: "/" },
+                        { label: "Dashboard", to: "/" },
                         { label: "Workloads", to: "/workloads" },
                     ]}
                 />
-
             </div>
 
-            {/* Page Header with Title + Actions */}
-            <div className="flex items-center justify-between my-6">
-                {/* Title + Description */}
-                <div className="grid gap-1">
-                    <h1 className="text-xl font-medium">Workloads</h1>
-                    <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
-                </div>
+            <div className="flex items-center gap-4">
+                <SortDropdown
+                    value={filters.sort}
+                    onChange={filters.setSort}
+                    options={filters.sortOptions}
+                />
 
-                {/* Actions */}
-                <div className="flex items-center gap-4">
-                    {/* Create Workload Action */}
-                    <Button size="sm" onClick={() => modal.open()} disabled={modal.isOpen}>
-                        {t("button.create")}
-                    </Button>
-                </div>
+                <ProductAutocomplete
+                    items={products.map(product => ({
+                        title: localized(product.translations, locale, "name") ?? "",
+                        description: localized(product.translations, locale, "description") ?? ""
+                    }))}
+                    filters={filters}
+                />
+
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("workloads.create")}
+                </Button>
             </div>
 
-            <ProductList />
+            {products.map((product: Product) => (
+                <ProductItem key={product.id} product={product} />
+            ))}
 
             {modal.isOpen && (
                 <ProductModal

@@ -21,6 +21,7 @@ import { Route as MainFlatratesIndexRouteImport } from './routes/_main/flatrates
 import { Route as MainInvoicesIndexRouteImport } from './routes/_main/invoices/index'
 import { Route as MainOffersIndexRouteImport } from './routes/_main/offers/index'
 import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index'
+import { Route as MainSearchIndexRouteImport } from './routes/_main/search/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
 import { Route as MainTestIndexRouteImport } from './routes/_main/test/index'
@@ -90,6 +91,11 @@ const MainOrdersIndexRoute = MainOrdersIndexRouteImport.update({
   path: '/orders/',
   getParentRoute: () => MainRouteRoute,
 } as any)
+const MainSearchIndexRoute = MainSearchIndexRouteImport.update({
+  id: '/search/',
+  path: '/search/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -153,6 +159,7 @@ export interface FileRoutesByFullPath {
   '/invoices/': typeof MainInvoicesIndexRoute
   '/offers/': typeof MainOffersIndexRoute
   '/orders/': typeof MainOrdersIndexRoute
+  '/search/': typeof MainSearchIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
   '/test/': typeof MainTestIndexRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/invoices': typeof MainInvoicesIndexRoute
   '/offers': typeof MainOffersIndexRoute
   '/orders': typeof MainOrdersIndexRoute
+  '/search': typeof MainSearchIndexRoute
   '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
   '/test': typeof MainTestIndexRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/_main/invoices/': typeof MainInvoicesIndexRoute
   '/_main/offers/': typeof MainOffersIndexRoute
   '/_main/orders/': typeof MainOrdersIndexRoute
+  '/_main/search/': typeof MainSearchIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
   '/_main/test/': typeof MainTestIndexRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/invoices/'
     | '/offers/'
     | '/orders/'
+    | '/search/'
     | '/settings/'
     | '/suppliers/'
     | '/test/'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/invoices'
     | '/offers'
     | '/orders'
+    | '/search'
     | '/settings'
     | '/suppliers'
     | '/test'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/_main/invoices/'
     | '/_main/offers/'
     | '/_main/orders/'
+    | '/_main/search/'
     | '/_main/settings/'
     | '/_main/suppliers/'
     | '/_main/test/'
@@ -369,6 +381,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainOrdersIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/search/': {
+      id: '/_main/search/'
+      path: '/search'
+      fullPath: '/search/'
+      preLoaderRoute: typeof MainSearchIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/settings/': {
       id: '/_main/settings/'
       path: '/'
@@ -462,6 +481,7 @@ interface MainRouteRouteChildren {
   MainInvoicesIndexRoute: typeof MainInvoicesIndexRoute
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
+  MainSearchIndexRoute: typeof MainSearchIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
   MainTestIndexRoute: typeof MainTestIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
@@ -479,6 +499,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainInvoicesIndexRoute: MainInvoicesIndexRoute,
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
+  MainSearchIndexRoute: MainSearchIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
   MainTestIndexRoute: MainTestIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,

@@ -17,6 +17,8 @@ export * from './language-toggle';
 export * from './language-toggle-options';
 export * from './menu-styles';
 export * from './nav-link';
+export * from './nav-search';
+export * from './nav-user-menu';
 export * from './navigation';
 export * from './number-field';
 export * from './page-width';

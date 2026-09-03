@@ -49,8 +49,8 @@ export default function OfferVolumeChart({ months }: Props) {
                     {/* Die Id muss eindeutig bleiben: zwei Verläufe mit demselben
                         Namen im Dokument überschreiben einander. */}
                     <linearGradient id="offerVolumeFill" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="20%" stopColor="var(--primary-400)" stopOpacity={0.4} />
-                        <stop offset="100%" stopColor="var(--primary-400)" stopOpacity={0} />
+                        <stop offset="20%" stopColor="var(--primary-800)" stopOpacity={0.4} />
+                        <stop offset="100%" stopColor="var(--primary-800)" stopOpacity={0} />
                     </linearGradient>
                 </defs>
 
@@ -72,7 +72,7 @@ export default function OfferVolumeChart({ months }: Props) {
                 <Area
                     type="linear"
                     dataKey="volume"
-                    stroke="var(--primary-400)"
+                    stroke="var(--primary-800)"
                     strokeWidth={3}
                     fillOpacity={1}
                     fill="url(#offerVolumeFill)"

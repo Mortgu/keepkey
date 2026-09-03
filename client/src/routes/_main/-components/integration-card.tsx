@@ -24,7 +24,7 @@ const styles = tv({
     base: 'flex-1 grid rounded-lg bg-(--page-bg) border border-t-3 border-(--border)',
     variants: {
         status: {
-            connected: "border-t-(--primary-400)",
+            connected: "border-t-(--primary-700)",
             checking: "border-t-(--warning)",
             failed: "border-t-(--destructive)",
             not_configured: "border-t-gray-500",
@@ -36,7 +36,7 @@ const statusText = tv({
     base: "text-sm",
     variants: {
         status: {
-            connected: "text-(--primary)",
+            connected: "text-(--primary-700)",
             checking: "text-(--warning)",
             failed: "text-(--destructive)",
             not_configured: "text-gray-500",

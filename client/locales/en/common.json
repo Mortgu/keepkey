@@ -13,7 +13,12 @@
     "overview": "Overview",
     "sales": "Sales",
     "management": "Management",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Log out"
+  },
+  "search": {
+    "title": "Search",
+    "description": "Search offers, orders and customers."
   },
   "section": {
     "workloads": "Workloads",
