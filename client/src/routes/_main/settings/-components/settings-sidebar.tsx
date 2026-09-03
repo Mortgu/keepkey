@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createLink } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { FileText, ShieldCheck, UserCircle } from "lucide-react";
 import type { LinkComponent } from "@tanstack/react-router";
@@ -51,13 +52,17 @@ const SettingsSidebarLink = ((props: SettingsSidebarLinkProps) => (
     />
 )) as LinkComponent<typeof SettingsLinkComponent>;
 
+/** `labelKey` statt `label`: der Text wird erst beim Rendern aufgelöst, sonst
+    stünde er in einer Konstanten fest, bevor die Sprache bekannt ist. */
 const navItems = [
-    { to: "/settings/account", label: "Konto", icon: <UserCircle size={ICON_SIZE} /> },
-    { to: "/settings/security", label: "Sicherheit", icon: <ShieldCheck size={ICON_SIZE} /> },
-    { to: "/settings/templates", label: "Vorlagen", icon: <FileText size={ICON_SIZE} /> },
+    { to: "/settings/account", labelKey: "settings.account", icon: <UserCircle size={ICON_SIZE} /> },
+    { to: "/settings/security", labelKey: "settings.security", icon: <ShieldCheck size={ICON_SIZE} /> },
+    { to: "/settings/templates", labelKey: "settings.templates", icon: <FileText size={ICON_SIZE} /> },
 ];
 
 export function SettingsSidebar() {
+    const { t } = useTranslation();
+
     return (
         <div className="p-3  border-r border-(--border)">
 
@@ -67,7 +72,7 @@ export function SettingsSidebar() {
                     <SettingsSidebarLink
                         key={item.to}
                         to={item.to}
-                        label={item.label}
+                        label={t(item.labelKey)}
                         icon={item.icon}
                         className={itemStyles()}
                     />
@@ -80,7 +85,7 @@ export function SettingsSidebar() {
                     <SettingsSidebarLink
                         key={item.to}
                         to={item.to}
-                        label={item.label}
+                        label={t(item.labelKey)}
                         icon={item.icon}
                         className={itemStyles()}
                     />

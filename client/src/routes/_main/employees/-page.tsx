@@ -1,12 +1,12 @@
-import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import EmployeeList from "./-components/employee-list";
-import { useModal } from "@/hooks";
-import type { User } from "@keepit/schemas";
 import UserModal from "./-components/user-modal";
 import useEmployeeFilters from "./-hooks/use-employee-filters";
 import EmployeeFilters from "./-components/employee-filters";
+import type { User } from "@keepit/schemas";
+import { useModal } from "@/hooks";
+import { Button, PageWidth } from "@/components";
 
 export default function EmployeePage() {
     const { t } = useTranslation();
@@ -22,7 +22,7 @@ export default function EmployeePage() {
                 <div className="flex items-center justify-between">
                     <div className="flex-1 grid gap-1">
                         <h1 className="font-medium text-xl">{t("section.employees")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Angestellten</h1>
+                        <h1 className="font-light text-sm text-gray-400">{t("employees.description")}</h1>
                     </div>
                     <div className="flex items-center gap-4">
                         <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"

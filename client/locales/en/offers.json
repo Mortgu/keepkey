@@ -3,6 +3,7 @@
     "compare": "Compare?",
     "add_workload": "add Workload",
     "add_flatrate": "add Flatrate",
+    "flatrate": "Flat rate",
     "add_discount": "add Discound",
     "quantity": "Quantity",
     "free_months": "Free months",
@@ -67,7 +68,8 @@
       "documentUploadError": "Document could not be uploaded: {{message}}",
       "documentDeleteError": "Document could not be deleted: {{message}}",
       "documentRenameError": "Document could not be renamed: {{message}}",
-      "restoreError": "Version could not be restored: {{message}}"
+      "restoreError": "Version could not be restored: {{message}}",
+      "renewalStub": "Generating an offer from a renewal is coming in a later step."
     }
   }
 }

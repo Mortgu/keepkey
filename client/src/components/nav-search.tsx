@@ -37,7 +37,7 @@ export function NavSearch() {
             <Search className="size-4 shrink-0 text-(--fg-3)" />
 
             <span className="flex-1 truncate text-[13px] text-(--fg-3)">
-                {t("dashboard.search.placeholder")}
+                {t("search.placeholder")}
             </span>
 
             <span className="shrink-0 rounded border border-(--fg-2) px-1.5 py-px text-[11px] text-(--fg-3)">

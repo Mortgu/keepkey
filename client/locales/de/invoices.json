@@ -1,0 +1,6 @@
+{
+  "invoices": {
+    "description": "Zentrale Verwaltung der Rechnungen",
+    "searchPlaceholder": "AG-Nr. suchen…"
+  }
+}

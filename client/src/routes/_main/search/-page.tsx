@@ -98,10 +98,10 @@ export default function SearchPage() {
     };
 
     const tabs: Array<{ key: TabKey; label: string }> = [
-        { key: "all", label: t("dashboard.search.tabs.all") },
-        { key: "offer", label: t("dashboard.search.tabs.offers") },
-        { key: "order", label: t("dashboard.search.tabs.orders") },
-        { key: "customer", label: t("dashboard.search.tabs.customers") },
+        { key: "all", label: t("search.tabs.all") },
+        { key: "offer", label: t("search.tabs.offers") },
+        { key: "order", label: t("search.tabs.orders") },
+        { key: "customer", label: t("search.tabs.customers") },
     ];
 
     return (
@@ -122,7 +122,7 @@ export default function SearchPage() {
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         onKeyDown={handleKeyDown}
-                        placeholder={t("dashboard.search.placeholder")}
+                        placeholder={t("search.placeholder")}
                         className="flex-1 border-none outline-none text-sm text-(--text) bg-transparent"
                     />
 
@@ -163,12 +163,12 @@ export default function SearchPage() {
                         {showRecent && (
                             <>
                                 <p className="px-4 pt-2 pb-1 text-[10px] font-semibold text-(--text-secondary) uppercase tracking-[0.06em]">
-                                    {t("dashboard.search.recent")}
+                                    {t("search.recent")}
                                 </p>
 
                                 {recent.length === 0 ? (
                                     <p className="px-4 py-3 text-sm text-(--text-secondary)">
-                                        {t("dashboard.search.recentEmpty")}
+                                        {t("search.recentEmpty")}
                                     </p>
                                 ) : recent.map((term) => (
                                     <button
@@ -197,7 +197,7 @@ export default function SearchPage() {
                             <div className="flex flex-col items-center gap-2 py-12 px-4 text-(--text-secondary)">
                                 <Search size={30} />
                                 <p className="text-sm text-(--text-600)">
-                                    {t("dashboard.search.empty", { query: trimmed })}
+                                    {t("search.empty", { query: trimmed })}
                                 </p>
                             </div>
                         )}
@@ -205,8 +205,8 @@ export default function SearchPage() {
 
                     {!showRecent && items.length > 0 && (
                         <div className="border-t border-(--border) px-4 py-2 text-[11.5px] text-(--text-secondary) flex justify-between">
-                            <span>{t("dashboard.search.results", { count: items.length })}</span>
-                            <span>{t("dashboard.search.hints")}</span>
+                            <span>{t("search.results", { count: items.length })}</span>
+                            <span>{t("search.hints")}</span>
                         </div>
                     )}
                 </div>

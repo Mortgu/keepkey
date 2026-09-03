@@ -1,0 +1,17 @@
+{
+  "login": {
+    "title": "Anmelden",
+    "welcome": "Willkommen zurück",
+    "email": "E-Mail",
+    "emailPlaceholder": "du@firma.de",
+    "password": "Passwort",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort verbergen",
+    "rememberMe": "Angemeldet bleiben",
+    "forgotPassword": "Passwort vergessen?",
+    "submit": "Anmelden",
+    "or": "oder",
+    "passkey": "Mit Passkey anmelden"
+  }
+}

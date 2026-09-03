@@ -1,0 +1,17 @@
+{
+  "login": {
+    "title": "Sign in",
+    "welcome": "Welcome back",
+    "email": "Email",
+    "emailPlaceholder": "you@company.com",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password",
+    "rememberMe": "Stay signed in",
+    "forgotPassword": "Forgot password?",
+    "submit": "Sign in",
+    "or": "or",
+    "passkey": "Sign in with a passkey"
+  }
+}

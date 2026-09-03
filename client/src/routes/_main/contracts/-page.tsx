@@ -1,13 +1,13 @@
-import { Button, PageWidth } from "@/components";
-import ContractList from "./-components/contract-list";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useModal } from "@/hooks";
-import type { Contract } from "@keepit/schemas";
 import { Fragment } from "react/jsx-runtime";
+import ContractList from "./-components/contract-list";
 import ContractModal from "./-components/contract-modal";
+import type { Contract } from "@keepit/schemas";
+import { useModal } from "@/hooks";
+import { Button, PageWidth } from "@/components";
 
-export default function ContractPage({ }) {
+export default function ContractPage() {
     const { t } = useTranslation();
     const modal = useModal<Contract>();
 
@@ -19,9 +19,7 @@ export default function ContractPage({ }) {
                     <div className="flex items-center justify-between">
                         <div className="flex-1 grid gap-1">
                             <h1 className="font-medium text-xl">{t("section.contracts")}</h1>
-                            <p className="font-light text-sm text-gray-400">
-                                Zentrale Tarif verwaltung
-                            </p>
+                            <p className="font-light text-sm text-gray-400">{t("contracts.description")}</p>
                         </div>
                         <div className="flex items-center gap-4">
                             <Button

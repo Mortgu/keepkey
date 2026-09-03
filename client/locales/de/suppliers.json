@@ -1,0 +1,6 @@
+{
+  "suppliers": {
+    "description": "Zentrale Verwaltung der Lieferanten",
+    "searchPlaceholder": "Lieferanten durchsuchen…"
+  }
+}

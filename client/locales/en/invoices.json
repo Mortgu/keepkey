@@ -1,0 +1,6 @@
+{
+  "invoices": {
+    "description": "Central management of invoices",
+    "searchPlaceholder": "Search quote no.…"
+  }
+}

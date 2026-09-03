@@ -16,10 +16,6 @@
     "settings": "Settings",
     "logout": "Log out"
   },
-  "search": {
-    "title": "Search",
-    "description": "Search offers, orders and customers."
-  },
   "section": {
     "workloads": "Workloads",
     "workload_pricing": "Pricing",

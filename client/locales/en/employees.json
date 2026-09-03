@@ -1,0 +1,6 @@
+{
+  "employees": {
+    "description": "Central management of employees",
+    "searchPlaceholder": "Search employees…"
+  }
+}

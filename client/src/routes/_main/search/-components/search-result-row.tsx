@@ -16,9 +16,9 @@ const TYPE_COLOR: Record<SearchType, string> = {
 };
 
 const TYPE_LABEL_KEY: Record<SearchType, string> = {
-    offer: "dashboard.search.typeLabels.offer",
-    order: "dashboard.search.typeLabels.order",
-    customer: "dashboard.search.typeLabels.customer",
+    offer: "search.typeLabels.offer",
+    order: "search.typeLabels.order",
+    customer: "search.typeLabels.customer",
 };
 
 /** Hebt den Suchbegriff im Treffer hervor — erster Fund, ohne Rücksicht auf Gross-/Kleinschreibung. */
@@ -50,10 +50,10 @@ function formatRelativeDate(iso: string, t: (key: string, opts?: Record<string, 
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
 
-    if (minutes < 1) return t("dashboard.search.justNow");
-    if (minutes < 60) return t("dashboard.search.minutesAgo", { count: minutes });
-    if (hours < 24) return t("dashboard.search.hoursAgo", { count: hours });
-    if (days < 7) return t("dashboard.search.daysAgo", { count: days });
+    if (minutes < 1) return t("search.justNow");
+    if (minutes < 60) return t("search.minutesAgo", { count: minutes });
+    if (hours < 24) return t("search.hoursAgo", { count: hours });
+    if (days < 7) return t("search.daysAgo", { count: days });
 
     return new Date(iso).toLocaleDateString();
 }

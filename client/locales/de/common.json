@@ -16,10 +16,6 @@
     "settings": "Einstellungen",
     "logout": "Abmelden"
   },
-  "search": {
-    "title": "Suche",
-    "description": "Angebote, Bestellungen und Kunden durchsuchen."
-  },
   "section": {
     "workloads": "Workloads",
     "workload_pricing": "Preistabelle",

@@ -1,12 +1,12 @@
-import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import SupplierList from "./-components/supplier-list";
 import useSupplierFilters from "./-hooks/use-supplier-filters";
 import SupplierFilters from "./-components/supplier-filters";
-import { useModal } from "@/hooks";
-import type { Supplier } from "@keepit/schemas";
 import SupplierModal from "./-components/supplier-modal";
+import type { Supplier } from "@keepit/schemas";
+import { useModal } from "@/hooks";
+import { Button, PageWidth } from "@/components";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
@@ -22,7 +22,7 @@ export default function SupplierPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex-1 grid gap-1">
                         <h1 className="font-medium text-xl">{t("section.suppliers")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Lieferanten</h1>
+                        <h1 className="font-light text-sm text-gray-400">{t("suppliers.description")}</h1>
                     </div>
                     <div className="flex items-center gap-4">
                         <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"

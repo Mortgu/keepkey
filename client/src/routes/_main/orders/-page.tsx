@@ -1,11 +1,11 @@
 import { useTranslation } from "react-i18next";
-import OrderList from "./-components/order-list";
-import { Button, PageWidth } from "@/components";
 import { Plus } from "lucide-react";
-import { useModal } from "@/hooks";
+import OrderList from "./-components/order-list";
 import OrderModal from "./-components/order-select-modal";
 import OrderFilters from "./-components/order-filters";
 import useOrderFilters from "./-hooks/use-order-filters";
+import { useModal } from "@/hooks";
+import { Button, PageWidth } from "@/components";
 
 export function OrderPage() {
     const { t } = useTranslation();
@@ -21,7 +21,7 @@ export function OrderPage() {
                 <div className="flex items-center justify-between">
                     <div className="flex-1 grid gap-1">
                         <h1 className="font-medium text-xl">{t("section.orders")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Angebote</h1>
+                        <h1 className="font-light text-sm text-gray-400">{t("orders.description")}</h1>
                     </div>
                     <div className="flex items-center gap-4">
                         <Button
