@@ -7,7 +7,7 @@ model Order {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String // Kunden-Nr.
 
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
   contactPersonId       String // Ihr Ansprechpartner
 
   employee   User   @relation(fields: [employeeId], references: [id])
@@ -52,6 +52,11 @@ model Order {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([customerId])
+  @@index([contactPersonId])
+  @@index([employeeId])
+  @@index([contractId])
+  @@index([supplierId])
   @@map("order")
 }
 
@@ -71,6 +76,7 @@ model OrderRevision {
   createdAt DateTime @default(now())
 
   @@unique([orderId, version])
+  @@index([changedById])
   @@map("order_revision")
 }
 
@@ -92,6 +98,8 @@ model OrderPosition {
 
   createdAt DateTime @default(now())
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_position")
 }
 
@@ -107,6 +115,8 @@ model OrderFlatRate {
   quantity    Int
   total_cents Int
 
+  @@index([orderId])
+  @@index([flatRateId])
   @@map("order_flat_rate")
 }
 

@@ -22,6 +22,7 @@ model TariffGroupProduct {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([tariffGroupId])
   @@map("tariff_group_product")
 }
 
@@ -43,6 +44,7 @@ model Tariff {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@unique([tariffGroupId, contractId])
+  @@index([contractId])
   @@map("tariff")
 }
 
@@ -111,7 +113,14 @@ model TariffCustomerPrice {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  /// Unique inkl. gruppenweiter Preise (productId = null, "gilt fuer alle
+  /// Produkte"): dieses Prisma-Unique deckt NULL nicht ab — Postgres behandelt
+  /// NULLs als distinct. Die Luecke schliesst der partielle Unique-Index
+  /// `tariff_customer_price_group_wide_key` (Migration 20260904090820),
+  /// hier nicht ausdrueckbar.
   @@unique([tariffId, customerId, productId, duration, min_quantity])
+  @@index([customerId])
+  @@index([productId])
   @@map("tariff_customer_price")
 }
 
@@ -150,6 +159,7 @@ model TariffVersion {
 
   @@unique([tariffId, version])
   @@index([tariffId, hash])
+  @@index([createdById])
   @@map("tariff_version")
 }
 

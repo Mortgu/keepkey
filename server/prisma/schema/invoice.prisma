@@ -15,5 +15,8 @@ model Invoice {
   order   Order  @relation(fields: [orderId], references: [id])
   orderId String
 
+  @@index([customerId])
+  @@index([orderId])
+  @@index([supplierId])
   @@map("invoice")
 }

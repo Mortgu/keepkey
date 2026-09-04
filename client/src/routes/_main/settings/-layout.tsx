@@ -1,15 +1,16 @@
 import { Outlet } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 
-import { SettingsSidebar } from "./-components/settings-sidebar.tsx";
+import { SettingsTabs } from "./-components/settings-tabs";
 import { Breadcrumbs } from "@/components";
 
 /**
- * Rahmen der Einstellungen: dieselbe Kopfleiste wie jede andere Seite, darunter
- * die eigene Navigation der Unterseiten.
+ * Rahmen der Einstellungen: Kopfleiste wie auf jeder Seite, darunter die Reiter
+ * der Unterseiten und darunter deren Inhalt.
  *
- * Kein `PageWidth` mehr — das Scrollen liegt in `#app`, die Komponente brächte
- * hier nur einen zweiten Scrollbereich mit.
+ * Die Reiter lagen vorher als Seitenleiste links daneben. Als Zeile über dem
+ * Inhalt bekommt dieser die volle Breite, und die Einstellungen lesen sich wie
+ * die Kundendetailseite, die dieselbe Aufteilung benutzt.
  */
 export function SettingsLayoutComponent() {
     const { t } = useTranslation();
@@ -27,13 +28,9 @@ export function SettingsLayoutComponent() {
                 />
             </div>
 
-            <div className="flex flex-col md:flex-row">
-                <SettingsSidebar />
+            <SettingsTabs />
 
-                <div className="flex-1 min-w-0 p-6">
-                    <Outlet />
-                </div>
-            </div>
+            <Outlet />
         </div>
     );
 }

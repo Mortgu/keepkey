@@ -5,17 +5,22 @@ import { tv } from "tailwind-variants";
 import { FileText, ShieldCheck, UserCircle } from "lucide-react";
 import type { LinkComponent } from "@tanstack/react-router";
 
-const ICON_SIZE = 16;
+const ICON_SIZE = 15;
 
-const itemStyles = tv({
+/**
+ * Die Unterstrich-Optik der `Tabs`-Komponente, hier aber auf Links statt auf
+ * Knöpfen: die Unterseiten der Einstellungen sind eigene Routen, und als
+ * `<a href>` bleiben Mittelklick und „in neuem Tab öffnen" erhalten.
+ */
+const tabStyles = tv({
     base: [
-        "flex items-center gap-2.5 rounded-md text-sm font-normal text-(--fg-1)",
-        "px-3 py-2 transition-colors hover:bg-(--subtle-50)",
-        "cursor-pointer whitespace-nowrap",
+        "flex items-center gap-[7px] px-1 py-2.5 whitespace-nowrap",
+        "font-sans text-[13.5px] font-medium cursor-pointer border-b-2 border-transparent",
+        "text-(--fg-3) hover:text-(--text-600) transition-colors duration-[140ms]",
     ],
     variants: {
         isActive: {
-            true: "bg-(--primary-100) text-(--primary) font-medium hover:bg-(--primary-100)",
+            true: "text-(--primary-600) hover:text-(--text) border-(--primary-600)",
             false: "",
         },
     },
@@ -38,16 +43,16 @@ const SettingsLinkComponent = React.forwardRef<HTMLAnchorElement, SettingsLinkPr
 
 const CreatedSettingsLink = createLink(SettingsLinkComponent);
 
-type SettingsSidebarLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
+type SettingsTabLinkProps = React.AnchorHTMLAttributes<HTMLAnchorElement> & {
     to: string;
 };
 
-const SettingsSidebarLink = ((props: SettingsSidebarLinkProps) => (
+const SettingsTabLink = ((props: SettingsTabLinkProps) => (
     <CreatedSettingsLink
         activeOptions={{ exact: true }}
         {...props}
         activeProps={{
-            className: itemStyles({ isActive: true }),
+            className: tabStyles({ isActive: true }),
         }}
     />
 )) as LinkComponent<typeof SettingsLinkComponent>;
@@ -60,37 +65,20 @@ const navItems = [
     { to: "/settings/templates", labelKey: "settings.templates", icon: <FileText size={ICON_SIZE} /> },
 ];
 
-export function SettingsSidebar() {
+export function SettingsTabs() {
     const { t } = useTranslation();
 
     return (
-        <div className="p-3  border-r border-(--border)">
-
-            {/* Desktop sidebar */}
-            <aside className="w-64 hidden md:flex flex-col gap-1 shrink-0">
-                {navItems.map((item) => (
-                    <SettingsSidebarLink
-                        key={item.to}
-                        to={item.to}
-                        label={t(item.labelKey)}
-                        icon={item.icon}
-                        className={itemStyles()}
-                    />
-                ))}
-            </aside>
-
-            {/* Mobile tab bar */}
-            <nav className="md:hidden flex gap-1 overflow-x-auto border-b border-(--border) pb-2 mb-2">
-                {navItems.map((item) => (
-                    <SettingsSidebarLink
-                        key={item.to}
-                        to={item.to}
-                        label={t(item.labelKey)}
-                        icon={item.icon}
-                        className={itemStyles()}
-                    />
-                ))}
-            </nav>
-        </div>
+        <nav role="tablist" className="flex gap-4 overflow-x-auto border-b border-(--border)">
+            {navItems.map((item) => (
+                <SettingsTabLink
+                    key={item.to}
+                    to={item.to}
+                    label={t(item.labelKey)}
+                    icon={item.icon}
+                    className={tabStyles()}
+                />
+            ))}
+        </nav>
     );
 }

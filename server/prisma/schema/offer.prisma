@@ -16,7 +16,7 @@ model Offer {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
 
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
   contactPersonId       String
 
   user   User   @relation(fields: [userId], references: [id])
@@ -67,6 +67,12 @@ model Offer {
   updatedAt      DateTime        @updatedAt @db.Timestamptz(6)
   offerDiscounts OfferDiscount[]
 
+  @@index([customerId])
+  @@index([contactPersonId])
+  @@index([userId])
+  @@index([contractId])
+  @@index([supplierId])
+  @@index([renewedFromOfferId])
   @@map("offer")
 }
 
@@ -86,6 +92,7 @@ model OfferRevision {
   createdAt DateTime @default(now())
 
   @@unique([offerId, version])
+  @@index([changedById])
   @@map("offer_revision")
 }
 
@@ -115,6 +122,9 @@ model OfferPosition {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([offerId])
+  @@index([productId])
+  @@index([tariffVersionId])
   @@map("offer_position")
 }
 
@@ -130,6 +140,8 @@ model OfferFlatRate {
   quantity    Int
   total_cents Int
 
+  @@index([offerId])
+  @@index([flatRateId])
   @@map("offer_flat_rate")
 }
 
@@ -165,7 +177,7 @@ model OfferDocument {
 model OfferDiscount {
   id String @id @default(cuid())
 
-  offer   Offer  @relation(fields: [offerId], references: [id])
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
   title       String
@@ -176,5 +188,6 @@ model OfferDiscount {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([offerId])
   @@map("offer_discount")
 }
