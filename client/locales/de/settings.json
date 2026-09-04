@@ -2,6 +2,38 @@
   "settings": {
     "account": "Konto",
     "security": "Sicherheit",
-    "templates": "Vorlagen"
+    "templates": "Vorlagen",
+    "templatePage": {
+      "kind": {
+        "OFFER": "Angebotsvorlagen",
+        "ORDER": "Bestellvorlagen"
+      },
+      "language": {
+        "DE": "Deutsch",
+        "EN": "Englisch"
+      },
+      "activeSlot": "Aktive Vorlage",
+      "active": "Aktiv",
+      "setActive": "Aktivieren",
+      "noActive": "Keine Vorlage gesetzt — es wird die mitgelieferte Datei verwendet.",
+      "library": "Weitere Vorlagen",
+      "empty": "Noch keine Vorlage hochgeladen.",
+      "upload": "Hochladen",
+      "edit": "Bearbeiten",
+      "download": "Herunterladen",
+      "rename": "Umbenennen",
+      "delete": "Löschen",
+      "deleteTitle": "Vorlage löschen",
+      "deleteConfirm": "Möchten Sie die Vorlage „{{name}}“ wirklich löschen?",
+      "toast": {
+        "uploaded": "Vorlage hochgeladen.",
+        "activated": "Vorlage aktiviert.",
+        "renamed": "Vorlage umbenannt.",
+        "deleted": "Vorlage gelöscht.",
+        "saved": "Vorlage gespeichert.",
+        "notDocx": "Nur .docx-Dateien sind erlaubt.",
+        "loadFailed": "Die Vorlage konnte nicht geladen werden."
+      }
+    }
   }
 }

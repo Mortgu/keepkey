@@ -46,5 +46,8 @@
     "months": "Monate",
     "increment": "Wert erhöhen",
     "decrement": "Wert verringern"
+  },
+  "docxEditor": {
+    "noBuffer": "Der Editor konnte die Datei nicht lesen."
   }
 }

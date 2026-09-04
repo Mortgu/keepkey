@@ -1,12 +1,12 @@
 import '@docx-editor.dev/core/styles/editor.css';
 
 import { loadDefaultFonts } from '@docx-editor.dev/fonts';
-import { DocxEditor,   composeFontConfiguration, useFonts } from '@docx-editor.dev/react';
+import { DocxEditor, composeFontConfiguration } from '@docx-editor.dev/react';
 import { useRef } from 'react';
-import { toast } from 'react-toastify';
-import { googleFonts } from '@docx-editor.dev/fonts/google';
-import type {DocxEditorRef, FontResolver} from '@docx-editor.dev/react';
-import { Button } from '@/components';
+import { useTranslation } from 'react-i18next';
+import type { DocxEditorRef, FontResolver } from '@docx-editor.dev/react';
+import { Button } from './button';
+import { showToast } from './toast';
 
 interface Props {
     document?: Uint8Array;
@@ -15,9 +15,19 @@ interface Props {
     onClose: () => void;
 }
 
+/**
+ * DOCX-Editor für alles, was als .docx-Datei vorliegt.
+ *
+ * Bewusst ohne eigenen Begriff davon, was da bearbeitet wird: er bekommt
+ * Bytes und gibt eine Datei zurück. So bearbeitet dieselbe Komponente sowohl
+ * erzeugte Dokumente als auch die Vorlagen, aus denen sie entstehen.
+ *
+ * Auch die Darstellung bleibt beim Aufrufer — er entscheidet, ob der Editor
+ * bildschirmfüllend liegt oder in einem Dialog.
+ */
 export default function DocumentDocxEditor({ document, displayName = "unnamed.docx", onSave, onClose }: Props) {
+    const { t } = useTranslation();
     const editorRef = useRef<DocxEditorRef>(null);
-    const fonts = useFonts(googleFonts());
 
     const fontResolver: FontResolver = async (request) => {
         const defaults = await loadDefaultFonts();
@@ -43,14 +53,13 @@ export default function DocumentDocxEditor({ document, displayName = "unnamed.do
         const buffer = await editorRef.current?.save();
 
         if (!buffer) {
-            toast.error("DocumentDocxEditor: File-Buffer existiert nicht!");
+            showToast.error("docxEditor.noBuffer");
             return;
         }
 
         const file = new File([buffer], displayName, {
             type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         });
-
 
         onSave(file);
     }
@@ -64,8 +73,8 @@ export default function DocumentDocxEditor({ document, displayName = "unnamed.do
             onSave={handleSave}
             renderTitleBarRight={() => (
                 <>
-                    <Button variant="border" size="xs" onClick={onClose}>Abbrechen</Button>
-                    <Button variant="primary" size="xs" onClick={handleSave}>Speichern</Button>
+                    <Button variant="border" size="xs" onClick={onClose}>{t("button.cancel")}</Button>
+                    <Button variant="primary" size="xs" onClick={handleSave}>{t("button.save")}</Button>
                 </>
             )}
         />

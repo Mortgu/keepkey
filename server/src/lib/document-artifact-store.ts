@@ -203,6 +203,24 @@ export async function storeDocumentArtifacts(
     return { pdf, docx };
 }
 
+/**
+ * Legt ein einzelnes Objekt ab und meldet zurück, was davon in der Datenbank
+ * landet.
+ *
+ * {@link storeDocumentArtifacts} taugt dafür nicht: es schreibt immer das Paar
+ * aus DOCX und PDF unter einem gemeinsamen Präfix und räumt beide zusammen
+ * wieder ab. Eine Vorlage ist eine einzelne Datei ohne Partner.
+ */
+export async function storeObject(
+    objectKey: string,
+    content: Buffer,
+    contentType: string,
+): Promise<StoredDocumentArtifact> {
+    const stored = artifact(objectKey, content);
+    await putArtifact(stored, content, contentType);
+    return stored;
+}
+
 export async function removeDocumentArtifacts(files: StoredDocumentArtifacts): Promise<void> {
     await settleOperations([
         deleteArtifact(files.docx.objectKey),

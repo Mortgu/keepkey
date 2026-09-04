@@ -1,9 +1,9 @@
 import Docxtemplater from "docxtemplater";
 import InspectModule from "docxtemplater/js/inspect-module.js";
-import fs from "fs/promises";
 import PizZip from "pizzip";
 
 import { prisma } from "@/lib/prismaClient.js";
+import { loadTemplateForRendering } from "@/services/document-template.service.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import logger from "@/utils/logger.js";
@@ -16,7 +16,7 @@ import { netCents } from "@keepit/schemas";
 import { PipelineStageError } from "../pipeline.js";
 import { OfferFetchData, OfferPipelineContext } from "./context.js";
 import { livePrice, storedPrice, toTemplateItem } from "./format/position-item.js";
-import { customParser, deepIterate, resolveTemplateName } from "./utils.js";
+import { customParser, deepIterate } from "./utils.js";
 
 /* Helper function */
 export const fetchOfferData = async (offerId: string) => {
@@ -344,10 +344,7 @@ export async function generateAction(context: OfferPipelineContext) {
     // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
     const iModule = InspectModule();
 
-    const content = await fs.readFile(
-        resolveTemplateName("offer", context.fetchedData!.offer.language),
-        "binary"
-    );
+    const content = await loadTemplateForRendering("OFFER", context.fetchedData!.offer.language);
 
     const zip = new PizZip(content);
 

@@ -1,16 +1,24 @@
 import { useTranslation } from "react-i18next";
-import SupplierList from "./-components/supplier-list";
 import SupplierModal from "./-components/supplier-modal";
 import useSupplierFilters from "./-hooks/use-supplier-filters";
 import type { Supplier } from "@keepit/schemas";
-import { Breadcrumbs, Button, SearchBar, SortDropdown } from "@/components";
-import { useModal } from "@/hooks";
+import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/components";
+import { useModal, useSuppliers } from "@/hooks";
+import SupplierListItem from "./-components/supplier-list-item";
+import { LoaderCircle } from "lucide-react";
+import { error } from "better-auth/api";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
     const modal = useModal<Supplier>();
 
     const filters = useSupplierFilters();
+
+    const {
+        suppliers,
+        isPending: pendingSuppliers,
+        error: errorSuppliers
+    } = useSuppliers();
 
     return (
         <div className="grid gap-4 mx-4">
@@ -34,10 +42,25 @@ export default function SupplierPage() {
                 </Button>
             </div>
 
-            <SupplierList
-                filters={filters}
-                onEdit={(supplier) => modal.open(supplier)}
-            />
+            <div className="grid gap-4">
+                {errorSuppliers && (
+                    <RouteError error={error} />
+                )}
+
+                {pendingSuppliers && (
+                    <div className="py-8 flex items-center justify-center">
+                        <LoaderCircle className="animate-spin" />
+                    </div>
+                )}
+
+                {suppliers.map(supplier => (
+                    <SupplierListItem
+                        key={supplier.id}
+                        supplier={supplier}
+                        onEdit={(supplier) => modal.open(supplier)}
+                    />
+                ))}
+            </div>
 
             {modal.isOpen && (
                 <SupplierModal

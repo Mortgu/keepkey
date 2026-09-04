@@ -16,11 +16,3 @@ export const taskQueue = new Queue<TaskJobData>(taskQueueKey, {
         removeOnFail: { count: 500 }
     }
 });
-
-export const templateSyncQueue = new Queue('template-sync', {
-    connection,
-    defaultJobOptions: {
-        attempts: 5,
-        backoff: { type: 'exponential', delay: 5000 },
-    },
-})

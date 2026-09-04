@@ -1,46 +1,101 @@
-import { useEffect, useRef, useState } from "react";
-import { toast } from "react-toastify";
-import { Download, Plus, RotateCcw, Trash } from "lucide-react";
-
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { CloudFile } from "@keepit/schemas";
-import { Badge, Button, Dialog } from "@/components";
-import { useDeleteTemplate, useGetTemplates, useNextcloudStatus, useUploadTemplate } from "@/hooks/nextcloud/nextcloud-hooks";
-import { templateDownloadUrl } from "@/hooks/nextcloud/nextcloud-api";
+import { Check, Download, Pencil, Plus, Trash, Type } from "lucide-react";
+import {
+    DOCUMENT_TEMPLATE_KINDS,
+    groupTemplatesBySlot,
+    type DocumentTemplate,
+    type DocumentTemplateKind,
+    type DocumentTemplateSlot,
+} from "@keepit/schemas";
+import SettingsCard from "./settings-card";
+import {
+    Button,
+    DocumentDocxEditor,
+    DocumentRenameModal,
+    Dialog,
+    ListSkeleton,
+    RouteError,
+    Skeleton,
+    showToast,
+} from "@/components";
+import {
+    getTemplateContent,
+    templateDownloadUrl,
+    useTemplateMutations,
+    useTemplates,
+} from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
+import { formatDate } from "@/lib/format";
+
+/** Welcher Slot gerade eine Datei erwartet — der Upload-Dialog kennt keinen eigenen. */
+type PendingUpload = { kind: DocumentTemplateKind; language: DocumentTemplateSlot["language"] };
 
 export default function TemplateList() {
     const { t } = useTranslation();
+
+    const { data: templates, isPending, error } = useTemplates();
+    const mutations = useTemplateMutations();
+
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [templateToDelete, setTemplateToDelete] = useState<CloudFile | null>(null);
+    const pendingUpload = useRef<PendingUpload | null>(null);
 
-    const { connected, isPending: isStatusPending } = useNextcloudStatus();
-    const { data: templates, isFetching, refetch, error } = useGetTemplates({ enabled: connected });
-    const { uploadTemplate, isUploadingTemplate } = useUploadTemplate();
-    const { deleteTemplate, isDeletingTemplate } = useDeleteTemplate();
+    const [templateToDelete, setTemplateToDelete] = useState<DocumentTemplate | null>(null);
+    const [templateToRename, setTemplateToRename] = useState<DocumentTemplate | null>(null);
+    const [editing, setEditing] = useState<{ template: DocumentTemplate; bytes: Uint8Array } | null>(null);
 
-    useEffect(() => {
-        if (error) {
-            toast.error(error.message);
-        }
-    }, [error]);
+    if (error) return <RouteError error={error} />;
+
+    if (isPending) {
+        return (
+            <div className="grid gap-4">
+                <ListSkeleton rows={2} skeleton={<Skeleton className="h-40" />} />
+            </div>
+        );
+    }
+
+    const slots = groupTemplatesBySlot(templates ?? []);
+
+    const openUpload = (kind: DocumentTemplateKind, language: DocumentTemplateSlot["language"]) => {
+        pendingUpload.current = { kind, language };
+        fileInputRef.current?.click();
+    };
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        event.target.value = "";
+        const target = pendingUpload.current;
 
-        if (!file) return;
+        // Zuruecksetzen, damit dieselbe Datei erneut gewaehlt werden kann.
+        event.target.value = "";
+        pendingUpload.current = null;
+
+        if (!file || !target) return;
 
         if (!file.name.toLowerCase().endsWith(".docx")) {
-            toast.error("Nur .docx-Dateien sind erlaubt!");
+            showToast.error("settings.templatePage.toast.notDocx");
             return;
         }
 
         try {
-            await uploadTemplate({ file });
-            toast.success("Vorlage hochgeladen");
-        } catch (exception: unknown) {
-            toast.error(exception instanceof Error ? exception.message : String(exception));
+            await mutations.uploadTemplate({ ...target, file });
+            showToast.success("settings.templatePage.toast.uploaded");
+        } catch {
+            // Der globale onError-Handler zeigt die Server-Meldung bereits an.
+        }
+    };
+
+    const handleActivate = async (template: DocumentTemplate) => {
+        try {
+            await mutations.activateTemplate(template.id);
+            showToast.success("settings.templatePage.toast.activated");
+        } catch { /* siehe oben */ }
+    };
+
+    const handleEdit = async (template: DocumentTemplate) => {
+        try {
+            setEditing({ template, bytes: await getTemplateContent(template.id) });
+        } catch {
+            showToast.error("settings.templatePage.toast.loadFailed");
         }
     };
 
@@ -48,69 +103,149 @@ export default function TemplateList() {
         if (!templateToDelete) return;
 
         try {
-            await deleteTemplate({ basename: templateToDelete.basename });
-            toast.success("Vorlage gelöscht");
-        } catch (exception: unknown) {
-            toast.error(exception instanceof Error ? exception.message : String(exception));
-        } finally {
+            await mutations.deleteTemplate(templateToDelete.id);
+            showToast.success("settings.templatePage.toast.deleted");
+        } catch { /* siehe oben */ } finally {
             setTemplateToDelete(null);
         }
     };
 
-    return (
-        <div className="grid gap-4 overflow-hidden">
-            <div className="flex items-center justify-end gap-2">
-                <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept=".docx"
-                    className="hidden"
-                    onChange={handleFileChange}
-                />
-                <Button size="xs" variant="primary" icon={<Plus className="size-4" />}
-                    disabled={!connected}
-                    loading={isUploadingTemplate}
-                    onClick={() => fileInputRef.current?.click()}>
-                    Hochladen
-                </Button>
-                <Button size="xs" variant="secondary" iconOnly title="Aktualisieren"
-                    icon={<RotateCcw className={`size-3 ${isFetching ? "animate-spin" : ""}`} />}
-                    disabled={!connected}
-                    onClick={() => refetch()} />
+    const renderRow = (template: DocumentTemplate) => (
+        <div
+            key={template.id}
+            className="flex items-center justify-between gap-4 bg-white border border-(--border) py-2.5 px-3 rounded-md"
+        >
+            <div className="grid gap-0.5 min-w-0">
+                <div className="flex items-center gap-2">
+                    <p className="truncate">{template.name}</p>
+                    {template.isActive && (
+                        <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium bg-(--primary-100) text-(--primary-600)">
+                            {t("settings.templatePage.active")}
+                        </span>
+                    )}
+                </div>
+                <p className="text-sm text-(--text-secondary) font-light truncate">
+                    {template.fileName} · {formatBytesToKB(template.size)} · {formatDate(template.updatedAt)}
+                </p>
             </div>
 
-            {!connected && !isStatusPending && (
-                <p className="text-sm text-(--text-secondary)">Nextcloud ist nicht konfiguriert.</p>
-            )}
+            <div className="flex items-center gap-2 shrink-0">
+                {!template.isActive && (
+                    <Button
+                        variant="secondary"
+                        size="xs"
+                        icon={<Check className="size-3.5" />}
+                        loading={mutations.isActivatingTemplate}
+                        onClick={() => handleActivate(template)}
+                    >
+                        {t("settings.templatePage.setActive")}
+                    </Button>
+                )}
+                <Button
+                    variant="secondary"
+                    size="xs"
+                    iconOnly
+                    icon={<Pencil className="size-3.5" />}
+                    title={t("settings.templatePage.edit")}
+                    onClick={() => handleEdit(template)}
+                />
+                <Button
+                    variant="secondary"
+                    size="xs"
+                    iconOnly
+                    icon={<Type className="size-3.5" />}
+                    title={t("settings.templatePage.rename")}
+                    onClick={() => setTemplateToRename(template)}
+                />
+                <a href={templateDownloadUrl(template.id)} download>
+                    <Button
+                        variant="secondary"
+                        size="xs"
+                        iconOnly
+                        icon={<Download className="size-3.5" />}
+                        title={t("settings.templatePage.download")}
+                    />
+                </a>
+                <Button
+                    variant="secondary"
+                    size="xs"
+                    iconOnly
+                    icon={<Trash className="size-3.5" />}
+                    title={t("settings.templatePage.delete")}
+                    onClick={() => setTemplateToDelete(template)}
+                />
+            </div>
+        </div>
+    );
 
-            {connected && templates?.length === 0 && (
-                <p className="text-sm text-(--text-secondary)">Keine Vorlagen vorhanden.</p>
-            )}
+    const renderSlot = (slot: DocumentTemplateSlot) => {
+        const others = slot.templates.filter((template) => !template.isActive);
 
-            {connected && !!templates?.length && (
-                <div className="grid gap-2">
-                    {templates.map(template => (
-                        <div key={template.filename}
-                            className="flex items-center justify-between bg-(--page-bg) border border-(--border) py-3 px-4 rounded-md">
-                            <div className="grid gap-0">
-                                <div className="flex items-center gap-2">
-                                    <p>{template.basename}</p>
-                                    <Badge variant="GENERATED">{formatBytesToKB(template.size)}</Badge>
-                                </div>
-                                <p className="text-sm text-(--text-secondary) font-light">{template.filename}</p>
-                            </div>
-
-                            <div className="flex items-center gap-2">
-                                <a href={templateDownloadUrl(template.basename)} download>
-                                    <Button variant="secondary" size="xs" icon={<Download className="size-3.5" />} iconOnly
-                                        title="Herunterladen" />
-                                </a>
-                                <Button variant="secondary" size="xs" icon={<Trash className="size-3.5" />} iconOnly
-                                    title="Löschen" onClick={() => setTemplateToDelete(template)} />
-                            </div>
-                        </div>
-                    ))}
+        return (
+            <div key={`${slot.kind}-${slot.language}`} className="grid gap-2">
+                <div className="flex items-center justify-between gap-4">
+                    <h2 className="font-medium">
+                        {t(`settings.templatePage.language.${slot.language}`)}
+                    </h2>
+                    <Button
+                        size="xs"
+                        variant="primary"
+                        icon={<Plus className="size-4" />}
+                        loading={mutations.isUploadingTemplate}
+                        onClick={() => openUpload(slot.kind, slot.language)}
+                    >
+                        {t("settings.templatePage.upload")}
+                    </Button>
                 </div>
+
+                {slot.active
+                    ? renderRow(slot.active)
+                    : (
+                        <p className="text-sm text-(--text-secondary)">
+                            {t("settings.templatePage.noActive")}
+                        </p>
+                    )}
+
+                {others.length > 0 && (
+                    <div className="grid gap-2 pl-4 border-l-2 border-(--border)">
+                        <p className="text-sm text-(--text-secondary)">
+                            {t("settings.templatePage.library")}
+                        </p>
+                        {others.map(renderRow)}
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="grid gap-4 overflow-hidden">
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept=".docx"
+                className="hidden"
+                onChange={handleFileChange}
+            />
+
+            {DOCUMENT_TEMPLATE_KINDS.map((kind) => (
+                <SettingsCard key={kind} title={t(`settings.templatePage.kind.${kind}`)}>
+                    <div className="grid gap-6">
+                        {slots.filter((slot) => slot.kind === kind).map(renderSlot)}
+                    </div>
+                </SettingsCard>
+            ))}
+
+            {templateToRename && (
+                <DocumentRenameModal
+                    onClose={() => setTemplateToRename(null)}
+                    isPending={mutations.isRenamingTemplate}
+                    initialValue={templateToRename.name}
+                    onSubmit={async (name) => {
+                        await mutations.renameTemplate({ id: templateToRename.id, name });
+                        showToast.success("settings.templatePage.toast.renamed");
+                    }}
+                />
             )}
 
             {templateToDelete && (
@@ -119,20 +254,35 @@ export default function TemplateList() {
                     size="sm"
                     onOpenChange={(open) => { if (!open) setTemplateToDelete(null); }}
                 >
-                    <Dialog.Header title="Vorlage löschen" />
+                    <Dialog.Header title={t("settings.templatePage.deleteTitle")} />
                     <Dialog.Body>
-                        <p>Möchten Sie die Vorlage „{templateToDelete.basename}" wirklich löschen?</p>
+                        <p>{t("settings.templatePage.deleteConfirm", { name: templateToDelete.name })}</p>
                     </Dialog.Body>
                     <Dialog.Footer>
                         <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
-                        <Button size="sm" danger loading={isDeletingTemplate} onClick={handleDelete}>
+                        <Button size="sm" danger loading={mutations.isDeletingTemplate} onClick={handleDelete}>
                             {t("button.delete")}
                         </Button>
                     </Dialog.Footer>
                 </Dialog>
             )}
 
-
+            {editing && (
+                <div className="fixed inset-0 z-[1000]">
+                    <DocumentDocxEditor
+                        document={editing.bytes}
+                        displayName={editing.template.fileName}
+                        onSave={async (file) => {
+                            try {
+                                await mutations.replaceTemplateContent({ id: editing.template.id, file });
+                                showToast.success("settings.templatePage.toast.saved");
+                                setEditing(null);
+                            } catch { /* Editor offen lassen, damit nichts verloren geht. */ }
+                        }}
+                        onClose={() => setEditing(null)}
+                    />
+                </div>
+            )}
         </div>
-    )
+    );
 }

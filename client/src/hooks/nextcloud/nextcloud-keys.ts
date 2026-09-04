@@ -5,5 +5,4 @@ export const nextcloudKeys = {
     orderFiles: (id: string) => [...nextcloudKeys.all, "order", id] as const,
     cloud: () => ["cloud"] as const,
     directory: (path: string) => [...nextcloudKeys.cloud(), "directory", path] as const,
-    templates: () => [...nextcloudKeys.cloud(), "templates"] as const,
 };

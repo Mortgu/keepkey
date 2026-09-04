@@ -7,10 +7,9 @@ import { useRef, useState } from "react";
 import '@docx-editor.dev/core/styles/editor.css';
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import DocumentDocxEditor from "./docx-editor";
 import type { DocxEditorRef } from "@docx-editor.dev/react";
 import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
-import { Badge, Button, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
 import {
     documentDownloadUrl,
     useDocumentCapabilities,

@@ -24,5 +24,6 @@ export * from './products/product-mutations';
 export * from './suppliers/supplier-hooks';
 export * from './suppliers/supplier-mutations';
 export * from './tariffs/tariff-hooks';
+export * from './templates';
 export * from './users/user-hooks';
 export * from './users/user-mutations';

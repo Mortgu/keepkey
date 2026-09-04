@@ -1,10 +1,9 @@
 import Docxtemplater from "docxtemplater";
-import fs from "fs/promises";
+import type { Language } from "@prisma/client";
 import { convert as libconvert } from "libreoffice-convert";
-import path from "path";
 import PizZip from "pizzip";
-import env from "../../lib/env.js";
 import { prisma } from "../../lib/prismaClient.js";
+import { loadTemplateForRendering } from "../../services/document-template.service.js";
 import { pickTranslation } from "../../utils/i18n.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { customParser, deepIterate } from "../offer/utils.js";
@@ -45,7 +44,10 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     }
 
     const order = fetchedData.order;
-    const lang = "DE"; // Orders carry no language yet — default to German.
+    // Bestellungen tragen selbst keine Sprache. Der Kunde tut es — und er ist
+    // der Empfänger des Dokuments, also entscheidet seine Sprache über Vorlage
+    // und Übersetzungen.
+    const lang = order.customer.language;
     const { customer, customerContactPerson: ccp, employee } = order;
 
     // Resolve the language variant once and flatten it onto each entity so the
@@ -170,8 +172,11 @@ export async function postprocessing(formatedData?: OrderFormattedData): Promise
 }
 
 
-export async function generating(formatedData?: OrderFormattedData): Promise<Buffer> {
-    const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "order.docx"), "binary");
+export async function generating(
+    formatedData: OrderFormattedData | undefined,
+    language: Language,
+): Promise<Buffer> {
+    const content = await loadTemplateForRendering("ORDER", language);
 
     const zip = new PizZip(content);
 

@@ -17,7 +17,6 @@ const styles = tv({
 
 export default function CustomerGeneralTab({ customer }: Props) {
     const css = styles();
-    console.log(customer)
 
     return (
         <div className="border border-(--border) rounded-md">

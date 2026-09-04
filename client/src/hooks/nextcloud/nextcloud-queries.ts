@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { findFilesById, findOfferFilesById, findOrderFilesById, getCloudDirectory, getTemplates } from "./nextcloud-api";
+import { findFilesById, findOfferFilesById, findOrderFilesById, getCloudDirectory } from "./nextcloud-api";
 import { nextcloudKeys } from "./nextcloud-keys";
 import type { CloudFile, FindFilesByIdResult } from "@keepit/schemas";
 
@@ -26,11 +26,6 @@ export const nextcloudQueries = {
         queryKey: nextcloudKeys.directory(path),
         queryFn: () => getCloudDirectory(path),
         enabled: Boolean(path),
-        staleTime: 30_000,
-    }),
-    templates: () => queryOptions<Array<CloudFile>>({
-        queryKey: nextcloudKeys.templates(),
-        queryFn: getTemplates,
         staleTime: 30_000,
     }),
 };

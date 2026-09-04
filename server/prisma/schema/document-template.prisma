@@ -1,0 +1,43 @@
+/// Dokumentvorlage (.docx), aus der die Pipelines Angebote und Bestellungen
+/// rendern.
+///
+/// Die Datei selbst liegt im Objektspeicher — hier steht nur, wozu sie gehört
+/// und welche je Slot (Typ x Sprache) gerade benutzt wird. Vorher lagen
+/// Vorlagen ausschliesslich als Dateien unter `TEMPLATES_DIR` und liessen sich
+/// deshalb weder auswaehlen noch aus der Anwendung heraus bearbeiten.
+enum DocumentTemplateKind {
+  OFFER
+  ORDER
+}
+
+model DocumentTemplate {
+  id String @id @default(cuid())
+
+  kind     DocumentTemplateKind
+  language Language
+
+  /// Frei waehlbarer Anzeigename in der Verwaltung.
+  name String
+  /// Urspruenglicher Dateiname beim Upload — nur informativ.
+  fileName String
+
+  objectKey String @unique
+  size      Int
+  sha256    String
+
+  /// Genau eine aktive Vorlage je (kind, language). Erzwungen wird das nicht
+  /// von Prisma, sondern von einem partiellen Unique-Index, der in der
+  /// Migration von Hand steht — Prisma kennt keine `WHERE`-Klausel an einem
+  /// Index.
+  isActive Boolean @default(false)
+
+  createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)
+  createdById String?
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([kind, language])
+  @@index([createdById])
+  @@map("document_template")
+}
