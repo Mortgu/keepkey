@@ -1,7 +1,10 @@
 model Invoice {
   id String @id @default(cuid())
 
-  invoiceId   String // Rechnungs-Nr.
+  /// Rechnungsnummer. In DE rechtlich eindeutig und lückenlos zu vergeben
+  /// (§ 146a AO / GoBD) — der Unique-Constraint erzwingt die Eindeutigkeit
+  /// auf DB-Ebene.
+  invoiceId   String @unique // Rechnungs-Nr.
   date        DateTime @default(now()) // Datum
   paymentTerm String
   projectId   String // Projekt-Nr.

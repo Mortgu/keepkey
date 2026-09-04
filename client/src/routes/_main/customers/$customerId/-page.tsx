@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
-import CustomerDetailPageHeader from "./-components/header";
 import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
@@ -30,7 +29,7 @@ export default function CustomerDetailPage() {
     if (isPending || !customer) return <div className="mx-4 p-4">Lädt…</div>;
 
     return (
-        <div className="grid gap-4 mx-4">
+        <div className="grid mx-4">
             <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
                 <Breadcrumbs
                     size="sm"
@@ -43,15 +42,13 @@ export default function CustomerDetailPage() {
                 />
             </div>
 
-            <CustomerDetailPageHeader customer={customer} onEdit={(c) => modal.open(c)} />
-
             <div className="w-full h-full flex">
-                <div className="w-full flex-2  border-r border-(--border)">
-                    <div className="h-[42px] px-8 border-b border-(--border)">
+                <div className="w-full flex-2">
+                    <div className="h-[42px] border-b border-(--border)">
                         <Tabs tabs={TABS} value={tab} onChange={setTab} />
                     </div>
 
-                    <div className="gap-4 px-8 py-6">
+                    <div className="gap-4 py-6">
                         {tab === "general" && (
                             <CustomerGeneralTab customer={customer} />
                         )}

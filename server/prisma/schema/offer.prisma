@@ -33,7 +33,9 @@ model Offer {
 
   duration_months Int
 
-  quoteId         String // quoteId / voucherId
+  /// Belegnummer. Eindeutig — bei Rechnungsnummern in DE auch rechtlich
+  /// geboten (Eindeutigkeit); Lückenlosigkeit sichert der Vergabeprozess.
+  quoteId         String @unique // quoteId / voucherId
   /// @openapi.ignore
   documentVersion Int    @default(0)
   paymentTerm     String

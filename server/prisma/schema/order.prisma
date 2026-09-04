@@ -24,7 +24,8 @@ model Order {
 
   duration_months Int
 
-  orderId String // Beleg-Nr.
+  /// Belegnummer — eindeutig, siehe {@link Offer.quoteId}.
+  orderId String @unique // Beleg-Nr.
 
   /// @openapi.ignore
   documentVersion Int    @default(0)
