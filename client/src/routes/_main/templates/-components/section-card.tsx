@@ -6,7 +6,7 @@ type Props = {
     children: ReactNode;
 }
 
-export default function SettingsCard({ title, actions, children }: Props) {
+export default function SectionCard({ title, actions, children }: Props) {
     return (
         <div className="grid gap-4 bg-(--page-bg) border border-(--border) rounded-md overflow-hidden">
             <div className="flex items-center justify-between px-4 py-2 border-b border-(--border) bg-white">

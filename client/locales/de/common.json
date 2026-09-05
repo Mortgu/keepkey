@@ -28,7 +28,8 @@
     "employees": "Angestellte",
     "offers": "Angebote",
     "invoices": "Rechnungen",
-    "orders": "Bestellungen"
+    "orders": "Bestellungen",
+    "templates": "Vorlagen"
   },
   "common": {
     "search": "Suchen",

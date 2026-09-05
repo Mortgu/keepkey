@@ -3,6 +3,7 @@ import {
     ChevronDown,
     DollarSign,
     Euro,
+    File,
     FileText,
     Languages,
     LayoutGrid,
@@ -152,6 +153,11 @@ export function Navigation() {
                         to="/employees"
                         label={t("section.employees")}
                         icon={<UserCircle2 size={ICON_SIZE} />}
+                    />
+                    <NavLink
+                        to="/templates"
+                        label={t("section.templates")}
+                        icon={<File size={ICON_SIZE} />}
                     />
                     <NavLink
                         to="/settings"

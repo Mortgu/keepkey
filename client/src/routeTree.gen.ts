@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as MainRouteRouteImport } from './routes/_main/route'
 import { Route as MainIndexRouteImport } from './routes/_main/index'
-import { Route as MainSettingsRouteRouteImport } from './routes/_main/settings/route'
 import { Route as DevComponentsRouteImport } from './routes/dev/components'
 import { Route as LoginIndexRouteImport } from './routes/login/index'
 import { Route as MainContractsIndexRouteImport } from './routes/_main/contracts/index'
@@ -24,12 +23,10 @@ import { Route as MainOrdersIndexRouteImport } from './routes/_main/orders/index
 import { Route as MainSearchIndexRouteImport } from './routes/_main/search/index'
 import { Route as MainSettingsIndexRouteImport } from './routes/_main/settings/index'
 import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers/index'
+import { Route as MainTemplatesIndexRouteImport } from './routes/_main/templates/index'
 import { Route as MainTestIndexRouteImport } from './routes/_main/test/index'
 import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
 import { Route as MainCustomersCustomerIdIndexRouteImport } from './routes/_main/customers/$customerId/index'
-import { Route as MainSettingsAccountIndexRouteImport } from './routes/_main/settings/account/index'
-import { Route as MainSettingsSecurityIndexRouteImport } from './routes/_main/settings/security/index'
-import { Route as MainSettingsTemplatesIndexRouteImport } from './routes/_main/settings/templates/index'
 import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
@@ -39,11 +36,6 @@ const MainRouteRoute = MainRouteRouteImport.update({
 const MainIndexRoute = MainIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
-const MainSettingsRouteRoute = MainSettingsRouteRouteImport.update({
-  id: '/settings',
-  path: '/settings',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const DevComponentsRoute = DevComponentsRouteImport.update({
@@ -97,13 +89,18 @@ const MainSearchIndexRoute = MainSearchIndexRouteImport.update({
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainSettingsIndexRoute = MainSettingsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => MainSettingsRouteRoute,
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => MainRouteRoute,
 } as any)
 const MainSuppliersIndexRoute = MainSuppliersIndexRouteImport.update({
   id: '/suppliers/',
   path: '/suppliers/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
+const MainTemplatesIndexRoute = MainTemplatesIndexRouteImport.update({
+  id: '/templates/',
+  path: '/templates/',
   getParentRoute: () => MainRouteRoute,
 } as any)
 const MainTestIndexRoute = MainTestIndexRouteImport.update({
@@ -122,24 +119,6 @@ const MainCustomersCustomerIdIndexRoute =
     path: '/customers/$customerId/',
     getParentRoute: () => MainRouteRoute,
   } as any)
-const MainSettingsAccountIndexRoute =
-  MainSettingsAccountIndexRouteImport.update({
-    id: '/account/',
-    path: '/account/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
-const MainSettingsSecurityIndexRoute =
-  MainSettingsSecurityIndexRouteImport.update({
-    id: '/security/',
-    path: '/security/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
-const MainSettingsTemplatesIndexRoute =
-  MainSettingsTemplatesIndexRouteImport.update({
-    id: '/templates/',
-    path: '/templates/',
-    getParentRoute: () => MainSettingsRouteRoute,
-  } as any)
 const MainWorkloadsPricingIndexRoute =
   MainWorkloadsPricingIndexRouteImport.update({
     id: '/workloads/pricing/',
@@ -149,7 +128,6 @@ const MainWorkloadsPricingIndexRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof MainIndexRoute
-  '/settings': typeof MainSettingsRouteRouteWithChildren
   '/dev/components': typeof DevComponentsRoute
   '/login/': typeof LoginIndexRoute
   '/contracts/': typeof MainContractsIndexRoute
@@ -162,12 +140,10 @@ export interface FileRoutesByFullPath {
   '/search/': typeof MainSearchIndexRoute
   '/settings/': typeof MainSettingsIndexRoute
   '/suppliers/': typeof MainSuppliersIndexRoute
+  '/templates/': typeof MainTemplatesIndexRoute
   '/test/': typeof MainTestIndexRoute
   '/workloads/': typeof MainWorkloadsIndexRoute
   '/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/settings/account/': typeof MainSettingsAccountIndexRoute
-  '/settings/security/': typeof MainSettingsSecurityIndexRoute
-  '/settings/templates/': typeof MainSettingsTemplatesIndexRoute
   '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -184,18 +160,15 @@ export interface FileRoutesByTo {
   '/search': typeof MainSearchIndexRoute
   '/settings': typeof MainSettingsIndexRoute
   '/suppliers': typeof MainSuppliersIndexRoute
+  '/templates': typeof MainTemplatesIndexRoute
   '/test': typeof MainTestIndexRoute
   '/workloads': typeof MainWorkloadsIndexRoute
   '/customers/$customerId': typeof MainCustomersCustomerIdIndexRoute
-  '/settings/account': typeof MainSettingsAccountIndexRoute
-  '/settings/security': typeof MainSettingsSecurityIndexRoute
-  '/settings/templates': typeof MainSettingsTemplatesIndexRoute
   '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_main': typeof MainRouteRouteWithChildren
-  '/_main/settings': typeof MainSettingsRouteRouteWithChildren
   '/dev/components': typeof DevComponentsRoute
   '/_main/': typeof MainIndexRoute
   '/login/': typeof LoginIndexRoute
@@ -209,19 +182,16 @@ export interface FileRoutesById {
   '/_main/search/': typeof MainSearchIndexRoute
   '/_main/settings/': typeof MainSettingsIndexRoute
   '/_main/suppliers/': typeof MainSuppliersIndexRoute
+  '/_main/templates/': typeof MainTemplatesIndexRoute
   '/_main/test/': typeof MainTestIndexRoute
   '/_main/workloads/': typeof MainWorkloadsIndexRoute
   '/_main/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/_main/settings/account/': typeof MainSettingsAccountIndexRoute
-  '/_main/settings/security/': typeof MainSettingsSecurityIndexRoute
-  '/_main/settings/templates/': typeof MainSettingsTemplatesIndexRoute
   '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/settings'
     | '/dev/components'
     | '/login/'
     | '/contracts/'
@@ -234,12 +204,10 @@ export interface FileRouteTypes {
     | '/search/'
     | '/settings/'
     | '/suppliers/'
+    | '/templates/'
     | '/test/'
     | '/workloads/'
     | '/customers/$customerId/'
-    | '/settings/account/'
-    | '/settings/security/'
-    | '/settings/templates/'
     | '/workloads/pricing/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -256,17 +224,14 @@ export interface FileRouteTypes {
     | '/search'
     | '/settings'
     | '/suppliers'
+    | '/templates'
     | '/test'
     | '/workloads'
     | '/customers/$customerId'
-    | '/settings/account'
-    | '/settings/security'
-    | '/settings/templates'
     | '/workloads/pricing'
   id:
     | '__root__'
     | '/_main'
-    | '/_main/settings'
     | '/dev/components'
     | '/_main/'
     | '/login/'
@@ -280,12 +245,10 @@ export interface FileRouteTypes {
     | '/_main/search/'
     | '/_main/settings/'
     | '/_main/suppliers/'
+    | '/_main/templates/'
     | '/_main/test/'
     | '/_main/workloads/'
     | '/_main/customers/$customerId/'
-    | '/_main/settings/account/'
-    | '/_main/settings/security/'
-    | '/_main/settings/templates/'
     | '/_main/workloads/pricing/'
   fileRoutesById: FileRoutesById
 }
@@ -309,13 +272,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof MainIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
-    '/_main/settings': {
-      id: '/_main/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof MainSettingsRouteRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/dev/components': {
@@ -390,16 +346,23 @@ declare module '@tanstack/react-router' {
     }
     '/_main/settings/': {
       id: '/_main/settings/'
-      path: '/'
+      path: '/settings'
       fullPath: '/settings/'
       preLoaderRoute: typeof MainSettingsIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
+      parentRoute: typeof MainRouteRoute
     }
     '/_main/suppliers/': {
       id: '/_main/suppliers/'
       path: '/suppliers'
       fullPath: '/suppliers/'
       preLoaderRoute: typeof MainSuppliersIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
+    '/_main/templates/': {
+      id: '/_main/templates/'
+      path: '/templates'
+      fullPath: '/templates/'
+      preLoaderRoute: typeof MainTemplatesIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
     '/_main/test/': {
@@ -423,27 +386,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCustomersCustomerIdIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/settings/account/': {
-      id: '/_main/settings/account/'
-      path: '/account'
-      fullPath: '/settings/account/'
-      preLoaderRoute: typeof MainSettingsAccountIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/settings/security/': {
-      id: '/_main/settings/security/'
-      path: '/security'
-      fullPath: '/settings/security/'
-      preLoaderRoute: typeof MainSettingsSecurityIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
-    '/_main/settings/templates/': {
-      id: '/_main/settings/templates/'
-      path: '/templates'
-      fullPath: '/settings/templates/'
-      preLoaderRoute: typeof MainSettingsTemplatesIndexRouteImport
-      parentRoute: typeof MainSettingsRouteRoute
-    }
     '/_main/workloads/pricing/': {
       id: '/_main/workloads/pricing/'
       path: '/workloads/pricing'
@@ -454,25 +396,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MainSettingsRouteRouteChildren {
-  MainSettingsIndexRoute: typeof MainSettingsIndexRoute
-  MainSettingsAccountIndexRoute: typeof MainSettingsAccountIndexRoute
-  MainSettingsSecurityIndexRoute: typeof MainSettingsSecurityIndexRoute
-  MainSettingsTemplatesIndexRoute: typeof MainSettingsTemplatesIndexRoute
-}
-
-const MainSettingsRouteRouteChildren: MainSettingsRouteRouteChildren = {
-  MainSettingsIndexRoute: MainSettingsIndexRoute,
-  MainSettingsAccountIndexRoute: MainSettingsAccountIndexRoute,
-  MainSettingsSecurityIndexRoute: MainSettingsSecurityIndexRoute,
-  MainSettingsTemplatesIndexRoute: MainSettingsTemplatesIndexRoute,
-}
-
-const MainSettingsRouteRouteWithChildren =
-  MainSettingsRouteRoute._addFileChildren(MainSettingsRouteRouteChildren)
-
 interface MainRouteRouteChildren {
-  MainSettingsRouteRoute: typeof MainSettingsRouteRouteWithChildren
   MainIndexRoute: typeof MainIndexRoute
   MainContractsIndexRoute: typeof MainContractsIndexRoute
   MainCustomersIndexRoute: typeof MainCustomersIndexRoute
@@ -482,7 +406,9 @@ interface MainRouteRouteChildren {
   MainOffersIndexRoute: typeof MainOffersIndexRoute
   MainOrdersIndexRoute: typeof MainOrdersIndexRoute
   MainSearchIndexRoute: typeof MainSearchIndexRoute
+  MainSettingsIndexRoute: typeof MainSettingsIndexRoute
   MainSuppliersIndexRoute: typeof MainSuppliersIndexRoute
+  MainTemplatesIndexRoute: typeof MainTemplatesIndexRoute
   MainTestIndexRoute: typeof MainTestIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
   MainCustomersCustomerIdIndexRoute: typeof MainCustomersCustomerIdIndexRoute
@@ -490,7 +416,6 @@ interface MainRouteRouteChildren {
 }
 
 const MainRouteRouteChildren: MainRouteRouteChildren = {
-  MainSettingsRouteRoute: MainSettingsRouteRouteWithChildren,
   MainIndexRoute: MainIndexRoute,
   MainContractsIndexRoute: MainContractsIndexRoute,
   MainCustomersIndexRoute: MainCustomersIndexRoute,
@@ -500,7 +425,9 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainOffersIndexRoute: MainOffersIndexRoute,
   MainOrdersIndexRoute: MainOrdersIndexRoute,
   MainSearchIndexRoute: MainSearchIndexRoute,
+  MainSettingsIndexRoute: MainSettingsIndexRoute,
   MainSuppliersIndexRoute: MainSuppliersIndexRoute,
+  MainTemplatesIndexRoute: MainTemplatesIndexRoute,
   MainTestIndexRoute: MainTestIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
   MainCustomersCustomerIdIndexRoute: MainCustomersCustomerIdIndexRoute,

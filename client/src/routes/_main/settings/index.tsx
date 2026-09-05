@@ -1,7 +1,7 @@
-import {createFileRoute, redirect} from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/_main/settings/')({
-    beforeLoad: () => {
-        throw redirect({to: '/settings/account'});
-    },
+import SettingsPage from "./-page";
+
+export const Route = createFileRoute("/_main/settings/")({
+    component: SettingsPage,
 });

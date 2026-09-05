@@ -8,7 +8,7 @@ import {
     type DocumentTemplateKind,
     type DocumentTemplateSlot,
 } from "@keepit/schemas";
-import SettingsCard from "./settings-card";
+import SectionCard from "./section-card";
 import {
     Button,
     DocumentDocxEditor,
@@ -72,13 +72,13 @@ export default function TemplateList() {
         if (!file || !target) return;
 
         if (!file.name.toLowerCase().endsWith(".docx")) {
-            showToast.error("settings.templatePage.toast.notDocx");
+            showToast.error("templates.toast.notDocx");
             return;
         }
 
         try {
             await mutations.uploadTemplate({ ...target, file });
-            showToast.success("settings.templatePage.toast.uploaded");
+            showToast.success("templates.toast.uploaded");
         } catch {
             // Der globale onError-Handler zeigt die Server-Meldung bereits an.
         }
@@ -87,7 +87,7 @@ export default function TemplateList() {
     const handleActivate = async (template: DocumentTemplate) => {
         try {
             await mutations.activateTemplate(template.id);
-            showToast.success("settings.templatePage.toast.activated");
+            showToast.success("templates.toast.activated");
         } catch { /* siehe oben */ }
     };
 
@@ -95,7 +95,7 @@ export default function TemplateList() {
         try {
             setEditing({ template, bytes: await getTemplateContent(template.id) });
         } catch {
-            showToast.error("settings.templatePage.toast.loadFailed");
+            showToast.error("templates.toast.loadFailed");
         }
     };
 
@@ -104,7 +104,7 @@ export default function TemplateList() {
 
         try {
             await mutations.deleteTemplate(templateToDelete.id);
-            showToast.success("settings.templatePage.toast.deleted");
+            showToast.success("templates.toast.deleted");
         } catch { /* siehe oben */ } finally {
             setTemplateToDelete(null);
         }
@@ -120,7 +120,7 @@ export default function TemplateList() {
                     <p className="truncate">{template.name}</p>
                     {template.isActive && (
                         <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-medium bg-(--primary-100) text-(--primary-600)">
-                            {t("settings.templatePage.active")}
+                            {t("templates.active")}
                         </span>
                     )}
                 </div>
@@ -138,7 +138,7 @@ export default function TemplateList() {
                         loading={mutations.isActivatingTemplate}
                         onClick={() => handleActivate(template)}
                     >
-                        {t("settings.templatePage.setActive")}
+                        {t("templates.setActive")}
                     </Button>
                 )}
                 <Button
@@ -146,7 +146,7 @@ export default function TemplateList() {
                     size="xs"
                     iconOnly
                     icon={<Pencil className="size-3.5" />}
-                    title={t("settings.templatePage.edit")}
+                    title={t("templates.edit")}
                     onClick={() => handleEdit(template)}
                 />
                 <Button
@@ -154,7 +154,7 @@ export default function TemplateList() {
                     size="xs"
                     iconOnly
                     icon={<Type className="size-3.5" />}
-                    title={t("settings.templatePage.rename")}
+                    title={t("templates.rename")}
                     onClick={() => setTemplateToRename(template)}
                 />
                 <a href={templateDownloadUrl(template.id)} download>
@@ -163,7 +163,7 @@ export default function TemplateList() {
                         size="xs"
                         iconOnly
                         icon={<Download className="size-3.5" />}
-                        title={t("settings.templatePage.download")}
+                        title={t("templates.download")}
                     />
                 </a>
                 <Button
@@ -171,7 +171,7 @@ export default function TemplateList() {
                     size="xs"
                     iconOnly
                     icon={<Trash className="size-3.5" />}
-                    title={t("settings.templatePage.delete")}
+                    title={t("templates.delete")}
                     onClick={() => setTemplateToDelete(template)}
                 />
             </div>
@@ -185,7 +185,7 @@ export default function TemplateList() {
             <div key={`${slot.kind}-${slot.language}`} className="grid gap-2">
                 <div className="flex items-center justify-between gap-4">
                     <h2 className="font-medium">
-                        {t(`settings.templatePage.language.${slot.language}`)}
+                        {t(`templates.language.${slot.language}`)}
                     </h2>
                     <Button
                         size="xs"
@@ -194,7 +194,7 @@ export default function TemplateList() {
                         loading={mutations.isUploadingTemplate}
                         onClick={() => openUpload(slot.kind, slot.language)}
                     >
-                        {t("settings.templatePage.upload")}
+                        {t("templates.upload")}
                     </Button>
                 </div>
 
@@ -202,14 +202,14 @@ export default function TemplateList() {
                     ? renderRow(slot.active)
                     : (
                         <p className="text-sm text-(--text-secondary)">
-                            {t("settings.templatePage.noActive")}
+                            {t("templates.noActive")}
                         </p>
                     )}
 
                 {others.length > 0 && (
                     <div className="grid gap-2 pl-4 border-l-2 border-(--border)">
                         <p className="text-sm text-(--text-secondary)">
-                            {t("settings.templatePage.library")}
+                            {t("templates.library")}
                         </p>
                         {others.map(renderRow)}
                     </div>
@@ -229,11 +229,11 @@ export default function TemplateList() {
             />
 
             {DOCUMENT_TEMPLATE_KINDS.map((kind) => (
-                <SettingsCard key={kind} title={t(`settings.templatePage.kind.${kind}`)}>
+                <SectionCard key={kind} title={t(`templates.kind.${kind}`)}>
                     <div className="grid gap-6">
                         {slots.filter((slot) => slot.kind === kind).map(renderSlot)}
                     </div>
-                </SettingsCard>
+                </SectionCard>
             ))}
 
             {templateToRename && (
@@ -243,7 +243,7 @@ export default function TemplateList() {
                     initialValue={templateToRename.name}
                     onSubmit={async (name) => {
                         await mutations.renameTemplate({ id: templateToRename.id, name });
-                        showToast.success("settings.templatePage.toast.renamed");
+                        showToast.success("templates.toast.renamed");
                     }}
                 />
             )}
@@ -254,9 +254,9 @@ export default function TemplateList() {
                     size="sm"
                     onOpenChange={(open) => { if (!open) setTemplateToDelete(null); }}
                 >
-                    <Dialog.Header title={t("settings.templatePage.deleteTitle")} />
+                    <Dialog.Header title={t("templates.deleteTitle")} />
                     <Dialog.Body>
-                        <p>{t("settings.templatePage.deleteConfirm", { name: templateToDelete.name })}</p>
+                        <p>{t("templates.deleteConfirm", { name: templateToDelete.name })}</p>
                     </Dialog.Body>
                     <Dialog.Footer>
                         <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
@@ -275,7 +275,7 @@ export default function TemplateList() {
                         onSave={async (file) => {
                             try {
                                 await mutations.replaceTemplateContent({ id: editing.template.id, file });
-                                showToast.success("settings.templatePage.toast.saved");
+                                showToast.success("templates.toast.saved");
                                 setEditing(null);
                             } catch { /* Editor offen lassen, damit nichts verloren geht. */ }
                         }}

@@ -16,6 +16,7 @@ import ordersEN from '../locales/en/orders.json';
 import searchEN from '../locales/en/search.json';
 import settingsEN from '../locales/en/settings.json';
 import suppliersEN from '../locales/en/suppliers.json';
+import templatesEN from '../locales/en/templates.json';
 import versionHistoryEN from '../locales/en/versionHistory.json';
 import workloadsEN from '../locales/en/workloads.json';
 
@@ -33,6 +34,7 @@ import ordersDE from '../locales/de/orders.json';
 import searchDE from '../locales/de/search.json';
 import settingsDE from '../locales/de/settings.json';
 import suppliersDE from '../locales/de/suppliers.json';
+import templatesDE from '../locales/de/templates.json';
 import versionHistoryDE from '../locales/de/versionHistory.json';
 import workloadsDE from '../locales/de/workloads.json';
 
@@ -65,6 +67,7 @@ const en = {
         ...searchEN,
         ...settingsEN,
         ...suppliersEN,
+        ...templatesEN,
         ...versionHistoryEN,
         ...workloadsEN,
 
@@ -87,6 +90,7 @@ const de = {
         ...searchDE,
         ...settingsDE,
         ...suppliersDE,
+        ...templatesDE,
         ...versionHistoryDE,
         ...workloadsDE,
 

@@ -28,7 +28,8 @@
     "employees": "Employees",
     "offers": "Offers",
     "invoices": "Invoices",
-    "orders": "Orders"
+    "orders": "Orders",
+    "templates": "Templates"
   },
   "common": {
     "search": "Search",

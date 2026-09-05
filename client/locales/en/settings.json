@@ -1,39 +1,6 @@
 {
   "settings": {
     "account": "Account",
-    "security": "Security",
-    "templates": "Templates",
-    "templatePage": {
-      "kind": {
-        "OFFER": "Offer templates",
-        "ORDER": "Order templates"
-      },
-      "language": {
-        "DE": "German",
-        "EN": "English"
-      },
-      "activeSlot": "Active template",
-      "active": "Active",
-      "setActive": "Set active",
-      "noActive": "No template set — the bundled file is used.",
-      "library": "Other templates",
-      "empty": "No template uploaded yet.",
-      "upload": "Upload",
-      "edit": "Edit",
-      "download": "Download",
-      "rename": "Rename",
-      "delete": "Delete",
-      "deleteTitle": "Delete template",
-      "deleteConfirm": "Do you really want to delete the template “{{name}}”?",
-      "toast": {
-        "uploaded": "Template uploaded.",
-        "activated": "Template activated.",
-        "renamed": "Template renamed.",
-        "deleted": "Template deleted.",
-        "saved": "Template saved.",
-        "notDocx": "Only .docx files are allowed.",
-        "loadFailed": "The template could not be loaded."
-      }
-    }
+    "security": "Security"
   }
 }
