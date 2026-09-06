@@ -7,16 +7,17 @@ import {
   getFlatRates,
   updateFlatRate,
 } from "@/controllers/index.js";
-import { validate } from "@/middlewares/zod.middleware.js";
+import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
   createFlatrateSchema,
+  flatrateFilterSchema,
   updateFlatrateSchema,
 } from "@keepit/schemas";
 
 const router = Router();
 
 /* [GET] http://localhost:3000/api/flatrates */
-router.get("/", getFlatRates);
+router.get("/", validateQuery(flatrateFilterSchema), getFlatRates);
 
 /* [GET] http://localhost:3000/api/flatrates/:id */
 router.get("/:id", getFlatrate);

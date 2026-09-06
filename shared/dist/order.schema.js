@@ -3,15 +3,14 @@ import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
 import { flatrateSchema } from './flatrate.schema.js';
 import { documentStatusSchema, documentArtifactSchema } from './document.schema.js';
+import { offerSchema } from './offer.schema.js';
 /* OrderPosition */
+/** Vertrag und Laufzeit stehen an der Bestellung, nicht hier — siehe {@link orderSchema}. */
 export const orderPositionSchema = z.object({
     id: z.string(),
     orderId: z.string(),
     productId: z.string(),
-    contractId: z.string(),
     product: productSchema,
-    contract: contractSchema,
-    duration_months: z.number().int(),
     quantity: z.number().int(),
     optional: z.boolean().optional(),
     total_cents: z.number().int(),
@@ -67,6 +66,8 @@ const orderFieldsSchema = z.object({
     customerId: z.string().min(1),
     contactPersonId: z.string().min(1),
     employeeId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration_months: z.number().int().positive(),
     orderId: z.string().min(1),
     paymentTerm: z.string(),
     projectNumber: z.string().nullable(),
@@ -78,8 +79,6 @@ const orderFieldsSchema = z.object({
 });
 const orderPositionInputSchema = z.object({
     productId: z.string().min(1),
-    contractId: z.string().min(1),
-    duration_months: z.number().int().positive(),
     quantity: z.number().int().positive(),
     optional: z.boolean().nullable(),
     total_cents: z.number().int().min(0),
@@ -108,6 +107,9 @@ export const orderSchema = z.object({
     employeeId: z.string(),
     offerId: z.string(),
     orderId: z.string(),
+    contractId: z.string(),
+    contract: contractSchema,
+    duration_months: z.number().int(),
     paymentTerm: z.string(),
     projectNumber: z.string().optional(),
     projectDescription: z.string().optional(),
@@ -127,6 +129,7 @@ export const orderSchema = z.object({
         firstName: z.string(),
         lastName: z.string(),
     }),
+    offer: offerSchema,
     documents: z.array(orderDocumentSchema),
     orderPositions: z.array(orderPositionSchema),
     flatRates: z.array(orderFlatRateSchema),

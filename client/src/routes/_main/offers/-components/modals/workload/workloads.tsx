@@ -8,10 +8,13 @@ import WorkloadItem from "./workload-item";
 import { Button, Checkbox, MultiSelectList } from "@/components";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
+import { useLocale } from "@/hooks";
 
 export default function WorkloadSection() {
     const { t } = useTranslation();
-    const { form, policy, sourceOffer, customerId } = useOfferModalContext();
+    const locale = useLocale();
+
+    const { form, policy, sourceOffer, header } = useOfferModalContext();
 
     const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
     const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
@@ -26,7 +29,7 @@ export default function WorkloadSection() {
         addWorkload,
         updateWorkload,
         deleteWorkload,
-    } = useWorkloadOfferModal({ customerId, form });
+    } = useWorkloadOfferModal({ header, form });
 
     const [showWorkloadForm, setShowWorkloadForm] = useState<boolean>(false);
 
@@ -38,8 +41,6 @@ export default function WorkloadSection() {
 
     return (
         <div className="grid gap-4">
-            <hr className="text-(--border)" />
-
             {/* Head */}
             <div className="flex items-center justify-between">
                 <p>{t("offerModal.workload_section")}</p>
@@ -89,6 +90,7 @@ export default function WorkloadSection() {
             {offerPositions.map((workload, index) => (
                 <WorkloadItem
                     key={workload.sourcePositionId ?? index}
+                    index={index}
                     workload={workload}
                     updateFn={(updatedWl) => updateWorkload(index, updatedWl)}
                     deleteFn={canRemove ? () => deleteWorkload(index) : undefined}

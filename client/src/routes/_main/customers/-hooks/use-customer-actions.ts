@@ -4,13 +4,7 @@ import { useModal } from "@/hooks";
 export function useCustomerActions() {
     const [activeCustomerId, setActiveCustomerId] = useState<string | null>(null);
 
-    const offerModal = useModal();
     const orderModal = useModal();
-
-    const createOffer = (customerId: string) => {
-        setActiveCustomerId(customerId);
-        offerModal.open();
-    };
 
     const createOrder = (customerId: string) => {
         setActiveCustomerId(customerId);
@@ -18,8 +12,8 @@ export function useCustomerActions() {
     };
 
     return {
-        actions: { createOffer, createOrder },
+        actions: { createOrder },
         activeCustomerId,
-        modals: { offerModal, orderModal },
+        modals: { orderModal },
     };
 }

@@ -2,14 +2,21 @@ import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     CreateFlatrateInput,
+    FlatrateFilterParams,
     UpdateFlatrateInput
 } from "@keepit/schemas";
 
 /* ========== Queries ========== */
 
-export async function getFlatRates() {
+export async function getFlatRates(filters: FlatrateFilterParams = {}) {
+    const { search, sort } = filters;
+    const sortDir = sort?.split(":")[1] === "asc" ? "asc" : "desc";
+
     return prisma.flatRate.findMany({
-        orderBy: { id: "asc" },
+        where: search
+            ? { translations: { some: { name: { contains: search, mode: "insensitive" } } } }
+            : undefined,
+        orderBy: { createdAt: sortDir },
         include: { translations: true },
     });
 }

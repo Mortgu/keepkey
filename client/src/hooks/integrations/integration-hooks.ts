@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { getIntegrationStatus } from "./integration-api";
 import { integrationKeys } from "./integration-keys";
-import type { IntegrationStatusResponse } from "@/data/integrations";
+import type { IntegrationStatusResponse } from "@keepit/schemas";
 
 export function useIntegrationStatus() {
     const query = useQuery<IntegrationStatusResponse>({

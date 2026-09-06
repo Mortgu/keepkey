@@ -1,15 +1,16 @@
 import { useStore } from "@tanstack/react-form";
 import {  coordinatesFrom } from "@keepit/schemas";
-import type {CreateOfferPositionInput} from "@keepit/schemas";
+import type { CreateOfferPositionInput, PriceHeader } from "@keepit/schemas";
 import type { OfferModalFormApi } from "./use-offer-modal-form";
 import { usePriceResolver } from "@/hooks";
 
 interface Props {
-    customerId: string;
+    /** Kunde, Vertrag und Laufzeit — der gemeinsame Teil jeder Preiskoordinate. */
+    header: PriceHeader;
     form: OfferModalFormApi;
 }
 
-export default function useWorkloadOfferModal({ customerId, form }: Props) {
+export default function useWorkloadOfferModal({ header, form }: Props) {
     const resolvePrice = usePriceResolver();
 
     const offerPositions = useStore(form.store, (s) => s.values.offerPositions);
@@ -20,7 +21,7 @@ export default function useWorkloadOfferModal({ customerId, form }: Props) {
      * Anzeige der Summen im Modal.
      */
     const priced = async (workload: CreateOfferPositionInput): Promise<CreateOfferPositionInput> => {
-        const price = await resolvePrice(coordinatesFrom(customerId, workload));
+        const price = await resolvePrice(coordinatesFrom(header, workload));
 
         return {
             ...workload,

@@ -24,11 +24,13 @@ export const getTariffVersions = async (request: Request, response: Response) =>
     return response.status(200).json(versions);
 };
 
-export const getTariffDurations = async (request: Request, response: Response) => {
-    const durations = await tariffService.getTariffDurations(
-        request.params.productId as string,
-        request.params.contractId as string
-    );
+export const getStandardTiers = async (request: Request, response: Response) => {
+    const tiers = await tariffService.getStandardTiers();
+    return response.status(200).json(tiers);
+};
+
+export const getStandardDurations = async (request: Request, response: Response) => {
+    const durations = await tariffService.getStandardDurations();
     return response.status(200).json(durations);
 };
 
@@ -48,6 +50,11 @@ export const getTariffPrice = async (request: Request, response: Response) => {
 };
 
 /* ========== POST ========== */
+
+export const createStandardDuration = async (request: Request, response: Response) => {
+    const duration = await tariffService.createStandardDuration(request.body);
+    return response.status(201).json(duration);
+};
 
 export const createTariffGroup = async (request: Request, response: Response) => {
     const group = await tariffService.createTariffGroup(request.body);
@@ -78,16 +85,9 @@ export const restoreTariffVersion = async (request: Request, response: Response)
     return response.status(200).json(tariff);
 };
 
-export const createTariffColumn = async (request: Request, response: Response) => {
-    const tariffId = request.params.tariffId as string;
-    const updated = await tariffService.createTariffColumn(tariffId, request.body);
-    return response.status(201).json(updated);
-};
-
-export const createTariffRow = async (request: Request, response: Response) => {
-    const tariffId = request.params.tariffId as string;
-    const updated = await tariffService.createTariffRow(tariffId, request.body);
-    return response.status(201).json(updated);
+export const createStandardTier = async (request: Request, response: Response) => {
+    const tier = await tariffService.createStandardTier(request.body);
+    return response.status(201).json(tier);
 };
 
 /* ========== UPDATE ========== */
@@ -100,22 +100,20 @@ export const updateTariffGroup = async (request: Request, response: Response) =>
     return response.status(200).json(group);
 };
 
-export const updateTariffColumn = async (request: Request, response: Response) => {
-    const columnId = request.params.columnId as string;
-    const updated = await tariffService.updateTariffColumn(columnId, request.body);
-    return response.status(200).json({ message: 'Column updated successfully!', updated });
-};
-
-export const updateTariffRow = async (request: Request, response: Response) => {
-    const rowId = request.params.rowId as string;
-    const updated = await tariffService.updateTariffRow(rowId, request.body);
-    return response.status(200).json({ message: 'Row updated successfully!', updated });
+export const updateStandardTier = async (request: Request, response: Response) => {
+    const tier = await tariffService.updateStandardTier(request.params.id as string, request.body);
+    return response.status(200).json(tier);
 };
 
 export const updateTariffCell = async (request: Request, response: Response) => {
-    const cellId = request.params.cellId as string;
-    const updated = await tariffService.updateTariffCell(cellId, request.body);
+    const tariffId = request.params.tariffId as string;
+    const updated = await tariffService.updateTariffCell(tariffId, request.body);
     return response.status(200).json({ message: 'Cell updated successfully!', updated });
+};
+
+export const getCustomerPrices = async (request: Request, response: Response) => {
+    const prices = await tariffService.getCustomerPrices(request.query.customerId as string);
+    return response.status(200).json(prices);
 };
 
 export const upsertCustomerPrice = async (request: Request, response: Response) => {
@@ -124,6 +122,11 @@ export const upsertCustomerPrice = async (request: Request, response: Response) 
 };
 
 /* ========== DELETE ========== */
+
+export const deleteStandardDuration = async (request: Request, response: Response) => {
+    await tariffService.deleteStandardDuration(request.params.id as string);
+    return response.status(204).send();
+};
 
 export const deleteTariffGroup = async (request: Request, response: Response) => {
     await tariffService.deleteTariffGroup(request.params.id as string);
@@ -135,14 +138,31 @@ export const deleteTariff = async (request: Request, response: Response) => {
     return response.status(200).json({ success: true, message: "Tariff deleted." });
 };
 
-export const deleteTariffColumn = async (request: Request, response: Response) => {
-    const column = await tariffService.deleteTariffColumn(request.params.columnId as string);
-    return response.status(200).json({ message: 'Column deleted successfully!', column });
+export const deleteStandardTier = async (request: Request, response: Response) => {
+    await tariffService.deleteStandardTier(request.params.id as string);
+    return response.status(204).send();
 };
 
-export const deleteTariffRow = async (request: Request, response: Response) => {
-    const row = await tariffService.deleteTariffRow(request.params.rowId as string);
-    return response.status(200).json({ message: "Successfully deleted row!", row });
+/**
+ * Die Werte werden hier von Hand konvertiert, weil `validateQuery` das Ergebnis
+ * bewusst nicht zurückschreibt — siehe dort. Geprüft sind sie zu diesem
+ * Zeitpunkt bereits.
+ */
+export const deleteTariffCell = async (request: Request, response: Response) => {
+    const tariffId = request.params.tariffId as string;
+    const duration = request.query.duration;
+
+    await tariffService.deleteTariffCell(tariffId, {
+        min_quantity: Number(request.query.min_quantity),
+        duration: duration === undefined ? undefined : Number(duration),
+    });
+
+    return response.status(204).send();
+};
+
+export const deleteCustomerPriceById = async (request: Request, response: Response) => {
+    await tariffService.deleteCustomerPriceById(request.params.id as string);
+    return response.status(204).send();
 };
 
 export const deleteCustomerPrice = async (request: Request, response: Response) => {

@@ -1,11 +1,13 @@
 import { Request, Response } from "express";
+import { flatrateFilterSchema } from "@keepit/schemas";
 
 import * as flatRateService from "../services/flat-rate.service.js";
 
 /* ========== GET ========== */
 
 export const getFlatRates = async (request: Request, response: Response) => {
-    const result = await flatRateService.getFlatRates();
+    const filters = flatrateFilterSchema.parse(request.query);
+    const result = await flatRateService.getFlatRates(filters);
     return response.status(200).json(result);
 };
 

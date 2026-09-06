@@ -8,14 +8,18 @@ import { productSchema } from "./product.schema.js";
 import { flatrateSchema } from "./flatrate.schema.js";
 import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
 /* OfferPosition */
+/**
+ * Vertrag und Laufzeit stehen bewusst **nicht** hier, sondern am Angebot:
+ * fachlich teilen alle Positionen eines Angebots beide Werte. Solange sie je
+ * Position gespeichert wurden, hatte ein Angebot keine eindeutige Laufzeit —
+ * und damit keine bestimmbare Restlaufzeit.
+ */
 export const createOfferPositionSchema = z.object({
     productId: z.string(),
-    contractId: z.string(),
     free_months: z.number().int(),
     optional: z.boolean(),
     quantity: z.number().int(),
     total_cents: z.number().int(),
-    duration_months: z.number().int(),
     // TODO: remove these from the body
     discount_cents: z.number().int(),
     eur_user_month: z.number().int(),
@@ -24,7 +28,6 @@ export const updateOfferPositionSchema = createOfferPositionSchema.partial();
 export const offerPositionSchema = createOfferPositionSchema.extend({
     id: z.string(),
     offerId: z.string(),
-    contract: contractSchema,
     product: productSchema,
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
@@ -81,6 +84,13 @@ export const createOfferSchema = z.object({
     contactPersonId: z.string(),
     userId: z.string(),
     supplierId: z.string().nullable(),
+    /**
+     * Vertrag und Laufzeit gelten für das ganze Angebot. Beide sind wählbar,
+     * *bevor* eine Position existiert — die Laufzeiten sind Standardlaufzeiten
+     * und hängen nicht mehr am Tarif des gewählten Produkts.
+     */
+    contractId: z.string().min(1),
+    duration_months: z.number().int().positive(),
     quoteId: z.string().trim().nonempty("Required!"),
     paymentTerm: z.string().nonempty("Required!"),
     validUntil: z.string().nullable(),
@@ -130,6 +140,9 @@ export const offerSchema = z.object({
     contactPersonId: z.string(),
     userId: z.string(),
     supplierId: z.string().nullable().optional(),
+    contractId: z.string(),
+    contract: contractSchema,
+    duration_months: z.number().int(),
     quoteId: z.string(),
     paymentTerm: z.string(),
     validUntil: z.string().nullable().optional(),

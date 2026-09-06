@@ -1,0 +1,7 @@
+{
+  "employees": {
+    "description": "Zentrale Verwaltung der Angestellten",
+    "searchPlaceholder": "Angestellte durchsuchen…",
+    "create": "Angestellten anlegen"
+  }
+}

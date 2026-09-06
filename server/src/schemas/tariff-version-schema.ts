@@ -20,39 +20,34 @@ export type { TariffVersionSnapshot };
 
 /** Minimale Tarif-Form, die {@link buildTariffVersionSnapshot} benötigt. */
 export interface TariffForSnapshot {
-    columns: Array<{ id: string; duration: number }>;
-    rows: Array<{ id: string; min_quantity: number; max_quantity: number | null }>;
-    cells: Array<{ rowId: string; columnId: string; default_cells: Array<{ price: number }> }>;
+    /** Die Mengenstaffeln der Tarifgruppe — nur sie kennen die Obergrenzen. */
+    tiers: Array<{ min_quantity: number; max_quantity: number | null }>;
+    cells: Array<{ duration: number; min_quantity: number; price: number }>;
 }
 
 /**
  * Normalisiert einen geladenen Tarif zu einem Snapshot: Spalten nach Laufzeit,
  * Zeilen nach Mengenuntergrenze, Zellen nach (Laufzeit, Menge) sortiert. Ohne
- * cuids, ohne Timestamps und ohne Kundenpreise — letztere hängen an
+ * Timestamps und ohne Kundenpreise — letztere hängen an
  * `TariffCustomerPrice` und sind nicht Teil der Version.
+ *
+ * Die Snapshot-Form ist bewusst unverändert geblieben, obwohl das Live-Modell
+ * keine Spalten- und Zeilentabellen mehr hat: der sha256 darüber ist die
+ * Preisgrundlage jeder angepinnten Position und darf sich nicht verschieben.
+ * `columns` sind deshalb die Laufzeiten, die dieser Tarif tatsächlich bepreist
+ * — dieselbe Menge, die vorher als Spalten in der Datenbank stand.
  */
 export function buildTariffVersionSnapshot(tariff: TariffForSnapshot): TariffVersionSnapshot {
-    const durationByColumnId = new Map(tariff.columns.map((column) => [column.id, column.duration]));
-    const minQuantityByRowId = new Map(tariff.rows.map((row) => [row.id, row.min_quantity]));
-
-    const cells = tariff.cells.flatMap((cell) => {
-        const duration = durationByColumnId.get(cell.columnId);
-        const min_quantity = minQuantityByRowId.get(cell.rowId);
-
-        // Verwaiste Zelle (Zeile oder Spalte existiert nicht mehr) — überspringen.
-        if (duration === undefined || min_quantity === undefined) return [];
-
-        return [{ duration, min_quantity, price: cell.default_cells[0]?.price ?? null }];
-    });
+    const durations = [...new Set(tariff.cells.map((cell) => cell.duration))].sort((a, b) => a - b);
 
     return tariffVersionSnapshotSchema.parse({
-        columns: [...tariff.columns]
-            .sort((a, b) => a.duration - b.duration)
-            .map(({ duration }) => ({ duration })),
-        rows: [...tariff.rows]
+        columns: durations.map((duration) => ({ duration })),
+        rows: [...tariff.tiers]
             .sort((a, b) => a.min_quantity - b.min_quantity)
             .map(({ min_quantity, max_quantity }) => ({ min_quantity, max_quantity })),
-        cells: cells.sort((a, b) => a.duration - b.duration || a.min_quantity - b.min_quantity),
+        cells: [...tariff.cells]
+            .sort((a, b) => a.duration - b.duration || a.min_quantity - b.min_quantity)
+            .map(({ duration, min_quantity, price }) => ({ duration, min_quantity, price })),
     });
 }
 
@@ -79,32 +74,26 @@ export function parseTariffVersionSnapshot(value: unknown): TariffVersionSnapsho
 
 /**
  * Hydriert einen Snapshot zu der Form, die {@link import('../utils/products.js').selectPrice}
- * erwartet. Die synthetischen Ids sind aus den Koordinaten abgeleitet und damit
- * innerhalb des Snapshots eindeutig; sie verlassen diese Funktion nie.
+ * erwartet.
  *
- * Zellen ohne Default-Preis bleiben erhalten, aber mit leerem `default_cells` —
- * so bleibt die Unterscheidung zwischen `NO_CELL` und `NO_DEFAULT` erhalten.
+ * Zellen ohne Preis fallen weg. Alte Snapshots konnten sie tragen (`price: null`);
+ * sie liefen dort als `NO_DEFAULT` auf und laufen jetzt als `NO_CELL` — beides
+ * heißt „nicht konfiguriert", der gerechnete Preis ändert sich nicht.
  */
 export function tariffFromSnapshot(
     snapshot: TariffVersionSnapshot,
     customerPrices: TariffForPricing["customerPrices"] = [],
 ): TariffForPricing {
     return {
-        columns: snapshot.columns.map((column) => ({
-            id: `c:${column.duration}`,
-            duration: column.duration,
-        })),
-        rows: snapshot.rows.map((row) => ({
-            id: `r:${row.min_quantity}`,
+        tiers: snapshot.rows.map((row) => ({
             min_quantity: row.min_quantity,
             max_quantity: row.max_quantity,
         })),
-        cells: snapshot.cells.map((cell) => ({
-            id: `cell:${cell.duration}:${cell.min_quantity}`,
-            rowId: `r:${cell.min_quantity}`,
-            columnId: `c:${cell.duration}`,
-            default_cells: cell.price === null ? [] : [{ price: cell.price }],
-        })),
+        cells: snapshot.cells.flatMap((cell) =>
+            cell.price === null
+                ? []
+                : [{ duration: cell.duration, min_quantity: cell.min_quantity, price: cell.price }],
+        ),
         customerPrices,
     };
 }

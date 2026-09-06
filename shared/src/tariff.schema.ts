@@ -3,42 +3,61 @@ import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
 
 
-/* Row */
-export const tariffRowSchema = z.object({
+/**
+ * Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+ * Zusammen mit {@link standardDurationSchema} spannt sie das Raster auf; ein
+ * Tarif trägt nur noch die Preise an diesen Koordinaten.
+ */
+export const standardTierSchema = z.object({
     id: z.string(),
-    tariffId: z.string(),
 
     min_quantity: z.number().int(),
     max_quantity: z.number().int().nullable(),
 
+    /**
+     * Wie viele Preise auf dieser Mengenstufe liegen — über alle Tarife hinweg.
+     *
+     * Rein abgeleitet, nur damit sichtbar ist, was eine Staffel trägt, *bevor*
+     * jemand sie entfernt: die Preise bleiben dann stehen, werden aber von der
+     * dann greifenden Nachbarstaffel überdeckt.
+     */
+    priceCount: z.number().int(),
+
     createdAt: z.string(),
     updatedAt: z.string(),
 });
-export type TariffRow = z.infer<typeof tariffRowSchema>;
+export type StandardTier = z.infer<typeof standardTierSchema>;
 
-/* Column */
-export const tariffColumnSchema = z.object({
+export const standardTierListSchema = z.array(standardTierSchema);
+export type StandardTierList = z.infer<typeof standardTierListSchema>;
+
+/**
+ * Global gepflegte Laufzeit. Sie ist die Spaltenachse *aller* Preistabellen —
+ * nur weil sie nicht am Tarif hängt, steht die Laufzeit eines Angebots fest,
+ * bevor ein Produkt und damit eine Tarifgruppe gewählt ist.
+ */
+export const standardDurationSchema = z.object({
     id: z.string(),
-    tariffId: z.string(),
 
-    duration: z.number().int(),
-
-    createdAt: z.string(),
-    updatedAt: z.string(),
-});
-export type TariffColumn = z.infer<typeof tariffColumnSchema>;
-
-/* TariffCellDefault */
-export const tariffCellDefaultSchema = z.object({
-    id: z.string(),
-    cellId: z.string(),
-
-    price: z.number().int(),
+    /** Laufzeit in Monaten. == TariffCell.duration */
+    months: z.number().int(),
 
     createdAt: z.string(),
     updatedAt: z.string(),
 });
-export type TariffCellDefault = z.infer<typeof tariffCellDefaultSchema>;
+export type StandardDuration = z.infer<typeof standardDurationSchema>;
+
+export const standardDurationListSchema = z.array(standardDurationSchema);
+export type StandardDurationList = z.infer<typeof standardDurationListSchema>;
+
+/**
+ * Dieselbe Schranke wie im Versions-Snapshot: eine Laufzeit 0 ließe jedes
+ * Versiegeln einer Tarif-Version scheitern.
+ */
+export const createStandardDurationSchema = z.object({
+    months: z.int().positive(),
+});
+export type CreateStandardDurationInput = z.infer<typeof createStandardDurationSchema>;
 
 /**
  * TariffCustomerPrice — kundenspezifischer Stückpreis.
@@ -64,15 +83,22 @@ export const tariffCustomerPriceSchema = z.object({
 });
 export type TariffCustomerPrice = z.infer<typeof tariffCustomerPriceSchema>;
 
-/* TariffCell */
+/**
+ * Ein Preis an seiner Koordinate. Dieselbe Schlüsselform wie
+ * {@link tariffCustomerPriceSchema} und wie der Versions-Snapshot — es gibt
+ * keine zweite Darstellung derselben Tabelle mehr.
+ *
+ * Eine Zelle ohne Preis gibt es nicht: „nicht konfiguriert" heißt, dass für
+ * diese Koordinate keine Zeile existiert.
+ */
 export const tariffCellSchema = z.object({
     id: z.string(),
     tariffId: z.string(),
 
-    rowId: z.string(),
-    columnId: z.string(),
+    duration: z.number().int(),
+    min_quantity: z.number().int(),
 
-    default_cells: z.array(tariffCellDefaultSchema),
+    price: z.number().int(),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -108,10 +134,7 @@ const tariffBaseSchema = z.object({
 
     tariffGroupId: z.string(),
 
-    rows: z.array(tariffRowSchema),
-    columns: z.array(tariffColumnSchema),
     cells: z.array(tariffCellSchema),
-    customerPrices: z.array(tariffCustomerPriceSchema).default([]),
 
     createdAt: z.string(),
     updatedAt: z.string(),
@@ -147,35 +170,18 @@ export const createTariffSchema = z.object({
 });
 export type CreateTariffInput = z.infer<typeof createTariffSchema>;
 
-/**
- * Die Laufzeit muss positiv sein — deckungsgleich mit
- * {@link tariffVersionSnapshotSchema}. Ohne diese Schranke ließe sich eine
- * Spalte mit Laufzeit 0 anlegen, an der anschließend jedes Versiegeln einer
- * Version scheitert. Damit wäre die ganze Preistabelle blockiert, inklusive
- * der Angebotserstellung.
- */
-export const createTariffColumnSchema = z.object({
-    duration: z.int().positive(),
+/** Mengenstaffel (create) — gilt global, nicht je Gruppe. */
+export const createStandardTierSchema = z.object({
+    min_quantity: z.int().positive(),
+    max_quantity: z.int().positive().nullable(),
 });
-export type CreateTariffColumnInput = z.infer<typeof createTariffColumnSchema>;
+export type CreateStandardTierInput = z.infer<typeof createStandardTierSchema>;
 
-export const updateTariffColumnSchema = z.object({
-    duration: z.int().positive().optional(),
+export const updateStandardTierSchema = z.object({
+    min_quantity: z.int().positive().optional(),
+    max_quantity: z.int().positive().nullable().optional(),
 });
-export type UpdateTariffColumnInput = z.infer<typeof updateTariffColumnSchema>;
-
-/** TariffRow (create) */
-export const createTariffRowSchema = z.object({
-    min_quantity: z.int(),
-    max_quantity: z.int().nullable(),
-});
-export type CreateTariffRowInput = z.infer<typeof createTariffRowSchema>;
-
-export const updateTariffRowSchema = z.object({
-    min_quantity: z.int().optional(),
-    max_quantity: z.int().nullable().optional(),
-});
-export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
+export type UpdateStandardTierInput = z.infer<typeof updateStandardTierSchema>;
 
 /**
  * TariffCell (update) — setzt den Listenpreis der Zelle.
@@ -185,9 +191,28 @@ export type UpdateTariffRowInput = z.infer<typeof updateTariffRowSchema>;
  * (duration, min_quantity), nicht an einer cellId.
  */
 export const updateTariffCellSchema = z.object({
+    duration: z.int().positive(),
+    min_quantity: z.int().positive(),
     default_price: z.int(),
 });
 export type UpdateTariffCellInput = z.infer<typeof updateTariffCellSchema>;
+
+/**
+ * TariffCell (delete) — entfernt den Preis an einer Koordinate.
+ *
+ * Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. Gebraucht wird
+ * das für verwaiste Zeilen: eine Mengenstufe, die nicht mehr in den
+ * Standard-Staffeln steht, trägt weiterhin Preise, und ohne Gegenstück zum
+ * Upsert gäbe es keinen Weg, sie loszuwerden.
+ *
+ * `coerce` wie bei {@link deleteCustomerPriceSchema} — überträgt wird als
+ * Query-String, dort kommt alles als String an.
+ */
+export const deleteTariffCellSchema = z.object({
+    min_quantity: z.coerce.number().int().positive(),
+    duration: z.coerce.number().int().positive().optional(),
+});
+export type DeleteTariffCellInput = z.infer<typeof deleteTariffCellSchema>;
 
 /** Kundenspezifischen Stückpreis upserten. */
 export const upsertCustomerPriceSchema = z.object({
@@ -216,6 +241,47 @@ export const deleteCustomerPriceSchema = z.object({
     customerId: z.string().min(1),
 });
 export type DeleteCustomerPriceInput = z.infer<typeof deleteCustomerPriceSchema>;
+
+/**
+ * Ein Kundenpreis, wie ihn die Kundenübersicht braucht — angereichert um alles,
+ * was ihn ohne Kenntnis der Preistabelle lesbar macht.
+ *
+ * `list_price` ist der Listenpreis derselben Koordinate und `null`, wenn dort
+ * keiner hinterlegt ist; der Kundenpreis steht dann allein. `reachable` sagt, ob
+ * die Mengenstufe noch in den Standard-Staffeln steht — ist sie es nicht, bleibt
+ * der Preis erhalten, greift aber nicht mehr, weil keine Menge ihn trifft.
+ */
+export const customerPriceRowSchema = z.object({
+    id: z.string(),
+    tariffId: z.string(),
+
+    contractId: z.string(),
+    contract: contractSchema,
+
+    /** `null` beim gruppenweiten Altbestand: gilt für jedes Produkt der Gruppe. */
+    productId: z.string().nullable(),
+    product: productSchema.nullable(),
+
+    duration: z.number().int(),
+
+    min_quantity: z.number().int(),
+    /** Obergrenze der Staffel; `null` bei offener Staffel **und** bei verwaister. */
+    max_quantity: z.number().int().nullable(),
+    reachable: z.boolean(),
+
+    price: z.number().int(),
+    list_price: z.number().int().nullable(),
+});
+export type CustomerPriceRow = z.infer<typeof customerPriceRowSchema>;
+
+export const customerPriceRowListSchema = z.array(customerPriceRowSchema);
+export type CustomerPriceRowList = z.infer<typeof customerPriceRowListSchema>;
+
+/** Kundenpreise eines Kunden lesen. */
+export const listCustomerPricesSchema = z.object({
+    customerId: z.string().min(1),
+});
+export type ListCustomerPricesInput = z.infer<typeof listCustomerPricesSchema>;
 
 /**
  * Base tariff shape — without `tariffGroup`.
@@ -261,7 +327,10 @@ export type TariffGroup = z.infer<typeof tariffGroupSchema>;
  * Spalte erzeugen, die keine Preisabfrage mehr trifft.
  */
 export const tariffVersionSnapshotSchema = z.object({
-    columns: z.array(createTariffColumnSchema),
+    /* Inline statt aus einem Input-Schema: die Snapshot-Form darf sich nicht
+       mitbewegen, wenn sich die Eingabeschemata ändern — sonst kippt der Hash
+       und mit ihm die Preisgrundlage jeder angepinnten Position. */
+    columns: z.array(z.object({ duration: z.int().positive() })),
     rows: z.array(z.object({
         min_quantity: z.int().positive(),
         max_quantity: z.int().positive().nullable(),

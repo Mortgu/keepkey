@@ -2,29 +2,29 @@ import { Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import OfferModal from "../modals/offer-modal";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
-import OfferCardDiscount from "./offer-card-discount";
-import OfferCardFlatRate from "./offer-card-flatrate";
-import OfferCardProduct from "./offer-card-product";
+import OfferModal from "../modals/offer-modal";
+import type { OfferModalMode } from "../modals/offer-modal-policy";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import { Badge, Button, Collapsable } from "@/components";
+import { Accordion, Badge, Button } from "@/components";
+import DiscountRow from "@/routes/_main/-components/card/discount-row";
+import DocumentCard from "@/routes/_main/-components/card/document-card";
+import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
+import PositionRow from "@/routes/_main/-components/card/position-row";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
-import DocumentCard from "./document-card";
 
 type OfferListItemProps = {
     offer: Offer;
-    onEdit: (offer: Offer) => void;
 };
 
-export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
+export default function OfferCard({ offer }: OfferListItemProps) {
     const { t } = useTranslation();
 
-    const renewalModal = useModal<Offer>();
-    const extensionModal = useModal<Offer>();
+    /** `data` trägt nur die Variante — die Quelle ist immer das Angebot dieser Karte. */
+    const offerModal = useModal<{ mode: OfferModalMode }>();
 
     const {
         customerContactPerson: ccp,
@@ -104,42 +104,43 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Collapsable label="Produkte"
-                className="w-full justify-between rounded-none"
-            >
-                <div className="grid mx-4">
-                    {offerPositions.map((position, i) => (
-                        <OfferCardProduct key={i} position={position} />
+            <Accordion>
+                <Accordion.Section value="products" label="Produkte">
+                    {offerPositions.map((position) => (
+                        <PositionRow
+                            key={position.id}
+                            position={position}
+                            contract={offer.contract}
+                            durationMonths={offer.duration_months}
+                        />
                     ))}
 
-                    {offerFlatRates.map((flatrate, i) => (
-                        <OfferCardFlatRate key={i} flatrate={flatrate} />
+                    {offerFlatRates.map((flatrate) => (
+                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
                     ))}
 
                     {offerDiscounts.map((discount) => (
-                        <OfferCardDiscount key={discount.id} discount={discount} />
+                        <DiscountRow key={discount.id} discount={discount} />
                     ))}
-                </div>
-            </Collapsable>
+                </Accordion.Section>
 
-            <hr className="text-(--border)" />
-
-            <Collapsable
-                label="Dokumente"
-                className="w-full justify-between rounded-none"
-            >
-                <div className="grid mx-4">
+                <Accordion.Section value="documents" label="Dokumente">
                     {offer.offerDocuments.map((document: OfferDocument) => (
-                        <DocumentCard key={document.id} document={document} offerId={offer.id} />
+                        <DocumentCard
+                            key={document.id}
+                            type="offer"
+                            parentId={offer.id}
+                            document={document}
+                        />
                     ))}
 
                     {offer.offerDocuments.length === 0 && (
                         <div className="flex items-center justify-center py-4">
-                            <p className="text-sm text-gray-500">Noch keine Dokumente generiert!</p>
+                            <p className="text-sm text-(--text-secondary)">Noch keine Dokumente generiert!</p>
                         </div>
                     )}
-                </div>
-            </Collapsable>
+                </Accordion.Section>
+            </Accordion>
 
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
 
@@ -156,27 +157,39 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
                         Dokument generieren
                     </Button>
 
-                    <Button variant="border" type="button" size="xs"
-                        onClick={() => renewalModal.open(offer)}>{t("derived.action_renewal")}</Button>
+                    <Button
+                        variant="border"
+                        type="button"
+                        size="xs"
+                        onClick={() => offerModal.open({ mode: "renewal" })}>
+                        {t("derived.action_renewal")}
+                    </Button>
 
-                    <Button variant="border" type="button" size="xs"
-                        onClick={() => extensionModal.open(offer)}>{t("derived.action_extension")}</Button>
+                    <Button
+                        variant="border"
+                        type="button"
+                        size="xs"
+                        onClick={() => offerModal.open({ mode: "extension" })}>
+                        {t("derived.action_extension")}
+                    </Button>
+
                 </div>
 
                 {/* Actions right */}
                 <div className="flex items-center gap-2">
                     <Button
-                        onClick={() => setDrawerOpen(true)}
                         size="xs"
-                        variant="secondary"
+                        variant="border"
+                        title={t("versionHistory.title")}
+                        onClick={() => setDrawerOpen(true)}
                         icon={<UndoDot className="size-3" />}
                         iconOnly
                     />
 
                     <Button
                         size="xs"
-                        variant="secondary"
-                        onClick={() => onEdit(offer)}
+                        variant="border"
+                        onClick={() => offerModal.open()}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
@@ -195,21 +208,12 @@ export default function OfferCard({ offer, onEdit }: OfferListItemProps) {
 
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
-            {renewalModal.isOpen && (
+            {offerModal.isOpen && (
                 <OfferModal
-                    key={`renewal-${renewalModal.key}`}
-                    mode="renewal"
+                    key={offerModal.key}
+                    mode={offerModal.data?.mode}
                     sourceOffer={offer}
-                    closeFn={renewalModal.close}
-                />
-            )}
-
-            {extensionModal.isOpen && (
-                <OfferModal
-                    key={`extension-${extensionModal.key}`}
-                    mode="extension"
-                    sourceOffer={offer}
-                    closeFn={extensionModal.close}
+                    onClose={offerModal.close}
                 />
             )}
         </div>

@@ -1,0 +1,9 @@
+{
+    "workloads": {
+        "create": "Workload erstellen",
+        "search": "Workloads durchsuchen...",
+        "pricing": {
+            "create": "Preistabelle erstellen"
+        }
+    }
+}

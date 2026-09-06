@@ -1,44 +1,60 @@
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
-import { Fragment } from "react";
 import ProductModal from "./-components/product-modal";
-import ProductList from "./-components/product-list";
-import { Button, PageWidth } from "@/components";
-import { useModal, useProductManager } from "@/hooks";
+import { Breadcrumbs, Button, SortDropdown } from "@/components";
+import { useLocale, useModal, useProductManager } from "@/hooks";
+import useWorkloadFilters from "./-hooks/use-workload-filters";
+import ProductAutocomplete from "./-components/product-autocomplete";
+import { localized } from "@/lib/i18n-content";
+import type { Product } from "@keepit/schemas";
+import ProductItem from "./-components/product-item";
 
 export default function ProductPage() {
-    const { t } = useTranslation()
-    const { createProduct } = useProductManager();
+    const locale = useLocale();
+    const { t } = useTranslation();
+
+    const filters = useWorkloadFilters();
+
+    const { products, createProduct } = useProductManager(filters.params);
 
     const modal = useModal();
 
     return (
-        <Fragment>
-            <PageWidth variant="none">
-                {/* Header */}
-                <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
-                    <div className="flex items-center justify-between">
-                        <div className="flex-1 grid gap-1">
-                            <h1 className="font-medium text-xl">{t('section.workloads')}</h1>
-                            <p className="font-light text-sm text-gray-400">
-                                Zentrale Workload verwaltung
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Button
-                                icon={<Plus size={14} strokeWidth={3} />}
-                                variant="primary"
-                                size="sm"
-                                onClick={() => modal.open()}
-                            >
-                                {t("button.create")}
-                            </Button>
-                        </div>
-                    </div>
-                </div>
+        <div className="grid gap-4 mx-4">
 
-                <ProductList />
-            </PageWidth>
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: "Workloads", to: "/workloads" },
+                    ]}
+                />
+            </div>
+
+            <div className="flex items-center gap-4">
+                <SortDropdown
+                    value={filters.sort}
+                    onChange={filters.setSort}
+                    options={filters.sortOptions}
+                />
+
+                <ProductAutocomplete
+                    items={products.map(product => ({
+                        title: localized(product.translations, locale, "name") ?? "",
+                        description: localized(product.translations, locale, "description") ?? ""
+                    }))}
+                    filters={filters}
+                />
+
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("workloads.create")}
+                </Button>
+            </div>
+
+            {products.map((product: Product) => (
+                <ProductItem key={product.id} product={product} />
+            ))}
 
             {modal.isOpen && (
                 <ProductModal
@@ -48,6 +64,6 @@ export default function ProductPage() {
                     currentItem={modal.data}
                 />
             )}
-        </Fragment>
+        </div>
     )
 }

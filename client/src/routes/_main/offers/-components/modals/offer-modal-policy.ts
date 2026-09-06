@@ -26,12 +26,14 @@ export type HeaderField =
     | "paymentTerm"
     | "validUntil"
     | "requestFrom"
-    | "language";
+    | "language"
+    /* Vertrag und Laufzeit gelten für alle Positionen gemeinsam und stehen
+       deshalb im Kopf. Beide sind wählbar, bevor eine Position existiert. */
+    | "contractId"
+    | "duration_months";
 
 export type PositionField =
     | "productId"
-    | "contractId"
-    | "duration_months"
     | "quantity"
     | "free_months"
     | "optional"
@@ -63,6 +65,8 @@ export interface OfferModalPolicy {
 }
 
 const ALL_HEADER_FIELDS_EDITABLE: Record<HeaderField, FieldAccess> = {
+    contractId: "edit",
+    duration_months: "edit",
     customerId: "edit",
     contactPersonId: "edit",
     userId: "edit",
@@ -81,6 +85,10 @@ const ALL_HEADER_FIELDS_EDITABLE: Record<HeaderField, FieldAccess> = {
  */
 const DERIVED_HEADER_FIELDS: Record<HeaderField, FieldAccess> = {
     ...ALL_HEADER_FIELDS_EDITABLE,
+    // Der Vertrag laeuft weiter; die Laufzeit bleibt offen, weil eine
+    // Verlaengerung genau darin besteht, eine neue zu waehlen. Die Erweiterung
+    // sperrt sie zusaetzlich — siehe dort.
+    contractId: "readonly",
     customerId: "readonly",
     contactPersonId: "readonly",
     userId: "readonly",
@@ -99,8 +107,6 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             startEmpty: false,
             fields: {
                 productId: "edit",
-                contractId: "edit",
-                duration_months: "edit",
                 quantity: "edit",
                 free_months: "edit",
                 optional: "edit",
@@ -127,8 +133,6 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             startEmpty: false,
             fields: {
                 productId: "readonly",
-                contractId: "readonly",
-                duration_months: "edit",
                 quantity: "edit",
                 free_months: "edit",
                 optional: "hidden",
@@ -149,7 +153,10 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
      * Pauschalen sind und in einer Nachbestellung doppelt fakturiert würden.
      */
     extension: {
-        header: DERIVED_HEADER_FIELDS,
+        // Laufzeit gesperrt: sie bestimmt zusammen mit dem Vertrag die Spalte
+        // der angepinnten Preistabelle. Eine andere Laufzeit waere ein neues
+        // Angebot, keine Erweiterung des laufenden.
+        header: { ...DERIVED_HEADER_FIELDS, duration_months: "readonly" },
         positions: {
             access: "edit",
             canAdd: true,
@@ -157,8 +164,6 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             startEmpty: false,
             fields: {
                 productId: "edit",
-                contractId: "edit",
-                duration_months: "edit",
                 quantity: "edit",
                 free_months: "edit",
                 optional: "hidden",

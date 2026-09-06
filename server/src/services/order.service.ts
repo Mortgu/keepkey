@@ -9,6 +9,7 @@ import {
 } from "@keepit/schemas";
 
 import {
+    ORDER_REVISION_SNAPSHOT_VERSION,
     buildOrderRevisionSnapshot,
     parseOrderRevisionSnapshot,
 } from "../schemas/revision-schemas.js";
@@ -32,6 +33,8 @@ export async function getAllOrders(query: OrderListQuery = {}) {
         where: Object.keys(where).length > 0 ? where : undefined,
         include: {
             customer: true,
+            offer: true,
+            contract: { include: { translations: true } },
             customerContactPerson: true,
             documents: {
                 where: { deletedAt: null },
@@ -44,7 +47,6 @@ export async function getAllOrders(query: OrderListQuery = {}) {
             orderPositions: {
                 include: {
                     product: { include: { translations: true } },
-                    contract: { include: { translations: true } },
                 },
             },
             flatRates: {
@@ -61,6 +63,8 @@ export async function getOrderById(orderId: string) {
         where: { id: orderId },
         include: {
             customer: true,
+            offer: true,
+            contract: { include: { translations: true } },
             customerContactPerson: true,
             documents: {
                 where: { deletedAt: null },
@@ -73,7 +77,6 @@ export async function getOrderById(orderId: string) {
             orderPositions: {
                 include: {
                     product: { include: { translations: true } },
-                    contract: { include: { translations: true } },
                 },
             },
             flatRates: {
@@ -155,6 +158,11 @@ export async function createOrder(input: CreateOrderInput) {
                 employeeId: existingOffer.userId,
                 offerId: existingOffer.id,
 
+                // Vertrag und Laufzeit kommen unveraendert aus dem Angebot: die
+                // Bestellung ist dessen Annahme, nicht eine neue Verhandlung.
+                contractId: existingOffer.contractId,
+                duration_months: existingOffer.duration_months,
+
                 orderId,
                 paymentTerm: existingOffer.paymentTerm,
 
@@ -174,8 +182,6 @@ export async function createOrder(input: CreateOrderInput) {
             data: existingOffer.offerPositions.map((offerPosition) => ({
                 orderId: order.id,
                 productId: offerPosition.productId,
-                contractId: offerPosition.contractId,
-                duration_months: offerPosition.duration_months,
                 quantity: offerPosition.quantity,
                 optional: offerPosition.optional,
                 total_cents: offerPosition.total_cents - offerPosition.discount_cents,
@@ -242,7 +248,7 @@ export async function updateOrder(orderId: string, input: UpdateOrderInput, acto
                 orderId,
                 version: current.version,
                 changedById: actorId,
-                snapshotVersion: 1,
+                snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
                 snapshot: snapshot as Prisma.InputJsonValue,
             },
         });
@@ -304,7 +310,9 @@ export async function restoreOrderRevision(
         if (!revision) {
             throw new AppException("Order revision not found", 404, "ORDER_REVISION_NOT_FOUND");
         }
-        if (revision.snapshotVersion !== 1) {
+        // Wie beim Angebot: Version 1 bleibt lesbar, Vertrag und Laufzeit werden
+        // beim Lesen von der Position an den Kopf gehoben.
+        if (revision.snapshotVersion > ORDER_REVISION_SNAPSHOT_VERSION) {
             throw new AppException(
                 `Order revision snapshot version ${revision.snapshotVersion} is not supported.`,
                 422,
@@ -314,7 +322,7 @@ export async function restoreOrderRevision(
 
         let restored;
         try {
-            restored = parseOrderRevisionSnapshot(revision.snapshot);
+            restored = parseOrderRevisionSnapshot(revision.snapshot, revision.snapshotVersion);
         } catch {
             throw new AppException(
                 "The stored order revision is invalid and cannot be restored.",
@@ -329,7 +337,7 @@ export async function restoreOrderRevision(
                 orderId,
                 version: current.version,
                 changedById: actorId,
-                snapshotVersion: 1,
+                snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
                 snapshot: currentSnapshot as Prisma.InputJsonValue,
             },
         });

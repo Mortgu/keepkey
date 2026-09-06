@@ -19,6 +19,8 @@ const EMPTY_PRICE: PositionPrice = {
     total_cents: 0,
     discount_cents: 0,
     fromSnapshot: false,
+    origin: "list",
+    list_eur_user_month: null,
 };
 
 interface UsePositionPriceArgs {
@@ -63,6 +65,14 @@ export function usePositionPrice({ source, coordinates, pin }: UsePositionPriceA
         discountCents: price.discount_cents,
         fromSnapshot: price.fromSnapshot,
         /**
+         * true, wenn der Stückpreis ein für diesen Kunden hinterlegter Preis
+         * ist und nicht der Listenpreis. Nur zusammen mit `hasPrice` aussagekräftig
+         * — ohne Preis meldet {@link EMPTY_PRICE} "list".
+         */
+        isCustomerPrice: price.origin === "customer",
+        /** Listenpreis derselben Koordinate; `null`, wenn dort keiner steht. */
+        listUnitCents: price.list_eur_user_month,
+        /**
          * false, solange kein Preis vorliegt — die Zahlen sind dann Nullen aus
          * {@link EMPTY_PRICE}. Wer aus `fromSnapshot` eine Warnung ableitet,
          * muss hierauf prüfen, sonst erscheint sie schon während des Ladens.
@@ -72,6 +82,13 @@ export function usePositionPrice({ source, coordinates, pin }: UsePositionPriceA
         isLoading: active.isLoading,
         error: active.error,
     };
+}
+
+/** Alle für einen Kunden hinterlegten Preise — Grundlage des Reiters „Preise". */
+export function useCustomerPrices(customerId: string) {
+    const { data: prices = [], isPending, error } = useQuery(pricingQueries.customerPrices(customerId));
+
+    return { prices, isPending, error };
 }
 
 /**

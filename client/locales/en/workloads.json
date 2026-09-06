@@ -1,0 +1,9 @@
+{
+    "workloads": {
+        "create": "Create workload",
+        "search": "Search workloads...",
+        "pricing": {
+            "create": "Create pricing table"
+        }
+    }
+}

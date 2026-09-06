@@ -1,108 +1,138 @@
 import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
-import {
-
-
-
-  createFlatrateSchema
-} from '@keepit/schemas';
+import { createFlatrateSchema } from '@keepit/schemas';
 import type { CreateFlatrateTranslationInput, Flatrate, Language } from '@keepit/schemas';
 
 import {
-  DEFAULT_LANGUAGE_OPTIONS,
-  FieldInput,
-  FieldTextarea,
-  FormModal,
-  SegmentedLanguageToggle
+    Button,
+    DEFAULT_LANGUAGE_OPTIONS,
+    Dialog,
+    FieldInput,
+    FieldTextarea,
+    NumberField,
+    SegmentedLanguageToggle,
 } from "@/components";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
+import { centsToEur, eurToCents } from "@/utils/utils";
 
 interface Props {
-  currentFlatrate?: Flatrate | null;
-  onClose: () => void;
+	currentFlatrate?: Flatrate | null;
+	onClose: () => void;
 }
 
 function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefined, lang: Language) {
-  const t = translations?.find((x) => x.language === lang);
-  return { name: t?.name ?? "", table: t?.table ?? "", language: lang };
+	const t = translations?.find((x) => x.language === lang);
+	return { name: t?.name ?? "", table: t?.table ?? "", language: lang };
 }
 
 export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
-  const isEdit = currentFlatrate != null;
+	const { t } = useTranslation();
+	const isEdit = currentFlatrate != null;
 
-  const [language, setLanguage] = useState<Language>("DE");
-  const langIndex = language === "DE" ? 0 : 1;
+	const [language, setLanguage] = useState<Language>("DE");
+	const langIndex = language === "DE" ? 0 : 1;
 
-  const { createFlatRate } = useCreateFlatRate();
-  const { updateFlatRate } = useUpdateFlatRate();
+	const { createFlatRate } = useCreateFlatRate();
+	const { updateFlatRate } = useUpdateFlatRate();
 
-  const form = useForm({
-    defaultValues: {
-      total_cents: currentFlatrate?.total_cents ?? 0,
-      translations: [
-        seedLang(currentFlatrate?.translations, "DE"),
-        seedLang(currentFlatrate?.translations, "EN"),
-      ]
-    },
-    validators: {
-      onChange: createFlatrateSchema,
-      onMount: createFlatrateSchema,
-    },
-    onSubmit: async ({ value }) => {
-      if (isEdit) {
-        await updateFlatRate({ id: currentFlatrate.id, flatRate: value });
-      } else {
-        await createFlatRate(value);
-      }
+	const form = useForm({
+		defaultValues: {
+			total_cents: currentFlatrate?.total_cents ?? 0,
+			translations: [
+				seedLang(currentFlatrate?.translations, "DE"),
+				seedLang(currentFlatrate?.translations, "EN"),
+			]
+		},
+		validators: {
+			onChange: createFlatrateSchema,
+			onMount: createFlatrateSchema,
+		},
+		onSubmit: async ({ value }) => {
+			if (isEdit) {
+				await updateFlatRate({ id: currentFlatrate.id, flatRate: value });
+			} else {
+				await createFlatRate(value);
+			}
 
-      onClose();
-    },
-  });
+			onClose();
+		},
+	});
 
-  return (
-    <FormModal
-      form={form}
-      onClose={onClose}
-      formId="flatrate-form"
-      title={
-        <div className="flex items-center justify-between w-full mr-2">
-          <h1 className="text-lg">
-            {isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}
-          </h1>
-          <SegmentedLanguageToggle
-            options={DEFAULT_LANGUAGE_OPTIONS}
-            value={language}
-            onChange={(lng) => setLanguage(lng)}
-          />
-        </div>
-      }
-    >
-      <form.Field name={`translations[${langIndex}].name`}>
-        {(field) => (
-          <div className="grid gap-1">
-            <FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
-          </div>
-        )}
-      </form.Field>
+	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      <form.Field name={`translations[${langIndex}].table`}>
-        {(field) => (
-          <FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
-        )}
-      </form.Field>
+	    e.preventDefault();
 
-      <form.Field name="total_cents">
-        {(field) => (
-          <FieldInput
-            field={field}
-            type="number"
-            min={1}
-            label="Preis (in Cent)"
-            onChange={(e, f) => f.handleChange(parseInt(e.target.value))}
-          />
-        )}
-      </form.Field>
-    </FormModal>
-  );
+	    e.stopPropagation();
+
+	    form.handleSubmit();
+
+	};
+
+
+	return (
+		<Dialog
+			defaultOpen
+			onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
+		>
+			<Dialog.Header title={isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}>
+				<SegmentedLanguageToggle
+					options={DEFAULT_LANGUAGE_OPTIONS}
+					value={language}
+					onChange={(lng) => setLanguage(lng)}
+				/>
+			</Dialog.Header>
+			<Dialog.Body>
+				<form id="flatrate-form" onSubmit={handleSubmit} className="grid gap-4">
+					<form.Field name={`translations[${langIndex}].name`}>
+						{(field) => (
+							<div className="grid gap-1">
+								<FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
+							</div>
+						)}
+					</form.Field>
+
+					<form.Field name={`translations[${langIndex}].table`}>
+						{(field) => (
+							<FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
+						)}
+					</form.Field>
+
+					{/* Gespeichert wird in Cent, eingegeben in Euro — die Umrechnung
+					    läuft über die zentralen Helfer, nicht über eigene /100. */}
+					<form.Field name="total_cents">
+						{(field) => (
+							<NumberField
+								min={0.01}
+								step={0.01}
+								format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
+								label="Preis"
+								suffix="€"
+								value={centsToEur(field.state.value)}
+								onValueChange={(value) => field.handleChange(value === null ? 0 : eurToCents(value))}
+							/>
+						)}
+					</form.Field>
+				</form>
+			</Dialog.Body>
+			<Dialog.Footer>
+				<Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+				<form.Subscribe
+					selector={(state) => [state.canSubmit, state.isSubmitting]}
+					children={([canSubmit, isSubmitting]) => (
+						<Button
+							type="submit"
+							form="flatrate-form"
+							size="sm"
+							disabled={!canSubmit}
+							loading={isSubmitting}
+						>
+							{t("button.save")}
+						</Button>
+					)}
+				/>
+			</Dialog.Footer>
+		</Dialog>
+	);
 }

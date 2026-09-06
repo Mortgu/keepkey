@@ -1,4 +1,3 @@
-import { Loader } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import DiscountSection from "./discount/discounts";
@@ -9,7 +8,7 @@ import { OfferModalProvider } from "./offer-modal-context";
 import { OFFER_MODAL_FORM_ID } from "./offer-modal-policy";
 import type { OfferModalMode } from "./offer-modal-policy";
 import type { Offer } from '@keepit/schemas';
-import { Button, ModalDialog } from "@/components";
+import { Button, Dialog } from "@/components";
 import useOfferModalForm from "@/routes/_main/offers/-hooks/use-offer-modal-form";
 
 interface OfferModalProps {
@@ -17,19 +16,19 @@ interface OfferModalProps {
     mode?: OfferModalMode;
     /** Beim Bearbeiten die Vorlage, bei abgeleiteten Angeboten das Quellangebot. */
     sourceOffer?: Offer;
-    closeFn: () => void;
+    onClose: () => void;
     preselectedCustomerId?: string;
 }
 
 export default function OfferModal(props: OfferModalProps) {
-    const { mode = "offer", sourceOffer, closeFn, preselectedCustomerId } = props;
+    const { mode = "offer", sourceOffer, onClose, preselectedCustomerId } = props;
 
     const { t } = useTranslation();
 
-    const { form, policy, customerId } = useOfferModalForm({
+    const { form, policy, header, pricing } = useOfferModalForm({
         mode,
         sourceOffer,
-        closeFn,
+        onClose,
         preselectedCustomerId,
     });
 
@@ -45,40 +44,45 @@ export default function OfferModal(props: OfferModalProps) {
     };
 
     return (
-        <OfferModalProvider value={{ mode, policy, form, sourceOffer, customerId }}>
-            <ModalDialog onClose={closeFn}>
-                <ModalDialog.Header>
-                    <div className="flex items-center justify-between w-full mr-2">
-                        <h1 className="text-lg">{title()}</h1>
-                    </div>
-                </ModalDialog.Header>
-
-                <ModalDialog.Content>
-                    <div className="grid gap-4">
-                        <HeaderForm />
-                        <WorkloadSection />
-                        <FlatrateSection />
-                        <DiscountSection />
-                    </div>
-                </ModalDialog.Content>
-
-                <ModalDialog.Footer>
-                    <div className="w-full flex items-center justify-end">
-                        <div className="flex gap-2">
-                            <Button variant="border" size="sm" type="button" onClick={closeFn}>
-                                {t("button.cancel")}
+        <OfferModalProvider value={{ mode, policy, form, sourceOffer, header, pricing }}>
+            <Dialog
+                defaultOpen
+                onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
+            >
+                <Dialog.Header title={title()} />
+                <Dialog.Body>
+                    <HeaderForm />
+                    <hr className="text-(--border)" />
+                    <WorkloadSection />
+                    <hr className="text-(--border)" />
+                    <FlatrateSection />
+                    <hr className="text-(--border)" />
+                    <DiscountSection />
+                </Dialog.Body>
+                <Dialog.Footer>
+                    <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />
+                    <form.Subscribe
+                        selector={(state) => [state.canSubmit, state.isSubmitting]}
+                        children={([canSubmit, isSubmitting]) => (
+                            <Button
+                                type="submit"
+                                form={OFFER_MODAL_FORM_ID}
+                                size="sm"
+                                /* Ohne Preis kein Angebot: eine Position, für
+                                   die keine Zelle hinterlegt ist, würde sonst
+                                   mit 0,00 € gespeichert. */
+                                disabled={!canSubmit || pricing.hasError}
+                                title={pricing.hasError
+                                    ? "Für mindestens eine Position ist kein Preis hinterlegt."
+                                    : undefined}
+                                loading={isSubmitting}
+                            >
+                                {t("button.save")}
                             </Button>
-
-                            <form.Subscribe selector={(s) => [s.canSubmit, s.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                                <Button form={OFFER_MODAL_FORM_ID} disabled={!canSubmit} type="submit" size="sm">
-                                    {isSubmitting && <Loader className="size-4 animate-spin" />}
-                                    {t("button.save")}
-                                </Button>
-                            )} />
-                        </div>
-                    </div>
-                </ModalDialog.Footer>
-            </ModalDialog>
+                        )}
+                    />
+                </Dialog.Footer>
+            </Dialog>
         </OfferModalProvider>
     );
 }

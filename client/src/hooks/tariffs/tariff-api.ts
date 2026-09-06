@@ -1,10 +1,11 @@
 import type {
     CreateTariffGroupInput,
     CreateTariffInput,
+    StandardDuration,
+    StandardTier,
     Tariff,
     TariffCell,
     TariffGroup,
-    TariffRow,
     TariffVersion,
     UpdateTariffGroupInput,
 } from '@keepit/schemas';
@@ -62,60 +63,74 @@ export const sealTariffVersion = (groupId: string, tariffId: string) =>
 export const restoreTariffVersion = (groupId: string, tariffId: string, versionId: string) =>
     api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/versions/${versionId}/restore`, { method: "POST" });
 
-export const getTariffDurations = (productId: string, contractId: string) =>
-    api<Array<number>>(`/api/tariffs/durations/${productId}/${contractId}`, { method: "GET" });
-
 /* ───────────────────────────────
-   Tariff Column
+   Standardlaufzeiten
    ─────────────────────────────── */
 
-export const createTariffColumn = (groupId: string, tariffId: string, duration: number) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column`, {
+export const getStandardDurations = () =>
+    api<Array<StandardDuration>>("/api/tariffs/standard-durations", { method: "GET" });
+
+export const createStandardDuration = (months: number) =>
+    api<StandardDuration>("/api/tariffs/standard-durations", {
         method: "POST",
-        body: JSON.stringify({ duration }),
+        body: JSON.stringify({ months }),
     });
 
-export const deleteTariffColumn = (groupId: string, tariffId: string, columnId: string) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column/${columnId}`, {
-        method: "DELETE",
-    });
-
-export const updateTariffColumn = (groupId: string, tariffId: string, columnId: string, duration: number) =>
-    api<Tariff>(`/api/tariffs/${groupId}/${tariffId}/column/${columnId}`, {
-        method: "PATCH",
-        body: JSON.stringify({ duration }),
-    });
+export const deleteStandardDuration = (id: string) =>
+    api<void>(`/api/tariffs/standard-durations/${id}`, { method: "DELETE" });
 
 /* ───────────────────────────────
-   Tariff Row
+   Standard-Mengenstaffeln
    ─────────────────────────────── */
 
-export const createTariffRow = (groupId: string, tariffId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row`, {
+export const getStandardTiers = () =>
+    api<Array<StandardTier>>("/api/tariffs/standard-tiers", { method: "GET" });
+
+export const createStandardTier = (min_quantity: number, max_quantity: number | null) =>
+    api<StandardTier>("/api/tariffs/standard-tiers", {
         method: "POST",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
-export const deleteTariffRow = (groupId: string, tariffId: string, rowId: string) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
-        method: "DELETE",
-    });
-
-export const updateTariffRow = (groupId: string, tariffId: string, rowId: string, min_quantity: number, max_quantity: number | null) =>
-    api<TariffRow>(`/api/tariffs/${groupId}/${tariffId}/row/${rowId}`, {
+export const updateStandardTier = (id: string, min_quantity: number, max_quantity: number | null) =>
+    api<StandardTier>(`/api/tariffs/standard-tiers/${id}`, {
         method: "PATCH",
         body: JSON.stringify({ min_quantity, max_quantity }),
     });
 
+export const deleteStandardTier = (id: string) =>
+    api<void>(`/api/tariffs/standard-tiers/${id}`, { method: "DELETE" });
+
 /* ───────────────────────────────
-   Tariff Cell
+   Zelle — adressiert über ihre Koordinate, nicht über eine Id
    ─────────────────────────────── */
 
-export const updateTariffCell = (groupId: string, tariffId: string, cellId: string, default_price: number) =>
-    api<TariffCell>(`/api/tariffs/${groupId}/${tariffId}/cell/${cellId}`, {
+export const updateTariffCell = (
+    groupId: string,
+    tariffId: string,
+    duration: number,
+    min_quantity: number,
+    default_price: number,
+) =>
+    api<TariffCell>(`/api/tariffs/${groupId}/${tariffId}/cell`, {
         method: "PATCH",
-        body: JSON.stringify({ default_price }),
+        body: JSON.stringify({ duration, min_quantity, default_price }),
     });
+
+/** Ohne `duration` fällt die ganze Mengenstufe dieses Tarifs weg. */
+export const deleteTariffCell = (
+    groupId: string,
+    tariffId: string,
+    min_quantity: number,
+    duration?: number,
+) => {
+    const query = new URLSearchParams({ min_quantity: String(min_quantity) });
+    if (duration !== undefined) query.set("duration", String(duration));
+
+    return api<void>(`/api/tariffs/${groupId}/${tariffId}/cell?${query.toString()}`, {
+        method: "DELETE",
+    });
+};
 
 /* ───────────────────────────────
    Price

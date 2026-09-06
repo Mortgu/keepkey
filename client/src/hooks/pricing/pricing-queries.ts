@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import {  isPriceable } from "@keepit/schemas";
-import { getLivePrice, getPinnedPrice } from "./pricing-api";
+import { getCustomerPrices, getLivePrice, getPinnedPrice } from "./pricing-api";
 import { pricingKeys } from "./pricing-keys";
 import type {PriceCoordinates} from "@keepit/schemas";
 
@@ -17,6 +17,14 @@ export const pricingQueries = {
             queryFn: () => getLivePrice(coordinates),
             enabled: enabled && isPriceable(coordinates),
             staleTime: 0,
+        }),
+
+    /** Alle für einen Kunden hinterlegten Preise. */
+    customerPrices: (customerId: string) =>
+        queryOptions({
+            queryKey: pricingKeys.customerPrices(customerId),
+            queryFn: () => getCustomerPrices(customerId),
+            enabled: Boolean(customerId),
         }),
 
     /** Preis aus der von der Quellposition angepinnten Tarif-Version. */

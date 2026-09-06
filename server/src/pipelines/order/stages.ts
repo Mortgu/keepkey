@@ -37,7 +37,12 @@ const postprocess: PipelineStage<OrderPipelineContext> = {
 const generate: PipelineStage<OrderPipelineContext> = {
     name: "generate",
     run: async (context) => {
-        context.docxBuffer = await generating(context.formatedData);
+        // Die Sprache steckt am Kunden, nicht an der Bestellung — hier ist der
+        // erste Punkt, an dem beides zusammen vorliegt.
+        context.docxBuffer = await generating(
+            context.formatedData,
+            context.fetchedData!.order.customer.language,
+        );
     },
 };
 

@@ -127,7 +127,7 @@ function CheckboxFilterList({
                         value={q}
                         onChange={(e) => setQ(e.target.value)}
                         placeholder={placeholder}
-                        className="w-full font-sans text-[12.5px] text-(--text) bg-(--page-bg) border border-(--border) rounded-md py-1.5 pl-7 pr-2.5 outline-none focus:border-(--primary-600)"
+                        className="w-full font-sans text-[12.5px] text-(--text) bg-(--page-bg) border border-(--border) rounded-md py-1.5 pl-7 pr-2.5 outline-none focus:border-(--primary) focus:shadow-(--focus-ring)"
                     />
                 </div>
             )}
@@ -192,8 +192,8 @@ function CheckboxFilterList({
 
 const thumbVariants = cn(
     "appearance-none",
-    "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[2.5px] [&::-webkit-slider-thumb]:border-(--primary-600) [&::-webkit-slider-thumb]:shadow-[0_1px_3px_rgba(0,0,0,0.25)] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto",
-    "[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-[2.5px] [&::-moz-range-thumb]:border-(--primary-600) [&::-moz-range-thumb]:shadow-[0_1px_3px_rgba(0,0,0,0.25)] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto",
+    "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:border-[2.5px] [&::-webkit-slider-thumb]:border-(--primary-600) [&::-webkit-slider-thumb]:shadow-(--shadow-thumb) [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:pointer-events-auto",
+    "[&::-moz-range-thumb]:appearance-none [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white [&::-moz-range-thumb]:border-[2.5px] [&::-moz-range-thumb]:border-(--primary-600) [&::-moz-range-thumb]:shadow-(--shadow-thumb) [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:pointer-events-auto",
 );
 
 function PriceRangeSlider({

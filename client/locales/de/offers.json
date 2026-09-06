@@ -3,11 +3,19 @@
     "compare": "Vergleichen?",
     "add_workload": "Workload hinzufügen",
     "add_flatrate": "Flatrate hinzufügen",
+    "flatrate": "Pauschale",
     "add_discount": "Rabatt hinzufügen",
     "quantity": "Menge",
     "free_months": "Freimonate",
     "unit_price": "Stückpreis",
+    "no_price": "Kein Preis",
+    "customer_price": "Kundenpreis",
+    "list_price": "Listenpreis",
+    "reset_price": "Zurücksetzen",
+    "no_tariff_hint": "Für dieses Produkt gibt es keine Preistabelle — ein Kundenpreis hängt an einem Tarif. Ordne das Produkt zuerst einer Tarifgruppe zu.",
     "customer": "Kunde",
+    "contract": "Vertrag",
+    "duration": "Laufzeit",
     "employee": "Unser Ansprechpartner",
     "contact": "Ihr Ansprechpartner",
     "quoteId": "Angebotsnummer",
@@ -62,6 +70,8 @@
       "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
       "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}",
       "renewalStub": "Angebot-Generierung aus Verlängerung folgt in einem kommenden Schritt."
-    }
+    },
+    "create": "Angebot erstellen",
+    "description": "Zentrale Verwaltung der Angebote"
   }
 }

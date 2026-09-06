@@ -1,12 +1,12 @@
-import { Button, PageWidth } from "@/components";
-import { Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import SupplierList from "./-components/supplier-list";
-import useSupplierFilters from "./-hooks/use-supplier-filters";
-import SupplierFilters from "./-components/supplier-filters";
-import { useModal } from "@/hooks";
-import type { Supplier } from "@keepit/schemas";
 import SupplierModal from "./-components/supplier-modal";
+import useSupplierFilters from "./-hooks/use-supplier-filters";
+import type { Supplier } from "@keepit/schemas";
+import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/components";
+import { useModal, useSuppliers } from "@/hooks";
+import SupplierListItem from "./-components/supplier-list-item";
+import { LoaderCircle } from "lucide-react";
+import { error } from "better-auth/api";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
@@ -14,33 +14,52 @@ export default function SupplierPage() {
 
     const filters = useSupplierFilters();
 
+    const {
+        suppliers,
+        isPending: pendingSuppliers,
+        error: errorSuppliers
+    } = useSuppliers();
+
     return (
-        <PageWidth variant="none">
-            <div className="bg-white border-b border-(--border) px-8 py-6">
-
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex-1 grid gap-1">
-                        <h1 className="font-medium text-xl">{t("section.suppliers")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Lieferanten</h1>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-                            onClick={() => modal.open()}>{t("button.create")}</Button>
-                    </div>
-                </div>
-
-            </div>
-
-            <div className="px-8 py-4 border-b border-(--border)">
-                <SupplierFilters filters={filters} />
-            </div>
-
-            <div className="px-8 py-6">
-                <SupplierList
-                    filters={filters}
-                    onEdit={(supplier) => modal.open(supplier)}
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("section.suppliers"), to: "/suppliers" },
+                    ]}
                 />
+            </div>
+
+            <div className="flex items-center gap-2">
+                <SortDropdown value={filters.sort} onChange={filters.setSort} options={filters.sortOptions} />
+                <SearchBar value={filters.searchQuery} onChange={filters.setSearchQuery} placeholder={t("suppliers.searchPlaceholder")} />
+
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("suppliers.create")}
+                </Button>
+            </div>
+
+            <div className="grid gap-4">
+                {errorSuppliers && (
+                    <RouteError error={error} />
+                )}
+
+                {pendingSuppliers && (
+                    <div className="py-8 flex items-center justify-center">
+                        <LoaderCircle className="animate-spin" />
+                    </div>
+                )}
+
+                {suppliers.map(supplier => (
+                    <SupplierListItem
+                        key={supplier.id}
+                        supplier={supplier}
+                        onEdit={(supplier) => modal.open(supplier)}
+                    />
+                ))}
             </div>
 
             {modal.isOpen && (
@@ -50,6 +69,6 @@ export default function SupplierPage() {
                     currentSupplier={modal.data}
                 />
             )}
-        </PageWidth>
+        </div>
     )
 }

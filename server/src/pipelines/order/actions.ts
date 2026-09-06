@@ -1,10 +1,9 @@
 import Docxtemplater from "docxtemplater";
-import fs from "fs/promises";
+import type { Language } from "@prisma/client";
 import { convert as libconvert } from "libreoffice-convert";
-import path from "path";
 import PizZip from "pizzip";
-import env from "../../lib/env.js";
 import { prisma } from "../../lib/prismaClient.js";
+import { loadTemplateForRendering } from "../../services/document-template.service.js";
 import { pickTranslation } from "../../utils/i18n.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 import { customParser, deepIterate } from "../offer/utils.js";
@@ -20,10 +19,10 @@ export async function fetchOrderData(orderId: string) {
                 customerContactPerson: true,
                 employee: true,
 
+                contract: { include: { translations: true } },
                 orderPositions: {
                     include: {
                         product: { include: { translations: true } },
-                        contract: { include: { translations: true } },
                     }
                 },
 
@@ -45,18 +44,33 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     }
 
     const order = fetchedData.order;
-    const lang = "DE"; // Orders carry no language yet — default to German.
+    // Bestellungen tragen selbst keine Sprache. Der Kunde tut es — und er ist
+    // der Empfänger des Dokuments, also entscheidet seine Sprache über Vorlage
+    // und Übersetzungen.
+    const lang = order.customer.language;
     const { customer, customerContactPerson: ccp, employee } = order;
 
     // Resolve the language variant once and flatten it onto each entity so the
     // docx template can keep referencing name/description/table/features directly.
+    // Vertrag und Laufzeit gelten fuer die ganze Bestellung. Sie werden einmal
+    // aufgeloest und an jede Position gehaengt, damit das Template weiterhin
+    // `position.contract` und `position.duration_months` lesen kann.
+    const orderContractT = pickTranslation(order.contract.translations, lang);
+    const contract = {
+        ...order.contract,
+        name: orderContractT?.name ?? "",
+        features: orderContractT?.features ?? [],
+        table: orderContractT?.table ?? "",
+    };
+    const duration_months = order.duration_months;
+
     const orderPositions = order.orderPositions.map((position) => {
         const pt = pickTranslation(position.product.translations, lang);
-        const ct = pickTranslation(position.contract.translations, lang);
         return {
             ...position,
+            duration_months,
+            contract,
             product: { ...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? "" },
-            contract: { ...position.contract, name: ct?.name ?? "", features: ct?.features ?? [], table: ct?.table ?? "" },
         };
     });
     const flatRates = order.flatRates.map((fr) => {
@@ -65,44 +79,39 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     });
 
     const products = orderPositions.map((position) => ({
-        contract: position.contract,
+        contract,
         ...position.product,
 
-        duration_months: position.duration_months,
-        duration: formatDuration(position.duration_months),
+        duration_months,
+        duration: formatDuration(duration_months),
     }));
 
-    const groups = Object.groupBy(
-        orderPositions,
-        (p) => `${p.contract.id}_${p.duration_months}`,
-    );
+    // Frueher nach `contract_duration` gruppiert — beides steht jetzt an der
+    // Bestellung, es gibt also genau eine Gruppe.
+    const grouped = [orderPositions].map((group) => {
+        const flatRate_total = flatRates.reduce((sum, p) => sum + p.total_cents, 0);
 
-    const grouped = Object.values(groups).map((group) => {
-        const first = group![0];
-
-        const flatRate_total = flatRates?.reduce((sum, p) => sum + p.total_cents, 0);
-
-        const group_total = group?.reduce((sum, p) => sum + p.total_cents, flatRate_total);
+        const group_total = group.reduce((sum, p) => sum + p.total_cents, flatRate_total);
 
         return {
-            names: group?.map((p) => p.product.name).join(" & "),
-            contract: first.contract,
-            duration_months: first.duration_months,
-            duration: formatDuration(first.duration_months),
-            total: formatEur(group_total! / 100),
-            items: group?.map((item) => ({
+            names: group.map((p) => p.product.name).join(" & "),
+            contract,
+            duration_months,
+            duration: formatDuration(duration_months),
+            total: formatEur(group_total / 100),
+            items: group.map((item) => ({
                 name: item.product.name,
                 description: item.product.description,
                 table: item.product.table,
                 quantity: item.quantity,
                 optional: item.optional,
-                contract: item.contract,
-                duration_months: item.duration_months,
+                contract,
+                duration_months,
                 price: {
                     total: formatEur(item.total_cents / 100),
                     unit: formatEur(
-                        item.quantity && item.duration_months
-                            ? item.total_cents / item.quantity / item.duration_months / 100
+                        item.quantity && duration_months
+                            ? item.total_cents / item.quantity / duration_months / 100
                             : 0,
                     ),
                 },
@@ -163,8 +172,11 @@ export async function postprocessing(formatedData?: OrderFormattedData): Promise
 }
 
 
-export async function generating(formatedData?: OrderFormattedData): Promise<Buffer> {
-    const content = await fs.readFile(path.join(env.TEMPLATES_DIR, "order.docx"), "binary");
+export async function generating(
+    formatedData: OrderFormattedData | undefined,
+    language: Language,
+): Promise<Buffer> {
+    const content = await loadTemplateForRendering("ORDER", language);
 
     const zip = new PizZip(content);
 

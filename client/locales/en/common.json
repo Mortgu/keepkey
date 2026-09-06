@@ -13,7 +13,8 @@
     "overview": "Overview",
     "sales": "Sales",
     "management": "Management",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Log out"
   },
   "section": {
     "workloads": "Workloads",
@@ -27,7 +28,8 @@
     "employees": "Employees",
     "offers": "Offers",
     "invoices": "Invoices",
-    "orders": "Orders"
+    "orders": "Orders",
+    "templates": "Templates"
   },
   "common": {
     "search": "Search",
@@ -42,6 +44,11 @@
     "errorTitle": "Something went wrong",
     "errorRetry": "Try again",
     "errorGeneric": "An unexpected error occurred.",
-    "months": "months"
+    "months": "months",
+    "increment": "Increase value",
+    "decrement": "Decrease value"
+  },
+  "docxEditor": {
+    "noBuffer": "The editor could not read the file."
   }
 }

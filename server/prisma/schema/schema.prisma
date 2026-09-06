@@ -35,6 +35,9 @@ model User {
   orderRevisions OrderRevision[]
   tariffVersions TariffVersion[]
 
+  documentTemplates DocumentTemplate[]
+
+  @@index([customerId])
   @@map("user")
 }
 

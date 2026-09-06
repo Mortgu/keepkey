@@ -3,19 +3,27 @@
     "compare": "Compare?",
     "add_workload": "add Workload",
     "add_flatrate": "add Flatrate",
+    "flatrate": "Flat rate",
     "add_discount": "add Discound",
     "quantity": "Quantity",
     "free_months": "Free months",
     "unit_price": "Unit price",
+    "no_price": "No price",
+    "customer_price": "Customer price",
+    "list_price": "List price",
+    "reset_price": "Reset",
+    "no_tariff_hint": "This product has no pricing table — a customer price belongs to a tariff. Assign the product to a tariff group first.",
     "customer": "Customer",
+    "contract": "Contract",
+    "duration": "Runtime",
     "employee": "Our Employee",
     "contact": "Your Contact",
     "quoteId": "Quote id",
     "supplierId": "Supplier",
     "paymentTerm": "Payment term",
     "validUntil": "Valid until",
-    "requestFrom": "Angebot vom",
-    "language": "Sprache",
+    "requestFrom": "Offer from",
+    "language": "Language",
     "workload_section": "Workloads",
     "flatrate_section": "Flatrates",
     "discount_section": "Discounts"
@@ -60,7 +68,10 @@
       "documentUploadError": "Document could not be uploaded: {{message}}",
       "documentDeleteError": "Document could not be deleted: {{message}}",
       "documentRenameError": "Document could not be renamed: {{message}}",
-      "restoreError": "Version could not be restored: {{message}}"
-    }
+      "restoreError": "Version could not be restored: {{message}}",
+      "renewalStub": "Generating an offer from a renewal is coming in a later step."
+    },
+    "create": "Create offer",
+    "description": "Central management of offers"
   }
 }

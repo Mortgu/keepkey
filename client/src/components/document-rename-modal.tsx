@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Input, ModalDialog } from "@/components";
+import { Button } from "./button";
+import { Dialog } from "./dialog";
+import { Input } from "./input";
 
 type Props = {
   initialValue: string;
@@ -25,11 +27,13 @@ export function DocumentRenameModal({ initialValue, isPending, onClose, onSubmit
   };
 
   return (
-    <ModalDialog onClose={onClose}>
-      <ModalDialog.Header>
-        <h1 className="text-lg">Dokument umbenennen</h1>
-      </ModalDialog.Header>
-      <ModalDialog.Content>
+    <Dialog
+      defaultOpen
+      size="sm"
+      onOpenChange={(open) => { if (!open) onClose(); }}
+    >
+      <Dialog.Header title="Dokument umbenennen" />
+      <Dialog.Body>
         <Input
           value={displayName}
           onChange={(event) => setDisplayName(event.target.value)}
@@ -42,15 +46,15 @@ export function DocumentRenameModal({ initialValue, isPending, onClose, onSubmit
             }
           }}
         />
-      </ModalDialog.Content>
-      <ModalDialog.Footer>
+      </Dialog.Body>
+      <Dialog.Footer>
         <Button variant="border" size="sm" onClick={onClose} disabled={isPending}>
           {t("button.cancel")}
         </Button>
         <Button size="sm" onClick={submit} loading={isPending} disabled={!value || isPending}>
           {t("button.save")}
         </Button>
-      </ModalDialog.Footer>
-    </ModalDialog>
+      </Dialog.Footer>
+    </Dialog>
   );
 }

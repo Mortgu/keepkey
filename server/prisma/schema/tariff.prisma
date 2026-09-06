@@ -22,6 +22,7 @@ model TariffGroupProduct {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([tariffGroupId])
   @@map("tariff_group_product")
 }
 
@@ -34,9 +35,7 @@ model Tariff {
   tariffGroup   TariffGroup @relation(fields: [tariffGroupId], references: [id], onDelete: Cascade)
   tariffGroupId String
 
-  rows    TariffRow[]
-  columns TariffColumn[]
-  cells   TariffCell[]
+  cells TariffCell[]
 
   versions       TariffVersion[]
   customerPrices TariffCustomerPrice[]
@@ -45,80 +44,48 @@ model Tariff {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@unique([tariffGroupId, contractId])
+  @@index([contractId])
   @@map("tariff")
 }
 
-model TariffRow {
+/// Global gepflegte Mengenstaffel — die Zeilenachse *aller* Preistabellen.
+/// Zusammen mit StandardDuration spannt sie das Raster auf; ein Tarif traegt
+/// nur noch die Preise an diesen Koordinaten.
+model StandardTier {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
-
-  /// Zugleich Sortierschlüssel: Mengenstaffeln überschneiden sich nicht
-  /// (siehe assertNoOverlap), die Untergrenze ist innerhalb eines Tarifs
-  /// also eindeutig und ordnet die Zeilen fachlich richtig.
-  min_quantity Int
+  /// Zugleich Sortierschluessel: Staffeln ueberschneiden sich nicht (siehe
+  /// assertNoOverlap), die Untergrenze ist damit eindeutig.
+  min_quantity Int  @unique
   max_quantity Int?
 
-  cells TariffCell[]
-
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@map("tariff_row")
+  @@map("standard_tier")
 }
 
-model TariffColumn {
-  id String @id @default(cuid())
-
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
-  tariffId String
-
-  /// Zugleich Sortierschlüssel: doppelte Laufzeiten werden abgelehnt, die
-  /// Laufzeit ist innerhalb eines Tarifs also eindeutig.
-  duration Int
-
-  cells TariffCell[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@map("tariff_column")
-}
-
+/// Ein Preis an seiner Koordinate — dieselbe Schluesselform wie
+/// TariffCustomerPrice und wie der Versions-Snapshot. Eine Zelle ohne Preis
+/// gibt es nicht: "nicht konfiguriert" heisst, dass keine Zeile existiert.
 model TariffCell {
   id String @id @default(cuid())
 
   tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Cascade)
   tariffId String
 
-  row   TariffRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
-  rowId String
-
-  column   TariffColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
-  columnId String
-
-  default_cells TariffCellDefault[]
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@unique([rowId, columnId])
-  @@map("tariff_cell")
-}
-
-model TariffCellDefault {
-  id String @id @default(cuid())
-
-  cell   TariffCell @relation(fields: [cellId], references: [id], onDelete: Cascade)
-  cellId String     @unique
+  /// == StandardDuration.months
+  duration     Int
+  /// == StandardTier.min_quantity
+  min_quantity Int
 
   price Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@map("tariff_cell_default")
+  @@unique([tariffId, duration, min_quantity])
+  @@map("tariff_cell")
 }
 
 /// Kundenspezifischer Stueckpreis. Haengt an den stabilen Koordinaten
@@ -146,7 +113,14 @@ model TariffCustomerPrice {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  /// Unique inkl. gruppenweiter Preise (productId = null, "gilt fuer alle
+  /// Produkte"): dieses Prisma-Unique deckt NULL nicht ab — Postgres behandelt
+  /// NULLs als distinct. Die Luecke schliesst der partielle Unique-Index
+  /// `tariff_customer_price_group_wide_key` (Migration 20260904090820),
+  /// hier nicht ausdrueckbar.
   @@unique([tariffId, customerId, productId, duration, min_quantity])
+  @@index([customerId])
+  @@index([productId])
   @@map("tariff_customer_price")
 }
 
@@ -185,5 +159,21 @@ model TariffVersion {
 
   @@unique([tariffId, version])
   @@index([tariffId, hash])
+  @@index([createdById])
   @@map("tariff_version")
+}
+
+/// Global gepflegte Laufzeiten. Sie sind die Spaltenachse *aller* Preistabellen:
+/// nur weil sie nicht am Tarif haengen, steht die Laufzeit eines Angebots fest,
+/// bevor ein Produkt — und damit eine Tarifgruppe — gewaehlt ist.
+model StandardDuration {
+  id String @id @default(cuid())
+
+  /// Laufzeit in Monaten. == TariffColumn.duration
+  months Int @unique
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("standard_duration")
 }

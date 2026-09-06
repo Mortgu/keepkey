@@ -1,15 +1,27 @@
-import { AlertCircle, AlertTriangle, Loader2 } from "lucide-react";
-import { forwardRef } from "react";
+import { Loader2 } from "lucide-react";
+import { forwardRef, useId } from "react";
 import { tv } from "tailwind-variants";
 import { Button } from "./button";
+import { Field } from "./field";
+import { selectOnFocus } from "./select-on-focus";
+import {
+    CONTROL_HEIGHT,
+    CONTROL_TEXT,
+    FIELD_FOCUS_WITHIN,
+    FIELD_GROUP_ADDON,
+    FIELD_GROUP_BASE,
+    FIELD_GROUP_INPUT,
+    FIELD_PADDING,
+    FIELD_STATE_WITHIN,
+    fieldState,
+} from "./tokens";
 import type { ButtonComponentProps } from "./button";
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
 import type { ComponentSize } from "./tokens";
 
 type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 
-export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
-    variant?: "primary" | "secondary";
+export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size" | "prefix"> {
     size?: ComponentSize;
 
     /** Optional label text that will be rendered above the input element. */
@@ -27,6 +39,16 @@ export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputE
     /** Longer explanation shown in a tooltip when the warning badge is hovered. */
     warningTooltip?: string;
 
+    /**
+     * Statischer Inhalt links im Feld, durch eine Trennlinie abgesetzt — Text,
+     * Icon oder beides. Gedacht für Teile des Werts, die der Nutzer *nicht*
+     * mittippen soll, z. B. `prefix="AG"` vor einer Angebotsnummer.
+     */
+    prefix?: ReactNode;
+
+    /** Wie {@link InputComponentProps.prefix}, aber rechts im Feld. */
+    suffix?: ReactNode;
+
     /** Decorative icon rendered on the right side of the input (non-interactive). */
     rightIcon?: ReactNode;
 
@@ -35,163 +57,157 @@ export interface InputComponentProps extends Omit<InputHTMLAttributes<HTMLInputE
 
     /** When true, renders a spinning loader on the right side. Takes precedence over `rightButton` and `rightIcon`. */
     loading?: boolean;
+
+    /** Klassen für den inneren `<input>` — `className` trifft die Gruppe (Rahmen). */
+    inputClassName?: string;
+
+    /**
+     * Markiert beim Fokus den kompletten Wert, sodass die erste Eingabe ihn
+     * ersetzt. Bei `type="number"` ohne Zutun aktiv; explizit nötig für Felder,
+     * die eine Zahl in einem Text-Input führen (z. B. das Zahlungsziel).
+     */
+    selectOnFocus?: boolean;
 }
 
-const styles = tv({
-    base: [
-        "w-full rounded-md border border-(--border) bg-white transition-all duration-150",
-        "text-sm text-(--text) outline-none",
-        "placeholder:text-(--text-secondary)",
-        "focus:border-(--primary) focus:shadow-[0_0_0_3px_rgba(0,104,63,0.15)]",
-        "disabled:bg-(--subtle-50) disabled:text-(--text-secondary) disabled:cursor-not-allowed",
-    ],
+/* Modul-privat: das Modul exportiert nur Komponenten (react-refresh). */
+const inputStyles = tv({
+    slots: {
+        group: [FIELD_GROUP_BASE, FIELD_FOCUS_WITHIN],
+        input: FIELD_GROUP_INPUT,
+        addon: FIELD_GROUP_ADDON,
+    },
     variants: {
         input_size: {
-            xs: "h-[34px] px-3 text-xs font-light",
-            sm: "h-[38px] px-3 text-sm font-normal",
-            md: "h-[42px] px-3 text-md font-semibold",
+            xs: {
+                group: CONTROL_HEIGHT.xs,
+                input: `${FIELD_PADDING.xs} ${CONTROL_TEXT.xs} font-light`,
+                addon: `${FIELD_PADDING.xs} ${CONTROL_TEXT.xs}`,
+            },
+            sm: {
+                group: CONTROL_HEIGHT.sm,
+                input: `${FIELD_PADDING.sm} ${CONTROL_TEXT.sm} font-normal`,
+                addon: `${FIELD_PADDING.sm} ${CONTROL_TEXT.sm}`,
+            },
+            md: {
+                group: CONTROL_HEIGHT.md,
+                input: `${FIELD_PADDING.md} ${CONTROL_TEXT.md} font-semibold`,
+                addon: `${FIELD_PADDING.md} ${CONTROL_TEXT.md}`,
+            },
         },
-        variant: {},
         state: {
-            none: "",
-            error: "border-(--destructive) focus:shadow-[0_0_0_3px_rgba(192,57,43,0.15)]",
-            warning: "border-(--warning) focus:shadow-[0_0_0_3px_rgba(180,83,9,0.18)]",
+            none: {},
+            error: { group: FIELD_STATE_WITHIN.error },
+            warning: { group: FIELD_STATE_WITHIN.warning },
         },
-        adornment: {
-            none: "",
-            icon: "pr-9",
-            button: "pr-11",
+        disabled: {
+            true: { group: "bg-(--subtle-50) cursor-not-allowed" },
+            false: {},
         },
     },
     defaultVariants: {
         input_size: "sm",
         state: "none",
-        adornment: "none",
+        disabled: false,
     },
 });
-
-const adornmentButtonClass =
-    "absolute right-1 top-1/2 -translate-y-1/2 h-[29px] w-[29px] rounded-md";
-
-function LabelBadge({
-    kind,
-    label,
-    tooltip,
-}: {
-    kind: "error" | "warning";
-    label: string;
-    tooltip?: string;
-}) {
-    const isError = kind === "error";
-    const colorClasses = isError
-        ? "bg-(--destructive-subtle) text-red-800 border border-red-200"
-        : "bg-(--warning-subtle) text-amber-800 border border-amber-200";
-    const Icon = isError ? AlertCircle : AlertTriangle;
-
-    return (
-        <span
-            className={`relative group inline-flex items-center gap-1 px-1.5 py-px rounded-full text-[11px] font-medium leading-[1.4] cursor-help ${colorClasses}`}
-            tabIndex={0}
-            role="button"
-            aria-label={`${kind} details`}
-        >
-            <Icon size={11} strokeWidth={2.5} className="shrink-0" />
-            {label}
-            {tooltip && (
-                <span
-                    className={[
-                        "absolute top-[calc(100%+6px)] left-0 z-10",
-                        "min-w-55 max-w-xs",
-                        "bg-(--text) text-white text-xs font-normal leading-[1.45]",
-                        "px-2.5 py-2 rounded-md shadow-lg",
-                        "opacity-0 -translate-y-0.5 pointer-events-none",
-                        "transition-[opacity,transform] duration-120 ease-out",
-                        "group-hover:opacity-100 group-hover:translate-y-0",
-                        "group-focus:opacity-100 group-focus:translate-y-0",
-                        "before:content-[''] before:absolute before:-top-1 before:left-3",
-                        "before:w-2 before:h-2 before:bg-(--text) before:rotate-45",
-                    ].join(" ")}
-                >
-                    {tooltip}
-                </span>
-            )}
-        </span>
-    );
-}
 
 export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
     (
         {
             className,
+            inputClassName,
             size,
             label,
             error,
             errorTooltip,
             warning,
             warningTooltip,
+            prefix,
+            suffix,
             rightIcon,
             rightButton,
             loading,
+            disabled,
+            selectOnFocus: selectOnFocusProp,
+            type,
+            onFocus,
             ...rest
         },
         ref,
     ) => {
-        const state = error ? "error" : warning ? "warning" : "none";
-        const adornment = loading || rightButton ? (loading ? "icon" : "button") : rightIcon ? "icon" : "none";
+        const state = fieldState(error, warning);
+        const styles = inputStyles({ input_size: size, state, disabled: Boolean(disabled) });
+
+        // Das Präfix ist Teil der Bedeutung des Felds ("AG" vor der Nummer), nicht
+        // bloß Dekor — ohne diese Verknüpfung bliebe es für Screenreader unsichtbar.
+        const generatedId = useId();
+        const prefixId = `${rest.id ?? generatedId}-prefix`;
+
+        // Zahlenfelder markieren ihren Wert beim Fokus von selbst; Textfelder nur
+        // auf Ansage. Ein eigener Handler der Call-Site wird angehängt, nicht ersetzt.
+        const selectsOnFocus = selectOnFocusProp ?? type === "number";
+        const handleFocus = selectsOnFocus
+            ? (event: FocusEvent<HTMLInputElement>) => {
+                  selectOnFocus(event);
+                  onFocus?.(event);
+              }
+            : onFocus;
 
         return (
-            <div className="w-full">
-                {(label || error || warning) && (
-                    <div className="flex items-center gap-1.5 mb-1 justify-between">
-                        {label && (
-                            <label className="text-sm font-medium text-(--text)">
-                                {label}
-                            </label>
-                        )}
-                        {error && (
-                            <LabelBadge kind="error" label={error} tooltip={errorTooltip} />
-                        )}
-                        {!error && warning && (
-                            <LabelBadge kind="warning" label={warning} tooltip={warningTooltip} />
-                        )}
-                    </div>
-                )}
-                <div className="relative">
+            <Field
+                label={label}
+                error={error}
+                errorTooltip={errorTooltip}
+                warning={warning}
+                warningTooltip={warningTooltip}
+                htmlFor={rest.id}
+            >
+                <div className={styles.group({ className })}>
+                    {prefix != null && (
+                        <span id={prefixId} className={styles.addon({ className: "border-r border-(--border)" })}>
+                            {prefix}
+                        </span>
+                    )}
+
                     <input
                         ref={ref}
-                        className={styles({ input_size: size, state, adornment, className })}
+                        disabled={disabled}
+                        aria-describedby={prefix != null ? prefixId : undefined}
+                        className={styles.input({ className: inputClassName })}
                         {...rest}
+                        type={type}
+                        onFocus={handleFocus}
                     />
 
+                    {suffix != null && <span className={styles.addon()}>{suffix}</span>}
+
                     {loading && (
-                        <span
-                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--border-200)">
+                        <span className={styles.addon({ className: "pl-0 text-(--border-200)" })}>
                             <Loader2 size={16} className="animate-spin border-t-(--primary)" />
                         </span>
                     )}
 
                     {!loading && rightButton && (() => {
-                        const { icon, className: btnClassName, type, ...btnRest } = rightButton;
+                        const { icon, className: btnClassName, type: btnType, ...btnRest } = rightButton;
                         return (
-                            <Button
-                                size="xs"
-                                type={type ?? "button"}
-                                {...btnRest}
-                                icon={icon}
-                                iconOnly
-                                className={`${adornmentButtonClass} ${btnClassName ?? ""}`.trim()}
-                            />
+                            <span className={styles.addon({ className: "pl-0" })}>
+                                <Button
+                                    size="xs"
+                                    type={btnType ?? "button"}
+                                    {...btnRest}
+                                    icon={icon}
+                                    iconOnly
+                                    className={`h-[29px] w-[29px] rounded-md ${btnClassName ?? ""}`.trim()}
+                                />
+                            </span>
                         );
                     })()}
 
                     {!loading && !rightButton && rightIcon && (
-                        <span
-                            className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 flex text-(--text-secondary)">
-                            {rightIcon}
-                        </span>
+                        <span className={styles.addon({ className: "pl-0" })}>{rightIcon}</span>
                     )}
                 </div>
-            </div>
+            </Field>
         );
     },
 );

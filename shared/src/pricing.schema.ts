@@ -15,6 +15,9 @@ import { z } from "zod";
  * ist dieselbe, in der eine Position gespeichert wird — Vorschau und
  * gespeichertes Angebot zeigen dadurch dieselben Zahlen.
  */
+export const priceOriginSchema = z.enum(["list", "customer"]);
+export type PriceOrigin = z.infer<typeof priceOriginSchema>;
+
 export const positionPriceSchema = z.object({
     /** Stückpreis pro Einheit und Monat. */
     eur_user_month: z.number().int(),
@@ -31,6 +34,23 @@ export const positionPriceSchema = z.object({
      * nicht mehr.
      */
     fromSnapshot: z.boolean(),
+
+    /**
+     * Woher der Stückpreis stammt: aus der Preistabelle (`list`) oder aus einem
+     * für diesen Kunden hinterlegten Preis (`customer`).
+     *
+     * Ohne diese Angabe ist einem Betrag nicht anzusehen, ob er ausgehandelt
+     * oder Listenpreis ist — ein Sonderpreis blieb dadurch unsichtbar und war
+     * über die Oberfläche weder erkennbar noch zurückzunehmen.
+     */
+    origin: priceOriginSchema,
+
+    /**
+     * Der Listenpreis an derselben Koordinate — `null`, wenn dort keiner
+     * hinterlegt ist. Erst dadurch ist sichtbar, *wovon* ein Kundenpreis
+     * abweicht.
+     */
+    list_eur_user_month: z.number().int().nullable(),
 });
 export type PositionPrice = z.infer<typeof positionPriceSchema>;
 
@@ -41,8 +61,8 @@ export const netCents = (price: Pick<PositionPrice, "total_cents" | "discount_ce
 /**
  * Koordinaten, die einen Preis im Tarif eindeutig adressieren.
  *
- * Die Feldnamen folgen bewusst der Angebotsposition, damit Koordinaten ohne
- * Umbenennung aus einer Position entstehen. Die Abbildung auf die abweichenden
+ * Die Feldnamen folgen bewusst dem Angebot, damit Koordinaten ohne Umbenennung
+ * aus Kopf und Position entstehen. Die Abbildung auf die abweichenden
  * Query-Parameter des Endpunkts (`duration`, `freeMonths`) passiert an genau
  * einer Stelle im API-Layer.
  */
@@ -57,20 +77,27 @@ export const priceCoordinatesSchema = z.object({
 export type PriceCoordinates = z.infer<typeof priceCoordinatesSchema>;
 
 /**
- * Koordinaten aus einer Angebotsposition.
+ * Der Teil der Koordinaten, der am Angebotskopf hängt. Vertrag und Laufzeit
+ * gelten für alle Positionen gemeinsam; erst Produkt und Menge machen die
+ * Koordinate vollständig.
+ */
+export type PriceHeader = Pick<PriceCoordinates, "customerId" | "contractId" | "duration_months">;
+
+/**
+ * Koordinaten aus Angebotskopf und Position.
  *
  * Die Felder werden einzeln übernommen statt gespreadet: eine gespeicherte
  * Position bringt `id`, `total_cents` und weitere Felder mit, die den
  * Query-Key aufblähen und Treffer im Cache verhindern würden.
  */
 export const coordinatesFrom = (
-    customerId: string,
-    position: Omit<PriceCoordinates, "customerId">,
+    header: PriceHeader,
+    position: Pick<PriceCoordinates, "productId" | "quantity" | "free_months">,
 ): PriceCoordinates => ({
-    customerId,
+    customerId: header.customerId,
+    contractId: header.contractId,
+    duration_months: header.duration_months,
     productId: position.productId,
-    contractId: position.contractId,
-    duration_months: position.duration_months,
     quantity: position.quantity,
     free_months: position.free_months,
 });

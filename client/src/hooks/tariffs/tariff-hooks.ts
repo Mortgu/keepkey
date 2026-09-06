@@ -12,9 +12,20 @@ export function useTariffVersionsHook(groupId: string, tariffId: string) {
     return { versions, isPending, error };
 }
 
-export function useTariffDurationsHook(productId: string, contractId: string) {
-    const { data: durations = [], isPending, error } = useQuery(tariffQueries.durations(productId, contractId));
+/**
+ * Die global gepflegten Laufzeiten. Braucht weder Produkt noch Vertrag und
+ * steht damit fest, bevor im Angebot eine Position existiert.
+ */
+export function useStandardDurations() {
+    const { data: durations = [], isPending, error } = useQuery(tariffQueries.standardDurations());
 
     return { durations, isPending, error };
+}
+
+/** Die global gepflegten Mengenstaffeln — die Zeilenachse jeder Preistabelle. */
+export function useStandardTiers() {
+    const { data: tiers = [], isPending, error } = useQuery(tariffQueries.standardTiers());
+
+    return { tiers, isPending, error };
 }
 

@@ -5,10 +5,10 @@ import type { SyntheticEvent } from "react";
 
 interface Props {
     currentSupplier?: Supplier | null;
-    closeFn: () => void;
+    onClose: () => void;
 }
 
-export default function useSupplierForm({ currentSupplier, closeFn }: Props) {
+export default function useSupplierForm({ currentSupplier, onClose }: Props) {
     const { createSupplier } = useCreateSupplier();
     const { updateSupplier } = useUpdateSupplier();
 
@@ -32,7 +32,7 @@ export default function useSupplierForm({ currentSupplier, closeFn }: Props) {
                 createSupplier({ ...value });
             }
 
-            closeFn();
+            onClose();
         }
     });
 

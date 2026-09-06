@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
-import { search, type SearchType } from "../services/search.service.js";
+import { search } from "../services/search.service.js";
+import type { SearchType } from "@keepit/schemas";
 
 export const getSearch = async (request: Request, response: Response) => {
     const q = (request.query.q as string | undefined)?.trim() ?? "";

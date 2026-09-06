@@ -26,7 +26,22 @@ import env from "../src/lib/env.js";
  * Was der Direkt-Upload mindestens braucht. Weitere Methoden einer bereits
  * vorhandenen Regel bleiben erhalten — dieses Script ergänzt, es verengt nicht.
  */
-const REQUIRED_METHODS = ["GET", "PUT", "POST"];
+const REQUIRED_METHODS = ["GET", "HEAD", "PUT", "POST"];
+
+/**
+ * Der Download geht als `<a download>` an unsere eigene API, die mit 302 auf die
+ * signierte Bucket-URL umleitet. Ein Redirect über eine Origin-Grenze setzt das
+ * "tainted origin"-Flag: Der Browser schickt danach `Origin: null` statt der
+ * App-Origin. Ohne diesen Eintrag passt keine Regel, der Bucket antwortet ohne
+ * `Access-Control-Allow-Origin`, und Firefox verwirft die 200er-Antwort.
+ *
+ * Das Objekt bleibt privat — lesbar nur mit einer signierten URL, die fünf
+ * Minuten gilt.
+ */
+const REDIRECT_ORIGIN = "null";
+
+/** Header, die der Browser nach dem Download lesen können muss. */
+const REQUIRED_EXPOSED = ["ETag", "Content-Disposition", "Content-Length", "Content-Type"];
 
 const dryRun = process.argv.includes("--dry-run");
 
@@ -54,11 +69,15 @@ function managedRule(existing: Array<CORSRule>): CORSRule {
     const mine = existing.filter(isManaged);
 
     return {
-        AllowedOrigins: distinct([...mine.flatMap((rule) => rule.AllowedOrigins ?? []), ...appOrigins]),
+        AllowedOrigins: distinct([
+            ...mine.flatMap((rule) => rule.AllowedOrigins ?? []),
+            ...appOrigins,
+            REDIRECT_ORIGIN,
+        ]),
         AllowedMethods: distinct([...mine.flatMap((rule) => rule.AllowedMethods ?? []), ...REQUIRED_METHODS]),
         // Der Upload schickt den Content-Type mit, mit dem die URL signiert wurde.
         AllowedHeaders: distinct([...mine.flatMap((rule) => rule.AllowedHeaders ?? []), "*"]),
-        ExposeHeaders: distinct([...mine.flatMap((rule) => rule.ExposeHeaders ?? []), "ETag"]),
+        ExposeHeaders: distinct([...mine.flatMap((rule) => rule.ExposeHeaders ?? []), ...REQUIRED_EXPOSED]),
         MaxAgeSeconds: mine.find((rule) => rule.MaxAgeSeconds !== undefined)?.MaxAgeSeconds ?? 3000,
     };
 }

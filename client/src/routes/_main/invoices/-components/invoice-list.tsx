@@ -47,7 +47,7 @@ export default function InvoiceList() {
                         values={customerFilter} onChange={setCustomerFilter} />
 
                     <SearchBar value={searchInput} onChange={setSearchInput}
-                        onSubmit={handleSearch} placeholder="AG-Nr. Suchen..." />
+                        onSubmit={handleSearch} placeholder={t("invoices.searchPlaceholder")} />
                 </div>
                 <div className="flex items-center gap-2">
                     <Button onClick={() => modal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>

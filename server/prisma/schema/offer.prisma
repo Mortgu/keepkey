@@ -16,7 +16,7 @@ model Offer {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
 
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
   contactPersonId       String
 
   user   User   @relation(fields: [userId], references: [id])
@@ -24,7 +24,18 @@ model Offer {
 
   language Language @default(DE)
 
-  quoteId         String // quoteId / voucherId
+  /// Vertrag und Laufzeit des Angebots. Sie gelten für alle Positionen
+  /// gemeinsam: fachlich hat ein Angebot genau einen Vertrag und genau eine
+  /// Laufzeit. Vorher hing beides an jeder Position, wodurch ein Angebot keine
+  /// eindeutige Laufzeit hatte — und damit keine bestimmbare Restlaufzeit.
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration_months Int
+
+  /// Belegnummer. Eindeutig — bei Rechnungsnummern in DE auch rechtlich
+  /// geboten (Eindeutigkeit); Lückenlosigkeit sichert der Vergabeprozess.
+  quoteId         String @unique // quoteId / voucherId
   /// @openapi.ignore
   documentVersion Int    @default(0)
   paymentTerm     String
@@ -58,6 +69,12 @@ model Offer {
   updatedAt      DateTime        @updatedAt @db.Timestamptz(6)
   offerDiscounts OfferDiscount[]
 
+  @@index([customerId])
+  @@index([contactPersonId])
+  @@index([userId])
+  @@index([contractId])
+  @@index([supplierId])
+  @@index([renewedFromOfferId])
   @@map("offer")
 }
 
@@ -77,6 +94,7 @@ model OfferRevision {
   createdAt DateTime @default(now())
 
   @@unique([offerId, version])
+  @@index([changedById])
   @@map("offer_revision")
 }
 
@@ -89,18 +107,15 @@ model OfferPosition {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
   /// Eingefrorene Preisgrundlage dieser Position. Null bei Bestandspositionen,
   /// die vor Einfuehrung der Tarif-Versionierung angelegt wurden.
   tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
   tariffVersionId String?
 
-  duration_months Int
-  free_months     Int     @default(0)
-  quantity        Int
-  optional        Boolean @default(false)
+  /// Vertrag und Laufzeit stehen am Angebot — siehe {@link Offer}.
+  free_months Int     @default(0)
+  quantity    Int
+  optional    Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int
@@ -109,6 +124,9 @@ model OfferPosition {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([offerId])
+  @@index([productId])
+  @@index([tariffVersionId])
   @@map("offer_position")
 }
 
@@ -124,6 +142,8 @@ model OfferFlatRate {
   quantity    Int
   total_cents Int
 
+  @@index([offerId])
+  @@index([flatRateId])
   @@map("offer_flat_rate")
 }
 
@@ -159,7 +179,7 @@ model OfferDocument {
 model OfferDiscount {
   id String @id @default(cuid())
 
-  offer   Offer  @relation(fields: [offerId], references: [id])
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
   title       String
@@ -170,5 +190,6 @@ model OfferDiscount {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([offerId])
   @@map("offer_discount")
 }

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { OFFER_MODAL_POLICIES } from "../-components/modals/offer-modal-policy";
 import { offerModalSchema } from "../-schemas/offer-modal-schema";
 import useOfferModal from "./use-offer.offer-modal";
+import usePricingStatus from "./use-pricing-status.offer-modal";
 import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "../-components/modals/offer-modal-policy";
 import type { OfferModalValues } from "../-schemas/offer-modal-schema";
@@ -12,7 +13,7 @@ interface Props {
     mode: OfferModalMode;
     /** Beim Bearbeiten die Vorlage, bei abgeleiteten Angeboten das Quellangebot. */
     sourceOffer?: Offer;
-    closeFn: () => void;
+    onClose: () => void;
     preselectedCustomerId?: string;
 }
 
@@ -25,8 +26,6 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
         ...values,
         offerPositions: values.offerPositions.map((position) => ({
             productId: position.productId,
-            contractId: position.contractId,
-            duration_months: position.duration_months,
             free_months: position.free_months,
             quantity: position.quantity,
             optional: position.optional,
@@ -66,7 +65,7 @@ function toExtendInput(values: OfferModalValues): ExtendOfferInput {
  * identisch; verschieden sind nur die Startwerte (siehe Policy) und die
  * Mutation beim Speichern.
  */
-export default function useOfferModalForm({ mode, sourceOffer, closeFn, preselectedCustomerId }: Props) {
+export default function useOfferModalForm({ mode, sourceOffer, onClose, preselectedCustomerId }: Props) {
     const policy = OFFER_MODAL_POLICIES[mode];
 
     const { defaultValues } = useOfferModal({ currentOffer: sourceOffer, preselectedCustomerId });
@@ -103,16 +102,33 @@ export default function useOfferModalForm({ mode, sourceOffer, closeFn, preselec
                 await createOffer(toCreateInput(value));
             }
 
-            closeFn();
+            onClose();
         },
     });
 
-    const customerId = useStore(form.store, (s) => s.values.customerId);
+    // Der Teil der Preiskoordinate, den alle Positionen teilen. Als ein Wert,
+    // damit jede Position ihn unverändert weiterreicht, statt drei Felder
+    // einzeln durch den Baum zu tragen.
+    const header = useStore(form.store, (s) => ({
+        customerId: s.values.customerId,
+        contractId: s.values.contractId,
+        duration_months: s.values.duration_months,
+    }));
+
+    const positions = useStore(form.store, (s) => s.values.offerPositions);
+
+    const pricing = usePricingStatus({
+        header,
+        source: policy.priceSource,
+        sourceOfferId: sourceOffer?.id,
+        positions,
+    });
 
     return {
         form,
         policy,
-        customerId,
+        header,
+        pricing,
     };
 }
 

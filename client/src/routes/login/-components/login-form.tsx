@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
+import useLoginForm from "../-hooks/use-login-form";
 import { Button, Input } from "@/components";
 import { getFormError } from "@/lib/utils";
-import useLoginForm from "../-hooks/use-login-form";
 import { authClient } from "@/lib/auth-client";
 
 export function LoginFormComponent() {
+    const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
@@ -39,9 +41,9 @@ export function LoginFormComponent() {
                     {/* Heading */}
                     <div className="text-center mb-6">
                         <h1 className="font-medium text-xl text-gray-900 tracking-tight">
-                            Anmelden
+                            {t("login.title")}
                         </h1>
-                        <p className="text-sm text-gray-400 mt-1">Willkommen zurück</p>
+                        <p className="text-sm text-gray-400 mt-1">{t("login.welcome")}</p>
                     </div>
 
                     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
@@ -75,7 +77,7 @@ export function LoginFormComponent() {
                                         htmlFor={field.name}
                                         className="text-sm font-medium text-gray-900"
                                     >
-                                        E-Mail
+                                        {t("login.email")}
                                     </label>
                                     <Input
                                         id={field.name}
@@ -85,7 +87,7 @@ export function LoginFormComponent() {
                                         onBlur={field.handleBlur}
                                         type="email"
                                         autoComplete="username webauthn"
-                                        placeholder="du@firma.de"
+                                        placeholder={t("login.emailPlaceholder")}
                                         className={
                                             field.state.meta.isTouched &&
                                                 field.state.meta.errors.length > 0
@@ -110,28 +112,29 @@ export function LoginFormComponent() {
                                         htmlFor={field.name}
                                         className="text-sm font-medium text-gray-900"
                                     >
-                                        Passwort
+                                        {t("login.password")}
                                     </label>
-                                    <div className="relative">
-                                        <Input
-                                            id={field.name}
-                                            name={field.name}
-                                            value={field.state.value}
-                                            onChange={(e) => field.handleChange(e.target.value)}
-                                            onBlur={field.handleBlur}
-                                            type={showPassword ? "text" : "password"}
-                                            autoComplete="current-password webauthn"
-                                            placeholder="••••••••"
-                                            className={`pr-10 ${field.state.meta.isTouched && field.state.meta.errors.length > 0 ? "border-red-400!" : ""}`}
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword((v) => !v)}
-                                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors cursor-pointer"
-                                        >
-                                            {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-                                        </button>
-                                    </div>
+                                    <Input
+                                        id={field.name}
+                                        name={field.name}
+                                        value={field.state.value}
+                                        onChange={(e) => field.handleChange(e.target.value)}
+                                        onBlur={field.handleBlur}
+                                        type={showPassword ? "text" : "password"}
+                                        autoComplete="current-password webauthn"
+                                        placeholder={t("login.passwordPlaceholder")}
+                                        className={
+                                            field.state.meta.isTouched && field.state.meta.errors.length > 0
+                                                ? "border-red-400!"
+                                                : ""
+                                        }
+                                        rightButton={{
+                                            variant: "ghost",
+                                            onClick: () => setShowPassword((v) => !v),
+                                            "aria-label": showPassword ? t("login.hidePassword") : t("login.showPassword"),
+                                            icon: showPassword ? <EyeOff size={15} /> : <Eye size={15} />,
+                                        }}
+                                    />
                                     {field.state.meta.isTouched && field.state.meta.errors[0] && (
                                         <span className="text-xs text-red-500">
                                             {getFormError(field.state.meta.errors)}
@@ -164,13 +167,13 @@ export function LoginFormComponent() {
                                         </svg>
                                     )}
                                 </div>
-                                Angemeldet bleiben
+                                {t("login.rememberMe")}
                             </label>
                             <a
                                 href="#"
                                 className="text-sm text-(--primary-600) hover:underline"
                             >
-                                Passwort vergessen?
+                                {t("login.forgotPassword")}
                             </a>
                         </div>
 
@@ -183,7 +186,7 @@ export function LoginFormComponent() {
                                     loading={isSubmitting}
                                     className="w-full mt-1"
                                 >
-                                    {!(isSubmitting) && "Anmelden"}
+                                    {!isSubmitting && t("login.submit")}
                                 </Button>
                             )}
                         </form.Subscribe>
@@ -192,7 +195,7 @@ export function LoginFormComponent() {
                     {/* Divider */}
                     <div className="flex items-center gap-3 my-3">
                         <div className="h-px flex-1 bg-(--border)" />
-                        <span className="text-xs text-gray-400">oder</span>
+                        <span className="text-xs text-gray-400">{t("login.or")}</span>
                         <div className="h-px flex-1 bg-(--border)" />
                     </div>
 
@@ -205,7 +208,7 @@ export function LoginFormComponent() {
                         onClick={handlePasskeySignIn}
                         className="w-full"
                     >
-                        {!passkeyLoading && "Mit Passkey anmelden"}
+                        {!passkeyLoading && t("login.passkey")}
                     </Button>
                 </div>
             </div>

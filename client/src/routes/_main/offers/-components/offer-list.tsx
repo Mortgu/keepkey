@@ -1,12 +1,9 @@
 import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
 import OfferCard from "./card/offer-card";
-import OfferModal from "./modals/offer-modal";
 import type { OfferFilters } from "../-hooks/use-offer-filters";
 
-
-import type { Offer } from "@keepit/schemas";
 import { FilterChip, ListSkeleton, OfferCardSkeleton, RouteError } from "@/components";
-import { useContacts, useCustomers, useLocale, useModal, useProducts } from "@/hooks";
+import { useContacts, useCustomers, useLocale, useProducts } from "@/hooks";
 import { useOffers } from "@/hooks/offers/offer-hooks";
 
 interface Props {
@@ -14,8 +11,6 @@ interface Props {
 }
 
 export default function OfferList({ filters }: Props) {
-  const modal = useModal<Offer>();
-
   const { items: offers, isPending, error } = useOffers(filters.params);
 
   const { contacts } = useContacts();
@@ -78,19 +73,11 @@ export default function OfferList({ filters }: Props) {
             <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
           )}
           {offers.map((offer) => (
-            <OfferCard key={offer.id} offer={offer} onEdit={(o) => modal.open(o)} />
+            <OfferCard key={offer.id} offer={offer} />
           ))}
         </div>
 
       </div>
-
-      {modal.isOpen && (
-        <OfferModal
-          key={modal.key}
-          closeFn={modal.close}
-          sourceOffer={modal.data ?? undefined}
-        />
-      )}
     </div>
   );
 }

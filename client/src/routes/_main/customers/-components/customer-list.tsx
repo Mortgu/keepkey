@@ -1,13 +1,12 @@
 import { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import OfferModal from "../../offers/-components/modals/offer-modal";
-import OrderModal from "../../orders/-components/order-modal";
+import OrderModal from "../../orders/-components/order-select-modal";
 import { useCustomerActions } from "../-hooks/use-customer-actions";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
-
 import type { Customer } from "@keepit/schemas";
-import type {CustomerFilters} from "../-page.hooks";
+import type { CustomerFilters } from "../-page.hooks";
 import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 
@@ -19,6 +18,7 @@ interface Props {
 export default function CustomerList({ filters, onEdit }: Props) {
     const { t } = useTranslation();
     const modal = useModal<Customer>();
+    const offerModal = useModal<string>();
     const { actions, activeCustomerId, modals } = useCustomerActions();
 
     const { customers, isPending, error } = useCustomers(filters.params);
@@ -53,7 +53,7 @@ export default function CustomerList({ filters, onEdit }: Props) {
                         key={customer.id}
                         customer={customer}
                         onEdit={onEdit}
-                        onCreateOffer={() => actions.createOffer(customer.id)}
+                        onCreateOffer={() => offerModal.open(customer.id)}
                         onCreateOrder={() => actions.createOrder(customer.id)}
                     />
                 ))}
@@ -63,11 +63,11 @@ export default function CustomerList({ filters, onEdit }: Props) {
                 <CustomerModal key={modal.key} onClose={modal.close} />
             )}
 
-            {modals.offerModal.isOpen && (
+            {offerModal.isOpen && offerModal.data && (
                 <OfferModal
-                    key={`offer-${activeCustomerId}`}
-                    closeFn={modals.offerModal.close}
-                    preselectedCustomerId={activeCustomerId ?? undefined}
+                    key={`offer-${offerModal.data}`}
+                    preselectedCustomerId={offerModal.data}
+                    onClose={offerModal.close}
                 />
             )}
 
@@ -75,7 +75,6 @@ export default function CustomerList({ filters, onEdit }: Props) {
                 <OrderModal
                     key={`order-${activeCustomerId}`}
                     onClose={modals.orderModal.close}
-                    customerId={activeCustomerId ?? undefined}
                 />
             )}
         </Fragment>

@@ -7,7 +7,7 @@ model Order {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String // Kunden-Nr.
 
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId], references: [id])
+  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
   contactPersonId       String // Ihr Ansprechpartner
 
   employee   User   @relation(fields: [employeeId], references: [id])
@@ -16,7 +16,16 @@ model Order {
   offer   Offer  @relation(fields: [offerId], references: [id])
   offerId String @unique // One-to-one relation
 
-  orderId String // Beleg-Nr.
+  /// Vertrag und Laufzeit der Bestellung — übernommen aus dem Angebot und dort
+  /// aus demselben Grund am Kopf statt an der Position. Sie sind die Grundlage
+  /// jeder Aussage über die Restlaufzeit dieser Bestellung.
+  contract   Contract @relation(fields: [contractId], references: [id])
+  contractId String
+
+  duration_months Int
+
+  /// Belegnummer — eindeutig, siehe {@link Offer.quoteId}.
+  orderId String @unique // Beleg-Nr.
 
   /// @openapi.ignore
   documentVersion Int    @default(0)
@@ -44,6 +53,11 @@ model Order {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
+  @@index([customerId])
+  @@index([contactPersonId])
+  @@index([employeeId])
+  @@index([contractId])
+  @@index([supplierId])
   @@map("order")
 }
 
@@ -63,6 +77,7 @@ model OrderRevision {
   createdAt DateTime @default(now())
 
   @@unique([orderId, version])
+  @@index([changedById])
   @@map("order_revision")
 }
 
@@ -75,11 +90,8 @@ model OrderPosition {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration_months Int
-  quantity        Int
+  /// Vertrag und Laufzeit stehen an der Bestellung — siehe {@link Order}.
+  quantity Int
 
   optional Boolean? @default(false)
 
@@ -87,6 +99,8 @@ model OrderPosition {
 
   createdAt DateTime @default(now())
 
+  @@index([orderId])
+  @@index([productId])
   @@map("order_position")
 }
 
@@ -102,6 +116,8 @@ model OrderFlatRate {
   quantity    Int
   total_cents Int
 
+  @@index([orderId])
+  @@index([flatRateId])
   @@map("order_flat_rate")
 }
 

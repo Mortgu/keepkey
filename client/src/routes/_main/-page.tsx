@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
+import OfferVolumeChart from "./-components/charts/offer-volume-chart";
 import IntegrationCard from "./-components/integration-card";
-import GlobalSearch from "./-components/global-search";
-import StatCard from "./-components/stat-card";
+import OffersOrdersChart from "./-components/charts/offers-orders-chart";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
-import type { IntegrationEntry } from "@/data/integrations";
-import { PageWidth, RouteError } from "@/components";
+import type { IntegrationEntry } from "@keepit/schemas";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 import { useDashboardStats } from "@/hooks";
+import { Breadcrumbs, RouteError, Skeleton } from "@/components";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 
@@ -17,7 +17,7 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 
 export default function DashboardPage() {
     const { t } = useTranslation();
-    const { stats } = useDashboardStats();
+    const { months, isPending: statsPending, error: statsError } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
     const renderCard = (
@@ -38,85 +38,53 @@ export default function DashboardPage() {
         );
     };
 
+    if (error) {
+        return <RouteError error={error} onRetry={refetch} />
+    }
+
     return (
-        <PageWidth variant="none">
-            <div className="w-full bg-(--page-bg) border-b border-(--border) p-4">
-                <GlobalSearch />
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[{ label: "Dashboard", to: "/" }]}
+                />
             </div>
 
-            {error ? (
-                <RouteError error={error} onRetry={refetch} />
-            ) : (
-                <div className="grid grid-cols-3 border-b border-(--border) [&>*:not(:last-child)]:border-r [&>*:not(:last-child)]:border-(--border)">
-                    {renderCard("NextCloud", data?.nextcloud)}
-                    {renderCard("Redis", data?.redis)}
-                    {renderCard("S3 Storage", data?.s3)}
+            {/* Page Header with Title + Actions */}
+            <div className="flex items-center justify-between mb-2">
+                {/* Title + Description */}
+                <div className="grid gap-1">
+                    <h1 className="text-xl font-medium">Overview</h1>
+                    <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
+                </div>
+            </div>
+
+            {/* Integrations (Status + Infos) */}
+            <div className='flex flex-wrap items-start gap-4 mb-4'>
+                {renderCard("NextCloud", data?.nextcloud)}
+                {renderCard("Redis", data?.redis)}
+                {renderCard("S3 Storage", data?.s3)}
+            </div>
+
+            {/* Kennzahlen der letzten 12 Monate */}
+            {statsError && <RouteError error={statsError} />}
+
+            {statsPending && (
+                <div className='flex flex-wrap gap-4 mb-6'>
+                    <Skeleton className="flex-1 h-80 min-w-[420px]" />
+                    <Skeleton className="flex-1 h-80 min-w-[420px]" />
                 </div>
             )}
 
-            <div className="flex border-b border-(--border) [&>*:not(:last-child)]:border-r [&>*:not(:last-child)]:border-(--border) overflow-y-scroll">
-                <StatCard
-                    title={t("section.offers")}
-                    total={stats.offers.total}
-                    volume={stats.offers.volume}
-                />
-
-                <StatCard
-                    title={t("section.orders")}
-                    total={stats.orders.total}
-                    volume={stats.orders.volume}
-                />
-            </div>
-
-            {/* <div className="grid">
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="md">Button md</Button>
-                    <Button size="md" icon={<Plus size={18} />}>Button md</Button>
-                    <Button size="md" icon={<Plus size={18} />} iconOnly />
-                    <Button size="md" variant="primary" loading>Button xs</Button>
-
-                    <Button size="md" variant="secondary">Button md</Button>
-                    <Button size="md" variant="border">Button md</Button>
-                    <Button size="md" variant="ghost">Button md</Button>
-
-                    <Button size="md" variant="primary" danger>Button xs</Button>
-                    <Button size="md" variant="secondary" danger>Button xs</Button>
-                    <Button size="md" variant="border" danger>Button xs</Button>
+            {!statsPending && !statsError && (
+                <div className='flex flex-wrap items-stretch gap-4 mb-6'>
+                    <OfferVolumeChart months={months} />
+                    <OffersOrdersChart months={months} />
                 </div>
+            )}
 
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="sm">Button sm</Button>
-                    <Button size="sm" icon={<Plus size={16} />}>Button sm</Button>
-                    <Button size="sm" icon={<Plus size={16} />} iconOnly />
-                    <Button size="sm" variant="primary" loading>Button xs</Button>
-
-                    <Button size="sm" variant="secondary">Button sm</Button>
-                    <Button size="sm" variant="border">Button sm</Button>
-                    <Button size="sm" variant="ghost">Button sm</Button>
-
-                    <Button size="sm" variant="primary" danger>Button xs</Button>
-                    <Button size="sm" variant="secondary" danger>Button xs</Button>
-                    <Button size="sm" variant="border" danger>Button xs</Button>
-
-                </div>
-
-                <div className="m-4 flex flex-wrap items-center gap-4">
-                    <Button size="xs">Button xs</Button>
-                    <Button size="xs" icon={<Plus size={14} />}>Button xs</Button>
-                    <Button size="xs" icon={<Plus size={14} />} iconOnly />
-                    <Button size="xs" variant="primary" loading>Button xs</Button>
-
-                    <Button size="xs" variant="secondary">Button xs</Button>
-                    <Button size="xs" variant="border">Button xs</Button>
-                    <Button size="xs" variant="ghost">Button xs</Button>
-
-                    <Button size="xs" variant="primary" danger>Button xs</Button>
-                    <Button size="xs" variant="secondary" danger>Button xs</Button>
-                    <Button size="xs" variant="border" danger>Button xs</Button>
-
-
-                </div>
-            </div>*/}
-        </PageWidth>
+        </div>
     );
 }

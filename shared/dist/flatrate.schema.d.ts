@@ -47,4 +47,16 @@ export declare const flatrateSchema: z.ZodObject<{
     updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
 }, z.core.$strip>;
 export type Flatrate = z.infer<typeof flatrateSchema>;
+/**
+ * Filter der Pauschalen-Liste — dieselbe Form wie {@link workloadFilterSchema}.
+ * Gesucht wird über den übersetzten Namen, sortiert über das Anlagedatum.
+ */
+export declare const flatrateFilterSchema: z.ZodObject<{
+    search: z.ZodOptional<z.ZodString>;
+    sort: z.ZodOptional<z.ZodEnum<{
+        "createdAt:asc": "createdAt:asc";
+        "createdAt:desc": "createdAt:desc";
+    }>>;
+}, z.core.$strip>;
+export type FlatrateFilterParams = z.input<typeof flatrateFilterSchema>;
 //# sourceMappingURL=flatrate.schema.d.ts.map

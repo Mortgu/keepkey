@@ -1,20 +1,20 @@
 import {  useMutation, useQueryClient } from "@tanstack/react-query";
 import { tariffKeys } from "./tariff-keys";
 import {
+    createStandardDuration,
+    createStandardTier,
     createTariff,
-    createTariffColumn,
     createTariffGroup,
-    createTariffRow,
+    deleteStandardDuration,
+    deleteStandardTier,
     deleteTariff,
-    deleteTariffColumn,
+    deleteTariffCell,
     deleteTariffGroup,
-    deleteTariffRow,
     restoreTariffVersion,
     sealTariffVersion,
+    updateStandardTier,
     updateTariffCell,
-    updateTariffColumn,
     updateTariffGroup,
-    updateTariffRow,
 } from "./tariff-api";
 import type {QueryClient} from "@tanstack/react-query";
 import type {
@@ -24,7 +24,7 @@ import type {
 } from "@keepit/schemas";
 
 /**
- * Strukturänderungen an Zeilen, Spalten oder Zellen.
+ * Strukturänderungen an Staffeln oder Zellen.
  *
  * Die Versionsliste muss mit invalidiert werden: Sie hängt unterhalb von `all`
  * und wird von `lists()` nicht erfasst — ohne das bliebe die `isCurrent`-Markierung
@@ -57,6 +57,30 @@ function useTariffMutation<TArgs, TResult>(
 ) {
     const queryClient = useQueryClient();
     return useMutation({ mutationFn, onSuccess: () => invalidate(queryClient) });
+}
+
+/* ───────────────────────────────
+   Standardlaufzeiten
+   ─────────────────────────────── */
+
+/**
+ * `tariffKeys.all`, weil die Liste unterhalb davon hängt — und weil sie in
+ * Abschnitt 2 die Spaltenachse jeder Preistabelle wird.
+ */
+export function useCreateStandardDuration() {
+    const { mutate, isPending, error } = useTariffMutation(
+        (months: number) => createStandardDuration(months),
+        invalidateAll,
+    );
+    return { createStandardDuration: mutate, isPending, error };
+}
+
+export function useDeleteStandardDuration() {
+    const { mutate, isPending, error } = useTariffMutation(
+        (id: string) => deleteStandardDuration(id),
+        invalidateAll,
+    );
+    return { deleteStandardDuration: mutate, isPending, error };
 }
 
 /* ───────────────────────────────
@@ -131,80 +155,59 @@ export function useRestoreTariffVersion() {
 }
 
 /* ───────────────────────────────
-   Column
+   Standard-Mengenstaffeln — wirken auf jede Preistabelle
    ─────────────────────────────── */
 
-export function useCreateTariffColumn() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, duration }: { groupId: string; tariffId: string; duration: number }) =>
-            createTariffColumn(groupId, tariffId, duration),
-        invalidateStructure,
-    );
-    return { createColumn: mutate, isPending, error };
-}
-
-export function useDeleteTariffColumn() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, columnId }: { groupId: string; tariffId: string; columnId: string }) =>
-            deleteTariffColumn(groupId, tariffId, columnId),
-        invalidateStructure,
-    );
-    return { deleteColumn: mutate, isPending, error };
-}
-
-export function useUpdateTariffColumn() {
+export function useCreateStandardTier() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, columnId, duration }: {
-            groupId: string; tariffId: string; columnId: string; duration: number;
-        }) => updateTariffColumn(groupId, tariffId, columnId, duration),
-        invalidateStructure,
+        ({ min_quantity, max_quantity }: { min_quantity: number; max_quantity: number | null }) =>
+            createStandardTier(min_quantity, max_quantity),
+        invalidateAll,
     );
-    return { updateColumn: mutateAsync, isPending, error };
+    return { createTier: mutateAsync, isPending, error };
+}
+
+export function useUpdateStandardTier() {
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ id, min_quantity, max_quantity }: { id: string; min_quantity: number; max_quantity: number | null }) =>
+            updateStandardTier(id, min_quantity, max_quantity),
+        invalidateAll,
+    );
+    return { updateTier: mutateAsync, isPending, error };
+}
+
+export function useDeleteStandardTier() {
+    const { mutate, isPending, error } = useTariffMutation(
+        (id: string) => deleteStandardTier(id),
+        invalidateAll,
+    );
+    return { deleteTier: mutate, isPending, error };
 }
 
 /* ───────────────────────────────
-   Row
-   ─────────────────────────────── */
-
-export function useCreateTariffRow() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, min_quantity, max_quantity }: {
-            groupId: string; tariffId: string; min_quantity: number; max_quantity: number | null;
-        }) => createTariffRow(groupId, tariffId, min_quantity, max_quantity),
-        invalidateStructure,
-    );
-    return { createRow: mutateAsync, isPending, error };
-}
-
-export function useDeleteTariffRow() {
-    const { mutate, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, rowId }: { groupId: string; tariffId: string; rowId: string }) =>
-            deleteTariffRow(groupId, tariffId, rowId),
-        invalidateStructure,
-    );
-    return { deleteRow: mutate, isPending, error };
-}
-
-export function useUpdateTariffRow() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, rowId, min_quantity, max_quantity }: {
-            groupId: string; tariffId: string; rowId: string; min_quantity: number; max_quantity: number | null;
-        }) => updateTariffRow(groupId, tariffId, rowId, min_quantity, max_quantity),
-        invalidateStructure,
-    );
-    return { updateRow: mutateAsync, isPending, error };
-}
-
-/* ───────────────────────────────
-   Cell
+   Zelle
    ─────────────────────────────── */
 
 export function useUpdateTariffCell() {
     const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, cellId, default_price }: {
-            groupId: string; tariffId: string; cellId: string; default_price: number;
-        }) => updateTariffCell(groupId, tariffId, cellId, default_price),
+        ({ groupId, tariffId, duration, min_quantity, default_price }: {
+            groupId: string; tariffId: string; duration: number; min_quantity: number; default_price: number;
+        }) => updateTariffCell(groupId, tariffId, duration, min_quantity, default_price),
         invalidateStructure,
     );
     return { updateCell: mutateAsync, isPending, error };
+}
+
+/**
+ * `invalidateStructure` statt `invalidateAll`: es fallen Preise weg, keine
+ * Achse — die Staffel- und Laufzeitlisten bleiben unberührt.
+ */
+export function useDeleteTariffCell() {
+    const { mutateAsync, isPending, error } = useTariffMutation(
+        ({ groupId, tariffId, min_quantity, duration }: {
+            groupId: string; tariffId: string; min_quantity: number; duration?: number;
+        }) => deleteTariffCell(groupId, tariffId, min_quantity, duration),
+        invalidateStructure,
+    );
+    return { deleteCell: mutateAsync, isPending, error };
 }

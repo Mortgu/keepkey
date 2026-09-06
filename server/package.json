@@ -14,6 +14,7 @@
     "build": "prisma generate && tsc",
     "seed": "tsx prisma/seed.ts",
     "cors:apply": "tsx scripts/put-bucket-cors.ts",
+    "templates:import": "tsx scripts/import-templates.ts",
     "typecheck:scripts": "tsc --project tsconfig.scripts.json",
     "test": "vitest run",
     "test:watch": "vitest",

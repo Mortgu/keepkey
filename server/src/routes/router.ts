@@ -5,6 +5,8 @@ import { requireSession } from "@/middlewares/auth.middleware.js";
 import contactPersonRouter from "./contact.route.js";
 import contractRouter from "./contract.route.js";
 import customerRouter from "./customer.route.js";
+import dashboardRouter from "./dashboard.route.js";
+import documentTemplateRouter from './document-template.route.js';
 import documentRouter from './document.route.js';
 import flatRatesRouter from "./flatrate.route.js";
 import cloudRouter from './nextcloud.route.js';
@@ -56,6 +58,9 @@ router.use("/tariffs", requireSession, tariffRouter);
 /* /api/documents */
 router.use('/documents', requireSession, documentRouter);
 
+/* /api/templates */
+router.use('/templates', requireSession, documentTemplateRouter);
+
 /* /api/cloud */
 router.use('/cloud', requireSession, cloudRouter);
 
@@ -64,5 +69,8 @@ router.use('/integrations', requireSession, integrationsRouter);
 
 /* /api/search */
 router.use('/search', requireSession, searchRouter);
+
+/* /api/dashboard */
+router.use('/dashboard', requireSession, dashboardRouter);
 
 export default router;

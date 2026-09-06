@@ -1,139 +1,155 @@
-import { Plus } from "lucide-react";
 import { useMemo } from "react";
+import { Trash } from "lucide-react";
 import TariffCellComponent from "./cell-component";
-import TariffColumnComponent from "./column-component";
-import TariffRowComponent from "./row-component";
-import type { TariffBase, TariffCell } from "@keepit/schemas";
-import { useCreateTariffColumn, useCreateTariffRow, useUpdateTariffRow } from "@/hooks/tariffs/tariff-mutations";
+import TariffTierComponent from "./tier-component";
+import type { TariffBase } from "@keepit/schemas";
+import { useDeleteTariffCell } from "@/hooks/tariffs/tariff-mutations";
+import { useStandardDurations, useStandardTiers } from "@/hooks";
 import { Button } from "@/components";
 
 type Props = {
     tariff: TariffBase;
 };
 
-function buildCellMap(cells: Array<TariffCell>): Map<string, TariffCell> {
-    const map = new Map<string, TariffCell>();
-    for (const cell of cells) {
-        map.set(`${cell.rowId}:${cell.columnId}`, cell);
-    }
-    return map;
-}
+const ORPHAN_COLUMN_HINT =
+    "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar.";
 
-/**
- * Nächste freie Laufzeit. Feste Vorgaben würden mit einer bestehenden Spalte
- * kollidieren, seit doppelte Laufzeiten abgelehnt werden.
- */
-function nextDuration(columns: TariffBase["columns"]): number {
-    if (columns.length === 0) return 12;
-    return columns.reduce((max, column) => Math.max(max, column.duration), 0) + 12;
-}
+const ORPHAN_ROW_HINT =
+    "Diese Mengenstufe steht nicht in den Standard-Staffeln. Die Preise bleiben erhalten, werden aber von der Staffel überdeckt, die diese Menge jetzt abdeckt — sie gelten also nicht mehr.";
 
 export default function TariffComponent({ tariff }: Props) {
-    const { createColumn } = useCreateTariffColumn();
-    const { createRow } = useCreateTariffRow();
-    const { updateRow } = useUpdateTariffRow();
+    const { deleteCell } = useDeleteTariffCell();
+    const { durations: standardDurations } = useStandardDurations();
+    const { tiers } = useStandardTiers();
 
     const groupId = tariff.tariffGroupId;
-    const cells = tariff.cells;
-
-    const cellMap = useMemo(() => buildCellMap(cells), [cells]);
 
     /**
-     * Hängt eine Mengenstaffel lückenlos hinten an.
-     *
-     * Ist die letzte Staffel nach oben offen, gibt es hinter ihr keinen Platz —
-     * sie wird deshalb zuerst begrenzt und die neue Staffel übernimmt den
-     * offenen Rest. So bleiben die Bereiche überschneidungsfrei.
+     * Die Spaltenachse sind die Standardlaufzeiten. Laufzeiten, für die dieser
+     * Tarif noch Preise trägt, die aber nicht (mehr) in der Liste stehen, kommen
+     * hinten dran — sonst verschwänden hinterlegte Preise unbemerkt.
      */
-    const handleAddRow = async () => {
-        const sorted = [...tariff.rows].sort((a, b) => a.min_quantity - b.min_quantity);
-        const last = sorted.at(-1);
+    const columns = useMemo(() => {
+        const standard = standardDurations.map(d => d.months);
+        const standardSet = new Set(standard);
+        const orphans = [...new Set(tariff.cells.map(c => c.duration))]
+            .filter(duration => !standardSet.has(duration))
+            .sort((a, b) => a - b);
 
-        if (!last) {
-            await createRow({ groupId, tariffId: tariff.id, min_quantity: 1, max_quantity: null });
-            return;
-        }
+        return [
+            ...[...standard].sort((a, b) => a - b).map(duration => ({ duration, orphan: false })),
+            ...orphans.map(duration => ({ duration, orphan: true })),
+        ];
+    }, [standardDurations, tariff.cells]);
 
-        if (last.max_quantity === null) {
-            const boundary = last.min_quantity + 9;
+    /**
+     * Dasselbe für die Mengenachse — und hier wiegt es schwerer als bei den
+     * Spalten. Eine Spalte wird über die Laufzeit exakt getroffen; eine Zeile
+     * über einen *Bereich*. Fällt eine Mengenstufe aus der Staffelliste, decken
+     * die Nachbarstaffeln ihren Bereich mit ab und liefern ab dann deren Preis.
+     * Ohne diese Zeile passierte das unsichtbar.
+     */
+    const rows = useMemo(() => {
+        const standard = [...tiers]
+            .sort((a, b) => a.min_quantity - b.min_quantity)
+            .map(tier => ({
+                key: tier.id,
+                tierId: tier.id,
+                min_quantity: tier.min_quantity,
+                max_quantity: tier.max_quantity,
+            }));
 
-            await updateRow({
-                groupId, tariffId: tariff.id, rowId: last.id,
-                min_quantity: last.min_quantity, max_quantity: boundary,
-            });
-            await createRow({ groupId, tariffId: tariff.id, min_quantity: boundary + 1, max_quantity: null });
-            return;
-        }
+        const standardSet = new Set(tiers.map(t => t.min_quantity));
+        const orphans = [...new Set(tariff.cells.map(c => c.min_quantity))]
+            .filter(min_quantity => !standardSet.has(min_quantity))
+            .sort((a, b) => a - b)
+            .map(min_quantity => ({
+                key: `orphan:${min_quantity}`,
+                tierId: null,
+                min_quantity,
+                max_quantity: null,
+            }));
 
-        await createRow({ groupId, tariffId: tariff.id, min_quantity: last.max_quantity + 1, max_quantity: null });
-    };
+        return [...standard, ...orphans];
+    }, [tiers, tariff.cells]);
+
+    const priceAt = useMemo(() => {
+        const map = new Map(tariff.cells.map(cell => [`${cell.duration}:${cell.min_quantity}`, cell.price]));
+        return (duration: number, min_quantity: number) => map.get(`${duration}:${min_quantity}`) ?? null;
+    }, [tariff.cells]);
 
     return (
-        <div className="border-b border-(--border)">
+        <div className="">
             <div className="flex items-center">
                 <table className="w-full">
-                    <thead className="h-fit">
-                        <tr className="border-b border-(--border) bg-(--subtle-50)">
-
+                    <thead className="h-[41px] border-b border-(--border)">
+                        <tr className="">
                             <th className="border-r border-(--border)" />
 
-                            {tariff.columns.map(column => (
-                                <TariffColumnComponent key={column.id} groupId={groupId} tariffId={tariff.id} columnId={column.id} duration={column.duration} />
+                            {columns.map(column => (
+                                <th key={column.duration} className="px-3 py-1 last:border-r-0 border-r border-(--border)">
+                                    <div
+                                        className={column.orphan ? "text-(--text-secondary)" : undefined}
+                                        title={column.orphan ? ORPHAN_COLUMN_HINT : undefined}
+                                    >
+                                        <p className="font-medium text-md">{column.duration} Monate</p>
+                                    </div>
+                                </th>
                             ))}
-
-                            <th>
-                                <Button variant="ghost" size="xs"
-                                    title="Laufzeit hinzufügen"
-                                    onClick={() => createColumn({ groupId, tariffId: tariff.id, duration: nextDuration(tariff.columns) })}
-                                    icon={<Plus className="size-4" />} iconOnly />
-                            </th>
-
                         </tr>
-
                     </thead>
 
-
                     <tbody>
-                        {tariff.rows.map(row => (
-                            <tr key={row.id}>
-                                <TariffRowComponent groupId={groupId} tariffId={tariff.id} rowId={row.id}
-                                    minQty={row.min_quantity} maxQty={row.max_quantity} />
+                        {rows.map(row => (
+                            <tr
+                                key={row.key}
+                                className={`h-[41px] border-b border-(--border) ${row.tierId === null ? "text-(--text-secondary)" : ""}`}
+                            >
+                                {row.tierId !== null ? (
+                                    <TariffTierComponent
+                                        tierId={row.tierId}
+                                        minQty={row.min_quantity}
+                                        maxQty={row.max_quantity}
+                                    />
+                                ) : (
+                                    <td>
+                                        <div
+                                            className="flex items-center gap-2 px-3 py-1"
+                                            title={ORPHAN_ROW_HINT}
+                                        >
+                                            <span className="flex-1 tabular-nums">ab {row.min_quantity}</span>
+                                            <span className="text-xs">nicht in der Staffelliste</span>
+                                            <Button
+                                                variant="link"
+                                                size="xs"
+                                                iconOnly
+                                                icon={<Trash className="size-3" />}
+                                                title={`Alle Preise auf Mengenstufe ${row.min_quantity} in dieser Preistabelle entfernen`}
+                                                onClick={() => deleteCell({
+                                                    groupId,
+                                                    tariffId: tariff.id,
+                                                    min_quantity: row.min_quantity,
+                                                })}
+                                            />
+                                        </div>
+                                    </td>
+                                )}
 
-                                {tariff.columns.map(column => {
-                                    const cell = cellMap.get(`${row.id}:${column.id}`);
-
-                                    // Zeile/Spalte existieren, aber es gibt keine Zelle dazu —
-                                    // als leeres Feld darstellen statt als Platzhaltertext.
-                                    if (!cell) {
-                                        return (
-                                            <td key={`${row.id}:${column.id}`}
-                                                className="border border-(--border) px-3 py-1 bg-(--page-bg)" />
-                                        );
-                                    }
-
-                                    return (
-                                        <TariffCellComponent key={cell.id} groupId={groupId} tariffId={tariff.id} cell={cell} />
-                                    );
-                                })}
-                                <td />
+                                {columns.map(column => (
+                                    <TariffCellComponent
+                                        key={`${column.duration}:${row.min_quantity}`}
+                                        groupId={groupId}
+                                        tariffId={tariff.id}
+                                        duration={column.duration}
+                                        minQuantity={row.min_quantity}
+                                        price={priceAt(column.duration, row.min_quantity)}
+                                    />
+                                ))}
                             </tr>
                         ))}
-
-                        <tr>
-                            <td className=" border-b border-r border-(--border)">
-                                <Button variant="secondary" size="xs" className="w-full px-4 py-1 border-none rounded-none"
-                                    title="Mengenstaffel hinzufügen"
-                                    onClick={handleAddRow}
-                                    icon={<Plus className="size-4" />} iconOnly />
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
-
-
             </div>
-
-
         </div>
     );
 }

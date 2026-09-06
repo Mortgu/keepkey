@@ -35,7 +35,6 @@ const env = createEnv({
         NEXTCLOUD_PASSWORD: z.string().optional(),
         NEXTCLOUD_OFFER_PATH: z.string(),
 
-        NEXTCLOUD_TEMPLATES_PATH: z.string().default('/Templates'),
 
         NEXTCLOUD_OFFER_PDF_PATH: z.string().default('/'),
         NEXTCLOUD_OFFER_ORIGINAL_PATH: z.string().default('/'),

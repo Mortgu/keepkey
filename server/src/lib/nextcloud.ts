@@ -1,8 +1,8 @@
 import { createClient, FileStat, type WebDAVClient } from "webdav";
-import { Readable } from "stream";
 import env from "./env.js";
 import logger from "@/utils/logger.js";
 import { AppException } from "./exceptions.js";
+import type { CloudFileMetadata, FindFilesByIdResult } from "@keepit/schemas";
 
 let client: WebDAVClient | null = null;
 export let isNextcloudAvailable = false;
@@ -15,20 +15,6 @@ type DirectoryCache = {
 
 const directoryCache = new Map<string, DirectoryCache>();
 const CACHE_TTL = 60_000;
-
-export type NextcloudFileMetadata = {
-    basename: string;
-    filename: string;
-    size: number;
-    lastmod: string;
-    mime: string | null;
-};
-
-export type FindFilesByIdResult = {
-    id: string;
-    found: boolean;
-    files: Record<string, NextcloudFileMetadata[]>;
-};
 
 type DirectoryConfig = {
     path: string;
@@ -59,7 +45,7 @@ export async function findFilesById(
     id: string,
     directories: DirectoryConfig[]
 ): Promise<FindFilesByIdResult> {
-    const files: Record<string, NextcloudFileMetadata[]> = {};
+    const files: Record<string, CloudFileMetadata[]> = {};
     let anyFound = false;
 
     const results = await Promise.all(
@@ -161,15 +147,5 @@ export async function getFilesInDirectory(path: string): Promise<Array<string>> 
     } catch (exception: any) {
         logger.error('nextcloud_list_directory_error', { path, error: exception.message });
         return [];
-    }
-}
-
-export async function downloadDocumentStream(remotePath: string): Promise<Readable> {
-    const client = getNextCloudClient();
-    try {
-        return client.createReadStream(remotePath);
-    } catch (exception: any) {
-        logger.error('nextcloud_download_error', { path: remotePath, error: exception.message });
-        throw new AppException("Nextcloud download failed!", 503, "NEXTCLOUD_DOWNLOAD_FAILED");
     }
 }

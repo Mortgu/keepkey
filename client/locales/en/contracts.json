@@ -1,0 +1,6 @@
+{
+  "contracts": {
+    "description": "Central contract management",
+    "create": "Create contract"
+  }
+}

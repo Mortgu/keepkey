@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createProduct, deleteProduct, updateProduct } from "./product-api";
 import { productKeys } from "./product-keys";
 import { useProducts } from "./product-hooks";
-import type { UpdateProductInput } from "@keepit/schemas";
+import type { UpdateProductInput, WorkloadFilterParams } from "@keepit/schemas";
 
 export function useCreateProduct() {
     const queryClient = useQueryClient();
@@ -50,8 +50,8 @@ export function useDeleteProduct() {
     };
 }
 
-export function useProductManager() {
-    const productsQuery = useProducts();
+export function useProductManager(filters: WorkloadFilterParams = {}) {
+    const productsQuery = useProducts(filters);
     const createMutation = useCreateProduct();
     const updateMutation = useUpdateProduct();
     const deleteMutation = useDeleteProduct();

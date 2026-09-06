@@ -10,6 +10,23 @@ Rules:
 
 ## Frontend conventions
 
+### Komponenten & Design-Token
+- `client/src/components/tokens.ts` ist die **einzige** Quelle für Größen, Fokus und Feldzustände. Komponenten definieren diese nicht selbst.
+  - Größe: `ACTION_SIZE` (Button/Tab) bzw. `FIELD_SIZE` (Input/Select/NumberField). Beide bauen auf `CONTROL_HEIGHT` + `CONTROL_TEXT` auf — nur so stehen Kontrollen nebeneinander bündig.
+  - Fokus: `FIELD_FOCUS` / `FIELD_FOCUS_WITHIN` für Felder, `ACTION_FOCUS` für klickbare Flächen. Nie lokal `focus:`-Klassen erfinden.
+  - Zustand: `FIELD_STATE` / `FIELD_STATE_WITHIN` + `fieldState(error, warning)`.
+- **Keine Tailwind-Palettenfarben** (`red-500`, `gray-300`, …), **keine `rgba()`/`#hex`-Literale** in `components/`. Farben kommen als CSS-Variable aus `index.css`; abgeleitete Werte über `color-mix()` **dort** definieren, nicht in der Komponente.
+- Feldkomponenten rendern Label und Fehler-/Warn-Badge über `<Field>` aus `components/field.tsx` — nicht selbst. Damit ist die Anatomie per Konstruktion identisch.
+- `components/index.ts` ist der einzige Einstiegspunkt: `import { … } from "@/components"`, keine Deep-Importe.
+- Visuelle Kontrolle über die Route `/dev/components` — dort stehen alle Kontrollen je Größe und Zustand nebeneinander.
+
+Prüfung (muss jeweils leer sein):
+```
+grep -rnoE "\b(bg|text|border|ring|shadow|outline)-(gray|red|amber|green|blue|neutral|slate|zinc)-[0-9]{2,3}" client/src/components
+grep -rn "rgba(\|hsl(" client/src/components
+grep -rnoE "#[0-9A-Fa-f]{3,8}\b" client/src/components
+```
+
 ### Loading states
 - Use `<Skeleton/>` / `<ListSkeleton rows skeleton/>` / `<PageHeaderSkeleton/>` from `@/components` for loading states. Do NOT use hardcoded `"Laden..."` / `"Loading..."` strings.
 - For list pages: render `<ListSkeleton rows={6} skeleton={<...CardSkeleton/>} />` while `useQuery` returns `isPending`.

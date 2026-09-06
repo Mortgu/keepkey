@@ -29,7 +29,7 @@ export function RouteError({ error, onRetry, retryLabel }: RouteErrorProps) {
     };
 
     return (
-        <div className="grid place-items-center gap-3 py-12 text-center">
+        <div className="h-fit grid place-items-center gap-3 py-12 text-center">
             <AlertCircle className="size-8 text-(--destructive)" />
             <div className="grid gap-1">
                 <p className="text-md font-medium text-(--text)">{t("common.errorTitle")}</p>

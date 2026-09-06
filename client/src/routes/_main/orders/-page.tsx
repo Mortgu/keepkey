@@ -1,53 +1,43 @@
 import { useTranslation } from "react-i18next";
 import OrderList from "./-components/order-list";
-import { Button, PageWidth } from "@/components";
-import { Plus } from "lucide-react";
-import { useModal } from "@/hooks";
-import type { Order } from "@keepit/schemas";
-import OrderModal from "./-components/order-modal";
-import OrderFilters from "./-components/order-filters";
+import OrderModal from "./-components/order-select-modal";
 import useOrderFilters from "./-hooks/use-order-filters";
+import { Breadcrumbs, Button, SearchBar, SortDropdown } from "@/components";
+import { useModal } from "@/hooks";
 
 export function OrderPage() {
     const { t } = useTranslation();
 
-    const modal = useModal<Order>();
+    const modal = useModal();
     const filters = useOrderFilters();
 
     return (
-        <PageWidth variant="none">
-            <div className="bg-white border-b border-(--border) px-8 py-6">
-
-                {/* Header */}
-                <div className="flex items-center justify-between">
-                    <div className="flex-1 grid gap-1">
-                        <h1 className="font-medium text-xl">{t("section.orders")}</h1>
-                        <h1 className="font-light text-sm text-gray-400">Zentrale verwaltung der Angebote</h1>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Button icon={<Plus size={14} strokeWidth={3} />} variant="primary" size="sm"
-                            onClick={() => modal.open()}>{t("button.create")}</Button>
-                    </div>
-                </div>
-
+        <div className="grid gap-4 mx-4">
+            <div className="flex items-center justify-between gap-4 border-b border-(--border) h-14">
+                <Breadcrumbs
+                    size="sm"
+                    maxItems={4}
+                    items={[
+                        { label: "Dashboard", to: "/" },
+                        { label: t("section.orders"), to: "/orders" },
+                    ]}
+                />
             </div>
 
+            <div className="flex items-center gap-2">
+                <SortDropdown value={filters.sort} onChange={filters.setSort} options={filters.sortOptions} />
+                <SearchBar value={filters.searchQuery} onChange={filters.setSearchQuery} placeholder="Orders durchsuchen..." />
 
-            <div className="px-8 py-4 border-b border-(--border)">
-                <OrderFilters filters={filters} />
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("orders.create")}
+                </Button>
             </div>
 
-            <div className="px-8 py-6">
-                <OrderList filters={filters} />
-            </div>
+            <OrderList filters={filters} />
 
             {modal.isOpen && (
-                <OrderModal
-                    key={modal.key}
-                    onClose={modal.close}
-                />
+                <OrderModal key={modal.key} onClose={modal.close} />
             )}
-
-        </PageWidth>
+        </div>
     );
 }

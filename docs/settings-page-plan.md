@@ -18,7 +18,7 @@ Stack: Vite + React 19, TanStack Router (file-based, `-components/`-Konvention),
 - User werden unverifiziert angelegt (kein Mailer) → `changeEmail` greift sofort (better-auth verlangt Mailer nur bei verifizierten Usern — Caveat als Kommentar dokumentieren).
 - Session-Query-Key `["session"]` (auth context) → nach Profil-/E-Mail-Änderung invalidieren.
 - `-page.tsx` hat einen Rules-of-Hooks-Bug (early return vor `useEffect`) — wird durch den Umbau behoben.
-- Docx-Pipelines lesen Templates aus lokalem `env.TEMPLATES_DIR`, nicht Nextcloud; neues Env `NEXTCLOUD_TEMPLATES_PATH` (Default `/Templates`) hält Mutationspfade serverseitig kontrolliert.
+- ~~Docx-Pipelines lesen Templates aus lokalem `env.TEMPLATES_DIR`, nicht Nextcloud; neues Env `NEXTCLOUD_TEMPLATES_PATH` (Default `/Templates`) hält Mutationspfade serverseitig kontrolliert.~~ **Überholt:** Vorlagen liegen inzwischen als `DocumentTemplate` im Objektspeicher, je Dokumentart und Sprache mit einer aktiven Vorlage; der Nextcloud-Vorlagenordner und `NEXTCLOUD_TEMPLATES_PATH` sind entfallen. `TEMPLATES_DIR` ist nur noch der Rückfall, wenn nichts gesetzt ist.
 
 ## Teil A — Server: Template-Endpoints (Service → Controller → Router)
 

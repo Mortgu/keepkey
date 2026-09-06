@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Pen, Trash, User } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
-import { useState, type SyntheticEvent } from "react";
+import { type SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
-import { useDeleteCustomer } from "@/hooks";
+import { useDeleteCustomer, useModal } from "@/hooks";
 import { Button } from "@/components";
-import ContactPersonModal from "./contact-person-modal";
+import ContactsModal from "./contact/contacts-modal";
 
 interface Props {
     customer: Customer;
@@ -16,8 +16,7 @@ interface Props {
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
-
-    const [open, setOpen] = useState(false);
+    const contactsModal = useModal();
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
@@ -78,7 +77,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                     <Button
                         variant="border"
                         size="xs"
-                        icon={<Pen size={14} />}
+                        icon={<Pen size={13} />}
                         iconOnly
                         onClick={() => onEdit(customer)}
                     />
@@ -88,24 +87,26 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                         size="xs"
                         icon={<User size={14} />}
                         iconOnly
-                        onClick={() => setOpen(true)}
+                        onClick={() => contactsModal.open()}
                     />
 
                     <Button
                         variant="border"
                         size="xs"
                         loading={isDeletingCustomer}
-                        icon={<Trash size={14} />}
+                        icon={<Trash size={13} />}
                         iconOnly
                         onClick={handleDeleteCustomer}
                     />
                 </div>
             </div>
 
-            {open && (
-                <ContactPersonModal
-                    onClose={() => setOpen(false)}
-                    currentCustomerId={customer.id}
+            {contactsModal.isOpen && (
+                <ContactsModal
+                    key={contactsModal.key}
+                    customerId={customer.id}
+                    contacts={customer.contactPersons ?? []}
+                    onClose={contactsModal.close}
                 />
             )}
         </div>
