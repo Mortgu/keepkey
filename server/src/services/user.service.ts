@@ -71,15 +71,18 @@ export async function createUser(input: CreateUserInput) {
     const { email, password, firstName, lastName, salutation, phone } = input;
 
     try {
-        const createdUser = await auth.api.signUpEmail({
+        const { user: createdUser } = await auth.api.createUser({
             body: {
                 email,
                 password,
                 name: `${firstName} ${lastName}`,
-                firstName,
-                lastName,
-                salutation,
-                phone: phone || undefined,
+                role: "user",
+                data: {
+                    firstName,
+                    lastName,
+                    salutation,
+                    phone: phone || undefined,
+                },
             },
         });
 

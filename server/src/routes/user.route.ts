@@ -7,6 +7,7 @@ import {
   getSessionUser,
   updateUserById,
 } from "@/controllers/index.js";
+import { requireAdmin } from "@/middlewares/auth.middleware.js";
 import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
   createContactSchema,
@@ -17,15 +18,15 @@ import {
 
 const router = Router();
 
-router.get("/", validateQuery(userFilterSchema), getUsers);
-
 router.get("/session", getSessionUser);
 
-router.put("/:id", validate(updateUserSchema), updateUserById);
+router.get("/", requireAdmin, validateQuery(userFilterSchema), getUsers);
 
-router.post("/", validate(createUserSchema), createUser);
+router.put("/:id", requireAdmin, validate(updateUserSchema), updateUserById);
 
-router.delete("/:id", deleteUser);
+router.post("/", requireAdmin, validate(createUserSchema), createUser);
+
+router.delete("/:id", requireAdmin, deleteUser);
 
 router.post(
   "/me/contact-persons",

@@ -1,5 +1,6 @@
 import { passkey } from "@better-auth/passkey";
 import { betterAuth } from "better-auth";
+import { admin } from "better-auth/plugins";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 
 import env from "./env.js";
@@ -23,6 +24,7 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
+        disableSignUp: true,
     },
     user: {
         changeEmail: {
@@ -48,6 +50,9 @@ export const auth = betterAuth({
         },
     },
     plugins: [
+        admin({
+            defaultRole: "user",
+        }),
         passkey(),
     ],
 });

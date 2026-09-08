@@ -3,6 +3,7 @@ import { fromNodeHeaders } from "better-auth/node";
 import type { User } from "@prisma/client";
 
 import { auth } from "@/lib/auth.js";
+import { AppException } from "@/lib/exceptions.js";
 
 declare global {
     namespace Express {
@@ -33,4 +34,14 @@ export async function requireSession(req: Request, res: Response, next: NextFunc
             message: "Not authorized",
         });
     }
+}
+
+export async function requireAdmin(req: Request, _res: Response, next: NextFunction) {
+    const roles = (req.user?.role ?? "").split(",").map((role) => role.trim());
+
+    if (!roles.includes("admin")) {
+        return next(new AppException("Admin privileges required!", 403, "FORBIDDEN_ADMIN_ONLY"));
+    }
+
+    return next();
 }

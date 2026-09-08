@@ -1,5 +1,5 @@
 import { createAuthClient } from "better-auth/react";
-import { inferAdditionalFields } from "better-auth/client/plugins";
+import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
 import { BASE_URL } from "./api-client.ts";
 
@@ -7,6 +7,7 @@ import { BASE_URL } from "./api-client.ts";
 export const authClient = createAuthClient({
     baseURL: BASE_URL,
     plugins: [
+        adminClient(),
         inferAdditionalFields({
             user: {
                 salutation: {

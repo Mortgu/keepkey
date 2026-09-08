@@ -7,6 +7,8 @@
   "USER_CREATION_FAILED": "Benutzer konnte nicht erstellt werden.",
   "USER_UPDATE_FAILED": "Benutzer konnte nicht aktualisiert werden.",
   "USER_DELETE_FAILED": "Benutzer konnte nicht gelöscht werden.",
+  "USER_DELETE_SELF_FORBIDDEN": "Das eigene Konto kann nicht gelöscht werden.",
+  "FORBIDDEN_ADMIN_ONLY": "Diese Aktion erfordert Administratorrechte.",
   "MISSING_ORDER": "Bestellung nicht gefunden.",
   "ORDER_NOT_FOUND": "Bestellung nicht gefunden.",
   "ORDER_REVISION_NOT_FOUND": "Bestellungsversion nicht gefunden.",

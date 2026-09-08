@@ -20,6 +20,7 @@ import { NavGroup, NavLink } from "./nav-link";
 import { NavSearch } from "./nav-search";
 import { NavUserMenu } from "./nav-user-menu";
 import type { ReactNode } from "react";
+import { useAuth } from "@/context/auth-context";
 import { DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
 
 const ICON_SIZE = 14;
@@ -86,6 +87,12 @@ function LanguageFooter() {
 
 export function Navigation() {
     const { t } = useTranslation();
+    const { user } = useAuth();
+
+    const isAdmin = (user?.role ?? "")
+        .split(",")
+        .map((role) => role.trim())
+        .includes("admin");
 
     return (
         <aside className="flex h-screen w-74 flex-col overflow-hidden bg-(--text)">
@@ -136,11 +143,11 @@ export function Navigation() {
                         label={t("section.orders")}
                         icon={<ShoppingCart size={ICON_SIZE} />}
                     />
-                    {/*<NavLink
+                    {/* <NavLink
                         to="/invoices"
                         label={t("section.invoices")}
                         icon={<ShoppingCart size={ICON_SIZE} />}
-                    />*/}
+                    /> */}
                 </Section>
 
                 <Section title={t("nav.management")} collapsible>
@@ -149,11 +156,13 @@ export function Navigation() {
                         label={t("section.suppliers")}
                         icon={<Truck size={ICON_SIZE} />}
                     />
-                    <NavLink
-                        to="/employees"
-                        label={t("section.employees")}
-                        icon={<UserCircle2 size={ICON_SIZE} />}
-                    />
+                    {isAdmin && (
+                        <NavLink
+                            to="/employees"
+                            label={t("section.employees")}
+                            icon={<UserCircle2 size={ICON_SIZE} />}
+                        />
+                    )}
                     <NavLink
                         to="/templates"
                         label={t("section.templates")}

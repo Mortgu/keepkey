@@ -7,6 +7,8 @@
   "USER_CREATION_FAILED": "Could not create user.",
   "USER_UPDATE_FAILED": "Could not update user.",
   "USER_DELETE_FAILED": "Could not delete user.",
+  "USER_DELETE_SELF_FORBIDDEN": "You cannot delete your own account.",
+  "FORBIDDEN_ADMIN_ONLY": "This action requires administrator privileges.",
   "MISSING_ORDER": "Order not found.",
   "ORDER_NOT_FOUND": "Order not found.",
   "ORDER_REVISION_NOT_FOUND": "Order revision not found.",
