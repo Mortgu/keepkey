@@ -5,7 +5,7 @@ import { useCustomerFilters } from "../../customers/-page.hooks";
 import OrderCreateModal from "./order-create-modal";
 import type { Offer } from "@keepit/schemas";
 import { useModal, useOffers } from "@/hooks";
-import { Button, Dialog } from "@/components";
+import { Button, Dialog, ListSkeleton, RouteError, Skeleton } from "@/components";
 import { formatDate } from "@/lib/format";
 
 interface Props {
@@ -14,14 +14,15 @@ interface Props {
 
 export default function OrderModal({ onClose }: Props) {
     const { t } = useTranslation();
-    const { items: offers } = useOffers();
+    const { items, isPending, error } = useOffers();
+    const offers = items.filter(offer => !offer.acceptedAt);
     const filters = useCustomerFilters();
 
     const createModal = useModal<Offer>();
 
     return (
         <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
-            <Dialog.Header title="Bestellung für ---" />
+            <Dialog.Header title={t("orders.selectOffer")} />
 
             <Dialog.Toolbar>
                 <CustomerAutocomplete
@@ -34,7 +35,7 @@ export default function OrderModal({ onClose }: Props) {
             </Dialog.Toolbar>
 
             <Dialog.Body className="gap-2">
-                {offers.map(offer => (
+                {error ? <RouteError error={error} /> : isPending ? <ListSkeleton rows={6} skeleton={<Skeleton className="h-16" />} /> : offers.length === 0 ? <p>{t("orders.emptyOffers")}</p> : offers.map(offer => (
                     <button
                         key={offer.id}
                         type="button"

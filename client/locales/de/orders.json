@@ -2,6 +2,23 @@
   "orders": {
     "description": "Zentrale Verwaltung der Bestellungen",
     "create": "Bestellung erstellen",
-    "search": "Bestellungen durchsuchen…"
+    "search": "Bestellungen durchsuchen…",
+    "editTitle": "Bestellung bearbeiten",
+    "createTitle": "Bestellung für {{quoteId}}",
+    "fixedOffer": "Das angenommene Angebot bleibt unverändert. Hier werden nur Bestell- und Projektangaben gespeichert.",
+    "number": "Bestell-Nr.",
+    "projectNumber": "Projekt-Nr.",
+    "date": "Bestelldatum",
+    "projectDescription": "Projektbezug",
+    "details": "Bestelldetails",
+    "edit": "Bearbeiten",
+    "cancelOrder": "Stornieren",
+    "cancelConfirm": "Bestellung {{number}} stornieren? Das Angebot bleibt gesperrt und die Dokumente bleiben erhalten.",
+    "cancelled": "Storniert",
+    "cancelSuccess": "Bestellung storniert.",
+    "accepted": "Angenommen",
+    "acceptedHint": "Angenommene Angebote können nicht mehr geändert werden.",
+    "selectOffer": "Angebot für Bestellung auswählen",
+    "emptyOffers": "Keine offenen Angebote verfügbar."
   }
 }

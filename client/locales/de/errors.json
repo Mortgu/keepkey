@@ -72,5 +72,10 @@
   "WEBDAV_INSUFFICIENT_STORAGE": "Der Cloud-Speicher ist voll.",
   "WEBDAV_ERROR": "Fehler bei der Kommunikation mit dem Cloud-Speicher.",
   "APP_ERROR": "Ein Anwendungsfehler ist aufgetreten.",
-  "INTERNAL_SERVER_ERROR": "Ein interner Fehler ist aufgetreten."
+  "INTERNAL_SERVER_ERROR": "Ein interner Fehler ist aufgetreten.",
+  "OFFER_ACCEPTED": "Dieses Angebot wurde bereits angenommen und kann nicht mehr geändert werden.",
+  "ORDER_CANCELLED": "Diese Bestellung wurde storniert und kann nicht mehr geändert werden.",
+  "ORDER_DELETE_FORBIDDEN": "Bestellungen können nur storniert werden.",
+  "INVALID_ACCEPTED_OFFER_SNAPSHOT": "Die gespeicherten Angebotsdaten sind ungültig.",
+  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten."
 }

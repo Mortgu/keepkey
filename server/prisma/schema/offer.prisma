@@ -10,7 +10,7 @@ enum OfferDerivationType {
 model Offer {
   id String @id @default(uuid())
 
-  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: Restrict)
   supplierId String?
 
   customer   Customer @relation(fields: [customerId], references: [id])
@@ -53,6 +53,11 @@ model Offer {
   revisions      OfferRevision[]
 
   orders Order?
+
+  /// Dauerhafte Annahmesperre, unabhängig vom Lebenszyklus der Bestellung.
+  acceptedAt DateTime? @db.Timestamptz(6)
+  /// Versioniertes Dokumentdaten-Abbild einschließlich Stammdaten und Texten.
+  acceptedSnapshot Json?
 
   /// Quellangebot, aus dem dieses abgeleitet wurde — fuer Verlaengerung
   /// und Lizenzerweiterung gleichermassen. `derivationType` unterscheidet beide.

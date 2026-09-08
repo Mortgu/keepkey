@@ -3,7 +3,6 @@ model Product {
 
   translations ProductTranslation[]
 
-  orderPositions OrderPosition[]
   offerPositions OfferPosition[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)

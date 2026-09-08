@@ -71,55 +71,44 @@ export const orderRevisionSchema = z.object({
 });
 export type OrderRevision = z.infer<typeof orderRevisionSchema>;
 
-/* Order (create) */
-export const createOrderSchema = z.object({
-    id: z.string().min(1),
-    orderId: z.string().min(1, "Bestell-Nr. erforderlich"),
-    date: z.string().optional(),
-    projectNumber: z.string().optional(),
-    projectDescription: z.string().optional(),
-    orderDetails: z.string().optional(),
-});
+/* Shared write contract: orders contain metadata only. */
+const dateInput = z
+    .string()
+    .refine(
+        (value) =>
+            value.trim() !== "" && Number.isFinite(new Date(value).getTime()),
+        "Invalid date",
+    );
+export const orderMetadataSchema = z
+    .object({
+        orderId: z.string().trim().min(1),
+        date: dateInput,
+        projectNumber: z.string().nullable(),
+        projectDescription: z.string().nullable(),
+        orderDetails: z.string().nullable(),
+    })
+    .strict();
+export const createOrderSchema = z
+    .object({
+        id: z.string().min(1),
+        expectedOfferVersion: z.number().int().positive(),
+        orderId: z.string().trim().min(1),
+        date: dateInput.optional(),
+        projectNumber: z.string().optional(),
+        projectDescription: z.string().optional(),
+        orderDetails: z.string().optional(),
+    })
+    .strict();
+export const updateOrderSchema = z
+    .object({
+        expectedVersion: z.number().int().positive(),
+        order: orderMetadataSchema,
+    })
+    .strict();
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
-
-/* Order (update) */
-const orderFieldsSchema = z.object({
-    supplierId: z.string().nullable(),
-    customerId: z.string().min(1),
-    contactPersonId: z.string().min(1),
-    employeeId: z.string().min(1),
-    contractId: z.string().min(1),
-    duration_months: z.number().int().positive(),
-    orderId: z.string().min(1),
-    paymentTerm: z.string(),
-    projectNumber: z.string().nullable(),
-    projectDescription: z.string().nullable(),
-    orderDetails: z.string().nullable(),
-    date: z.string(),
-    validUntil: z.string().nullable(),
-    requestFrom: z.string().nullable(),
-});
-
-const orderPositionInputSchema = z.object({
-    productId: z.string().min(1),
-    quantity: z.number().int().positive(),
-    optional: z.boolean().nullable(),
-    total_cents: z.number().int().min(0),
-});
-
-const orderFlatRateInputSchema = z.object({
-    flatRateId: z.string().min(1),
-    quantity: z.number().int().positive(),
-    total_cents: z.number().int().min(0),
-});
-
-export const updateOrderSchema = z.object({
-    expectedVersion: z.number().int().positive(),
-    order: orderFieldsSchema,
-    positions: z.array(orderPositionInputSchema),
-    flatRates: z.array(orderFlatRateInputSchema),
-});
-export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
+export type UpdateOrderInput = z.infer<
+    typeof updateOrderSchema
+>;
 
 /* Restore Order Revision */
 export const restoreOrderRevisionSchema = z.object({
@@ -143,13 +132,13 @@ export const orderSchema = z.object({
     duration_months: z.number().int(),
 
     paymentTerm: z.string(),
-    projectNumber: z.string().optional(),
-    projectDescription: z.string().optional(),
-    orderDetails: z.string().optional(),
+    projectNumber: z.string().nullish(),
+    projectDescription: z.string().nullish(),
+    orderDetails: z.string().nullish(),
 
     date: z.string(),
-    validUntil: z.string().optional(),
-    requestFrom: z.string().optional(),
+    validUntil: z.string().nullish(),
+    requestFrom: z.string().nullish(),
 
     net_amount: z.number().int(),
     version: z.number().int(),
@@ -161,12 +150,16 @@ export const orderSchema = z.object({
 
     customerContactPerson: z.object({
         id: z.string(),
-        salutation: z.string(),
+        salutation: z.string().nullable(),
         firstName: z.string(),
         lastName: z.string(),
     }),
 
-    offer: offerSchema,
+    offer: offerSchema.pick({ id: true, quoteId: true, version: true, acceptedAt: true }),
+    acceptedAt: z.string(),
+    acceptedById: z.string(),
+    cancelledAt: z.string().nullable(),
+    discounts: z.array(z.object({ id: z.string(), title: z.string(), description: z.string().nullable(), amount_cents: z.number().int() })),
 
     documents: z.array(orderDocumentSchema),
     orderPositions: z.array(orderPositionSchema),

@@ -2,6 +2,23 @@
   "orders": {
     "description": "Central management of orders",
     "create": "Create order",
-    "search": "Search orders…"
+    "search": "Search orders…",
+    "editTitle": "Edit order",
+    "createTitle": "Order for {{quoteId}}",
+    "fixedOffer": "The accepted offer remains unchanged. Only order and project details are saved here.",
+    "number": "Order number",
+    "projectNumber": "Project number",
+    "date": "Order date",
+    "projectDescription": "Project description",
+    "details": "Order details",
+    "edit": "Edit",
+    "cancelOrder": "Cancel order",
+    "cancelConfirm": "Cancel order {{number}}? The offer stays locked and documents are retained.",
+    "cancelled": "Cancelled",
+    "cancelSuccess": "Order cancelled.",
+    "accepted": "Accepted",
+    "acceptedHint": "Accepted offers can no longer be changed.",
+    "selectOffer": "Select an offer for the order",
+    "emptyOffers": "No open offers available."
   }
 }

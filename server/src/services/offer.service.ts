@@ -1,3 +1,5 @@
+import { presentOffer } from "./accepted-offer-view.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
 import { OfferDerivationType, Prisma, TariffVersionReason } from "@prisma/client";
 
 import { prisma } from "../lib/prismaClient.js";
@@ -306,7 +308,7 @@ export async function getOffers(query: OfferFilterParams) {
 
     const nextCursor = items.length === limit ? items[items.length - 1]?.id ?? null : null;
 
-    return { items, nextCursor };
+    return { items: items.map(presentOffer), nextCursor };
 }
 
 export async function getOfferById(id: string) {
@@ -342,7 +344,7 @@ export async function getOfferById(id: string) {
         throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
     }
 
-    return offer;
+    return presentOffer(offer);
 }
 
 export async function getOfferRevisions(offerId: string) {
@@ -475,16 +477,8 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
 
     const header = { contractId: input.contractId, duration_months: input.duration_months };
 
-    const positions = await pricePositions(rawPositions, header, input.customerId, actorId);
-    const flatrates = await priceFlatrates(rawFlatrates);
-
     return prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
-
-        const net_amount =
-            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
-            sumDiscounts(discounts);
+        await assertOfferEditable(tx, offerId);
 
         const current = await tx.offer.findFirstOrThrow({
             where: { id: offerId },
@@ -502,6 +496,13 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 "VERSION_CONFLICT",
             );
         }
+
+        const positions = await pricePositions(rawPositions, header, input.customerId, actorId);
+        const flatrates = await priceFlatrates(rawFlatrates);
+        const net_amount =
+            positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
+            flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+            sumDiscounts(discounts);
 
         const snapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
 
@@ -545,7 +546,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         });
 
         return offer;
-    });
+    }, { timeout: 30_000 });
 }
 
 export async function restoreOfferRevision(
@@ -555,7 +556,7 @@ export async function restoreOfferRevision(
     actorId: string,
 ) {
     return prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
+        await assertOfferEditable(tx, offerId);
 
         const current = await tx.offer.findUnique({
             where: { id: offerId },
@@ -663,6 +664,7 @@ export async function createOfferPositions(
     );
 
     return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+        await assertOfferEditable(tx, offerId);
         const created = await tx.offerPosition.createManyAndReturn({
             data: priced.map((position) => ({ offerId, ...position })),
         });
@@ -677,6 +679,7 @@ export async function createOfferFlatrates(offerId: string, flatrates: CreateOff
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
 
     return prisma.$transaction(async (tx) => {
+        await assertOfferEditable(tx, offerId);
         const created = await tx.offerFlatRate.createManyAndReturn({
             data: flatrates.map((flatrate) => {
                 const rate_cents = rateById.get(flatrate.flatRateId);
@@ -735,7 +738,7 @@ export async function deleteOffer(id: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
 
-        await tx.offer.findUniqueOrThrow({ where: { id } });
+        await assertOfferEditable(tx, id);
 
         if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
             throw new AppException(

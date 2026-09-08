@@ -2,104 +2,67 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
 import { AppException } from "../lib/exceptions.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
-import { toDate } from "../utils/utils.js";
+import { acceptOffer } from "./offer-acceptance.service.js";
+import { presentOrder } from "./order-source.js";
 import {
-    CreateOrderInput,
-    UpdateOrderInput,
-} from "@keepit/schemas";
-
-import {
+    acceptOrderSchema,
+    updateOrderMetadataSchema,
+    metadataSnapshot,
+    parseMetadataRevision,
     ORDER_REVISION_SNAPSHOT_VERSION,
-    buildOrderRevisionSnapshot,
-    parseOrderRevisionSnapshot,
-} from "../schemas/revision-schemas.js";
+    type AcceptOrderInput,
+    type UpdateOrderMetadataInput,
+} from "../schemas/order-inputs.js";
 
-
-/* ========== Queries ========== */
+const orderInclude = {
+    offer: true,
+    documents: {
+        where: { deletedAt: null },
+        orderBy: { version: "desc" },
+        include: { artifacts: true, task: true },
+    },
+} satisfies Prisma.OrderInclude;
 
 export interface OrderListQuery {
     companyIds?: unknown;
 }
-
 export async function getAllOrders(query: OrderListQuery = {}) {
-    const where: { customerId?: { in: string[] } } = {};
-
-    if (query.companyIds) {
-        const ids = Array.isArray(query.companyIds) ? query.companyIds : [query.companyIds];
-        where.customerId = { in: ids as string[] };
-    }
-
-    return prisma.order.findMany({
-        where: Object.keys(where).length > 0 ? where : undefined,
-        include: {
-            customer: true,
-            offer: true,
-            contract: { include: { translations: true } },
-            customerContactPerson: true,
-            documents: {
-                where: { deletedAt: null },
-                orderBy: { version: "desc" as const },
-                include: {
-                    artifacts: true,
-                    task: true,
-                },
-            },
-            orderPositions: {
-                include: {
-                    product: { include: { translations: true } },
-                },
-            },
-            flatRates: {
-                include: {
-                    flatRate: { include: { translations: true } },
-                },
-            },
-        },
+    const raw = query.companyIds
+        ? Array.isArray(query.companyIds)
+            ? query.companyIds
+            : [query.companyIds]
+        : [];
+    if (!raw.every((id) => typeof id === "string"))
+        throw new AppException(
+            "Invalid customer filter",
+            400,
+            "INVALID_FILTER",
+        );
+    const ids = raw as string[];
+    const where: Prisma.OrderWhereInput = ids.length
+        ? { offer: { customerId: { in: ids } } }
+        : {};
+    const orders = await prisma.order.findMany({
+        where,
+        include: orderInclude,
+        orderBy: { createdAt: "desc" },
     });
+    return orders.map(presentOrder);
 }
-
-export async function getOrderById(orderId: string) {
+export async function getOrderById(id: string) {
     const order = await prisma.order.findUnique({
-        where: { id: orderId },
-        include: {
-            customer: true,
-            offer: true,
-            contract: { include: { translations: true } },
-            customerContactPerson: true,
-            documents: {
-                where: { deletedAt: null },
-                orderBy: { version: "desc" as const },
-                include: {
-                    artifacts: true,
-                    task: true,
-                },
-            },
-            orderPositions: {
-                include: {
-                    product: { include: { translations: true } },
-                },
-            },
-            flatRates: {
-                include: {
-                    flatRate: { include: { translations: true } },
-                },
-            },
-        },
+        where: { id },
+        include: orderInclude,
     });
-
-    if (!order) {
+    if (!order)
         throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    }
-
-    return order;
+    return presentOrder(order);
 }
-
 export async function getOrderRevisions(orderId: string) {
-    const exists = await prisma.order.findUnique({ where: { id: orderId }, select: { id: true } });
-    if (!exists) {
-        throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    }
-
+    await prisma.order.findUniqueOrThrow({
+        where: { id: orderId },
+        select: { id: true },
+    });
     return prisma.orderRevision.findMany({
         where: { orderId },
         orderBy: { version: "desc" },
@@ -111,293 +74,191 @@ export async function getOrderRevisions(orderId: string) {
         },
     });
 }
-
+/** A suggestion, not a reservation. The unique constraint rejects concurrent duplicates. */
 export async function getNextOrderNumber(): Promise<string> {
-    const year = new Date().getFullYear();
-    const prefix = `AB-${year}-`;
-
-    const latest = await prisma.order.findFirst({
-        where: { orderId: { startsWith: prefix } },
-        select: { orderId: true },
-        orderBy: { orderId: "desc" },
-    });
-
-    let nextNumber = 1;
-    if (latest?.orderId) {
-        const match = latest.orderId.match(/(\d+)$/);
-        if (match) {
-            nextNumber = parseInt(match[1], 10) + 1;
-        }
-    }
-
-    return `${prefix}${String(nextNumber).padStart(3, "0")}`;
+    const prefix = `AB-${new Date().getFullYear()}-`;
+    const [row] = await prisma.$queryRaw<{ next: bigint }[]>`
+        SELECT COALESCE(MAX(substring("orderId" from '[0-9]+$')::bigint), 0) + 1 AS next
+        FROM "order" WHERE "orderId" ~ ${`^${prefix}[0-9]+$`}
+    `;
+    return `${prefix}${String(row?.next ?? 1).padStart(3, "0")}`;
 }
-
-/* ========== Mutations ========== */
-
-export async function createOrder(input: CreateOrderInput) {
-    const { id, orderId, date, projectNumber, projectDescription, orderDetails } = input;
-
-    return prisma.$transaction(async (tx) => {
-        const existingOffer = await tx.offer.findUnique({
-            where: { id },
-            include: {
-                offerPositions: true,
-                offerFlatRates: true,
-            },
-        });
-        if (!existingOffer) {
-            throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
-        }
-
-        const order = await tx.order.create({
-            data: {
-                supplierId: existingOffer.supplierId,
-                customerId: existingOffer.customerId,
-                contactPersonId: existingOffer.contactPersonId,
-                employeeId: existingOffer.userId,
-                offerId: existingOffer.id,
-
-                // Vertrag und Laufzeit kommen unveraendert aus dem Angebot: die
-                // Bestellung ist dessen Annahme, nicht eine neue Verhandlung.
-                contractId: existingOffer.contractId,
-                duration_months: existingOffer.duration_months,
-
-                orderId,
-                paymentTerm: existingOffer.paymentTerm,
-
-                projectNumber: projectNumber ?? null,
-                projectDescription: projectDescription ?? null,
-                orderDetails: orderDetails ?? null,
-
-                date: toDate(date) ?? new Date(),
-                validUntil: existingOffer.validUntil,
-                requestFrom: existingOffer.requestFrom,
-
-                net_amount: existingOffer.net_amount,
-            },
-        });
-
-        await tx.orderPosition.createMany({
-            data: existingOffer.offerPositions.map((offerPosition) => ({
-                orderId: order.id,
-                productId: offerPosition.productId,
-                quantity: offerPosition.quantity,
-                optional: offerPosition.optional,
-                total_cents: offerPosition.total_cents - offerPosition.discount_cents,
-            })),
-        });
-
-        await tx.orderFlatRate.createMany({
-            data: existingOffer.offerFlatRates.map((offerFlatRate) => ({
-                flatRateId: offerFlatRate.flatRateId,
-                orderId: order.id,
-                quantity: offerFlatRate.quantity,
-                total_cents: offerFlatRate.total_cents,
-            })),
-        });
-
-        return order;
-    });
-}
-
-async function replaceOrderPositions(
-    tx: Prisma.TransactionClient,
-    orderId: string,
-    positions: UpdateOrderInput["positions"],
-) {
-    await tx.orderPosition.deleteMany({ where: { orderId } });
-    await tx.orderPosition.createMany({
-        data: positions.map((position) => ({ orderId, ...position })),
-    });
-}
-
-async function replaceOrderFlatRates(
-    tx: Prisma.TransactionClient,
-    orderId: string,
-    flatRates: UpdateOrderInput["flatRates"],
-) {
-    await tx.orderFlatRate.deleteMany({ where: { orderId } });
-    await tx.orderFlatRate.createMany({
-        data: flatRates.map((flatRate) => ({ orderId, ...flatRate })),
-    });
-}
-
-export async function updateOrder(orderId: string, input: UpdateOrderInput, actorId: string) {
-    return prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${orderId}`}))::text AS "lock"`;
-
-        const current = await tx.order.findUnique({
-            where: { id: orderId },
-            include: { orderPositions: true, flatRates: true },
-        });
-        if (!current) {
-            throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-        }
-        if (current.version !== input.expectedVersion) {
-            throw new AppException(
-                "The order was changed by another user. Reload it and try again.",
-                409,
-                "VERSION_CONFLICT",
+export async function createOrder(input: AcceptOrderInput, actorId: string) {
+    const data = acceptOrderSchema.parse(input);
+    return prisma.$transaction(
+        async (tx) => {
+            const acceptedAt = await acceptOffer(
+                tx,
+                data.id,
+                data.expectedOfferVersion,
             );
-        }
-
-        const snapshot = buildOrderRevisionSnapshot(current as unknown as Record<string, unknown>);
-        await tx.orderRevision.create({
-            data: {
-                orderId,
-                version: current.version,
-                changedById: actorId,
-                snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
-                snapshot: snapshot as Prisma.InputJsonValue,
-            },
-        });
-
-        const net_amount =
-            input.positions.reduce((sum, position) => sum + position.total_cents, 0) +
-            input.flatRates.reduce((sum, flatRate) => sum + flatRate.total_cents, 0);
+            return tx.order.create({
+                data: {
+                    offerId: data.id,
+                    orderId: data.orderId,
+                    date: data.date ? new Date(data.date) : acceptedAt,
+                    projectNumber: data.projectNumber ?? null,
+                    projectDescription: data.projectDescription ?? null,
+                    orderDetails: data.orderDetails ?? null,
+                    acceptedAt,
+                    acceptedById: actorId,
+                },
+            });
+        },
+        { timeout: 30_000 },
+    );
+}
+async function lockOrder(
+    tx: Prisma.TransactionClient,
+    id: string,
+    expectedVersion: number,
+) {
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${id}`}))::text AS "lock"`;
+    const order = await tx.order.findUniqueOrThrow({ where: { id } });
+    if (order.version !== expectedVersion)
+        throw new AppException(
+            "The order changed. Reload it.",
+            409,
+            "VERSION_CONFLICT",
+        );
+    if (order.cancelledAt)
+        throw new AppException(
+            "Cancelled orders cannot be changed.",
+            409,
+            "ORDER_CANCELLED",
+        );
+    return order;
+}
+async function saveRevision(
+    tx: Prisma.TransactionClient,
+    order: Parameters<typeof metadataSnapshot>[0] & {
+        id: string;
+        version: number;
+    },
+    actorId: string,
+) {
+    await tx.orderRevision.create({
+        data: {
+            orderId: order.id,
+            version: order.version,
+            changedById: actorId,
+            snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
+            snapshot: metadataSnapshot(order),
+        },
+    });
+}
+async function invalidateDocuments(
+    tx: Prisma.TransactionClient,
+    orderId: string,
+) {
+    await tx.orderDocument.updateMany({
+        where: { orderId, isCurrent: true },
+        data: { isCurrent: false },
+    });
+}
+export async function updateOrder(
+    id: string,
+    input: UpdateOrderMetadataInput,
+    actorId: string,
+) {
+    const data = updateOrderMetadataSchema.parse(input);
+    return prisma.$transaction(async (tx) => {
+        const current = await lockOrder(tx, id, data.expectedVersion);
+        await saveRevision(tx, current, actorId);
         const order = await tx.order.update({
-            where: { id: orderId },
+            where: { id },
             data: {
-                ...input.order,
-                date: new Date(input.order.date),
-                validUntil: input.order.validUntil ? new Date(input.order.validUntil) : null,
-                requestFrom: input.order.requestFrom ? new Date(input.order.requestFrom) : null,
-                net_amount,
+                ...data.order,
+                date: new Date(data.order.date),
                 version: { increment: 1 },
             },
         });
-
-        await replaceOrderPositions(tx, orderId, input.positions);
-        await replaceOrderFlatRates(tx, orderId, input.flatRates);
-        await tx.orderDocument.updateMany({
-            where: { orderId, isCurrent: true },
-            data: { isCurrent: false },
-        });
-
+        await invalidateDocuments(tx, id);
         return order;
     });
 }
-
 export async function restoreOrderRevision(
-    orderId: string,
+    id: string,
     revisionId: string,
     expectedVersion: number,
     actorId: string,
 ) {
     return prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${orderId}`}))::text AS "lock"`;
-
-        const current = await tx.order.findUnique({
-            where: { id: orderId },
-            include: { orderPositions: true, flatRates: true },
-        });
-        if (!current) {
-            throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-        }
-        if (current.version !== expectedVersion) {
-            throw new AppException(
-                "The order was changed by another user. Reload it and try again.",
-                409,
-                "VERSION_CONFLICT",
-            );
-        }
-
+        const current = await lockOrder(tx, id, expectedVersion);
         const revision = await tx.orderRevision.findFirst({
-            where: { id: revisionId, orderId },
-            select: { snapshot: true, snapshotVersion: true },
+            where: { id: revisionId, orderId: id },
         });
-        if (!revision) {
-            throw new AppException("Order revision not found", 404, "ORDER_REVISION_NOT_FOUND");
-        }
-        // Wie beim Angebot: Version 1 bleibt lesbar, Vertrag und Laufzeit werden
-        // beim Lesen von der Position an den Kopf gehoben.
-        if (revision.snapshotVersion > ORDER_REVISION_SNAPSHOT_VERSION) {
+        if (!revision)
             throw new AppException(
-                `Order revision snapshot version ${revision.snapshotVersion} is not supported.`,
-                422,
-                "UNSUPPORTED_REVISION_SNAPSHOT_VERSION",
+                "Order revision not found",
+                404,
+                "ORDER_REVISION_NOT_FOUND",
             );
-        }
-
         let restored;
         try {
-            restored = parseOrderRevisionSnapshot(revision.snapshot, revision.snapshotVersion);
+            restored = parseMetadataRevision(
+                revision.snapshot,
+                revision.snapshotVersion,
+            );
         } catch {
             throw new AppException(
-                "The stored order revision is invalid and cannot be restored.",
+                "Invalid or unsupported order revision",
                 422,
                 "INVALID_REVISION_SNAPSHOT",
             );
         }
-
-        const currentSnapshot = buildOrderRevisionSnapshot(current as unknown as Record<string, unknown>);
-        await tx.orderRevision.create({
-            data: {
-                orderId,
-                version: current.version,
-                changedById: actorId,
-                snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
-                snapshot: currentSnapshot as Prisma.InputJsonValue,
-            },
-        });
-
+        await saveRevision(tx, current, actorId);
         const order = await tx.order.update({
-            where: { id: orderId },
+            where: { id },
             data: {
-                ...restored.order,
-                date: new Date(restored.order.date),
-                validUntil: restored.order.validUntil ? new Date(restored.order.validUntil) : null,
-                requestFrom: restored.order.requestFrom ? new Date(restored.order.requestFrom) : null,
+                ...restored,
+                date: new Date(restored.date),
                 version: { increment: 1 },
             },
         });
-
-        await replaceOrderPositions(tx, orderId, restored.positions);
-        await replaceOrderFlatRates(tx, orderId, restored.flatRates);
-        await tx.orderDocument.updateMany({
-            where: { orderId, isCurrent: true },
-            data: { isCurrent: false },
-        });
-
+        await invalidateDocuments(tx, id);
         return order;
     });
 }
-
-async function createDocumentForOrder(orderId: string) {
+export async function cancelOrder(
+    id: string,
+    expectedVersion: number,
+    actorId: string,
+) {
+    return prisma.$transaction(async (tx) => {
+        const current = await lockOrder(tx, id, expectedVersion);
+        await saveRevision(tx, current, actorId);
+        const order = await tx.order.update({
+            where: { id },
+            data: { cancelledAt: new Date(), version: { increment: 1 } },
+        });
+        await invalidateDocuments(tx, id);
+        return order;
+    });
+}
+export async function createOrderTask(orderId: string): Promise<void> {
+    await generateOrderDocument(orderId);
+}
+export async function generateOrderDocument(orderId: string) {
+    const order = await prisma.order.findUniqueOrThrow({
+        where: { id: orderId },
+    });
+    if (order.cancelledAt)
+        throw new AppException(
+            "Cancelled orders cannot generate documents.",
+            409,
+            "ORDER_CANCELLED",
+        );
     return requestOrderGeneration(orderId);
 }
-
-export async function createOrderTask(orderId: string): Promise<void> {
-    await createDocumentForOrder(orderId);
-}
-
-export async function generateOrderDocument(orderId: string) {
-    const order = await prisma.order.findUnique({
-        where: { id: orderId },
+export async function deleteOrderById(id: string): Promise<void> {
+    await prisma.order.findUniqueOrThrow({
+        where: { id },
         select: { id: true },
     });
-
-    if (!order) {
-        throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    }
-
-    return createDocumentForOrder(orderId);
-}
-
-/* ========== Deletes ========== */
-
-export async function deleteOrderById(id: string): Promise<void> {
-    await prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-generation:${id}`}))::text AS "lock"`;
-        await tx.order.findUniqueOrThrow({ where: { id } });
-        if (await tx.orderDocument.count({ where: { orderId: id } }) > 0) {
-            throw new AppException(
-                "Orders with document history cannot be deleted.",
-                409,
-                "ORDER_HAS_DOCUMENT_HISTORY",
-            );
-        }
-        await tx.order.delete({ where: { id } });
-    });
+    throw new AppException(
+        "Orders preserve acceptance history. Cancel the order instead.",
+        409,
+        "ORDER_DELETE_FORBIDDEN",
+    );
 }

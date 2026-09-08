@@ -26,7 +26,7 @@ export async function getAllUsers(query: UserFilterParams) {
         where: Object.keys(where).length > 0 ? where : undefined,
         orderBy,
         include: {
-            orders: true,
+            acceptedOrders: true,
             customer: true,
             offers: true,
         },
@@ -37,7 +37,7 @@ export async function getUserById(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {
-            orders: true,
+            acceptedOrders: true,
             customer: {
                 include: {
                     contactPersons: true,

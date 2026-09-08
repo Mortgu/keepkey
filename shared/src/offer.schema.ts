@@ -194,6 +194,7 @@ export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 
 export const offerSchema = z.object({
     id: z.string(),
+    acceptedAt: isoDateTime.nullish(),
 
     customerId: z.string(),
     contactPersonId: z.string(),

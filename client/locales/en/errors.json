@@ -72,5 +72,10 @@
   "WEBDAV_INSUFFICIENT_STORAGE": "The cloud storage is full.",
   "WEBDAV_ERROR": "Error communicating with cloud storage.",
   "APP_ERROR": "An application error occurred.",
-  "INTERNAL_SERVER_ERROR": "Something went wrong on our end."
+  "INTERNAL_SERVER_ERROR": "Something went wrong on our end.",
+  "OFFER_ACCEPTED": "This offer has already been accepted and can no longer be changed.",
+  "ORDER_CANCELLED": "This order has been cancelled and can no longer be changed.",
+  "ORDER_DELETE_FORBIDDEN": "Orders can only be cancelled.",
+  "INVALID_ACCEPTED_OFFER_SNAPSHOT": "The stored offer data is invalid.",
+  "VALIDATION_ERROR": "Please check the entered details."
 }

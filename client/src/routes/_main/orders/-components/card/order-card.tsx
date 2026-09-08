@@ -1,10 +1,14 @@
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import OrderCreateModal from "../order-create-modal";
 import type { Order } from "@keepit/schemas";
+import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks/orders/order-mutations";
+import { getErrorMessage } from "@/lib/errors";
 
-import { Accordion, Button } from "@/components";
+import { Accordion, Badge, Button } from "@/components";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import { useGenerateOrderDocument } from "@/hooks/orders/order-mutations";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
 
@@ -13,6 +17,13 @@ interface Props {
 }
 
 export default function OrderCard({ order }: Props) {
+    const { t } = useTranslation();
+    const [editing, setEditing] = useState(false);
+    const { cancelOrder, isCancellingOrder, errorCancellingOrder } = useCancelOrder();
+    const cancel = async () => {
+        if (!confirm(t("orders.cancelConfirm", { number: order.orderId }))) return;
+        try { await cancelOrder({ orderId: order.id, expectedVersion: order.version }); } catch { /* Render mutation error below. */ }
+    };
     const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
 
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
@@ -25,6 +36,7 @@ export default function OrderCard({ order }: Props) {
                         <div className="flex items-center gap-2 text-md">
                             <span className="text-(--text) font-semibold">BE{order.orderId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
+                            {order.cancelledAt && <Badge variant="PENDING" size="xs">{t("orders.cancelled")}</Badge>}
                         </div>
                     </div>
 
@@ -78,8 +90,16 @@ export default function OrderCard({ order }: Props) {
                     {flatRates.map((flatrate) => (
                         <FlatRateRow key={flatrate.id} flatrate={flatrate} />
                     ))}
+                    {order.discounts.map(discount => <div key={discount.id} className="flex justify-between py-3 text-sm"><span>{discount.title}</span><span>{formatEur(-discount.amount_cents)}</span></div>)}
                 </Accordion.Section>
 
+                <Accordion.Section value="details" label={t("orders.details")}>
+                    <dl className="grid gap-2 py-3 text-sm">
+                        <dt>{t("orders.projectNumber")}</dt><dd>{order.projectNumber || "—"}</dd>
+                        <dt>{t("orders.projectDescription")}</dt><dd>{order.projectDescription || "—"}</dd>
+                        <dt>{t("orders.details")}</dt><dd>{order.orderDetails || "—"}</dd>
+                    </dl>
+                </Accordion.Section>
                 <Accordion.Section value="documents" label="Dokumente">
                     {documents.map((document) => (
                         <DocumentCard
@@ -107,19 +127,21 @@ export default function OrderCard({ order }: Props) {
                         variant="primary"
                         size="xs"
                         loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument}
+                        disabled={isGeneratingDocument || Boolean(order.cancelledAt)}
                         onClick={() => generateOrderDocument({ orderId: order.id })}
                     >
                         Dokument generieren
                     </Button>
                 </div>
 
-                {/* Actions right */}
                 <div className="flex items-center gap-2">
-
+                    <Button size="xs" variant="border" disabled={Boolean(order.cancelledAt) || isCancellingOrder} onClick={() => setEditing(true)}>{t("orders.edit")}</Button>
+                    <Button size="xs" variant="border" danger disabled={Boolean(order.cancelledAt) || isCancellingOrder} loading={isCancellingOrder} onClick={cancel}>{t("orders.cancelOrder")}</Button>
                 </div>
             </div>
 
+            {errorCancellingOrder && <p role="alert" className="px-4 py-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>}
+            {editing && <OrderCreateModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)} />}
         </div>
     );
 }

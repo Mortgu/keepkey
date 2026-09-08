@@ -96,45 +96,33 @@ export declare const orderRevisionSchema: z.ZodObject<{
     }, z.core.$strip>;
 }, z.core.$strip>;
 export type OrderRevision = z.infer<typeof orderRevisionSchema>;
+export declare const orderMetadataSchema: z.ZodObject<{
+    orderId: z.ZodString;
+    date: z.ZodString;
+    projectNumber: z.ZodNullable<z.ZodString>;
+    projectDescription: z.ZodNullable<z.ZodString>;
+    orderDetails: z.ZodNullable<z.ZodString>;
+}, z.core.$strict>;
 export declare const createOrderSchema: z.ZodObject<{
     id: z.ZodString;
+    expectedOfferVersion: z.ZodNumber;
     orderId: z.ZodString;
     date: z.ZodOptional<z.ZodString>;
     projectNumber: z.ZodOptional<z.ZodString>;
     projectDescription: z.ZodOptional<z.ZodString>;
     orderDetails: z.ZodOptional<z.ZodString>;
-}, z.core.$strip>;
-export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+}, z.core.$strict>;
 export declare const updateOrderSchema: z.ZodObject<{
     expectedVersion: z.ZodNumber;
     order: z.ZodObject<{
-        supplierId: z.ZodNullable<z.ZodString>;
-        customerId: z.ZodString;
-        contactPersonId: z.ZodString;
-        employeeId: z.ZodString;
-        contractId: z.ZodString;
-        duration_months: z.ZodNumber;
         orderId: z.ZodString;
-        paymentTerm: z.ZodString;
+        date: z.ZodString;
         projectNumber: z.ZodNullable<z.ZodString>;
         projectDescription: z.ZodNullable<z.ZodString>;
         orderDetails: z.ZodNullable<z.ZodString>;
-        date: z.ZodString;
-        validUntil: z.ZodNullable<z.ZodString>;
-        requestFrom: z.ZodNullable<z.ZodString>;
-    }, z.core.$strip>;
-    positions: z.ZodArray<z.ZodObject<{
-        productId: z.ZodString;
-        quantity: z.ZodNumber;
-        optional: z.ZodNullable<z.ZodBoolean>;
-        total_cents: z.ZodNumber;
-    }, z.core.$strip>>;
-    flatRates: z.ZodArray<z.ZodObject<{
-        flatRateId: z.ZodString;
-        quantity: z.ZodNumber;
-        total_cents: z.ZodNumber;
-    }, z.core.$strip>>;
-}, z.core.$strip>;
+    }, z.core.$strict>;
+}, z.core.$strict>;
+export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 export declare const restoreOrderRevisionSchema: z.ZodObject<{
     expectedVersion: z.ZodNumber;
@@ -164,12 +152,12 @@ export declare const orderSchema: z.ZodObject<{
     }, z.core.$strip>;
     duration_months: z.ZodNumber;
     paymentTerm: z.ZodString;
-    projectNumber: z.ZodOptional<z.ZodString>;
-    projectDescription: z.ZodOptional<z.ZodString>;
-    orderDetails: z.ZodOptional<z.ZodString>;
+    projectNumber: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    projectDescription: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    orderDetails: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     date: z.ZodString;
-    validUntil: z.ZodOptional<z.ZodString>;
-    requestFrom: z.ZodOptional<z.ZodString>;
+    validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     net_amount: z.ZodNumber;
     version: z.ZodNumber;
     customer: z.ZodObject<{
@@ -178,210 +166,25 @@ export declare const orderSchema: z.ZodObject<{
     }, z.core.$strip>;
     customerContactPerson: z.ZodObject<{
         id: z.ZodString;
-        salutation: z.ZodString;
+        salutation: z.ZodNullable<z.ZodString>;
         firstName: z.ZodString;
         lastName: z.ZodString;
     }, z.core.$strip>;
     offer: z.ZodObject<{
         id: z.ZodString;
-        customerId: z.ZodString;
-        contactPersonId: z.ZodString;
-        userId: z.ZodString;
-        supplierId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        contractId: z.ZodString;
-        contract: z.ZodObject<{
-            translations: z.ZodArray<z.ZodObject<{
-                language: z.ZodEnum<{
-                    DE: "DE";
-                    EN: "EN";
-                }>;
-                name: z.ZodString;
-                features: z.ZodArray<z.ZodString>;
-                table: z.ZodString;
-            }, z.core.$strip>>;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        duration_months: z.ZodNumber;
-        quoteId: z.ZodString;
-        paymentTerm: z.ZodString;
-        validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        language: z.ZodEnum<{
-            DE: "DE";
-            EN: "EN";
-        }>;
-        featureComparison: z.ZodBoolean;
-        toCompare: z.ZodArray<z.ZodString>;
-        offerPositions: z.ZodArray<z.ZodObject<{
-            productId: z.ZodString;
-            free_months: z.ZodNumber;
-            optional: z.ZodBoolean;
-            quantity: z.ZodNumber;
-            total_cents: z.ZodNumber;
-            discount_cents: z.ZodNumber;
-            eur_user_month: z.ZodNumber;
-            id: z.ZodString;
-            offerId: z.ZodString;
-            product: z.ZodObject<{
-                id: z.ZodString;
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
-                    table: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
-                }, z.core.$strip>>;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        offerFlatRates: z.ZodArray<z.ZodObject<{
-            flatRateId: z.ZodString;
-            quantity: z.ZodNumber;
-            id: z.ZodString;
-            offerId: z.ZodString;
-            total_cents: z.ZodNumber;
-            flatRate: z.ZodObject<{
-                id: z.ZodString;
-                total_cents: z.ZodNumber;
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    table: z.ZodString;
-                }, z.core.$strip>>;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
-        }, z.core.$strip>>;
-        offerDiscounts: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            offerId: z.ZodString;
-            title: z.ZodString;
-            description: z.ZodNullable<z.ZodString>;
-            amount_cents: z.ZodNumber;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        offerDocuments: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            displayName: z.ZodOptional<z.ZodString>;
-            version: z.ZodNumber;
-            sourceVersion: z.ZodOptional<z.ZodNumber>;
-            status: z.ZodEnum<{
-                PENDING: "PENDING";
-                PROCESSING: "PROCESSING";
-                GENERATED: "GENERATED";
-                UPLOADING: "UPLOADING";
-                UPLOADED: "UPLOADED";
-                FAILED: "FAILED";
-            }>;
-            isCurrent: z.ZodBoolean;
-            error: z.ZodOptional<z.ZodString>;
-            offerId: z.ZodString;
-            artifacts: z.ZodArray<z.ZodObject<{
-                id: z.ZodString;
-                objectKey: z.ZodString;
-                format: z.ZodEnum<{
-                    PDF: "PDF";
-                    DOCX: "DOCX";
-                }>;
-                size: z.ZodOptional<z.ZodNumber>;
-                sha256: z.ZodOptional<z.ZodString>;
-                uploadedAt: z.ZodOptional<z.ZodString>;
-                remotePath: z.ZodOptional<z.ZodString>;
-                remoteEtag: z.ZodOptional<z.ZodString>;
-                remoteSha256: z.ZodOptional<z.ZodString>;
-                offerDocumentId: z.ZodOptional<z.ZodString>;
-                orderDocumentId: z.ZodOptional<z.ZodString>;
-                updatedAt: z.ZodString;
-                createdAt: z.ZodString;
-            }, z.core.$strip>>;
-            taskId: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        derivationType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
-            RENEWAL: "RENEWAL";
-            LICENSE_EXTENSION: "LICENSE_EXTENSION";
-        }>>>;
-        user: z.ZodObject<{
-            id: z.ZodString;
-            name: z.ZodString;
-            firstName: z.ZodString;
-            lastName: z.ZodString;
-            salutation: z.ZodString;
-            email: z.ZodString;
-            phone: z.ZodNullable<z.ZodString>;
-            role: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        customer: z.ZodObject<{
-            customerId: z.ZodOptional<z.ZodString>;
-            companyName: z.ZodString;
-            email: z.ZodOptional<z.ZodString>;
-            invoiceEmail: z.ZodOptional<z.ZodString>;
-            phone: z.ZodOptional<z.ZodString>;
-            street: z.ZodOptional<z.ZodString>;
-            city: z.ZodOptional<z.ZodString>;
-            zip: z.ZodOptional<z.ZodString>;
-            language: z.ZodEnum<{
-                DE: "DE";
-                EN: "EN";
-            }>;
-            country: z.ZodString;
-            currency: z.ZodEnum<{
-                EUR: "EUR";
-                RAND: "RAND";
-                DOLLAR: "DOLLAR";
-                CHF: "CHF";
-            }>;
-            taxRate: z.ZodNumber;
-            salutation: z.ZodOptional<z.ZodString>;
-            id: z.ZodString;
-            contactPersons: z.ZodArray<z.ZodObject<{
-                customerId: z.ZodString;
-                salutation: z.ZodString;
-                firstName: z.ZodString;
-                lastName: z.ZodString;
-                email: z.ZodString;
-                id: z.ZodString;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>>;
-            _count: z.ZodObject<{
-                offers: z.ZodInt;
-                orders: z.ZodInt;
-            }, z.core.$strip>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        customerContactPerson: z.ZodObject<{
-            customerId: z.ZodString;
-            salutation: z.ZodString;
-            firstName: z.ZodString;
-            lastName: z.ZodString;
-            email: z.ZodString;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        net_amount: z.ZodNumber;
         version: z.ZodNumber;
-        date: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        quoteId: z.ZodString;
+        acceptedAt: z.ZodOptional<z.ZodNullable<z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>>>;
     }, z.core.$strip>;
+    acceptedAt: z.ZodString;
+    acceptedById: z.ZodString;
+    cancelledAt: z.ZodNullable<z.ZodString>;
+    discounts: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        title: z.ZodString;
+        description: z.ZodNullable<z.ZodString>;
+        amount_cents: z.ZodNumber;
+    }, z.core.$strip>>;
     documents: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         displayName: z.ZodOptional<z.ZodString>;
@@ -494,12 +297,12 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
     }, z.core.$strip>;
     duration_months: z.ZodNumber;
     paymentTerm: z.ZodString;
-    projectNumber: z.ZodOptional<z.ZodString>;
-    projectDescription: z.ZodOptional<z.ZodString>;
-    orderDetails: z.ZodOptional<z.ZodString>;
+    projectNumber: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    projectDescription: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    orderDetails: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     date: z.ZodString;
-    validUntil: z.ZodOptional<z.ZodString>;
-    requestFrom: z.ZodOptional<z.ZodString>;
+    validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     net_amount: z.ZodNumber;
     version: z.ZodNumber;
     customer: z.ZodObject<{
@@ -508,210 +311,25 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
     }, z.core.$strip>;
     customerContactPerson: z.ZodObject<{
         id: z.ZodString;
-        salutation: z.ZodString;
+        salutation: z.ZodNullable<z.ZodString>;
         firstName: z.ZodString;
         lastName: z.ZodString;
     }, z.core.$strip>;
     offer: z.ZodObject<{
         id: z.ZodString;
-        customerId: z.ZodString;
-        contactPersonId: z.ZodString;
-        userId: z.ZodString;
-        supplierId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        contractId: z.ZodString;
-        contract: z.ZodObject<{
-            translations: z.ZodArray<z.ZodObject<{
-                language: z.ZodEnum<{
-                    DE: "DE";
-                    EN: "EN";
-                }>;
-                name: z.ZodString;
-                features: z.ZodArray<z.ZodString>;
-                table: z.ZodString;
-            }, z.core.$strip>>;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        duration_months: z.ZodNumber;
-        quoteId: z.ZodString;
-        paymentTerm: z.ZodString;
-        validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        language: z.ZodEnum<{
-            DE: "DE";
-            EN: "EN";
-        }>;
-        featureComparison: z.ZodBoolean;
-        toCompare: z.ZodArray<z.ZodString>;
-        offerPositions: z.ZodArray<z.ZodObject<{
-            productId: z.ZodString;
-            free_months: z.ZodNumber;
-            optional: z.ZodBoolean;
-            quantity: z.ZodNumber;
-            total_cents: z.ZodNumber;
-            discount_cents: z.ZodNumber;
-            eur_user_month: z.ZodNumber;
-            id: z.ZodString;
-            offerId: z.ZodString;
-            product: z.ZodObject<{
-                id: z.ZodString;
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    description: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
-                    table: z.ZodPipe<z.ZodOptional<z.ZodNullable<z.ZodString>>, z.ZodTransform<string | null, string | null | undefined>>;
-                }, z.core.$strip>>;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        offerFlatRates: z.ZodArray<z.ZodObject<{
-            flatRateId: z.ZodString;
-            quantity: z.ZodNumber;
-            id: z.ZodString;
-            offerId: z.ZodString;
-            total_cents: z.ZodNumber;
-            flatRate: z.ZodObject<{
-                id: z.ZodString;
-                total_cents: z.ZodNumber;
-                translations: z.ZodArray<z.ZodObject<{
-                    language: z.ZodEnum<{
-                        DE: "DE";
-                        EN: "EN";
-                    }>;
-                    name: z.ZodString;
-                    table: z.ZodString;
-                }, z.core.$strip>>;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>;
-        }, z.core.$strip>>;
-        offerDiscounts: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            offerId: z.ZodString;
-            title: z.ZodString;
-            description: z.ZodNullable<z.ZodString>;
-            amount_cents: z.ZodNumber;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        offerDocuments: z.ZodArray<z.ZodObject<{
-            id: z.ZodString;
-            displayName: z.ZodOptional<z.ZodString>;
-            version: z.ZodNumber;
-            sourceVersion: z.ZodOptional<z.ZodNumber>;
-            status: z.ZodEnum<{
-                PENDING: "PENDING";
-                PROCESSING: "PROCESSING";
-                GENERATED: "GENERATED";
-                UPLOADING: "UPLOADING";
-                UPLOADED: "UPLOADED";
-                FAILED: "FAILED";
-            }>;
-            isCurrent: z.ZodBoolean;
-            error: z.ZodOptional<z.ZodString>;
-            offerId: z.ZodString;
-            artifacts: z.ZodArray<z.ZodObject<{
-                id: z.ZodString;
-                objectKey: z.ZodString;
-                format: z.ZodEnum<{
-                    PDF: "PDF";
-                    DOCX: "DOCX";
-                }>;
-                size: z.ZodOptional<z.ZodNumber>;
-                sha256: z.ZodOptional<z.ZodString>;
-                uploadedAt: z.ZodOptional<z.ZodString>;
-                remotePath: z.ZodOptional<z.ZodString>;
-                remoteEtag: z.ZodOptional<z.ZodString>;
-                remoteSha256: z.ZodOptional<z.ZodString>;
-                offerDocumentId: z.ZodOptional<z.ZodString>;
-                orderDocumentId: z.ZodOptional<z.ZodString>;
-                updatedAt: z.ZodString;
-                createdAt: z.ZodString;
-            }, z.core.$strip>>;
-            taskId: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>>;
-        renewedFromOfferId: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-        derivationType: z.ZodOptional<z.ZodNullable<z.ZodEnum<{
-            RENEWAL: "RENEWAL";
-            LICENSE_EXTENSION: "LICENSE_EXTENSION";
-        }>>>;
-        user: z.ZodObject<{
-            id: z.ZodString;
-            name: z.ZodString;
-            firstName: z.ZodString;
-            lastName: z.ZodString;
-            salutation: z.ZodString;
-            email: z.ZodString;
-            phone: z.ZodNullable<z.ZodString>;
-            role: z.ZodOptional<z.ZodNullable<z.ZodString>>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        customer: z.ZodObject<{
-            customerId: z.ZodOptional<z.ZodString>;
-            companyName: z.ZodString;
-            email: z.ZodOptional<z.ZodString>;
-            invoiceEmail: z.ZodOptional<z.ZodString>;
-            phone: z.ZodOptional<z.ZodString>;
-            street: z.ZodOptional<z.ZodString>;
-            city: z.ZodOptional<z.ZodString>;
-            zip: z.ZodOptional<z.ZodString>;
-            language: z.ZodEnum<{
-                DE: "DE";
-                EN: "EN";
-            }>;
-            country: z.ZodString;
-            currency: z.ZodEnum<{
-                EUR: "EUR";
-                RAND: "RAND";
-                DOLLAR: "DOLLAR";
-                CHF: "CHF";
-            }>;
-            taxRate: z.ZodNumber;
-            salutation: z.ZodOptional<z.ZodString>;
-            id: z.ZodString;
-            contactPersons: z.ZodArray<z.ZodObject<{
-                customerId: z.ZodString;
-                salutation: z.ZodString;
-                firstName: z.ZodString;
-                lastName: z.ZodString;
-                email: z.ZodString;
-                id: z.ZodString;
-                createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-                updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            }, z.core.$strip>>;
-            _count: z.ZodObject<{
-                offers: z.ZodInt;
-                orders: z.ZodInt;
-            }, z.core.$strip>;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        customerContactPerson: z.ZodObject<{
-            customerId: z.ZodString;
-            salutation: z.ZodString;
-            firstName: z.ZodString;
-            lastName: z.ZodString;
-            email: z.ZodString;
-            id: z.ZodString;
-            createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-            updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        }, z.core.$strip>;
-        net_amount: z.ZodNumber;
         version: z.ZodNumber;
-        date: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
-        updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
+        quoteId: z.ZodString;
+        acceptedAt: z.ZodOptional<z.ZodNullable<z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>>>;
     }, z.core.$strip>;
+    acceptedAt: z.ZodString;
+    acceptedById: z.ZodString;
+    cancelledAt: z.ZodNullable<z.ZodString>;
+    discounts: z.ZodArray<z.ZodObject<{
+        id: z.ZodString;
+        title: z.ZodString;
+        description: z.ZodNullable<z.ZodString>;
+        amount_cents: z.ZodNumber;
+    }, z.core.$strip>>;
     documents: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
         displayName: z.ZodOptional<z.ZodString>;

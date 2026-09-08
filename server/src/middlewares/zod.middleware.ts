@@ -7,6 +7,7 @@ export const validate = (schema: ZodSchema) => (request: Request, response: Resp
   if (!result.success) {
     return response.status(400).json({
       success: false,
+      code: "VALIDATION_ERROR",
       message: result.error.issues.map(i => i.message).join(' & '),
     });
   }
@@ -29,6 +30,7 @@ export const validateQuery = (schema: ZodSchema) => (request: Request, response:
   if (!result.success) {
     return response.status(400).json({
       success: false,
+      code: "VALIDATION_ERROR",
       message: result.error.issues.map(i => i.message).join(' & '),
     });
   }
@@ -42,6 +44,7 @@ export const validateParams = (schema: ZodSchema) => (request: Request, response
   if (!result.success) {
     return response.status(400).json({
       success: false,
+      code: "VALIDATION_ERROR",
       message: result.error.issues.map(i => i.message).join(' & '),
     });
   }

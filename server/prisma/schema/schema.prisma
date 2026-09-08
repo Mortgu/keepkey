@@ -30,7 +30,7 @@ model User {
   customer       Customer?       @relation(fields: [customerId], references: [id])
   customerId     String?
   offers         Offer[]
-  orders         Order[]
+  acceptedOrders Order[]
   offerRevisions OfferRevision[]
   orderRevisions OrderRevision[]
   tariffVersions TariffVersion[]
@@ -100,7 +100,6 @@ model Supplier {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   offers   Offer[]
-  orders   Order[]
   invoices Invoice[]
 
   @@map("supplier")
@@ -116,7 +115,6 @@ model FlatRate {
   translations FlatRateTranslation[]
 
   offerFlatRates OfferFlatRate[]
-  orderFlatRates OrderFlatRate[]
 
   @@map("flat_rate")
 }

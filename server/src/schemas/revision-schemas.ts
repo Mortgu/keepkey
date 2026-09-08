@@ -18,7 +18,6 @@ const nullableDateTimeSchema = z.preprocess(
  * gespeicherte Snapshots sind unveraenderlich.
  */
 export const OFFER_REVISION_SNAPSHOT_VERSION = 2;
-export const ORDER_REVISION_SNAPSHOT_VERSION = 2;
 
 const offerFields = z.object({
   supplierId: z.string().nullable(),
@@ -75,45 +74,7 @@ export const offerRevisionSnapshotSchema = z.object({
   discounts: z.array(offerDiscount).default([]),
 });
 
-const orderFields = z.object({
-  supplierId: z.string().nullable(),
-  customerId: z.string(),
-  contactPersonId: z.string(),
-  employeeId: z.string(),
-  contractId: z.string(),
-  duration_months: z.number().int(),
-  orderId: z.string(),
-  paymentTerm: z.string(),
-  projectNumber: z.string().nullable(),
-  projectDescription: z.string().nullable(),
-  orderDetails: z.string().nullable(),
-  date: dateTimeSchema,
-  validUntil: nullableDateTimeSchema,
-  requestFrom: nullableDateTimeSchema,
-  net_amount: z.number().int(),
-});
-
-const orderPosition = z.object({
-  productId: z.string(),
-  quantity: z.number().int(),
-  optional: z.boolean(),
-  total_cents: z.number().int(),
-});
-
-const orderFlatRate = z.object({
-  flatRateId: z.string(),
-  quantity: z.number().int(),
-  total_cents: z.number().int(),
-});
-
-export const orderRevisionSnapshotSchema = z.object({
-  order: orderFields,
-  positions: z.array(orderPosition),
-  flatRates: z.array(orderFlatRate),
-});
-
 export type OfferRevisionSnapshot = z.infer<typeof offerRevisionSnapshotSchema>;
-export type OrderRevisionSnapshot = z.infer<typeof orderRevisionSnapshotSchema>;
 
 /* ========== Version 1 — nur noch lesend ==========
  *
@@ -149,17 +110,6 @@ const offerRevisionSnapshotSchemaV1 = z.object({
   discounts: z.array(offerDiscount).default([]),
 });
 
-const orderPositionV1 = orderPosition.extend({
-  contractId: z.string(),
-  duration_months: z.number().int(),
-});
-
-const orderRevisionSnapshotSchemaV1 = z.object({
-  order: orderFields.omit({ contractId: true, duration_months: true }),
-  positions: z.array(orderPositionV1),
-  flatRates: z.array(orderFlatRate),
-});
-
 /**
  * Hebt Vertrag und Laufzeit der ersten Position an den Kopf.
  *
@@ -190,18 +140,6 @@ function upgradeOfferSnapshotV1(
     positions: v1.positions.map(({ contractId: _c, duration_months: _d, ...position }) => position),
     flatRates: v1.flatRates,
     discounts: v1.discounts,
-  };
-}
-
-function upgradeOrderSnapshotV1(
-  v1: z.infer<typeof orderRevisionSnapshotSchemaV1>,
-): OrderRevisionSnapshot {
-  const header = hoistHeader(v1.positions, "Bestellrevision");
-
-  return {
-    order: { ...v1.order, ...header },
-    positions: v1.positions.map(({ contractId: _c, duration_months: _d, ...position }) => position),
-    flatRates: v1.flatRates,
   };
 }
 
@@ -236,20 +174,4 @@ export function parseOfferRevisionSnapshot(value: unknown, snapshotVersion = OFF
   }
 
   return offerRevisionSnapshotSchema.parse(value);
-}
-
-export function buildOrderRevisionSnapshot(value: Record<string, unknown>): OrderRevisionSnapshot {
-  return orderRevisionSnapshotSchema.parse({
-    order: value,
-    positions: value.orderPositions,
-    flatRates: value.flatRates,
-  });
-}
-
-export function parseOrderRevisionSnapshot(value: unknown, snapshotVersion = ORDER_REVISION_SNAPSHOT_VERSION): OrderRevisionSnapshot {
-  if (snapshotVersion === 1) {
-    return upgradeOrderSnapshotV1(orderRevisionSnapshotSchemaV1.parse(value));
-  }
-
-  return orderRevisionSnapshotSchema.parse(value);
 }

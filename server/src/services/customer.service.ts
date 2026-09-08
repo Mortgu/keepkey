@@ -38,7 +38,7 @@ export async function getCustomers(filters: CustomerFilterParams) {
         }
     }
 
-    return prisma.customer.findMany({
+    const customers = await prisma.customer.findMany({
         where,
         orderBy,
         include: {
@@ -46,11 +46,14 @@ export async function getCustomers(filters: CustomerFilterParams) {
             _count: {
                 select: {
                     offers: true,
-                    orders: true,
                 }
             }
         },
     });
+    const counts = await prisma.offer.groupBy({ by: ["customerId"],
+        where: { customerId: { in: customers.map(c => c.id) }, orders: { isNot: null } }, _count: { _all: true } });
+    const orderCounts = new Map(counts.map(c => [c.customerId, c._count._all]));
+    return customers.map(c => ({ ...c, _count: { ...c._count, orders: orderCounts.get(c.id) ?? 0 } }));
 }
 
 export async function getCustomerById(id: string) {
@@ -61,7 +64,6 @@ export async function getCustomerById(id: string) {
             _count: {
                 select: {
                     offers: true,
-                    orders: true,
                 }
             }
         },
@@ -71,7 +73,7 @@ export async function getCustomerById(id: string) {
         throw new AppException("Customer not found!", 404, "CUSTOMER_NOT_FOUND");
     }
 
-    return customer;
+    return { ...customer, _count: { ...customer._count, orders: await prisma.order.count({ where: { offer: { customerId: id } } }) } };
 }
 
 export async function getCustomerContacts(customerId: string) {

@@ -1,63 +1,26 @@
+/// Eine Bestellung nimmt ein unveränderliches Angebot an. Konditionen stehen
+/// ausschließlich am Angebot.
 model Order {
   id String @id @default(uuid())
-
-  supplier   Supplier? @relation(fields: [supplierId], references: [id])
-  supplierId String? // Lieferanten-Nr.
-
-  customer   Customer @relation(fields: [customerId], references: [id])
-  customerId String // Kunden-Nr.
-
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
-  contactPersonId       String // Ihr Ansprechpartner
-
-  employee   User   @relation(fields: [employeeId], references: [id])
-  employeeId String // Unser Ansprechpartner
-
-  offer   Offer  @relation(fields: [offerId], references: [id])
-  offerId String @unique // One-to-one relation
-
-  /// Vertrag und Laufzeit der Bestellung — übernommen aus dem Angebot und dort
-  /// aus demselben Grund am Kopf statt an der Position. Sie sind die Grundlage
-  /// jeder Aussage über die Restlaufzeit dieser Bestellung.
-  contract   Contract @relation(fields: [contractId], references: [id])
-  contractId String
-
-  duration_months Int
-
-  /// Belegnummer — eindeutig, siehe {@link Offer.quoteId}.
-  orderId String @unique // Beleg-Nr.
-
-  /// @openapi.ignore
-  documentVersion Int    @default(0)
-  paymentTerm     String @default("") // Zahlungsbedingung
-
-  projectNumber      String? // Projekt-Nr.
-  projectDescription String? // Projektbezug
-  orderDetails       String? // Bestelldetails (Registrierung, Absprachen etc.)
-
-  date        DateTime  @default(now()) // Datum
-  validUntil  DateTime?
-  requestFrom DateTime?
-
-  net_amount Int
-
+  offerId String @unique
+  offer Offer @relation(fields: [offerId], references: [id], onDelete: Restrict)
+  orderId String @unique
+  date DateTime @default(now())
+  projectNumber String?
+  projectDescription String?
+  orderDetails String?
+  acceptedAt DateTime @default(now()) @db.Timestamptz(6)
+  acceptedById String
+  acceptedBy User @relation(fields: [acceptedById], references: [id], onDelete: Restrict)
+  cancelledAt DateTime? @db.Timestamptz(6)
   version Int @default(1)
-
-  documents      OrderDocument[]
-  orderPositions OrderPosition[]
-  flatRates      OrderFlatRate[]
-  revisions      OrderRevision[]
-
+  documentVersion Int @default(0)
+  documents OrderDocument[]
+  revisions OrderRevision[]
   invoices Invoice[]
-
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  @@index([customerId])
-  @@index([contactPersonId])
-  @@index([employeeId])
-  @@index([contractId])
-  @@index([supplierId])
+  @@index([acceptedById])
   @@map("order")
 }
 
@@ -79,46 +42,6 @@ model OrderRevision {
   @@unique([orderId, version])
   @@index([changedById])
   @@map("order_revision")
-}
-
-model OrderPosition {
-  id String @id @default(uuid())
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String
-
-  product   Product @relation(fields: [productId], references: [id])
-  productId String
-
-  /// Vertrag und Laufzeit stehen an der Bestellung — siehe {@link Order}.
-  quantity Int
-
-  optional Boolean? @default(false)
-
-  total_cents Int
-
-  createdAt DateTime @default(now())
-
-  @@index([orderId])
-  @@index([productId])
-  @@map("order_position")
-}
-
-model OrderFlatRate {
-  id String @id @default(uuid())
-
-  flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
-  flatRateId String
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String
-
-  quantity    Int
-  total_cents Int
-
-  @@index([orderId])
-  @@index([flatRateId])
-  @@map("order_flat_rate")
 }
 
 model OrderDocument {

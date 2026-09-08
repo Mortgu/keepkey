@@ -1,23 +1,29 @@
 import { Dot } from "lucide-react";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
-import type { Offer } from "@keepit/schemas";
+import type { Offer, Order } from "@keepit/schemas";
+import { getErrorMessage } from "@/lib/errors";
 import { Button, Dialog, Input, Textarea } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 interface Props {
-    offer: Offer;
+    offer?: Offer;
+    order?: Order;
     /** Abbrechen — schließt nur diesen Dialog. */
     onClose: () => void;
     /** Bestellung angelegt — schließt zusätzlich die darüberliegende Auswahl. */
     onCreated: () => void;
 }
 
-export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
-    const { form } = useOrderForm({
+export default function OrderCreateModal({ offer, order, onClose, onCreated }: Props) {
+    const { form, error } = useOrderForm({
         onDone: onCreated,
-        currentOfferId: offer.id,
+        currentOffer: offer,
+        currentOrder: order,
     });
+
+    const source = order ?? offer!;
+    const formId = `order-form-${source.id}`;
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
@@ -32,21 +38,23 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
 
     return (
         <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
-            <Dialog.Header title={`Bestellung für ${offer.quoteId}`} description={
+            <Dialog.Header title={order ? t("orders.editTitle") : t("orders.createTitle", { quoteId: offer?.quoteId })} description={
                 <>
-                    {offer.customer.companyName}
+                    {source.customer.companyName}
                     <Dot size={18} />
-                    {offer.customerContactPerson.firstName} {offer.customerContactPerson.lastName}
+                    {source.customerContactPerson.firstName} {source.customerContactPerson.lastName}
                 </>
             } />
             <Dialog.Body>
-                <form id={`order-form-${offer.id}`} onSubmit={handleSubmit} className="grid gap-4">
+                <p className="text-sm text-(--text-secondary)">{t("orders.fixedOffer")}</p>
+                {error && <p role="alert" className="text-sm text-(--destructive)">{getErrorMessage(error)}</p>}
+                <form id={formId} onSubmit={handleSubmit} className="grid gap-4">
                     <div className="flex items-center gap-4">
                         <form.Field name="orderId" children={(field) => (
                             <Input
                                 id={field.name}
                                 name={field.name}
-                                label="Bestell-Nr."
+                                label={t("orders.number")}
                                 prefix="BE"
                                 value={field.state.value}
                                 error={getFormError(field.state.meta.errors)}
@@ -58,7 +66,7 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
                         <form.Field name="projectNumber" children={(field) => (
                             <Input
                                 id={field.name}
-                                label="Projekt-Nr."
+                                label={t("orders.projectNumber")}
                                 value={field.state.value}
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 onBlur={field.handleBlur}
@@ -70,7 +78,7 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
                         <Input
                             id={field.name}
                             type="date"
-                            label="Bestelldatum"
+                            label={t("orders.date")}
                             value={field.state.value}
                             error={getFormError(field.state.meta.errors)}
                             onChange={(e) => field.handleChange(e.target.value)}
@@ -81,8 +89,8 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
                     <form.Field name="projectDescription" children={(field) => (
                         <Textarea
                             id={field.name}
-                            label="Projektbezug"
-                            placeholder="Kurzbeschreibung des Projekts"
+                            label={t("orders.projectDescription")}
+
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={field.handleBlur}
@@ -92,8 +100,8 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
                     <form.Field name="orderDetails" children={(field) => (
                         <Textarea
                             id={field.name}
-                            label="Bestelldetails"
-                            placeholder="Registrierung, Absprachen, etc."
+                            label={t("orders.details")}
+
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={field.handleBlur}
@@ -108,9 +116,9 @@ export default function OrderCreateModal({ offer, onClose, onCreated }: Props) {
                     children={([canSubmit, isSubmitting]) => (
                         <Button
                             type="submit"
-                            form={`order-form-${offer.id}`}
+                            form={formId}
                             size="sm"
-                            disabled={!canSubmit}
+                            disabled={!canSubmit || isSubmitting || Boolean(order?.cancelledAt) || Boolean(offer?.acceptedAt)}
                             loading={isSubmitting}
                         >
                             {t("button.save")}

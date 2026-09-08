@@ -64,24 +64,23 @@ export async function getDashboardStats(): Promise<DashboardStats> {
             GROUP BY 1
         `,
         prisma.$queryRaw<MonthRow[]>`
-            SELECT to_char(date_trunc('month', "date"), 'YYYY-MM') AS month,
-                   count(*)                                        AS count,
-                   sum("net_amount")                               AS volume
-            FROM "order"
-            WHERE "date" >= ${start}
+            SELECT to_char(date_trunc('month', o."date"), 'YYYY-MM') AS month,
+                   count(*) AS count, sum(f."net_amount") AS volume
+            FROM "order" o JOIN "offer" f ON f.id = o."offerId"
+            WHERE o."date" >= ${start} AND o."cancelledAt" IS NULL
             GROUP BY 1
         `,
-        // Offen heisst: es hängt keine Bestellung daran. `Order.offerId` ist
-        // unique, ein Angebot hat also höchstens eine.
+        // Angenommene Angebote bleiben auch nach Storno geschlossen.
         prisma.offer.aggregate({
-            where: { orders: null },
+            where: { acceptedAt: null },
             _count: { _all: true },
             _sum: { net_amount: true },
         }),
-        prisma.order.aggregate({
-            _count: { _all: true },
-            _sum: { net_amount: true },
-        }),
+        prisma.$queryRaw<{ count: bigint; volume: bigint | null }[]>`
+            SELECT count(*) AS count, sum(f."net_amount") AS volume
+            FROM "order" o JOIN "offer" f ON f.id = o."offerId"
+            WHERE o."cancelledAt" IS NULL
+        `,
     ]);
 
     const offersByMonth = toMap(offerRows);
@@ -107,8 +106,8 @@ export async function getDashboardStats(): Promise<DashboardStats> {
                 volume_cents: openOffers._sum.net_amount ?? 0,
             },
             orders: {
-                count: orderTotals._count._all,
-                volume_cents: orderTotals._sum.net_amount ?? 0,
+                count: Number(orderTotals[0]?.count ?? 0),
+                volume_cents: Number(orderTotals[0]?.volume ?? 0),
             },
         },
         months,

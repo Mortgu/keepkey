@@ -136,6 +136,7 @@ export const offerDiscountSchema = z.object({
 });
 export const offerSchema = z.object({
     id: z.string(),
+    acceptedAt: isoDateTime.nullish(),
     customerId: z.string(),
     contactPersonId: z.string(),
     userId: z.string(),

@@ -46,7 +46,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
     const handleDeleteOffer = () => {
-        if (confirm("Angebot löschen")) {
+        if (!offer.acceptedAt && confirm("Angebot löschen")) {
             deleteOffer({ id: offer.id });
         }
     };
@@ -59,6 +59,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         <div className="flex items-center gap-2 text-md">
                             <span className="text-(--text) font-semibold">AG{quoteId}</span>
                             <span className="text-(--text)">{customer.companyName}</span>
+                            {offer.acceptedAt && <Badge variant="PENDING" size="xs">{t("orders.accepted")}</Badge>}
                             {offer.derivationType === "RENEWAL" && (
                                 <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                             )}
@@ -189,6 +190,8 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="border"
+                        disabled={Boolean(offer.acceptedAt)}
+                        title={offer.acceptedAt ? t("orders.acceptedHint") : t("orders.edit")}
                         onClick={() => offerModal.open()}
                         icon={<Pen className="size-3" />}
                         iconOnly
@@ -198,6 +201,8 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         size="xs"
                         variant="secondary"
                         danger
+                        disabled={Boolean(offer.acceptedAt)}
+                        title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
                         icon={<Trash className="size-3" />}

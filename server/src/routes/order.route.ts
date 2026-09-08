@@ -1,3 +1,5 @@
+import { cancelOrder } from "@/controllers/order.controller.js";
+import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
 import { Router } from "express";
 import {
   createOrder,
@@ -12,11 +14,7 @@ import {
   updateOrder,
 } from "@/controllers/index.js";
 import { validate } from "@/middlewares/zod.middleware.js";
-import {
-  createOrderSchema,
-  restoreOrderRevisionSchema,
-  updateOrderSchema
-} from "@keepit/schemas";
+import { restoreOrderRevisionSchema } from "@keepit/schemas";
 
 const router = Router();
 
@@ -30,11 +28,13 @@ router.get("/:orderId/revisions", getOrderRevisions);
 
 router.post('/:orderId/documents', generateOrderDocument);
 
-router.post('/', validate(createOrderSchema), createOrder, createOrderTask);
+router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
 router.post('/:orderId/revisions/:revisionId/restore', validate(restoreOrderRevisionSchema), restoreOrderRevision);
 
-router.patch('/:orderId', validate(updateOrderSchema), updateOrder);
+router.patch('/:orderId', validate(updateOrderMetadataSchema), updateOrder);
+
+router.post("/:orderId/cancel", validate(restoreOrderRevisionSchema), cancelOrder);
 
 router.delete("/:id", deleteOrderById);
 
