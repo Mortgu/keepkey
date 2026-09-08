@@ -1,6 +1,7 @@
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
-import {converting, fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {convertDocxToPdf} from "../../lib/docx-to-pdf.js";
 import {pickTranslation} from "../../utils/i18n.js";
 
 const loadOrderData: PipelineStage<OrderPipelineContext> = {
@@ -49,7 +50,7 @@ const generate: PipelineStage<OrderPipelineContext> = {
 const convert: PipelineStage<OrderPipelineContext> = {
     name: "convert",
     run: async (context) => {
-        context.pdfBuffer = await converting(context.docxBuffer!);
+        context.pdfBuffer = await convertDocxToPdf(context.docxBuffer!);
     },
 };
 

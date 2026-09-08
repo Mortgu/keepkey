@@ -65,6 +65,13 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
     const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
 
+    /*
+     * Beim Ersetzen wird die PDF serverseitig neu aus der DOCX erzeugt. Das
+     * läuft im selben Request und dauert Sekunden — ohne Anzeige wirkt die
+     * Karte in der Zeit eingefroren.
+     */
+    const isBusy = document.status === "PROCESSING" || mutations.isReplacingDocumentFile;
+
     const dropzone = useDropzone({
         noClick: true,
         noKeyboard: true,
@@ -253,7 +260,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             )}
 
                             {/* Menu Button */}
-                            {(document.status !== "UPLOADING" && document.status !== "PROCESSING") && (
+                            {(document.status !== "UPLOADING" && !isBusy) && (
                                 <Menu.Root>
                                     <Menu.Trigger className={menuStyles().Trigger()}>
                                         <Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />
@@ -287,7 +294,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             )}
 
                             {/* Loader Circle */}
-                            {(document.status === "PROCESSING") && (
+                            {isBusy && (
                                 <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
                                     <LoaderCircle size={16} strokeWidth={2} className="animate-spin" />
                                 </div>

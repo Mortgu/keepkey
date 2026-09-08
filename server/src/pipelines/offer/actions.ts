@@ -10,7 +10,7 @@ import logger from "@/utils/logger.js";
 import { calculatePrice } from "@/utils/products.js";
 import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { convert as libconvert } from "libreoffice-convert";
+import { convertDocxToPdf } from "@/lib/docx-to-pdf.js";
 import { z } from "zod";
 import { netCents } from "@keepit/schemas";
 import { PipelineStageError } from "../pipeline.js";
@@ -379,12 +379,7 @@ export async function convertAction(context: OfferPipelineContext) {
         throw new PipelineStageError("Something went wrong! Empty docx buffer.");
     }
 
-    context.pdfBuffer = await new Promise((resolve, reject) => {
-        libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
+    context.pdfBuffer = await convertDocxToPdf(docxBuffer);
 }
 
 export async function createDisplayNameAction(context: OfferPipelineContext) {

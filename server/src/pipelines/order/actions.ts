@@ -1,6 +1,5 @@
 import Docxtemplater from "docxtemplater";
 import type { Language } from "@prisma/client";
-import { convert as libconvert } from "libreoffice-convert";
 import PizZip from "pizzip";
 import { prisma } from "../../lib/prismaClient.js";
 import { loadTemplateForRendering } from "../../services/document-template.service.js";
@@ -189,14 +188,4 @@ export async function generating(
     doc.render(formatedData);
 
     return doc.toBuffer();
-}
-
-
-export async function converting(docxBuffer: Buffer): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-        libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
 }
