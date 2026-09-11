@@ -1,9 +1,9 @@
+import { createLink } from "@tanstack/react-router";
 import * as React from "react";
 import { tv } from "tailwind-variants";
-import { createLink } from "@tanstack/react-router";
 
-import { ChevronDown } from "lucide-react";
 import type { LinkComponent } from "@tanstack/react-router";
+import { ChevronDown } from "lucide-react";
 
 const itemStyles = tv({
     base: [
@@ -17,8 +17,11 @@ const itemStyles = tv({
             false: "",
         },
         isActive: {
-            true: "bg-(--fg-2)  text-(--text-inv) hover:bg-(--fg-2) hover:text-(--text-inv)",
-            false: "",
+            true: [
+                "bg-(--fg-2)  text-(--text-inv) hover:bg-(--fg-2) hover:text-(--text-inv)",
+                "text-white"
+            ],
+            false: "text-(--border-200)",
         },
     },
     defaultVariants: { indent: false, isActive: false },
@@ -28,8 +31,8 @@ const iconStyles = tv({
     base: "flex shrink-0",
     variants: {
         isActive: {
-            true: "text-(--text-inv)",
-            false: "text-(--text-inv)",
+            true: "text-(--text-inv) text-white",
+            false: "text-(--text-inv) text-(--border-200)",
         },
     },
 });
@@ -52,13 +55,15 @@ type NavItemContentProps = {
     isActive?: boolean;
 };
 
-function NavItemContent({
-    icon,
-    label,
-    badge,
-    trailing,
-    isActive,
-}: NavItemContentProps) {
+function NavItemContent(props: NavItemContentProps) {
+    const {
+        icon,
+        label,
+        badge,
+        trailing,
+        isActive,
+    } = props;
+
     return (
         <>
             {icon && <span className={iconStyles({ isActive })}>{icon}</span>}
