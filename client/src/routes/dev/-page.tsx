@@ -286,7 +286,7 @@ export function ComponentMatrix() {
                             <DemoDialog label="Verschachtelt öffnen" size="sm">
                                 <Dialog.Header title="Verschachtelter Dialog" />
                                 <Dialog.Body>
-                                    <p className="text-body">Der Eltern-Dialog skaliert zurück (data-nested-dialog-open).</p>
+                                    <p className="text-body">Der Eltern-Dialog wird ausgeblendet (data-nested-dialog-open).</p>
                                 </Dialog.Body>
                             </DemoDialog>
                             <Dialog.Close render={<Button variant="border" size="sm">Schließen</Button>} />
