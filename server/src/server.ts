@@ -1,7 +1,8 @@
 /**
- * Übergangs-Entry-Point: API und Worker in einem Prozess, wie vor der
- * Trennung. Nur als Fallback während des Rollouts — Produktion startet
- * `dist/api.js` und `dist/worker.js` als getrennte Services.
+ * Standard-Entry-Point: API und Worker in einem Prozess. Reicht, solange die
+ * Dokumentgenerierung die API nicht spürbar ausbremst. Bei Bedarf lassen sich
+ * `dist/api.js` und `dist/worker.js` als getrennte Services betreiben —
+ * ohne Codeänderung, nur über das Startkommando.
  */
 import "./runtime/bootstrap.js";
 

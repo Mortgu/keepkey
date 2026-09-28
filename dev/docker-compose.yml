@@ -82,30 +82,17 @@ services:
         condition: service_healthy
     restart: "no"
 
+  # API + Worker in einem Prozess (dist/server.js, Default des Images).
   app:
     image: keepit:dev
     container_name: keepit_app
     env_file:
       - .env.docker
-    command: node dist/api.js
-    ports:
-      - "3000:3000"
-    depends_on:
-      migrate:
-        condition: service_completed_successfully
-      garage:
-        condition: service_healthy
-    restart: always
-
-  worker:
-    image: keepit:dev
-    container_name: keepit_worker
-    env_file:
-      - .env.docker
     environment:
       SHUTDOWN_TIMEOUT_MS: "110000"
-    command: node dist/worker.js
     stop_grace_period: 120s
+    ports:
+      - "3000:3000"
     depends_on:
       migrate:
         condition: service_completed_successfully
