@@ -85,8 +85,14 @@ export async function getCustomerContacts(customerId: string) {
 /* ========== Mutations ========== */
 
 export async function createCustomer(input: CreateCustomerInput) {
+    const { contactPersons = [], ...data } = input;
+
+    // Verschachteltes Create: Kunde und Ansprechpartner entstehen atomar.
     const customer = await prisma.customer.create({
-        data: input,
+        data: {
+            ...data,
+            ...(contactPersons.length > 0 && { contactPersons: { create: contactPersons } }),
+        },
     });
 
     return customer;

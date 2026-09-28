@@ -7,6 +7,14 @@ export declare const createContactSchema: z.ZodObject<{
     email: z.ZodString;
 }, z.core.$strip>;
 export type CreateContactInput = z.infer<typeof createContactSchema>;
+/** Ansprechpartner, der zusammen mit einem neuen Kunden angelegt wird — die Kunden-ID gibt es dann noch nicht. */
+export declare const newCustomerContactSchema: z.ZodObject<{
+    salutation: z.ZodString;
+    firstName: z.ZodString;
+    lastName: z.ZodString;
+    email: z.ZodString;
+}, z.core.$strip>;
+export type NewCustomerContactInput = z.infer<typeof newCustomerContactSchema>;
 export declare const updateContactSchema: z.ZodObject<{
     customerId: z.ZodOptional<z.ZodString>;
     salutation: z.ZodOptional<z.ZodString>;

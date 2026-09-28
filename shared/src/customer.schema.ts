@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { isoDateTime } from './common.js';
-import { contactListSchema } from './contact.schema.js';
+import { contactListSchema, newCustomerContactSchema } from './contact.schema.js';
 import { currencySchema } from './currency.schema.js';
 import { languageSchema } from './language.schema.js';
 
@@ -20,10 +20,14 @@ export const createCustomerSchema = z.object({
     taxRate: z.number(),
 
     salutation: z.string().optional(),
+
+    /** Optional: Ansprechpartner, die im selben Schritt mit angelegt werden. */
+    contactPersons: z.array(newCustomerContactSchema).optional(),
 });
 export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
 
-export const updateCustomerSchema = createCustomerSchema.partial();
+/* Ansprechpartner eines bestehenden Kunden laufen über die Contact-Endpunkte. */
+export const updateCustomerSchema = createCustomerSchema.omit({ contactPersons: true }).partial();
 export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
 
 /* Stricte UI-Validierung für das Kunden-Formular. Bewusst strenger als
@@ -40,6 +44,12 @@ export const customerFormSchema = createCustomerSchema.extend({
     city: z.string(),
     zip: z.string(),
     phone: z.string(),
+    contactPersons: z.array(z.object({
+        salutation: z.string().min(1, "Anrede fehlt"),
+        firstName: z.string().min(1, "Vorname fehlt"),
+        lastName: z.string().min(1, "Nachname fehlt"),
+        email: z.union([z.literal(""), z.email()]),
+    })),
 });
 export type CustomerFormInput = z.infer<typeof customerFormSchema>;
 

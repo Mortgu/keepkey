@@ -7,6 +7,8 @@ export const createContactSchema = z.object({
     lastName: z.string(),
     email: z.string(),
 });
+/** Ansprechpartner, der zusammen mit einem neuen Kunden angelegt wird — die Kunden-ID gibt es dann noch nicht. */
+export const newCustomerContactSchema = createContactSchema.omit({ customerId: true });
 export const updateContactSchema = createContactSchema.partial();
 export const contactSchema = createContactSchema.extend({
     id: z.string(),
