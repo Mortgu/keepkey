@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
-import * as offerService from "../services/offer.service.js";
+import * as offerService from "../services/offer/index.js";
 
 /* ========== GET ========== */
 
