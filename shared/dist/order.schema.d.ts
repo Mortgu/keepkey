@@ -418,7 +418,7 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
 }, z.core.$strip>>;
 export type OrderList = z.infer<typeof orderListSchema>;
 export declare const orderFilterSchema: z.ZodObject<{
-    companyIds: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    companyIds: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
 }, z.core.$strip>;
 export type OrderFilterParams = z.input<typeof orderFilterSchema>;
 //# sourceMappingURL=order.schema.d.ts.map

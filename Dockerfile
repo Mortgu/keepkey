@@ -52,3 +52,5 @@ COPY docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 EXPOSE 3000
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# API + Worker in einem Prozess; getrennter Betrieb überschreibt das Kommando.
+CMD ["node", "dist/server.js"]

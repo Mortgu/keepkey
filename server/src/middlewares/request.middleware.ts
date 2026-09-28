@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import type { Request, Response, NextFunction } from 'express';
-import logger from '@/utils/logger.js';
+import { requestContext } from '@/lib/request-context.js';
 
 declare global {
     namespace Express {
@@ -10,8 +10,9 @@ declare global {
     }
 }
 
-export function requestIdMiddleware(req: Request, _res: Response, next: NextFunction): void {
-    (req as any).id = randomUUID();
-    (req as any).logger = logger.child({ requestId: (req as any).id });
-    next();
+export function requestIdMiddleware(req: Request, res: Response, next: NextFunction): void {
+    req.id = randomUUID();
+    // Header, damit der Client die ID in Fehlermeldungen anzeigen kann.
+    res.setHeader('X-Request-Id', req.id);
+    requestContext.run({ requestId: req.id }, next);
 }

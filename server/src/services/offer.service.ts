@@ -638,69 +638,6 @@ export async function restoreOfferRevision(
     });
 }
 
-export async function createOfferPositions(
-    offerId: string,
-    positions: CreateOfferPositionInput[],
-    actorId: string | null,
-) {
-    // Kunde, Vertrag und Laufzeit stammen aus dem Angebot — der Kunde, weil
-    // sonst kundenspezifische Preise auf diesem Pfad stillschweigend ignoriert
-    // würden; Vertrag und Laufzeit, weil sie eine Eigenschaft des Angebots sind
-    // und eine neue Position sie nicht mitbringen kann.
-    const offer = await prisma.offer.findUnique({
-        where: { id: offerId },
-        select: { customerId: true, contractId: true, duration_months: true },
-    });
-
-    if (!offer) {
-        throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
-    }
-
-    const priced = await pricePositions(
-        positions,
-        { contractId: offer.contractId, duration_months: offer.duration_months },
-        offer.customerId,
-        actorId,
-    );
-
-    return prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-        await assertOfferEditable(tx, offerId);
-        const created = await tx.offerPosition.createManyAndReturn({
-            data: priced.map((position) => ({ offerId, ...position })),
-        });
-
-        await recomputeNetAmount(tx, offerId);
-
-        return created;
-    });
-}
-
-export async function createOfferFlatrates(offerId: string, flatrates: CreateOfferFlatrateInput[]) {
-    const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
-
-    return prisma.$transaction(async (tx) => {
-        await assertOfferEditable(tx, offerId);
-        const created = await tx.offerFlatRate.createManyAndReturn({
-            data: flatrates.map((flatrate) => {
-                const rate_cents = rateById.get(flatrate.flatRateId);
-                if (rate_cents === undefined) {
-                    throw new AppException(`FlatRate ${flatrate.flatRateId} not found!`, 404, "FLAT_RATE_NOT_FOUND");
-                }
-
-                return {
-                    offerId,
-                    ...flatrate,
-                    total_cents: rate_cents,
-                };
-            }),
-        });
-
-        await recomputeNetAmount(tx, offerId);
-
-        return created;
-    });
-}
-
 /* ========== Documents ========== */
 
 export async function enqueueGeneration(offerId: string) {

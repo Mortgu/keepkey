@@ -66,20 +66,36 @@ services:
         condition: service_healthy
     restart: always
 
-  app:
+  # Einmaliger Schritt vor API und Worker. Lokal wird wie bisher mitgeseedet.
+  migrate:
     build:
       context: ..
       dockerfile: Dockerfile
-    container_name: keepit_app
+    image: keepit:dev
     env_file:
       - .env.docker
-    ports:
-      - "3000:3000"
+    command: sh -c "npx prisma migrate deploy --schema prisma/schema && node dist-seed/prisma/seed.js"
     depends_on:
       postgres:
         condition: service_healthy
       redis:
         condition: service_healthy
+    restart: "no"
+
+  # API + Worker in einem Prozess (dist/server.js, Default des Images).
+  app:
+    image: keepit:dev
+    container_name: keepit_app
+    env_file:
+      - .env.docker
+    environment:
+      SHUTDOWN_TIMEOUT_MS: "110000"
+    stop_grace_period: 120s
+    ports:
+      - "3000:3000"
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
       garage:
         condition: service_healthy
     restart: always

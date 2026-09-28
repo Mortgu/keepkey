@@ -10,7 +10,8 @@ import {
     updateCustomer,
     updateCustomerContact
 } from "@/controllers/index.js";
-import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
+import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
+import { idParamsSchema, customerContactParamsSchema } from "@/schemas/params-schemas.js";
 import {
     createContactSchema,
     updateContactSchema,
@@ -27,29 +28,29 @@ const router = Router();
 router.get('/', validateQuery(customerFiltersSchema), getCustomers);
 
 /* [GET] /api/customers/:id */
-router.get('/:id', getCustomer);
+router.get('/:id', validateParams(idParamsSchema), getCustomer);
 
 /* [POST] /api/customers */
 router.post('/', validate(createCustomerSchema), createCustomer);
 
 /* [PATCH] /api/customers/:id */
-router.patch('/:id', validate(updateCustomerSchema), updateCustomer);
+router.patch('/:id', validateParams(idParamsSchema), validate(updateCustomerSchema), updateCustomer);
 
 /* [DELETE] /api/customers/:id */
-router.delete('/:id', deleteCustomer);
+router.delete('/:id', validateParams(idParamsSchema), deleteCustomer);
 
 /* ========== Customer Contacts ========== */
 
 /* [GET] /api/customers/:id/contacts */
-router.get('/:id/contacts', getCustomerContacts);
+router.get('/:id/contacts', validateParams(idParamsSchema), getCustomerContacts);
 
 /* [POST] /api/customers/:id/contacts */
-router.post('/:id/contacts', validate(createContactSchema), createCustomerContact);
+router.post('/:id/contacts', validateParams(idParamsSchema), validate(createContactSchema), createCustomerContact);
 
 /* [PATCH] /api/customers/:id/contacts/:contactId */
-router.patch('/:id/contacts/:contactId', validate(updateContactSchema), updateCustomerContact);
+router.patch('/:id/contacts/:contactId', validateParams(customerContactParamsSchema), validate(updateContactSchema), updateCustomerContact);
 
 /* [DELETE] /api/customers/:id/contacts/:contactId */
-router.delete('/:id/contacts/:contactId', deleteCustomerContact);
+router.delete('/:id/contacts/:contactId', validateParams(customerContactParamsSchema), deleteCustomerContact);
 
 export default router;

@@ -15,16 +15,6 @@ export declare const createOfferPositionSchema: z.ZodObject<{
     eur_user_month: z.ZodNumber;
 }, z.core.$strip>;
 export type CreateOfferPositionInput = z.infer<typeof createOfferPositionSchema>;
-export declare const updateOfferPositionSchema: z.ZodObject<{
-    productId: z.ZodOptional<z.ZodString>;
-    free_months: z.ZodOptional<z.ZodNumber>;
-    optional: z.ZodOptional<z.ZodBoolean>;
-    quantity: z.ZodOptional<z.ZodNumber>;
-    total_cents: z.ZodOptional<z.ZodNumber>;
-    discount_cents: z.ZodOptional<z.ZodNumber>;
-    eur_user_month: z.ZodOptional<z.ZodNumber>;
-}, z.core.$strip>;
-export type UpdateOfferPositionInput = z.infer<typeof updateOfferPositionSchema>;
 export declare const offerPositionSchema: z.ZodObject<{
     productId: z.ZodString;
     free_months: z.ZodNumber;
@@ -58,11 +48,6 @@ export declare const createOfferFlatrateSchema: z.ZodObject<{
     quantity: z.ZodNumber;
 }, z.core.$strip>;
 export type CreateOfferFlatrateInput = z.infer<typeof createOfferFlatrateSchema>;
-export declare const updateOfferFlatrateSchema: z.ZodObject<{
-    flatRateId: z.ZodOptional<z.ZodString>;
-    quantity: z.ZodOptional<z.ZodNumber>;
-}, z.core.$strip>;
-export type UpdateOfferFlatrateInput = z.infer<typeof updateOfferFlatrateSchema>;
 export declare const offerFlatrateSchema: z.ZodObject<{
     flatRateId: z.ZodString;
     quantity: z.ZodNumber;
@@ -674,14 +659,22 @@ export type OfferList = z.infer<typeof offerListSchema>;
 export declare const restoreOfferRevisionSchema: z.ZodObject<{
     expectedVersion: z.ZodNumber;
 }, z.core.$strip>;
+/**
+ * Filter der Angebotsliste — übertragen als Query-String.
+ *
+ * Die ID-Filter akzeptieren String **oder** String-Array: ein Array mit einem
+ * Element wird als einzelner Parameter übertragen und kommt beim Server als
+ * String an. `limit` wird mit `coerce` gelesen, weil Query-Parameter immer
+ * Strings sind.
+ */
 export declare const offerFilterSchema: z.ZodObject<{
     search: z.ZodOptional<z.ZodString>;
-    companyIds: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    contactPersonIds: z.ZodOptional<z.ZodArray<z.ZodString>>;
-    productIds: z.ZodOptional<z.ZodArray<z.ZodString>>;
+    companyIds: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
+    contactPersonIds: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
+    productIds: z.ZodOptional<z.ZodUnion<readonly [z.ZodString, z.ZodArray<z.ZodString>]>>;
     sort: z.ZodOptional<z.ZodString>;
     cursor: z.ZodOptional<z.ZodString>;
-    limit: z.ZodDefault<z.ZodOptional<z.ZodNumber>>;
+    limit: z.ZodDefault<z.ZodOptional<z.ZodCoercedNumber<unknown>>>;
 }, z.core.$strip>;
 export type OfferFilterParams = z.input<typeof offerFilterSchema>;
 export declare const offersPageSchema: z.ZodObject<{

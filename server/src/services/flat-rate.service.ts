@@ -21,13 +21,6 @@ export async function getFlatRates(filters: FlatrateFilterParams = {}) {
     });
 }
 
-export async function getFlatrate(id: string) {
-    return prisma.flatRate.findUnique({
-        where: { id },
-        include: { translations: true },
-    });
-}
-
 export async function getFlatRateById(id: string) {
     const flatrate = await prisma.flatRate.findUnique({
         where: { id },

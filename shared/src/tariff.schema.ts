@@ -284,6 +284,24 @@ export const listCustomerPricesSchema = z.object({
 export type ListCustomerPricesInput = z.infer<typeof listCustomerPricesSchema>;
 
 /**
+ * Live-Preis am Tarif-Endpunkt (`GET /api/tariffs/price`).
+ *
+ * Übertragen als Query-String, deshalb `coerce` wie bei
+ * {@link deleteCustomerPriceSchema}: ohne diese Validierung landete ein `NaN`
+ * aus `Number(…)` in der Preislogik. Die Obergrenze von `freeMonths` prüft der
+ * Service, weil sie von `duration` abhängt.
+ */
+export const tariffPriceQuerySchema = z.object({
+    productId: z.string().min(1),
+    contractId: z.string().min(1),
+    duration: z.coerce.number().int().positive(),
+    quantity: z.coerce.number().int().positive(),
+    customerId: z.string().min(1).optional(),
+    freeMonths: z.coerce.number().int().nonnegative().optional(),
+});
+export type TariffPriceQuery = z.infer<typeof tariffPriceQuerySchema>;
+
+/**
  * Base tariff shape — without `tariffGroup`.
  * Used by `TariffGroup.tariffs[]`.
  */

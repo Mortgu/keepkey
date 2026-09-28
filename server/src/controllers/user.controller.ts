@@ -52,7 +52,7 @@ export const updateUserById = async (request: Request, response: Response) => {
 /* ========== DELETE ========== */
 
 export const deleteUser = async (request: Request, response: Response) => {
-    if (request.user?.id === request.params.id) {
+    if (request.user?.id === request.params.id as string) {
         throw new AppException("You cannot delete your own account!", 403, "USER_DELETE_SELF_FORBIDDEN");
     }
 

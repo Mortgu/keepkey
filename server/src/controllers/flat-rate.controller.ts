@@ -11,12 +11,6 @@ export const getFlatRates = async (request: Request, response: Response) => {
     return response.status(200).json(result);
 };
 
-export const getFlatrate = async (request: Request, response: Response) => {
-    const flatrateId = request.params.id as string;
-    const result = await flatRateService.getFlatrate(flatrateId);
-    return response.status(200).json(result);
-};
-
 export const getFlatRate = async (request: Request, response: Response) => {
     const flatrate = await flatRateService.getFlatRateById(request.params.id as string);
     return response.status(200).json(flatrate);

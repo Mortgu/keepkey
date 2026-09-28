@@ -1,5 +1,5 @@
 import env from "../lib/env.js";
-import connection from "../lib/redis.js";
+import { pingTaskQueue } from "../workers/task-queue.js";
 import { getCloudStatus } from "./nextcloud.service.js";
 import { isS3Available } from "../lib/document-artifact-store.js";
 import {
@@ -38,7 +38,7 @@ async function redisStatus(): Promise<IntegrationEntry> {
     if (env.REDIS_URL) meta.url = sanitizeUrl(env.REDIS_URL);
 
     try {
-        const reply = await connection.ping();
+        const reply = await pingTaskQueue();
         return { status: reply === "PONG" ? "connected" : "failed", meta };
     } catch (error) {
         return {

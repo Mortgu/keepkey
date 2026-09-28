@@ -1,21 +1,19 @@
 import { Task, TaskStatus, TaskTarget } from "@prisma/client";
 import { Job, Worker } from "bullmq";
+import type { Redis } from "ioredis";
 import env from "../lib/env.js";
 import { prisma } from "@/lib/prismaClient.js";
-import connection from "../lib/redis.js";
 import logger from "@/utils/logger.js";
 import invoiceTaskHandler from "./handlers/invoice-handler.js";
 import offerTaskHandler from "./handlers/offer-handler.js";
 import orderTaskHandler from "./handlers/order-handler.js";
-import { TaskJobData, taskQueue, taskQueueKey } from "./task-queue.js";
+import { type TaskJobData, taskQueueKey } from "./task-contract.js";
 import {
     handleTaskFailure,
     markTaskCompleted,
     markTaskRunning,
     releaseTaskRun,
 } from "./task-lifecycle.js";
-
-export { taskQueue, taskQueueKey };
 
 type TaskHandlerFn = (task: Task) => Promise<void>;
 
@@ -25,7 +23,7 @@ const handlers: Partial<Record<TaskTarget, TaskHandlerFn>> = {
     INVOICE: invoiceTaskHandler,
 }
 
-export default function registerTaskWorker() {
+export default function registerTaskWorker(connection: Redis) {
     const taskWorker = new Worker<TaskJobData>(taskQueueKey, async (job: Job<TaskJobData>, token?: string) => {
         const { taskId } = job.data;
 
@@ -69,6 +67,11 @@ export default function registerTaskWorker() {
         }
 
     }, { connection, concurrency: env.WORKER_CONCURRENCY });
+
+    // Ohne Listener würde BullMQ ein "error"-Event als uncaughtException werfen.
+    taskWorker.on("error", (error) => {
+        logger.warn('task_worker_redis_error', { error: error.message });
+    });
 
     taskWorker.on("failed", async (job, error) => {
         try {

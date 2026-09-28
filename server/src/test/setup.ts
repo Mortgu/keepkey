@@ -7,5 +7,11 @@ vi.mock("../lib/env.js", () => ({
         TEMPLATES_DIR: "assets/templates",
         DATABASE_URL: "postgresql://test:test@127.0.0.1:1/test",
         WORKER_CONCURRENCY: 1,
+        // Port 1 ist geschlossen — Redis-Zugriffe scheitern, statt irgendwohin zu verbinden.
+        REDIS_URL: "redis://127.0.0.1:1",
+        PORT: 0,
+        CORS_ORIGIN: "http://localhost",
+        TASK_ENQUEUE_TIMEOUT_MS: 300,
+        SHUTDOWN_TIMEOUT_MS: 1_000,
     },
 }));

@@ -10,7 +10,12 @@
   "scripts": {
     "predev": "prisma generate",
     "dev": "nodemon --exec tsx src/server.ts",
+    "dev:split": "pnpm run --parallel \"/^dev:(api|worker)$/\"",
+    "dev:api": "nodemon --exec tsx src/api.ts",
+    "dev:worker": "nodemon --exec tsx src/worker.ts",
     "start": "node dist/server.js",
+    "start:api": "node dist/api.js",
+    "start:worker": "node dist/worker.js",
     "build": "prisma generate && tsc",
     "seed": "tsx prisma/seed.ts",
     "cors:apply": "tsx scripts/put-bucket-cors.ts",

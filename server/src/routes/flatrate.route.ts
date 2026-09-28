@@ -2,12 +2,12 @@ import { Router } from "express";
 import {
   createFlatRate,
   deleteFlatRate,
-  getFlatrate,
   getFlatRate,
   getFlatRates,
   updateFlatRate,
 } from "@/controllers/index.js";
-import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
+import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
+import { idParamsSchema } from "@/schemas/params-schemas.js";
 import {
   createFlatrateSchema,
   flatrateFilterSchema,
@@ -20,18 +20,15 @@ const router = Router();
 router.get("/", validateQuery(flatrateFilterSchema), getFlatRates);
 
 /* [GET] http://localhost:3000/api/flatrates/:id */
-router.get("/:id", getFlatrate);
-
-/* [GET] http://localhost:3000/api/flatrates/:id */
-router.get("/:id", getFlatRate);
+router.get("/:id", validateParams(idParamsSchema), getFlatRate);
 
 /* [POST] http://localhost:3000/api/flatrates */
 router.post("/", validate(createFlatrateSchema), createFlatRate);
 
 /* [PUT] http://localhost:3000/api/flatrates/:id */
-router.put("/:id", validate(updateFlatrateSchema), updateFlatRate);
+router.put("/:id", validateParams(idParamsSchema), validate(updateFlatrateSchema), updateFlatRate);
 
 /* [DELETE] http://localhost:3000/api/flatrates/:id */
-router.delete("/:id", deleteFlatRate);
+router.delete("/:id", validateParams(idParamsSchema), deleteFlatRate);
 
 export default router;

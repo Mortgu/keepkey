@@ -5,4 +5,8 @@ export const cloudFileSchema = z.object({
     lastmod: z.string(),
     size: z.number(),
 });
+/** Query des Verzeichnis-Endpunkts (`GET /api/cloud/directory?path=…`). */
+export const cloudDirectoryQuerySchema = z.object({
+    path: z.string().min(1),
+});
 //# sourceMappingURL=cloud.js.map

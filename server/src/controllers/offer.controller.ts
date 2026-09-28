@@ -38,9 +38,7 @@ export const deleteOffer = async (request: Request, response: Response) => {
 /* ========== UPDATE ========== */
 
 export const updateOffer = async (request: Request, response: Response) => {
-    const offerId = request.params.id as string;
-
-    const offer = await offerService.updateOffer(offerId, request.body, request.user!.id);
+    const offer = await offerService.updateOffer(request.params.id as string, request.body, request.user!.id);
     return response.status(200).json(offer);
 };
 
@@ -49,16 +47,6 @@ export const updateOffer = async (request: Request, response: Response) => {
 export const createOffer = async (request: Request, response: Response) => {
     const offer = await offerService.createOffer(request.body, { actorId: request.user!.id });
     return response.status(200).json(offer);
-};
-
-export const createOfferPositions = async (request: Request, response: Response) => {
-    const positions = await offerService.createOfferPositions(request.params.id as string, request.body, request.user!.id);
-    return response.status(200).json(positions);
-};
-
-export const createOfferFlatrates = async (request: Request, response: Response) => {
-    const flatrates = await offerService.createOfferFlatrates(request.params.id as string, request.body);
-    return response.status(200).json(flatrates);
 };
 
 export const enqueueGeneration = async (request: Request, response: Response) => {
@@ -94,6 +82,11 @@ export const extendOffer = async (request: Request, response: Response) => {
     return response.status(200).json(offer);
 };
 
+/**
+ * `quantity` wird von Hand konvertiert, weil `validateQuery` das Ergebnis
+ * bewusst nicht zurückschreibt — siehe dort. Geprüft ist der Wert zu diesem
+ * Zeitpunkt bereits.
+ */
 export const getExtensionPrice = async (request: Request, response: Response) => {
     const price = await offerService.getExtensionPrice(
         request.params.offerId as string,

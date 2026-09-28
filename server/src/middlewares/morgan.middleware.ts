@@ -1,16 +1,18 @@
 import morgan from 'morgan';
+import type { Request } from 'express';
 
 import logger from '@/utils/logger.js';
 
-const morganMiddleware = morgan((tokens, req, res) => {
+const morganMiddleware = morgan<Request>((tokens, req, res) => {
     const status = Number(tokens.status(req, res));
-    const method = tokens.method(req, res);
-    const url = tokens.url(req, res);
 
     const data = {
-        requestId: (req as any).id,
-        method,
-        url,
+        // Explizit statt über den Request-Kontext: morgan loggt erst beim
+        // "finish"-Event, dort ist der AsyncLocalStorage nicht garantiert.
+        requestId: req.id,
+        userId: req.user?.id,
+        method: tokens.method(req, res),
+        url: tokens.url(req, res),
         status,
         responseTime: `${tokens['response-time'](req, res)}ms`,
         contentLength: tokens.res(req, res, 'content-length'),
@@ -27,7 +29,10 @@ const morganMiddleware = morgan((tokens, req, res) => {
     }
 
     logger.log(level, 'http_request', data);
+    return undefined;
 }, {
+    // Statische Client-Assets erzeugen sonst pro Seitenaufruf Dutzende Zeilen.
+    skip: (req) => !req.originalUrl.startsWith('/api'),
     // Override default stream — we handle logging ourselves above
     stream: { write: () => { } },
 });

@@ -4,6 +4,13 @@ import { isoDateTime } from "./common.js";
 export const searchTypeSchema = z.enum(["offer", "order", "customer"]);
 export type SearchType = z.infer<typeof searchTypeSchema>;
 
+/** Query der globalen Suche (`GET /api/search`). */
+export const searchQuerySchema = z.object({
+    q: z.string().trim().max(200).optional(),
+    type: searchTypeSchema.optional(),
+});
+export type SearchQuery = z.infer<typeof searchQuerySchema>;
+
 export const searchResultItemSchema = z.object({
     id: z.string(),
     type: searchTypeSchema,

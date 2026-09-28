@@ -111,3 +111,12 @@ export const isPriceable = (coordinates: PriceCoordinates): boolean =>
     && Number.isInteger(coordinates.duration_months) && coordinates.duration_months > 0
     && Number.isInteger(coordinates.free_months) && coordinates.free_months >= 0
     && coordinates.free_months <= coordinates.duration_months;
+
+/**
+ * Query des Erweiterungspreis-Endpunkts. `coerce`, weil Query-Parameter
+ * immer als String ankommen.
+ */
+export const extensionPriceQuerySchema = z.object({
+    quantity: z.coerce.number().int().positive(),
+});
+export type ExtensionPriceQuery = z.infer<typeof extensionPriceQuerySchema>;
