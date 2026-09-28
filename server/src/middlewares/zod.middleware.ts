@@ -7,7 +7,7 @@ const formatIssues = (request: Request, error: ZodError) => {
   const message = error.issues
     .map(i => (i.path.length ? `${i.path.join(".")}: ${i.message}` : i.message))
     .join(" & ");
-  logger.warn(`VALIDATION_ERROR ${request.method} ${request.originalUrl} – ${message}`);
+  logger.warn("validation_failed", { method: request.method, url: request.originalUrl, issues: message });
   return message;
 };
 
@@ -19,6 +19,7 @@ export const validate = (schema: ZodSchema) => (request: Request, response: Resp
       success: false,
       code: "VALIDATION_ERROR",
       message: formatIssues(request, result.error),
+      requestId: request.id,
     });
   }
 
@@ -42,6 +43,7 @@ export const validateQuery = (schema: ZodSchema) => (request: Request, response:
       success: false,
       code: "VALIDATION_ERROR",
       message: formatIssues(request, result.error),
+      requestId: request.id,
     });
   }
 
@@ -56,6 +58,7 @@ export const validateParams = (schema: ZodSchema) => (request: Request, response
       success: false,
       code: "VALIDATION_ERROR",
       message: formatIssues(request, result.error),
+      requestId: request.id,
     });
   }
 

@@ -18,6 +18,18 @@ import { requestIdMiddleware } from "./middlewares/request.middleware.js";
 import logger from "./utils/logger.js";
 import registerTaskWorker from "./workers/task-worker.js";
 
+process.on("unhandledRejection", (reason) => {
+    logger.error("unhandled_rejection", { error: reason });
+});
+
+process.on("uncaughtException", (error) => {
+    logger.error("uncaught_exception", { error });
+    // Prozesszustand ist danach undefiniert — Plattform startet neu.
+    logger.on("finish", () => process.exit(1));
+    logger.end();
+    setTimeout(() => process.exit(1), 2000).unref();
+});
+
 const app: Express = express();
 
 app.set('trust proxy', true);
@@ -31,6 +43,7 @@ app.use(
         origin: env.CORS_ORIGIN,
         methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
         credentials: true,
+        exposedHeaders: ["X-Request-Id"],
     }),
 );
 
@@ -40,7 +53,7 @@ app.use(express.json());
 
 app.use("/api", router);
 
-app.use("/api/*splat", (_req, res) => res.status(404).json({ message: "Not found" }));
+app.use("/api/*splat", (req, res) => res.status(404).json({ code: "NOT_FOUND", message: "Not found", requestId: req.id }));
 
 app.use(express.static(path.join(process.cwd(), "../client/dist")));
 

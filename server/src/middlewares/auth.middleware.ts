@@ -4,6 +4,8 @@ import type { User } from "@prisma/client";
 
 import { auth } from "@/lib/auth.js";
 import { AppException } from "@/lib/exceptions.js";
+import { getRequestContext } from "@/lib/request-context.js";
+import logger from "@/utils/logger.js";
 
 declare global {
     namespace Express {
@@ -22,16 +24,26 @@ export async function requireSession(req: Request, res: Response, next: NextFunc
         if (!session) {
             return res.status(401).send({
                 success: false,
+                code: "UNAUTHORIZED",
                 message: "Not authorized",
+                requestId: req.id,
             });
         }
 
         req.user = session.user as User;
+
+        const context = getRequestContext();
+        if (context) context.userId = req.user.id;
+
         return next();
     } catch (exception) {
+        // Z. B. DB nicht erreichbar — sonst sähe das nur wie ein Logout aus.
+        logger.error("session_lookup_failed", { error: exception });
         return res.status(401).send({
             success: false,
+            code: "UNAUTHORIZED",
             message: "Not authorized",
+            requestId: req.id,
         });
     }
 }

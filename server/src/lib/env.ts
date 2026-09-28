@@ -28,7 +28,10 @@ const env = createEnv({
 
         PORT: z.coerce.number(),
         NODE_ENV: z.enum(["development", "production", "test"]),
-        LOG_LEVEL: z.enum(["trace", "debug", "info", "warn", "error"]).default("info"),
+        // Winston kennt kein "trace" — wird aus Kompatibilität auf "debug" abgebildet.
+        LOG_LEVEL: z.enum(["trace", "debug", "http", "info", "warn", "error"])
+            .default("info")
+            .transform((level) => (level === "trace" ? "debug" : level)),
 
         NEXTCLOUD_URL: z.string().url().optional(),
         NEXTCLOUD_USER: z.string().optional(),

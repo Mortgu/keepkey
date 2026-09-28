@@ -11,6 +11,11 @@ type errorMapProps = {
     message: string;
 }
 
+type ResolvedError = {
+    status: number;
+    body: Record<string, unknown> & { code: string; message: string };
+}
+
 const prismaErrorMap: Record<string, errorMapProps> = {
     P2002: { status: 409, code: "PRISMA_UNIQUE_CONSTRAINT", message: "Ein Eintrag mit diesen Werten existiert bereits." },
     P2003: { status: 409, code: "PRISMA_FOREIGN_KEY", message: "Dieser Datensatz kann nicht gelöscht werden, da er noch verwendet wird." },
@@ -25,6 +30,14 @@ const webDavErrorMap: Record<number, errorMapProps> = {
     507: { status: 507, code: "WEBDAV_INSUFFICIENT_STORAGE", message: "Der Cloud-Speicher/Server ist voll." },
 }
 
+/* body-parser-Fehler (kaputtes JSON, zu großer Body) — tragen `type` + `expose`. */
+function isBodyParserError(error: any): error is { status: number; type: string; message: string } {
+    return error instanceof Error
+        && typeof (error as any).type === "string"
+        && typeof (error as any).status === "number"
+        && (error as any).expose === true;
+}
+
 function isWebDavError(error: any): error is { status: number; message: string } {
     return (
         error instanceof Error &&
@@ -33,71 +46,111 @@ function isWebDavError(error: any): error is { status: number; message: string }
     );
 }
 
-export const exceptionHandler = (error: any, request: Request, response: Response, next: NextFunction) => {
+const isDev = env.NODE_ENV === "development";
 
+function resolveError(error: any): ResolvedError {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
         const mapped = prismaErrorMap[error.code];
 
         if (mapped) {
-            return response.status(mapped.status).json({
-                message: mapped.message,
-                code: mapped.code,
-            });
+            return { status: mapped.status, body: { message: mapped.message, code: mapped.code } };
         }
 
-        return response.status(400).json({
-            message: "Datenbankfehler",
-            code: "PRISMA_UNKNOWN",
-            ...(env.NODE_ENV === "development" && { detail: error.code }),
-        });
+        return {
+            status: 400,
+            body: {
+                message: "Datenbankfehler",
+                code: "PRISMA_UNKNOWN",
+                ...(isDev && { detail: error.code }),
+            },
+        };
     }
 
     if (error instanceof Prisma.PrismaClientValidationError) {
-        const clientMessage = env.NODE_ENV === "development"
-            ? error.message
-            : "Die übermittelten Daten entsprechen nicht den Validierungsregeln.";
+        return {
+            status: 400,
+            body: {
+                message: isDev ? error.message : "Die übermittelten Daten entsprechen nicht den Validierungsregeln.",
+                code: "PRISMA_VALIDATION_ERROR",
+                ...(isDev && { stack: error.stack }),
+            },
+        };
+    }
 
-        return response.status(400).json({
-            message: clientMessage,
-            code: "PRISMA_VALIDATION_ERROR",
-            ...(env.NODE_ENV === "development" && { stack: error.stack }),
-        });
+    if (error instanceof AppException) {
+        return {
+            status: error.statusCode,
+            body: {
+                message: error.message,
+                code: error.code ?? "APP_ERROR",
+                ...(isDev && { stack: error.stack }),
+            },
+        };
+    }
+
+    // Muss vor dem WebDAV-Check stehen: body-parser-Fehler haben ebenfalls ein
+    // numerisches `status` und landeten sonst als 502 WEBDAV_ERROR beim Client.
+    if (isBodyParserError(error)) {
+        return {
+            status: error.status,
+            body: {
+                message: error.status === 413 ? "Die Anfrage ist zu groß." : "Ungültiger Request-Body.",
+                code: error.status === 413 ? "PAYLOAD_TOO_LARGE" : "INVALID_REQUEST_BODY",
+            },
+        };
     }
 
     if (isWebDavError(error)) {
         const mapped = webDavErrorMap[error.status];
 
         if (mapped) {
-            return response.status(mapped.status).json({
-                message: mapped.message,
-                code: mapped.code,
-            });
+            return { status: mapped.status, body: { message: mapped.message, code: mapped.code } };
         }
 
-        return response.status(502).json({
-            message: "Fehler bei der Kommunikation mit dem Cloud-Speicher.",
-            code: "WEBDAV_ERROR",
-            ...(env.NODE_ENV === "development" && { detail: error.message }),
-        });
+        return {
+            status: 502,
+            body: {
+                message: "Fehler bei der Kommunikation mit dem Cloud-Speicher.",
+                code: "WEBDAV_ERROR",
+                ...(isDev && { detail: error.message }),
+            },
+        };
     }
 
-    if (error instanceof AppException) {
-        if (!error.isOperational) {
-            logger.error("UNHANDLED_OPERATIONAL_ERROR: ", error);
-        }
+    return {
+        status: 500,
+        body: {
+            message: 'Something went wrong!',
+            code: 'INTERNAL_SERVER_ERROR',
+            ...(isDev && { stack: error?.stack }),
+        },
+    };
+}
 
-        return response.status(error.statusCode).json({
-            message: error.message,
-            code: error.code ?? "APP_ERROR",
-            ...(env.NODE_ENV === "development" && { stack: error.stack }),
-        });
+export const exceptionHandler = (error: any, request: Request, response: Response, next: NextFunction) => {
+    const { status, body } = resolveError(error);
+
+    const meta = {
+        requestId: request.id,
+        userId: request.user?.id,
+        method: request.method,
+        url: request.originalUrl,
+        status,
+        code: body.code,
+    };
+
+    // 5xx: voller Stack, das ist ein Bug oder ein Ausfall. 4xx: erwartbar,
+    // die Originalmeldung reicht (sie kann vom gemappten Client-Text abweichen).
+    if (status >= 500) {
+        logger.error("request_failed", { ...meta, error });
+    } else {
+        logger.warn("request_failed", { ...meta, errorMessage: error?.message });
     }
 
-    logger.error("UNKNOWN_CRITICAL_ERROR: ", error);
+    // Antwort läuft schon (z. B. Stream) — Express' Default-Handler bricht die Verbindung ab.
+    if (response.headersSent) {
+        return next(error);
+    }
 
-    return response.status(500).json({
-        message: 'Something went wrong!',
-        code: 'INTERNAL_SERVER_ERROR',
-        ...(env.NODE_ENV === "development" && { stack: error.stack }),
-    });
+    return response.status(status).json({ ...body, requestId: request.id });
 };
