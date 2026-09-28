@@ -1,53 +1,7 @@
 import { OfferDerivationType, Prisma } from "@prisma/client";
 
 import { prisma } from "../../lib/prismaClient.js";
-import { toDate } from "../../utils/utils.js";
 import type { PricedDiscount, PricedFlatrate, PricedPosition, PriceHeader } from "./offer-pricing.js";
-
-/** Mapped die Scalar-Felder eines Offers auf Prisma-Datentypen (Datumsfelder, nullables). */
-function mapOfferData<T extends { supplierId?: string | null; validUntil?: string | null; requestFrom?: string | null; date?: string | null }>(fields: T) {
-    const { supplierId, validUntil, requestFrom, date, ...rest } = fields;
-
-    return {
-        ...rest,
-        date: toDate(date) ?? new Date(),
-        supplierId: supplierId || null,
-        validUntil: toDate(validUntil),
-        requestFrom: toDate(requestFrom),
-    };
-}
-
-/** Summiert Positionen + Flatrates neu und schreibt net_amount am Offer. */
-async function recomputeNetAmount(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    const [positionsSum, positionsDiscountSum, flatratesSum, discountsSum] = await Promise.all([
-        tx.offerPosition.aggregate({
-            where: { offerId },
-            _sum: { total_cents: true },
-        }),
-        tx.offerPosition.aggregate({
-            where: { offerId },
-            _sum: { discount_cents: true },
-        }),
-        tx.offerFlatRate.aggregate({
-            where: { offerId },
-            _sum: { total_cents: true },
-        }),
-        tx.offerDiscount.aggregate({
-            where: { offerId },
-            _sum: { amount_cents: true },
-        }),
-    ]);
-
-    const positionsNet = (positionsSum._sum.total_cents ?? 0) - (positionsDiscountSum._sum.discount_cents ?? 0);
-    const discountsNet = discountsSum._sum.amount_cents ?? 0;
-
-    await tx.offer.update({
-        where: { id: offerId },
-        data: {
-            net_amount: positionsNet + (flatratesSum._sum.total_cents ?? 0) - discountsNet,
-        },
-    });
-}
 
 export async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
