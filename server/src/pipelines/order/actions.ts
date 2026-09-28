@@ -1,8 +1,7 @@
 import Docxtemplater from "docxtemplater";
 import type { Language } from "@prisma/client";
-import { convert as libconvert } from "libreoffice-convert";
 import PizZip from "pizzip";
-import { prisma } from "../../lib/prismaClient.js";
+import { getOrderById } from "../../services/order.service.js";
 import { loadTemplateForRendering } from "../../services/document-template.service.js";
 import { pickTranslation } from "../../utils/i18n.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
@@ -10,32 +9,7 @@ import { customParser, deepIterate } from "../offer/utils.js";
 import { OrderFetchedData, OrderFormattedData } from "./context.js";
 
 export async function fetchOrderData(orderId: string) {
-    const [order] = await Promise.all([
-        await prisma.order.findUniqueOrThrow({
-            where: { id: orderId },
-            include: {
-                customer: true,
-                supplier: true,
-                customerContactPerson: true,
-                employee: true,
-
-                contract: { include: { translations: true } },
-                orderPositions: {
-                    include: {
-                        product: { include: { translations: true } },
-                    }
-                },
-
-                flatRates: {
-                    include: {
-                        flatRate: { include: { translations: true } }
-                    }
-                }
-            }
-        }),
-    ]);
-
-    return { order };
+    return { order: await getOrderById(orderId) };
 }
 
 export async function formatOrderData(fetchedData?: OrderFetchedData) {
@@ -44,10 +18,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     }
 
     const order = fetchedData.order;
-    // Bestellungen tragen selbst keine Sprache. Der Kunde tut es — und er ist
-    // der Empfänger des Dokuments, also entscheidet seine Sprache über Vorlage
-    // und Übersetzungen.
-    const lang = order.customer.language;
+    // Sprache und Konditionen stammen aus dem angenommenen Angebot.
+    const lang = order.language;
     const { customer, customerContactPerson: ccp, employee } = order;
 
     // Resolve the language variant once and flatten it onto each entity so the
@@ -89,9 +61,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     // Frueher nach `contract_duration` gruppiert — beides steht jetzt an der
     // Bestellung, es gibt also genau eine Gruppe.
     const grouped = [orderPositions].map((group) => {
-        const flatRate_total = flatRates.reduce((sum, p) => sum + p.total_cents, 0);
-
-        const group_total = group.reduce((sum, p) => sum + p.total_cents, flatRate_total);
+        const group_total = order.net_amount;
 
         return {
             names: group.map((p) => p.product.name).join(" & "),
@@ -128,6 +98,16 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
 
     return {
         quoteId: order.orderId,
+        orderId: order.orderId,
+        projectNumber: order.projectNumber ?? "",
+        projectId: order.projectNumber ?? "",
+        offerId: order.offer.quoteId,
+        projectDescription: order.projectDescription ?? "",
+        orderDetails: order.orderDetails ?? "",
+        products, groups: grouped, tables: grouped,
+        flatRates: orderFlatRates, flatrates: orderFlatRates,
+        total: formatEur(order.net_amount / 100),
+        discounts: order.discounts.map(d => ({ ...d, total: formatEur(-d.amount_cents / 100) })),
         date: formatDate(order.date),
         paymentTerm: order.paymentTerm,
         validUntil: order.validUntil ? formatDate(order.validUntil) : "",
@@ -141,7 +121,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             zip: customer.zip || "",
             city: customer.city || "",
 
-            fullName: `${ccp.salutation} ${ccp.firstName} ${ccp.lastName}`,
+            fullName: `${ccp.salutation ?? ""} ${ccp.firstName} ${ccp.lastName}`.trim(),
             salutation: ccp.salutation || "",
             firstName: ccp.firstName || "",
             lastName: ccp.lastName || "",
@@ -189,14 +169,4 @@ export async function generating(
     doc.render(formatedData);
 
     return doc.toBuffer();
-}
-
-
-export async function converting(docxBuffer: Buffer): Promise<Buffer> {
-    return new Promise((resolve, reject) => {
-        libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
 }

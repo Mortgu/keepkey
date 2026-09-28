@@ -1,3 +1,4 @@
+import { AppException } from "../lib/exceptions.js";
 import { Prisma, Task, TaskTarget } from "@prisma/client";
 import { enqueueTask } from "../lib/document.js";
 import { prisma } from "../lib/prismaClient.js";
@@ -81,10 +82,12 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
     return requestGeneration({
         lockKey: `order-generation:${orderId}`,
         target: TaskTarget.ORDER,
-        currentSourceVersion: async (tx) => (await tx.order.findUniqueOrThrow({
-            where: { id: orderId },
-            select: { version: true },
-        })).version,
+        currentSourceVersion: async (tx) => {
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${orderId}`}))::text AS "lock"`;
+            const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, select: { version: true, cancelledAt: true } });
+            if (order.cancelledAt) throw new AppException("Cancelled orders cannot generate documents.", 409, "ORDER_CANCELLED");
+            return order.version;
+        },
         findActive: (tx, sourceVersion) => tx.orderDocument.findFirst({
             where: { orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },

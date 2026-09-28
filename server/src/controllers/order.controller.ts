@@ -28,7 +28,7 @@ export const getOrderRevisions = async (request: Request, response: Response) =>
 /* ========== POST ========== */
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
-    const order = await orderService.createOrder(request.body);
+    const order = await orderService.createOrder(request.body, request.user!.id);
     response.locals.order = order;
     next();
 };
@@ -75,4 +75,9 @@ export const updateOrder = async (request: Request, response: Response) => {
 export const deleteOrderById = async (request: Request, response: Response) => {
     await orderService.deleteOrderById(request.params.id as string);
     return response.status(200).json({ message: "Deletion successfully", success: true });
+};
+
+export const cancelOrder = async (request: Request, response: Response) => {
+    const order = await orderService.cancelOrder(request.params.orderId as string, request.body.expectedVersion, request.user!.id);
+    return response.status(200).json(order);
 };

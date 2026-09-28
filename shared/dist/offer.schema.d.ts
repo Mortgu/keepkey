@@ -269,6 +269,7 @@ export declare const offerDiscountSchema: z.ZodObject<{
 export type OfferDiscount = z.infer<typeof offerDiscountSchema>;
 export declare const offerSchema: z.ZodObject<{
     id: z.ZodString;
+    acceptedAt: z.ZodOptional<z.ZodNullable<z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>>>;
     customerId: z.ZodString;
     contactPersonId: z.ZodString;
     userId: z.ZodString;
@@ -407,6 +408,7 @@ export declare const offerSchema: z.ZodObject<{
         salutation: z.ZodString;
         email: z.ZodString;
         phone: z.ZodNullable<z.ZodString>;
+        role: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
@@ -469,6 +471,7 @@ export declare const offerSchema: z.ZodObject<{
 export type Offer = z.infer<typeof offerSchema>;
 export declare const offerListSchema: z.ZodArray<z.ZodObject<{
     id: z.ZodString;
+    acceptedAt: z.ZodOptional<z.ZodNullable<z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>>>;
     customerId: z.ZodString;
     contactPersonId: z.ZodString;
     userId: z.ZodString;
@@ -607,6 +610,7 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
         salutation: z.ZodString;
         email: z.ZodString;
         phone: z.ZodNullable<z.ZodString>;
+        role: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
@@ -683,6 +687,7 @@ export type OfferFilterParams = z.input<typeof offerFilterSchema>;
 export declare const offersPageSchema: z.ZodObject<{
     items: z.ZodArray<z.ZodObject<{
         id: z.ZodString;
+        acceptedAt: z.ZodOptional<z.ZodNullable<z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>>>;
         customerId: z.ZodString;
         contactPersonId: z.ZodString;
         userId: z.ZodString;
@@ -821,6 +826,7 @@ export declare const offersPageSchema: z.ZodObject<{
             salutation: z.ZodString;
             email: z.ZodString;
             phone: z.ZodNullable<z.ZodString>;
+            role: z.ZodOptional<z.ZodNullable<z.ZodString>>;
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;

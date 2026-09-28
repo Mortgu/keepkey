@@ -20,3 +20,5 @@ graphify-out
 dist/*
 /shared/dist
 /client/.tanstack
+
+.env.docker

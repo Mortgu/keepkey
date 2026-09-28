@@ -25,7 +25,6 @@ model Customer {
   contactPersons ContactPerson[]
 
   offers   Offer[]
-  orders   Order[]
   invoices Invoice[]
 
   users                User[]
@@ -50,7 +49,6 @@ model ContactPerson {
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   offers Offer[]
-  orders Order[]
 
   @@unique([id, customerId])
   @@index([customerId])

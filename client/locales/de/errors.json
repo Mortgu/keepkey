@@ -7,6 +7,8 @@
   "USER_CREATION_FAILED": "Benutzer konnte nicht erstellt werden.",
   "USER_UPDATE_FAILED": "Benutzer konnte nicht aktualisiert werden.",
   "USER_DELETE_FAILED": "Benutzer konnte nicht gelöscht werden.",
+  "USER_DELETE_SELF_FORBIDDEN": "Das eigene Konto kann nicht gelöscht werden.",
+  "FORBIDDEN_ADMIN_ONLY": "Diese Aktion erfordert Administratorrechte.",
   "MISSING_ORDER": "Bestellung nicht gefunden.",
   "ORDER_NOT_FOUND": "Bestellung nicht gefunden.",
   "ORDER_REVISION_NOT_FOUND": "Bestellungsversion nicht gefunden.",
@@ -37,6 +39,9 @@
   "INVALID_INPUT": "Ungültige Eingabe. Dauer und Menge müssen positive Ganzzahlen sein.",
   "DOCUMENT_NOT_FOUND": "Dokument nicht gefunden.",
   "DOCUMENT_NOT_RENAMABLE": "Nur erzeugte oder hochgeladene Dokumente können umbenannt werden.",
+  "DOCUMENT_FORMAT_NOT_REPLACEABLE": "Nur die DOCX kann ersetzt werden — die PDF wird daraus erzeugt.",
+  "DOCX_CONVERSION_FAILED": "Die Datei konnte nicht nach PDF umgewandelt werden. Ist es eine gültige DOCX?",
+  "DOCUMENT_STATE_CHANGED": "Das Dokument wurde zwischenzeitlich verändert. Bitte neu laden.",
   "DOCUMENT_PROCESSING": "Ein Dokument kann während der Verarbeitung nicht gelöscht werden.",
   "DOCUMENTS_NOT_GENERATED": "Dokumente noch nicht erstellt.",
   "DOCUMENT_UPLOAD_IN_PROGRESS": "Dokumentenupload läuft bereits.",
@@ -67,5 +72,10 @@
   "WEBDAV_INSUFFICIENT_STORAGE": "Der Cloud-Speicher ist voll.",
   "WEBDAV_ERROR": "Fehler bei der Kommunikation mit dem Cloud-Speicher.",
   "APP_ERROR": "Ein Anwendungsfehler ist aufgetreten.",
-  "INTERNAL_SERVER_ERROR": "Ein interner Fehler ist aufgetreten."
+  "INTERNAL_SERVER_ERROR": "Ein interner Fehler ist aufgetreten.",
+  "OFFER_ACCEPTED": "Dieses Angebot wurde bereits angenommen und kann nicht mehr geändert werden.",
+  "ORDER_CANCELLED": "Diese Bestellung wurde storniert und kann nicht mehr geändert werden.",
+  "ORDER_DELETE_FORBIDDEN": "Bestellungen können nur storniert werden.",
+  "INVALID_ACCEPTED_OFFER_SNAPSHOT": "Die gespeicherten Angebotsdaten sind ungültig.",
+  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten."
 }

@@ -23,7 +23,7 @@ export const dialogStyles = tv({
         ScrollbarThumb: 'w-full bg-(--destructive) z-101',
         Popup: [
             'relative flex flex-col max-h-full max-w-full border border-(--border) min-h-0 bg-white',
-            'rounded-md data-nested-dialog-open:scale-96',
+            'rounded-md data-nested-dialog-open:hidden',
             'transition-all '
         ],
         Header: 'flex items-center justify-between gap-1 p-4 border-b border-(--border)',

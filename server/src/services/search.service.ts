@@ -1,3 +1,4 @@
+import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import { prisma } from "../lib/prismaClient.js";
 import { formatCentsToEur } from "../utils/utils.js";
 import type { SearchResponse, SearchResultItem, SearchType } from "@keepit/schemas";
@@ -56,21 +57,23 @@ async function searchOrders(q: string): Promise<Array<SearchResultItem>> {
     const orders = await prisma.order.findMany({
         where: { orderId: { contains: q, mode: "insensitive" } },
         include: {
-            customer: { select: { companyName: true } },
-            orderPositions: { select: { id: true } },
+            offer: { select: { acceptedSnapshot: true } },
         },
         orderBy: { updatedAt: "desc" },
         take: LIMIT_PER_TYPE,
     });
 
-    return orders.map((order) => ({
-        id: order.id,
-        type: "order" as const,
-        title: `Bestellung #${order.orderId}`,
-        searchValue: order.orderId,
-        meta: `${order.customer.companyName} · ${order.orderPositions.length} Positionen`,
-        updatedAt: order.updatedAt.toISOString(),
-    }));
+    return orders.map((order) => {
+        const source = parseAcceptedOfferSnapshot(order.offer.acceptedSnapshot);
+        return {
+            id: order.id,
+            type: "order" as const,
+            title: `Bestellung #${order.orderId}`,
+            searchValue: order.orderId,
+            meta: `${source.customer.companyName} · ${source.positions.length} Positionen`,
+            updatedAt: order.updatedAt.toISOString(),
+        };
+    });
 }
 
 async function searchCustomers(q: string): Promise<Array<SearchResultItem>> {

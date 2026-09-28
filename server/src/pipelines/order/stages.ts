@@ -1,6 +1,8 @@
+import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
-import {converting, fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {convertDocxToPdf} from "../../lib/docx-to-pdf.js";
 import {pickTranslation} from "../../utils/i18n.js";
 
 const loadOrderData: PipelineStage<OrderPipelineContext> = {
@@ -15,6 +17,7 @@ const preprocess: PipelineStage<OrderPipelineContext> = {
     run: async (context) => {
         try {
             context.formatedData = await formatOrderData(context.fetchedData);
+            orderTemplateSchema.parse(context.formatedData);
         } catch (exception: any) {
             throw new PipelineStageError("Preprocess step in pipeline failed!", 500, exception.message);
         }
@@ -41,7 +44,7 @@ const generate: PipelineStage<OrderPipelineContext> = {
         // erste Punkt, an dem beides zusammen vorliegt.
         context.docxBuffer = await generating(
             context.formatedData,
-            context.fetchedData!.order.customer.language,
+            context.fetchedData!.order.language,
         );
     },
 };
@@ -49,7 +52,7 @@ const generate: PipelineStage<OrderPipelineContext> = {
 const convert: PipelineStage<OrderPipelineContext> = {
     name: "convert",
     run: async (context) => {
-        context.pdfBuffer = await converting(context.docxBuffer!);
+        context.pdfBuffer = await convertDocxToPdf(context.docxBuffer!);
     },
 };
 

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { DocumentFormat, DocumentStatus } from "@prisma/client";
+import { DocumentFormat, DocumentStatus, Prisma } from "@prisma/client";
 import { artifactPair, findArtifact } from "../lib/document-artifacts.js";
 import {
     browserEndpointIssue,
@@ -10,8 +10,12 @@ import {
     isS3Available,
     removeDocumentArtifact,
     removeDocumentArtifacts,
+    storeObject,
     type DocumentArtifactScope,
+    type StoredDocumentArtifact,
 } from "../lib/document-artifact-store.js";
+import { assertDocxBuffer } from "../lib/docx.js";
+import { convertDocxToPdf } from "../lib/docx-to-pdf.js";
 import { AppException } from "../lib/exceptions.js";
 import {
     RemoteDocumentExistsError,
@@ -61,9 +65,6 @@ const REPLACEABLE_STATUSES = new Set<DocumentStatus>([
     DocumentStatus.UPLOADED,
 ]);
 
-/** Wie bei der Vorlagen-Route: mehr als das ist kein Angebotsdokument mehr. */
-const MAX_UPLOAD_BYTES = 25 * 1024 * 1024;
-
 const toDocumentFormat = (format: DocumentFormatParam): DocumentFormat =>
     format === "pdf" ? DocumentFormat.PDF : DocumentFormat.DOCX;
 
@@ -80,13 +81,17 @@ const scopeOf = (type: DocumentType): DocumentArtifactScope =>
 const replacementPrefix = (type: DocumentType, documentId: string) =>
     `replaced/${scopeOf(type)}/${documentId}/`;
 
-async function findGeneratedDocument(type: DocumentType, id: string) {
+async function findGeneratedDocument(
+    type: DocumentType,
+    id: string,
+    client: Prisma.TransactionClient = prisma,
+) {
     return type === "offer"
-        ? prisma.offerDocument.findFirst({
+        ? client.offerDocument.findFirst({
             where: { id, deletedAt: null },
             include: { artifacts: true },
         })
-        : prisma.orderDocument.findFirst({
+        : client.orderDocument.findFirst({
             where: { id, deletedAt: null },
             include: { artifacts: true },
         });
@@ -325,6 +330,20 @@ async function requireReplaceableArtifact(
     id: string,
     format: DocumentFormatParam,
 ) {
+    /*
+     * Nur die DOCX ist ersetzbar: die PDF wird beim Bestätigen aus ihr erzeugt.
+     * Eine direkt ersetzte PDF wäre dauerhaft nicht mehr aus ihrer DOCX
+     * ableitbar — die beiden Artefakte würden auseinanderlaufen, ohne dass es
+     * je wieder zusammenfindet.
+     */
+    if (format !== "docx") {
+        throw new AppException(
+            "Nur die DOCX kann ersetzt werden — die PDF wird daraus erzeugt.",
+            409,
+            "DOCUMENT_FORMAT_NOT_REPLACEABLE",
+        );
+    }
+
     const document = await requireGeneratedDocument(type, id);
 
     if (!REPLACEABLE_STATUSES.has(document.status)) {
@@ -415,11 +434,35 @@ export async function createReplacementUpload(
 }
 
 /**
- * Übernimmt eine hochgeladene Datei als neuen Inhalt des Artefakts.
+ * Entfernt ein Objekt, das nicht mehr gebraucht wird, ohne den Aufrufer zu
+ * unterbrechen. Ein verwaistes Objekt ist schlimmstenfalls belegter Speicher —
+ * ein abgebrochener Aufräumversuch darf den eigentlichen Fehler nicht verdecken.
+ */
+async function discardObject(objectKey: string): Promise<void> {
+    await removeDocumentArtifact(objectKey).catch((error) => {
+        logger.error('document_replacement_cleanup_failed', {
+            objectKey,
+            error: (error as Error).message,
+        });
+    });
+}
+
+/**
+ * Übernimmt eine hochgeladene DOCX als neuen Inhalt — und erzeugt die PDF neu.
+ *
+ * Die PDF muss mitgezogen werden, sonst zeigt sie weiter auf den alten
+ * generierten Stand: Download und Nextcloud-Abgleich lieferten dann eine PDF,
+ * die nicht zur DOCX daneben passt.
+ *
+ * Die Reihenfolge trägt den Rollback: Konvertiert und abgelegt wird alles
+ * **vor** dem ersten Schreibvorgang in der Datenbank. Scheitert irgendetwas
+ * davon, bleibt das bestehende Paar unangetastet und es sind nur frisch
+ * abgelegte Objekte aufzuräumen — einen Zwischenstatus braucht es dafür nicht.
  *
  * `remotePath`, `remoteEtag`, `uploadedAt` und `remoteSha256` bleiben bewusst
  * unangetastet: Liegt das Dokument bereits auf Nextcloud, entsteht dadurch die
- * sichtbare Abweichung, die der Nutzer anschließend gezielt auflöst.
+ * sichtbare Abweichung, die der Nutzer anschließend gezielt auflöst — jetzt für
+ * beide Artefakte.
  */
 export async function confirmReplacementUpload(
     type: DocumentType,
@@ -427,7 +470,7 @@ export async function confirmReplacementUpload(
     format: DocumentFormatParam,
     objectKey: string,
 ) {
-    const { artifact } = await requireReplaceableArtifact(type, id, format);
+    await requireReplaceableArtifact(type, id, format);
 
     if (!objectKey.startsWith(replacementPrefix(type, id)) || !objectKey.endsWith(`.${format}`)) {
         throw new AppException(
@@ -448,41 +491,105 @@ export async function confirmReplacementUpload(
         );
     }
 
-    // Eine signierte PUT-URL kann die Größe nicht begrenzen — das geht erst hier.
-    if (content.length === 0) {
-        await removeDocumentArtifact(objectKey).catch((error) => logger.error(error));
-        throw new AppException("Die hochgeladene Datei ist leer.", 400, "EMPTY_FILE");
+    /*
+     * Eine signierte PUT-URL prüft weder Größe noch Inhalt — das geht erst hier.
+     * Und die Umwandlung unten taugt nicht als Ersatzprüfung: LibreOffice nimmt
+     * auch eine reine Textdatei an und rendert sie klaglos, eine Nicht-DOCX käme
+     * so unbemerkt durch.
+     */
+    try {
+        assertDocxBuffer(content);
+    } catch (error) {
+        await discardObject(objectKey);
+        throw error;
     }
 
-    if (content.length > MAX_UPLOAD_BYTES) {
-        await removeDocumentArtifact(objectKey).catch((error) => logger.error(error));
+    let pdfContent: Buffer;
+    try {
+        pdfContent = await convertDocxToPdf(content);
+    } catch (error) {
+        await discardObject(objectKey);
+        logger.error('document_replacement_conversion_failed', {
+            documentId: id,
+            error: (error as Error).message,
+        });
         throw new AppException(
-            `Die Datei ist größer als ${MAX_UPLOAD_BYTES / 1024 / 1024} MB.`,
-            413,
-            "FILE_TOO_LARGE",
+            "Die hochgeladene Datei konnte nicht nach PDF umgewandelt werden. "
+            + "Ist es eine gültige DOCX?",
+            422,
+            "DOCX_CONVERSION_FAILED",
         );
     }
 
-    const previousKey = artifact.objectKey;
+    let storedPdf: StoredDocumentArtifact;
+    const pdfKey = `${replacementPrefix(type, id)}${randomUUID()}.pdf`;
+    try {
+        storedPdf = await storeObject(pdfKey, pdfContent, MIME_TYPES.pdf);
+    } catch (error) {
+        await discardObject(objectKey);
+        throw error;
+    }
 
-    await prisma.documentArtifact.update({
-        where: { id: artifact.id },
-        data: {
-            objectKey,
-            size: content.length,
-            sha256: sha256Document(content),
-        },
-    });
+    let previous: { docx: string; pdf: string };
+    try {
+        previous = await prisma.$transaction(async (tx) => {
+            // Zwei gleichzeitige Ersetzungen dürfen sich nicht überlagern: die
+            // zweite soll die erste vollständig ablösen, nicht halb.
+            await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`document-replace:${id}`}))::text AS "lock"`;
+
+            const current = await findGeneratedDocument(type, id, tx);
+            if (!current) {
+                throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
+            }
+            if (!REPLACEABLE_STATUSES.has(current.status)) {
+                throw new AppException(
+                    "Das Dokument wurde zwischenzeitlich verändert.",
+                    409,
+                    "DOCUMENT_STATE_CHANGED",
+                );
+            }
+
+            // Innerhalb der Sperre neu gelesen: nur so sind es wirklich die
+            // Schlüssel, die diese Ersetzung ablöst.
+            const { pdf, docx } = artifactPair(current.artifacts);
+            if (!pdf || !docx) {
+                throw new AppException(
+                    "Document has incomplete artifact links.",
+                    500,
+                    "INVALID_UPLOAD_METADATA",
+                );
+            }
+
+            await tx.documentArtifact.update({
+                where: { id: docx.id },
+                data: {
+                    objectKey,
+                    size: content.length,
+                    sha256: sha256Document(content),
+                },
+            });
+            await tx.documentArtifact.update({
+                where: { id: pdf.id },
+                data: {
+                    objectKey: storedPdf.objectKey,
+                    size: storedPdf.size,
+                    sha256: storedPdf.sha256,
+                },
+            });
+
+            return { docx: docx.objectKey, pdf: pdf.objectKey };
+        });
+    } catch (error) {
+        await Promise.all([discardObject(objectKey), discardObject(pdfKey)]);
+        throw error;
+    }
 
     // Erst nach dem Umbiegen: schlägt das Aufräumen fehl, bleibt nur ein
-    // verwaistes Objekt zurück — der Datensatz ist bereits korrekt.
-    if (previousKey !== objectKey) {
-        await removeDocumentArtifact(previousKey).catch((error) => {
-            logger.error('document_replacement_cleanup_failed', {
-                objectKey: previousKey,
-                error: (error as Error).message,
-            });
-        });
+    // verwaistes Objekt zurück — die Datensätze sind bereits korrekt.
+    for (const previousKey of [previous.docx, previous.pdf]) {
+        if (previousKey !== objectKey && previousKey !== storedPdf.objectKey) {
+            await discardObject(previousKey);
+        }
     }
 
     return requireGeneratedDocument(type, id);

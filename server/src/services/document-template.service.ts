@@ -1,13 +1,13 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
 import { DocumentTemplateKind, Language } from "@prisma/client";
-import PizZip from "pizzip";
 import {
     getDocumentArtifact,
     getDocumentDownloadUrl,
     removeDocumentArtifact,
     storeObject,
 } from "../lib/document-artifact-store.js";
+import { assertDocxBuffer } from "../lib/docx.js";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { resolveTemplateName } from "../pipelines/offer/utils.js";
@@ -16,50 +16,11 @@ import logger from "@/utils/logger.js";
 export const DOCX_MIME =
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-/** Dieselbe Grenze wie beim Ersetzen erzeugter Dateien. */
-const MAX_TEMPLATE_BYTES = 25 * 1024 * 1024;
-
 /** Basisname der mitgelieferten Vorlage je Dokumentart unter `TEMPLATES_DIR`. */
 const LEGACY_BASE_NAME: Record<DocumentTemplateKind, string> = {
     OFFER: "offer",
     ORDER: "order",
 };
-
-/**
- * Prüft den Inhalt statt des Dateinamens.
- *
- * Die Endung sagt über eine hochgeladene Datei nichts aus, und ein kaputtes
- * Template fällt sonst erst beim Rendern auf — im Worker, lange nachdem der
- * Nutzer den Dialog geschlossen hat. Ein DOCX ist ein ZIP mit `PK\x03\x04` am
- * Anfang und einer `word/document.xml` darin; genau das prüft `pizzip`, das
- * die Pipeline ohnehin schon benutzt.
- */
-function assertDocxBuffer(content: Buffer): void {
-    if (content.length === 0) {
-        throw new AppException("Die Datei ist leer.", 400, "EMPTY_FILE");
-    }
-
-    if (content.length > MAX_TEMPLATE_BYTES) {
-        throw new AppException(
-            `Die Datei ist größer als ${MAX_TEMPLATE_BYTES / 1024 / 1024} MB.`,
-            413,
-            "FILE_TOO_LARGE",
-        );
-    }
-
-    try {
-        const zip = new PizZip(content);
-        if (!zip.file("word/document.xml")) {
-            throw new Error("missing word/document.xml");
-        }
-    } catch {
-        throw new AppException(
-            "Die Datei ist kein gültiges Word-Dokument (.docx).",
-            400,
-            "INVALID_DOCX",
-        );
-    }
-}
 
 const templateObjectKey = (kind: DocumentTemplateKind) =>
     `templates/${kind.toLowerCase()}/${randomUUID()}.docx`;

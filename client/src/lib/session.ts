@@ -17,3 +17,15 @@ export async function requireSession(context: RouterContext) {
 
   return session;
 }
+
+export async function requireAdmin(context: RouterContext) {
+  const session = await requireSession(context);
+
+  const roles = (session.user.role ?? "").split(",").map((role) => role.trim());
+
+  if (!roles.includes("admin")) {
+    throw redirect({ to: "/" });
+  }
+
+  return session;
+}

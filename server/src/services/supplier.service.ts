@@ -22,15 +22,19 @@ export async function getSuppliers(query: SupplierFilterParams) {
 
     const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
 
-    return prisma.supplier.findMany({
+    const suppliers = await prisma.supplier.findMany({
         where: Object.keys(where).length > 0 ? where : undefined,
         orderBy,
         include: {
             _count: {
-                select: { offers: true, orders: true },
+                select: { offers: true },
             }
         }
     });
+    const counts = await prisma.offer.groupBy({ by: ["supplierId"],
+        where: { supplierId: { in: suppliers.map(s => s.id) }, orders: { isNot: null } }, _count: { _all: true } });
+    const orderCounts = new Map(counts.map(c => [c.supplierId, c._count._all]));
+    return suppliers.map(s => ({ ...s, _count: { ...s._count, orders: orderCounts.get(s.id) ?? 0 } }));
 }
 
 /* ========== Mutations ========== */

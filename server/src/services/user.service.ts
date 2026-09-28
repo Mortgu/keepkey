@@ -26,7 +26,7 @@ export async function getAllUsers(query: UserFilterParams) {
         where: Object.keys(where).length > 0 ? where : undefined,
         orderBy,
         include: {
-            orders: true,
+            acceptedOrders: true,
             customer: true,
             offers: true,
         },
@@ -37,7 +37,7 @@ export async function getUserById(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {
-            orders: true,
+            acceptedOrders: true,
             customer: {
                 include: {
                     contactPersons: true,
@@ -71,15 +71,18 @@ export async function createUser(input: CreateUserInput) {
     const { email, password, firstName, lastName, salutation, phone } = input;
 
     try {
-        const createdUser = await auth.api.signUpEmail({
+        const { user: createdUser } = await auth.api.createUser({
             body: {
                 email,
                 password,
                 name: `${firstName} ${lastName}`,
-                firstName,
-                lastName,
-                salutation,
-                phone: phone || undefined,
+                role: "user",
+                data: {
+                    firstName,
+                    lastName,
+                    salutation,
+                    phone: phone || undefined,
+                },
             },
         });
 
@@ -104,7 +107,12 @@ export async function updateUser(id: string, input: UpdateUserInput) {
         lastName,
         phone,
         email,
+        password,
     } = input;
+
+    if (password) {
+        await setUserPassword(id, password);
+    }
 
     try {
         const user = await prisma.user.update({
@@ -127,6 +135,24 @@ export async function updateUser(id: string, input: UpdateUserInput) {
             "USER_UPDATE_FAILED",
         );
     }
+}
+
+async function setUserPassword(userId: string, password: string) {
+    const ctx = await auth.$context;
+    const { minPasswordLength, maxPasswordLength } = ctx.password.config;
+
+    if (password.length < minPasswordLength || password.length > maxPasswordLength) {
+        throw new AppException(
+            `Password must be between ${minPasswordLength} and ${maxPasswordLength} characters!`,
+            400,
+            "INVALID_PASSWORD_LENGTH",
+        );
+    }
+
+    const hash = await ctx.password.hash(password);
+    await ctx.internalAdapter.updatePassword(userId, hash);
+    // Log the employee out everywhere so the old password can't keep a session alive.
+    await ctx.internalAdapter.deleteUserSessions(userId);
 }
 
 export async function createContactPersons(userId: string, persons: Array<CreateContactInput>) {

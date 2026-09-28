@@ -20,20 +20,18 @@ export async function seedOwner(prisma: PrismaClient) {
         return;
     }
 
-    await auth.api.signUpEmail({
+    await auth.api.createUser({
         body: {
             email: OWNER.email,
             password: OWNER.password,
             name: OWNER.name,
-            firstName: OWNER.firstName,
-            lastName: OWNER.lastName,
-            salutation: OWNER.salutation,
+            role: "admin",
+            data: {
+                firstName: OWNER.firstName,
+                lastName: OWNER.lastName,
+                salutation: OWNER.salutation,
+            },
         },
-    });
-
-    await prisma.user.update({
-        where: { email: OWNER.email },
-        data: { role: "admin" },
     });
 
     console.log(`Created owner user: ${OWNER.email}`);

@@ -15,6 +15,7 @@ export const createOrder = (input: CreateOrderInput) =>
         method: "POST",
         body: JSON.stringify({
             id: input.id,
+            expectedOfferVersion: input.expectedOfferVersion,
             orderId: input.orderId,
             date: input.date,
             projectNumber: input.projectNumber,
@@ -23,8 +24,8 @@ export const createOrder = (input: CreateOrderInput) =>
         }),
     });
 
-export const deleteOrder = (id: string) =>
-    api<void>(`/api/orders/${id}`, { method: "DELETE" });
+export const cancelOrder = (id: string, expectedVersion: number) =>
+    api<Order>(`/api/orders/${id}/cancel`, { method: "POST", body: JSON.stringify({ expectedVersion }) });
 
 export const updateOrder = (orderId: string, input: UpdateOrderInput) =>
     api<Order>(`/api/orders/${orderId}`, {

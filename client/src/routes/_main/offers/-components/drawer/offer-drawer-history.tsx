@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { Offer, OfferRevision } from "@keepit/schemas";
-import { Button, Drawer, showToast } from "@/components";
+import { Button, Drawer, RouteError, Skeleton, showToast } from "@/components";
 import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
 import { offerQueries } from "@/hooks/offers/offer-queries";
 import { getErrorMessage } from "@/lib/errors";
@@ -34,6 +34,7 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
     }, [errorRestoringRevision]);
 
     const restore = async (revision: OfferRevision) => {
+        if (offer.acceptedAt) return;
         if (!confirm(t("versionHistory.restoreConfirm", { version: revision.version }))) return;
         try {
             await restoreOfferRevision({
@@ -55,8 +56,8 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                     {t("versionHistory.currentVersion", { version: offer.version })}
                 </div>
 
-                {isPending && <p className="text-sm text-(--text-secondary)">{t("common.loading")}</p>}
-                {error && <p className="text-sm text-(--destructive)">{error.message}</p>}
+                {isPending && <Skeleton className="h-16" />}
+                {error && <RouteError error={error} />}
                 {!isPending && !error && revisions.length === 0 && (
                     <p className="text-sm text-(--text-secondary)">
                         {t("versionHistory.empty")}
@@ -101,7 +102,8 @@ export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
                                     <Button size="xs" variant="secondary"
                                         onClick={() => restore(revision)}
                                         loading={isRestoringRevision && restoringRevisionId === revision.id}
-                                        disabled={isRestoringRevision}>
+                                        disabled={isRestoringRevision || Boolean(offer.acceptedAt)}
+                                        title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}>
                                         {t("versionHistory.restore")}
                                     </Button>
                                 </div>

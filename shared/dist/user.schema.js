@@ -21,6 +21,7 @@ export const userSchema = z.object({
     salutation: z.string(),
     email: z.string(),
     phone: z.string().nullable(),
+    role: z.string().nullable().optional(),
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
 });

@@ -1,15 +1,27 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOrder, deleteOrder, generateOrderDocument, restoreOrderRevision, updateOrder } from "./order-api";
+import { offerKeys } from "../offers/offers-keys";
+import { customerKeys } from "../customers/customer-keys";
+import { supplierKeys } from "../suppliers/supplier-keys";
+import { dashboardKeys } from "../dashboard/dashboard-keys";
+import { searchKeys } from "../search/search-keys";
+
+import { cancelOrder, createOrder, generateOrderDocument, restoreOrderRevision, updateOrder } from "./order-api";
 import { orderKeys } from "./order-keys";
 import { useNextOrderNumber, useOrders } from "./order-hooks";
+import type { QueryClient } from "@tanstack/react-query";
 import type { CreateOrderInput, UpdateOrderInput } from "./order-api";
+import { showToast } from "@/components";
 
+async function invalidateOrderViews(client: QueryClient) {
+    await Promise.all([orderKeys.all, offerKeys.all, customerKeys.all, supplierKeys.all, dashboardKeys.all, searchKeys.all]
+        .map(queryKey => client.invalidateQueries({ queryKey })));
+}
 export function useCreateOrder() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
         mutationFn: (input: CreateOrderInput) => createOrder(input),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: orderKeys.lists() }),
+        onSuccess: () => invalidateOrderViews(queryClient),
     });
 
     return {
@@ -19,18 +31,18 @@ export function useCreateOrder() {
     };
 }
 
-export function useDeleteOrder() {
+export function useCancelOrder() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: (orderId: string) => deleteOrder(orderId),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: orderKeys.lists() }),
+        mutationFn: ({ orderId, expectedVersion }: { orderId: string; expectedVersion: number }) => cancelOrder(orderId, expectedVersion),
+        onSuccess: async () => { await invalidateOrderViews(queryClient); showToast.success("orders.cancelSuccess"); },
     });
 
     return {
-        deleteOrder: mutation.mutate,
-        isDeletingOrder: mutation.isPending,
-        errorDeletingOrder: mutation.error,
+        cancelOrder: mutation.mutateAsync,
+        isCancellingOrder: mutation.isPending,
+        errorCancellingOrder: mutation.error,
     };
 }
 
@@ -40,10 +52,7 @@ export function useUpdateOrder() {
     const mutation = useMutation({
         mutationFn: ({ orderId, input }: { orderId: string; input: UpdateOrderInput }) =>
             updateOrder(orderId, input),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: orderKeys.detail(args.orderId) });
-        },
+        onSuccess: () => invalidateOrderViews(queryClient),
     });
 
     return {
@@ -94,7 +103,7 @@ export function useOrderManager() {
     const ordersQuery = useOrders();
     const createMutation = useCreateOrder();
     const updateMutation = useUpdateOrder();
-    const deleteMutation = useDeleteOrder();
+    const cancelMutation = useCancelOrder();
     const nextNumber = useNextOrderNumber();
 
     return {
@@ -102,6 +111,6 @@ export function useOrderManager() {
         ...nextNumber,
         ...createMutation,
         ...updateMutation,
-        ...deleteMutation,
+        ...cancelMutation,
     };
 }

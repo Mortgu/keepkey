@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { useTranslation } from "react-i18next";
-import { useForm } from "@tanstack/react-form";
-import type { Contact } from "@keepit/schemas";
-import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
 import { Button, Dialog, FieldInput } from "@/components";
+import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
+import type { Contact } from "@keepit/schemas";
+import { useForm } from "@tanstack/react-form";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 const contactPersonSchema = z.object({
     salutation: z.string().min(1, "Anrede fehlt"),
@@ -67,7 +67,7 @@ export default function ContactModal({ customerId, contact, onClose }: Props) {
     return (
         <Dialog
             defaultOpen
-            size="md"
+            size="lg"
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
             <Dialog.Header title={contact ? "Kontaktperson bearbeiten" : "Kontaktperson hinzufügen"} />

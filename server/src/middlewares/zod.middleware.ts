@@ -1,5 +1,15 @@
 import type { Request, Response, NextFunction } from "express";
-import type { ZodSchema } from "zod";
+import type { ZodError, ZodSchema } from "zod";
+import logger from "@/utils/logger.js";
+
+/* Feldpfad voranstellen, sonst ist "expected string, received undefined" nicht zuordenbar. */
+const formatIssues = (request: Request, error: ZodError) => {
+  const message = error.issues
+    .map(i => (i.path.length ? `${i.path.join(".")}: ${i.message}` : i.message))
+    .join(" & ");
+  logger.warn(`VALIDATION_ERROR ${request.method} ${request.originalUrl} – ${message}`);
+  return message;
+};
 
 export const validate = (schema: ZodSchema) => (request: Request, response: Response, next: NextFunction) => {
   const result = schema.safeParse(request.body);
@@ -7,7 +17,8 @@ export const validate = (schema: ZodSchema) => (request: Request, response: Resp
   if (!result.success) {
     return response.status(400).json({
       success: false,
-      message: result.error.issues.map(i => i.message).join(' & '),
+      code: "VALIDATION_ERROR",
+      message: formatIssues(request, result.error),
     });
   }
 
@@ -29,7 +40,8 @@ export const validateQuery = (schema: ZodSchema) => (request: Request, response:
   if (!result.success) {
     return response.status(400).json({
       success: false,
-      message: result.error.issues.map(i => i.message).join(' & '),
+      code: "VALIDATION_ERROR",
+      message: formatIssues(request, result.error),
     });
   }
 
@@ -42,7 +54,8 @@ export const validateParams = (schema: ZodSchema) => (request: Request, response
   if (!result.success) {
     return response.status(400).json({
       success: false,
-      message: result.error.issues.map(i => i.message).join(' & '),
+      code: "VALIDATION_ERROR",
+      message: formatIssues(request, result.error),
     });
   }
 

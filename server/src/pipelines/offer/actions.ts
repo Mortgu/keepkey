@@ -1,3 +1,4 @@
+import { parseAcceptedOfferSnapshot, parseAcceptedOfferTemplate } from "../../schemas/accepted-offer.js";
 import Docxtemplater from "docxtemplater";
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import PizZip from "pizzip";
@@ -10,7 +11,7 @@ import logger from "@/utils/logger.js";
 import { calculatePrice } from "@/utils/products.js";
 import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
-import { convert as libconvert } from "libreoffice-convert";
+import { convertDocxToPdf } from "@/lib/docx-to-pdf.js";
 import { z } from "zod";
 import { netCents } from "@keepit/schemas";
 import { PipelineStageError } from "../pipeline.js";
@@ -49,6 +50,28 @@ export const fetchOfferData = async (offerId: string) => {
         }),
     ]);
 
+    if (offer.acceptedSnapshot) {
+        const s = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
+        // No current master data enters an accepted document's commercial content.
+        offer.customer = { ...offer.customer, ...s.customer };
+        offer.customerContactPerson = { ...offer.customerContactPerson, ...s.customerContactPerson };
+        offer.user = { ...offer.user, ...s.employee };
+        offer.language = s.language;
+        offer.contract = { ...offer.contract, translations: s.contract.translations.map(t => ({
+            ...t, contractId: s.contract.id, createdAt: s.contract.createdAt, updatedAt: s.contract.updatedAt,
+        })) };
+        offer.offerPositions = s.positions.map(p => ({
+            ...p, offerId: offer.id, tariffVersionId: p.tariffVersionId ?? null, updatedAt: p.createdAt,
+            product: { ...p.product, translations: p.product.translations.map(t => ({
+                ...t, productId: p.productId, description: t.description ?? null, table: t.table ?? null,
+            })) },
+        }));
+        offer.offerFlatRates = s.flatRates.map(f => ({ ...f, offerId: offer.id,
+            flatRate: { ...f.flatRate, translations: f.flatRate.translations.map(t => ({
+                ...t, flatRateId: f.flatRateId, table: t.table ?? "",
+            })) },
+        }));
+    }
     return { offer, contracts };
 }
 
@@ -280,7 +303,9 @@ export const formatFetchedDataAction = async (context: OfferPipelineContext) => 
     }
 
     try {
-        const formated = await formatOfferData(context.fetchedData);
+        const formated = context.fetchedData.offer.acceptedSnapshot
+            ? parseAcceptedOfferTemplate(context.fetchedData.offer.acceptedSnapshot)
+            : await formatOfferData(context.fetchedData);
         //console.dir(formated, { depth: null });
         context.formatedData = offerTemplateSchema.parse(formated);
     } catch (exception: any) {
@@ -379,12 +404,7 @@ export async function convertAction(context: OfferPipelineContext) {
         throw new PipelineStageError("Something went wrong! Empty docx buffer.");
     }
 
-    context.pdfBuffer = await new Promise((resolve, reject) => {
-        libconvert(docxBuffer, ".pdf", undefined, (err: Error | null, result: Buffer) => {
-            if (err) reject(err);
-            else resolve(result);
-        });
-    });
+    context.pdfBuffer = await convertDocxToPdf(docxBuffer);
 }
 
 export async function createDisplayNameAction(context: OfferPipelineContext) {
