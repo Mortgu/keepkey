@@ -1,7 +1,8 @@
 import { useForm } from "@tanstack/react-form";
+import { Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { customerFormSchema } from "@keepit/schemas";
-import type { Customer } from "@keepit/schemas";
+import type { Customer, CustomerFormInput } from "@keepit/schemas";
 import { Button, Dialog, FieldInput, FieldSelect, NumberField, Select } from "@/components";
 import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
 import {
@@ -45,21 +46,26 @@ export default function CustomerModal({
       language: currentCustomer?.language ?? initialCountry.language,
       currency: currentCustomer?.currency ?? initialCountry.currency,
       taxRate: currentCustomer?.taxRate ?? initialCountry.taxRate,
+
+      // Nur beim Anlegen; bestehende Ansprechpartner pflegt das Kontakt-Modal.
+      contactPersons: [] as CustomerFormInput["contactPersons"],
     },
     validators: {
       onChange: customerFormSchema,
     },
     onSubmit: async ({ value }) => {
+      const { contactPersons, ...customer } = value;
+
       if (isEdit) {
         try {
-          await updateCustomer({ customerId: currentCustomer.id, input: value });
+          await updateCustomer({ customerId: currentCustomer.id, input: customer });
           onClose();
         } catch (exception) {
           console.error(exception);
         }
       } else {
         try {
-          await createCustomer({ input: value });
+          await createCustomer({ input: { ...customer, contactPersons } });
           onClose();
         } catch (exception) {
           console.error(exception);
@@ -194,6 +200,49 @@ export default function CustomerModal({
               </div>
             )} />
           </div>
+
+          {!isEdit && (
+            <customerForm.Field name="contactPersons" mode="array" children={(field) => (
+              <div className="grid gap-2 border-t border-gray-200 pt-4">
+                <span className="text-sm text-gray-500">Ansprechpartner</span>
+
+                {field.state.value.map((_, index) => (
+                  <div key={index} className="flex items-start gap-2">
+                    <customerForm.Field name={`contactPersons[${index}].salutation`} children={(itemField) => (
+                      <div className="flex-1 min-w-0 grid grid-cols-1 gap-2">
+                        <FieldInput field={itemField} size="sm" label="Anrede" />
+                      </div>
+                    )} />
+                    <customerForm.Field name={`contactPersons[${index}].firstName`} children={(itemField) => (
+                      <div className="flex-2 min-w-0 grid grid-cols-1 gap-2">
+                        <FieldInput field={itemField} size="sm" label="Vorname" />
+                      </div>
+                    )} />
+                    <customerForm.Field name={`contactPersons[${index}].lastName`} children={(itemField) => (
+                      <div className="flex-2 min-w-0 grid grid-cols-1 gap-2">
+                        <FieldInput field={itemField} size="sm" label="Nachname" />
+                      </div>
+                    )} />
+                    <customerForm.Field name={`contactPersons[${index}].email`} children={(itemField) => (
+                      <div className="flex-3 min-w-0 grid grid-cols-1 gap-2">
+                        <FieldInput field={itemField} size="sm" label="E-Mail" />
+                      </div>
+                    )} />
+                    <Button variant="secondary" size="sm" type="button" className="mt-6"
+                      icon={<Trash2 className="size-4" />} iconOnly
+                      aria-label="Ansprechpartner entfernen"
+                      onClick={() => field.removeValue(index)} />
+                  </div>
+                ))}
+
+                <Button type="button" variant="secondary" size="sm" className="justify-self-start"
+                  icon={<Plus className="size-4" />}
+                  onClick={() => field.pushValue({ salutation: "", firstName: "", lastName: "", email: "" })}>
+                  Ansprechpartner hinzufügen
+                </Button>
+              </div>
+            )} />
+          )}
         </form>
       </Dialog.Body>
       <Dialog.Footer>

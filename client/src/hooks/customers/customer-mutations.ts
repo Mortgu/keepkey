@@ -12,7 +12,8 @@ import {
 import type {
     CreateContactInput,
     CreateCustomerInput,
-    UpdateContactInput
+    UpdateContactInput,
+    UpdateCustomerInput
 } from '@keepit/schemas';
 
 export function useCreateCustomer() {
@@ -39,7 +40,7 @@ export function useUpdateCustomer() {
 
     const mutation = useMutation({
         mutationFn: ({ customerId, input }: {
-            customerId: string, input: CreateCustomerInput
+            customerId: string, input: UpdateCustomerInput
         }) => updateCustomer(customerId, input),
         onSuccess: (_, args) => {
             queryClient.invalidateQueries({ queryKey: customerKeys.lists() });

@@ -21,30 +21,36 @@ export declare const createCustomerSchema: z.ZodObject<{
     }>;
     taxRate: z.ZodNumber;
     salutation: z.ZodOptional<z.ZodString>;
+    contactPersons: z.ZodOptional<z.ZodArray<z.ZodObject<{
+        salutation: z.ZodString;
+        firstName: z.ZodString;
+        lastName: z.ZodString;
+        email: z.ZodString;
+    }, z.core.$strip>>>;
 }, z.core.$strip>;
 export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
 export declare const updateCustomerSchema: z.ZodObject<{
     customerId: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    companyName: z.ZodOptional<z.ZodString>;
+    salutation: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     email: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    invoiceEmail: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    phone: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    street: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    city: z.ZodOptional<z.ZodOptional<z.ZodString>>;
-    zip: z.ZodOptional<z.ZodOptional<z.ZodString>>;
     language: z.ZodOptional<z.ZodEnum<{
         DE: "DE";
         EN: "EN";
     }>>;
-    country: z.ZodOptional<z.ZodString>;
     currency: z.ZodOptional<z.ZodEnum<{
         EUR: "EUR";
         RAND: "RAND";
         DOLLAR: "DOLLAR";
         CHF: "CHF";
     }>>;
+    companyName: z.ZodOptional<z.ZodString>;
+    invoiceEmail: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    phone: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    street: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    city: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    zip: z.ZodOptional<z.ZodOptional<z.ZodString>>;
+    country: z.ZodOptional<z.ZodString>;
     taxRate: z.ZodOptional<z.ZodNumber>;
-    salutation: z.ZodOptional<z.ZodOptional<z.ZodString>>;
 }, z.core.$strip>;
 export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
 export declare const customerFormSchema: z.ZodObject<{
@@ -69,6 +75,12 @@ export declare const customerFormSchema: z.ZodObject<{
     city: z.ZodString;
     zip: z.ZodString;
     phone: z.ZodString;
+    contactPersons: z.ZodArray<z.ZodObject<{
+        salutation: z.ZodString;
+        firstName: z.ZodString;
+        lastName: z.ZodString;
+        email: z.ZodUnion<readonly [z.ZodLiteral<"">, z.ZodEmail]>;
+    }, z.core.$strip>>;
 }, z.core.$strip>;
 export type CustomerFormInput = z.infer<typeof customerFormSchema>;
 export declare const customerSchema: z.ZodObject<{

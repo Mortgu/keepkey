@@ -10,6 +10,10 @@ export const createContactSchema = z.object({
 });
 export type CreateContactInput = z.infer<typeof createContactSchema>;
 
+/** Ansprechpartner, der zusammen mit einem neuen Kunden angelegt wird — die Kunden-ID gibt es dann noch nicht. */
+export const newCustomerContactSchema = createContactSchema.omit({ customerId: true });
+export type NewCustomerContactInput = z.infer<typeof newCustomerContactSchema>;
+
 export const updateContactSchema = createContactSchema.partial();
 export type UpdateContactInput = z.infer<typeof updateContactSchema>;
 
