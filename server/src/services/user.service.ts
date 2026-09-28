@@ -25,11 +25,6 @@ export async function getAllUsers(query: UserFilterParams) {
     return prisma.user.findMany({
         where: Object.keys(where).length > 0 ? where : undefined,
         orderBy,
-        include: {
-            acceptedOrders: true,
-            customer: true,
-            offers: true,
-        },
     });
 }
 

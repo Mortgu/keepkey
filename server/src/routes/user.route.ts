@@ -20,7 +20,9 @@ const router = Router();
 
 router.get("/session", getSessionUser);
 
-router.get("/", requireAdmin, validateQuery(userFilterSchema), getUsers);
+/* Kein requireAdmin: die Mitarbeiterliste braucht jeder, z. B. für
+ * "Unser Ansprechpartner" im Angebots-Modal. Anlegen/Ändern bleibt Admin. */
+router.get("/", validateQuery(userFilterSchema), getUsers);
 
 router.put("/:id", requireAdmin, validate(updateUserSchema), updateUserById);
 
