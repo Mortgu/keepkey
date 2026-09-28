@@ -2,7 +2,7 @@ import { DocumentStatus, TaskStatus } from "@prisma/client";
 import type { Job } from "bullmq";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import type { TaskJobData } from "./task-queue.js";
+import type { TaskJobData } from "./task-contract.js";
 
 export async function markTaskRunning(taskId: string, runToken: string): Promise<boolean> {
     return prisma.$transaction(async (tx) => {

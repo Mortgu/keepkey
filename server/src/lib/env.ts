@@ -46,6 +46,13 @@ const env = createEnv({
 
         REDIS_URL: z.string().min(1),
         WORKER_CONCURRENCY: z.coerce.number().default(2),
+        /** Obergrenze, bis ein Request bei nicht erreichbarem Redis mit 503 abbricht. */
+        TASK_ENQUEUE_TIMEOUT_MS: z.coerce.number().int().positive().default(5_000),
+        /**
+         * Nach SIGTERM wird spätestens nach dieser Zeit hart beendet. Muss unter
+         * der Stop-Grace-Period der Plattform liegen (Docker-Default: 10 s).
+         */
+        SHUTDOWN_TIMEOUT_MS: z.coerce.number().int().positive().default(8_000),
 
         CORS_ORIGIN: z.string(),
     },

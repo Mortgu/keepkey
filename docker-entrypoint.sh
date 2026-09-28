@@ -21,11 +21,8 @@ until node --input-type=commonjs -e "
 done
 echo "Redis is ready."
 
-echo "Running database migrations..."
-npx prisma migrate deploy --schema prisma/schema
-
-echo "Seeding database..."
-node dist-seed/prisma/seed.js
-
-echo "Starting application..."
-exec node dist/server.js
+# Migrationen und Seeding laufen nicht mehr bei jedem Start, sondern als
+# eigener Deployment-Schritt mit demselben Image, z. B.:
+#   docker run --rm <image> npx prisma migrate deploy --schema prisma/schema
+#   docker run --rm <image> node dist-seed/prisma/seed.js
+exec "$@"
