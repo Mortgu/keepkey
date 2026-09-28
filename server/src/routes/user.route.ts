@@ -8,7 +8,8 @@ import {
   updateUserById,
 } from "@/controllers/index.js";
 import { requireAdmin } from "@/middlewares/auth.middleware.js";
-import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
+import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
+import { idParamsSchema } from "@/schemas/params-schemas.js";
 import {
   createContactSchema,
   createUserSchema,
@@ -24,11 +25,11 @@ router.get("/session", getSessionUser);
  * "Unser Ansprechpartner" im Angebots-Modal. Anlegen/Ändern bleibt Admin. */
 router.get("/", validateQuery(userFilterSchema), getUsers);
 
-router.put("/:id", requireAdmin, validate(updateUserSchema), updateUserById);
+router.put("/:id", requireAdmin, validateParams(idParamsSchema), validate(updateUserSchema), updateUserById);
 
 router.post("/", requireAdmin, validate(createUserSchema), createUser);
 
-router.delete("/:id", requireAdmin, deleteUser);
+router.delete("/:id", requireAdmin, validateParams(idParamsSchema), deleteUser);
 
 router.post(
   "/me/contact-persons",

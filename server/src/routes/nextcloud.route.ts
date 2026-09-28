@@ -1,4 +1,7 @@
 import { Router } from 'express';
+import { validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
+import { idParamsSchema } from "@/schemas/params-schemas.js";
+import { cloudDirectoryQuerySchema } from "@keepit/schemas";
 import {
     getCloudDirectory,
     getCloudStatus,
@@ -11,7 +14,7 @@ import {
 const router = Router();
 
 /* [GET] /api/cloud/directory */
-router.get('/directory', getCloudDirectory);
+router.get('/directory', validateQuery(cloudDirectoryQuerySchema), getCloudDirectory);
 
 /* [GET] /api/cloud/status */
 router.get('/status', getCloudStatus);
@@ -20,13 +23,13 @@ router.get('/status', getCloudStatus);
 router.get('/offer', getOfferFiles);
 
 /* [GET] /api/cloud/offer/:id */
-router.get('/offer/:id', getOfferFileById);
+router.get('/offer/:id', validateParams(idParamsSchema), getOfferFileById);
 
 /* [GET] /api/cloud/order/:id */
-router.get('/order/:id', getOrderFileById);
+router.get('/order/:id', validateParams(idParamsSchema), getOrderFileById);
 
 /* [GET] /api/cloud/:id */
-router.get('/:id', getFilesById);
+router.get('/:id', validateParams(idParamsSchema), getFilesById);
 
 
 export default router;

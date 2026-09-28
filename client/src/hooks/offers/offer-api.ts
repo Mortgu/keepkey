@@ -1,20 +1,15 @@
 import type {
-    CreateOfferFlatrateInput,
     CreateOfferInput,
-    CreateOfferPositionInput,
     ExtendOfferInput,
     Offer,
     OfferFilterParams,
 
-    OfferPosition,
     OfferRevision,
 
     OffersPage,
     Task,
 
-    UpdateOfferFlatrateInput,
-    UpdateOfferInput,
-    UpdateOfferPositionInput
+    UpdateOfferInput
 } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
@@ -43,43 +38,6 @@ export const deleteOffer = async (id: string) =>
         method: "DELETE"
     });
 
-/* Offer Position */
-export const createOfferPositions = async (id: string, input: Array<CreateOfferPositionInput>) =>
-    api<Array<OfferPosition>>(`/api/offers/${id}/positions`, {
-        method: "POST",
-        body: JSON.stringify(input)
-    });
-
-export const updateOfferPosition = async (id: string, positionId: string, input: UpdateOfferPositionInput) =>
-    api<OfferPosition>(`/api/offers/${id}/positions/${positionId}`, {
-        method: "PATCH",
-        body: JSON.stringify(input),
-    });
-
-export const deleteOfferPosition = async (id: string, positionId: string) =>
-    api<OfferPosition>(`/api/offers/${id}/positions/${positionId}`, {
-        method: "DELETE"
-    });
-
-/* Offer Flatrates */
-export const createOfferFlatrates = async (id: string, input: Array<CreateOfferFlatrateInput>) =>
-    api<Array<OfferPosition>>(`/api/offers/${id}/flatrates`, {
-        method: "POST",
-        body: JSON.stringify(input),
-    });
-
-export const updateOfferFlatrate = async (id: string, flatrateId: string, input: UpdateOfferFlatrateInput) =>
-    api<OfferPosition>(`/api/offers/${id}/flatrates/${flatrateId}`, {
-        method: "PATCH",
-        body: JSON.stringify(input),
-    });
-
-export const deleteOfferFlatrate = async (id: string, flatrateId: string) =>
-    api<OfferPosition>(`/api/offers/${id}/flatrates/${flatrateId}`, {
-        method: "DELETE"
-    });
-
-
 export const generateOfferDocument = async (id: string) =>
     api<Task>(`/api/offers/${id}/documents`, {
         method: "POST"
@@ -95,12 +53,6 @@ export const restoreOfferRevision = async (id: string, revisionId: string, expec
     api<Offer>(`/api/offers/${id}/revisions/${revisionId}/restore`, {
         method: "POST",
         body: JSON.stringify({ expectedVersion }),
-    });
-
-/* Offer Tasks */
-export const getOfferTasks = async (id: string) =>
-    api<Array<Task>>(`/api/offers/${id}/tasks`, {
-        method: "GET"
     });
 
 export const getTask = async (taskId: string) =>

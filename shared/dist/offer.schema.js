@@ -24,7 +24,6 @@ export const createOfferPositionSchema = z.object({
     discount_cents: z.number().int(),
     eur_user_month: z.number().int(),
 });
-export const updateOfferPositionSchema = createOfferPositionSchema.partial();
 export const offerPositionSchema = createOfferPositionSchema.extend({
     id: z.string(),
     offerId: z.string(),
@@ -37,7 +36,6 @@ export const createOfferFlatrateSchema = z.object({
     flatRateId: z.string(),
     quantity: z.number().int(),
 });
-export const updateOfferFlatrateSchema = createOfferFlatrateSchema.partial();
 export const offerFlatrateSchema = createOfferFlatrateSchema.extend({
     id: z.string(),
     offerId: z.string(),
@@ -170,14 +168,22 @@ export const offerListSchema = z.array(offerSchema);
 export const restoreOfferRevisionSchema = z.object({
     expectedVersion: z.number().int().positive(),
 });
+/**
+ * Filter der Angebotsliste — übertragen als Query-String.
+ *
+ * Die ID-Filter akzeptieren String **oder** String-Array: ein Array mit einem
+ * Element wird als einzelner Parameter übertragen und kommt beim Server als
+ * String an. `limit` wird mit `coerce` gelesen, weil Query-Parameter immer
+ * Strings sind.
+ */
 export const offerFilterSchema = z.object({
     search: z.string().optional(),
-    companyIds: z.array(z.string()).optional(),
-    contactPersonIds: z.array(z.string()).optional(),
-    productIds: z.array(z.string()).optional(),
+    companyIds: z.union([z.string(), z.array(z.string())]).optional(),
+    contactPersonIds: z.union([z.string(), z.array(z.string())]).optional(),
+    productIds: z.union([z.string(), z.array(z.string())]).optional(),
     sort: z.string().optional(),
     cursor: z.string().optional(),
-    limit: z.number().int().positive().optional().default(50),
+    limit: z.coerce.number().int().positive().max(100).optional().default(50),
 });
 export const offersPageSchema = z.object({
     items: z.array(offerSchema),

@@ -130,6 +130,6 @@ export const orderSchema = z.object({
 export const orderListSchema = z.array(orderSchema);
 /* Order Filters */
 export const orderFilterSchema = z.object({
-    companyIds: z.array(z.string()).optional(),
+    companyIds: z.union([z.string(), z.array(z.string())]).optional(),
 });
 //# sourceMappingURL=order.schema.js.map

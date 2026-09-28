@@ -5,7 +5,8 @@ import {
   getSuppliers,
   updateSupplier,
 } from "@/controllers/index.js";
-import { validate, validateQuery } from "@/middlewares/zod.middleware.js";
+import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
+import { idParamsSchema } from "@/schemas/params-schemas.js";
 import {
   createSupplierSchema, supplierFilterSchema, updateSupplierSchema
 } from "@keepit/schemas";
@@ -19,9 +20,9 @@ router.get("/", validateQuery(supplierFilterSchema), getSuppliers);
 router.post("/", validate(createSupplierSchema), createSupplier);
 
 /* [PUT] http://localhost:3000/api/supplier/:id */
-router.put("/:id", validate(updateSupplierSchema), updateSupplier);
+router.put("/:id", validateParams(idParamsSchema), validate(updateSupplierSchema), updateSupplier);
 
 /* [DELETE] http://localhost:3000/api/supplier/:id */
-router.delete("/:id", deleteSupplier);
+router.delete("/:id", validateParams(idParamsSchema), deleteSupplier);
 
 export default router;

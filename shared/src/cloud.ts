@@ -8,3 +8,9 @@ export const cloudFileSchema = z.object({
 });
 
 export type CloudFile = z.infer<typeof cloudFileSchema>;
+
+/** Query des Verzeichnis-Endpunkts (`GET /api/cloud/directory?path=…`). */
+export const cloudDirectoryQuerySchema = z.object({
+  path: z.string().min(1),
+});
+export type CloudDirectoryQuery = z.infer<typeof cloudDirectoryQuerySchema>;
