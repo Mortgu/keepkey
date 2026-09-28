@@ -42,6 +42,20 @@ export type PricedDiscount = {
 };
 
 /**
+ * Nettobetrag eines Angebots: Positionen abzüglich Freimonate, zuzüglich
+ * Flatrates, abzüglich Rabatte.
+ */
+export function calculateNetAmount(
+    positions: ReadonlyArray<Pick<PricedPosition, "total_cents" | "discount_cents">>,
+    flatrates: ReadonlyArray<Pick<PricedFlatrate, "total_cents">>,
+    discounts: ReadonlyArray<Pick<PricedDiscount, "amount_cents">>,
+): number {
+    return positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
+        flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+        discounts.reduce((sum, d) => sum + d.amount_cents, 0);
+}
+
+/**
  * Berechnet total_cents für jede Position über den Tarif (wirft AppException,
  * wenn kein Preis ermittelbar).
  *

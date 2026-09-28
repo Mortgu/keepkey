@@ -1,14 +1,17 @@
-import { Prisma } from "@prisma/client";
-
 import { assertOfferEditable } from "../offer-acceptance.service.js";
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
 import {
     OFFER_REVISION_SNAPSHOT_VERSION,
-    buildOfferRevisionSnapshot,
     parseOfferRevisionSnapshot,
 } from "../../schemas/revision-schemas.js";
-import { replaceDiscounts, replaceFlatRates, replacePositions } from "./offer-write.js";
+import {
+    assertExpectedVersion,
+    invalidateCurrentDocuments,
+    offerLinesInclude,
+    recordRevision,
+    replaceOfferLines,
+} from "./offer-write.js";
 
 export async function getOfferRevisions(offerId: string) {
     const exists = await prisma.offer.findUnique({ where: { id: offerId }, select: { id: true } });
@@ -39,18 +42,12 @@ export async function restoreOfferRevision(
 
         const current = await tx.offer.findUnique({
             where: { id: offerId },
-            include: { offerPositions: true, offerFlatRates: true, offerDiscounts: true },
+            include: offerLinesInclude,
         });
         if (!current) {
             throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
         }
-        if (current.version !== expectedVersion) {
-            throw new AppException(
-                "The offer was changed by another user. Reload it and try again.",
-                409,
-                "VERSION_CONFLICT",
-            );
-        }
+        assertExpectedVersion(current, expectedVersion);
 
         const revision = await tx.offerRevision.findFirst({
             where: { id: revisionId, offerId },
@@ -82,16 +79,7 @@ export async function restoreOfferRevision(
             );
         }
 
-        const currentSnapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
-        await tx.offerRevision.create({
-            data: {
-                offerId,
-                version: current.version,
-                changedById: actorId,
-                snapshotVersion: OFFER_REVISION_SNAPSHOT_VERSION,
-                snapshot: currentSnapshot as Prisma.InputJsonValue,
-            },
-        });
+        await recordRevision(tx, current, actorId);
 
         const offer = await tx.offer.update({
             where: { id: offerId },
@@ -104,14 +92,8 @@ export async function restoreOfferRevision(
             },
         });
 
-        await replacePositions(tx, offerId, restored.positions);
-        await replaceFlatRates(tx, offerId, restored.flatRates);
-        await replaceDiscounts(tx, offerId, restored.discounts);
-
-        await tx.offerDocument.updateMany({
-            where: { offerId, isCurrent: true },
-            data: { isCurrent: false },
-        });
+        await replaceOfferLines(tx, offerId, restored);
+        await invalidateCurrentDocuments(tx, offerId);
 
         return offer;
     });
