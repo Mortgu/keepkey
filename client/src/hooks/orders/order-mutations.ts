@@ -1,13 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { offerKeys } from "../offers/offers-keys";
+import { offerKeys } from "../offers/offer-keys";
 import { customerKeys } from "../customers/customer-keys";
 import { supplierKeys } from "../suppliers/supplier-keys";
 import { dashboardKeys } from "../dashboard/dashboard-keys";
 import { searchKeys } from "../search/search-keys";
 
-import { cancelOrder, createOrder, generateOrderDocument, restoreOrderRevision, updateOrder } from "./order-api";
+import { cancelOrder, createOrder, generateOrderDocument, updateOrder } from "./order-api";
 import { orderKeys } from "./order-keys";
-import { useNextOrderNumber, useOrders } from "./order-hooks";
 import type { QueryClient } from "@tanstack/react-query";
 import type { CreateOrderInput, UpdateOrderInput } from "./order-api";
 import { showToast } from "@/components";
@@ -73,44 +72,5 @@ export function useGenerateOrderDocument() {
     return {
         generateOrderDocument: mutation.mutate,
         isGeneratingDocument: mutation.isPending,
-    };
-}
-
-export function useRestoreOrderRevision() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ orderId, revisionId, expectedVersion }: {
-            orderId: string;
-            revisionId: string;
-            expectedVersion: number;
-        }) => restoreOrderRevision(orderId, revisionId, expectedVersion),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: orderKeys.revisions(args.orderId) });
-        },
-    });
-
-    return {
-        restoreOrderRevision: mutation.mutateAsync,
-        isRestoringRevision: mutation.isPending,
-        restoringRevisionId: mutation.variables?.revisionId,
-        errorRestoringRevision: mutation.error,
-    };
-}
-
-export function useOrderManager() {
-    const ordersQuery = useOrders();
-    const createMutation = useCreateOrder();
-    const updateMutation = useUpdateOrder();
-    const cancelMutation = useCancelOrder();
-    const nextNumber = useNextOrderNumber();
-
-    return {
-        ...ordersQuery,
-        ...nextNumber,
-        ...createMutation,
-        ...updateMutation,
-        ...cancelMutation,
     };
 }

@@ -115,7 +115,7 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
  * ohne Layout und ohne Auth. TanStack Router splittet sie als eigenen Chunk,
  * der im Produktivbetrieb nie geladen wird.
  */
-export function ComponentMatrix() {
+export default function ComponentMatrix() {
     const [checked, setChecked] = useState(true);
     const [controlledOpen, setControlledOpen] = useState(false);
     const [sort, setSort] = useState("name_asc");

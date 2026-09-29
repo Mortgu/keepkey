@@ -1,15 +1,16 @@
 import { useState } from "react";
 import { useForm } from "@tanstack/react-form";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { KeyRound, Loader, Pencil, Trash2 } from "lucide-react";
-import { toast } from "react-toastify";
+import { KeyRound, Pencil, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { getAuthenticatorName } from "@better-auth/passkey";
 import { useTranslation } from "react-i18next";
 import type { Passkey } from "@better-auth/passkey";
 
-import { Button, FieldInput, Input } from "@/components";
+import { Button, FieldInput, Input, ListSkeleton, Skeleton, showToast } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
+import { getErrorMessage } from "@/lib/errors";
+import { userKeys } from "@/hooks";
 
 const passkeyNameSchema = z.object({
     name: z.string().min(1, "Pflichtfeld"),
@@ -21,7 +22,7 @@ export default function PasskeyForm() {
     const [editingId, setEditingId] = useState<string | null>(null);
 
     const { data: passkeys = [], isLoading } = useQuery({
-        queryKey: ["passkeys"],
+        queryKey: userKeys.passkeys(),
         queryFn: async () => {
             const { data, error } = await authClient.passkey.listUserPasskeys();
             if (error) {
@@ -43,12 +44,12 @@ export default function PasskeyForm() {
             setAdding(false);
 
             if (error) {
-                toast.error(error.message ?? "Passkey konnte nicht hinzugefügt werden");
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
-            toast.success("Passkey hinzugefügt");
+            await queryClient.invalidateQueries({ queryKey: userKeys.passkeys() });
+            showToast.success("settings.toast.passkeyAdded");
             formApi.reset();
         },
     });
@@ -62,22 +63,22 @@ export default function PasskeyForm() {
     const handleDelete = async (id: string) => {
         const { error } = await authClient.passkey.deletePasskey({ id });
         if (error) {
-            toast.error(error.message ?? "Passkey konnte nicht gelöscht werden");
+            showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
             return;
         }
-        await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
-        toast.success("Passkey entfernt");
+        await queryClient.invalidateQueries({ queryKey: userKeys.passkeys() });
+        showToast.success("settings.toast.passkeyRemoved");
     };
 
     const handleRename = async (id: string, name: string) => {
         const { error } = await authClient.passkey.updatePasskey({ id, name });
         if (error) {
-            toast.error(error.message ?? "Passkey konnte nicht umbenannt werden");
+            showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
             return;
         }
-        await queryClient.invalidateQueries({ queryKey: ["passkeys"] });
+        await queryClient.invalidateQueries({ queryKey: userKeys.passkeys() });
         setEditingId(null);
-        toast.success("Passkey umbenannt");
+        showToast.success("settings.toast.passkeyRenamed");
     };
 
     return (
@@ -106,12 +107,9 @@ export default function PasskeyForm() {
 
             <div className="grid gap-2">
                 {isLoading ? (
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                        <Loader className="animate-spin" size={15} />
-                        Laden…
-                    </div>
+                    <ListSkeleton rows={2} skeleton={<Skeleton shape="text" className="h-8" />} />
                 ) : passkeys.length === 0 ? (
-                    <p className="text-sm text-gray-400">Noch keine Passkeys registriert.</p>
+                    <p className="text-sm text-(--fg-3)">Noch keine Passkeys registriert.</p>
                 ) : (
                     <ul className="grid gap-2">
                         {passkeys.map((passkey: Passkey) => (
@@ -186,7 +184,7 @@ function PasskeyRow({ passkey, editing, onStartEdit, onCancelEdit, onRename, onD
     return (
         <li className="flex items-center justify-between border border-(--border) rounded-md px-3 py-2">
             <div className="flex items-center gap-2 min-w-0">
-                <KeyRound size={15} className="text-gray-400 shrink-0" />
+                <KeyRound size={15} className="text-(--fg-3) shrink-0" />
                 <span className="text-sm truncate">{label}</span>
             </div>
             <div className="flex items-center gap-2">

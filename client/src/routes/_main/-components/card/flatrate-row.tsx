@@ -1,7 +1,7 @@
 import type { OfferFlatrate, OrderFlatRate } from "@keepit/schemas";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 type Props = {
     flatrate: OfferFlatrate | OrderFlatRate;

@@ -5,7 +5,7 @@ import { useOfferModalContext } from "../offer-modal-context";
 import DiscountForm from "./discount-form";
 import DiscountItem from "./discount-item";
 import { Button } from "@/components";
-import useDiscountsOfferModal from "@/routes/_main/offers/-hooks/use-discounts.offer-modal";
+import useDiscountsOfferModal from "@/routes/_main/offers/-hooks/use-offer-modal-discounts";
 
 export default function DiscountSection() {
     const { t } = useTranslation();

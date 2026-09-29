@@ -20,7 +20,7 @@ import { NavGroup, NavLink } from "./nav-link";
 import { NavSearch } from "./nav-search";
 import { NavUserMenu } from "./nav-user-menu";
 import type { ReactNode } from "react";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/context/auth";
 import { DEFAULT_LANGUAGE_OPTIONS, SegmentedLanguageToggle, } from "@/components";
 
 const ICON_SIZE = 14;
@@ -85,7 +85,7 @@ function LanguageFooter() {
     );
 }
 
-export function Navigation() {
+export default function Navigation() {
     const { t } = useTranslation();
     const { user } = useAuth();
 

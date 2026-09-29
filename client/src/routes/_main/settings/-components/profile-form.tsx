@@ -1,13 +1,14 @@
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
-import { Button, FieldInput } from "@/components";
-import { useAuth } from "@/context/auth-context";
+import { Button, FieldInput, showToast } from "@/components";
+import { useAuth } from "@/context/auth";
 import { authClient } from "@/lib/auth-client.ts";
+import { getErrorMessage } from "@/lib/errors";
+import { userKeys } from "@/hooks";
 
 const profileSchema = z.object({
     salutation: z.string().min(1, "Pflichtfeld"),
@@ -41,12 +42,12 @@ export default function ProfileForm() {
             });
 
             if (error) {
-                toast.error(error.message);
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["session"] });
-            toast.success("Profil gespeichert");
+            await queryClient.invalidateQueries({ queryKey: userKeys.session() });
+            showToast.success("settings.toast.profileSaved");
         },
     });
 

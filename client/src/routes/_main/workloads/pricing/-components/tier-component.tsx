@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NumberField } from "@/components";
-import { useUpdateStandardTier } from "@/hooks/tariffs/tariff-mutations";
+import { useUpdateStandardTier } from "@/hooks";
 
 interface Props {
     tierId: string;

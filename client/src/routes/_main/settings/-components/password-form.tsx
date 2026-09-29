@@ -1,11 +1,11 @@
 import { useForm } from "@tanstack/react-form";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
-import { Button, FieldInput } from "@/components";
+import { Button, FieldInput, showToast } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
+import { getErrorMessage } from "@/lib/errors";
 
 const passwordSchema = z.object({
     currentPassword: z.string().min(1, "Pflichtfeld"),
@@ -35,11 +35,11 @@ export default function PasswordForm() {
             });
 
             if (error) {
-                toast.error(error.message);
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
                 return;
             }
 
-            toast.success("Passwort geändert");
+            showToast.success("settings.toast.passwordChanged");
             formApi.reset();
         },
     });

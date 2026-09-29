@@ -1,6 +1,6 @@
 import { queryOptions } from "@tanstack/react-query";
 import { getOfferRevisions, getOffers } from "./offer-api";
-import { offerKeys } from "./offers-keys";
+import { offerKeys } from "./offer-keys";
 import type { OfferFilterParams } from "@keepit/schemas";
 
 export const offerQueries = {

@@ -2,8 +2,7 @@ import { Pen, Trash } from "lucide-react";
 
 import type { Contract } from "@keepit/schemas";
 import { Button } from "@/components";
-import { useLocale } from "@/hooks";
-import { useDeleteContract } from "@/hooks/contracts/contract-mutations";
+import { useDeleteContract, useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 

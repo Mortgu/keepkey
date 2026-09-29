@@ -1,11 +1,28 @@
-import { useQuery } from "@tanstack/react-query";
+import { createContext, useContext } from "react";
 import { Loader } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
-import { AuthContext } from "./auth-context.ts";
 import type { ReactNode } from "react";
+import type { User } from "@keepit/schemas";
 import { authClient } from "@/lib/auth-client.ts";
-import { getSessionUser } from "@/hooks/users/user-api";
-import { userKeys } from "@/hooks/users/user-keys";
+import { useSessionUser } from "@/hooks";
+
+type AuthContextType = {
+    user: User | null | undefined;
+    isLoading: boolean;
+    refetch: () => void;
+    logout: () => void;
+};
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const AuthContext = createContext<AuthContextType>({
+    user: null,
+    isLoading: false,
+    refetch: () => { },
+    logout: () => { },
+});
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => useContext(AuthContext);
 
 interface Props {
     children: ReactNode;
@@ -14,11 +31,7 @@ interface Props {
 export function AuthProvider({ children }: Props) {
     const navigate = useNavigate();
 
-    const { data: user = null, isLoading, refetch } = useQuery({
-        queryKey: userKeys.session(),
-        queryFn: getSessionUser,
-        retry: false,
-    });
+    const { user = null, isLoading, refetch } = useSessionUser();
 
     const logout = async () => {
         await authClient.signOut();

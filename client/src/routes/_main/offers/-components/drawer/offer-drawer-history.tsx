@@ -1,10 +1,8 @@
-import { useQuery } from "@tanstack/react-query";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import type { Offer, OfferRevision } from "@keepit/schemas";
 import { Button, Drawer, RouteError, Skeleton, showToast } from "@/components";
-import { useRestoreOfferRevision } from "@/hooks/offers/offer-mutations";
-import { offerQueries } from "@/hooks/offers/offer-queries";
+import { useOfferRevisions, useRestoreOfferRevision } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 
@@ -16,10 +14,7 @@ type Props = {
 
 export default function OfferDrawerHistory({ open, onClose, offer }: Props) {
     const { t } = useTranslation();
-    const { data: revisions = [], isPending, error } = useQuery({
-        ...offerQueries.revisions(offer.id),
-        enabled: open,
-    });
+    const { revisions = [], isPending, error } = useOfferRevisions(offer.id, { enabled: open });
     const {
         restoreOfferRevision,
         isRestoringRevision,

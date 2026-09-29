@@ -2,8 +2,8 @@ import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
 import { OFFER_MODAL_POLICIES } from "../-components/modals/offer-modal-policy";
 import { offerModalSchema } from "../-schemas/offer-modal-schema";
-import useOfferModal from "./use-offer.offer-modal";
-import usePricingStatus from "./use-pricing-status.offer-modal";
+import useOfferModalDefaults from "./use-offer-modal-defaults";
+import usePricingStatus from "./use-offer-modal-pricing-status";
 import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "../-components/modals/offer-modal-policy";
 import type { OfferModalValues } from "../-schemas/offer-modal-schema";
@@ -68,7 +68,7 @@ function toExtendInput(values: OfferModalValues): ExtendOfferInput {
 export default function useOfferModalForm({ mode, sourceOffer, onClose, preselectedCustomerId }: Props) {
     const policy = OFFER_MODAL_POLICIES[mode];
 
-    const { defaultValues } = useOfferModal({ currentOffer: sourceOffer, preselectedCustomerId });
+    const { defaultValues } = useOfferModalDefaults({ currentOffer: sourceOffer, preselectedCustomerId });
     const { createOffer, updateOffer } = useOfferManager();
     const { renewOffer } = useRenewOffer();
     const { extendOffer } = useExtendOffer();

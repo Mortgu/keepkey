@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createFlatRate, deleteFlatRate, updateFlatRate } from "./flatrate-api";
 import { flatRateKeys } from "./flatrate-keys";
-import { useFlatRates } from "./flatrate-hooks";
 
 import type {
     CreateFlatrateInput,
@@ -51,19 +50,5 @@ export function useDeleteFlatRate() {
         deleteFlatRate: mutation.mutateAsync,
         isDeletingFlatRate: mutation.isPending,
         errorDeletingFlatRate: mutation.error,
-    };
-}
-
-export function useFlatRateManager() {
-    const flatRatesQuery = useFlatRates();
-    const createMutation = useCreateFlatRate();
-    const updateMutation = useUpdateFlatRate();
-    const deleteMutation = useDeleteFlatRate();
-
-    return {
-        ...flatRatesQuery,
-        ...createMutation,
-        ...updateMutation,
-        ...deleteMutation,
     };
 }

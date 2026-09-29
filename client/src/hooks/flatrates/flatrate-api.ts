@@ -12,9 +12,6 @@ import { formatQueryString } from "@/lib/utils";
 export const getFlatRates = (filters: FlatrateFilterParams = {}) =>
     api<Array<Flatrate>>(`/api/flatrates?${formatQueryString(filters)}`, { method: "GET" });
 
-export const getFlatrate = (id: string) =>
-    api<Flatrate>(`/api/flatrates/${id}`, { method: 'GET' });
-
 export const createFlatRate = (flatRate: CreateFlatrateInput) =>
     api<Flatrate>("/api/flatrates", {
         method: "POST",

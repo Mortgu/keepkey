@@ -4,8 +4,9 @@ import LanguageDetector from "i18next-browser-languagedetector";
 
 import commonEN from '../locales/en/common.json';
 import contractsEN from '../locales/en/contracts.json';
-import customerEN from '../locales/en/customer.json';
+import customersEN from '../locales/en/customers.json';
 import dashboardEN from '../locales/en/dashboard.json';
+import documentsEN from '../locales/en/documents.json';
 import employeesEN from '../locales/en/employees.json';
 import errorsEN from '../locales/en/errors.json';
 import flatratesEN from '../locales/en/flatrates.json';
@@ -17,13 +18,14 @@ import searchEN from '../locales/en/search.json';
 import settingsEN from '../locales/en/settings.json';
 import suppliersEN from '../locales/en/suppliers.json';
 import templatesEN from '../locales/en/templates.json';
-import versionHistoryEN from '../locales/en/versionHistory.json';
+import versionHistoryEN from '../locales/en/version-history.json';
 import workloadsEN from '../locales/en/workloads.json';
 
 import commonDE from '../locales/de/common.json';
 import contractsDE from '../locales/de/contracts.json';
-import customerDE from '../locales/de/customer.json';
+import customersDE from '../locales/de/customers.json';
 import dashboardDE from '../locales/de/dashboard.json';
+import documentsDE from '../locales/de/documents.json';
 import employeesDE from '../locales/de/employees.json';
 import errorsDE from '../locales/de/errors.json';
 import flatratesDE from '../locales/de/flatrates.json';
@@ -35,7 +37,7 @@ import searchDE from '../locales/de/search.json';
 import settingsDE from '../locales/de/settings.json';
 import suppliersDE from '../locales/de/suppliers.json';
 import templatesDE from '../locales/de/templates.json';
-import versionHistoryDE from '../locales/de/versionHistory.json';
+import versionHistoryDE from '../locales/de/version-history.json';
 import workloadsDE from '../locales/de/workloads.json';
 
 /*
@@ -56,8 +58,9 @@ const en = {
     translation: {
         ...commonEN,
         ...contractsEN,
-        ...customerEN,
+        ...customersEN,
         ...dashboardEN,
+        ...documentsEN,
         ...employeesEN,
         ...flatratesEN,
         ...invoicesEN,
@@ -79,8 +82,9 @@ const de = {
     translation: {
         ...commonDE,
         ...contractsDE,
-        ...customerDE,
+        ...customersDE,
         ...dashboardDE,
+        ...documentsDE,
         ...employeesDE,
         ...flatratesDE,
         ...invoicesDE,

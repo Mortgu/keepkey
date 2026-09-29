@@ -1,7 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import { loginSchema } from "@keepit/schemas";
-import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export default function useLoginForm() {
     const [error, setError] = useState<string | undefined>(undefined);
@@ -17,12 +17,12 @@ export default function useLoginForm() {
             onChange: loginSchema,
         },
         onSubmit: async ({ value }) => {
-            const { data, error } = await authClient.signIn.email({
+            const { data, error: signInError } = await authClient.signIn.email({
                 ...value, rememberMe,
             });
 
-            if (error) {
-                setError(error.message);
+            if (signInError) {
+                setError(signInError.message);
                 return null;
             }
 
@@ -42,7 +42,7 @@ export default function useLoginForm() {
         setPasskeyLoading(true);
         setError(undefined);
 
-        const { data, error } = await authClient.signIn.passkey({
+        const { error: passkeyError } = await authClient.signIn.passkey({
             fetchOptions: {
                 onSuccess: () => {
                     setPasskeyLoading(false);
@@ -55,8 +55,8 @@ export default function useLoginForm() {
             }
         });
 
-        if (error) {
-            setError(error.message ?? 'Passkey sign in failed!');
+        if (passkeyError) {
+            setError(passkeyError.message ?? 'Passkey sign in failed!');
         }
 
         setError(undefined);

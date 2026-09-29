@@ -3,7 +3,11 @@
         "create": "Workload erstellen",
         "search": "Workloads durchsuchen...",
         "pricing": {
-            "create": "Preistabelle erstellen"
+            "create": "Preistabelle erstellen",
+            "toast": {
+                "restored": "Preistabelle wiederhergestellt.",
+                "versionSealed": "Version {{version}} gespeichert."
+            }
         }
     }
 }

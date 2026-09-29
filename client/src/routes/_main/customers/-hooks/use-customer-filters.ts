@@ -1,6 +1,5 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { useCustomers } from "@/hooks";
 
 const sortOptions = [
     { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
@@ -9,9 +8,9 @@ const sortOptions = [
     { value: "companyName:desc", label: "Name Z–A" },
 ];
 
-export function useCustomerFilters() {
+export default function useCustomerFilters() {
     const urlSearch = useSearch({ strict: false });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [countryFilter, setCountryFilter] = useState<Array<string>>([]);
@@ -53,19 +52,3 @@ export function useCustomerFilters() {
 }
 
 export type CustomerFilters = ReturnType<typeof useCustomerFilters>;
-
-export function useCustomerPage() {
-    const filters = useCustomerFilters();
-    const { customers, isPending, error } = useCustomers(filters.params);
-
-    const filteredCustomers = useMemo(
-        () => customers.filter((c) => {
-            if (filters.countryFilter.length > 0 && !filters.countryFilter.includes(c.country)) return false;
-            if (filters.languageFilter.length > 0 && !filters.languageFilter.includes(c.language)) return false;
-            return true;
-        }),
-        [customers, filters.countryFilter, filters.languageFilter]
-    );
-
-    return { filters, isPending, error, customers: filteredCustomers };
-}

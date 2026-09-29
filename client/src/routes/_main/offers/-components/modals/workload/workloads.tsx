@@ -6,13 +6,11 @@ import { useOfferModalContext } from "../offer-modal-context";
 import WorkloadForm from "./workload-form";
 import WorkloadItem from "./workload-item";
 import { Button, Checkbox, MultiSelectList } from "@/components";
-import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
-import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
-import { useLocale } from "@/hooks";
+import useOfferModalDefaults from "@/routes/_main/offers/-hooks/use-offer-modal-defaults";
+import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-offer-modal-workloads";
 
 export default function WorkloadSection() {
     const { t } = useTranslation();
-    const locale = useLocale();
 
     const { form, policy, sourceOffer, header } = useOfferModalContext();
 
@@ -22,7 +20,7 @@ export default function WorkloadSection() {
     const toCompare = useStore(form.store, (s) => s.values.toCompare);
     const setToCompare = (vals: Array<string>) => form.setFieldValue("toCompare", vals);
 
-    const { compareOptions } = useOfferModal({ currentOffer: sourceOffer });
+    const { compareOptions } = useOfferModalDefaults({ currentOffer: sourceOffer });
 
     const {
         offerPositions,

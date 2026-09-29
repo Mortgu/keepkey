@@ -3,8 +3,7 @@ import OfferCard from "./card/offer-card";
 import type { OfferFilters } from "../-hooks/use-offer-filters";
 
 import { FilterChip, ListSkeleton, OfferCardSkeleton, RouteError } from "@/components";
-import { useContacts, useCustomers, useLocale, useProducts } from "@/hooks";
-import { useOffers } from "@/hooks/offers/offer-hooks";
+import { useContacts, useCustomers, useLocale, useOffers, useProducts } from "@/hooks";
 
 interface Props {
   filters: OfferFilters;

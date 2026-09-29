@@ -10,10 +10,6 @@ export function getFormError(errors: Array<unknown>): string | undefined {
     return (errors[0] as { message?: string } | undefined)?.message;
 }
 
-export function formatBytesToMB(bytes: number): string {
-    return `${(bytes / 1_048_576).toFixed(1)} MB`;
-}
-
 export function formatBytesToKB(bytes: number): string {
     return `${(bytes / 1024).toFixed(1)} KB`;
 }
@@ -23,9 +19,11 @@ export function formatQueryString(obj: object): string {
 
     for (const [key, value] of Object.entries(obj)) {
         if (value !== undefined && value !== null) {
-            Array.isArray(value) ?
-                value.forEach(v => params.append(key, v)) :
+            if (Array.isArray(value)) {
+                value.forEach(v => params.append(key, v));
+            } else {
                 params.append(key, String(value));
+            }
         }
     }
     return params.toString();

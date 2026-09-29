@@ -19,7 +19,7 @@ import {
 } from "@/components";
 import {
   useContractManager
-} from "@/hooks/contracts/contract-mutations";
+} from "@/hooks";
 
 
 interface ContractModalProps {

@@ -3,17 +3,18 @@ import { useTranslation } from "react-i18next";
 import { Check, Download, Pencil, Plus, Trash, Type } from "lucide-react";
 import {
     DOCUMENT_TEMPLATE_KINDS,
-    groupTemplatesBySlot,
-    type DocumentTemplate,
-    type DocumentTemplateKind,
-    type DocumentTemplateSlot,
+    
+    
+    
+    groupTemplatesBySlot
 } from "@keepit/schemas";
 import SectionCard from "./section-card";
+import type {DocumentTemplate, DocumentTemplateKind, DocumentTemplateSlot} from "@keepit/schemas";
 import {
     Button,
+    Dialog,
     DocumentDocxEditor,
     DocumentRenameModal,
-    Dialog,
     ListSkeleton,
     RouteError,
     Skeleton,
@@ -54,7 +55,7 @@ export default function TemplateList() {
         );
     }
 
-    const slots = groupTemplatesBySlot(templates ?? []);
+    const slots = groupTemplatesBySlot(templates);
 
     const openUpload = (kind: DocumentTemplateKind, language: DocumentTemplateSlot["language"]) => {
         pendingUpload.current = { kind, language };

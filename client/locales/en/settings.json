@@ -1,6 +1,14 @@
 {
   "settings": {
     "account": "Account",
-    "security": "Security"
+    "security": "Security",
+    "toast": {
+      "emailChanged": "Email address changed",
+      "profileSaved": "Profile saved",
+      "passwordChanged": "Password changed",
+      "passkeyAdded": "Passkey added",
+      "passkeyRemoved": "Passkey removed",
+      "passkeyRenamed": "Passkey renamed"
+    }
   }
 }

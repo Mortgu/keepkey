@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 import type { CreateOfferDiscountInput } from "@keepit/schemas";
 import { Button, Input, Textarea } from "@/components";
-import { eurToCents } from "@/utils/utils";
+import { eurToCents } from "@/lib/money";
 
 interface Props {
     currentDiscount?: CreateOfferDiscountInput;

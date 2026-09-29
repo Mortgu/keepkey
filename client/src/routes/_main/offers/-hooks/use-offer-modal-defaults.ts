@@ -10,7 +10,7 @@ interface Props {
     preselectedCustomerId?: string;
 }
 
-export default function useOfferModal({ currentOffer, preselectedCustomerId }: Props) {
+export default function useOfferModalDefaults({ currentOffer, preselectedCustomerId }: Props) {
     const locale = useLocale();
 
     const { customers } = useCustomers();

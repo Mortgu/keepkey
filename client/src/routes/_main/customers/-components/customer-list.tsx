@@ -1,12 +1,12 @@
 import { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import OfferModal from "../../offers/-components/modals/offer-modal";
-import OrderModal from "../../orders/-components/order-select-modal";
-import { useCustomerActions } from "../-hooks/use-customer-actions";
+import useCustomerActions from "../-hooks/use-customer-actions";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";
 import type { Customer } from "@keepit/schemas";
-import type { CustomerFilters } from "../-page.hooks";
+import type { CustomerFilters } from "../-hooks/use-customer-filters";
+import OrderModal from "@/routes/_main/orders/-components/order-select-modal";
+import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
 import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 

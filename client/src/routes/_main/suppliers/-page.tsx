@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
+import { LoaderCircle } from "lucide-react";
+import { error } from "better-auth/api";
 import SupplierModal from "./-components/supplier-modal";
 import useSupplierFilters from "./-hooks/use-supplier-filters";
+import SupplierListItem from "./-components/supplier-list-item";
 import type { Supplier } from "@keepit/schemas";
 import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/components";
 import { useModal, useSuppliers } from "@/hooks";
-import SupplierListItem from "./-components/supplier-list-item";
-import { LoaderCircle } from "lucide-react";
-import { error } from "better-auth/api";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
@@ -57,7 +57,7 @@ export default function SupplierPage() {
                     <SupplierListItem
                         key={supplier.id}
                         supplier={supplier}
-                        onEdit={(supplier) => modal.open(supplier)}
+                        onEdit={modal.open}
                     />
                 ))}
             </div>

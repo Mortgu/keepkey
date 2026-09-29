@@ -2,7 +2,7 @@ import type { Contract, OfferPosition, OrderPosition } from "@keepit/schemas";
 import { Badge } from "@/components";
 import { useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 type Props = {
     position: OfferPosition | OrderPosition;

@@ -29,7 +29,7 @@ export const CONTROL_TEXT = {
 } as const satisfies Record<ComponentSize, string>;
 
 /** Horizontales Padding für Aktionsflächen — großzügiger als bei Feldern. */
-export const ACTION_PADDING = {
+const ACTION_PADDING = {
     xs: "px-3.5",
     sm: "px-4",
     md: "px-4.5",
@@ -122,7 +122,7 @@ export const FIELD_FOCUS_WITHIN =
 export const ACTION_FOCUS =
     "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary)";
 
-export type FieldState = "none" | "error" | "warning";
+type FieldState = "none" | "error" | "warning";
 
 /** Rahmen + Fokusring je Feldzustand. */
 export const FIELD_STATE = {

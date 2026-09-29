@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSupplier, deleteSupplier, updateSupplier } from "./supplier-api";
 import { supplierKeys } from "./supplier-keys";
-import { useSuppliers } from "./supplier-hooks";
 import type { CreateSupplierInput, UpdateSupplierInput } from "@keepit/schemas";
 
 export function useCreateSupplier() {
@@ -47,19 +46,5 @@ export function useDeleteSupplier() {
         deleteSupplier: mutation.mutate,
         isDeletingSupplier: mutation.isPending,
         errorDeletingSupplier: mutation.error,
-    };
-}
-
-export function useSupplierManager() {
-    const suppliersQuery = useSuppliers();
-    const createMutation = useCreateSupplier();
-    const updateMutation = useUpdateSupplier();
-    const deleteMutation = useDeleteSupplier();
-
-    return {
-        ...suppliersQuery,
-        ...createMutation,
-        ...updateMutation,
-        ...deleteMutation,
     };
 }

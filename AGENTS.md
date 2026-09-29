@@ -42,6 +42,6 @@ grep -rnoE "#[0-9A-Fa-f]{3,8}\b" client/src/components
 - Server error codes from `AppException.code` are mapped via `errors.json` — use `t("ERROR_CODE")` on the client to display user-facing messages.
 
 ### QueryClient
-- `QueryClient` defaults live in `__root.tsx`: `staleTime: 30_000`, `gcTime: 5*60_000`, `retry: 1`, `refetchOnWindowFocus: false`, and a global `mutations.onError` safety net.
-- Manage query keys via `*Keys` factories (see `client/src/hooks/offers/offers-keys.ts` as the reference pattern). Do NOT use raw string-literal keys like `["offers"]`.
+- `QueryClient` defaults live in `main.tsx`: `staleTime: 30_000`, `gcTime: 5*60_000`, `retry: 1`, `refetchOnWindowFocus: false`, and a global `mutations.onError` safety net.
+- Manage query keys via `*Keys` factories (see `client/src/hooks/offers/offer-keys.ts` as the reference pattern). Do NOT use raw string-literal keys like `["offers"]`.
 

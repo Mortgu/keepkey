@@ -1,14 +1,13 @@
 import { t } from "i18next";
 import { LoaderCircle } from "lucide-react";
-import { toast } from "react-toastify";
 import { useEffect, useMemo } from "react";
 import PricingTable from "./-components/pricing-table";
 import StandardDurations from "./-components/standard-durations";
 import StandardTiers from "./-components/standard-tiers";
 import TariffGroupModal from "./-components/tariff-group-modal";
-import { useModal, useProducts, useTariffGroups } from "@/hooks";
-import { useCreateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
-import { Breadcrumbs, Button } from "@/components";
+import { useCreateTariffGroup, useModal, useProducts, useTariffGroups } from "@/hooks";
+import { Breadcrumbs, Button, showToast } from "@/components";
+import { getErrorMessage } from "@/lib/errors";
 
 export default function PricingPage() {
     const { groups, isPending, error } = useTariffGroups();
@@ -18,7 +17,7 @@ export default function PricingPage() {
 
     useEffect(() => {
         if (error) {
-            toast.error(error.message);
+            showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
         }
     }, [error]);
 

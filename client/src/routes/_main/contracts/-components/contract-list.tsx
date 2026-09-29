@@ -1,8 +1,8 @@
+import { LoaderCircle } from "lucide-react";
 import ContractListItem from "./contract-item";
 
-import { useContracts } from "@/hooks/contracts/contract-hooks";
 import type { Contract } from "@keepit/schemas";
-import { LoaderCircle } from "lucide-react";
+import { useContracts } from "@/hooks";
 
 interface Props {
     onEdit: (contract: Contract) => void;
@@ -26,7 +26,7 @@ export default function ContractList({ onEdit }: Props) {
                 </div>
             )}
 
-            {contracts.map((contract, _) => (
+            {contracts.map((contract) => (
                 <ContractListItem
                     key={contract.id}
                     contract={contract}

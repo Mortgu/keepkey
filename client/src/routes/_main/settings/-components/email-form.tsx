@@ -1,13 +1,14 @@
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
-import { Button, FieldInput, Input } from "@/components";
-import { useAuth } from "@/context/auth-context";
+import { Button, FieldInput, Input, showToast } from "@/components";
+import { useAuth } from "@/context/auth";
 import { authClient } from "@/lib/auth-client.ts";
+import { getErrorMessage } from "@/lib/errors";
+import { userKeys } from "@/hooks";
 
 const emailSchema = z.object({
     newEmail: z.email("Ungültige E-Mail!"),
@@ -31,12 +32,12 @@ export default function EmailForm() {
             });
 
             if (error) {
-                toast.error(error.message);
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["session"] });
-            toast.success("E-Mail-Adresse geändert");
+            await queryClient.invalidateQueries({ queryKey: userKeys.session() });
+            showToast.success("settings.toast.emailChanged");
             formApi.reset();
         },
     });

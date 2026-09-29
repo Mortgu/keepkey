@@ -5,7 +5,7 @@ import useOrderFilters from "./-hooks/use-order-filters";
 import { Breadcrumbs, Button, SearchBar, SortDropdown } from "@/components";
 import { useModal } from "@/hooks";
 
-export function OrderPage() {
+export default function OrderPage() {
     const { t } = useTranslation();
 
     const modal = useModal();

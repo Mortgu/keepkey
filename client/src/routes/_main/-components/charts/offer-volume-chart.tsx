@@ -4,7 +4,7 @@ import ChartCard from "./chart-card";
 import { monthLabel } from "./month-label";
 import type { DashboardMonth } from "@keepit/schemas";
 import { useLocale } from "@/hooks";
-import { centsToEur, formatEur } from "@/utils/utils";
+import { centsToEur, formatEur } from "@/lib/money";
 
 interface Props {
     months: Array<DashboardMonth>;

@@ -8,6 +8,14 @@ export function getErrorMessage(error: unknown): string {
         return i18n.t(`errors.${error.code}`);
     }
 
+    // better-auth & TanStack Query geben teils plain objects mit `message` zurück.
+    if (typeof error === "object" && error !== null && "message" in error) {
+        const { message } = error as { message?: unknown };
+        if (typeof message === "string" && message.length > 0) {
+            return message;
+        }
+    }
+
     if (error instanceof Error && error.message) {
         return error.message;
     }

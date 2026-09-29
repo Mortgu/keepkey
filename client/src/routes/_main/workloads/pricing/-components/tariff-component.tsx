@@ -3,8 +3,7 @@ import { Trash } from "lucide-react";
 import TariffCellComponent from "./cell-component";
 import TariffTierComponent from "./tier-component";
 import type { TariffBase } from "@keepit/schemas";
-import { useDeleteTariffCell } from "@/hooks/tariffs/tariff-mutations";
-import { useStandardDurations, useStandardTiers } from "@/hooks";
+import { useDeleteTariffCell, useStandardDurations, useStandardTiers } from "@/hooks";
 import { Button } from "@/components";
 
 type Props = {

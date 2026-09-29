@@ -6,7 +6,7 @@ import useOfferFilters from "./-hooks/use-offer-filters";
 import { Breadcrumbs, Button } from "@/components";
 import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
 
-export function OfferPage() {
+export default function OfferPage() {
     const { t } = useTranslation();
     const modal = useModal();
 

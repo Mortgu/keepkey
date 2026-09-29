@@ -1,15 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { getIntegrationStatus } from "./integration-api";
-import { integrationKeys } from "./integration-keys";
-import type { IntegrationStatusResponse } from "@keepit/schemas";
+import { integrationQueries } from "./integration-queries";
 
 export function useIntegrationStatus() {
-    const query = useQuery<IntegrationStatusResponse>({
-        queryKey: integrationKeys.status(),
-        queryFn: getIntegrationStatus,
-        staleTime: 30_000,
-        refetchOnWindowFocus: false,
-    });
+    const query = useQuery(integrationQueries.status());
 
     return {
         data: query.data,

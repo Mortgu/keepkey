@@ -1,6 +1,7 @@
 import React from "react";
 import { Outlet } from "@tanstack/react-router";
-import { Navigation, ToastContainer } from "@/components";
+import Navigation from "./-components/navigation";
+import { ToastContainer } from "@/components";
 
 export function MainLayoutComponent() {
     return (

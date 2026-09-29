@@ -1,5 +1,5 @@
 import type { OfferDiscount } from "@keepit/schemas";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 type Props = {
     discount: OfferDiscount;

@@ -1,14 +1,13 @@
 import { BookmarkPlus, ChevronDown, UndoDot } from "lucide-react";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 import TariffComponent from "./tariff-component";
 import { TariffVersionList } from "./tariff-version-list";
 import type { TariffBase } from "@keepit/schemas";
-import { Button, Drawer } from "@/components";
-import { useLocale } from "@/hooks";
+import { Button, Drawer, showToast } from "@/components";
+import { useLocale, useSealTariffVersion } from "@/hooks";
 import { formatDate } from "@/lib/format";
+import { getErrorMessage } from "@/lib/errors";
 import { localized } from "@/lib/i18n-content";
-import { useSealTariffVersion } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
     tariff: TariffBase;
@@ -26,13 +25,13 @@ export default function PricingTableItem({ tariff }: Props) {
 
     useEffect(() => {
         if (errorSealingVersion) {
-            toast.error(errorSealingVersion.message);
+            showToast.error("common.errorGeneric", { message: getErrorMessage(errorSealingVersion) });
         }
     }, [errorSealingVersion])
 
     const handleSeal = async () => {
         const version = await sealVersion({ groupId: tariff.tariffGroupId, tariffId: tariff.id });
-        toast.success(`Version ${version.version} gespeichert.`);
+        showToast.success("workloads.pricing.toast.versionSealed", { vars: { version: version.version } });
         setDrawerOpen(true);
     };
 

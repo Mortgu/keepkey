@@ -2,7 +2,7 @@ import { Menu } from "@base-ui/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { ChevronsUpDown, LogOut, Settings, UserCircle2 } from "lucide-react";
-import { useAuth } from "@/context/auth-context";
+import { useAuth } from "@/context/auth";
 
 /**
  * Der angemeldete Nutzer als Einstiegspunkt der Navigation.

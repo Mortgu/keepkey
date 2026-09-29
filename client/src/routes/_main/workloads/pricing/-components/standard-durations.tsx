@@ -1,8 +1,7 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { Button, NumberField, RouteError, Skeleton } from "@/components";
-import { useStandardDurations } from "@/hooks";
-import { useCreateStandardDuration, useDeleteStandardDuration } from "@/hooks/tariffs/tariff-mutations";
+import { useCreateStandardDuration, useDeleteStandardDuration, useStandardDurations } from "@/hooks";
 
 /**
  * Die Laufzeiten gelten für *alle* Preistabellen und stehen deshalb über den

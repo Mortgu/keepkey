@@ -1,12 +1,11 @@
 import { ChevronRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-toastify";
 import type { TariffVersion, TariffVersionReason } from "@keepit/schemas";
-import { Badge, Button } from "@/components";
-import { useTariffVersionsHook } from "@/hooks";
-import { useRestoreTariffVersion } from "@/hooks/tariffs/tariff-mutations";
+import { Badge, Button, ListSkeleton, Skeleton, showToast } from "@/components";
+import { useRestoreTariffVersion, useTariffVersionsHook } from "@/hooks";
+import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 type Props = {
     groupId: string;
@@ -29,15 +28,15 @@ export function TariffVersionList({ groupId, tariffId }: Props) {
     const handleRestore = async (versionId: string) => {
         try {
             await restoreVersion({ groupId, tariffId, versionId });
-            toast.success("Preistabelle wiederhergestellt.");
+            showToast.success("workloads.pricing.toast.restored");
             setConfirmingId(null);
         } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Wiederherstellen fehlgeschlagen.");
+            showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
         }
     };
 
-    if (isPending) return <p className="text-sm text-gray-500">Laden...</p>;
-    if (versions.length === 0) return <p className="text-sm text-gray-500">Keine Versionen vorhanden.</p>;
+    if (isPending) return <ListSkeleton rows={3} skeleton={<Skeleton shape="text" className="h-10" />} />;
+    if (versions.length === 0) return <p className="text-sm text-(--fg-3)">Keine Versionen vorhanden.</p>;
 
     return (
         <div className="grid gap-1">
@@ -86,15 +85,15 @@ function VersionRow({
                         <span className="font-medium">Version {version.version}</span>
                         {version.isCurrent && <Badge variant="GENERATED" size="xs">Aktuell</Badge>}
                         {version.usageCount > 0 && (
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-(--fg-3)">
                                 in {version.usageCount} {version.usageCount === 1 ? "Angebot" : "Angeboten"} verwendet
                             </span>
                         )}
                     </div>
 
                     <div className="flex flex-col items-end">
-                        <span className="text-sm text-gray-500">{formatDate(version.createdAt)}</span>
-                        <span className="text-xs text-gray-400">
+                        <span className="text-sm text-(--fg-3)">{formatDate(version.createdAt)}</span>
+                        <span className="text-xs text-(--fg-3)">
                             {REASON_LABELS[version.reason]}
                             {version.createdBy ? ` · ${version.createdBy.name}` : ""}
                         </span>

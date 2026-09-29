@@ -71,19 +71,7 @@ export function useDeleteCustomer() {
         deleteCustomer: mutation.mutateAsync,
         isDeletingCustomer: mutation.isPending,
         errorDeletingCustomer: mutation.error,
-    }
-}
-
-export function useCustomerManager() {
-    const createCustomerMutation = useCreateCustomer();
-    const updateCustomerMutation = useUpdateCustomer();
-    const deleteCustomerMutation = useDeleteCustomer();
-
-    return {
-        ...createCustomerMutation,
-        ...updateCustomerMutation,
-        ...deleteCustomerMutation,
-    }
+    };
 }
 
 export function useCreateCustomerContact() {
@@ -142,17 +130,5 @@ export function useDeleteCustomerContact() {
         deleteCustomerContact: mutation.mutateAsync,
         isDeletingCustomerContact: mutation.isPending,
         errorDeletingCustomerContact: mutation.error,
-    }
-}
-
-export function useCustomerContactHook() {
-    const createCustomerContactMutation = useCreateCustomerContact();
-    const updateCustomerContactMutation = useUpdateCustomerContact();
-    const deleteCustomerContactMutation = useDeleteCustomerContact();
-
-    return {
-        ...createCustomerContactMutation,
-        ...updateCustomerContactMutation,
-        ...deleteCustomerContactMutation,
     }
 }

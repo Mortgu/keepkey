@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createOffer, deleteOffer, extendOffer, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer } from "./offer-api";
 import { useOffers } from "./offer-hooks";
-import { offerKeys } from "./offers-keys";
+import { offerKeys } from "./offer-keys";
 
 import type {
     CreateOfferInput,

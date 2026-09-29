@@ -1,12 +1,13 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
+import { documentKeys } from "./document-keys";
 import type { QueryClient } from "@tanstack/react-query";
 import type {
     DocumentStatus, OffersPage,
     Order
 } from "@keepit/schemas";
 import { getTask } from "@/hooks/offers/offer-api";
-import { offerKeys } from "@/hooks/offers/offers-keys";
+import { offerKeys } from "@/hooks/offers/offer-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
 
 
@@ -17,7 +18,7 @@ function updateOfferDocumentStatus(
     error?: string,
 ) {
     queryClient.setQueriesData<OffersPage>({ queryKey: offerKeys.all }, (page) => {
-        if (!page || !page?.items?.length || !('offerDocuments' in page.items[0])) return page;
+        if (!page || !page.items.length || !('offerDocuments' in page.items[0])) return page;
         return {
             ...page, items: page.items.map((offer) => ({
                 ...offer,
@@ -52,7 +53,7 @@ export const useDocumentTask = (taskId?: string) => {
     const queryClient = useQueryClient();
 
     const { data: task } = useQuery({
-        queryKey: ["task", taskId],
+        queryKey: documentKeys.task(taskId ?? ""),
         queryFn: () => getTask(taskId!),
         refetchInterval: (query) => {
             if (query.state.data?.status === "COMPLETED") {

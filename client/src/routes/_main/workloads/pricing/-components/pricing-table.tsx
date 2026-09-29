@@ -1,15 +1,14 @@
 import { Pen, Plus, Trash } from "lucide-react";
 import { useEffect, useMemo } from "react";
-import { toast } from "react-toastify";
 import PricingTableItem from "./pricing-table-item";
 import AddContractsModal from "./add-contracts-modal";
 import EditProductsModal from "./edit-products-modal";
 import type { TariffGroup } from "@keepit/schemas";
-import { Button } from "@/components";
-import { useContracts, useLocale, useModal, useProducts } from "@/hooks";
+import { Button, showToast } from "@/components";
+import { useContracts, useCreateTariff, useDeleteTariffGroup, useLocale, useModal, useProducts, useUpdateTariffGroup } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatDate } from "@/lib/format";
-import { useCreateTariff, useDeleteTariffGroup, useUpdateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
+import { getErrorMessage } from "@/lib/errors";
 
 type Props = {
     group: TariffGroup;
@@ -28,19 +27,19 @@ export default function PricingTable({ group }: Props) {
 
     useEffect(() => {
         if (deleteTariffGroupError) {
-            toast.error(deleteTariffGroupError.message);
+            showToast.error("common.errorGeneric", { message: getErrorMessage(deleteTariffGroupError) });
         }
     }, [deleteTariffGroupError]);
 
     useEffect(() => {
         if (createTariffError) {
-            toast.error(createTariffError.message);
+            showToast.error("common.errorGeneric", { message: getErrorMessage(createTariffError) });
         }
     }, [createTariffError]);
 
     useEffect(() => {
         if (updateTariffGroupError) {
-            toast.error(updateTariffGroupError.message);
+            showToast.error("common.errorGeneric", { message: getErrorMessage(updateTariffGroupError) });
         }
     }, [updateTariffGroupError]);
 

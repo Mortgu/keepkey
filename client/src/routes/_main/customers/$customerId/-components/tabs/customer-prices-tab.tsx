@@ -1,10 +1,9 @@
 import { Trash } from "lucide-react";
 import type { Customer, CustomerPriceRow } from "@keepit/schemas";
 import { Button, RouteError, Skeleton } from "@/components";
-import { useCustomerPrices, useLocale } from "@/hooks";
-import { useDeleteCustomerPrice } from "@/hooks/pricing/pricing-mutations";
+import { useCustomerPrices, useDeleteCustomerPrice, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 interface Props {
     customer: Customer;

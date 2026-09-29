@@ -1,10 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchDocumentCapabilities } from "./document-api";
+import { documentKeys } from "./document-keys";
 import type { DocumentCapabilities, DocumentReplaceBlocker } from "@keepit/schemas";
-
-const documentCapabilityKeys = {
-    all: ["documents", "capabilities"] as const,
-};
 
 /**
  * Solange nichts geladen ist, gilt das Ersetzen als nicht möglich: Lieber ein
@@ -20,7 +17,7 @@ const UNKNOWN: DocumentCapabilities = { canReplaceFiles: false };
  */
 export function useDocumentCapabilities() {
     const { data, isPending } = useQuery({
-        queryKey: documentCapabilityKeys.all,
+        queryKey: documentKeys.capabilities(),
         queryFn: fetchDocumentCapabilities,
         staleTime: 5 * 60 * 1000,
     });

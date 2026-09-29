@@ -9,7 +9,7 @@ import type { OfferModalPositionValues } from "@/routes/_main/offers/-schemas/of
 import { Button } from "@/components";
 import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 interface Props {
     /** Stelle im Positionsarray — adressiert die Preismeldung zu dieser Zeile. */

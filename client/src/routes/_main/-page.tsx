@@ -1,11 +1,9 @@
-import { useTranslation } from "react-i18next";
 import OfferVolumeChart from "./-components/charts/offer-volume-chart";
 import IntegrationCard from "./-components/integration-card";
 import OffersOrdersChart from "./-components/charts/offers-orders-chart";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import type { IntegrationEntry } from "@keepit/schemas";
-import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
-import { useDashboardStats } from "@/hooks";
+import { useDashboardStats, useIntegrationStatus } from "@/hooks";
 import { Breadcrumbs, RouteError, Skeleton } from "@/components";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
@@ -16,7 +14,6 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 }
 
 export default function DashboardPage() {
-    const { t } = useTranslation();
     const { months, isPending: statsPending, error: statsError } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 

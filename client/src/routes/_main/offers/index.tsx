@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import { OfferPage } from "./-page";
+import OfferPage from "./-page";
 
 const offerSearchSchema = z.object({
     search: z.string().optional(),

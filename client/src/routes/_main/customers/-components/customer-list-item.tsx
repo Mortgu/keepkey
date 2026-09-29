@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Pen, Trash, User } from "lucide-react";
+import ContactsModal from "./contacts/contacts-modal";
+import type {SyntheticEvent} from "react";
 import type { Customer } from "@keepit/schemas";
-import { type SyntheticEvent } from "react";
 import { formatDate } from "@/lib/format";
 import { useDeleteCustomer, useModal } from "@/hooks";
 import { Button } from "@/components";
-import ContactsModal from "./contact/contacts-modal";
 
 interface Props {
     customer: Customer;
@@ -105,7 +105,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                 <ContactsModal
                     key={contactsModal.key}
                     customerId={customer.id}
-                    contacts={customer.contactPersons ?? []}
+                    contacts={customer.contactPersons}
                     onClose={contactsModal.close}
                 />
             )}

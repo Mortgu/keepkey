@@ -3,7 +3,11 @@
         "create": "Create workload",
         "search": "Search workloads...",
         "pricing": {
-            "create": "Create pricing table"
+            "create": "Create pricing table",
+            "toast": {
+                "restored": "Pricing table restored.",
+                "versionSealed": "Version {{version}} saved."
+            }
         }
     }
 }

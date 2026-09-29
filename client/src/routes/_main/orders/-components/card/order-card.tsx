@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OrderCreateModal from "../order-create-modal";
 import type { Order } from "@keepit/schemas";
-import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks/orders/order-mutations";
+import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 
 import { Accordion, Badge, Button } from "@/components";
@@ -10,7 +10,7 @@ import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 interface Props {
     order: Order;

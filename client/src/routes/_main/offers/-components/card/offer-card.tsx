@@ -11,10 +11,9 @@ import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { useModal } from "@/hooks";
+import { useDeleteOffer, useGenerateOfferDocument, useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 type OfferListItemProps = {
     offer: Offer;

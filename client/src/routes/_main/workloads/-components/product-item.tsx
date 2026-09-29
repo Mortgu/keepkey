@@ -1,6 +1,5 @@
 import { Pen, Trash } from "lucide-react";
 
-import { useTranslation } from "react-i18next";
 import ProductModal from "./product-modal";
 import type { Product } from "@keepit/schemas";
 import { Button } from "@/components";
@@ -13,7 +12,6 @@ interface Props {
 }
 
 export default function ProductItem({ product }: Props) {
-  const { t } = useTranslation();
   const { deleteProduct, isDeletingProduct } = useDeleteProduct();
   const { updateProduct } = useUpdateProduct();
   const modal = useModal<Product>();

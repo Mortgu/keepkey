@@ -2,16 +2,15 @@ import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
 import { Dot, Download, EllipsisVertical, ExternalLink, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
-import { toast } from "react-toastify";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import '@docx-editor.dev/core/styles/editor.css';
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import type { DocxEditorRef } from "@docx-editor.dev/react";
 import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
-import { Badge, Button, DocumentDocxEditor, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentRenameModal, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
+    documentKeys,
     useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
@@ -19,7 +18,8 @@ import {
     useModal
 } from "@/hooks";
 import { api } from "@/lib/api-client";
-import { getDocumentStatus } from "@/utils/status";
+import { getErrorMessage } from "@/lib/errors";
+import { getDocumentStatus } from "@/lib/document-status";
 import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
 
@@ -60,7 +60,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
 
     const mutations = useDocumentMutations(type, parentId);
 
-    const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
+    const { canReplaceFiles } = useDocumentCapabilities();
 
     const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
     const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
@@ -85,6 +85,9 @@ export default function DocumentCard({ type, parentId, document }: Props) {
         // stand hier vorher trotzdem "erfolgreich ersetzt".
         onDrop: async (acceptedFiles) => {
             const [file] = acceptedFiles;
+            // Runtime-Schutz gegen leere `acceptedFiles` — der Typ sagt `File`,
+            // react-dropzone kann aber ein leeres Array liefern.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (file === undefined) return;
 
             try {
@@ -93,25 +96,26 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                     format: "docx",
                     file,
                 });
-                toast.success("Datei wurde ersetzt.");
+                showToast.success("documents.toast.replaced");
             } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Datei konnte nicht ersetzt werden.");
+                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
             }
         },
-        onDropRejected(fileRejections, _) {
-            toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
+        onDropRejected(fileRejections) {
+            showToast.error("common.errorGeneric", {
+                message: `File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`,
+            });
         },
         onError(err) {
-            toast.error(`File rejected! ${err.message}`)
+            showToast.error("common.errorGeneric", { message: `File rejected! ${err.message}` });
         },
     });
     const styles = cardStyles({ focused: dropzone.isFocused });
     const renameModal = useModal();
 
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
-    const task = useDocumentTask(document.taskId);
+    useDocumentTask(document.taskId);
 
-    const editorRef = useRef<DocxEditorRef>(null);
     const [bytes, setBytes] = useState<Uint8Array>();
     const [editDocx, setEditDocx] = useState<boolean>(false);
 
@@ -126,7 +130,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     }
 
     const { refetch } = useQuery({
-        queryKey: ['fetched', type, document.id],
+        queryKey: documentKeys.fetchedDocx(type, document.id),
         enabled: false,
         queryFn: async () => {
             const { url } = await api<{ url: string }>(
@@ -171,16 +175,16 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                 <p className="text-md font-medium">{document.displayName}</p>
                             </div>
                             <Tooltip content={<>{renderDocumentTooltip()}</>} side="right">
-                                <Info size={18} className="text-gray-400 hover:text-black" />
+                                <Info size={18} className="text-(--fg-3) hover:text-(--text)" />
                             </Tooltip>
                         </div>
                         {/* createdAt + document status */}
                         <div className="flex items-center gap-1 text-sm">
-                            <p className="text-gray-400 font-normal">{formatDate(document.createdAt)}</p>
+                            <p className="text-(--fg-3) font-normal">{formatDate(document.createdAt)}</p>
                             {/* Displays normal status badge */}
                             {!remoteOutdated && (
                                 <>
-                                    <Dot size={14} className="text-gray-200" />
+                                    <Dot size={14} className="text-(--border-200)" />
                                     <Tooltip content={getDocumentStatus(document.status, locales, "description")}>
                                         <Badge variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
                                     </Tooltip>
@@ -189,7 +193,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Displays "out of sync" badge */}
                             {remoteOutdated && (
                                 <>
-                                    <Dot size={14} className="text-gray-200" />
+                                    <Dot size={14} className="text-(--border-200)" />
                                     <Tooltip content='The NextCloud version differs from the local one!'>
                                         <Badge variant="FAILED">Out of Sync</Badge>
                                     </Tooltip>
@@ -332,10 +336,10 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                     format: "docx",
                                     file,
                                 });
-                                toast.success("Datei wurde gespeichert.");
+                                showToast.success("documents.toast.saved");
                                 setEditDocx(false);
                             } catch (error) {
-                                toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
+                                showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
                             }
                         }}
                         onClose={() => {

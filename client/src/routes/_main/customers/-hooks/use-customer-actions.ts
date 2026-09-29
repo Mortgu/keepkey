@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useModal } from "@/hooks";
 
-export function useCustomerActions() {
+export default function useCustomerActions() {
     const [activeCustomerId, setActiveCustomerId] = useState<string | null>(null);
 
     const orderModal = useModal();

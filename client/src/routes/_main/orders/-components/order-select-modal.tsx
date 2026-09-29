@@ -1,9 +1,9 @@
 import { Dot } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import CustomerAutocomplete from "../../customers/-components/customer-autocomplete";
-import { useCustomerFilters } from "../../customers/-page.hooks";
 import OrderCreateModal from "./order-create-modal";
 import type { Offer } from "@keepit/schemas";
+import CustomerAutocomplete from "@/routes/_main/customers/-components/customer-autocomplete";
+import useCustomerFilters from "@/routes/_main/customers/-hooks/use-customer-filters";
 import { useModal, useOffers } from "@/hooks";
 import { Button, Dialog, ListSkeleton, RouteError, Skeleton } from "@/components";
 import { formatDate } from "@/lib/format";

@@ -8,8 +8,7 @@ import { loadRecent, saveRecent } from "./-search-recents";
 import { Route } from "./index";
 import type { SearchResultItem, SearchType } from "@keepit/schemas";
 import { Breadcrumbs } from "@/components";
-import { useDebouncedValue } from "@/hooks/use-debounce";
-import { useSearch } from "@/hooks/search/search-hooks";
+import { useDebouncedValue, useSearch } from "@/hooks";
 
 const DEBOUNCE_MS = 250;
 

@@ -1,5 +1,4 @@
-import { z } from 'zod';
-import { useTranslation } from "react-i18next";
+import { useTranslation } from 'react-i18next';
 import useSupplierForm from "../-hooks/use-supplier-form";
 import type { Supplier } from "@keepit/schemas";
 import { Button, Dialog, FieldInput } from "@/components";
@@ -8,11 +7,6 @@ interface Props {
     onClose: () => void;
     currentSupplier?: Supplier | null;
 }
-
-const supplierSchema = z.object({
-    name: z.string().min(1, "Required!"),
-    supplierId: z.string(),
-})
 
 export default function SupplierModal({ onClose, currentSupplier }: Props) {
     const { t } = useTranslation();

@@ -1,8 +1,7 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
 import { Button, NumberField, RouteError, Skeleton } from "@/components";
-import { useStandardTiers } from "@/hooks";
-import { useCreateStandardTier, useDeleteStandardTier } from "@/hooks/tariffs/tariff-mutations";
+import { useCreateStandardTier, useDeleteStandardTier, useStandardTiers } from "@/hooks";
 
 /**
  * Die Mengenachse aller Preistabellen — Gegenstück zu den Standardlaufzeiten.

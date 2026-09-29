@@ -5,7 +5,7 @@ import { useOfferModalContext } from "../offer-modal-context";
 import FlatrateItem from "./flatrate-item";
 import FlatrateForm from "./flatrate-form";
 import { Button } from "@/components";
-import useFlatrateOfferModal from "@/routes/_main/offers/-hooks/use-flatreate.offer-modal";
+import useFlatrateOfferModal from "@/routes/_main/offers/-hooks/use-offer-modal-flatrates";
 
 export default function FlatrateSection() {
     const { t } = useTranslation();

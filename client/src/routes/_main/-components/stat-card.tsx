@@ -1,4 +1,4 @@
-import { formatEur } from "@/utils/utils";
+import { formatEur } from "@/lib/money";
 
 interface Props {
     title: string;

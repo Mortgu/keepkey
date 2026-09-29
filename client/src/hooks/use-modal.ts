@@ -12,5 +12,3 @@ export function useModal<TData = null>() {
     key: state == null ? "create" : String((state as { id?: unknown }).id ?? JSON.stringify(state)),
   };
 }
-
-export type ModalType = ReturnType<typeof useModal>["open"];

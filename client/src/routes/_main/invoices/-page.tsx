@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import InvoiceList from "./-components/invoice-list";
 import { Breadcrumbs } from "@/components";
 
-export function InvoicePage() {
+export default function InvoicePage() {
     const { t } = useTranslation();
 
     return (

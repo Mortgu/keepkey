@@ -8,8 +8,3 @@ export function useFlatRates(filters: FlatrateFilterParams = {}) {
     const { data = EMPTY_ARRAY, isPending, error } = useQuery(flatRateQueries.list(filters));
     return { flatRates: data, isPending, error };
 }
-
-export function useFlatrate(id: string) {
-    const { data, isPending, error } = useQuery(flatRateQueries.detail(id));
-    return { flatrate: data, isPending, error };
-}

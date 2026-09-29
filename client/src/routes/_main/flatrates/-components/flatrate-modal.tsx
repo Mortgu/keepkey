@@ -15,7 +15,7 @@ import {
     SegmentedLanguageToggle,
 } from "@/components";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
-import { centsToEur, eurToCents } from "@/utils/utils";
+import { centsToEur, eurToCents } from "@/lib/money";
 
 interface Props {
 	currentFlatrate?: Flatrate | null;

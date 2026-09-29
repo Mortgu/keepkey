@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
+import { useUpdateTariffCell } from "@/hooks";
 import { NumberField } from "@/components";
-import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
+import { centsToEur, eurToCents, formatEur } from "@/lib/money";
 
 interface Props {
     groupId: string;

@@ -1,12 +1,13 @@
 import { useTranslation } from "react-i18next";
-import { useCustomerPage } from "./-page.hooks";
+import useCustomerPage from "./-hooks/use-customer-page";
 import CustomerModal from "./-components/customer-modal";
 import CustomerList from "./-components/customer-list";
+import CustomerAutocomplete from "./-components/customer-autocomplete";
+import type {CustomerFuzzyItem} from "./-components/customer-autocomplete";
 import type { Customer } from "@keepit/schemas";
 import { Breadcrumbs, Button, MultiDropdown } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
 import { COUNTRY_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/countries";
-import CustomerAutocomplete, { type CustomerFuzzyItem } from "./-components/customer-autocomplete";
 
 export default function CustomerPage() {
     const { t } = useTranslation();
