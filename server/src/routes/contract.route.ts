@@ -5,11 +5,12 @@ import {
     deleteContract,
     getAllContracts,
     getContract,
+    reorderContracts,
     updateContract
 } from "@/controllers/index.js";
 import { validate, validateParams } from "@/middlewares/zod.middleware.js";
 import { idParamsSchema } from "@/schemas/params-schemas.js";
-import { createContractSchema, updateContractSchema } from "@keepit/schemas";
+import { createContractSchema, reorderContractsSchema, updateContractSchema } from "@keepit/schemas";
 
 const router = Router();
 
@@ -21,6 +22,9 @@ router.get("/:id", validateParams(idParamsSchema), getContract);
 
 /* [POST] http://localhost:3000/api/contracts */
 router.post("/", validate(createContractSchema), createContract);
+
+/* [PUT] http://localhost:3000/api/contracts/order */
+router.put("/order", validate(reorderContractsSchema), reorderContracts);
 
 /* [PATCH] http://localhost:3000/api/contracts/:id */
 router.patch("/:id", validateParams(idParamsSchema), validate(updateContractSchema), updateContract);

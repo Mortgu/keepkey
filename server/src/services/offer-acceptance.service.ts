@@ -1,6 +1,7 @@
 import { formatOfferData } from "../pipelines/offer/actions.js";
 import type { Prisma } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
+import { contractOrderBy } from "./contract.service.js";
 import { serializeAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 
 export const acceptanceInclude = {
@@ -62,6 +63,7 @@ export async function acceptOffer(
     }
     const contracts = await tx.contract.findMany({
         include: { translations: true },
+        orderBy: contractOrderBy,
     });
     const offerTemplate = await formatOfferData({ offer, contracts });
     const acceptedAt = new Date();

@@ -1,6 +1,7 @@
 import type {
     Contract,
     CreateContractInput,
+    ReorderContractsInput,
     UpdateContractInput
 } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
@@ -22,6 +23,12 @@ export const createContract = (input: CreateContractInput) =>
 export const updateContract = (id: string, input: UpdateContractInput) =>
     api<Contract>(`/api/contracts/${id}`, {
         method: "PATCH",
+        body: JSON.stringify(input),
+    });
+
+export const reorderContracts = (input: ReorderContractsInput) =>
+    api<void>("/api/contracts/order", {
+        method: "PUT",
         body: JSON.stringify(input),
     });
 

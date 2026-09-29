@@ -4,6 +4,7 @@ import InspectModule from "docxtemplater/js/inspect-module.js";
 import PizZip from "pizzip";
 
 import { prisma } from "@/lib/prismaClient.js";
+import { contractOrderBy } from "@/services/contract.service.js";
 import { loadTemplateForRendering } from "@/services/document-template.service.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
@@ -46,7 +47,8 @@ export const fetchOfferData = async (offerId: string) => {
         await prisma.contract.findMany({
             include: {
                 translations: true,
-            }
+            },
+            orderBy: contractOrderBy,
         }),
     ]);
 
