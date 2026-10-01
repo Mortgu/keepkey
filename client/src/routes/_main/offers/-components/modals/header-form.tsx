@@ -220,6 +220,17 @@ export default function HeaderForm() {
                 </div>
 
                 <div className="flex items-center gap-4">
+                    {shows("validFrom") && (
+                        <form.Field name="validFrom" children={(field) => (
+                            <Input label={t("offerModal.validFrom")} type="date" value={asDateInput(field.state.value)}
+                                disabled={locked("validFrom")}
+                                error={getFormError(field.state.meta.errors)}
+                                onBlur={field.handleBlur}
+                                onChange={(e) => field.handleChange(fromDateInput(e.target.value))}
+                            />
+                        )} />
+                    )}
+
                     {shows("validUntil") && (
                         <form.Field name="validUntil" children={(field) => (
                             <Input label={t("offerModal.validUntil")} type="date" value={asDateInput(field.state.value)}

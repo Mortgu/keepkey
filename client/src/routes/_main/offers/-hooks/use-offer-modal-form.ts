@@ -47,6 +47,7 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
 function toExtendInput(values: OfferModalValues): ExtendOfferInput {
     return {
         quoteId: values.quoteId,
+        validFrom: values.validFrom,
         validUntil: values.validUntil,
         requestFrom: values.requestFrom,
         positions: values.offerPositions.flatMap((position) =>
