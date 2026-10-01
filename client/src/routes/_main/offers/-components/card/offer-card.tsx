@@ -15,6 +15,7 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import { Link } from "@tanstack/react-router";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -65,7 +66,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
                         <div className="flex items-center gap-2 text-md">
-                            <span className="text-(--text) font-semibold">AG{quoteId}</span>
+                            <Link to="/offers/$offer" params={{ offer: quoteId }} className="text-(--text) font-semibold hover:underline">AG{quoteId}</Link>
                             <span className="text-(--text)">{customer.companyName}</span>
                             {offer.acceptedAt && <Badge variant="PENDING" size="xs">{t("orders.accepted")}</Badge>}
                             {offer.derivationType === "RENEWAL" && (
@@ -151,41 +152,49 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </Accordion.Section>
             </Accordion>
 
-            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
+            <div className="flex items-center justify-between  border-t border-(--border)">
 
                 {/* Actions left */}
                 <div className="flex items-center gap-2">
-                    <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="xs"
-                        loading={isGenerating}
-                        disabled={isGenerating}
-                        onClick={handleGenerateDocument}
-                    >
-                        Dokument generieren
-                    </Button>
+                    <div className="flex items-center gap-2 p-2 border-r border-(--border)">
+                        <Button
+                            className="min-w-fit"
+                            variant="primary"
+                            size="xs"
+                            loading={isGenerating}
+                            disabled={isGenerating}
+                            onClick={handleGenerateDocument}
+                        >
+                            Dokument generieren
+                        </Button>
+
+                        <Button
+                            variant="border"
+                            type="button"
+                            size="xs"
+                            onClick={() => offerModal.open({ mode: "renewal" })}>
+                            {t("derived.action_renewal")}
+                        </Button>
+
+                        <Button
+                            variant="border"
+                            type="button"
+                            size="xs"
+                            onClick={() => offerModal.open({ mode: "extension" })}>
+                            {t("derived.action_extension")}
+                        </Button>
+                    </div>
 
                     <Button
                         variant="border"
                         type="button"
-                        size="xs"
-                        onClick={() => offerModal.open({ mode: "renewal" })}>
-                        {t("derived.action_renewal")}
+                        size="xs">
+                        Bestellung erstellen
                     </Button>
-
-                    <Button
-                        variant="border"
-                        type="button"
-                        size="xs"
-                        onClick={() => offerModal.open({ mode: "extension" })}>
-                        {t("derived.action_extension")}
-                    </Button>
-
                 </div>
 
                 {/* Actions right */}
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 p-2">
                     <Button
                         size="xs"
                         variant="border"
