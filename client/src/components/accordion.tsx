@@ -27,6 +27,9 @@ const accordionStyles = tv({
 export interface AccordionComponentProps {
     children: ReactNode;
     defaultValue?: Array<string>;
+    /** Kontrollierter Modus: geöffnete Abschnitte, zusammen mit `onValueChange`. */
+    value?: Array<string>;
+    onValueChange?: (value: Array<string>) => void;
     multiple?: boolean;
     className?: string;
 }
@@ -34,6 +37,8 @@ export interface AccordionComponentProps {
 export function Accordion({
     children,
     defaultValue,
+    value,
+    onValueChange,
     multiple = true,
     className,
 }: AccordionComponentProps) {
@@ -43,6 +48,8 @@ export function Accordion({
         <BaseAccordion.Root
             multiple={multiple}
             defaultValue={defaultValue}
+            value={value}
+            onValueChange={onValueChange}
             className={styles.Root({ className })}
         >
             {children}

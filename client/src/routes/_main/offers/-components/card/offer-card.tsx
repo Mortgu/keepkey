@@ -44,6 +44,14 @@ export default function OfferCard({ offer }: OfferListItemProps) {
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    const [openSections, setOpenSections] = useState<Array<string>>([]);
+
+    const handleGenerateDocument = async () => {
+        await generateOfferDocument({ offerId: offer.id });
+        setOpenSections((sections) =>
+            sections.includes("documents") ? sections : [...sections, "documents"],
+        );
+    };
 
     const handleDeleteOffer = () => {
         if (!offer.acceptedAt && confirm("Angebot löschen")) {
@@ -105,7 +113,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </div>
             </div>
 
-            <Accordion>
+            <Accordion value={openSections} onValueChange={setOpenSections}>
                 <Accordion.Section value="products" label="Produkte">
                     {offerPositions.map((position) => (
                         <PositionRow
@@ -153,7 +161,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         size="xs"
                         loading={isGenerating}
                         disabled={isGenerating}
-                        onClick={() => generateOfferDocument({ offerId: offer.id })}
+                        onClick={handleGenerateDocument}
                     >
                         Dokument generieren
                     </Button>
