@@ -6,6 +6,7 @@
     "emailPlaceholder": "du@firma.de",
     "password": "Passwort",
     "passwordPlaceholder": "••••••••",
+    "passwordRequirement": "Mindestens {{min}} und höchstens {{max}} Zeichen",
     "showPassword": "Passwort anzeigen",
     "hidePassword": "Passwort verbergen",
     "rememberMe": "Angemeldet bleiben",

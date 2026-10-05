@@ -27,6 +27,14 @@ export default function OrderCard({ order }: Props) {
     const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
 
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
+    const [openSections, setOpenSections] = useState<Array<string>>([]);
+
+    const handleGenerateDocument = async () => {
+        await generateOrderDocument({ orderId: order.id });
+        setOpenSections((sections) =>
+            sections.includes("documents") ? sections : [...sections, "documents"],
+        );
+    };
 
     return (
         <div className="bg-white border border-(--border) rounded-md">
@@ -76,7 +84,7 @@ export default function OrderCard({ order }: Props) {
                 </div>
             </div>
 
-            <Accordion>
+            <Accordion value={openSections} onValueChange={setOpenSections}>
                 <Accordion.Section value="products" label="Produkte">
                     {orderPositions.map((position) => (
                         <PositionRow
@@ -128,7 +136,7 @@ export default function OrderCard({ order }: Props) {
                         size="xs"
                         loading={isGeneratingDocument}
                         disabled={isGeneratingDocument || Boolean(order.cancelledAt)}
-                        onClick={() => generateOrderDocument({ orderId: order.id })}
+                        onClick={handleGenerateDocument}
                     >
                         Dokument generieren
                     </Button>

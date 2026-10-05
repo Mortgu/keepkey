@@ -15,6 +15,7 @@ import {
     Users
 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { useRouterState } from "@tanstack/react-router";
 import { tv } from "tailwind-variants";
 import { NavGroup, NavLink } from "./nav-link";
 import { NavSearch } from "./nav-search";
@@ -28,11 +29,15 @@ const ICON_SIZE = 14;
 type SectionProps = {
     title: string;
     collapsible?: boolean;
+    /** Pfadpräfixe der Einträge: enthält die aktive Route einen davon, startet die Gruppe offen. */
+    paths?: Array<string>;
     children: ReactNode;
 };
 
-function Section({ title, collapsible = false, children }: SectionProps) {
-    const [collapsed, setCollapsed] = useState(false);
+function Section({ title, collapsible = false, paths = [], children }: SectionProps) {
+    const pathname = useRouterState({ select: (s) => s.location.pathname });
+    const containsActive = paths.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+    const [collapsed, setCollapsed] = useState(collapsible && !containsActive);
 
     const sectionStyle = tv({
         base: [
@@ -112,21 +117,7 @@ export function Navigation() {
                     />
                 </Section>
 
-                <Section title={t("nav.catalog")} collapsible>
-
-                    <NavGroup label={t("section.workloads")} icon={<Package size={ICON_SIZE} />} defaultOpen>
-                        <NavLink to="/workloads" label={t("section.workload_text")} indent
-                            icon={<Text size={ICON_SIZE} />} />
-                        <NavLink to="/workloads/pricing" label={t("section.workload_pricing")} indent
-                            icon={<Euro size={ICON_SIZE} />} />
-                    </NavGroup>
-
-                    <NavLink to="/flatrates" label={t("section.flatRates")} icon={<DollarSign size={ICON_SIZE} />} />
-
-                    <NavLink to="/contracts" label={t("section.contracts")} icon={<Users size={ICON_SIZE} />} />
-                </Section>
-
-                <Section title={t("nav.sales")} collapsible>
+                <Section title={t("nav.sales")} collapsible paths={["/customers", "/offers", "/orders"]}>
                     <NavLink
                         to="/customers"
                         label={t("section.customers")}
@@ -150,7 +141,21 @@ export function Navigation() {
                     /> */}
                 </Section>
 
-                <Section title={t("nav.management")} collapsible>
+                <Section title={t("nav.catalog")} collapsible paths={["/workloads", "/flatrates", "/contracts"]}>
+
+                    <NavGroup label={t("section.workloads")} icon={<Package size={ICON_SIZE} />} defaultOpen>
+                        <NavLink to="/workloads" label={t("section.workload_text")} indent
+                            icon={<Text size={ICON_SIZE} />} />
+                        <NavLink to="/workloads/pricing" label={t("section.workload_pricing")} indent
+                            icon={<Euro size={ICON_SIZE} />} />
+                    </NavGroup>
+
+                    <NavLink to="/flatrates" label={t("section.flatRates")} icon={<DollarSign size={ICON_SIZE} />} />
+
+                    <NavLink to="/contracts" label={t("section.contracts")} icon={<Users size={ICON_SIZE} />} />
+                </Section>
+
+                <Section title={t("nav.management")} collapsible paths={["/suppliers", "/employees", "/templates", "/settings"]}>
                     <NavLink
                         to="/suppliers"
                         label={t("section.suppliers")}

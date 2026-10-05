@@ -2,7 +2,7 @@
 import { useTranslation } from "react-i18next";
 import useEmployeeForm from "../-hooks/use-employee-form";
 import type { User } from '@keepit/schemas';
-import { Button, Dialog, FieldInput } from "@/components";
+import { Button, Dialog, FieldInput, FieldPasswordInput } from "@/components";
 
 interface Props {
     onClose: () => void;
@@ -60,7 +60,7 @@ export default function UserModal({ onClose, currentEmployee }: Props) {
 
                         <form.Field name="password" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} type="password" size="sm" label="Passwort" />
+                                <FieldPasswordInput field={field} size="sm" label="Passwort" showRequirements />
                             </div>
                         )} />
                     </div>
