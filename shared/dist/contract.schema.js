@@ -13,8 +13,13 @@ export const createContractSchema = z.object({
 export const updateContractSchema = z.object({
     translations: z.array(contractTranslationSchema).optional(),
 });
+/** Vollständige neue Reihenfolge aller Tarife; Index 0 ist der Standard. */
+export const reorderContractsSchema = z.object({
+    ids: z.array(z.string()).min(1),
+});
 export const contractSchema = createContractSchema.extend({
     id: z.string(),
+    sortOrder: z.int(),
     createdAt: isoDateTime,
     updatedAt: isoDateTime,
 });

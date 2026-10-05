@@ -27,6 +27,7 @@ import { Route as MainTemplatesIndexRouteImport } from './routes/_main/templates
 import { Route as MainTestIndexRouteImport } from './routes/_main/test/index'
 import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
 import { Route as MainCustomersCustomerIdIndexRouteImport } from './routes/_main/customers/$customerId/index'
+import { Route as MainOffersOfferIndexRouteImport } from './routes/_main/offers/$offer/index'
 import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
 
 const MainRouteRoute = MainRouteRouteImport.update({
@@ -119,6 +120,11 @@ const MainCustomersCustomerIdIndexRoute =
     path: '/customers/$customerId/',
     getParentRoute: () => MainRouteRoute,
   } as any)
+const MainOffersOfferIndexRoute = MainOffersOfferIndexRouteImport.update({
+  id: '/offers/$offer/',
+  path: '/offers/$offer/',
+  getParentRoute: () => MainRouteRoute,
+} as any)
 const MainWorkloadsPricingIndexRoute =
   MainWorkloadsPricingIndexRouteImport.update({
     id: '/workloads/pricing/',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/test/': typeof MainTestIndexRoute
   '/workloads/': typeof MainWorkloadsIndexRoute
   '/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
+  '/offers/$offer/': typeof MainOffersOfferIndexRoute
   '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesByTo {
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/test': typeof MainTestIndexRoute
   '/workloads': typeof MainWorkloadsIndexRoute
   '/customers/$customerId': typeof MainCustomersCustomerIdIndexRoute
+  '/offers/$offer': typeof MainOffersOfferIndexRoute
   '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRoutesById {
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/_main/test/': typeof MainTestIndexRoute
   '/_main/workloads/': typeof MainWorkloadsIndexRoute
   '/_main/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
+  '/_main/offers/$offer/': typeof MainOffersOfferIndexRoute
   '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
 }
 export interface FileRouteTypes {
@@ -208,6 +217,7 @@ export interface FileRouteTypes {
     | '/test/'
     | '/workloads/'
     | '/customers/$customerId/'
+    | '/offers/$offer/'
     | '/workloads/pricing/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -228,6 +238,7 @@ export interface FileRouteTypes {
     | '/test'
     | '/workloads'
     | '/customers/$customerId'
+    | '/offers/$offer'
     | '/workloads/pricing'
   id:
     | '__root__'
@@ -249,6 +260,7 @@ export interface FileRouteTypes {
     | '/_main/test/'
     | '/_main/workloads/'
     | '/_main/customers/$customerId/'
+    | '/_main/offers/$offer/'
     | '/_main/workloads/pricing/'
   fileRoutesById: FileRoutesById
 }
@@ -386,6 +398,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCustomersCustomerIdIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
+    '/_main/offers/$offer/': {
+      id: '/_main/offers/$offer/'
+      path: '/offers/$offer'
+      fullPath: '/offers/$offer/'
+      preLoaderRoute: typeof MainOffersOfferIndexRouteImport
+      parentRoute: typeof MainRouteRoute
+    }
     '/_main/workloads/pricing/': {
       id: '/_main/workloads/pricing/'
       path: '/workloads/pricing'
@@ -412,6 +431,7 @@ interface MainRouteRouteChildren {
   MainTestIndexRoute: typeof MainTestIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
   MainCustomersCustomerIdIndexRoute: typeof MainCustomersCustomerIdIndexRoute
+  MainOffersOfferIndexRoute: typeof MainOffersOfferIndexRoute
   MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
 }
 
@@ -431,6 +451,7 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainTestIndexRoute: MainTestIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
   MainCustomersCustomerIdIndexRoute: MainCustomersCustomerIdIndexRoute,
+  MainOffersOfferIndexRoute: MainOffersOfferIndexRoute,
   MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,
 }
 

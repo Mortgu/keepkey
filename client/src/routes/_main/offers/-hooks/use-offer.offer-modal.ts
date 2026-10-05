@@ -42,6 +42,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
 
         quoteId: currentOffer?.quoteId || "",
         paymentTerm: currentOffer?.paymentTerm || "30 Tage",
+        validFrom: currentOffer?.validFrom || null,
         validUntil: currentOffer?.validUntil || null,
         requestFrom: currentOffer?.requestFrom || null,
         language: currentOffer?.language || "DE",

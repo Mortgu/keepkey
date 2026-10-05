@@ -44,6 +44,7 @@ model Offer {
   toCompare         String[]
 
   date        DateTime  @default(now())
+  validFrom   DateTime?
   validUntil  DateTime?
   requestFrom DateTime?
 

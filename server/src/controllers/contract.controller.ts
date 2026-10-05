@@ -32,6 +32,11 @@ export const updateContract = async (request: Request, response: Response) => {
     return response.status(200).json(contract);
 };
 
+export const reorderContracts = async (request: Request, response: Response) => {
+    await contractService.reorderContracts(request.body.ids);
+    return response.status(200).json({ success: true });
+};
+
 /* ========== DELETE ========== */
 
 export const deleteContract = async (request: Request, response: Response) => {

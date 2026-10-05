@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Check, Eye, EyeOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { Input } from "./input";
 import { Textarea } from "./textarea";
 import { Select } from "./select";
@@ -53,6 +56,46 @@ export function FieldInput<TValue = string>({
             }
             {...rest}
         />
+    );
+}
+
+/* ── Password ───────────────────────────────────────────────────────── */
+
+export const PASSWORD_MIN_LENGTH = 8;
+export const PASSWORD_MAX_LENGTH = 128;
+
+/**
+ * Wie {@link FieldInput}, mit Augen-Symbol zum Ein-/Ausblenden des Passworts.
+ * Mit `showRequirements` steht darunter, was das Passwort erfüllen muss.
+ */
+export function FieldPasswordInput<TValue = string>({
+    showRequirements = false,
+    ...props
+}: Omit<FieldInputProps<TValue>, "type" | "rightButton"> & { showRequirements?: boolean }) {
+    const { t } = useTranslation();
+    const [visible, setVisible] = useState(false);
+    const length = String(props.field.state.value ?? "").length;
+    const met = length >= PASSWORD_MIN_LENGTH && length <= PASSWORD_MAX_LENGTH;
+
+    return (
+        <div className="grid gap-1.5">
+            <FieldInput
+                {...props}
+                type={visible ? "text" : "password"}
+                rightButton={{
+                    variant: "ghost",
+                    onClick: () => setVisible((v) => !v),
+                    "aria-label": visible ? t("login.hidePassword") : t("login.showPassword"),
+                    icon: visible ? <EyeOff size={15} /> : <Eye size={15} />,
+                }}
+            />
+            {showRequirements && (
+                <p className={`flex items-center gap-1.5 text-xs ${met ? "text-green-600" : "text-(--text-secondary)"}`}>
+                    <Check size={12} className={met ? "" : "opacity-30"} />
+                    {t("login.passwordRequirement", { min: PASSWORD_MIN_LENGTH, max: PASSWORD_MAX_LENGTH })}
+                </p>
+            )}
+        </div>
     );
 }
 

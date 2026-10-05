@@ -1,4 +1,6 @@
-import { Pen, Trash } from "lucide-react";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import { GripVertical, Pen, Trash } from "lucide-react";
 
 import type { Contract } from "@keepit/schemas";
 import { Button } from "@/components";
@@ -9,10 +11,12 @@ import { localized } from "@/lib/i18n-content";
 
 interface ContractListItemProps {
   contract: Contract;
+  /** Erster Tarif der Liste — wird bei neuen Angeboten vorausgewählt. */
+  isDefault: boolean;
   onEdit: (contract: Contract) => void;
 }
 
-export default function ContractListItem({ contract, onEdit }: ContractListItemProps) {
+export default function ContractListItem({ contract, isDefault, onEdit }: ContractListItemProps) {
   const locale = useLocale();
 
   const name = localized(contract.translations, locale, "name");
@@ -20,13 +24,42 @@ export default function ContractListItem({ contract, onEdit }: ContractListItemP
 
   const { deleteContract, isDeletingContract } = useDeleteContract();
 
+  const {
+    attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging,
+  } = useSortable({ id: contract.id });
+
   return (
-    <div className="bg-white border border-(--border) rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden">
-      <div className="grid items-center justify-between px-4 py-3 border-b border-(--border) bg-(--page-bg)">
-        <p className="text-md font-medium">{name}</p>
-        <p className="text-sm font-light text-gray-500">
-          {formatDate(contract.createdAt || "")}
-        </p>
+    <div
+      ref={setNodeRef}
+      style={{ transform: CSS.Transform.toString(transform), transition }}
+      className={`relative bg-white border border-(--border) rounded-md shadow-[0_1px_3px_rgba(0,0,0,0.08)] overflow-hidden ${isDragging ? "z-10 opacity-80 shadow-lg" : ""}`}
+    >
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-(--border) bg-(--page-bg)">
+        {/* Nur der Griff startet das Ziehen, damit die Buttons klickbar bleiben. */}
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          {...listeners}
+          aria-label={`${name} verschieben`}
+          className="-ml-1 p-1 rounded text-gray-400 hover:text-(--text) hover:bg-gray-100 cursor-grab active:cursor-grabbing touch-none"
+        >
+          <GripVertical size={16} />
+        </button>
+
+        <div className="grid flex-1">
+          <div className="flex items-center gap-2">
+            <p className="text-md font-medium">{name}</p>
+            {isDefault && (
+              <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-200">
+                Standard
+              </span>
+            )}
+          </div>
+          <p className="text-sm font-light text-gray-500">
+            {formatDate(contract.createdAt || "")}
+          </p>
+        </div>
       </div>
 
       <div className="px-4 py-3.5">

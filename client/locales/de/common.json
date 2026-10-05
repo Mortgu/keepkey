@@ -50,5 +50,12 @@
   },
   "docxEditor": {
     "noBuffer": "Der Editor konnte die Datei nicht lesen."
+  },
+  "documentPreview": {
+    "title": "Vorschau",
+    "open": "Vorschau",
+    "loadFailed": "Vorschau konnte nicht geladen werden.",
+    "retry": "Erneut versuchen",
+    "download": "PDF herunterladen"
   }
 }

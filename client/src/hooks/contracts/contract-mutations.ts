@@ -1,8 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { createContract, deleteContract, updateContract } from "./contract-api";
+import { createContract, deleteContract, reorderContracts, updateContract } from "./contract-api";
 import { contractKeys } from "./contract-keys";
-import type { CreateContractInput } from '@keepit/schemas';
+import type { Contract, CreateContractInput } from '@keepit/schemas';
+import { showToast } from "@/components/toast";
 
 export function useCreateContract() {
     const queryClient = useQueryClient();
@@ -56,6 +57,37 @@ export function useDeleteContract() {
         deleteContract: mutation.mutateAsync,
         isDeletingContract: mutation.isPending,
         errorDeletingContract: mutation.error,
+    }
+}
+
+/**
+ * Speichert eine neue Tarif-Reihenfolge. Optimistisch: Die Liste springt sofort
+ * um und wird bei einem Fehler auf den vorherigen Stand zurückgesetzt.
+ */
+export function useReorderContracts() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: (ordered: Array<Contract>) =>
+            reorderContracts({ ids: ordered.map((contract) => contract.id) }),
+        onMutate: async (ordered) => {
+            await queryClient.cancelQueries({ queryKey: contractKeys.lists() });
+            const previous = queryClient.getQueryData<Array<Contract>>(contractKeys.lists());
+            queryClient.setQueryData(contractKeys.lists(), ordered);
+            return { previous };
+        },
+        onError: (error, _, context) => {
+            queryClient.setQueryData(contractKeys.lists(), context?.previous);
+            showToast.error("", { message: error.message });
+        },
+        onSettled: () => queryClient.invalidateQueries({
+            queryKey: contractKeys.lists(),
+        }),
+    });
+
+    return {
+        reorderContracts: mutation.mutate,
+        isReorderingContracts: mutation.isPending,
     }
 }
 

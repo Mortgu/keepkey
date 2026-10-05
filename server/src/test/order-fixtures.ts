@@ -11,6 +11,7 @@ export const sourceFixture = () => ({
     duration_months: 12,
     paymentTerm: "30 Tage",
     language: "EN" as const,
+    validFrom: null,
     validUntil: null,
     requestFrom: null,
     net_amount: 90000,

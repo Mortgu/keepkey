@@ -6,6 +6,7 @@
     "emailPlaceholder": "you@company.com",
     "password": "Password",
     "passwordPlaceholder": "••••••••",
+    "passwordRequirement": "Between {{min}} and {{max}} characters",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
     "rememberMe": "Stay signed in",

@@ -27,6 +27,9 @@ const accordionStyles = tv({
 export interface AccordionComponentProps {
     children: ReactNode;
     defaultValue?: Array<string>;
+    /** Kontrollierter Modus: geöffnete Abschnitte, zusammen mit `onValueChange`. */
+    value?: Array<string>;
+    onValueChange?: (value: Array<string>) => void;
     multiple?: boolean;
     className?: string;
 }
@@ -34,6 +37,8 @@ export interface AccordionComponentProps {
 export function Accordion({
     children,
     defaultValue,
+    value,
+    onValueChange,
     multiple = true,
     className,
 }: AccordionComponentProps) {
@@ -43,6 +48,8 @@ export function Accordion({
         <BaseAccordion.Root
             multiple={multiple}
             defaultValue={defaultValue}
+            value={value}
+            onValueChange={onValueChange}
             className={styles.Root({ className })}
         >
             {children}
@@ -57,6 +64,8 @@ export interface AccordionSectionComponentProps {
     children: ReactNode;
     /** Optionaler Inhalt links neben dem Chevron, z. B. eine Anzahl. */
     actions?: ReactNode;
+    /** Bedienelement rechts neben dem Auslöser — liegt außerhalb des Buttons, darf also selbst klickbar sein. */
+    aside?: ReactNode;
     className?: string;
 }
 
@@ -65,20 +74,22 @@ export function AccordionSection({
     label,
     children,
     actions,
+    aside,
     className,
 }: AccordionSectionComponentProps) {
     const styles = accordionStyles();
 
     return (
         <BaseAccordion.Item value={value} className={styles.Item()}>
-            <BaseAccordion.Header>
-                <BaseAccordion.Trigger className={styles.Trigger()}>
+            <BaseAccordion.Header className="flex">
+                <BaseAccordion.Trigger className={styles.Trigger({ className: "flex-1 min-w-0" })}>
                     <span>{label}</span>
                     <span className="flex items-center gap-2">
                         {actions}
                         <ChevronDown className={styles.Icon()} />
                     </span>
                 </BaseAccordion.Trigger>
+                {aside}
             </BaseAccordion.Header>
 
             <BaseAccordion.Panel className={styles.Panel()}>

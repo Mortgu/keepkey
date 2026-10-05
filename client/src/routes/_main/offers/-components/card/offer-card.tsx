@@ -1,4 +1,4 @@
-import { Pen, Trash, UndoDot } from "lucide-react";
+import { ChevronRight, Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -15,6 +15,7 @@ import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-m
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { formatEur } from "@/utils/utils";
+import { Link } from "@tanstack/react-router";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -44,6 +45,14 @@ export default function OfferCard({ offer }: OfferListItemProps) {
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+    const [openSections, setOpenSections] = useState<Array<string>>([]);
+
+    const handleGenerateDocument = async () => {
+        await generateOfferDocument({ offerId: offer.id });
+        setOpenSections((sections) =>
+            sections.includes("documents") ? sections : [...sections, "documents"],
+        );
+    };
 
     const handleDeleteOffer = () => {
         if (!offer.acceptedAt && confirm("Angebot löschen")) {
@@ -51,61 +60,63 @@ export default function OfferCard({ offer }: OfferListItemProps) {
         }
     };
 
+    const dateCell = "grid gap-0.5 px-3 py-2 text-xs border-l border-(--border) first:border-l-0";
+
     return (
-        <div className="bg-white border border-(--border) rounded-md">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
+        <div className="bg-white border border-(--border) rounded-md overflow-hidden">
+            {/* Kopf */}
+            <div className="flex items-start justify-between gap-4 px-4 py-3">
                 <div className="grid gap-1">
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 text-md">
-                            <span className="text-(--text) font-semibold">AG{quoteId}</span>
-                            <span className="text-(--text)">{customer.companyName}</span>
-                            {offer.acceptedAt && <Badge variant="PENDING" size="xs">{t("orders.accepted")}</Badge>}
-                            {offer.derivationType === "RENEWAL" && (
-                                <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
-                            )}
-                            {offer.derivationType === "LICENSE_EXTENSION" && (
-                                <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>
-                            )}
-                        </div>
+                        <Link to="/offers/$offer" params={{ offer: quoteId }} className="text-md font-mono font-semibold text-(--text) hover:underline">AG{quoteId}</Link>
+                        {offer.derivationType === "RENEWAL" && (
+                            <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
+                        )}
+                        {offer.derivationType === "LICENSE_EXTENSION" && (
+                            <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>
+                        )}
                     </div>
-
-
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Kontakt:</label>
-                            <p className="text-(--text)">
-                                {ccp.salutation} {ccp.firstName} {ccp.lastName}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Angebots-Nr.</label>
-                            <p className="text-(--text)">{quoteId}</p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Erstellt:</label>
-                            <p className="text-(--text)">{formatDate(offer.createdAt)}</p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Gültig bis:</label>
-                            <p className="text-(--text)">
-                                {offer.validUntil ? formatDate(offer.validUntil) : "-"}
-                            </p>
-                        </div>
-                    </div>
+                    <p className="text-sm font-light text-(--text-secondary)">
+                        {[
+                            customer.companyName,
+                            `${ccp.firstName} ${ccp.lastName}`,
+                            `${customer.zip} ${customer.city}`.trim(),
+                        ].filter(Boolean).join(" · ")}
+                    </p>
                 </div>
 
                 <div className="flex flex-col items-end">
-                    <p className="text-md font-mono font-medium">{formatEur(offer.net_amount)}</p>
-                    <p className="text-(--text-secondary) font-light text-sm">
-                        Gesamtpreis
-                    </p>
+                    <p className="text-md font-mono font-semibold">{formatEur(offer.net_amount)}</p>
+                    <p className="text-(--text-secondary) font-light text-xs">Gesamtpreis</p>
                 </div>
             </div>
 
-            <Accordion>
+            {/* Status- und Datumsleiste */}
+            <div className="grid grid-cols-2 md:grid-cols-4 border-t border-(--border) bg-(--page-bg) text-(--text)">
+                {offer.acceptedAt && (
+                    <div className={`${dateCell} flex items-center justify-between bg-(--primary-50) text-(--primary)`}>
+                        <div className="grid gap-0.5">
+                            <span className="text-xs">{t("orders.accepted")} am:</span>
+                            <span className="text-sm font-medium">{formatDate(offer.acceptedAt)}</span>
+                        </div>
+                        <ChevronRight className="size-4" />
+                    </div>
+                )}
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Erstellt am:</span>
+                    <span className="text-sm font-medium">{formatDate(offer.createdAt)}</span>
+                </div>
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Gültig vom:</span>
+                    <span className="text-sm font-medium">{offer.validFrom ? formatDate(offer.validFrom) : "-"}</span>
+                </div>
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Gültig bis:</span>
+                    <span className="text-sm font-medium">{offer.validUntil ? formatDate(offer.validUntil) : "-"}</span>
+                </div>
+            </div>
+
+            <Accordion value={openSections} onValueChange={setOpenSections} className="border-t border-(--border)">
                 <Accordion.Section value="products" label="Produkte">
                     {offerPositions.map((position) => (
                         <PositionRow
@@ -125,7 +136,22 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     ))}
                 </Accordion.Section>
 
-                <Accordion.Section value="documents" label="Dokumente">
+                <Accordion.Section
+                    value="documents"
+                    label="Dokumente"
+                    aside={(
+                        <Button
+                            className="min-w-fit h-auto rounded-none border-l border-(--border) px-4"
+                            variant="secondary"
+                            size="xs"
+                            loading={isGenerating}
+                            disabled={isGenerating}
+                            onClick={handleGenerateDocument}
+                        >
+                            Dokument generieren
+                        </Button>
+                    )}
+                >
                     {offer.offerDocuments.map((document: OfferDocument) => (
                         <DocumentCard
                             key={document.id}
@@ -143,23 +169,16 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </Accordion.Section>
             </Accordion>
 
-            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
-
-                {/* Actions left */}
+            {/* Aktionen */}
+            <div className="flex items-center justify-between gap-2 p-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
-                    <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="xs"
-                        loading={isGenerating}
-                        disabled={isGenerating}
-                        onClick={() => generateOfferDocument({ offerId: offer.id })}
-                    >
-                        Dokument generieren
+                    {/* Noch ohne Funktion. */}
+                    <Button variant="primary" type="button" size="xs">
+                        Bestellung erstellen
                     </Button>
 
                     <Button
-                        variant="border"
+                        variant="secondary"
                         type="button"
                         size="xs"
                         onClick={() => offerModal.open({ mode: "renewal" })}>
@@ -167,16 +186,14 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     </Button>
 
                     <Button
-                        variant="border"
+                        variant="secondary"
                         type="button"
                         size="xs"
                         onClick={() => offerModal.open({ mode: "extension" })}>
                         {t("derived.action_extension")}
                     </Button>
-
                 </div>
 
-                {/* Actions right */}
                 <div className="flex items-center gap-2">
                     <Button
                         size="xs"

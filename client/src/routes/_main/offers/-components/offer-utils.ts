@@ -10,6 +10,7 @@ export const offerSchema = z.object({
   supplierId: z.string().nullable(),
   paymentTerm: z.string(),
 
+  validFrom: z.string().datetime().nullable(),
   validUntil: z.string().datetime().nullable(),
   requestFrom: z.string().datetime().nullable(),
   featureComparison: z.boolean().default(false),

@@ -86,6 +86,7 @@ export async function restoreOfferRevision(
             data: {
                 ...restored.offer,
                 date: new Date(restored.offer.date),
+                validFrom: restored.offer.validFrom ? new Date(restored.offer.validFrom) : null,
                 validUntil: restored.offer.validUntil ? new Date(restored.offer.validUntil) : null,
                 requestFrom: restored.offer.requestFrom ? new Date(restored.offer.requestFrom) : null,
                 version: { increment: 1 },

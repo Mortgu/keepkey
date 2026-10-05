@@ -115,6 +115,7 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
             quoteId: input.quoteId,
             paymentTerm: source.paymentTerm,
             language: source.language,
+            validFrom: input.validFrom,
             validUntil: input.validUntil,
             requestFrom: input.requestFrom,
             featureComparison: source.featureComparison,

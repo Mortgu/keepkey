@@ -8,6 +8,11 @@ model Contract {
   /// Bestellung, nicht je Position — alle Positionen eines Belegs teilen sie.
   offers Offer[]
 
+  /// Anzeigereihenfolge (aufsteigend); der erste Tarif ist der Standard bei
+  /// neuen Angeboten. Bewusst nicht unique, damit Umsortieren ohne
+  /// Zwischenkonflikte in einer Transaktion möglich ist.
+  sortOrder Int @default(0)
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 

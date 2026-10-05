@@ -144,6 +144,7 @@ export declare const createOfferSchema: z.ZodObject<{
     duration_months: z.ZodNumber;
     quoteId: z.ZodString;
     paymentTerm: z.ZodString;
+    validFrom: z.ZodNullable<z.ZodString>;
     validUntil: z.ZodNullable<z.ZodString>;
     requestFrom: z.ZodNullable<z.ZodString>;
     language: z.ZodEnum<{
@@ -181,6 +182,7 @@ export declare const updateOfferSchema: z.ZodObject<{
     duration_months: z.ZodNumber;
     quoteId: z.ZodString;
     paymentTerm: z.ZodString;
+    validFrom: z.ZodNullable<z.ZodString>;
     validUntil: z.ZodNullable<z.ZodString>;
     requestFrom: z.ZodNullable<z.ZodString>;
     language: z.ZodEnum<{
@@ -229,6 +231,7 @@ export declare const extendOfferPositionSchema: z.ZodObject<{
 export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>;
 export declare const extendOfferSchema: z.ZodObject<{
     quoteId: z.ZodString;
+    validFrom: z.ZodNullable<z.ZodString>;
     validUntil: z.ZodNullable<z.ZodString>;
     requestFrom: z.ZodNullable<z.ZodString>;
     positions: z.ZodArray<z.ZodObject<{
@@ -271,12 +274,14 @@ export declare const offerSchema: z.ZodObject<{
             table: z.ZodString;
         }, z.core.$strip>>;
         id: z.ZodString;
+        sortOrder: z.ZodInt;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
     duration_months: z.ZodNumber;
     quoteId: z.ZodString;
     paymentTerm: z.ZodString;
+    validFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     language: z.ZodEnum<{
@@ -473,12 +478,14 @@ export declare const offerListSchema: z.ZodArray<z.ZodObject<{
             table: z.ZodString;
         }, z.core.$strip>>;
         id: z.ZodString;
+        sortOrder: z.ZodInt;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
     duration_months: z.ZodNumber;
     quoteId: z.ZodString;
     paymentTerm: z.ZodString;
+    validFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     language: z.ZodEnum<{
@@ -697,12 +704,14 @@ export declare const offersPageSchema: z.ZodObject<{
                 table: z.ZodString;
             }, z.core.$strip>>;
             id: z.ZodString;
+            sortOrder: z.ZodInt;
             createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
             updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         }, z.core.$strip>;
         duration_months: z.ZodNumber;
         quoteId: z.ZodString;
         paymentTerm: z.ZodString;
+        validFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         validUntil: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         requestFrom: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         language: z.ZodEnum<{

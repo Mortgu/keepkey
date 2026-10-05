@@ -72,6 +72,7 @@ export default function OfferList({ filters }: Props) {
           {isPending && (
             <ListSkeleton rows={6} skeleton={<OfferCardSkeleton />} />
           )}
+
           {offers.map((offer) => (
             <OfferCard key={offer.id} offer={offer} />
           ))}

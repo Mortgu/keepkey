@@ -1,0 +1,720 @@
+<!-- @dsCard group="Prototyp" name="Vertriebs-Workflow" subtitle="Kundenzentrierter Ablauf: Angebot im Kunden in eine Lieferantenbestellung umwandeln (Mock-Daten, kein Backend)" viewport="1280x820" -->
+<title>Vertriebs-Workflow Prototyp</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: App-Shell wie im Client — feste Sidebar links, Arbeitsfläche rechts; Prototyp-Leiste oben. Farben = Keepit-Tokens. */
+:root {
+  --bg:#F7F8F7; --surface:#FFFFFF; --surface-2:#F0F4F1; --border:#E0E4E1; --border-strong:#C4CFC8;
+  --fg:#111A14; --muted:#4B5C52; --faint:#8A9E93;
+  --accent:#00683F; --accent-hover:#005633; --accent-soft:#E6F2EC; --accent-soft-2:#D4EDE1; --on-accent:#FFFFFF;
+  --warn:#8A5A00; --warn-soft:#FBF1DC; --info:#1F5F8B; --info-soft:#E3EEF6; --danger:#B03A2E;
+  --overlay:rgba(17,26,20,.32); --shadow:0 1px 2px rgba(17,26,20,.06), 0 4px 16px rgba(17,26,20,.06);
+  --paper:#FFFFFF; --paper-fg:#1B231E;
+  --font:'DM Sans', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'DM Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg:#0E1310; --surface:#151C17; --surface-2:#1B241E; --border:#27322B; --border-strong:#3A473F;
+  --fg:#E4EBE6; --muted:#A3B2A9; --faint:#6D7E74;
+  --accent:#3DB27C; --accent-hover:#52C58F; --accent-soft:#132A1E; --accent-soft-2:#1A3828; --on-accent:#05130B;
+  --warn:#E2AC52; --warn-soft:#2A2312; --info:#80B6DC; --info-soft:#132331; --danger:#E0786C;
+  --overlay:rgba(0,0,0,.55); --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+  --paper:#F4F6F4; --paper-fg:#1B231E; color-scheme:dark;
+}}
+:root[data-theme="dark"] {
+  --bg:#0E1310; --surface:#151C17; --surface-2:#1B241E; --border:#27322B; --border-strong:#3A473F;
+  --fg:#E4EBE6; --muted:#A3B2A9; --faint:#6D7E74;
+  --accent:#3DB27C; --accent-hover:#52C58F; --accent-soft:#132A1E; --accent-soft-2:#1A3828; --on-accent:#05130B;
+  --warn:#E2AC52; --warn-soft:#2A2312; --info:#80B6DC; --info-soft:#132331; --danger:#E0786C;
+  --overlay:rgba(0,0,0,.55); --shadow:0 1px 2px rgba(0,0,0,.3), 0 6px 20px rgba(0,0,0,.3);
+  --paper:#F4F6F4; --paper-fg:#1B231E; color-scheme:dark;
+}
+*, *::before, *::after { box-sizing:border-box; }
+html, body { height:100%; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--font); font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased; }
+button, input, textarea, select { font:inherit; color:inherit; }
+button { cursor:pointer; }
+:focus-visible { outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
+.num { font-variant-numeric:tabular-nums; }
+.mono { font-family:var(--mono); font-size:12.5px; letter-spacing:-.01em; }
+h1, h2, h3 { margin:0; text-wrap:balance; font-weight:600; letter-spacing:-.01em; }
+
+/* Prototyp-Leiste */
+.proto { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; padding:8px 16px; background:var(--surface-2); border-bottom:1px dashed var(--border-strong); font-size:12.5px; color:var(--muted); }
+.proto b { color:var(--fg); font-weight:600; }
+.proto .tag { font-size:10.5px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--warn); background:var(--warn-soft); padding:2px 8px; border-radius:999px; }
+.seg { display:inline-flex; background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:2px; gap:2px; }
+.seg button { border:0; background:none; padding:3px 10px; border-radius:4px; font-size:12px; color:var(--muted); }
+.seg button[aria-pressed="true"] { background:var(--accent-soft); color:var(--accent); font-weight:600; }
+.linkbtn { border:0; background:none; padding:0; color:var(--accent); font-weight:500; text-decoration:underline; text-underline-offset:2px; }
+
+/* Shell */
+.shell { display:grid; grid-template-columns:232px minmax(0,1fr); min-height:calc(100% - 42px); }
+.side { background:var(--surface); border-right:1px solid var(--border); padding:12px 0; display:flex; flex-direction:column; gap:2px; }
+.brand { display:flex; align-items:center; gap:8px; padding:2px 16px 12px; font-weight:600; font-size:14px; }
+.brand i { width:26px; height:26px; border-radius:6px; background:var(--accent); display:grid; place-items:center; color:var(--on-accent); }
+.sec { padding:10px 16px 4px; font-size:10px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); }
+.nav { display:flex; align-items:center; gap:10px; margin:0 6px; padding:7px 10px; border-radius:5px; border:0; background:none; text-align:left; font-size:13px; color:var(--muted); width:calc(100% - 12px); }
+.nav:hover { background:var(--surface-2); color:var(--fg); }
+.nav[aria-current="page"] { background:var(--accent-soft); color:var(--accent); font-weight:500; }
+.nav .ic { display:flex; color:var(--faint); }
+.nav[aria-current="page"] .ic { color:var(--accent); }
+.nav .badge { margin-left:auto; font-size:10px; font-weight:600; padding:1px 7px; border-radius:999px; background:var(--surface-2); color:var(--muted); }
+.nav.sub { padding-left:36px; font-size:12.5px; }
+.hint { margin:4px 16px 0; font-size:11px; color:var(--faint); line-height:1.35; }
+
+.main { min-width:0; display:flex; flex-direction:column; }
+.pagehead { padding:20px 32px; border-bottom:1px solid var(--border); background:var(--surface); display:flex; flex-wrap:wrap; align-items:center; gap:12px 20px; }
+.crumb { font-size:12.5px; color:var(--faint); display:flex; gap:6px; align-items:center; }
+.crumb button { border:0; background:none; padding:0; color:var(--faint); }
+.crumb button:hover { text-decoration:underline; color:var(--fg); }
+.pagehead h1 { font-size:20px; }
+.pagehead .grow { flex:1; min-width:200px; display:grid; gap:2px; }
+.meta { display:flex; flex-wrap:wrap; gap:4px 16px; font-size:12.5px; color:var(--muted); }
+.content { padding:24px 32px 48px; display:grid; gap:16px; align-content:start; }
+
+/* Buttons */
+.btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; height:38px; padding:0 16px; border-radius:6px; border:1px solid transparent; font-size:14px; font-weight:500; white-space:nowrap; }
+.btn.sm { height:32px; padding:0 12px; font-size:13px; }
+.btn.primary { background:var(--accent); color:var(--on-accent); }
+.btn.primary:hover { background:var(--accent-hover); }
+.btn.border { background:var(--surface); border-color:var(--border); color:var(--fg); }
+.btn.border:hover { background:var(--surface-2); }
+.btn.ghost { background:none; color:var(--muted); }
+.btn.ghost:hover { background:var(--surface-2); color:var(--fg); }
+.btn:disabled { opacity:.5; cursor:not-allowed; }
+
+/* Tabs */
+.tabs { display:flex; gap:2px; border-bottom:1px solid var(--border); overflow-x:auto; padding:0 32px; background:var(--surface); }
+.tab { border:0; background:none; padding:10px 12px; font-size:13.5px; color:var(--muted); border-bottom:2px solid transparent; margin-bottom:-1px; white-space:nowrap; display:flex; gap:6px; align-items:center; }
+.tab:hover { color:var(--fg); }
+.tab[aria-selected="true"] { color:var(--accent); border-bottom-color:var(--accent); font-weight:500; }
+.tab .count { font-size:10.5px; font-weight:600; padding:0 7px; border-radius:999px; background:var(--surface-2); color:var(--muted); }
+.tab[aria-selected="true"] .count { background:var(--accent-soft); color:var(--accent); }
+.proc.locked { background:var(--surface-2); border-style:dashed; }
+.proc.locked h3, .proc.locked .proc-sum strong { color:var(--muted); }
+.proc.locked .proc-foot { background:transparent; }
+.lockline { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted); }
+.toast { position:fixed; left:50%; transform:translateX(-50%); bottom:calc(20px + env(safe-area-inset-bottom, 0px)); z-index:30; background:var(--fg); color:var(--bg); padding:10px 16px; border-radius:8px; font-size:13px; box-shadow:var(--shadow); display:flex; gap:12px; align-items:center; max-width:calc(100% - 32px); }
+.toast button { border:0; background:none; color:inherit; font-weight:600; text-decoration:underline; padding:0; }
+
+/* Liste */
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.input { height:38px; padding:0 12px; border:1px solid var(--border); border-radius:6px; background:var(--surface); width:100%; }
+.input:focus { outline:2px solid var(--accent); outline-offset:-1px; }
+.search { flex:1; min-width:220px; max-width:420px; }
+.tablewrap { overflow-x:auto; border:1px solid var(--border); border-radius:8px; background:var(--surface); }
+table { border-collapse:collapse; width:100%; min-width:560px; }
+th { text-align:left; font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); padding:10px 14px; border-bottom:1px solid var(--border); background:var(--surface-2); }
+td { padding:11px 14px; border-bottom:1px solid var(--border); vertical-align:middle; }
+tr:last-child td { border-bottom:0; }
+tbody tr.click { cursor:pointer; }
+tbody tr.click:hover td { background:var(--surface-2); }
+td.r, th.r { text-align:right; }
+
+/* Pills */
+.pill { display:inline-flex; align-items:center; gap:5px; font-size:11.5px; font-weight:500; padding:2px 9px; border-radius:999px; white-space:nowrap; }
+.pill::before { content:""; width:6px; height:6px; border-radius:50%; background:currentColor; }
+.pill.wait { background:var(--warn-soft); color:var(--warn); }
+.pill.todo { background:var(--info-soft); color:var(--info); }
+.pill.ok { background:var(--accent-soft); color:var(--accent); }
+.pill.neutral { background:var(--surface-2); color:var(--muted); }
+
+/* Vorgangs-Karte */
+.proc { background:var(--surface); border:1px solid var(--border); border-radius:10px; display:grid; }
+.proc.focus { border-color:var(--accent); box-shadow:var(--shadow); }
+.proc-head { display:flex; flex-wrap:wrap; gap:8px 16px; align-items:flex-start; padding:16px 18px 12px; }
+.proc-head .t { flex:1; min-width:220px; display:grid; gap:3px; }
+.proc-head h3 { font-size:15.5px; }
+.proc-sum { text-align:right; display:grid; gap:1px; }
+.proc-sum strong { font-size:15px; }
+.proc-sum span { font-size:12px; color:var(--muted); }
+.proc-foot { display:flex; flex-wrap:wrap; align-items:center; gap:10px 16px; padding:12px 18px; border-top:1px solid var(--border); background:var(--surface-2); border-radius:0 0 10px 10px; }
+.proc-foot .log { flex:1; min-width:200px; font-size:12.5px; color:var(--muted); }
+
+/* Stepper */
+.stepper { list-style:none; margin:0; padding:4px 18px 16px; display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:0; overflow-x:auto; }
+.step { position:relative; display:grid; gap:4px; padding-right:12px; min-width:118px; }
+.step .row { display:flex; align-items:center; gap:0; }
+.dot { width:22px; height:22px; border-radius:50%; flex-shrink:0; display:grid; place-items:center; font-size:11px; font-weight:600; border:1.5px solid var(--border-strong); color:var(--faint); background:var(--surface); }
+.line { height:2px; flex:1; background:var(--border); margin-left:6px; border-radius:2px; }
+.step:last-child .line { display:none; }
+.step .lbl { overflow-wrap:anywhere; font-size:12.5px; font-weight:500; color:var(--muted); }
+.step .subl { font-size:11.5px; color:var(--faint); }
+.step.done .dot { background:var(--accent); border-color:var(--accent); color:var(--on-accent); }
+.step.done .line { background:var(--accent); }
+.step.done .lbl { color:var(--fg); }
+.step.current .dot { border-color:var(--accent); color:var(--accent); box-shadow:0 0 0 4px var(--accent-soft); }
+.step.current .lbl { color:var(--accent); font-weight:600; }
+.step.later .dot { border-style:dashed; }
+.step.later .lbl { color:var(--faint); }
+
+/* Dialog & Drawer */
+.overlay { position:fixed; inset:0; background:var(--overlay); z-index:20; display:flex; }
+.dialog { margin:auto; width:min(460px, calc(100% - 32px)); background:var(--surface); border-radius:12px; border:1px solid var(--border); box-shadow:var(--shadow); display:grid; gap:16px; padding:22px; }
+.dialog h2 { font-size:17px; }
+.field { display:grid; gap:5px; }
+.field label { font-size:12.5px; font-weight:500; color:var(--muted); }
+textarea.input { height:auto; padding:8px 12px; min-height:70px; resize:vertical; }
+.actions { display:flex; justify-content:flex-end; gap:8px; flex-wrap:wrap; }
+.drawer { margin-left:auto; width:min(720px, 100%); height:100%; background:var(--bg); border-left:1px solid var(--border); display:flex; flex-direction:column; box-shadow:var(--shadow); }
+.drawer-head { padding:18px 22px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; padding-top:calc(18px + env(safe-area-inset-top, 0px)); }
+.drawer-head .grow { flex:1; min-width:200px; display:grid; gap:2px; }
+.drawer-head h2 { font-size:17px; }
+.drawer-body { flex:1; overflow-y:auto; padding:20px 22px; display:grid; gap:18px; align-content:start; }
+.drawer-foot { padding:14px 22px calc(14px + env(safe-area-inset-bottom, 0px)); background:var(--surface); border-top:1px solid var(--border); display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+.drawer-foot .grow { flex:1; min-width:160px; font-size:12.5px; color:var(--muted); }
+.kv { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:12px 20px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+.kv div { display:grid; gap:2px; min-width:0; }
+.kv dt { font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--faint); }
+.kv dd { margin:0; font-size:13.5px; overflow-wrap:anywhere; }
+.substeps { display:flex; flex-wrap:wrap; gap:6px; align-items:center; font-size:12.5px; color:var(--faint); }
+.substeps .on { color:var(--accent); font-weight:600; }
+.substeps .done { color:var(--fg); }
+.blockh { font-size:11px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; color:var(--faint); margin-bottom:-8px; }
+.paper { background:var(--paper); color:var(--paper-fg); border:1px solid var(--border); border-radius:4px; padding:22px 24px; font-size:11.5px; display:grid; gap:10px; max-width:520px; box-shadow:var(--shadow); }
+.paper .ph { display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.paper strong { font-size:13px; }
+.paper .bar { height:6px; border-radius:3px; background:#D9E0DB; }
+.paper .placeholder { border:1.5px dashed #C4CFC8; border-radius:6px; padding:28px; text-align:center; color:#6B7C71; }
+.note { font-size:12.5px; padding:10px 12px; border-radius:6px; background:var(--info-soft); color:var(--info); }
+.margin-ok { color:var(--accent); font-weight:600; }
+
+/* Offene Fragen */
+.questions { background:var(--surface); border:1px dashed var(--border-strong); border-radius:10px; padding:14px 18px; display:grid; gap:8px; }
+.questions h3 { font-size:13px; }
+.questions ol { margin:0; padding-left:18px; display:grid; gap:4px; color:var(--muted); font-size:13px; max-width:75ch; }
+
+.empty { padding:40px 20px; text-align:center; color:var(--muted); background:var(--surface); border:1px dashed var(--border-strong); border-radius:10px; display:grid; gap:6px; justify-items:center; }
+
+@media (max-width: 820px) {
+  .shell { grid-template-columns:1fr; }
+  .side { border-right:0; border-bottom:1px solid var(--border); flex-direction:row; flex-wrap:wrap; padding:8px 10px; }
+  .side .sec, .side .hint, .brand { display:none; }
+  .nav { width:auto; margin:0; }
+  .nav.sub { padding-left:10px; }
+  .pagehead, .content { padding-left:16px; padding-right:16px; }
+  .tabs { padding:0 16px; }
+  .stepper { padding:4px 16px 16px; }
+  .proc-sum { text-align:left; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .proc, .step .dot, .step .line { transition:background .2s, border-color .2s, box-shadow .2s; }
+}
+</style>
+
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
+const { useState, useMemo, useEffect } = React;
+
+// ── Mock-Daten ──────────────────────────────────────────────────────────────
+// Ein Datensatz = ein Angebot. Wird es umgewandelt (stage "po"), hängt die
+// Lieferantenbestellung daran; das Angebot bleibt erhalten, ist aber gesperrt.
+// poStatus: draft → generated → sent (Versand macht der Mitarbeiter selbst und markiert ihn nur).
+const TODAY = "01.10.2026";
+
+const SUPPLIERS = {
+  keepit: { name:"Keepit A/S", email:"orders@supplier.example", country:"Dänemark" },
+  nordwind: { name:"Nordwind Distribution GmbH", email:"bestellung@nordwind.example", country:"Deutschland" },
+};
+
+const INITIAL = [
+  { id:"c1", name:"Brandt Logistik GmbH", number:"K-10234", city:"Hamburg", contact:"Julia Brandt", email:"j.brandt@brandt-logistik.example", items:[
+    { id:"v1", quoteId:"AN-2026-0142", title:"Microsoft 365 Backup – Erweiterung Standort Bremen", supplier:"keepit", contract:"Keepit Rahmenvertrag 2026", months:36, start:"01.11.2026",
+      positions:[{ name:"Keepit für Microsoft 365", unit:"Nutzer", qty:250, vk:2.90, ek:2.05 }, { name:"Keepit für Entra ID", unit:"Nutzer", qty:250, vk:0.60, ek:0.38 }],
+      stage:"offer", sentAt:"24.09.2026", log:"Angebot am 24.09.2026 an Julia Brandt versendet" },
+    { id:"v2", quoteId:"AN-2026-0117", title:"Google Workspace Backup", supplier:"nordwind", contract:"Standardvertrag", months:12, start:"15.10.2026",
+      positions:[{ name:"Keepit für Google Workspace", unit:"Nutzer", qty:80, vk:2.40, ek:1.70 }],
+      stage:"po", poStatus:"generated", poNumber:"BE-2026-0032", sentAt:"02.09.2026", acceptedAt:"29.09.2026", projectNumber:"BL-IT-2026-07", log:"PDF für BE-2026-0032 generiert, noch nicht versendet" },
+    { id:"v3", quoteId:"AN-2026-0088", title:"Salesforce Backup Pilot", supplier:"keepit", contract:"Keepit Rahmenvertrag 2026", months:12, start:"01.08.2026",
+      positions:[{ name:"Keepit für Salesforce", unit:"Lizenzen", qty:40, vk:4.50, ek:3.10 }],
+      stage:"po", poStatus:"sent", poNumber:"BE-2026-0027", sentAt:"10.07.2026", acceptedAt:"18.07.2026", poSentAt:"19.07.2026", poSentBy:"Oskar Sammet", log:"Als versendet markiert: 19.07.2026" },
+    { id:"v6", quoteId:"AN-2026-0071", title:"Microsoft 365 Backup – Erstangebot (abgelöst)", supplier:"keepit", contract:"Keepit Rahmenvertrag 2026", months:36, start:"01.07.2026",
+      positions:[{ name:"Keepit für Microsoft 365", unit:"Nutzer", qty:200, vk:2.90, ek:2.05 }],
+      stage:"offer", sentAt:"12.06.2026", log:"Angebot am 12.06.2026 versendet" },
+  ]},
+  { id:"c2", name:"Stadtwerke Kelheim", number:"K-10311", city:"Kelheim", contact:"Markus Feil", email:"m.feil@sw-kelheim.example", items:[
+    { id:"v4", quoteId:"AN-2026-0139", title:"Dynamics 365 Backup", supplier:"nordwind", contract:"Öffentlicher Sektor", months:24, start:"01.01.2027",
+      positions:[{ name:"Keepit für Dynamics 365", unit:"Nutzer", qty:60, vk:3.20, ek:2.30 }],
+      stage:"po", poStatus:"draft", poNumber:"BE-2026-0033", sentAt:"15.09.2026", acceptedAt:"30.09.2026", log:"Aus Angebot AN-2026-0139 umgewandelt, Entwurf" },
+  ]},
+  { id:"c3", name:"Meyer & Söhne Maschinenbau KG", number:"K-10087", city:"Augsburg", contact:"Petra Meyer", email:"p.meyer@meyer-soehne.example", items:[
+    { id:"v5", quoteId:"AN-2026-0131", title:"Microsoft 365 Backup – Verlängerung", supplier:"keepit", contract:"Keepit Rahmenvertrag 2026", months:36, start:"01.12.2026",
+      positions:[{ name:"Keepit für Microsoft 365", unit:"Nutzer", qty:420, vk:2.75, ek:2.05 }],
+      stage:"offer", sentAt:"19.09.2026", log:"Angebot am 19.09.2026 an Petra Meyer versendet" },
+  ]},
+];
+
+const eur = new Intl.NumberFormat("de-DE", { style:"currency", currency:"EUR" });
+const sum = (ps, k) => ps.reduce((a, p) => a + p.qty * p[k], 0);
+const deDate = iso => iso.split("-").reverse().join(".");
+let poCounter = 34, quoteCounter = 143;
+
+function offerStatus(v) {
+  return v.stage === "offer" ? { cls:"wait", text:"Offen" } : { cls:"neutral", text:"In Bestellung umgewandelt" };
+}
+function orderStatus(v) {
+  return { draft:{ cls:"todo", text:"Entwurf" }, generated:{ cls:"wait", text:"PDF bereit · nicht versendet" }, sent:{ cls:"ok", text:"Versendet" } }[v.poStatus];
+}
+// Für Listen außerhalb des Kunden: wichtigster Status eines Datensatzes
+const statusOf = v => v.stage === "offer" ? { cls:"wait", text:"Angebot offen" } : orderStatus(v);
+
+// ── Icons ───────────────────────────────────────────────────────────────────
+const svg = (d, s=14) => <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{d}</svg>;
+const I = {
+  dash: svg(<><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></>),
+  cust: svg(<><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></>),
+  offer: svg(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="13" y2="17"/></>),
+  order: svg(<><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></>),
+  list: svg(<><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></>),
+  tariff: svg(<><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></>),
+  plus: svg(<><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></>),
+  check: svg(<polyline points="20 6 9 17 4 12"/>, 12),
+  convert: svg(<><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></>),
+  download: svg(<><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></>),
+  file: svg(<><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></>),
+  x: svg(<><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></>, 18),
+  chev: svg(<polyline points="6 9 12 15 18 9"/>, 11),
+  lock: svg(<><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>, 13),
+  arrow: svg(<><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></>, 13),
+};
+
+// ── Sidebar ─────────────────────────────────────────────────────────────────
+function Sidebar({ page, go, navMode, counts }) {
+  const [open, setOpen] = useState(false);
+  const Nav = ({ id, icon, label, badge, sub }) => (
+    <button className={"nav" + (sub ? " sub" : "")} aria-current={page === id ? "page" : undefined} onClick={() => go(id)}>
+      {icon && <span className="ic">{icon}</span>}<span>{label}</span>{badge !== undefined && <span className="badge num">{badge}</span>}
+    </button>
+  );
+  return (
+    <nav className="side" aria-label="Hauptnavigation">
+      <div className="brand"><i>{svg(<><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></>)}</i>Keepit</div>
+      <div className="sec">Übersicht</div>
+      <Nav id="dashboard" icon={I.dash} label="Dashboard" />
+      <div className="sec">Katalog</div>
+      <Nav id="tariffs" icon={I.tariff} label="Tarife" />
+      <div className="sec">Vertrieb</div>
+      <Nav id="customers" icon={I.cust} label="Kunden" badge={counts.customers} />
+      {navMode === "visible" && <>
+        <Nav id="offers" icon={I.offer} label="Angebote" badge={counts.open} />
+        <Nav id="orders" icon={I.order} label="Bestellungen" badge={counts.po} />
+      </>}
+      {navMode === "collapsed" && <>
+        <button className="nav" aria-expanded={open} onClick={() => setOpen(!open)}>
+          <span className="ic">{I.list}</span><span>Alle Belege</span>
+          <span style={{ marginLeft:"auto", display:"flex", transform: open ? "rotate(180deg)" : "none" }}>{I.chev}</span>
+        </button>
+        {open && <>
+          <Nav id="offers" label="Angebote" badge={counts.open} sub />
+          <Nav id="orders" label="Bestellungen" badge={counts.po} sub />
+        </>}
+      </>}
+      {navMode === "removed" && <p className="hint">Angebote und Bestellungen gibt es nur noch im Kunden.</p>}
+    </nav>
+  );
+}
+
+// ── Kundenliste ─────────────────────────────────────────────────────────────
+function CustomerList({ customers, openCustomer }) {
+  const [q, setQ] = useState("");
+  const rows = customers.filter(c => (c.name + c.number + c.city + c.contact).toLowerCase().includes(q.toLowerCase()));
+  return (<>
+    <header className="pagehead">
+      <div className="grow"><h1>Kunden</h1><div className="meta">Einstieg für alles Weitere: Kunde suchen, dort Angebot anlegen und in eine Bestellung umwandeln.</div></div>
+      <button className="btn border sm">{I.plus} Kunde anlegen</button>
+    </header>
+    <div className="content">
+      <div className="toolbar">
+        <input id="customer-search" className="input search" placeholder="Firma, Kundennummer, Ort oder Ansprechpartner…" value={q} onChange={e => setQ(e.target.value)} />
+      </div>
+      <div className="tablewrap">
+        <table>
+          <thead><tr><th>Kunde</th><th>Ansprechpartner</th><th className="r">Offene Angebote</th><th className="r">Offene Bestellungen</th></tr></thead>
+          <tbody>
+            {rows.map(c => {
+              const offers = c.items.filter(v => v.stage === "offer").length;
+              const orders = c.items.filter(v => v.stage === "po" && v.poStatus !== "sent").length;
+              return (
+                <tr key={c.id} className="click" tabIndex={0} onClick={() => openCustomer(c.id)} onKeyDown={e => e.key === "Enter" && openCustomer(c.id)}>
+                  <td><div style={{ fontWeight:500 }}>{c.name}</div><div className="mono" style={{ color:"var(--faint)" }}>{c.number} · {c.city}</div></td>
+                  <td>{c.contact}</td>
+                  <td className="r num">{offers}</td>
+                  <td className="r num">{orders ? <span className="pill todo">{orders} nicht versendet</span> : 0}</td>
+                </tr>
+              );
+            })}
+            {rows.length === 0 && <tr><td colSpan="4" style={{ color:"var(--muted)" }}>Kein Kunde passt zu „{q}“.</td></tr>}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </>);
+}
+
+// ── Kleiner Ablauf in der Bestell-Karte ─────────────────────────────────────
+function Stepper({ v }) {
+  const sup = SUPPLIERS[v.supplier].name;
+  const steps = [
+    { lbl:"Angebot", sub:`${v.quoteId} · angenommen ${v.acceptedAt}`, st:"done" },
+    { lbl:"Bestellung", sub: v.poStatus === "sent" ? `versendet ${v.poSentAt}` : v.poStatus === "generated" ? "PDF bereit, Versand offen" : "Entwurf", st: v.poStatus === "sent" ? "done" : "current" },
+    { lbl:"Auftragsbestätigung", sub: v.poStatus === "sent" ? "nächster Schritt · kommt später" : "kommt später", st:"later" },
+    { lbl:"Rechnung", sub:"kommt später", st:"later" },
+  ];
+  return (
+    <ol className="stepper" aria-label="Fortschritt" style={{ gridTemplateColumns:`repeat(${steps.length}, minmax(124px,1fr))` }}>
+      {steps.map((s, i) => (
+        <li key={i} className={"step " + s.st} aria-current={s.st === "current" ? "step" : undefined}>
+          <div className="row"><span className="dot">{s.st === "done" ? I.check : i + 1}</span><span className="line" /></div>
+          <span className="lbl">{s.lbl}</span><span className="subl">{s.sub}</span>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+// ── Angebots-Karte (Reiter „Angebote“) ──────────────────────────────────────
+function OfferCard({ v, focused, onConvert, onShowOrder }) {
+  const locked = v.stage === "po";
+  const st = offerStatus(v);
+  const mvk = sum(v.positions, "vk");
+  return (
+    <article className={"proc" + (locked ? " locked" : "") + (focused ? " focus" : "")}>
+      <div className="proc-head">
+        <div className="t">
+          <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
+            <span className="mono" style={{ color:"var(--faint)" }}>{v.quoteId}</span>
+            <span className={"pill " + st.cls}>{st.text}</span>
+          </div>
+          <h3>{v.title}</h3>
+          <div className="meta"><span>{v.contract}</span><span>{v.months} Monate ab {v.start}</span><span>Lieferant: {SUPPLIERS[v.supplier].name}</span></div>
+        </div>
+        <div className="proc-sum num"><strong>{eur.format(mvk)}</strong><span>pro Monat · {eur.format(mvk * v.months)} gesamt</span></div>
+      </div>
+      <div className="proc-foot">
+        {locked ? <>
+          <span className="log lockline">{I.lock} Gesperrt seit Annahme am {v.acceptedAt}. Nicht mehr bearbeitbar.</span>
+          <button className="btn border sm">{I.file} PDF ansehen</button>
+          <button className="btn border sm" onClick={() => onShowOrder(v.id)}>Zur Bestellung {v.poNumber} {I.arrow}</button>
+        </> : <>
+          <span className="log">{v.log}</span>
+          <button className="btn ghost sm">Bearbeiten</button>
+          <button className="btn border sm">{I.file} PDF ansehen</button>
+          <button className="btn primary sm" onClick={() => onConvert(v.id)}>{I.convert} In Bestellung umwandeln</button>
+        </>}
+      </div>
+    </article>
+  );
+}
+
+// ── Bestell-Karte (Reiter „Bestellungen“) ───────────────────────────────────
+function OrderCard({ v, focused, onOpen, onShowOffer }) {
+  const st = orderStatus(v);
+  const ek = sum(v.positions, "ek");
+  const label = { draft:"Bestellung bearbeiten", generated:"PDF herunterladen / versenden", sent:"Bestellung ansehen" }[v.poStatus];
+  return (
+    <article className={"proc" + (focused ? " focus" : "")}>
+      <div className="proc-head">
+        <div className="t">
+          <div style={{ display:"flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>
+            <span className="mono" style={{ color:"var(--faint)" }}>{v.poNumber}</span>
+            <span className={"pill " + st.cls}>{st.text}</span>
+          </div>
+          <h3>{v.title}</h3>
+          <div className="meta">
+            <span>An {SUPPLIERS[v.supplier].name}</span>
+            <span>aus <button className="linkbtn mono" onClick={() => onShowOffer(v.id)}>{v.quoteId}</button></span>
+            {v.projectNumber && <span>Projekt <span className="mono">{v.projectNumber}</span></span>}
+          </div>
+        </div>
+        <div className="proc-sum num"><strong>{eur.format(ek)}</strong><span>Einkauf pro Monat</span></div>
+      </div>
+      <Stepper v={v} />
+      <div className="proc-foot">
+        <span className="log">{v.log}</span>
+        {v.poStatus === "sent" && <button className="btn primary sm" disabled title="Kommt in einem späteren Schritt">Auftragsbestätigung erstellen</button>}
+        <button className={"btn sm " + (v.poStatus === "sent" ? "border" : "primary")} onClick={() => onOpen(v.id)}>{label}</button>
+      </div>
+    </article>
+  );
+}
+
+// ── Kundendetail ────────────────────────────────────────────────────────────
+function CustomerDetail({ c, go, tab, setTab, focusId, setFocus, onConvert, onOpenPO, onNewOffer }) {
+  const [showLocked, setShowLocked] = useState(false);
+  const [showSent, setShowSent] = useState(true);
+  const offersOpen = c.items.filter(v => v.stage === "offer");
+  const offersLocked = c.items.filter(v => v.stage === "po");
+  const orders = c.items.filter(v => v.stage === "po");
+  const showOffers = showLocked || (focusId && offersLocked.some(v => v.id === focusId)) ? [...offersOpen, ...offersLocked] : offersOpen;
+  const showOrders = showSent ? orders : orders.filter(v => v.poStatus !== "sent");
+  const jump = (t, id) => { setTab(t); setFocus(id); };
+  const tabs = [["general","Allgemein"],["prices","Preise"],["offers","Angebote", offersOpen.length],["orders","Bestellungen", orders.filter(v => v.poStatus !== "sent").length],["invoices","Rechnungen"]];
+  return (<>
+    <header className="pagehead">
+      <div className="grow">
+        <div className="crumb"><button onClick={() => go("customers")}>Kunden</button><span>/</span><span style={{ color:"var(--fg)" }}>{c.name}</span></div>
+        <h1>{c.name}</h1>
+        <div className="meta"><span className="mono">{c.number}</span><span>{c.city}</span><span>{c.contact} · {c.email}</span></div>
+      </div>
+      <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+        <button className="btn border sm">Bearbeiten</button>
+        <button className="btn primary sm" onClick={() => { onNewOffer(c.id); setTab("offers"); }}>{I.plus} Neues Angebot</button>
+      </div>
+    </header>
+    <div className="tabs" role="tablist">
+      {tabs.map(([k, l, n]) => <button key={k} role="tab" className="tab" aria-selected={tab === k} onClick={() => { setTab(k); setFocus(null); }}>
+        {l}{n !== undefined && <span className="count num">{n}</span>}
+      </button>)}
+    </div>
+    <div className="content">
+      {tab === "offers" && <>
+        <div className="toolbar">
+          <div className="seg" role="group" aria-label="Filter Angebote">
+            <button aria-pressed={!showLocked} onClick={() => setShowLocked(false)}>Offen</button>
+            <button aria-pressed={showLocked} onClick={() => setShowLocked(true)}>Alle inkl. umgewandelte ({offersLocked.length})</button>
+          </div>
+        </div>
+        {showOffers.map(v => <OfferCard key={v.id} v={v} focused={v.id === focusId} onConvert={onConvert} onShowOrder={id => jump("orders", id)} />)}
+        {showOffers.length === 0 && <div className="empty"><strong>Keine offenen Angebote</strong><span>Umgewandelte Angebote findest du unter „Alle“.</span></div>}
+      </>}
+      {tab === "orders" && <>
+        <div className="toolbar">
+          <div className="seg" role="group" aria-label="Filter Bestellungen">
+            <button aria-pressed={!showSent} onClick={() => setShowSent(false)}>Nicht versendet</button>
+            <button aria-pressed={showSent} onClick={() => setShowSent(true)}>Alle</button>
+          </div>
+        </div>
+        {showOrders.map(v => <OrderCard key={v.id} v={v} focused={v.id === focusId} onOpen={onOpenPO} onShowOffer={id => jump("offers", id)} />)}
+        {showOrders.length === 0 && <div className="empty"><strong>Keine Bestellungen</strong><span>Eine Bestellung entsteht, wenn du ein Angebot unter „Angebote“ umwandelst.</span></div>}
+      </>}
+      {!["offers","orders"].includes(tab) && <div className="empty"><strong>Heutiger Reiter, unverändert</strong><span>Im Prototyp nicht nachgebaut.</span></div>}
+    </div>
+  </>);
+}
+
+// ── Globale Listen (Angebote / Bestellungen) ────────────────────────────────
+function GlobalList({ kind, customers, openItem }) {
+  const rows = customers.flatMap(c => c.items.map(v => ({ c, v })))
+    .filter(({ v }) => kind === "offers" ? v.stage === "offer" : v.stage === "po");
+  return (<>
+    <header className="pagehead"><div className="grow"><h1>{kind === "offers" ? "Offene Angebote" : "Bestellungen an Lieferanten"}</h1>
+      <div className="meta">Übersicht über alle Kunden. Ein Klick öffnet den Beleg im Kunden.</div></div></header>
+    <div className="content">
+      <div className="tablewrap"><table>
+        <thead><tr><th>{kind === "offers" ? "Angebot" : "Bestellung"}</th><th>Kunde</th><th>{kind === "offers" ? "Titel" : "Lieferant"}</th><th>Status</th><th className="r">€ / Monat</th></tr></thead>
+        <tbody>{rows.map(({ c, v }) => { const st = statusOf(v); return (
+          <tr key={v.id} className="click" tabIndex={0} onClick={() => openItem(c.id, v.id, kind)} onKeyDown={e => e.key === "Enter" && openItem(c.id, v.id, kind)}>
+            <td className="mono">{kind === "offers" ? v.quoteId : v.poNumber}</td><td>{c.name}</td>
+            <td>{kind === "offers" ? v.title : SUPPLIERS[v.supplier].name}</td>
+            <td><span className={"pill " + st.cls}>{st.text}</span></td>
+            <td className="r num">{eur.format(sum(v.positions, kind === "offers" ? "vk" : "ek"))}</td>
+          </tr>); })}</tbody>
+      </table></div>
+    </div>
+  </>);
+}
+
+// ── Umwandeln-Dialog ────────────────────────────────────────────────────────
+function ConvertDialog({ v, c, onClose, onConfirm }) {
+  const [date, setDate] = useState("2026-10-01");
+  const [proj, setProj] = useState("");
+  const [desc, setDesc] = useState("");
+  return (
+    <div className="overlay" onClick={onClose}>
+      <form className="dialog" role="dialog" aria-modal="true" aria-labelledby="cv-title" onClick={e => e.stopPropagation()}
+        onSubmit={e => { e.preventDefault(); onConfirm({ date, proj, desc }); }}>
+        <div style={{ display:"grid", gap:6 }}>
+          <h2 id="cv-title">{v.quoteId} in Bestellung umwandeln</h2>
+          <span style={{ color:"var(--muted)", fontSize:13 }}>Es entsteht ein Bestellentwurf an {SUPPLIERS[v.supplier].name} mit denselben Positionen. Das Angebot bleibt erhalten, wird gesperrt und unter „Angebote“ standardmäßig ausgeblendet.</span>
+        </div>
+        <div className="field"><label htmlFor="cv-date">Vom Kunden angenommen am</label><input id="cv-date" type="date" className="input" value={date} onChange={e => setDate(e.target.value)} /></div>
+        <div className="field"><label htmlFor="cv-proj">Projekt- oder Bestellnummer des Kunden (optional)</label><input id="cv-proj" className="input" placeholder="z. B. aus der Bestätigungsmail" value={proj} onChange={e => setProj(e.target.value)} /></div>
+        <div className="field"><label htmlFor="cv-desc">Projektbeschreibung (optional)</label><textarea id="cv-desc" className="input" value={desc} onChange={e => setDesc(e.target.value)} /></div>
+        <div className="actions">
+          <button type="button" className="btn ghost sm" onClick={onClose}>Abbrechen</button>
+          <button type="submit" className="btn primary sm">{I.convert} Umwandeln</button>
+        </div>
+      </form>
+    </div>
+  );
+}
+
+// ── Bestellung an Lieferant (Drawer) ────────────────────────────────────────
+function PurchaseOrderDrawer({ v, c, onClose, onUpdate, onToast }) {
+  const sup = SUPPLIERS[v.supplier];
+  const [marking, setMarking] = useState(false);
+  const [sentDate, setSentDate] = useState("2026-10-01");
+  const [sentTo, setSentTo] = useState(sup.email);
+  const ek = sum(v.positions, "ek"), vk = sum(v.positions, "vk");
+  const margin = vk ? ((vk - ek) / vk) * 100 : 0;
+  const sub = ["draft", "generated", "sent"], lbl = { draft:"Entwurf", generated:"PDF generiert", sent:"Versendet" };
+  const idx = sub.indexOf(v.poStatus);
+  return (
+    <div className="overlay" onClick={onClose}>
+      <aside className="drawer" role="dialog" aria-modal="true" aria-labelledby="po-title" onClick={e => e.stopPropagation()}>
+        <div className="drawer-head">
+          <div className="grow">
+            <span className="mono" style={{ color:"var(--faint)" }}>{v.poNumber}</span>
+            <h2 id="po-title">Bestellung an {sup.name}</h2>
+            <div className="substeps">{sub.map((s, i) => <React.Fragment key={s}>
+              {i > 0 && <span aria-hidden="true">→</span>}
+              <span className={i === idx ? "on" : i < idx ? "done" : ""}>{lbl[s]}</span>
+            </React.Fragment>)}</div>
+          </div>
+          <button className="btn ghost sm" onClick={onClose} aria-label="Schließen">{I.x}</button>
+        </div>
+        <div className="drawer-body">
+          <dl className="kv" style={{ margin:0 }}>
+            <div><dt>Lieferant</dt><dd>{sup.name}<br /><span style={{ color:"var(--muted)" }}>{sup.email}</span></dd></div>
+            <div><dt>Endkunde</dt><dd>{c.name}</dd></div>
+            <div><dt>Aus Angebot</dt><dd className="mono">{v.quoteId}</dd></div>
+            <div><dt>Lizenzbeginn · Laufzeit</dt><dd>{v.start} · {v.months} Monate</dd></div>
+            {v.projectNumber && <div><dt>Projektnr. Kunde</dt><dd className="mono">{v.projectNumber}</dd></div>}
+          </dl>
+
+          <div className="blockh">Positionen (Einkauf)</div>
+          <div className="tablewrap"><table>
+            <thead><tr><th>Produkt</th><th className="r">Menge</th><th className="r">EK / Einheit</th><th className="r">EK / Monat</th><th className="r">VK / Monat</th></tr></thead>
+            <tbody>{v.positions.map((p, i) => (
+              <tr key={i}><td>{p.name}</td><td className="r num">{p.qty} {p.unit}</td><td className="r num">{eur.format(p.ek)}</td><td className="r num">{eur.format(p.qty * p.ek)}</td><td className="r num" style={{ color:"var(--muted)" }}>{eur.format(p.qty * p.vk)}</td></tr>
+            ))}
+            <tr><td style={{ fontWeight:600 }}>Summe</td><td></td><td></td><td className="r num" style={{ fontWeight:600 }}>{eur.format(ek)}</td><td className="r num" style={{ color:"var(--muted)" }}>{eur.format(vk)}</td></tr>
+            </tbody>
+          </table></div>
+          <div style={{ fontSize:12.5, color:"var(--muted)" }}>Positionen und Mengen kommen unverändert aus dem angenommenen Angebot. Rohmarge: <span className="margin-ok num">{margin.toFixed(1).replace(".", ",")} %</span> · {eur.format((vk - ek) * v.months)} über die Laufzeit</div>
+
+          <div className="blockh">Dokument</div>
+          <div className="paper">
+            <div className="ph"><strong>Bestellung {v.poNumber}</strong><span>{TODAY}</span></div>
+            <div>An: {sup.name}<br />Endkunde: {c.name} · Bezug: {v.quoteId}</div>
+            {v.poStatus === "draft"
+              ? <div className="placeholder">Noch kein PDF. „Dokument generieren“ nutzt die Bestellvorlage.</div>
+              : <><div className="bar" style={{ width:"90%" }} /><div className="bar" style={{ width:"75%" }} /><div className="bar" style={{ width:"82%" }} /><div className="bar" style={{ width:"40%" }} />
+                 <div style={{ display:"flex", justifyContent:"space-between" }}><span>Summe netto / Monat</span><strong className="num">{eur.format(ek)}</strong></div></>}
+          </div>
+
+          {v.poStatus === "generated" && !marking && <div className="note">Lade das PDF herunter und schick es selbst an {sup.name}. Danach hier als versendet markieren.</div>}
+          {v.poStatus === "sent" && <div className="note">Von {v.poSentBy} als versendet markiert: {v.poSentAt}{v.poTo ? ` an ${v.poTo}` : ""}. Nächster Schritt wäre die Auftragsbestätigung für {c.name}.</div>}
+          {marking && v.poStatus === "generated" && (
+            <div style={{ background:"var(--surface)", border:"1px solid var(--border)", borderRadius:8, padding:14, display:"grid", gap:12 }}>
+              <div className="field"><label htmlFor="po-date">Versendet am</label><input id="po-date" type="date" className="input" value={sentDate} onChange={e => setSentDate(e.target.value)} /></div>
+              <div className="field"><label htmlFor="po-to">An (optional, nur zur Dokumentation)</label><input id="po-to" className="input" value={sentTo} onChange={e => setSentTo(e.target.value)} /></div>
+            </div>
+          )}
+        </div>
+        <div className="drawer-foot">
+          <span className="grow">{v.log}</span>
+          {v.poStatus === "draft" && <button className="btn primary sm" onClick={() => onUpdate({ poStatus:"generated", log:`PDF für ${v.poNumber} generiert, noch nicht versendet` })}>{I.file} Dokument generieren</button>}
+          {v.poStatus === "generated" && !marking && <>
+            <button className="btn ghost sm" onClick={() => onUpdate({ poStatus:"draft", log:`${v.poNumber} zurück auf Entwurf` })}>Neu generieren</button>
+            <button className="btn border sm" onClick={() => onToast(`${v.poNumber}.pdf würde jetzt heruntergeladen (Prototyp)`)}>{I.download} PDF herunterladen</button>
+            <button className="btn primary sm" onClick={() => setMarking(true)}>{I.check} Als versendet markieren…</button>
+          </>}
+          {v.poStatus === "generated" && marking && <>
+            <button className="btn ghost sm" onClick={() => setMarking(false)}>Abbrechen</button>
+            <button className="btn primary sm" onClick={() => { const d = deDate(sentDate); onUpdate({ poStatus:"sent", poSentAt:d, poTo:sentTo, poSentBy:"Oskar Sammet", log:`Als versendet markiert: ${d}` }); }}>{I.check} Versand bestätigen</button>
+          </>}
+          {v.poStatus === "sent" && <>
+            <button className="btn border sm" onClick={() => onToast(`${v.poNumber}.pdf würde jetzt heruntergeladen (Prototyp)`)}>{I.download} PDF herunterladen</button>
+            <button className="btn border sm" onClick={onClose}>Schließen</button>
+          </>}
+        </div>
+      </aside>
+    </div>
+  );
+}
+
+// ── App ─────────────────────────────────────────────────────────────────────
+function App() {
+  const [customers, setCustomers] = useState(INITIAL);
+  const [view, setView] = useState({ page:"customers" });
+  const [navMode, setNavMode] = useState("collapsed");
+  const [convert, setConvert] = useState(null); // item id
+  const [po, setPo] = useState(null);           // item id
+  const [toast, setToast] = useState(null);
+  const [showQ, setShowQ] = useState(true);
+
+  useEffect(() => { if (!toast) return; const t = setTimeout(() => setToast(null), 5000); return () => clearTimeout(t); }, [toast]);
+
+  const find = id => { for (const c of customers) { const v = c.items.find(x => x.id === id); if (v) return { c, v }; } return null; };
+  const patch = (id, p) => setCustomers(cs => cs.map(c => ({ ...c, items:c.items.map(v => v.id === id ? { ...v, ...p } : v) })));
+
+  const counts = useMemo(() => {
+    const all = customers.flatMap(c => c.items);
+    return { customers:customers.length, open:all.filter(v => v.stage === "offer").length, po:all.filter(v => v.stage === "po" && v.poStatus !== "sent").length };
+  }, [customers]);
+
+  const go = page => setView({ page });
+  const openCustomer = (id, tab = "offers", focus = null) => setView({ page:"customer", customerId:id, tab, focus });
+  const setTab = tab => setView(s => ({ ...s, tab }));
+  const setFocus = focus => setView(s => ({ ...s, focus }));
+  const newOffer = cid => {
+    const v = { id:"v" + Date.now(), quoteId:`AN-2026-0${quoteCounter++}`, title:"Microsoft 365 Backup – neues Angebot", supplier:"keepit", contract:"Keepit Rahmenvertrag 2026", months:12, start:"01.11.2026",
+      positions:[{ name:"Keepit für Microsoft 365", unit:"Nutzer", qty:50, vk:2.90, ek:2.05 }], stage:"offer", sentAt:TODAY, log:`Angebot am ${TODAY} erstellt (simuliert)` };
+    setCustomers(cs => cs.map(c => c.id === cid ? { ...c, items:[v, ...c.items] } : c));
+    setFocus(v.id);
+  };
+
+  const cust = customers.find(c => c.id === view.customerId);
+  const cv = convert && find(convert);
+  const poV = po && find(po);
+  const page = view.page === "customer" ? "customers" : view.page;
+
+  return (<>
+    <div className="proto">
+      <span className="tag">Prototyp</span>
+      <span>Mock-Daten, nichts wird gespeichert.</span>
+      <span style={{ display:"inline-flex", gap:8, alignItems:"center", flexWrap:"wrap" }}>Angebote/Bestellungen in der Navigation:
+        <span className="seg" role="group" aria-label="Navigationsvariante">
+          {[["visible","sichtbar"],["collapsed","eingeklappt"],["removed","entfernt"]].map(([k, l]) =>
+            <button key={k} aria-pressed={navMode === k} onClick={() => setNavMode(k)}>{l}</button>)}
+        </span>
+      </span>
+      <button className="linkbtn" onClick={() => { setCustomers(INITIAL); setView({ page:"customers" }); }}>Zurücksetzen</button>
+      <button className="linkbtn" onClick={() => setShowQ(!showQ)}>{showQ ? "Offene Fragen ausblenden" : "Offene Fragen zeigen"}</button>
+    </div>
+    <div className="shell">
+      <Sidebar page={page} go={go} navMode={navMode} counts={counts} />
+      <main className="main">
+        {view.page === "customers" && <CustomerList customers={customers} openCustomer={openCustomer} />}
+        {view.page === "customer" && cust && <CustomerDetail key={cust.id} c={cust} go={go} tab={view.tab} setTab={setTab}
+          focusId={view.focus} setFocus={setFocus} onConvert={setConvert} onOpenPO={setPo} onNewOffer={newOffer} />}
+        {(view.page === "offers" || view.page === "orders") && <GlobalList kind={view.page} customers={customers} openItem={(cid, vid, kind) => openCustomer(cid, kind, vid)} />}
+        {(view.page === "dashboard" || view.page === "tariffs") && <div className="content"><div className="empty"><strong>Nicht Teil des Prototyps</strong><span>Weiter über „Kunden“.</span></div></div>}
+        {showQ && (
+          <div className="content" style={{ paddingTop:0 }}>
+            <section className="questions" aria-labelledby="q-title">
+              <h3 id="q-title">Offene Fragen, die wir hieran entscheiden wollen</h3>
+              <ol>
+                <li>Ist „Umwandeln“ gleichzeitig die Annahme durch den Kunden, oder braucht es einen eigenen Zwischenschritt „angenommen, Bestellung noch nicht angelegt“?</li>
+                <li>Eine Bestellung pro Angebot, oder mehrere, wenn Positionen von verschiedenen Lieferanten kommen?</li>
+                <li>Reicht beim Versand „als versendet markieren“ mit Datum, oder soll man die gesendete Mail bzw. Lieferantenbestätigung hochladen können?</li>
+                <li>Darf eine Bestellung im Entwurf zurück in ein Angebot verwandelt werden (Umwandlung rückgängig)?</li>
+                <li>Navigation: Angebote und Bestellungen eingeklappt lassen oder ganz entfernen?</li>
+              </ol>
+            </section>
+          </div>
+        )}
+      </main>
+    </div>
+    {cv && <ConvertDialog v={cv.v} c={cv.c} onClose={() => setConvert(null)} onConfirm={({ date, proj }) => {
+      const d = deDate(date), poNumber = `BE-2026-00${poCounter++}`;
+      patch(cv.v.id, { stage:"po", poStatus:"draft", poNumber, acceptedAt:d, projectNumber:proj || undefined, log:`Aus Angebot ${cv.v.quoteId} umgewandelt, Entwurf` });
+      setView(s => ({ ...s, tab:"orders", focus:cv.v.id }));
+      setToast(`${cv.v.quoteId} ist jetzt Bestellung ${poNumber}. Das Angebot ist gesperrt und unter „Angebote → Alle“ zu finden.`);
+      setConvert(null);
+    }} />}
+    {poV && <PurchaseOrderDrawer key={poV.v.id} v={poV.v} c={poV.c} onClose={() => setPo(null)} onUpdate={p => patch(poV.v.id, p)} onToast={setToast} />}
+    {toast && <div className="toast" role="status"><span>{toast}</span><button onClick={() => setToast(null)}>OK</button></div>}
+  </>);
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>

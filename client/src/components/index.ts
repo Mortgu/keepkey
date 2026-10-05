@@ -8,6 +8,7 @@ export * from './checkbox';
 export * from './dialog';
 export * from './dialog-styles';
 export { default as DocumentDocxEditor } from './docx-editor';
+export * from './document-preview-modal';
 export * from './document-rename-modal';
 export * from './drawer';
 export * from './drawer-styles';

@@ -21,8 +21,15 @@ export const updateContractSchema = z.object({
 
 export type UpdateContractInput = z.infer<typeof updateContractSchema>;
 
+/** Vollständige neue Reihenfolge aller Tarife; Index 0 ist der Standard. */
+export const reorderContractsSchema = z.object({
+    ids: z.array(z.string()).min(1),
+});
+export type ReorderContractsInput = z.infer<typeof reorderContractsSchema>;
+
 export const contractSchema = createContractSchema.extend({
     id: z.string(),
+    sortOrder: z.int(),
 
     createdAt: isoDateTime,
     updatedAt: isoDateTime,

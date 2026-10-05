@@ -147,6 +147,7 @@ export declare const orderSchema: z.ZodObject<{
             table: z.ZodString;
         }, z.core.$strip>>;
         id: z.ZodString;
+        sortOrder: z.ZodInt;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;
@@ -292,6 +293,7 @@ export declare const orderListSchema: z.ZodArray<z.ZodObject<{
             table: z.ZodString;
         }, z.core.$strip>>;
         id: z.ZodString;
+        sortOrder: z.ZodInt;
         createdAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
         updatedAt: z.ZodPipe<z.ZodUnion<readonly [z.ZodDate, z.ZodISODateTime]>, z.ZodTransform<string, string | Date>>;
     }, z.core.$strip>;

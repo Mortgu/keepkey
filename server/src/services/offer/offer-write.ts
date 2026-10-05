@@ -111,6 +111,7 @@ export type OfferFields = PriceHeader & {
     quoteId: string;
     paymentTerm: string;
     language: "DE" | "EN";
+    validFrom: string | null;
     validUntil: string | null;
     requestFrom: string | null;
     featureComparison: boolean;
