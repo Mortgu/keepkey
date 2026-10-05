@@ -1,5 +1,5 @@
 import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
-import { Dot, Download, EllipsisVertical, ExternalLink, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
+import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
 import { toast } from "react-toastify";
@@ -9,7 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
 import type { DocxEditorRef } from "@docx-editor.dev/react";
 import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
-import { Badge, Button, DocumentDocxEditor, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
 import {
     documentDownloadUrl,
     useDocumentCapabilities,
@@ -107,6 +107,8 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     });
     const styles = cardStyles({ focused: dropzone.isFocused });
     const renameModal = useModal();
+    const previewModal = useModal();
+    const canPreview = (document.status === "GENERATED" || document.status === "UPLOADED") && Boolean(pdf);
 
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
     const task = useDocumentTask(document.taskId);
@@ -238,6 +240,17 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                 />
                             )}
 
+                            {/* Preview Button */}
+                            {canPreview && (
+                                <Button
+                                    variant="ghost"
+                                    size="xs"
+                                    icon={<Eye size={14} />}
+                                    iconOnly
+                                    onClick={() => previewModal.open()}
+                                />
+                            )}
+
                             {/* Download Button */}
                             {(document.status === "GENERATED" || document.status === "UPLOADED") && (
                                 <Menu.Root>
@@ -274,6 +287,11 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                                 <Menu.Item className={menuStyles().Item()} onClick={() => dropzone.open()}>
                                                     <Replace size={14} /> Replace File
                                                 </Menu.Item>
+                                                {canPreview && (
+                                                    <Menu.Item className={menuStyles().Item()} onClick={() => previewModal.open()}>
+                                                        <Eye size={14} /> Vorschau
+                                                    </Menu.Item>
+                                                )}
                                                 <Menu.Item className={menuStyles().Item()} onClick={async () => {
                                                     const result = await refetch();
                                                     if (result.data) setBytes(result.data);
@@ -303,6 +321,16 @@ export default function DocumentCard({ type, parentId, document }: Props) {
 
                     </div>
                 </div>
+
+                {previewModal.isOpen && pdf && (
+                    <DocumentPreviewModal
+                        type={type}
+                        documentId={document.id}
+                        artifactId={pdf.id}
+                        title={document.displayName ?? `v${document.version}`}
+                        onClose={previewModal.close}
+                    />
+                )}
 
                 {renameModal.isOpen && (
                     <DocumentRenameModal
