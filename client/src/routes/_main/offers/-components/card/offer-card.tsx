@@ -11,6 +11,7 @@ import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
+import OrderCreateModal from "@/routes/_main/orders/-components/order-create-modal";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import { useModal } from "@/hooks";
 import { formatDate } from "@/lib/format";
@@ -26,6 +27,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
     /** `data` trägt nur die Variante — die Quelle ist immer das Angebot dieser Karte. */
     const offerModal = useModal<{ mode: OfferModalMode }>();
+    const orderModal = useModal();
 
     const {
         customerContactPerson: ccp,
@@ -60,13 +62,13 @@ export default function OfferCard({ offer }: OfferListItemProps) {
         }
     };
 
-    const dateCell = "grid gap-0.5 px-3 py-2 text-xs border-l border-(--border) first:border-l-0";
+    const dateCell = "flex flex-col gap-0.5 px-4 py-2 text-xs border-l border-(--border) first:border-l-0";
 
     return (
         <div className="bg-white border border-(--border) rounded-md overflow-hidden">
             {/* Kopf */}
             <div className="flex items-start justify-between gap-4 px-4 py-3">
-                <div className="grid gap-1">
+                <div className="grid gap-0">
                     <div className="flex items-center gap-2">
                         <Link to="/offers/$offer" params={{ offer: quoteId }} className="text-md font-mono font-semibold text-(--text) hover:underline">AG{quoteId}</Link>
                         {offer.derivationType === "RENEWAL" && (
@@ -87,14 +89,14 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
                 <div className="flex flex-col items-end">
                     <p className="text-md font-mono font-semibold">{formatEur(offer.net_amount)}</p>
-                    <p className="text-(--text-secondary) font-light text-xs">Gesamtpreis</p>
+                    <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis</p>
                 </div>
             </div>
 
             {/* Status- und Datumsleiste */}
             <div className="grid grid-cols-2 md:grid-cols-4 border-t border-(--border) bg-(--page-bg) text-(--text)">
                 {offer.acceptedAt && (
-                    <div className={`${dateCell} flex items-center justify-between bg-(--primary-50) text-(--primary)`}>
+                    <div className={`${dateCell} flex-row items-center justify-between bg-(--primary-50) text-(--primary)`}>
                         <div className="grid gap-0.5">
                             <span className="text-xs">{t("orders.accepted")} am:</span>
                             <span className="text-sm font-medium">{formatDate(offer.acceptedAt)}</span>
@@ -172,8 +174,13 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             {/* Aktionen */}
             <div className="flex items-center justify-between gap-2 p-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
-                    {/* Noch ohne Funktion. */}
-                    <Button variant="primary" type="button" size="xs">
+                    <Button
+                        variant="primary"
+                        type="button"
+                        size="xs"
+                        disabled={Boolean(offer.acceptedAt)}
+                        title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}
+                        onClick={() => orderModal.open()}>
                         Bestellung erstellen
                     </Button>
 
@@ -229,6 +236,15 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             </div>
 
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
+
+            {orderModal.isOpen && (
+                <OrderCreateModal
+                    key={orderModal.key}
+                    offer={offer}
+                    onClose={orderModal.close}
+                    onCreated={orderModal.close}
+                />
+            )}
 
             {offerModal.isOpen && (
                 <OfferModal
