@@ -125,6 +125,7 @@ export const createOfferSchema = z.object({
 
     quoteId: z.string().trim().nonempty("Required!"),
     paymentTerm: z.string().nonempty("Required!"),
+    validFrom: z.string().nullable(),
     validUntil: z.string().nullable(),
     requestFrom: z.string().nullable(),
     language: z.enum(["EN", "DE"]),
@@ -164,6 +165,7 @@ export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>
 
 export const extendOfferSchema = z.object({
     quoteId: z.string().trim().nonempty("Required!"),
+    validFrom: z.string().nullable(),
     validUntil: z.string().nullable(),
     requestFrom: z.string().nullable(),
 
@@ -201,6 +203,7 @@ export const offerSchema = z.object({
 
     quoteId: z.string(),
     paymentTerm: z.string(),
+    validFrom: z.string().nullable().optional(),
     validUntil: z.string().nullable().optional(),
     requestFrom: z.string().nullable().optional(),
     language: z.enum(["EN", "DE"]),

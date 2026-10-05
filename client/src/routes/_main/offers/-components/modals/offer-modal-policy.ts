@@ -24,6 +24,7 @@ export type HeaderField =
     | "quoteId"
     | "supplierId"
     | "paymentTerm"
+    | "validFrom"
     | "validUntil"
     | "requestFrom"
     | "language"
@@ -73,6 +74,7 @@ const ALL_HEADER_FIELDS_EDITABLE: Record<HeaderField, FieldAccess> = {
     quoteId: "edit",
     supplierId: "edit",
     paymentTerm: "edit",
+    validFrom: "edit",
     validUntil: "edit",
     requestFrom: "edit",
     language: "edit",

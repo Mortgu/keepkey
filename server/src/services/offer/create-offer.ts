@@ -28,6 +28,7 @@ export async function createOffer(
             quoteId: input.quoteId,
             paymentTerm: input.paymentTerm,
             language: input.language,
+            validFrom: input.validFrom,
             validUntil: input.validUntil,
             requestFrom: input.requestFrom,
             featureComparison: input.featureComparison,

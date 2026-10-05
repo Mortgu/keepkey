@@ -31,6 +31,8 @@ const offerFields = z.object({
   paymentTerm: z.string(),
   featureComparison: z.boolean().default(false),
   date: dateTimeSchema,
+  // Ältere Revisionen kennen das Feld noch nicht.
+  validFrom: nullableDateTimeSchema.optional().transform((v) => v ?? null),
   validUntil: nullableDateTimeSchema,
   requestFrom: nullableDateTimeSchema,
   net_amount: z.number().int(),

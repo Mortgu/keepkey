@@ -46,6 +46,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 language: input.language,
                 supplierId: input.supplierId,
                 paymentTerm: input.paymentTerm,
+                validFrom: input.validFrom,
                 validUntil: input.validUntil,
                 requestFrom: input.requestFrom,
                 featureComparison: input.featureComparison,

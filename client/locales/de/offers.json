@@ -21,6 +21,7 @@
     "quoteId": "Angebotsnummer",
     "supplierId": "Lieferant",
     "paymentTerm": "Zahlungsbedingung",
+    "validFrom": "Gültig vom",
     "validUntil": "Gültig bis",
     "requestFrom": "Anfrage vom",
     "offerDate": "Angebot vom",

@@ -21,6 +21,7 @@
     "quoteId": "Quote id",
     "supplierId": "Supplier",
     "paymentTerm": "Payment term",
+    "validFrom": "Valid from",
     "validUntil": "Valid until",
     "requestFrom": "Request from",
     "offerDate": "Offer date",
