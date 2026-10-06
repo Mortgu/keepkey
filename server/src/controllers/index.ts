@@ -9,6 +9,7 @@ export * from './integrations.controller.js';
 export * from './nextcloud.controller.js';
 export * from './order.controller.js';
 export * from './confirmation.controller.js';
+export * from './invoice.controller.js';
 export * from './search.controller.js';
 export * from './supplier.controller.js';
 export * from './tariff.controller.js';

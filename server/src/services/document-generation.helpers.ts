@@ -86,7 +86,7 @@ export function getGeneratedDocument(context: PipelineContext): GeneratedDocumen
 export async function createArtifactDocuments(
     tx: Prisma.TransactionClient,
     files: StoredDocumentArtifacts,
-    owner: { offerDocumentId: string } | { orderDocumentId: string } | { confirmationDocumentId: string },
+    owner: { offerDocumentId: string } | { orderDocumentId: string } | { confirmationDocumentId: string } | { invoiceDocumentId: string },
 ) {
     const pdf = await tx.documentArtifact.create({
         data: {

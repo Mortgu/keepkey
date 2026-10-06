@@ -5,7 +5,7 @@ import { tv } from "tailwind-variants";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import type { ConfirmationDocument, DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
+import type { ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument } from "@keepit/schemas";
 import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
@@ -47,7 +47,7 @@ interface Props {
     type: DocumentType;
     /** Id des Angebots bzw. der Bestellung. */
     parentId: string;
-    document: OfferDocument | OrderDocument | ConfirmationDocument;
+    document: OfferDocument | OrderDocument | ConfirmationDocument | InvoiceDocument;
 }
 
 export default function DocumentCard({ type, parentId, document }: Props) {

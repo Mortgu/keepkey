@@ -29,6 +29,15 @@
       "create": "Create confirmation",
       "regenerate": "Regenerate document",
       "noDocument": "No document generated yet."
+    },
+    "invoice": {
+      "title": "Invoice",
+      "hint": "The invoice number is assigned once and cannot be changed afterwards. Line items, net, VAT and gross come from the order.",
+      "number": "Invoice no.",
+      "date": "Invoice date",
+      "create": "Create invoice",
+      "regenerate": "Regenerate document",
+      "noDocument": "No document generated yet."
     }
   }
 }

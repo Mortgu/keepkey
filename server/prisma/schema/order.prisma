@@ -20,7 +20,7 @@ model Order {
   documents OrderDocument[]
   confirmation Confirmation?
   revisions OrderRevision[]
-  invoices Invoice[]
+  invoice Invoice?
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   @@index([acceptedById])

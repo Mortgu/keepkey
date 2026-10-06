@@ -29,6 +29,15 @@
       "create": "AB erstellen",
       "regenerate": "Dokument neu erzeugen",
       "noDocument": "Noch kein Dokument erzeugt."
+    },
+    "invoice": {
+      "title": "Rechnung",
+      "hint": "Die Rechnungsnummer wird einmal vergeben und danach nicht mehr geändert. Positionen, Netto, MwSt. und Brutto kommen aus der Bestellung.",
+      "number": "Rechnungs-Nr.",
+      "date": "Rechnungsdatum",
+      "create": "Rechnung erstellen",
+      "regenerate": "Dokument neu erzeugen",
+      "noDocument": "Noch kein Dokument erzeugt."
     }
   }
 }

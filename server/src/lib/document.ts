@@ -83,6 +83,10 @@ export async function enqueueTask(taskId: string, options: { markFailedOnError?:
             where: { taskId, status: "PENDING" },
             data: { status: "FAILED", error: exception.message },
           }),
+          prisma.invoiceDocument.updateMany({
+            where: { taskId, status: "PENDING" },
+            data: { status: "FAILED", error: exception.message },
+          }),
         ]);
       } catch (dbException: any) {
         logger.error('enqueue_task_persist_failed', { taskId, error: dbException.message });

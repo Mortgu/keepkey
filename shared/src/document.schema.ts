@@ -40,7 +40,7 @@ export const documentArtifactSchema = z.object({
 });
 export type DocumentArtifact = z.infer<typeof documentArtifactSchema>;
 
-export const documentTypeSchema = z.enum(["offer", "order", "confirmation"]);
+export const documentTypeSchema = z.enum(["offer", "order", "confirmation", "invoice"]);
 export type DocumentType = z.infer<typeof documentTypeSchema>;
 
 export const generatedDocumentSchema = z.object({

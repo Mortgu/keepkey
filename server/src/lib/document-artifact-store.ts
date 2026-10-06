@@ -22,7 +22,7 @@ export type StoredDocumentArtifacts = {
     docx: StoredDocumentArtifact;
 };
 
-export type DocumentArtifactScope = "offers" | "orders" | "confirmations";
+export type DocumentArtifactScope = "offers" | "orders" | "confirmations" | "invoices";
 const DOWNLOAD_URL_TTL_SECONDS = 5 * 60;
 
 /**

@@ -45,6 +45,8 @@ const env = createEnv({
         NEXTCLOUD_ORDER_ORIGINAL_PATH: z.string().default('/'),
         NEXTCLOUD_CONFIRMATION_PDF_PATH: z.string().default('/'),
         NEXTCLOUD_CONFIRMATION_ORIGINAL_PATH: z.string().default('/'),
+        NEXTCLOUD_INVOICE_PDF_PATH: z.string().default('/'),
+        NEXTCLOUD_INVOICE_ORIGINAL_PATH: z.string().default('/'),
 
         REDIS_URL: z.string().min(1),
         WORKER_CONCURRENCY: z.coerce.number().default(2),

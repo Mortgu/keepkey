@@ -15,13 +15,14 @@ import type { DocumentType } from "@keepit/schemas";
 
 /** Filter, die für jede Dokumenttabelle gültig sind (ohne Eltern-FK). */
 export type DocumentWhere =
-    Prisma.OfferDocumentWhereInput & Prisma.OrderDocumentWhereInput & Prisma.ConfirmationDocumentWhereInput;
+    Prisma.OfferDocumentWhereInput & Prisma.OrderDocumentWhereInput & Prisma.ConfirmationDocumentWhereInput & Prisma.InvoiceDocumentWhereInput;
 
 /** Updates, die für jede Dokumenttabelle gültig sind. */
 export type DocumentUpdate =
     Prisma.OfferDocumentUpdateManyMutationInput
     & Prisma.OrderDocumentUpdateManyMutationInput
-    & Prisma.ConfirmationDocumentUpdateManyMutationInput;
+    & Prisma.ConfirmationDocumentUpdateManyMutationInput
+    & Prisma.InvoiceDocumentUpdateManyMutationInput;
 
 export type DocumentWithArtifacts = NonNullable<
     Awaited<ReturnType<ReturnType<typeof documentTable>["findWithArtifacts"]>>
@@ -82,6 +83,24 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.confirmationDocument.updateMany({ where, data }),
+            };
+        case "invoice":
+            return {
+                scope: "invoices" satisfies DocumentArtifactScope as DocumentArtifactScope,
+                nextcloud: {
+                    pdfDirectory: env.NEXTCLOUD_INVOICE_PDF_PATH,
+                    docxDirectory: env.NEXTCLOUD_INVOICE_ORIGINAL_PATH,
+                },
+                findWithArtifacts: (id: string) => client.invoiceDocument.findFirst({
+                    where: { id, deletedAt: null },
+                    include: { artifacts: true },
+                }),
+                reloadWithArtifacts: (id: string) => client.invoiceDocument.findUnique({
+                    where: { id },
+                    include: { artifacts: true },
+                }),
+                updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
+                    client.invoiceDocument.updateMany({ where, data }),
             };
     }
 }

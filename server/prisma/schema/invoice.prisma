@@ -1,25 +1,65 @@
+/// Rechnung zu einer Bestellung — genau eine je Bestellung. Die Rechnungsnummer
+/// vergibt der Nutzer einmal; danach ist sie unveränderlich (§ 14 UStG / GoBD:
+/// eindeutig, der Unique-Constraint erzwingt das auf DB-Ebene).
+///
+/// Positionen, Beträge, Zahlungsziel, Projekt und Lieferant stehen am
+/// angenommenen Angebot bzw. an der Bestellung und werden nicht kopiert.
+/// `customerId` ist bewusst denormalisiert, damit die Kundenseite ihre
+/// Rechnungen ohne Umweg über Order → Offer findet.
 model Invoice {
   id String @id @default(cuid())
 
-  /// Rechnungsnummer. In DE rechtlich eindeutig und lückenlos zu vergeben
-  /// (§ 146a AO / GoBD) — der Unique-Constraint erzwingt die Eindeutigkeit
-  /// auf DB-Ebene.
-  invoiceId   String @unique // Rechnungs-Nr.
-  date        DateTime @default(now()) // Datum
-  paymentTerm String
-  projectId   String // Projekt-Nr.
+  /// Rechnungs-Nr., vom Nutzer vergeben.
+  invoiceId String   @unique
+  date      DateTime @default(now())
 
-  customer   Customer @relation(fields: [customerId], references: [id])
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderId String @unique
+
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
   customerId String
 
-  supplier   Supplier @relation(fields: [supplierId], references: [id])
-  supplierId String
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdById String
 
-  order   Order  @relation(fields: [orderId], references: [id])
-  orderId String
+  documents InvoiceDocument[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@index([customerId])
-  @@index([orderId])
-  @@index([supplierId])
+  @@index([createdById])
   @@map("invoice")
+}
+
+/// Dieselben Spalten wie die anderen Dokumenttabellen (siehe
+/// `ConfirmationDocument`), keine Versionierung: eine neue Generierung ersetzt
+/// das vorherige Dokument.
+model InvoiceDocument {
+  id String @id @default(cuid())
+
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
+
+  error       String?
+  /// @openapi.ignore
+  uploadToken String?
+
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId String
+
+  artifacts DocumentArtifact[] @relation("InvoiceDocumentArtifacts")
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @unique
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+
+  @@index([invoiceId])
+  @@map("invoice_document")
 }

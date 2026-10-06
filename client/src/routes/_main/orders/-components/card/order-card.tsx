@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OrderCreateModal from "../order-create-modal";
 import ConfirmationSection from "./confirmation-section";
+import InvoiceSection from "./invoice-section";
 import type { Order } from "@keepit/schemas";
 import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks/orders/order-mutations";
 import { getErrorMessage } from "@/lib/errors";
@@ -112,6 +113,9 @@ export default function OrderCard({ order }: Props) {
                 </Accordion.Section>
                 <Accordion.Section value="confirmation" label={t("orders.confirmation.title")}>
                     <ConfirmationSection order={order} />
+                </Accordion.Section>
+                <Accordion.Section value="invoice" label={t("orders.invoice.title")}>
+                    <InvoiceSection order={order} />
                 </Accordion.Section>
                 <Accordion.Section value="documents" label="Dokumente">
                     {documents.map((document) => (

@@ -3,6 +3,7 @@ import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-in
 import { Router } from "express";
 import {
   createConfirmation,
+  createInvoice,
   createOrder,
   createOrderTask,
   deleteOrderById,
@@ -11,13 +12,15 @@ import {
   getNextOrderNumber,
   getOrderById,
   getConfirmation,
+  getInvoice,
   getOrderRevisions,
   regenerateConfirmation,
+  regenerateInvoice,
   restoreOrderRevision,
   updateOrder,
 } from "@/controllers/index.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
-import { createConfirmationSchema, orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
+import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
 import {
   idParamsSchema,
   orderIdParamsSchema,
@@ -47,8 +50,19 @@ router.post(
     validateParams(orderIdParamsSchema),
     validate(createConfirmationSchema),
     createConfirmation,
+  createInvoice,
 );
 router.post("/:orderId/confirmation/documents", validateParams(orderIdParamsSchema), regenerateConfirmation);
+
+/* Rechnung — eine je Bestellung, Nummer vom Nutzer. */
+router.get("/:orderId/invoice", validateParams(orderIdParamsSchema), getInvoice);
+router.post(
+    "/:orderId/invoice",
+    validateParams(orderIdParamsSchema),
+    validate(createInvoiceSchema),
+    createInvoice,
+);
+router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), regenerateInvoice);
 
 router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
