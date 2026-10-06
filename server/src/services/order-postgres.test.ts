@@ -152,6 +152,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 language: "EN",
                 offerPositions: {
                     create: {
+                        id: `pos-${randomUUID()}`,
                         productId: "product",
                         quantity: 10,
                         total_cents: 120000,
@@ -166,16 +167,21 @@ integration("real PostgreSQL acceptance transactions", () => {
             },
         });
     }
-    const input = (id: string) => ({
-        id,
-        orderId: randomUUID(),
-        expectedOfferVersion: 1,
-    });
+    const input = async (id: string) => {
+        const positions = await prisma.offerPosition.findMany({ where: { offerId: id }, select: { id: true } });
+        return {
+            id,
+            orderId: randomUUID(),
+            expectedOfferVersion: 1,
+            positions: positions.map((p) => ({ offerPositionId: p.id, purchase_eur_user_month: 800 })),
+        };
+    };
     it("allows exactly one of two simultaneous acceptances", async () => {
         const offer = await draft();
+        const body = await input(offer.id);
         const results = await Promise.allSettled([
-            createOrder(input(offer.id), "user"),
-            createOrder(input(offer.id), "user"),
+            createOrder(body, "user"),
+            createOrder({ ...body, orderId: randomUUID() }, "user"),
         ]);
         expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
         expect(results.filter((r) => r.status === "rejected")).toHaveLength(1);
@@ -203,7 +209,7 @@ integration("real PostgreSQL acceptance transactions", () => {
             });
         });
         await locked;
-        const acceptance = createOrder(input(offer.id), "user");
+        const acceptance = createOrder(await input(offer.id), "user");
         const result = expect(acceptance).rejects.toMatchObject({
             code: "VERSION_CONFLICT",
         });
@@ -220,11 +226,11 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("rolls back the offer lock and snapshot when the order cannot be inserted", async () => {
         const first = await draft();
-        const existing = await createOrder(input(first.id), "user");
+        const existing = await createOrder(await input(first.id), "user");
         const second = await draft();
         await expect(
             createOrder(
-                { ...input(second.id), orderId: existing.orderId },
+                { ...(await input(second.id)), orderId: existing.orderId },
                 "user",
             ),
         ).rejects.toThrow();
@@ -236,7 +242,7 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("metadata edits and restores preserve the accepted price and frozen master data", async () => {
         const offer = await draft();
-        const order = await createOrder(input(offer.id), "user");
+        const order = await createOrder(await input(offer.id), "user");
         await prisma.customer.update({
             where: { id: "customer" },
             data: { companyName: "Changed Ltd" },
@@ -272,7 +278,7 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("resolves list counts, search and dashboard volumes through the accepted offer", async () => {
         const offer = await draft();
-        const order = await createOrder(input(offer.id), "user");
+        const order = await createOrder(await input(offer.id), "user");
         const customers = await getCustomers({});
         expect(customers[0]?._count.orders).toBeGreaterThan(0);
         expect(

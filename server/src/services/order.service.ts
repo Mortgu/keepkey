@@ -4,6 +4,8 @@ import { AppException } from "../lib/exceptions.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
 import { acceptOffer } from "./offer-acceptance.service.js";
 import { presentOrder } from "./order-source.js";
+import { purchaseLines } from "./order-purchase.js";
+import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
     acceptOrderSchema,
     updateOrderMetadataSchema,
@@ -16,6 +18,7 @@ import {
 
 const orderInclude = {
     offer: true,
+    positions: true,
     documents: {
         where: { deletedAt: null },
         orderBy: { version: "desc" },
@@ -92,6 +95,9 @@ export async function createOrder(input: AcceptOrderInput, actorId: string) {
                 data.id,
                 data.expectedOfferVersion,
             );
+            // Der Snapshot ist soeben entstanden — die Einkaufszeilen beziehen
+            // sich auf genau diese Positionen.
+            const lines = await purchaseLinesForOffer(tx, data.id, data.positions);
             return tx.order.create({
                 data: {
                     offerId: data.id,
@@ -103,11 +109,25 @@ export async function createOrder(input: AcceptOrderInput, actorId: string) {
                     contractStartDate: data.contractStartDate ? new Date(data.contractStartDate) : null,
                     acceptedAt,
                     acceptedById: actorId,
+                    positions: { create: lines },
                 },
             });
         },
         { timeout: 30_000 },
     );
+}
+/** Einkaufszeilen gegen den Accepted-Snapshot des Angebots rechnen und prüfen. */
+async function purchaseLinesForOffer(
+    tx: Prisma.TransactionClient,
+    offerId: string,
+    input: Parameters<typeof purchaseLines>[1],
+) {
+    const offer = await tx.offer.findUniqueOrThrow({
+        where: { id: offerId },
+        select: { acceptedSnapshot: true },
+    });
+    const source = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
+    return purchaseLines(source.positions, input, source.duration_months);
 }
 async function lockOrder(
     tx: Prisma.TransactionClient,
@@ -166,6 +186,10 @@ export async function updateOrder(
     return prisma.$transaction(async (tx) => {
         const current = await lockOrder(tx, id, data.expectedVersion);
         await saveRevision(tx, current, actorId);
+        // Einkaufspreise werden (noch) nicht versioniert: ersetzen, fertig.
+        const lines = data.positions
+            ? await purchaseLinesForOffer(tx, current.offerId, data.positions)
+            : null;
         const order = await tx.order.update({
             where: { id },
             data: {
@@ -173,6 +197,7 @@ export async function updateOrder(
                 date: new Date(data.order.date),
                 contractStartDate: data.order.contractStartDate ? new Date(data.order.contractStartDate) : null,
                 version: { increment: 1 },
+                ...(lines ? { positions: { deleteMany: {}, create: lines } } : {}),
             },
         });
         await invalidateDocuments(tx, id);

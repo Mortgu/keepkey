@@ -38,6 +38,21 @@
       "create": "Create invoice",
       "regenerate": "Regenerate document",
       "noDocument": "No document generated yet."
+    },
+    "purchase": {
+      "title": "Purchase prices (order to the supplier)",
+      "hint": "Per user and month, net. Prefilled with the sales price. Flat rates and discounts of the offer stay with the customer.",
+      "product": "Product",
+      "quantity": "Qty",
+      "sales": "Sales",
+      "purchase": "Purchase",
+      "lineTotal": "Net",
+      "salesTotal": "Sales total",
+      "purchaseTotal": "Purchase total",
+      "margin": "Margin",
+      "purchaseShort": "Purchase",
+      "marginShort": "Margin",
+      "fallback": "Purchase prices not recorded yet (equal to the sales price)."
     }
   }
 }

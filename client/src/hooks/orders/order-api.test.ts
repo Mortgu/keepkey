@@ -2,7 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { createOrderSchema, updateOrderSchema } from "@keepit/schemas";
 import { cancelOrder, createOrder, updateOrder } from "./order-api";
 
-const acceptance = { id: "a598e5c1-af68-428c-a398-f4022a9fe246", expectedOfferVersion: 7, orderId: "23232", projectNumber: "232323" };
+const acceptance = {
+    id: "a598e5c1-af68-428c-a398-f4022a9fe246", expectedOfferVersion: 7, orderId: "23232", projectNumber: "232323",
+    positions: [{ offerPositionId: "pos-1", purchase_eur_user_month: 800 }],
+};
 afterEach(() => vi.unstubAllGlobals());
 
 function mockResponse(status = 200, body: unknown = {}) {
@@ -26,6 +29,9 @@ describe("order write contracts", () => {
         const oldRequest = { id: acceptance.id, orderId: acceptance.orderId, projectNumber: acceptance.projectNumber };
         expect(createOrderSchema.safeParse(oldRequest).success).toBe(false);
         expect(createOrderSchema.safeParse({ ...acceptance, net_amount: 100 }).success).toBe(false);
+        // Einkaufspreise sind Pflicht — ohne sie hätte die Bestellung keine Preise für den Zulieferer.
+        expect(createOrderSchema.safeParse({ ...acceptance, positions: [] }).success).toBe(false);
+        expect(createOrderSchema.safeParse({ ...acceptance, positions: [{ offerPositionId: "p", purchase_eur_user_month: -1 }] }).success).toBe(false);
     });
 
     it("updates only order metadata with optimistic concurrency", async () => {

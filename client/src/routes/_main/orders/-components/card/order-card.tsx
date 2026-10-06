@@ -28,6 +28,9 @@ export default function OrderCard({ order }: Props) {
     };
     const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
 
+    // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
+    const positionsSales = orderPositions.reduce((sum, p) => sum + p.total_cents, 0);
+
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
     const [openSections, setOpenSections] = useState<Array<string>>([]);
 
@@ -78,11 +81,28 @@ export default function OrderCard({ order }: Props) {
                     </div>
                 </div>
 
-                <div className="flex flex-col items-end">
-                    <p className="text-md font-mono font-medium">{formatEur(order.net_amount)}</p>
-                    <p className="text-(--text-secondary) font-light text-sm">
-                        Gesamtpreis
-                    </p>
+                <div className="flex items-start gap-6">
+                    {/* Einkaufsseite: Bestellung an den Zulieferer. Pauschalen/Rabatte nicht enthalten. */}
+                    <div className="flex flex-col items-end">
+                        <p
+                            className="text-md font-mono font-medium"
+                            title={order.supplierPositions.some((p) => p.fallback) ? t("orders.purchase.fallback") : undefined}
+                        >
+                            {formatEur(order.purchase_net_amount)}
+                            {order.supplierPositions.some((p) => p.fallback) && <span className="text-(--text-secondary)"> *</span>}
+                        </p>
+                        <p className="text-(--text-secondary) font-light text-sm">{t("orders.purchase.purchaseShort")}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <p className="text-md font-mono font-medium">{formatEur(positionsSales - order.purchase_net_amount)}</p>
+                        <p className="text-(--text-secondary) font-light text-sm">{t("orders.purchase.marginShort")}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                        <p className="text-md font-mono font-medium">{formatEur(order.net_amount)}</p>
+                        <p className="text-(--text-secondary) font-light text-sm">
+                            Gesamtpreis
+                        </p>
+                    </div>
                 </div>
             </div>
 

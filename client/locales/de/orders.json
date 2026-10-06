@@ -38,6 +38,21 @@
       "create": "Rechnung erstellen",
       "regenerate": "Dokument neu erzeugen",
       "noDocument": "Noch kein Dokument erzeugt."
+    },
+    "purchase": {
+      "title": "Einkaufspreise (Bestellung an den Zulieferer)",
+      "hint": "Je User und Monat, netto. Vorbelegt mit dem Verkaufspreis. Pauschalen und Rabatte des Angebots bleiben Kundensache.",
+      "product": "Produkt",
+      "quantity": "Menge",
+      "sales": "Verkauf",
+      "purchase": "Einkauf",
+      "lineTotal": "Netto",
+      "salesTotal": "Verkauf gesamt",
+      "purchaseTotal": "Einkauf gesamt",
+      "margin": "Marge",
+      "purchaseShort": "Einkauf",
+      "marginShort": "Marge",
+      "fallback": "Einkaufspreise noch nicht erfasst (entsprechen dem Verkaufspreis)."
     }
   }
 }

@@ -83,5 +83,6 @@
   "CONFIRMATION_NOT_FOUND": "Auftragsbestätigung nicht gefunden.",
   "INVOICE_EXISTS": "Zu dieser Bestellung existiert bereits eine Rechnung.",
   "INVOICE_ID_TAKEN": "Diese Rechnungsnummer ist bereits vergeben.",
-  "INVOICE_NOT_FOUND": "Rechnung nicht gefunden."
+  "INVOICE_NOT_FOUND": "Rechnung nicht gefunden.",
+  "PURCHASE_POSITIONS_MISMATCH": "Die Einkaufspreise passen nicht zu den Positionen des Angebots. Bitte Dialog neu öffnen."
 }

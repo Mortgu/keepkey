@@ -1,6 +1,7 @@
 import { Dot } from "lucide-react";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
+import PurchasePriceTable from "./purchase-price-table";
 import type { Offer, Order } from "@keepit/schemas";
 import { getErrorMessage } from "@/lib/errors";
 import { Button, Dialog, Input, Textarea } from "@/components";
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export default function OrderCreateModal({ offer, order, onClose, onCreated }: Props) {
-    const { form, error } = useOrderForm({
+    const { form, rows, error } = useOrderForm({
         onDone: onCreated,
         currentOffer: offer,
         currentOrder: order,
@@ -119,6 +120,22 @@ export default function OrderCreateModal({ offer, order, onClose, onCreated }: P
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             onBlur={field.handleBlur}
+                        />
+                    )} />
+
+                    <hr className="text-(--border)" />
+
+                    {/* Einkaufsseite: Die Bestellung geht an den Zulieferer. */}
+                    <form.Field name="positions" children={(field) => (
+                        <PurchasePriceTable
+                            rows={rows}
+                            values={field.state.value}
+                            disabled={Boolean(order?.cancelledAt)}
+                            onChange={(offerPositionId, purchaseCents) => field.handleChange(
+                                field.state.value.map((p) => p.offerPositionId === offerPositionId
+                                    ? { ...p, purchase_eur_user_month: purchaseCents }
+                                    : p),
+                            )}
                         />
                     )} />
                 </form>

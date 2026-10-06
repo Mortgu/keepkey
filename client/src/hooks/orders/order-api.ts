@@ -22,6 +22,7 @@ export const createOrder = (input: CreateOrderInput) =>
             projectDescription: input.projectDescription,
             orderDetails: input.orderDetails,
             contractStartDate: input.contractStartDate,
+            positions: input.positions,
         }),
     });
 

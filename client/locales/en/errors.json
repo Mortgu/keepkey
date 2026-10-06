@@ -83,5 +83,6 @@
   "CONFIRMATION_NOT_FOUND": "Confirmation not found.",
   "INVOICE_EXISTS": "This order already has an invoice.",
   "INVOICE_ID_TAKEN": "This invoice number is already in use.",
-  "INVOICE_NOT_FOUND": "Invoice not found."
+  "INVOICE_NOT_FOUND": "Invoice not found.",
+  "PURCHASE_POSITIONS_MISMATCH": "The purchase prices do not match the positions of the offer. Please reopen the dialog."
 }

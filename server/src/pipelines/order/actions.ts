@@ -70,6 +70,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             duration: formatDuration(duration_months),
             total: formatEur(group_total / 100),
             items: group.map((item) => ({
+                offerPositionId: item.id,
                 name: item.product.name,
                 description: item.product.description,
                 table: item.product.table,
@@ -138,6 +139,47 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             phone: employee.phone || "",
             email: employee.email || "",
         },
+    };
+}
+
+/**
+ * Die Bestellung geht an den Zulieferer: Positionspreise und Summe werden
+ * durch die Einkaufswerte ersetzt. Nur hier — `formatOrderData` selbst bleibt
+ * auf Verkaufspreisen, weil Auftragsbestätigung und Rechnung darauf aufbauen.
+ * Pauschalen und Rabatte haben keinen Einkaufspreis und bleiben, wie sie sind.
+ */
+export function withPurchasePrices(
+    formatted: OrderFormattedData,
+    order: OrderFetchedData["order"],
+): OrderFormattedData & { customerTotal: string; duration: string } {
+    const byId = new Map(order.supplierPositions.map((p) => [p.offerPositionId, p]));
+    const duration = order.duration_months;
+
+    const groups = formatted.groups.map((group) => ({
+        ...group,
+        total: formatEur(order.purchase_net_amount / 100),
+        items: group.items.map((item) => {
+            const purchase = byId.get(item.offerPositionId);
+            if (!purchase) return item;
+            const net = purchase.purchase_total_cents - purchase.purchase_discount_cents;
+            return {
+                ...item,
+                price: {
+                    total: formatEur(net / 100),
+                    unit: formatEur(purchase.purchase_eur_user_month / 100),
+                },
+            };
+        }),
+    }));
+
+    return {
+        ...formatted,
+        groups,
+        tables: groups,
+        total: formatEur(order.purchase_net_amount / 100),
+        // Zum Abgleich für Vorlagen, die beides zeigen wollen.
+        customerTotal: formatted.total,
+        duration: formatDuration(duration),
     };
 }
 

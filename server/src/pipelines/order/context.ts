@@ -8,5 +8,5 @@ export type OrderPipelineContext = PipelineContext & {
     orderId: string;
 
     fetchedData?: OrderFetchedData;
-    formatedData?: OrderFormattedData;
+    formatedData?: OrderFormattedData & { customerTotal?: string; duration?: string };
 }

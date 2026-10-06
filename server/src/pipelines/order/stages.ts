@@ -1,7 +1,7 @@
 import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
 import {PipelineStage, PipelineStageError} from "../pipeline.js";
 import {OrderPipelineContext} from "./context.js";
-import {fetchOrderData, formatOrderData, generating, postprocessing} from "./actions.js";
+import {fetchOrderData, formatOrderData, generating, postprocessing, withPurchasePrices} from "./actions.js";
 import {convertDocxToPdf} from "../../lib/docx-to-pdf.js";
 import {pickTranslation} from "../../utils/i18n.js";
 
@@ -16,7 +16,9 @@ const preprocess: PipelineStage<OrderPipelineContext> = {
     name: 'preprocess',
     run: async (context) => {
         try {
-            context.formatedData = await formatOrderData(context.fetchedData);
+            // Verkaufspreise formatieren, dann für den Zulieferer auf Einkauf umstellen.
+            const customerSide = await formatOrderData(context.fetchedData);
+            context.formatedData = withPurchasePrices(customerSide, context.fetchedData!.order);
             orderTemplateSchema.parse(context.formatedData);
         } catch (exception: any) {
             throw new PipelineStageError("Preprocess step in pipeline failed!", 500, exception.message);

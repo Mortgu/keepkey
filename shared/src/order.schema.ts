@@ -23,6 +23,32 @@ export const orderPositionSchema = z.object({
 });
 export type OrderPosition = z.infer<typeof orderPositionSchema>;
 
+/* Einkaufspreis je Position — die Bestellung geht an den Zulieferer. */
+export const purchasePositionInputSchema = z
+    .object({
+        /** Id der Position im Accepted-Snapshot. */
+        offerPositionId: z.string().min(1),
+        /** Einkaufspreis je User/Monat in Cent, wie der Verkaufspreis. */
+        purchase_eur_user_month: z.number().int().min(0),
+    })
+    .strict();
+export type PurchasePositionInput = z.infer<typeof purchasePositionInputSchema>;
+
+export const supplierPositionSchema = z.object({
+    offerPositionId: z.string(),
+    productId: z.string(),
+    quantity: z.number().int(),
+    free_months: z.number().int(),
+    /** Verkaufspreis je User/Monat, zum Vergleich. */
+    eur_user_month: z.number().int(),
+    purchase_eur_user_month: z.number().int(),
+    purchase_total_cents: z.number().int(),
+    purchase_discount_cents: z.number().int(),
+    /** true bei Altbestellungen ohne gespeicherte Einkaufspreise (Fallback = Verkaufspreis). */
+    fallback: z.boolean(),
+});
+export type SupplierPosition = z.infer<typeof supplierPositionSchema>;
+
 /* OrderFlatRate */
 export const orderFlatRateSchema = z.object({
     id: z.string(),
@@ -100,12 +126,19 @@ export const createOrderSchema = z
         projectDescription: z.string().optional(),
         orderDetails: z.string().optional(),
         contractStartDate: dateInput.optional(),
+        /** Genau eine Zeile je Snapshot-Position; der Server prüft die Abdeckung. */
+        positions: z.array(purchasePositionInputSchema).min(1),
     })
     .strict();
 export const updateOrderSchema = z
     .object({
         expectedVersion: z.number().int().positive(),
         order: orderMetadataSchema,
+        /**
+         * Optional: Einkaufspreise ersetzen. Bewusst neben `order`, damit die
+         * Revisions-Snapshots (nur Metadaten) unverändert bleiben.
+         */
+        positions: z.array(purchasePositionInputSchema).min(1).optional(),
     })
     .strict();
 export type CreateOrderInput = z.infer<typeof createOrderSchema>;
@@ -145,6 +178,9 @@ export const orderSchema = z.object({
     contractStartDate: z.string().nullish(),
 
     net_amount: z.number().int(),
+    /** Einkaufsseite: Summe der Positionen zum Einkaufspreis (Pauschalen/Rabatte nicht enthalten). */
+    purchase_net_amount: z.number().int(),
+    supplierPositions: z.array(supplierPositionSchema),
     version: z.number().int(),
 
     customer: z.object({

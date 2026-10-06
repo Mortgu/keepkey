@@ -83,9 +83,14 @@ describe("accepted offer order data", () => {
         expect(orderTemplateSchema.safeParse(formatted).success).toBe(true);
         expect(formatted.customer.fullName).toBe("First Last");
     });
-    it("requires the version shown at acceptance", () => {
+    it("requires the version shown at acceptance and purchase prices for the supplier", () => {
+        const positions = [{ offerPositionId: "position", purchase_eur_user_month: 800 }];
         expect(
-            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1" })
+            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1", positions })
+                .success,
+        ).toBe(false);
+        expect(
+            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1", expectedOfferVersion: 1 })
                 .success,
         ).toBe(false);
         expect(
@@ -93,6 +98,7 @@ describe("accepted offer order data", () => {
                 id: "offer",
                 orderId: "AB-1",
                 expectedOfferVersion: 1,
+                positions,
             }).success,
         ).toBe(true);
     });
