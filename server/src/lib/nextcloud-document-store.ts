@@ -84,9 +84,12 @@ export async function deleteDocumentArtifact(path: string): Promise<void> {
     await client.deleteFile(path);
 }
 
-function toBuffer(content: Buffer | ArrayBuffer | string): Buffer {
+function toBuffer(content: Buffer | ArrayBuffer | ArrayBufferView | string): Buffer {
     if (Buffer.isBuffer(content)) return content;
     if (typeof content === "string") return Buffer.from(content);
+    if (ArrayBuffer.isView(content)) {
+        return Buffer.from(content.buffer, content.byteOffset, content.byteLength);
+    }
     return Buffer.from(content);
 }
 

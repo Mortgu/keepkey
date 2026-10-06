@@ -6,7 +6,6 @@ import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/comp
 import { useModal, useSuppliers } from "@/hooks";
 import SupplierListItem from "./-components/supplier-list-item";
 import { LoaderCircle } from "lucide-react";
-import { error } from "better-auth/api";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
@@ -44,7 +43,7 @@ export default function SupplierPage() {
 
             <div className="grid gap-4">
                 {errorSuppliers && (
-                    <RouteError error={error} />
+                    <RouteError error={errorSuppliers} />
                 )}
 
                 {pendingSuppliers && (
