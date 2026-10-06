@@ -11,6 +11,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
                 confirmationId: "000042",
                 date: new Date("2026-10-06T00:00:00Z"),
                 orderId: "order",
+                taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100,
             })),
         },
     },
@@ -33,7 +34,7 @@ describe("buildConfirmation", () => {
         expect(data.orderId).toBe(order.orderId);
         expect(data.customer.companyName).toBe(order.customer.companyName);
 
-        // 19 % aus dem Snapshot-Kunden, einmal gerundet.
+        // Steuerblock aus der Row, nicht aus dem Kunden.
         const net = order.net_amount;
         const vat = Math.round(net * 0.19);
         const eur = (cents: number) => (cents / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -41,6 +42,19 @@ describe("buildConfirmation", () => {
         expect(data.netTotal).toContain(eur(net));
         expect(data.vatAmount).toContain(eur(vat));
         expect(data.grossTotal).toContain(eur(net + vat));
+    });
+
+    it("shows the real unit price and the free-month deduction per line", async () => {
+        const built = await buildConfirmation("conf-1");
+        const data = confirmationTemplateSchema.parse(built.data);
+        const line = (data.groups[0] as unknown as { items: Array<{ free_months: number; price: Record<string, string> }> }).items[0]!;
+
+        expect(line.free_months).toBe(3);
+        expect(line.price.unit).toBe("10,00 €");
+        expect(line.price.gross).toBe("1.200,00 €");
+        expect(line.price.discount).toBe("-300,00 €");
+        expect(line.price.total).toBe("900,00 €");
+        expect(data.netTotal).toBe("900,00 €");
     });
 
     it("names the document after the confirmation number, not the order", async () => {

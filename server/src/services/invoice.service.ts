@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { createInvoiceSchema, type CreateInvoiceInput, type InvoiceFilterParams } from "@keepit/schemas";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
+import { vatForOrder } from "./document-vat.js";
 import { requestInvoiceGeneration } from "./invoice-generation.service.js";
 
 const withDocuments = {
@@ -61,15 +62,16 @@ export async function createInvoice(orderId: string, input: CreateInvoiceInput, 
 
     let invoice;
     try {
-        invoice = await prisma.invoice.create({
+        invoice = await prisma.$transaction(async (tx) => tx.invoice.create({
             data: {
                 orderId,
                 customerId: order.offer.customerId,
                 invoiceId: data.invoiceId,
                 date: data.date ? new Date(data.date) : new Date(),
                 createdById: actorId,
+                ...(await vatForOrder(tx, orderId, data.taxRate)),
             },
-        });
+        }));
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
             throw new AppException("This invoice number is already in use.", 409, "INVOICE_ID_TAKEN");

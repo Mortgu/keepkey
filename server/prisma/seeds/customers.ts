@@ -4,6 +4,7 @@ const CUSTOMERS = [
     {
         customerId: "C-1001",
         companyName: "Musterfirma GmbH",
+        taxRate: 19,
         email: "info@musterfirma.de",
         street: "Musterstraße 12",
         city: "Musterstadt",
@@ -27,6 +28,7 @@ const CUSTOMERS = [
     {
         customerId: "C-1002",
         companyName: "Beispiel AG",
+        taxRate: 19,
         email: "kontakt@beispiel-ag.de",
         street: "Beispielallee 45",
         city: "Beispielburg",

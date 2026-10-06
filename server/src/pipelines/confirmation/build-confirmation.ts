@@ -1,4 +1,3 @@
-import { vatTotals } from "@keepit/schemas";
 import { prisma } from "../../lib/prismaClient.js";
 import { getOrderById } from "../../services/order.service.js";
 import { formatDate, formatEur } from "../../utils/utils.js";
@@ -11,9 +10,8 @@ import type { Language } from "@prisma/client";
  * von oben nach unten lesbar: Order laden, wie die Bestellung formatieren,
  * AB-Nummer und Steuerblock ergänzen, Namen bilden.
  *
- * Der Steuersatz kommt aus dem Accepted-Snapshot (`customer.taxRate`), nicht
- * aus dem aktuellen Kundendatensatz — die AB soll auch später noch dieselben
- * Zahlen zeigen wie am Tag der Annahme.
+ * Der Steuerblock steht an der AB selbst (beim Anlegen festgelegt) — die AB
+ * zeigt auch später noch dieselben Zahlen, egal was sich am Kunden ändert.
  */
 export async function buildConfirmation(confirmationId: string): Promise<{
     data: Record<string, unknown>;
@@ -24,7 +22,13 @@ export async function buildConfirmation(confirmationId: string): Promise<{
     const order = await getOrderById(confirmation.orderId);
 
     const base = await formatOrderData({ order });
-    const totals = vatTotals(order.net_amount, order.customer.taxRate);
+    // Steuerblock aus der Row — beim Anlegen festgelegt, Regenerieren rechnet nie neu.
+    const totals = {
+        netCents: confirmation.net_cents,
+        vatRate: confirmation.taxRate,
+        vatCents: confirmation.vat_cents,
+        grossCents: confirmation.gross_cents,
+    };
 
     const data = confirmationTemplateSchema.parse({
         ...base,

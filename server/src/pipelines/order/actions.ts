@@ -69,6 +69,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             duration_months,
             duration: formatDuration(duration_months),
             total: formatEur(group_total / 100),
+            // `item.total_cents` ist bereits netto (Freimonate abgezogen, siehe
+            // presentOrder); `discount_cents` ist der abgezogene Betrag.
             items: group.map((item) => ({
                 offerPositionId: item.id,
                 name: item.product.name,
@@ -76,15 +78,14 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
                 table: item.product.table,
                 quantity: item.quantity,
                 optional: item.optional,
+                free_months: item.free_months,
                 contract,
                 duration_months,
                 price: {
+                    unit: formatEur(item.eur_user_month / 100),
+                    gross: formatEur((item.total_cents + item.discount_cents) / 100),
+                    discount: item.discount_cents ? formatEur(-item.discount_cents / 100) : "",
                     total: formatEur(item.total_cents / 100),
-                    unit: formatEur(
-                        item.quantity && duration_months
-                            ? item.total_cents / item.quantity / duration_months / 100
-                            : 0,
-                    ),
                 },
             })),
         };
@@ -165,8 +166,10 @@ export function withPurchasePrices(
             return {
                 ...item,
                 price: {
-                    total: formatEur(net / 100),
                     unit: formatEur(purchase.purchase_eur_user_month / 100),
+                    gross: formatEur(purchase.purchase_total_cents / 100),
+                    discount: purchase.purchase_discount_cents ? formatEur(-purchase.purchase_discount_cents / 100) : "",
+                    total: formatEur(net / 100),
                 },
             };
         }),

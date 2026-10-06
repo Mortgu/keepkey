@@ -75,6 +75,11 @@
       "emptyHint": "Search and click on the left. You will then see positions, amount and validity here and enter the purchase prices.",
       "noneSelected": "No offer selected yet",
       "submit": "Create order"
+    },
+    "vat": {
+      "rate": "VAT rate",
+      "preview": "Net {{net}} + {{rate}} % VAT ({{vat}}) = gross {{gross}}. The rate is stored with the document and fixed afterwards.",
+      "stored": "VAT"
     }
   }
 }

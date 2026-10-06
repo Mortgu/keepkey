@@ -31,6 +31,11 @@ export const invoiceSchema = z.object({
     date: z.string(),
     orderId: z.string(),
     customerId: z.string(),
+    /** Beim Anlegen festgelegt, danach fest. */
+    taxRate: z.number(),
+    net_cents: z.number().int(),
+    vat_cents: z.number().int(),
+    gross_cents: z.number().int(),
     createdById: z.string(),
     documents: z.array(invoiceDocumentSchema),
     createdAt: z.string(),
@@ -53,6 +58,8 @@ export const createInvoiceSchema = z
     .object({
         invoiceId: z.string().trim().min(1),
         date: dateInput.optional(),
+        /** Steuersatz in Prozent (0 erlaubt, z. B. Reverse-Charge). Ohne Angabe: Kundensatz. */
+        taxRate: z.number().min(0).max(100).optional(),
     })
     .strict();
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;

@@ -92,6 +92,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 id: "customer",
                 companyName: "Original Ltd",
                 language: "EN",
+                taxRate: 19,
             },
         });
         await prisma.contactPerson.create({

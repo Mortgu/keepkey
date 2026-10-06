@@ -75,6 +75,11 @@
       "emptyHint": "Links suchen und anklicken. Hier siehst du dann Positionen, Betrag und Gültigkeit und trägst die Einkaufspreise ein.",
       "noneSelected": "Noch kein Angebot gewählt",
       "submit": "Bestellung anlegen"
+    },
+    "vat": {
+      "rate": "Steuersatz",
+      "preview": "Netto {{net}} + {{rate}} % MwSt. ({{vat}}) = Brutto {{gross}}. Der Satz wird mit dem Beleg gespeichert und ist danach fest.",
+      "stored": "Steuer"
     }
   }
 }

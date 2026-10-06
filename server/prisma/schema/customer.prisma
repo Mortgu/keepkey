@@ -15,7 +15,8 @@ model Customer {
   language Language @default(DE)
   country  String   @default("Deutschland")
   currency Currency @default(EUR)
-  taxRate  Float    @default(0)
+  /// Prozent (19 = 19 %). Kein Default: ein Kunde ohne Satz ist ein Fehler, kein 0 %.
+  taxRate  Float
 
   salutation String?
 

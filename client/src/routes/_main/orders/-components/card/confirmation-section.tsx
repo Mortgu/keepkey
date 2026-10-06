@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { vatTotals } from "@keepit/schemas";
 import type { Order } from "@keepit/schemas";
-import { Button, Input, ListSkeleton, Skeleton } from "@/components";
-import { useConfirmation, useCreateConfirmation, useRegenerateConfirmation } from "@/hooks";
+import { Button, Input, ListSkeleton, NumberField, Skeleton } from "@/components";
+import { useConfirmation, useCreateConfirmation, useCustomer, useRegenerateConfirmation } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
+import { formatEur } from "@/utils/utils";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 
 interface Props {
@@ -24,6 +26,11 @@ export default function ConfirmationSection({ order }: Props) {
 
     const [confirmationId, setConfirmationId] = useState("");
     const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+    // Satz vom aktuellen Kunden (nicht aus dem Snapshot der Order) — hier noch korrigierbar.
+    const { customer } = useCustomer(order.customer.id);
+    const [taxRate, setTaxRate] = useState<number | null>(null);
+    const effectiveRate = taxRate ?? customer?.taxRate ?? 0;
+    const preview = vatTotals(order.net_amount, effectiveRate);
 
     const cancelled = Boolean(order.cancelledAt);
 
@@ -39,7 +46,7 @@ export default function ConfirmationSection({ order }: Props) {
             event.preventDefault();
             if (!confirmationId.trim()) return;
             try {
-                await createConfirmation({ confirmationId: confirmationId.trim(), date });
+                await createConfirmation({ confirmationId: confirmationId.trim(), date, taxRate: effectiveRate });
             } catch {
                 // Fehler wird unten gerendert.
             }
@@ -68,6 +75,16 @@ export default function ConfirmationSection({ order }: Props) {
                         onChange={(e) => setDate(e.target.value)}
                         disabled={cancelled}
                     />
+                    <NumberField
+                        label={t("orders.vat.rate")}
+                        value={effectiveRate}
+                        min={0}
+                        max={100}
+                        step={0.1}
+                        suffix="%"
+                        disabled={cancelled}
+                        onValueChange={(value) => setTaxRate(value ?? 0)}
+                    />
                     <Button
                         type="submit"
                         size="sm"
@@ -77,6 +94,14 @@ export default function ConfirmationSection({ order }: Props) {
                         {t("orders.confirmation.create")}
                     </Button>
                 </div>
+                <p className="text-sm text-(--text-secondary)">
+                    {t("orders.vat.preview", {
+                        net: formatEur(preview.netCents),
+                        rate: effectiveRate.toLocaleString("de-DE"),
+                        vat: formatEur(preview.vatCents),
+                        gross: formatEur(preview.grossCents),
+                    })}
+                </p>
             </form>
         );
     }
@@ -94,6 +119,12 @@ export default function ConfirmationSection({ order }: Props) {
                     <div className="flex items-center gap-1">
                         <dt className="text-(--text-secondary)">{t("orders.confirmation.date")}:</dt>
                         <dd>{formatDate(confirmation.date)}</dd>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <dt className="text-(--text-secondary)">{t("orders.vat.stored")}:</dt>
+                        <dd className="font-mono">
+                            {formatEur(confirmation.net_cents)} + {confirmation.taxRate.toLocaleString("de-DE")} % = {formatEur(confirmation.gross_cents)}
+                        </dd>
                     </div>
                 </dl>
                 <Button

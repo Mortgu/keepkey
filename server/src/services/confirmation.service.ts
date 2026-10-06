@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import { createConfirmationSchema, type CreateConfirmationInput } from "@keepit/schemas";
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
+import { vatForOrder } from "./document-vat.js";
 import { requestConfirmationGeneration } from "./confirmation-generation.service.js";
 
 const withDocuments = {
@@ -33,14 +34,15 @@ export async function createConfirmation(orderId: string, input: CreateConfirmat
 
     let confirmation;
     try {
-        confirmation = await prisma.confirmation.create({
+        confirmation = await prisma.$transaction(async (tx) => tx.confirmation.create({
             data: {
                 orderId,
                 confirmationId: data.confirmationId,
                 date: data.date ? new Date(data.date) : new Date(),
                 createdById: actorId,
+                ...(await vatForOrder(tx, orderId, data.taxRate)),
             },
-        });
+        }));
     } catch (error) {
         if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002") {
             throw new AppException("This confirmation number is already in use.", 409, "CONFIRMATION_ID_TAKEN");

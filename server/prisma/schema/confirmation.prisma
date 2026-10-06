@@ -12,6 +12,13 @@ model Confirmation {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   orderId String @unique
 
+  /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
+  /// `offer.net_amount`, der Satz aus dem Formular (Default: Kundensatz).
+  taxRate     Float
+  net_cents   Int
+  vat_cents   Int
+  gross_cents Int
+
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
 

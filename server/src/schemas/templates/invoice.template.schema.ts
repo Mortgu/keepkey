@@ -19,6 +19,7 @@ export const CustomerTemplateSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     salutation: z.string(),
+    fullName: z.string(),
 
     phone: z.string().nullish().transform(v => v ?? ''),
     email: z.string().nullish().transform(v => v ?? ''),
@@ -34,11 +35,15 @@ export type CustomerTemplate = z.infer<typeof CustomerTemplateSchema>;
 // A single invoice line item (table row)
 const item = z.object({
     pos: z.number(),
-    articleNumber: z.string(),
     description: z.string(),
     quantity: z.number(),
-    unitPrice: z.string(), // formatted, e.g. "10,00" — analogous to price.total in the offer contract
+    /** Einzelpreis je User/Monat, formatiert. */
+    unitPrice: z.string(),
+    /** Brutto der Zeile vor Freimonaten/Rabatt, formatiert. */
+    gross: z.string(),
+    /** Abzug (Freimonate), negativ formatiert oder "". */
     discount: z.string(),
+    /** Netto der Zeile, formatiert. */
     total: z.string(),
 });
 
@@ -49,10 +54,19 @@ export const invoiceContract = z.object({
     invoiceNumber: z.string(),
     date: z.string(),
     paymentTerm: z.string(),
+    /** Rechnungsdatum + Tage aus `paymentTerm` ("30 Tage"); "" wenn nicht ableitbar. */
+    dueDate: z.string(),
     projectNumber: z.string(),
     customerNumber: z.string(),
     supplierNumber: z.string(),
     orderNumber: z.string(),
+    /** AB-Nummer, falls eine Auftragsbestätigung existiert. */
+    confirmationNumber: z.string(),
+    /** Leistungszeitraum aus Vertragsbeginn + Laufzeit; "" ohne Vertragsbeginn. */
+    servicePeriodFrom: z.string(),
+    servicePeriodTo: z.string(),
+    durationMonths: z.number(),
+    duration: z.string(),
 
     customer: CustomerTemplateSchema,
     employee: employee,
