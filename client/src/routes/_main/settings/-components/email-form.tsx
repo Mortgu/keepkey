@@ -7,6 +7,7 @@ import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput, Input } from "@/components";
 import { useAuth } from "@/context/auth-context";
+import { userKeys } from "@/hooks/users/user-keys";
 import { authClient } from "@/lib/auth-client.ts";
 
 const emailSchema = z.object({
@@ -35,7 +36,7 @@ export default function EmailForm() {
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["session"] });
+            await queryClient.invalidateQueries({ queryKey: userKeys.session() });
             toast.success("E-Mail-Adresse geändert");
             formApi.reset();
         },

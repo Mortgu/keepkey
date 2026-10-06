@@ -1,4 +1,4 @@
-import { TariffVersionReason } from "@prisma/client";
+import { Prisma, TariffVersionReason } from "@prisma/client";
 
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
@@ -64,18 +64,24 @@ export function calculateNetAmount(
  * {@link sealTariffVersion} sorgt dafür, dass unveränderte Tabellen keine neue
  * Version erzeugen — es entsteht genau eine Version je tatsächlich verkaufter
  * Konfiguration.
+ *
+ * Läuft der Aufrufer bereits in einer Transaktion, muss er sie als `db`
+ * hereinreichen: Sonst öffnet {@link sealTariffVersion} je Position eine
+ * eigene, unabhängige Transaktion, während die äußere eine Verbindung hält —
+ * bei parallelen Bearbeitungen läuft so der Pool leer.
  */
 export async function pricePositions(
     positions: CreateOfferPositionInput[],
     header: PriceHeader,
     customerId: string | undefined,
     actorId: string | null,
+    db: Prisma.TransactionClient = prisma,
 ): Promise<PricedPosition[]> {
     const priced: PricedPosition[] = [];
 
     for (const position of positions) {
         try {
-            const tariff = await loadTariffForPricing(position.productId, header.contractId, customerId);
+            const tariff = await loadTariffForPricing(position.productId, header.contractId, customerId, db);
 
             if (!tariff) {
                 throw new AppException(
@@ -100,7 +106,7 @@ export async function pricePositions(
                 );
             }
 
-            const version = await sealTariffVersion(tariff.id, TariffVersionReason.OFFER, actorId);
+            const version = await sealTariffVersion(tariff.id, TariffVersionReason.OFFER, actorId, db);
 
             const eur_user_month = result.breakdown.unitPrice;
             const discount_cents = eur_user_month * position.quantity * (position.free_months ?? 0);
@@ -126,8 +132,11 @@ export async function pricePositions(
 }
 
 /** Lädt die total_cents aller angefragten FlatRates als Map (id → cents). */
-async function getFlatRateCentsById(flatRateIds: string[]): Promise<Map<string, number>> {
-    const rates = await prisma.flatRate.findMany({
+async function getFlatRateCentsById(
+    flatRateIds: string[],
+    db: Prisma.TransactionClient,
+): Promise<Map<string, number>> {
+    const rates = await db.flatRate.findMany({
         where: { id: { in: flatRateIds } },
         select: { id: true, total_cents: true },
     });
@@ -136,8 +145,11 @@ async function getFlatRateCentsById(flatRateIds: string[]): Promise<Map<string, 
 }
 
 /** Berechnet total_cents (= rate * quantity) für jede Flatrate. */
-export async function priceFlatrates(flatrates: CreateOfferFlatrateInput[]): Promise<PricedFlatrate[]> {
-    const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId));
+export async function priceFlatrates(
+    flatrates: CreateOfferFlatrateInput[],
+    db: Prisma.TransactionClient = prisma,
+): Promise<PricedFlatrate[]> {
+    const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId), db);
 
     return flatrates.map((flatrate) => {
         const rate_cents = rateById.get(flatrate.flatRateId);

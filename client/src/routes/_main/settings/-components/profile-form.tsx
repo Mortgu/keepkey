@@ -7,6 +7,7 @@ import type { SyntheticEvent } from "react";
 
 import { Button, FieldInput } from "@/components";
 import { useAuth } from "@/context/auth-context";
+import { userKeys } from "@/hooks/users/user-keys";
 import { authClient } from "@/lib/auth-client.ts";
 
 const profileSchema = z.object({
@@ -45,7 +46,7 @@ export default function ProfileForm() {
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["session"] });
+            await queryClient.invalidateQueries({ queryKey: userKeys.session() });
             toast.success("Profil gespeichert");
         },
     });
