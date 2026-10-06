@@ -77,5 +77,8 @@
   "ORDER_CANCELLED": "This order has been cancelled and can no longer be changed.",
   "ORDER_DELETE_FORBIDDEN": "Orders can only be cancelled.",
   "INVALID_ACCEPTED_OFFER_SNAPSHOT": "The stored offer data is invalid.",
-  "VALIDATION_ERROR": "Please check the entered details."
+  "VALIDATION_ERROR": "Please check the entered details.",
+  "CONFIRMATION_EXISTS": "This order already has a confirmation.",
+  "CONFIRMATION_ID_TAKEN": "This confirmation number is already in use.",
+  "CONFIRMATION_NOT_FOUND": "Confirmation not found."
 }

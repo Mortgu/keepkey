@@ -3,12 +3,13 @@ import OfferFilters from "./-components/offer-filters";
 import OfferList from "./-components/offer-list";
 import OfferModal from "./-components/modals/offer-modal";
 import useOfferFilters from "./-hooks/use-offer-filters";
+import type { OfferModalMode } from "./-components/modals/offer-modal-policy";
 import { Breadcrumbs, Button } from "@/components";
 import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
 
 export function OfferPage() {
     const { t } = useTranslation();
-    const modal = useModal();
+    const modal = useModal<{ mode: OfferModalMode }>();
 
     const filters = useOfferFilters();
 
@@ -37,15 +38,22 @@ export function OfferPage() {
                     products={products}
                 />
 
-                <Button size="sm" onClick={() => modal.open()}>
+                <Button size="sm" onClick={() => modal.open({ mode: "offer" })}>
                     {t("offers.create")}
+                </Button>
+                {/* Bestandsverträge ohne Ursprungsangebot im System. */}
+                <Button size="sm" variant="secondary" onClick={() => modal.open({ mode: "renewal" })}>
+                    {t("offers.createRenewal")}
+                </Button>
+                <Button size="sm" variant="secondary" onClick={() => modal.open({ mode: "extension" })}>
+                    {t("offers.createExtension")}
                 </Button>
             </div>
 
             <OfferList filters={filters} />
 
             {modal.isOpen && (
-                <OfferModal key={modal.key} onClose={modal.close} />
+                <OfferModal key={modal.key} mode={modal.data?.mode} onClose={modal.close} />
             )}
         </div>
     );

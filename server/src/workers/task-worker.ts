@@ -4,6 +4,7 @@ import type { Redis } from "ioredis";
 import env from "../lib/env.js";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
+import confirmationTaskHandler from "./handlers/confirmation-handler.js";
 import invoiceTaskHandler from "./handlers/invoice-handler.js";
 import offerTaskHandler from "./handlers/offer-handler.js";
 import orderTaskHandler from "./handlers/order-handler.js";
@@ -20,6 +21,7 @@ type TaskHandlerFn = (task: Task) => Promise<void>;
 const handlers: Partial<Record<TaskTarget, TaskHandlerFn>> = {
     OFFER: offerTaskHandler,
     ORDER: orderTaskHandler,
+    CONFIRMATION: confirmationTaskHandler,
     INVOICE: invoiceTaskHandler,
 }
 

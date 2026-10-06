@@ -37,7 +37,12 @@ export async function createOffer(
         positions,
         flatrates,
         input.discounts,
-        { renewedFromOfferId: options?.renewedFromOfferId, derivationType: options?.derivationType },
+        {
+            renewedFromOfferId: options?.renewedFromOfferId,
+            // Mit Quellangebot bestimmt der Aufrufer den Typ; ohne darf der
+            // Client ihn setzen (Bestandsvertrag ohne Ursprungsangebot).
+            derivationType: options?.derivationType ?? input.derivationType ?? undefined,
+        },
     );
 }
 

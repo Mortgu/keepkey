@@ -32,10 +32,14 @@ model DocumentArtifact {
   orderDocument   OrderDocument? @relation("OrderDocumentArtifacts", fields: [orderDocumentId], references: [id], onDelete: Cascade)
   orderDocumentId String?
 
+  confirmationDocument   ConfirmationDocument? @relation("ConfirmationDocumentArtifacts", fields: [confirmationDocumentId], references: [id], onDelete: Cascade)
+  confirmationDocumentId String?
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
   @@unique([offerDocumentId, format])
   @@unique([orderDocumentId, format])
+  @@unique([confirmationDocumentId, format])
   @@map("document")
 }

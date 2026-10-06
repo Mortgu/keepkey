@@ -1,110 +1,17 @@
-import { DocumentFormat, DocumentStatus, Prisma } from "@prisma/client";
-import {
-    removeDocumentArtifacts,
-    storeDocumentArtifacts,
-    StoredDocumentArtifacts,
-} from "../lib/document-artifact-store.js";
+import { DocumentStatus } from "@prisma/client";
+import { storeDocumentArtifacts } from "../lib/document-artifact-store.js";
 import { prisma } from "../lib/prismaClient.js";
-import { artifactPair } from "../lib/document-artifacts.js";
 import { OfferPipelineContext } from "../pipelines/offer/context.js";
 import { offerStages } from "../pipelines/offer/stages.js";
 import { OrderPipelineContext } from "../pipelines/order/context.js";
 import { orderStages } from "../pipelines/order/stages.js";
-import { PipelineContext, PipelineStageError, runPipeline } from "../pipelines/pipeline.js";
-import logger from "@/utils/logger.js";
-
-type GeneratedDocument = {
-    displayName: string;
-    docxBuffer: Buffer;
-    pdfBuffer: Buffer;
-};
-
-const COMPLETED_DOCUMENT_STATUSES = new Set<DocumentStatus>([
-    DocumentStatus.GENERATED,
-    DocumentStatus.UPLOADING,
-    DocumentStatus.UPLOADED,
-]);
-
-function assertDocumentCanBeGenerated(
-    document: { id: string; status: DocumentStatus; artifacts: { format: DocumentFormat }[] },
-    type: "OfferDocument" | "OrderDocument",
-): boolean {
-    const { pdf, docx } = artifactPair(document.artifacts);
-    if (Boolean(pdf) !== Boolean(docx)) {
-        throw new Error(`${type} ${document.id} has incomplete artifact links.`);
-    }
-
-    if (pdf && docx) {
-        return false;
-    }
-
-    if (COMPLETED_DOCUMENT_STATUSES.has(document.status)) {
-        throw new Error(`${type} ${document.id} is ${document.status} without complete artifact links.`);
-    }
-
-    return true;
-}
-
-async function artifactsWereFinalized(
-    files: StoredDocumentArtifacts,
-    linkedFiles: () => Promise<{ artifacts: { objectKey: string; format: DocumentFormat }[] } | null>,
-): Promise<boolean> {
-    try {
-        const linked = await linkedFiles();
-        const linkedArtifacts = artifactPair(linked?.artifacts ?? []);
-        if (linkedArtifacts.pdf?.objectKey === files.pdf.objectKey
-            && linkedArtifacts.docx?.objectKey === files.docx.objectKey) {
-            return true;
-        }
-    } catch (verificationError) {
-        logger.error(verificationError);
-        return false;
-    }
-
-    try {
-        await removeDocumentArtifacts(files);
-    } catch (cleanupError) {
-        logger.error(cleanupError);
-    }
-    return false;
-}
-
-function getGeneratedDocument(context: PipelineContext): GeneratedDocument {
-    if (!context.displayName || !context.docxBuffer || !context.pdfBuffer) {
-        throw new PipelineStageError(
-            "Pipeline completed without a display name, DOCX buffer, or PDF buffer.",
-        );
-    }
-
-    return {
-        displayName: context.displayName,
-        docxBuffer: context.docxBuffer,
-        pdfBuffer: context.pdfBuffer,
-    };
-}
-
-async function createArtifactDocuments(
-    tx: Prisma.TransactionClient,
-    files: StoredDocumentArtifacts,
-    owner: { offerDocumentId: string } | { orderDocumentId: string },
-) {
-    const pdf = await tx.documentArtifact.create({
-        data: {
-            ...files.pdf,
-            format: DocumentFormat.PDF,
-            ...owner,
-        },
-    });
-    const docx = await tx.documentArtifact.create({
-        data: {
-            ...files.docx,
-            format: DocumentFormat.DOCX,
-            ...owner,
-        },
-    });
-
-    return { pdf, docx };
-}
+import { runPipeline } from "../pipelines/pipeline.js";
+import {
+    artifactsWereFinalized,
+    assertDocumentCanBeGenerated,
+    createArtifactDocuments,
+    getGeneratedDocument,
+} from "./document-generation.helpers.js";
 
 export async function generateOfferDocument(taskId: string): Promise<void> {
     const offerDocument = await prisma.offerDocument.findFirst({

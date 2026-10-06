@@ -1,0 +1,58 @@
+/// Auftragsbestätigung (AB) zu einer Bestellung. Die AB-Nummer vergibt der
+/// Nutzer einmal; danach ist sie unveränderlich. Konditionen stehen am
+/// angenommenen Angebot — hier kommen nur MwSt und Brutto dazu, und die werden
+/// bei der Generierung aus `customer.taxRate` des Snapshots berechnet.
+model Confirmation {
+  id String @id @default(cuid())
+
+  /// AB-Nr., vom Nutzer vergeben.
+  confirmationId String   @unique
+  date           DateTime @default(now())
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderId String @unique
+
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdById String
+
+  documents ConfirmationDocument[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([createdById])
+  @@map("confirmation")
+}
+
+/// Dieselben Spalten wie OfferDocument/OrderDocument, damit Umbenennen,
+/// Löschen, Download und Nextcloud-Upload über `document-repo.ts` unverändert
+/// funktionieren. Anders als dort gibt es keine Versionierung: Eine neue
+/// Generierung ersetzt das vorherige Dokument (`deletedAt`), `version` bleibt 0.
+model ConfirmationDocument {
+  id String @id @default(cuid())
+
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
+
+  error       String?
+  /// @openapi.ignore
+  uploadToken String?
+
+  confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
+  confirmationId String
+
+  artifacts DocumentArtifact[] @relation("ConfirmationDocumentArtifacts")
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @unique
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+
+  @@index([confirmationId])
+  @@map("confirmation_document")
+}

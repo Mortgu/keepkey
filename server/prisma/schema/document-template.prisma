@@ -1,5 +1,5 @@
-/// Dokumentvorlage (.docx), aus der die Pipelines Angebote und Bestellungen
-/// rendern.
+/// Dokumentvorlage (.docx), aus der Angebote, Bestellungen, Auftragsbestätigungen
+/// und Rechnungen gerendert werden.
 ///
 /// Die Datei selbst liegt im Objektspeicher — hier steht nur, wozu sie gehört
 /// und welche je Slot (Typ x Sprache) gerade benutzt wird. Vorher lagen
@@ -8,6 +8,9 @@
 enum DocumentTemplateKind {
   OFFER
   ORDER
+  /// Auftragsbestätigung (AB) — Order-Daten plus MwSt und Brutto.
+  CONFIRMATION
+  INVOICE
 }
 
 model DocumentTemplate {

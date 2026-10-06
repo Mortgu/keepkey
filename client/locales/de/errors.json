@@ -77,5 +77,8 @@
   "ORDER_CANCELLED": "Diese Bestellung wurde storniert und kann nicht mehr geändert werden.",
   "ORDER_DELETE_FORBIDDEN": "Bestellungen können nur storniert werden.",
   "INVALID_ACCEPTED_OFFER_SNAPSHOT": "Die gespeicherten Angebotsdaten sind ungültig.",
-  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten."
+  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten.",
+  "CONFIRMATION_EXISTS": "Zu dieser Bestellung existiert bereits eine Auftragsbestätigung.",
+  "CONFIRMATION_ID_TAKEN": "Diese AB-Nummer ist bereits vergeben.",
+  "CONFIRMATION_NOT_FOUND": "Auftragsbestätigung nicht gefunden."
 }

@@ -20,6 +20,15 @@
     "accepted": "Accepted",
     "acceptedHint": "Accepted offers can no longer be changed.",
     "selectOffer": "Select an offer for the order",
-    "emptyOffers": "No open offers available."
+    "emptyOffers": "No open offers available.",
+    "confirmation": {
+      "title": "Order confirmation",
+      "hint": "The confirmation number is assigned once and cannot be changed afterwards. Net, VAT and gross are calculated from the accepted offer.",
+      "number": "Confirmation no.",
+      "date": "Date",
+      "create": "Create confirmation",
+      "regenerate": "Regenerate document",
+      "noDocument": "No document generated yet."
+    }
   }
 }

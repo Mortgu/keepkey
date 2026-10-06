@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OrderCreateModal from "../order-create-modal";
+import ConfirmationSection from "./confirmation-section";
 import type { Order } from "@keepit/schemas";
 import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks/orders/order-mutations";
 import { getErrorMessage } from "@/lib/errors";
@@ -108,6 +109,9 @@ export default function OrderCard({ order }: Props) {
                         <dt>{t("orders.details")}</dt><dd>{order.orderDetails || "—"}</dd>
                         <dt>{t("orders.contractStartDate")}</dt><dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
                     </dl>
+                </Accordion.Section>
+                <Accordion.Section value="confirmation" label={t("orders.confirmation.title")}>
+                    <ConfirmationSection order={order} />
                 </Accordion.Section>
                 <Accordion.Section value="documents" label="Dokumente">
                     {documents.map((document) => (

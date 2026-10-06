@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const taskStatusSchema = z.enum(["COMPLETED", "RUNNING", "PENDING", "FAILED"]);
 export type TaskStatus = z.infer<typeof taskStatusSchema>;
 
-export const taskTargetSchema = z.enum(["OFFER", "ORDER", "RENEWAL", "INVOICE"]);
+export const taskTargetSchema = z.enum(["OFFER", "ORDER", "RENEWAL", "INVOICE", "CONFIRMATION"]);
 export type TaskTarget = z.infer<typeof taskTargetSchema>;
 
 export const taskTypeSchema = z.enum(["UPLOAD", "RESERVATION", "GENERATION"]);

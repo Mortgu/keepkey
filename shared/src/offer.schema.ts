@@ -109,6 +109,9 @@ export const offerRevisionSchema = z.object({
 export type OfferRevision = z.infer<typeof offerRevisionSchema>;
 
 /* Offer*/
+export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
+export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
+
 export const createOfferSchema = z.object({
     customerId: z.string(),
     contactPersonId: z.string(),
@@ -137,6 +140,13 @@ export const createOfferSchema = z.object({
     flatrates: z.array(createOfferFlatrateSchema),
 
     discounts: z.array(createOfferDiscountSchema),
+
+    /**
+     * Verlängerung oder Lizenzerweiterung *ohne* Quellangebot — für Bestands-
+     * verträge, deren Ursprungsangebot nicht im System ist. Mit Quellangebot
+     * laufen beide über `/:id/renew` bzw. `/:id/extend`, wo der Typ feststeht.
+     */
+    derivationType: offerDerivationTypeSchema.nullable().optional(),
 });
 export type CreateOfferInput = z.infer<typeof createOfferSchema>;
 
@@ -147,8 +157,6 @@ export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
 
 /* Lizenzerweiterung */
 
-export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
-export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
 
 /**
  * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden

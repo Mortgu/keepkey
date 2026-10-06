@@ -17,6 +17,7 @@ export * from './offers/offer-hooks';
 export * from './offers/offer-mutations';
 export * from './orders/order-hooks';
 export * from './orders/order-mutations';
+export * from './confirmations/confirmation-hooks';
 export * from './pricing/pricing-hooks';
 export * from './pricing/pricing-mutations';
 export * from './products/product-hooks';

@@ -182,5 +182,34 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
     },
 };
 
+/**
+ * Verlängerung und Erweiterung *ohne* Quellangebot — für Bestandsverträge, deren
+ * Ursprungsangebot nicht im System ist. Es gibt nichts zu übernehmen und nichts
+ * zu pinnen: Kopf und Produkte sind frei wählbar, Preise kommen live aus dem
+ * Tarif. Was den Typ ausmacht (keine Flatrates bei der Erweiterung, kein
+ * Feature-Vergleich, neue AG-Nummer), bleibt bestehen.
+ */
+function withoutSource(policy: OfferModalPolicy): OfferModalPolicy {
+    return {
+        ...policy,
+        header: ALL_HEADER_FIELDS_EDITABLE,
+        positions: {
+            ...policy.positions,
+            startEmpty: true,
+            fields: { ...policy.positions.fields, productId: "edit" },
+        },
+        flatrates: policy.flatrates.access === "hidden"
+            ? policy.flatrates
+            : { ...policy.flatrates, canAdd: true, startEmpty: true },
+        discounts: { ...policy.discounts, startEmpty: true },
+        priceSource: "live",
+    };
+}
+
+export function resolveOfferModalPolicy(mode: OfferModalMode, hasSourceOffer: boolean): OfferModalPolicy {
+    const policy = OFFER_MODAL_POLICIES[mode];
+    return mode !== "offer" && !hasSourceOffer ? withoutSource(policy) : policy;
+}
+
 /** Verbindet das `<form>` im Kopfbereich mit dem Speichern-Button im Footer. */
 export const OFFER_MODAL_FORM_ID = "offer-modal-form";

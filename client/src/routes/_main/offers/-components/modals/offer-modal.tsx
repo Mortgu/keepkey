@@ -35,9 +35,13 @@ export default function OfferModal(props: OfferModalProps) {
     const title = () => {
         switch (mode) {
             case "renewal":
-                return t("renewal.title", { orderId: sourceOffer?.quoteId });
+                return sourceOffer
+                    ? t("renewal.title", { orderId: sourceOffer.quoteId })
+                    : t("renewal.title_standalone");
             case "extension":
-                return t("licenseExtension.title", { orderId: sourceOffer?.quoteId });
+                return sourceOffer
+                    ? t("licenseExtension.title", { orderId: sourceOffer.quoteId })
+                    : t("licenseExtension.title_standalone");
             default:
                 return sourceOffer ? "Angebot bearbeiten" : "Angebot erstellen";
         }

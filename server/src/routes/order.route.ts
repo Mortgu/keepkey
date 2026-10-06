@@ -2,6 +2,7 @@ import { cancelOrder } from "@/controllers/order.controller.js";
 import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
 import { Router } from "express";
 import {
+  createConfirmation,
   createOrder,
   createOrderTask,
   deleteOrderById,
@@ -9,12 +10,14 @@ import {
   getAllOrders,
   getNextOrderNumber,
   getOrderById,
+  getConfirmation,
   getOrderRevisions,
+  regenerateConfirmation,
   restoreOrderRevision,
   updateOrder,
 } from "@/controllers/index.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
-import { orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
+import { createConfirmationSchema, orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
 import {
   idParamsSchema,
   orderIdParamsSchema,
@@ -36,6 +39,16 @@ router.post(
     validateParams(orderIdParamsSchema),
     generateOrderDocument,
 );
+
+/* Auftragsbestätigung — eine je Bestellung, Nummer vom Nutzer. */
+router.get("/:orderId/confirmation", validateParams(orderIdParamsSchema), getConfirmation);
+router.post(
+    "/:orderId/confirmation",
+    validateParams(orderIdParamsSchema),
+    validate(createConfirmationSchema),
+    createConfirmation,
+);
+router.post("/:orderId/confirmation/documents", validateParams(orderIdParamsSchema), regenerateConfirmation);
 
 router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 

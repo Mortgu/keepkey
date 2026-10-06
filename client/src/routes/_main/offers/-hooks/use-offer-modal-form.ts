@@ -1,10 +1,10 @@
 import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
-import { OFFER_MODAL_POLICIES } from "../-components/modals/offer-modal-policy";
+import { resolveOfferModalPolicy } from "../-components/modals/offer-modal-policy";
 import { offerModalSchema } from "../-schemas/offer-modal-schema";
 import useOfferModal from "./use-offer.offer-modal";
 import usePricingStatus from "./use-pricing-status.offer-modal";
-import type { CreateOfferInput, ExtendOfferInput, Offer } from "@keepit/schemas";
+import type { CreateOfferInput, ExtendOfferInput, Offer, OfferDerivationType } from "@keepit/schemas";
 import type { OfferModalMode } from "../-components/modals/offer-modal-policy";
 import type { OfferModalValues } from "../-schemas/offer-modal-schema";
 import { useExtendOffer, useOfferManager, useRenewOffer } from "@/hooks";
@@ -59,6 +59,11 @@ function toExtendInput(values: OfferModalValues): ExtendOfferInput {
     };
 }
 
+const STANDALONE_DERIVATION: Record<Exclude<OfferModalMode, "offer">, OfferDerivationType> = {
+    renewal: "RENEWAL",
+    extension: "LICENSE_EXTENSION",
+};
+
 /**
  * Das Formular hinter allen drei Angebotstypen.
  *
@@ -67,7 +72,7 @@ function toExtendInput(values: OfferModalValues): ExtendOfferInput {
  * Mutation beim Speichern.
  */
 export default function useOfferModalForm({ mode, sourceOffer, onClose, preselectedCustomerId }: Props) {
-    const policy = OFFER_MODAL_POLICIES[mode];
+    const policy = resolveOfferModalPolicy(mode, sourceOffer !== undefined);
 
     const { defaultValues } = useOfferModal({ currentOffer: sourceOffer, preselectedCustomerId });
     const { createOffer, updateOffer } = useOfferManager();
@@ -94,6 +99,10 @@ export default function useOfferModalForm({ mode, sourceOffer, onClose, preselec
                 await renewOffer({ offerId: sourceOffer.id, input: toCreateInput(value) });
             } else if (mode === "extension" && sourceOffer) {
                 await extendOffer({ offerId: sourceOffer.id, input: toExtendInput(value) });
+            } else if (mode !== "offer") {
+                // Ohne Quellangebot ist das ein vollständiges Angebot, das nur
+                // als Verlängerung bzw. Erweiterung gekennzeichnet wird.
+                await createOffer({ ...toCreateInput(value), derivationType: STANDALONE_DERIVATION[mode] });
             } else if (sourceOffer) {
                 await updateOffer({
                     offerId: sourceOffer.id,

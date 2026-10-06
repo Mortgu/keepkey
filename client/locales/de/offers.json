@@ -32,6 +32,7 @@
   },
   "renewal": {
     "title": "Verlängerung für {{orderId}}",
+    "title_standalone": "Verlängerung (ohne Ursprungsangebot)",
     "period_section": "Periode",
     "start_date": "Startdatum",
     "valid_until": "Gültig bis",
@@ -51,6 +52,7 @@
   },
   "licenseExtension": {
     "title": "Lizenzerweiterung für {{orderId}}",
+    "title_standalone": "Lizenzerweiterung (ohne Ursprungsangebot)",
     "hint": "Zusätzliche Seats werden zu den Preisen des Ursprungsangebots berechnet. Produkt, Vertrag und Laufzeit bleiben unverändert.",
     "no_snapshot": "Für diese Position existiert keine eingefrorene Preistabelle — gerechnet wird mit ihrem gespeicherten Stückpreis, ohne Mengenstaffel."
   },
@@ -74,6 +76,8 @@
       "renewalStub": "Angebot-Generierung aus Verlängerung folgt in einem kommenden Schritt."
     },
     "create": "Angebot erstellen",
+    "createRenewal": "Verlängerung",
+    "createExtension": "Lizenzerweiterung",
     "description": "Zentrale Verwaltung der Angebote"
   }
 }

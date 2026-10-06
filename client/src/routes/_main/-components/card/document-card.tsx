@@ -5,10 +5,11 @@ import { tv } from "tailwind-variants";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
+import type { ConfirmationDocument, DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
 import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
+    replaceBlockerMessage,
     useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
@@ -46,7 +47,7 @@ interface Props {
     type: DocumentType;
     /** Id des Angebots bzw. der Bestellung. */
     parentId: string;
-    document: OfferDocument | OrderDocument;
+    document: OfferDocument | OrderDocument | ConfirmationDocument;
 }
 
 export default function DocumentCard({ type, parentId, document }: Props) {
@@ -253,9 +254,10 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Download Button */}
                             {(document.status === "GENERATED" || document.status === "UPLOADED") && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger
+                                        className={menuStyles().Trigger()}
+                                        render={<Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />}
+                                    />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
@@ -274,16 +276,24 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Menu Button */}
                             {(document.status !== "UPLOADING" && !isBusy) && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger
+                                        className={menuStyles().Trigger()}
+                                        render={<Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />}
+                                    />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
                                                 <Menu.Item className={menuStyles().Item()} disabled>
                                                     <ExternalLink size={14} /> View in NextCloud
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => dropzone.open()}>
+                                                {/* react-dropzone liefert zur Laufzeit `open: null`, solange die
+                                                    Zone deaktiviert ist — entgegen seiner Typen. */}
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={!canReplace}
+                                                    title={canReplace ? undefined : replaceBlockerMessage(replaceBlocker)}
+                                                    onClick={() => { if (canReplace) dropzone.open(); }}
+                                                >
                                                     <Replace size={14} /> Replace File
                                                 </Menu.Item>
                                                 {canPreview && (

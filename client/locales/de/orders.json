@@ -20,6 +20,15 @@
     "accepted": "Angenommen",
     "acceptedHint": "Angenommene Angebote können nicht mehr geändert werden.",
     "selectOffer": "Angebot für Bestellung auswählen",
-    "emptyOffers": "Keine offenen Angebote verfügbar."
+    "emptyOffers": "Keine offenen Angebote verfügbar.",
+    "confirmation": {
+      "title": "Auftragsbestätigung",
+      "hint": "Die AB-Nummer wird einmal vergeben und danach nicht mehr geändert. Netto, MwSt. und Brutto werden aus dem angenommenen Angebot berechnet.",
+      "number": "AB-Nr.",
+      "date": "Datum",
+      "create": "AB erstellen",
+      "regenerate": "Dokument neu erzeugen",
+      "noDocument": "Noch kein Dokument erzeugt."
+    }
   }
 }

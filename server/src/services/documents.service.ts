@@ -27,6 +27,7 @@ import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentCapabilities, DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
+import { documentTable } from "./document-repo.js";
 
 export type RenameDocumentInput = { displayName: string };
 
@@ -68,8 +69,7 @@ const REPLACEABLE_STATUSES = new Set<DocumentStatus>([
 const toDocumentFormat = (format: DocumentFormatParam): DocumentFormat =>
     format === "pdf" ? DocumentFormat.PDF : DocumentFormat.DOCX;
 
-const scopeOf = (type: DocumentType): DocumentArtifactScope =>
-    type === "offer" ? "offers" : "orders";
+const scopeOf = (type: DocumentType): DocumentArtifactScope => documentTable(type).scope;
 
 /**
  * Präfix, unter dem ersetzte Dateien liegen.
@@ -86,15 +86,7 @@ async function findGeneratedDocument(
     id: string,
     client: Prisma.TransactionClient = prisma,
 ) {
-    return type === "offer"
-        ? client.offerDocument.findFirst({
-            where: { id, deletedAt: null },
-            include: { artifacts: true },
-        })
-        : client.orderDocument.findFirst({
-            where: { id, deletedAt: null },
-            include: { artifacts: true },
-        });
+    return documentTable(type, client).findWithArtifacts(id);
 }
 
 async function requireGeneratedDocument(type: DocumentType, id: string) {
@@ -202,9 +194,7 @@ export async function renameDocument(
     await prisma.$transaction(async (tx) => {
         const where = { id, deletedAt: null, status: { in: [...RENAMABLE_STATUSES] } };
         const data = { displayName: input.displayName };
-        const renamed = type === "offer"
-            ? await tx.offerDocument.updateMany({ where, data })
-            : await tx.orderDocument.updateMany({ where, data });
+        const renamed = await documentTable(type, tx).updateMany(where, data);
 
         if (renamed.count !== 1) {
             throw new AppException(
@@ -276,9 +266,7 @@ export async function deleteDocument(type: DocumentType, id: string): Promise<vo
             status: { notIn: [...BUSY_STATUSES] },
         };
         const data = { deletedAt: new Date(), isCurrent: false };
-        const deleted = type === "offer"
-            ? await tx.offerDocument.updateMany({ where, data })
-            : await tx.orderDocument.updateMany({ where, data });
+        const deleted = await documentTable(type, tx).updateMany(where, data);
 
         if (deleted.count !== 1) {
             throw new AppException(
@@ -627,9 +615,7 @@ export async function resyncDocument(type: DocumentType, id: string) {
     await prisma.$transaction(async (tx) => {
         const where = { id, deletedAt: null, status: DocumentStatus.UPLOADED };
         const data = { status: DocumentStatus.GENERATED };
-        const reset = type === "offer"
-            ? await tx.offerDocument.updateMany({ where, data })
-            : await tx.orderDocument.updateMany({ where, data });
+        const reset = await documentTable(type, tx).updateMany(where, data);
 
         if (reset.count !== 1) {
             throw new AppException(

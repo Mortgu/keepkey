@@ -1,6 +1,5 @@
 import { randomUUID } from "crypto";
 import { DocumentFormat, DocumentStatus, Prisma } from "@prisma/client";
-import env from "../lib/env.js";
 import { getDocumentArtifact } from "../lib/document-artifact-store.js";
 import { artifactPair } from "../lib/document-artifacts.js";
 import { AppException } from "../lib/exceptions.js";
@@ -13,6 +12,7 @@ import {
 import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentType } from "@keepit/schemas";
+import { documentTable } from "./document-repo.js";
 
 type StoredDocumentArtifact = {
     id: string;
@@ -225,7 +225,8 @@ function artifactUpdates(result: DocumentUploadResult, hashes: { pdf: string; do
     };
 }
 
-async function finalizeOfferUpload(
+async function finalizeUpload(
+    type: DocumentType,
     tx: Prisma.TransactionClient,
     document: UploadableDocument,
     token: string,
@@ -234,31 +235,10 @@ async function finalizeOfferUpload(
 ): Promise<boolean> {
     const { pdf, docx } = artifactPair(document.artifacts);
     if (!pdf || !docx) return false;
-    const finalized = await tx.offerDocument.updateMany({
-        where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-        data: { status: DocumentStatus.UPLOADED, uploadToken: null, error: null },
-    });
-    if (finalized.count !== 1) return false;
-
-    const updates = artifactUpdates(result, hashes);
-    await tx.documentArtifact.update({ where: { id: pdf.id }, data: updates.pdf });
-    await tx.documentArtifact.update({ where: { id: docx.id }, data: updates.docx });
-    return true;
-}
-
-async function finalizeOrderUpload(
-    tx: Prisma.TransactionClient,
-    document: UploadableDocument,
-    token: string,
-    result: DocumentUploadResult,
-    hashes: { pdf: string; docx: string },
-): Promise<boolean> {
-    const { pdf, docx } = artifactPair(document.artifacts);
-    if (!pdf || !docx) return false;
-    const finalized = await tx.orderDocument.updateMany({
-        where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-        data: { status: DocumentStatus.UPLOADED, uploadToken: null, error: null },
-    });
+    const finalized = await documentTable(type, tx).updateMany(
+        { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
+        { status: DocumentStatus.UPLOADED, uploadToken: null, error: null },
+    );
     if (finalized.count !== 1) return false;
 
     const updates = artifactUpdates(result, hashes);
@@ -274,83 +254,33 @@ const claimableUpload = (staleBefore: Date) => ({
     ],
 });
 
-async function uploadOfferDocument(documentId: string): Promise<DocumentUploadResult> {
-    const document = await prisma.offerDocument.findFirst({
-        where: { id: documentId, deletedAt: null },
-        include: { artifacts: true },
-    });
-    if (!document) throw new AppException("Document not found.", 404, "DOCUMENT_NOT_FOUND");
-
-    return uploadDocument({
-        document,
-        pdfDirectory: env.NEXTCLOUD_OFFER_PDF_PATH,
-        docxDirectory: env.NEXTCLOUD_OFFER_ORIGINAL_PATH,
-        claim: async (token, staleBefore) => (await prisma.offerDocument.updateMany({
-            where: { id: document.id, deletedAt: null, ...claimableUpload(staleBefore) },
-            data: { status: DocumentStatus.UPLOADING, uploadToken: token, error: null },
-        })).count === 1,
-        reload: () => prisma.offerDocument.findUnique({
-            where: { id: document.id },
-            include: { artifacts: true },
-        }),
-        finalize: (claimedDocument, token, result, hashes) => prisma.$transaction((tx) =>
-            finalizeOfferUpload(tx, claimedDocument, token, result, hashes)),
-        release: async (token, error) => {
-            await prisma.offerDocument.updateMany({
-                where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-                data: { status: DocumentStatus.GENERATED, uploadToken: null, error },
-            });
-        },
-        renew: async (token) => {
-            await prisma.offerDocument.updateMany({
-                where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-                data: { updatedAt: new Date() },
-            });
-        },
-    });
-}
-
-async function uploadOrderDocument(documentId: string): Promise<DocumentUploadResult> {
-    const document = await prisma.orderDocument.findFirst({
-        where: { id: documentId, deletedAt: null },
-        include: { artifacts: true },
-    });
-    if (!document) throw new AppException("Document not found.", 404, "DOCUMENT_NOT_FOUND");
-
-    return uploadDocument({
-        document,
-        pdfDirectory: env.NEXTCLOUD_ORDER_PDF_PATH,
-        docxDirectory: env.NEXTCLOUD_ORDER_ORIGINAL_PATH,
-        claim: async (token, staleBefore) => (await prisma.orderDocument.updateMany({
-            where: { id: document.id, deletedAt: null, ...claimableUpload(staleBefore) },
-            data: { status: DocumentStatus.UPLOADING, uploadToken: token, error: null },
-        })).count === 1,
-        reload: () => prisma.orderDocument.findUnique({
-            where: { id: document.id },
-            include: { artifacts: true },
-        }),
-        finalize: (claimedDocument, token, result, hashes) => prisma.$transaction((tx) =>
-            finalizeOrderUpload(tx, claimedDocument, token, result, hashes)),
-        release: async (token, error) => {
-            await prisma.orderDocument.updateMany({
-                where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-                data: { status: DocumentStatus.GENERATED, uploadToken: null, error },
-            });
-        },
-        renew: async (token) => {
-            await prisma.orderDocument.updateMany({
-                where: { id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token },
-                data: { updatedAt: new Date() },
-            });
-        },
-    });
-}
-
-export function uploadGeneratedDocument(
+export async function uploadGeneratedDocument(
     type: DocumentType,
     documentId: string,
 ): Promise<DocumentUploadResult> {
-    return type === "offer"
-        ? uploadOfferDocument(documentId)
-        : uploadOrderDocument(documentId);
+    const table = documentTable(type);
+    const document = await table.findWithArtifacts(documentId);
+    if (!document) throw new AppException("Document not found.", 404, "DOCUMENT_NOT_FOUND");
+
+    const uploading = (token: string) => ({
+        id: document.id, deletedAt: null, status: DocumentStatus.UPLOADING, uploadToken: token,
+    });
+
+    return uploadDocument({
+        document,
+        ...table.nextcloud,
+        claim: async (token, staleBefore) => (await table.updateMany(
+            { id: document.id, deletedAt: null, ...claimableUpload(staleBefore) },
+            { status: DocumentStatus.UPLOADING, uploadToken: token, error: null },
+        )).count === 1,
+        reload: () => table.reloadWithArtifacts(document.id),
+        finalize: (claimedDocument, token, result, hashes) => prisma.$transaction((tx) =>
+            finalizeUpload(type, tx, claimedDocument, token, result, hashes)),
+        release: async (token, error) => {
+            await table.updateMany(uploading(token), { status: DocumentStatus.GENERATED, uploadToken: null, error });
+        },
+        renew: async (token) => {
+            await table.updateMany(uploading(token), { updatedAt: new Date() });
+        },
+    });
 }

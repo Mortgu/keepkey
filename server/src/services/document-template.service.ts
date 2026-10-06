@@ -20,6 +20,8 @@ export const DOCX_MIME =
 const LEGACY_BASE_NAME: Record<DocumentTemplateKind, string> = {
     OFFER: "offer",
     ORDER: "order",
+    CONFIRMATION: "confirmation",
+    INVOICE: "invoice",
 };
 
 const templateObjectKey = (kind: DocumentTemplateKind) =>

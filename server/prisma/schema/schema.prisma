@@ -31,6 +31,7 @@ model User {
   customerId     String?
   offers         Offer[]
   acceptedOrders Order[]
+  confirmations  Confirmation[]
   offerRevisions OfferRevision[]
   orderRevisions OrderRevision[]
   tariffVersions TariffVersion[]

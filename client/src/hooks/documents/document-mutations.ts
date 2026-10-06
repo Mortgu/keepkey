@@ -11,11 +11,15 @@ import {
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
+import { confirmationKeys } from "@/hooks/confirmations/confirmation-keys";
 
 const invalidate = (queryClient: QueryClient, type: DocumentType, parentId: string) => {
     if (type === "offer") {
         queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
         queryClient.invalidateQueries({ queryKey: offerKeys.detail(parentId) });
+    } else if (type === "confirmation") {
+        // parentId ist hier die Order, an der die AB hängt.
+        queryClient.invalidateQueries({ queryKey: confirmationKeys.byOrder(parentId) });
     } else {
         queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
     }

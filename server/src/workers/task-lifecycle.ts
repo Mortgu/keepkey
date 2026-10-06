@@ -36,6 +36,14 @@ export async function markTaskRunning(taskId: string, runToken: string): Promise
             },
             data: { status: DocumentStatus.PROCESSING, error: null },
         });
+        await tx.confirmationDocument.updateMany({
+            where: {
+                taskId,
+                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
+                artifacts: { none: {} },
+            },
+            data: { status: DocumentStatus.PROCESSING, error: null },
+        });
 
         return true;
     });
@@ -98,6 +106,14 @@ export async function handleTaskFailure(job: Job<TaskJobData> | undefined, error
             data: { status: DocumentStatus.FAILED, error: error.message },
         });
         await tx.orderDocument.updateMany({
+            where: {
+                taskId,
+                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
+                artifacts: { none: {} },
+            },
+            data: { status: DocumentStatus.FAILED, error: error.message },
+        });
+        await tx.confirmationDocument.updateMany({
             where: {
                 taskId,
                 status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
