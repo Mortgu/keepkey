@@ -100,6 +100,7 @@ export async function createOrder(input: AcceptOrderInput, actorId: string) {
                     projectNumber: data.projectNumber ?? null,
                     projectDescription: data.projectDescription ?? null,
                     orderDetails: data.orderDetails ?? null,
+                    contractStartDate: data.contractStartDate ? new Date(data.contractStartDate) : null,
                     acceptedAt,
                     acceptedById: actorId,
                 },
@@ -170,6 +171,7 @@ export async function updateOrder(
             data: {
                 ...data.order,
                 date: new Date(data.order.date),
+                contractStartDate: data.order.contractStartDate ? new Date(data.order.contractStartDate) : null,
                 version: { increment: 1 },
             },
         });
@@ -213,6 +215,7 @@ export async function restoreOrderRevision(
             data: {
                 ...restored,
                 date: new Date(restored.date),
+                contractStartDate: restored.contractStartDate ? new Date(restored.contractStartDate) : null,
                 version: { increment: 1 },
             },
         });

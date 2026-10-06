@@ -118,8 +118,24 @@ describe("accepted offer order data", () => {
                 order: { ...input.order, date: "invalid" },
             }).success,
         ).toBe(false);
+        expect(
+            updateOrderMetadataSchema.safeParse({
+                ...input,
+                order: { ...input.order, contractStartDate: "invalid" },
+            }).success,
+        ).toBe(false);
+        expect(
+            updateOrderMetadataSchema.safeParse({
+                ...input,
+                order: { ...input.order, contractStartDate: "2026-11-01" },
+            }).success,
+        ).toBe(true);
         expect(parseMetadataRevision(input, 1)).toEqual(input.order);
         expect(() => parseMetadataRevision(input, 2)).toThrow();
+    });
+    it("still reads revision snapshots written before contractStartDate existed", () => {
+        const { contractStartDate: _omitted, ...legacy } = metadataSnapshot(orderFixture()).order;
+        expect(parseMetadataRevision({ order: legacy }, 1)).toEqual(legacy);
     });
     it.each(["order.docx", "order.en.docx"])(
         "renders the bundled %s with order, offer and project numbers",

@@ -7,6 +7,7 @@ import { useCreateOrder, useUpdateOrder } from "@/hooks";
 
 const formSchema = orderMetadataSchema.extend({
     date: orderMetadataSchema.shape.date.or(z.literal("")),
+    contractStartDate: orderMetadataSchema.shape.date.or(z.literal("")),
     projectNumber: z.string(),
     projectDescription: z.string(),
     orderDetails: z.string(),
@@ -27,6 +28,7 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
         defaultValues: {
             orderId: currentOrder?.orderId ?? "",
             date: currentOrder?.date.slice(0, 10) ?? "",
+            contractStartDate: currentOrder?.contractStartDate?.slice(0, 10) ?? "",
             projectNumber: currentOrder?.projectNumber ?? "",
             projectDescription: currentOrder?.projectDescription ?? "",
             orderDetails: currentOrder?.orderDetails ?? "",
@@ -38,12 +40,13 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
                 if (currentOrder) {
                     await update.updateOrder({ orderId: currentOrder.id, input: {
                         expectedVersion, order: { ...value, date: value.date || currentOrder.date,
+                            contractStartDate: value.contractStartDate || null,
                             projectNumber: value.projectNumber || null, projectDescription: value.projectDescription || null,
                             orderDetails: value.orderDetails || null },
                     } });
                 } else if (currentOffer) {
                     await create.createOrder({ ...value, id: currentOffer.id, expectedOfferVersion: expectedVersion,
-                        date: value.date || undefined });
+                        date: value.date || undefined, contractStartDate: value.contractStartDate || undefined });
                 } else return;
                 onDone();
             } catch {

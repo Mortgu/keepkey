@@ -112,6 +112,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         paymentTerm: order.paymentTerm,
         validUntil: order.validUntil ? formatDate(order.validUntil) : "",
         requestFrom: order.requestFrom ? formatDate(order.requestFrom) : "",
+        contractStartDate: order.contractStartDate ? formatDate(order.contractStartDate) : "",
         supplierId: order.supplierId || "",
 
         customer: {

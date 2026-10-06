@@ -21,6 +21,7 @@ export const createOrder = (input: CreateOrderInput) =>
             projectNumber: input.projectNumber,
             projectDescription: input.projectDescription,
             orderDetails: input.orderDetails,
+            contractStartDate: input.contractStartDate,
         }),
     });
 

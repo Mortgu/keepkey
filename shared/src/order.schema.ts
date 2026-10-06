@@ -86,6 +86,8 @@ export const orderMetadataSchema = z
         projectNumber: z.string().nullable(),
         projectDescription: z.string().nullable(),
         orderDetails: z.string().nullable(),
+        /* Optional, damit ältere Revisions-Snapshots ohne das Feld lesbar bleiben. */
+        contractStartDate: dateInput.nullable().optional(),
     })
     .strict();
 export const createOrderSchema = z
@@ -97,6 +99,7 @@ export const createOrderSchema = z
         projectNumber: z.string().optional(),
         projectDescription: z.string().optional(),
         orderDetails: z.string().optional(),
+        contractStartDate: dateInput.optional(),
     })
     .strict();
 export const updateOrderSchema = z
@@ -139,6 +142,7 @@ export const orderSchema = z.object({
     date: z.string(),
     validUntil: z.string().nullish(),
     requestFrom: z.string().nullish(),
+    contractStartDate: z.string().nullish(),
 
     net_amount: z.number().int(),
     version: z.number().int(),

@@ -74,17 +74,31 @@ export default function OrderCreateModal({ offer, order, onClose, onCreated }: P
                         )} />
                     </div>
 
-                    <form.Field name="date" children={(field) => (
-                        <Input
-                            id={field.name}
-                            type="date"
-                            label={t("orders.date")}
-                            value={field.state.value}
-                            error={getFormError(field.state.meta.errors)}
-                            onChange={(e) => field.handleChange(e.target.value)}
-                            onBlur={field.handleBlur}
-                        />
-                    )} />
+                    <div className="flex items-center gap-4">
+                        <form.Field name="date" children={(field) => (
+                            <Input
+                                id={field.name}
+                                type="date"
+                                label={t("orders.date")}
+                                value={field.state.value}
+                                error={getFormError(field.state.meta.errors)}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                        )} />
+
+                        <form.Field name="contractStartDate" children={(field) => (
+                            <Input
+                                id={field.name}
+                                type="date"
+                                label={t("orders.contractStartDate")}
+                                value={field.state.value}
+                                error={getFormError(field.state.meta.errors)}
+                                onChange={(e) => field.handleChange(e.target.value)}
+                                onBlur={field.handleBlur}
+                            />
+                        )} />
+                    </div>
 
                     <form.Field name="projectDescription" children={(field) => (
                         <Textarea

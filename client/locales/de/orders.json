@@ -9,6 +9,7 @@
     "number": "Bestell-Nr.",
     "projectNumber": "Projekt-Nr.",
     "date": "Bestelldatum",
+    "contractStartDate": "Vertragsbeginn (optional)",
     "projectDescription": "Projektbezug",
     "details": "Bestelldetails",
     "edit": "Bearbeiten",

@@ -9,6 +9,7 @@
     "number": "Order number",
     "projectNumber": "Project number",
     "date": "Order date",
+    "contractStartDate": "Contract start date (optional)",
     "projectDescription": "Project description",
     "details": "Order details",
     "edit": "Edit",

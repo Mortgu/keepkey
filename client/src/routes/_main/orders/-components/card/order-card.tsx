@@ -106,6 +106,7 @@ export default function OrderCard({ order }: Props) {
                         <dt>{t("orders.projectNumber")}</dt><dd>{order.projectNumber || "—"}</dd>
                         <dt>{t("orders.projectDescription")}</dt><dd>{order.projectDescription || "—"}</dd>
                         <dt>{t("orders.details")}</dt><dd>{order.orderDetails || "—"}</dd>
+                        <dt>{t("orders.contractStartDate")}</dt><dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
                     </dl>
                 </Accordion.Section>
                 <Accordion.Section value="documents" label="Dokumente">

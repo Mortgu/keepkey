@@ -35,6 +35,7 @@ export const orderTemplateSchema = z
         projectDescription: z.string(),
         orderDetails: z.string(),
         date: z.string(),
+        contractStartDate: z.string(),
         paymentTerm: z.string(),
         customer: person.extend({
             companyName: z.string(),

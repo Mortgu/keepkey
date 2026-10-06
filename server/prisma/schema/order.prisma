@@ -9,6 +9,8 @@ model Order {
   projectNumber String?
   projectDescription String?
   orderDetails String?
+  /// Optionaler Vertragsbeginn; die Laufzeit (duration_months) steht am Angebot.
+  contractStartDate DateTime?
   acceptedAt DateTime @default(now()) @db.Timestamptz(6)
   acceptedById String
   acceptedBy User @relation(fields: [acceptedById], references: [id], onDelete: Restrict)

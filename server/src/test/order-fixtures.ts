@@ -186,6 +186,7 @@ export const orderFixture = () => ({
     projectNumber: "P-1",
     projectDescription: "Description",
     orderDetails: "Registration",
+    contractStartDate: null,
     version: 1,
     documentVersion: 0,
     acceptedAt: now,
