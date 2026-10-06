@@ -3,11 +3,9 @@ import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, I
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
 import { toast } from "react-toastify";
-import { useRef, useState } from "react";
-import '@docx-editor.dev/core/styles/editor.css';
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import type { DocxEditorRef } from "@docx-editor.dev/react";
 import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
 import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
 import {
@@ -113,7 +111,6 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
     const task = useDocumentTask(document.taskId);
 
-    const editorRef = useRef<DocxEditorRef>(null);
     const [bytes, setBytes] = useState<Uint8Array>();
     const [editDocx, setEditDocx] = useState<boolean>(false);
 
