@@ -2,7 +2,8 @@ import type { OfferDiscount } from "@keepit/schemas";
 import { formatEur } from "@/utils/utils";
 
 type Props = {
-    discount: OfferDiscount;
+    /** Angebot- und Bestellrabatte teilen Titel/Beschreibung/Betrag — nur diese Felder werden gerendert. */
+    discount: Pick<OfferDiscount, "title" | "description" | "amount_cents">;
 };
 
 export default function DiscountRow({ discount }: Props) {

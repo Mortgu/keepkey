@@ -1,13 +1,15 @@
+import { Ban, Pen } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OrderEditModal from "../order-edit-modal";
 import ConfirmationSection from "./confirmation-section";
 import InvoiceSection from "./invoice-section";
 import type { Order } from "@keepit/schemas";
-import { useCancelOrder, useGenerateOrderDocument  } from "@/hooks/orders/order-mutations";
+import { useCancelOrder, useGenerateOrderDocument } from "@/hooks/orders/order-mutations";
 import { getErrorMessage } from "@/lib/errors";
 
 import { Accordion, Badge, Button } from "@/components";
+import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
@@ -27,9 +29,12 @@ export default function OrderCard({ order }: Props) {
         try { await cancelOrder({ orderId: order.id, expectedVersion: order.version }); } catch { /* Render mutation error below. */ }
     };
     const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
+    const cancelled = Boolean(order.cancelledAt);
 
     // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
     const positionsSales = orderPositions.reduce((sum, p) => sum + p.total_cents, 0);
+    // Altbestellungen ohne gespeicherte Einkaufspreise: Fallback = Verkaufspreis.
+    const hasFallback = order.supplierPositions.some((p) => p.fallback);
 
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
     const [openSections, setOpenSections] = useState<Array<string>>([]);
@@ -41,72 +46,60 @@ export default function OrderCard({ order }: Props) {
         );
     };
 
+    const dateCell = "flex flex-col gap-0.5 px-4 py-2 text-xs border-l border-(--border) first:border-l-0";
+
     return (
-        <div className="bg-white border border-(--border) rounded-md">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-(--border) relative">
-                <div className="grid gap-1">
+        <div className="bg-white border border-(--border) rounded-md overflow-hidden">
+            {/* Kopf */}
+            <div className="flex items-start justify-between gap-4 px-4 py-3">
+                <div className="grid gap-0">
                     <div className="flex items-center gap-2">
-                        <div className="flex items-center gap-2 text-md">
-                            <span className="text-(--text) font-semibold">BE{order.orderId}</span>
-                            <span className="text-(--text)">{customer.companyName}</span>
-                            {order.cancelledAt && <Badge variant="PENDING" size="xs">{t("orders.cancelled")}</Badge>}
-                        </div>
+                        <span className="text-md font-mono font-semibold text-(--text)">BE{order.orderId}</span>
+                        {cancelled && <Badge variant="PENDING" size="xs">{t("orders.cancelled")}</Badge>}
                     </div>
-
-
-                    <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Kontakt:</label>
-                            <p className="text-(--text)">
-                                {ccp.salutation} {ccp.firstName} {ccp.lastName}
-                            </p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Angebots-Nr.</label>
-                            <p className="text-(--text)">{order.offer.quoteId}</p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Erstellt:</label>
-                            <p className="text-(--text)">{formatDate(order.createdAt)}</p>
-                        </div>
-
-                        <div className="flex items-center gap-1 text-sm font-light">
-                            <label className="text-(--text-secondary)">Gültig bis:</label>
-                            <p className="text-(--text)">
-                                {order.validUntil ? formatDate(order.validUntil) : "-"}
-                            </p>
-                        </div>
-                    </div>
+                    <p className="text-sm font-light text-(--text-secondary)">
+                        {[
+                            customer.companyName,
+                            `${ccp.firstName} ${ccp.lastName}`.trim(),
+                        ].filter(Boolean).join(" · ")}
+                    </p>
                 </div>
 
-                <div className="flex items-start gap-6">
-                    {/* Einkaufsseite: Bestellung an den Zulieferer. Pauschalen/Rabatte nicht enthalten. */}
-                    <div className="flex flex-col items-end">
-                        <p
-                            className="text-md font-mono font-medium"
-                            title={order.supplierPositions.some((p) => p.fallback) ? t("orders.purchase.fallback") : undefined}
-                        >
-                            {formatEur(order.purchase_net_amount)}
-                            {order.supplierPositions.some((p) => p.fallback) && <span className="text-(--text-secondary)"> *</span>}
-                        </p>
-                        <p className="text-(--text-secondary) font-light text-sm">{t("orders.purchase.purchaseShort")}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <p className="text-md font-mono font-medium">{formatEur(positionsSales - order.purchase_net_amount)}</p>
-                        <p className="text-(--text-secondary) font-light text-sm">{t("orders.purchase.marginShort")}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                        <p className="text-md font-mono font-medium">{formatEur(order.net_amount)}</p>
-                        <p className="text-(--text-secondary) font-light text-sm">
-                            Gesamtpreis
-                        </p>
-                    </div>
+                <div className="flex flex-col items-end">
+                    <p className="text-md font-mono font-semibold">{formatEur(order.net_amount)}</p>
+                    <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis</p>
                 </div>
             </div>
 
-            <Accordion value={openSections} onValueChange={setOpenSections}>
+            {/* Status- und Datumsleiste */}
+            <div className="grid grid-cols-2 md:grid-cols-5 border-t border-(--border) bg-(--page-bg) text-(--text)">
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Erstellt am:</span>
+                    <span className="text-sm font-medium">{formatDate(order.createdAt)}</span>
+                </div>
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Angebots-Nr.:</span>
+                    <span className="text-sm font-medium font-mono">AG{order.offer.quoteId}</span>
+                </div>
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">Gültig bis:</span>
+                    <span className="text-sm font-medium">{order.validUntil ? formatDate(order.validUntil) : "-"}</span>
+                </div>
+                {/* Einkaufsseite: Bestellung an den Zulieferer. Pauschalen/Rabatte nicht enthalten. */}
+                <div className={dateCell} title={hasFallback ? t("orders.purchase.fallback") : undefined}>
+                    <span className="text-(--text-secondary)">{t("orders.purchase.purchaseShort")}</span>
+                    <span className="text-sm font-medium font-mono">
+                        {formatEur(order.purchase_net_amount)}
+                        {hasFallback && <span className="text-(--text-secondary)"> *</span>}
+                    </span>
+                </div>
+                <div className={dateCell}>
+                    <span className="text-(--text-secondary)">{t("orders.purchase.marginShort")}</span>
+                    <span className="text-sm font-medium font-mono">{formatEur(positionsSales - order.purchase_net_amount)}</span>
+                </div>
+            </div>
+
+            <Accordion value={openSections} onValueChange={setOpenSections} className="border-t border-(--border)">
                 <Accordion.Section value="products" label="Produkte">
                     {orderPositions.map((position) => (
                         <PositionRow
@@ -120,7 +113,10 @@ export default function OrderCard({ order }: Props) {
                     {flatRates.map((flatrate) => (
                         <FlatRateRow key={flatrate.id} flatrate={flatrate} />
                     ))}
-                    {order.discounts.map(discount => <div key={discount.id} className="flex justify-between py-3 text-sm"><span>{discount.title}</span><span>{formatEur(-discount.amount_cents)}</span></div>)}
+
+                    {order.discounts.map((discount) => (
+                        <DiscountRow key={discount.id} discount={discount} />
+                    ))}
                 </Accordion.Section>
 
                 <Accordion.Section value="details" label={t("orders.details")}>
@@ -137,7 +133,22 @@ export default function OrderCard({ order }: Props) {
                 <Accordion.Section value="invoice" label={t("orders.invoice.title")}>
                     <InvoiceSection order={order} />
                 </Accordion.Section>
-                <Accordion.Section value="documents" label="Dokumente">
+                <Accordion.Section
+                    value="documents"
+                    label="Dokumente"
+                    aside={(
+                        <Button
+                            className="min-w-fit h-auto rounded-none border-l border-(--border) px-4"
+                            variant="secondary"
+                            size="xs"
+                            loading={isGeneratingDocument}
+                            disabled={isGeneratingDocument || cancelled}
+                            onClick={handleGenerateDocument}
+                        >
+                            Dokument generieren
+                        </Button>
+                    )}
+                >
                     {documents.map((document) => (
                         <DocumentCard
                             key={document.id}
@@ -155,29 +166,39 @@ export default function OrderCard({ order }: Props) {
                 </Accordion.Section>
             </Accordion>
 
-            <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
-
-                {/* Actions left */}
+            {/* Aktionen */}
+            <div className="flex items-center justify-between gap-2 p-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
-                    <Button
-                        className="min-w-fit"
-                        variant="primary"
-                        size="xs"
-                        loading={isGeneratingDocument}
-                        disabled={isGeneratingDocument || Boolean(order.cancelledAt)}
-                        onClick={handleGenerateDocument}
-                    >
-                        Dokument generieren
-                    </Button>
+                    {errorCancellingOrder && (
+                        <p role="alert" className="px-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button size="xs" variant="border" disabled={Boolean(order.cancelledAt) || isCancellingOrder} onClick={() => setEditing(true)}>{t("orders.edit")}</Button>
-                    <Button size="xs" variant="border" danger disabled={Boolean(order.cancelledAt) || isCancellingOrder} loading={isCancellingOrder} onClick={cancel}>{t("orders.cancelOrder")}</Button>
+                    <Button
+                        size="xs"
+                        variant="border"
+                        disabled={cancelled || isCancellingOrder}
+                        title={cancelled ? t("orders.cancelled") : t("orders.edit")}
+                        onClick={() => setEditing(true)}
+                        icon={<Pen className="size-3" />}
+                        iconOnly
+                    />
+
+                    <Button
+                        size="xs"
+                        variant="secondary"
+                        danger
+                        disabled={cancelled || isCancellingOrder}
+                        title={cancelled ? t("orders.cancelled") : t("orders.cancelOrder")}
+                        onClick={cancel}
+                        loading={isCancellingOrder}
+                        icon={<Ban className="size-3" />}
+                        iconOnly
+                    />
                 </div>
             </div>
 
-            {errorCancellingOrder && <p role="alert" className="px-4 py-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>}
             {editing && <OrderEditModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)} />}
         </div>
     );
