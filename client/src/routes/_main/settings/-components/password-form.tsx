@@ -1,23 +1,27 @@
 import { useForm } from "@tanstack/react-form";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
-import { Button, FieldPasswordInput } from "@/components";
+import { Button, FieldPasswordInput, showToast } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
 
-const passwordSchema = z.object({
-    currentPassword: z.string().min(1, "Pflichtfeld"),
-    newPassword: z.string().min(8, "min. 8 Zeichen!").max(128, "max. 128 Zeichen!"),
-    confirmPassword: z.string(),
-}).refine((value) => value.newPassword === value.confirmPassword, {
-    message: "Passwörter stimmen nicht überein!",
-    path: ["confirmPassword"],
-});
+const PASSWORD_MIN = 8;
+const PASSWORD_MAX = 128;
 
 export default function PasswordForm() {
     const { t } = useTranslation();
+
+    const passwordSchema = z.object({
+        currentPassword: z.string().min(1, t("validation.required")),
+        newPassword: z.string()
+            .min(PASSWORD_MIN, t("validation.passwordMin", { count: PASSWORD_MIN }))
+            .max(PASSWORD_MAX, t("validation.passwordMax", { count: PASSWORD_MAX })),
+        confirmPassword: z.string(),
+    }).refine((value) => value.newPassword === value.confirmPassword, {
+        message: t("validation.passwordMismatch"),
+        path: ["confirmPassword"],
+    });
     const passwordForm = useForm({
         defaultValues: {
             currentPassword: "",
@@ -35,11 +39,11 @@ export default function PasswordForm() {
             });
 
             if (error) {
-                toast.error(error.message);
+                showToast.error("common.errorGeneric", { message: error.message });
                 return;
             }
 
-            toast.success("Passwort geändert");
+            showToast.success("settings.toast.passwordChanged");
             formApi.reset();
         },
     });
@@ -54,17 +58,17 @@ export default function PasswordForm() {
         <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
             <form onSubmit={handleSubmit} className="grid gap-4">
                 <passwordForm.Field name="currentPassword" children={(field) => (
-                    <FieldPasswordInput field={field} label="Aktuelles Passwort" size="sm"
+                    <FieldPasswordInput field={field} label={t("settings.password.current")} size="sm"
                         autoComplete="current-password" />
                 )} />
 
                 <passwordForm.Field name="newPassword" children={(field) => (
-                    <FieldPasswordInput field={field} label="Neues Passwort" size="sm" showRequirements
+                    <FieldPasswordInput field={field} label={t("settings.password.new")} size="sm" showRequirements
                         autoComplete="new-password" />
                 )} />
 
                 <passwordForm.Field name="confirmPassword" children={(field) => (
-                    <FieldPasswordInput field={field} label="Neues Passwort wiederholen" size="sm"
+                    <FieldPasswordInput field={field} label={t("settings.password.confirm")} size="sm"
                         autoComplete="new-password" />
                 )} />
 

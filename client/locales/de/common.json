@@ -48,8 +48,22 @@
     "increment": "Wert erhöhen",
     "decrement": "Wert verringern"
   },
+  "validation": {
+    "required": "Pflichtfeld",
+    "email": "Ungültige E-Mail-Adresse",
+    "passwordMin": "Mindestens {{count}} Zeichen",
+    "passwordMax": "Höchstens {{count}} Zeichen",
+    "passwordMismatch": "Passwörter stimmen nicht überein"
+  },
   "docxEditor": {
     "noBuffer": "Der Editor konnte die Datei nicht lesen."
+  },
+  "documents": {
+    "toast": {
+      "replaced": "Datei wurde ersetzt.",
+      "saved": "Datei wurde gespeichert.",
+      "fileRejected": "Datei abgelehnt: {{reason}}"
+    }
   },
   "documentPreview": {
     "title": "Vorschau",

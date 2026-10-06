@@ -1,10 +1,9 @@
 import { BookmarkPlus, ChevronDown, UndoDot } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { useState } from "react";
 import TariffComponent from "./tariff-component";
 import { TariffVersionList } from "./tariff-version-list";
 import type { TariffBase } from "@keepit/schemas";
-import { Button, Drawer } from "@/components";
+import { Button, Drawer, showToast } from "@/components";
 import { useLocale } from "@/hooks";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
@@ -20,20 +19,18 @@ export default function PricingTableItem({ tariff }: Props) {
     const [open, setOpen] = useState<boolean>(false);
     const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
 
-    const { sealVersion, isPending: sealingVersion, error: errorSealingVersion } = useSealTariffVersion();
+    const { sealVersion, isPending: sealingVersion } = useSealTariffVersion();
 
     const contract = tariff.contract;
 
-    useEffect(() => {
-        if (errorSealingVersion) {
-            toast.error(errorSealingVersion.message);
-        }
-    }, [errorSealingVersion])
-
     const handleSeal = async () => {
-        const version = await sealVersion({ groupId: tariff.tariffGroupId, tariffId: tariff.id });
-        toast.success(`Version ${version.version} gespeichert.`);
-        setDrawerOpen(true);
+        try {
+            const version = await sealVersion({ groupId: tariff.tariffGroupId, tariffId: tariff.id });
+            showToast.success("workloads.pricing.toast.versionSealed", { vars: { version: version.version } });
+            setDrawerOpen(true);
+        } catch {
+            // Der globale onError-Handler zeigt die Server-Meldung bereits an.
+        }
     };
 
     return (

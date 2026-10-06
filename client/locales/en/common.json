@@ -48,8 +48,22 @@
     "increment": "Increase value",
     "decrement": "Decrease value"
   },
+  "validation": {
+    "required": "Required",
+    "email": "Invalid email address",
+    "passwordMin": "At least {{count}} characters",
+    "passwordMax": "At most {{count}} characters",
+    "passwordMismatch": "Passwords do not match"
+  },
   "docxEditor": {
     "noBuffer": "The editor could not read the file."
+  },
+  "documents": {
+    "toast": {
+      "replaced": "File replaced.",
+      "saved": "File saved.",
+      "fileRejected": "File rejected: {{reason}}"
+    }
   },
   "documentPreview": {
     "title": "Preview",

@@ -2,12 +2,11 @@ import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
 import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { tv } from "tailwind-variants";
-import { toast } from "react-toastify";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
 import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
-import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
     useDocumentCapabilities,
@@ -91,16 +90,19 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                     format: "docx",
                     file,
                 });
-                toast.success("Datei wurde ersetzt.");
-            } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Datei konnte nicht ersetzt werden.");
+                showToast.success("documents.toast.replaced");
+            } catch {
+                // Der globale onError-Handler zeigt die Server-Meldung bereits an.
             }
         },
-        onDropRejected(fileRejections, _) {
-            toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
+        onDropRejected(fileRejections) {
+            const reason = fileRejections
+                .flatMap(r => r.errors.map(e => e.message))
+                .join(" & ");
+            showToast.error("documents.toast.fileRejected", { vars: { reason } });
         },
         onError(err) {
-            toast.error(`File rejected! ${err.message}`)
+            showToast.error("documents.toast.fileRejected", { vars: { reason: err.message } });
         },
     });
     const styles = cardStyles({ focused: dropzone.isFocused });
@@ -357,10 +359,11 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                     format: "docx",
                                     file,
                                 });
-                                toast.success("Datei wurde gespeichert.");
+                                showToast.success("documents.toast.saved");
                                 setEditDocx(false);
-                            } catch (error) {
-                                toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
+                            } catch {
+                                // Editor offen lassen, damit nichts verloren geht;
+                                // der globale onError-Handler meldet den Fehler.
                             }
                         }}
                         onClose={() => {

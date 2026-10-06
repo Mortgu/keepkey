@@ -1,6 +1,5 @@
 import { Pen, Plus, Trash } from "lucide-react";
-import { useEffect, useMemo } from "react";
-import { toast } from "react-toastify";
+import { useMemo } from "react";
 import PricingTableItem from "./pricing-table-item";
 import AddContractsModal from "./add-contracts-modal";
 import EditProductsModal from "./edit-products-modal";
@@ -18,31 +17,15 @@ type Props = {
 export default function PricingTable({ group }: Props) {
     const locale = useLocale();
 
-    const { deleteTariffGroup, isPending: deleteTariffGroupPending, error: deleteTariffGroupError } = useDeleteTariffGroup();
-    const { createTariff, isPending: createTariffPending, error: createTariffError } = useCreateTariff();
-    const { updateTariffGroup, isPending: updateTariffGroupPending, error: updateTariffGroupError } = useUpdateTariffGroup();
+    // Fehler melden die Mutationen über den globalen onError in main.tsx —
+    // hier nicht noch einmal toasten.
+    const { deleteTariffGroup, isPending: deleteTariffGroupPending } = useDeleteTariffGroup();
+    const { createTariff, isPending: createTariffPending } = useCreateTariff();
+    const { updateTariffGroup, isPending: updateTariffGroupPending } = useUpdateTariffGroup();
     const { products } = useProducts();
     const { contracts } = useContracts();
     const modal = useModal();
     const editModal = useModal();
-
-    useEffect(() => {
-        if (deleteTariffGroupError) {
-            toast.error(deleteTariffGroupError.message);
-        }
-    }, [deleteTariffGroupError]);
-
-    useEffect(() => {
-        if (createTariffError) {
-            toast.error(createTariffError.message);
-        }
-    }, [createTariffError]);
-
-    useEffect(() => {
-        if (updateTariffGroupError) {
-            toast.error(updateTariffGroupError.message);
-        }
-    }, [updateTariffGroupError]);
 
     const excludeContractIds = useMemo(
         () => new Set(group.tariffs.map(t => t.contractId)),

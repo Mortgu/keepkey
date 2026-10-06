@@ -1,8 +1,8 @@
 import { ChevronRight, RotateCcw } from "lucide-react";
 import { useState } from "react";
-import { toast } from "react-toastify";
-import type { TariffVersion, TariffVersionReason } from "@keepit/schemas";
-import { Badge, Button } from "@/components";
+import { useTranslation } from "react-i18next";
+import type { TariffVersion } from "@keepit/schemas";
+import { Badge, Button, Skeleton, showToast } from "@/components";
 import { useTariffVersionsHook } from "@/hooks";
 import { useRestoreTariffVersion } from "@/hooks/tariffs/tariff-mutations";
 import { formatDate } from "@/lib/format";
@@ -13,13 +13,8 @@ type Props = {
     tariffId: string;
 }
 
-const REASON_LABELS: Record<TariffVersionReason, string> = {
-    MANUAL: "Manuell versiegelt",
-    OFFER: "Durch Angebot versiegelt",
-    RESTORE: "Stand vor einer Wiederherstellung",
-};
-
 export function TariffVersionList({ groupId, tariffId }: Props) {
+    const { t } = useTranslation();
     const { versions, isPending } = useTariffVersionsHook(groupId, tariffId);
     const { restoreVersion, isPending: restoringVersion } = useRestoreTariffVersion();
 
@@ -29,15 +24,15 @@ export function TariffVersionList({ groupId, tariffId }: Props) {
     const handleRestore = async (versionId: string) => {
         try {
             await restoreVersion({ groupId, tariffId, versionId });
-            toast.success("Preistabelle wiederhergestellt.");
+            showToast.success("workloads.pricing.toast.versionRestored");
             setConfirmingId(null);
-        } catch (error) {
-            toast.error(error instanceof Error ? error.message : "Wiederherstellen fehlgeschlagen.");
+        } catch {
+            // Der globale onError-Handler zeigt die Server-Meldung bereits an.
         }
     };
 
-    if (isPending) return <p className="text-sm text-gray-500">Laden...</p>;
-    if (versions.length === 0) return <p className="text-sm text-gray-500">Keine Versionen vorhanden.</p>;
+    if (isPending) return <Skeleton shape="text" className="w-48" />;
+    if (versions.length === 0) return <p className="text-sm text-(--text-secondary)">{t("workloads.pricing.versions.empty")}</p>;
 
     return (
         <div className="grid gap-1">
@@ -72,6 +67,7 @@ type VersionRowProps = {
 function VersionRow({
     version, expanded, onToggle, confirming, onConfirm, onCancelConfirm, onRestore, restoring,
 }: VersionRowProps) {
+    const { t } = useTranslation();
     const { snapshot } = version;
 
     return (
@@ -83,19 +79,19 @@ function VersionRow({
                 >
                     <div className="flex items-center gap-2">
                         <ChevronRight className={expanded ? "size-4 rotate-90 transition-all" : "size-4 transition-all"} />
-                        <span className="font-medium">Version {version.version}</span>
-                        {version.isCurrent && <Badge variant="GENERATED" size="xs">Aktuell</Badge>}
+                        <span className="font-medium">{t("workloads.pricing.versions.version", { version: version.version })}</span>
+                        {version.isCurrent && <Badge variant="GENERATED" size="xs">{t("workloads.pricing.versions.current")}</Badge>}
                         {version.usageCount > 0 && (
-                            <span className="text-xs text-gray-500">
-                                in {version.usageCount} {version.usageCount === 1 ? "Angebot" : "Angeboten"} verwendet
+                            <span className="text-xs text-(--text-secondary)">
+                                {t("workloads.pricing.versions.usedIn", { count: version.usageCount })}
                             </span>
                         )}
                     </div>
 
                     <div className="flex flex-col items-end">
-                        <span className="text-sm text-gray-500">{formatDate(version.createdAt)}</span>
-                        <span className="text-xs text-gray-400">
-                            {REASON_LABELS[version.reason]}
+                        <span className="text-sm text-(--text-secondary)">{formatDate(version.createdAt)}</span>
+                        <span className="text-xs text-(--text-secondary)">
+                            {t(`workloads.pricing.versions.reason.${version.reason}`)}
                             {version.createdBy ? ` · ${version.createdBy.name}` : ""}
                         </span>
                     </div>
@@ -108,9 +104,9 @@ function VersionRow({
 
                 {confirming && (
                     <div className="flex items-center gap-1">
-                        <Button size="xs" variant="border" onClick={onCancelConfirm}>Abbrechen</Button>
+                        <Button size="xs" variant="border" onClick={onCancelConfirm}>{t("button.cancel")}</Button>
                         <Button size="xs" variant="primary" onClick={onRestore} loading={restoring} disabled={restoring}>
-                            Wiederherstellen
+                            {t("workloads.pricing.versions.restore")}
                         </Button>
                     </div>
                 )}
@@ -123,7 +119,7 @@ function VersionRow({
                             <tr>
                                 <th className="text-left p-1" />
                                 {snapshot.columns.map((column) => (
-                                    <th key={column.duration} className="p-1 text-center">{column.duration} Monate</th>
+                                    <th key={column.duration} className="p-1 text-center">{column.duration} {t("common.months")}</th>
                                 ))}
                             </tr>
                         </thead>

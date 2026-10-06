@@ -3,7 +3,24 @@
         "create": "Workload erstellen",
         "search": "Workloads durchsuchen...",
         "pricing": {
-            "create": "Preistabelle erstellen"
+            "create": "Preistabelle erstellen",
+            "versions": {
+                "version": "Version {{version}}",
+                "current": "Aktuell",
+                "usedIn_one": "in {{count}} Angebot verwendet",
+                "usedIn_other": "in {{count}} Angeboten verwendet",
+                "restore": "Wiederherstellen",
+                "empty": "Keine Versionen vorhanden.",
+                "reason": {
+                    "MANUAL": "Manuell versiegelt",
+                    "OFFER": "Durch Angebot versiegelt",
+                    "RESTORE": "Stand vor einer Wiederherstellung"
+                }
+            },
+            "toast": {
+                "versionSealed": "Version {{version}} gespeichert.",
+                "versionRestored": "Preistabelle wiederhergestellt."
+            }
         }
     }
 }
