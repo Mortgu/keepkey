@@ -1,21 +1,23 @@
-.PHONY: dev install build docker-build docker-up docker-down docker-logs docker-clean bucket-cors bucket-cors-dry db-generate db-migrate db-seed db-reset db-studio lint clean
+.PHONY: dev install build build-shared docker-build docker-up docker-down docker-logs docker-clean bucket-cors bucket-cors-dry db-generate db-migrate db-seed db-reset db-studio lint test clean
 
 # ── Development ──
 
 dev:
-	npm --prefix server run dev & npm --prefix client run dev & wait
+	pnpm dev
 
 # ── Dependencies ──
 
 install:
-	npm --prefix server ci
-	npm --prefix client install
+	pnpm install --frozen-lockfile
 
 # ── Build ──
 
+build-shared:
+	pnpm --filter @keepit/schemas build
+
+# Baut shared zuerst (Produktions-Builds konsumieren shared/dist), danach Client und Server.
 build:
-	npm --prefix server run build
-	npm --prefix client run build
+	pnpm build
 
 # ── Docker ──
 
@@ -38,35 +40,39 @@ docker-clean:
 # ── Object storage ──
 
 bucket-cors:
-	npm --prefix server run cors:apply
+	pnpm --filter server cors:apply
 
 bucket-cors-dry:
-	npm --prefix server run cors:apply -- --dry-run
+	pnpm --filter server cors:apply -- --dry-run
 
 # ── Database ──
 
 db-generate:
-	npm --prefix server run build
+	pnpm --filter server exec prisma generate
 
 db-migrate:
-	npx --prefix server prisma migrate dev
+	pnpm --filter server exec prisma migrate dev
 
 db-seed:
-	npm --prefix server run seed
+	pnpm --filter server seed
 
 db-reset: db-migrate db-seed
 
 db-studio:
-	npx --prefix server prisma studio --schema prisma/schema
+	pnpm --filter server exec prisma studio
 
-# ── Linting ──
+# ── Quality ──
 
 lint:
-	npm --prefix client run lint || true
-	npx --prefix server tsc --noEmit --project tsconfig.json
+	pnpm --filter client lint || true
+	pnpm --filter server exec tsc --noEmit --project tsconfig.json
+
+test:
+	pnpm test
 
 # ── Cleanup ──
 
 clean:
-	rm -rf server/dist server/prisma/schema/openapi
+	rm -rf shared/dist
+	rm -rf server/dist server/dist-seed server/prisma/schema/openapi
 	rm -rf client/dist
