@@ -3,6 +3,7 @@ import path from "node:path";
 
 export default defineConfig({
   resolve: {
+    conditions: ["development"],
     alias: {
       "@": path.resolve(__dirname, "src"),
     },
