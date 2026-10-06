@@ -1,7 +1,7 @@
 import { Fragment, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import OfferModal from "../../offers/-components/modals/offer-modal";
-import OrderModal from "../../orders/-components/order-select-modal";
+import OrderModal from "../../orders/-components/modal/order-modal";
 import { useCustomerActions } from "../-hooks/use-customer-actions";
 import CustomerListItem from "./customer-list-item";
 import CustomerModal from "./customer-modal";

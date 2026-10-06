@@ -2,21 +2,21 @@ import { ChevronRight, Pen, Trash, UndoDot } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import { Link } from "@tanstack/react-router";
 import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferModal from "../modals/offer-modal";
-import type { OfferModalMode } from "../modals/offer-modal-policy";
 import type { Offer, OfferDocument } from '@keepit/schemas';
+import type { OfferModalMode } from "../modals/offer-modal-policy";
 import { Accordion, Badge, Button } from "@/components";
+import { useModal } from "@/hooks";
+import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import { formatDate } from "@/lib/format";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import OrderCreateModal from "@/routes/_main/orders/-components/order-create-modal";
-import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { useModal } from "@/hooks";
-import { formatDate } from "@/lib/format";
+import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import { formatEur } from "@/utils/utils";
-import { Link } from "@tanstack/react-router";
 
 type OfferListItemProps = {
     offer: Offer;
@@ -238,11 +238,10 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {orderModal.isOpen && (
-                <OrderCreateModal
+                <OrderModal
                     key={orderModal.key}
                     offer={offer}
                     onClose={orderModal.close}
-                    onCreated={orderModal.close}
                 />
             )}
 

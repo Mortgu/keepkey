@@ -256,7 +256,10 @@ export const restoreOfferRevisionSchema = z.object({
  * Strings sind.
  */
 export const offerFilterSchema = z.object({
+    /** Angebotsnr., Kundenfirma oder Ansprechpartner — ohne Groß-/Kleinschreibung. */
     search: z.string().optional(),
+    /** `open`: nur noch nicht angenommene Angebote. */
+    status: z.enum(["open"]).optional(),
     companyIds: z.union([z.string(), z.array(z.string())]).optional(),
     contactPersonIds: z.union([z.string(), z.array(z.string())]).optional(),
     productIds: z.union([z.string(), z.array(z.string())]).optional(),

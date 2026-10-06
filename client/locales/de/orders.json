@@ -53,6 +53,28 @@
       "purchaseShort": "Einkauf",
       "marginShort": "Marge",
       "fallback": "Einkaufspreise noch nicht erfasst (entsprechen dem Verkaufspreis)."
+    },
+    "modal": {
+      "title": "Bestellung anlegen",
+      "pickHint": "Wähle das Angebot, das der Kunde angenommen hat.",
+      "fromOffer": "Aus Angebot AG{{quoteId}} · {{company}}",
+      "searchPlaceholder": "Angebotsnr., Kunde, Ansprechpartner…",
+      "resultCount_one": "{{count}} offenes Angebot",
+      "resultCount_other": "{{count}} offene Angebote",
+      "moreResults": "mehr vorhanden, Suche verfeinern",
+      "noMatch": "Kein offenes Angebot passt zu „{{query}}“.",
+      "expired": "abgelaufen",
+      "from": "vom {{date}}",
+      "netTotal": "Netto gesamt",
+      "offerDate": "Angebot vom",
+      "validUntil": "Gültig bis",
+      "supplier": "Lieferant",
+      "contract": "Vertrag · Laufzeit",
+      "orderData": "Bestelldaten",
+      "emptyTitle": "Noch kein Angebot ausgewählt",
+      "emptyHint": "Links suchen und anklicken. Hier siehst du dann Positionen, Betrag und Gültigkeit und trägst die Einkaufspreise ein.",
+      "noneSelected": "Noch kein Angebot gewählt",
+      "submit": "Bestellung anlegen"
     }
   }
 }

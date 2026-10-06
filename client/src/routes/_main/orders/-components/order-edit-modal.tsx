@@ -2,28 +2,27 @@ import { Dot } from "lucide-react";
 import { t } from "i18next";
 import useOrderForm from "../-hooks/use-order-form";
 import PurchasePriceTable from "./purchase-price-table";
-import type { Offer, Order } from "@keepit/schemas";
+import type { Order } from "@keepit/schemas";
 import { getErrorMessage } from "@/lib/errors";
 import { Button, Dialog, Input, Textarea } from "@/components";
 import { getFormError } from "@/lib/utils";
 
 interface Props {
-    offer?: Offer;
-    order?: Order;
+    /** Zu bearbeitende Bestellung. Das Anlegen läuft über `modal/order-modal.tsx`. */
+    order: Order;
     /** Abbrechen — schließt nur diesen Dialog. */
     onClose: () => void;
     /** Bestellung angelegt — schließt zusätzlich die darüberliegende Auswahl. */
     onCreated: () => void;
 }
 
-export default function OrderCreateModal({ offer, order, onClose, onCreated }: Props) {
+export default function OrderEditModal({ order, onClose, onCreated }: Props) {
     const { form, rows, error } = useOrderForm({
         onDone: onCreated,
-        currentOffer: offer,
         currentOrder: order,
     });
 
-    const source = order ?? offer!;
+    const source = order;
     const formId = `order-form-${source.id}`;
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -39,7 +38,7 @@ export default function OrderCreateModal({ offer, order, onClose, onCreated }: P
 
     return (
         <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
-            <Dialog.Header title={order ? t("orders.editTitle") : t("orders.createTitle", { quoteId: offer?.quoteId })} description={
+            <Dialog.Header title={t("orders.editTitle")} description={
                 <>
                     {source.customer.companyName}
                     <Dot size={18} />
@@ -130,7 +129,7 @@ export default function OrderCreateModal({ offer, order, onClose, onCreated }: P
                         <PurchasePriceTable
                             rows={rows}
                             values={field.state.value}
-                            disabled={Boolean(order?.cancelledAt)}
+                            disabled={Boolean(order.cancelledAt)}
                             onChange={(offerPositionId, purchaseCents) => field.handleChange(
                                 field.state.value.map((p) => p.offerPositionId === offerPositionId
                                     ? { ...p, purchase_eur_user_month: purchaseCents }
@@ -149,7 +148,7 @@ export default function OrderCreateModal({ offer, order, onClose, onCreated }: P
                             type="submit"
                             form={formId}
                             size="sm"
-                            disabled={!canSubmit || isSubmitting || Boolean(order?.cancelledAt) || Boolean(offer?.acceptedAt)}
+                            disabled={!canSubmit || isSubmitting || Boolean(order.cancelledAt)}
                             loading={isSubmitting}
                         >
                             {t("button.save")}

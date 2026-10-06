@@ -5,7 +5,7 @@ import { useForm } from "@tanstack/react-form";
 import type {Offer, Order} from "@keepit/schemas";
 import { useCreateOrder, useUpdateOrder } from "@/hooks";
 
-const formSchema = orderMetadataSchema.extend({
+export const orderFormSchema = orderMetadataSchema.extend({
     date: orderMetadataSchema.shape.date.or(z.literal("")),
     contractStartDate: orderMetadataSchema.shape.date.or(z.literal("")),
     projectNumber: z.string(),
@@ -20,6 +20,8 @@ const formSchema = orderMetadataSchema.extend({
  * preis aus dem Angebot, beim Bearbeiten aus der Bestellung — die Tabelle selbst
  * ist in beiden Fällen dieselbe.
  */
+export type OrderFormValues = z.infer<typeof orderFormSchema>;
+
 export type PurchaseRow = {
     offerPositionId: string;
     productName: Array<{ language: "DE" | "EN"; name: string }>;
@@ -30,7 +32,7 @@ export type PurchaseRow = {
     eur_user_month: number;
 };
 
-function purchaseRows(currentOrder?: Order, currentOffer?: Offer): Array<PurchaseRow> {
+export function purchaseRows(currentOrder?: Order, currentOffer?: Offer): Array<PurchaseRow> {
     if (currentOrder) {
         const byId = new Map(currentOrder.orderPositions.map((p) => [p.id, p]));
         return currentOrder.supplierPositions.map((sp) => ({
@@ -83,7 +85,7 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
                     ?? row.eur_user_month,
             })),
         },
-        validators: { onChange: formSchema, onSubmit: formSchema },
+        validators: { onChange: orderFormSchema, onSubmit: orderFormSchema },
         onSubmit: async ({ value }) => {
             if (expectedVersion === undefined) return;
             try {

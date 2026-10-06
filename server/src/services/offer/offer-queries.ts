@@ -1,26 +1,32 @@
 import { OfferFilterParams } from '@keepit/schemas';
+import type { Prisma } from "@prisma/client";
 
 import { presentOffer } from "../accepted-offer-view.js";
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
 
 export async function getOffers(query: OfferFilterParams) {
-    const { search, companyIds, contactPersonIds, productIds, sort, cursor } = query;
+    const { search, status, companyIds, contactPersonIds, productIds, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);
     const limit = Number.isFinite(limitRaw) && limitRaw > 0
         ? Math.min(Math.trunc(limitRaw), 100)
         : 50;
 
-    const where: {
-        quoteId?: { contains: string };
-        customerId?: { in: string[] };
-        contactPersonId?: { in: string[] };
-        offerPositions?: { some: { productId: { in: string[] } } };
-    } = {};
+    const where: Prisma.OfferWhereInput = {};
 
-    if (search && typeof search === "string") {
-        where.quoteId = { contains: search };
+    if (search && typeof search === "string" && search.trim()) {
+        const contains = { contains: search.trim(), mode: "insensitive" as const };
+        where.OR = [
+            { quoteId: contains },
+            { customer: { companyName: contains } },
+            { customerContactPerson: { firstName: contains } },
+            { customerContactPerson: { lastName: contains } },
+        ];
+    }
+
+    if (status === "open") {
+        where.acceptedAt = null;
     }
 
     if (companyIds) {

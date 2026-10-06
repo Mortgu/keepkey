@@ -53,6 +53,28 @@
       "purchaseShort": "Purchase",
       "marginShort": "Margin",
       "fallback": "Purchase prices not recorded yet (equal to the sales price)."
+    },
+    "modal": {
+      "title": "Create order",
+      "pickHint": "Pick the offer the customer accepted.",
+      "fromOffer": "From offer AG{{quoteId}} · {{company}}",
+      "searchPlaceholder": "Offer no., customer, contact…",
+      "resultCount_one": "{{count}} open offer",
+      "resultCount_other": "{{count}} open offers",
+      "moreResults": "more available, refine the search",
+      "noMatch": "No open offer matches “{{query}}”.",
+      "expired": "expired",
+      "from": "from {{date}}",
+      "netTotal": "Net total",
+      "offerDate": "Offer date",
+      "validUntil": "Valid until",
+      "supplier": "Supplier",
+      "contract": "Contract · term",
+      "orderData": "Order details",
+      "emptyTitle": "No offer selected yet",
+      "emptyHint": "Search and click on the left. You will then see positions, amount and validity here and enter the purchase prices.",
+      "noneSelected": "No offer selected yet",
+      "submit": "Create order"
     }
   }
 }

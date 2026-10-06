@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import OrderCreateModal from "../order-create-modal";
+import OrderEditModal from "../order-edit-modal";
 import ConfirmationSection from "./confirmation-section";
 import InvoiceSection from "./invoice-section";
 import type { Order } from "@keepit/schemas";
@@ -178,7 +178,7 @@ export default function OrderCard({ order }: Props) {
             </div>
 
             {errorCancellingOrder && <p role="alert" className="px-4 py-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>}
-            {editing && <OrderCreateModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)} />}
+            {editing && <OrderEditModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)} />}
         </div>
     );
 }

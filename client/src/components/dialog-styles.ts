@@ -28,7 +28,7 @@ export const dialogStyles = tv({
         ],
         Header: 'flex items-center justify-between gap-1 p-4 border-b border-(--border)',
         Title: 'text-base leading-6 font-medium m-0',
-        Description: 'flex items-center text-sm leading-5 text-(--text) m-0',
+        Description: 'flex items-center text-sm mt-1 leading-5 text-(--text-secondary)',
         Toolbar: 'flex items-center justify-start gap-4 p-4 border-b border-(--border)',
         Body: 'relative flex-auto flex min-h-0 overflow-hidden',
         BodyViewport: 'box-border flex-auto min-h-0 overscroll-contain',
@@ -43,6 +43,7 @@ export const dialogStyles = tv({
             sm: { Popup: 'w-[min(28rem,calc(100vw_-_2rem))]' },
             md: { Popup: 'w-[min(40rem,calc(100vw_-_2rem))]' },
             lg: { Popup: 'w-[min(50rem,calc(100vw_-_2rem))]' },
+            xl: { Popup: 'w-[min(70rem,calc(100vw_-_2rem))]' }
         },
     },
     defaultVariants: {
