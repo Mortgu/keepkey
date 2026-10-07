@@ -22,3 +22,6 @@ dist/*
 /client/.tanstack
 
 .env.docker
+# Handbuch
+manual/site/
+manual/.venv/

@@ -1,0 +1,6 @@
+[project]
+name = "keepit-manual"
+version = "0.1.0"
+description = "Anwenderhandbuch für keepit"
+requires-python = ">=3.12"
+dependencies = ["mkdocs-material>=9.5", "mkdocs<2"]

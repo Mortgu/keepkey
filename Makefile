@@ -1,4 +1,4 @@
-.PHONY: dev install build build-shared docker-build docker-up docker-down docker-logs docker-clean bucket-cors bucket-cors-dry db-generate db-migrate db-seed db-reset db-studio lint test clean
+.PHONY: dev install build build-shared docker-build docker-up docker-down docker-logs docker-clean bucket-cors bucket-cors-dry db-generate db-migrate db-seed db-reset db-studio lint test clean manual-serve manual-build
 
 # ── Development ──
 
@@ -76,3 +76,11 @@ clean:
 	rm -rf shared/dist
 	rm -rf server/dist server/dist-seed server/prisma/schema/openapi
 	rm -rf client/dist
+
+# ── Handbuch ──
+
+manual-serve:
+	cd manual && uv run mkdocs serve
+
+manual-build:
+	cd manual && uv run mkdocs build --strict

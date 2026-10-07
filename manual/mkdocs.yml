@@ -1,0 +1,51 @@
+site_name: keepit Handbuch
+site_description: Anwenderhandbuch für keepit
+docs_dir: docs
+strict: true
+
+theme:
+  name: material
+  language: de
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - search.highlight
+    - content.code.copy
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Dunkles Design
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Helles Design
+
+plugins:
+  - search:
+      lang: de
+
+markdown_extensions:
+  - admonition
+  - toc:
+      permalink: true
+
+nav:
+  - Willkommen: index.md
+  - Erste Schritte: erste-schritte.md
+  - Stammdaten:
+      - Kunden: kunden.md
+      - Lieferanten: lieferanten.md
+      - Mitarbeiter: mitarbeiter.md
+      - Tarife und Flatrates: tarife.md
+  - Vorgänge:
+      - Angebote: angebote.md
+      - Aufträge: auftraege.md
+      - Verträge: vertraege.md
+      - Rechnungen: rechnungen.md
+  - Dokumente und Vorlagen: dokumente-und-vorlagen.md
+  - Einstellungen: einstellungen.md
+  - Glossar: glossar.md
