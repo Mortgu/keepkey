@@ -6,7 +6,6 @@
 export { getOffers, getOfferById, getNextQuoteId } from "./offer-queries.js";
 export { createOffer, renewOffer } from "./create-offer.js";
 export { updateOffer } from "./update-offer.js";
-export { getOfferRevisions, restoreOfferRevision } from "./offer-revisions.js";
 export { getExtensionPrice, extendOffer } from "./extend-offer.js";
 export { enqueueGeneration } from "./offer-documents.js";
 export { deleteOffer } from "./delete-offer.js";

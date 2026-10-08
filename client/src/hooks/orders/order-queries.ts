@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getNextOrderNumber, getOrderRevisions, getOrders } from "./order-api";
+import { getNextOrderNumber, getOrders } from "./order-api";
 import { orderKeys } from "./order-keys";
 import type { OrderFilterParams } from "@keepit/schemas";
 
@@ -11,10 +11,5 @@ export const orderQueries = {
     nextNumber: () => queryOptions({
         queryKey: orderKeys.nextNumber(),
         queryFn: getNextOrderNumber,
-    }),
-    revisions: (orderId: string) => queryOptions({
-        queryKey: orderKeys.revisions(orderId),
-        queryFn: () => getOrderRevisions(orderId),
-        enabled: Boolean(orderId),
     }),
 };

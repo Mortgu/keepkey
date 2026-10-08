@@ -13,18 +13,15 @@ import {
   getOrderById,
   getConfirmation,
   getInvoice,
-  getOrderRevisions,
   regenerateConfirmation,
   regenerateInvoice,
-  restoreOrderRevision,
   updateOrder,
 } from "@/controllers/index.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
-import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
+import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema, cancelOrderSchema } from "@keepit/schemas";
 import {
   idParamsSchema,
   orderIdParamsSchema,
-  orderRevisionParamsSchema,
 } from "@/schemas/params-schemas.js";
 
 const router = Router();
@@ -34,8 +31,6 @@ router.get("/", validateQuery(orderFilterSchema), getAllOrders);
 router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", validateParams(orderIdParamsSchema), getOrderById);
-
-router.get("/:orderId/revisions", validateParams(orderIdParamsSchema), getOrderRevisions);
 
 router.post(
     "/:orderId/documents",
@@ -66,13 +61,6 @@ router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), 
 
 router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
-router.post(
-    "/:orderId/revisions/:revisionId/restore",
-    validateParams(orderRevisionParamsSchema),
-    validate(restoreOrderRevisionSchema),
-    restoreOrderRevision,
-);
-
 router.patch(
     "/:orderId",
     validateParams(orderIdParamsSchema),
@@ -83,7 +71,7 @@ router.patch(
 router.post(
     "/:orderId/cancel",
     validateParams(orderIdParamsSchema),
-    validate(restoreOrderRevisionSchema),
+    validate(cancelOrderSchema),
     cancelOrder,
 );
 

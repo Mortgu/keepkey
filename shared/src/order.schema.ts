@@ -84,19 +84,6 @@ export const orderDocumentSchema = z.object({
 });
 export type OrderDocument = z.infer<typeof orderDocumentSchema>;
 
-/* OrderRevision */
-export const orderRevisionSchema = z.object({
-    id: z.string(),
-    version: z.number().int(),
-
-    createdAt: z.string(),
-    changedBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }),
-});
-export type OrderRevision = z.infer<typeof orderRevisionSchema>;
-
 /* Shared write contract: orders contain metadata only. */
 const dateInput = z
     .string()
@@ -112,7 +99,6 @@ export const orderMetadataSchema = z
         projectNumber: z.string().nullable(),
         projectDescription: z.string().nullable(),
         orderDetails: z.string().nullable(),
-        /* Optional, damit ältere Revisions-Snapshots ohne das Feld lesbar bleiben. */
         contractStartDate: dateInput.nullable().optional(),
     })
     .strict();
@@ -134,10 +120,7 @@ export const updateOrderSchema = z
     .object({
         expectedVersion: z.number().int().positive(),
         order: orderMetadataSchema,
-        /**
-         * Optional: Einkaufspreise ersetzen. Bewusst neben `order`, damit die
-         * Revisions-Snapshots (nur Metadaten) unverändert bleiben.
-         */
+        /** Optional: Einkaufspreise ersetzen. */
         positions: z.array(purchasePositionInputSchema).min(1).optional(),
     })
     .strict();
@@ -146,8 +129,8 @@ export type UpdateOrderInput = z.infer<
     typeof updateOrderSchema
 >;
 
-/* Restore Order Revision */
-export const restoreOrderRevisionSchema = z.object({
+/* Cancel Order */
+export const cancelOrderSchema = z.object({
     expectedVersion: z.number().int().positive(),
 });
 

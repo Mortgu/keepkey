@@ -17,11 +17,10 @@ import {
 import {
     acceptOrderSchema,
     updateOrderMetadataSchema,
-    metadataSnapshot,
-    parseMetadataRevision,
 } from "../schemas/order-inputs.js";
 import {
     orderFixture,
+    orderMetadata,
     sourceFixture,
     templateFixture,
 } from "../test/order-fixtures.js";
@@ -105,7 +104,7 @@ describe("accepted offer order data", () => {
     it("rejects attempts to write commercial fields, positions or invalid dates", () => {
         const input = {
             expectedVersion: 1,
-            ...metadataSnapshot(orderFixture()),
+            ...orderMetadata(orderFixture()),
         };
         expect(updateOrderMetadataSchema.safeParse(input).success).toBe(true);
         expect(
@@ -136,12 +135,6 @@ describe("accepted offer order data", () => {
                 order: { ...input.order, contractStartDate: "2026-11-01" },
             }).success,
         ).toBe(true);
-        expect(parseMetadataRevision(input, 1)).toEqual(input.order);
-        expect(() => parseMetadataRevision(input, 2)).toThrow();
-    });
-    it("still reads revision snapshots written before contractStartDate existed", () => {
-        const { contractStartDate: _omitted, ...legacy } = metadataSnapshot(orderFixture()).order;
-        expect(parseMetadataRevision({ order: legacy }, 1)).toEqual(legacy);
     });
     it.each(["order.docx", "order.en.docx"])(
         "renders the bundled %s with order, offer and project numbers",

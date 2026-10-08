@@ -22,32 +22,11 @@ model Order {
   documents OrderDocument[]
   positions OrderPosition[]
   confirmation Confirmation?
-  revisions OrderRevision[]
   invoice Invoice?
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
   @@index([acceptedById])
   @@map("order")
-}
-
-model OrderRevision {
-  id String @id @default(uuid())
-
-  version         Int
-  snapshotVersion Int  @default(1)
-  snapshot        Json
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String
-
-  changedBy   User   @relation(fields: [changedById], references: [id])
-  changedById String
-
-  createdAt DateTime @default(now())
-
-  @@unique([orderId, version])
-  @@index([changedById])
-  @@map("order_revision")
 }
 
 model OrderDocument {

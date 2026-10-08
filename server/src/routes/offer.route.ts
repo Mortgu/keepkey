@@ -7,10 +7,8 @@ import {
   extendOffer,
   getExtensionPrice,
   getOfferById,
-  getOfferRevisions,
   getOffers,
   renewOffer,
-  restoreOfferRevision,
   updateOffer,
 } from "@/controllers/offer.controller.js";
 
@@ -20,13 +18,11 @@ import {
   extendOfferSchema,
   extensionPriceQuerySchema,
   offerFilterSchema,
-  restoreOfferRevisionSchema,
   updateOfferSchema,
 } from '@keepit/schemas';
 import {
   idParamsSchema,
   offerPositionParamsSchema,
-  offerRevisionParamsSchema,
 } from "@/schemas/params-schemas.js";
 
 const router = Router();
@@ -68,18 +64,5 @@ router.get(
 
 /* [POST] /api/offers/:id/documents */
 router.post('/:id/documents', validateParams(idParamsSchema), enqueueGeneration);
-
-/* ========== Offer Revisions ========== */
-
-/* [GET] /api/offers/:id/revisions */
-router.get('/:id/revisions', validateParams(idParamsSchema), getOfferRevisions);
-
-/* [POST] /api/offers/:id/revisions/:revisionId/restore */
-router.post(
-    '/:id/revisions/:revisionId/restore',
-    validateParams(offerRevisionParamsSchema),
-    validate(restoreOfferRevisionSchema),
-    restoreOfferRevision,
-);
 
 export default router;

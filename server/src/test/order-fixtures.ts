@@ -203,3 +203,24 @@ export const orderFixture = () => ({
         ),
     },
 });
+
+/** Die schreibbaren Stammdaten einer Bestellung, wie sie `updateOrderSchema` erwartet. */
+export function orderMetadata(order: {
+    orderId: string;
+    date: Date;
+    projectNumber: string | null;
+    projectDescription: string | null;
+    orderDetails: string | null;
+    contractStartDate: Date | null;
+}) {
+    return {
+        order: {
+            orderId: order.orderId,
+            date: order.date.toISOString(),
+            projectNumber: order.projectNumber,
+            projectDescription: order.projectDescription,
+            orderDetails: order.orderDetails,
+            contractStartDate: order.contractStartDate?.toISOString() ?? null,
+        },
+    };
+}

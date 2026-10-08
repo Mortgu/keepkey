@@ -72,7 +72,6 @@
       "documentUploadError": "Dokument konnte nicht hochgeladen werden: {{message}}",
       "documentDeleteError": "Dokument konnte nicht gelöscht werden: {{message}}",
       "documentRenameError": "Dokument konnte nicht umbenannt werden: {{message}}",
-      "restoreError": "Version konnte nicht wiederhergestellt werden: {{message}}",
       "renewalStub": "Angebot-Generierung aus Verlängerung folgt in einem kommenden Schritt."
     },
     "create": "Angebot erstellen",

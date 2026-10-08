@@ -32,14 +32,13 @@ import {
     updateOrder,
     getOrderById,
     cancelOrder,
-    restoreOrderRevision,
 } from "./order.service.js";
 import { assertOfferEditable } from "./offer-acceptance.service.js";
 import { getCustomers, getCustomerById } from "./customer.service.js";
 import { getSuppliers } from "./supplier.service.js";
 import { getDashboardStats } from "./dashboard.service.js";
 import { search } from "./search.service.js";
-import { metadataSnapshot } from "../schemas/order-inputs.js";
+import { orderMetadata } from "../test/order-fixtures.js";
 
 const integration = describe.skipIf(!process.env.ORDER_TEST_DATABASE_URL);
 integration("real PostgreSQL acceptance transactions", () => {
@@ -241,40 +240,28 @@ integration("real PostgreSQL acceptance transactions", () => {
         expect(unchanged.acceptedAt).toBeNull();
         expect(unchanged.acceptedSnapshot).toBeNull();
     });
-    it("metadata edits and restores preserve the accepted price and frozen master data", async () => {
+    it("metadata edits preserve the accepted price and frozen master data", async () => {
         const offer = await draft();
         const order = await createOrder(await input(offer.id), "user");
         await prisma.customer.update({
             where: { id: "customer" },
             data: { companyName: "Changed Ltd" },
         });
-        const { order: metadata } = metadataSnapshot(order);
-        await updateOrder(
-            order.id,
-            {
-                expectedVersion: 1,
-                order: { ...metadata, projectNumber: "New project" },
-            },
-            "user",
-        );
-        const revision = await prisma.orderRevision.findFirstOrThrow({
-            where: { orderId: order.id, version: 1 },
+        const { order: metadata } = orderMetadata(order);
+        await updateOrder(order.id, {
+            expectedVersion: 1,
+            order: { ...metadata, projectNumber: "New project" },
         });
-        await restoreOrderRevision(order.id, revision.id, 2, "user");
-        const restored = await getOrderById(order.id);
-        expect(restored.net_amount).toBe(80000);
-        expect(restored.projectNumber).toBeNull();
-        expect(restored.customer.companyName).toBe("Original Ltd");
-        await cancelOrder(order.id, 3, "user");
+        const edited = await getOrderById(order.id);
+        expect(edited.net_amount).toBe(80000);
+        expect(edited.projectNumber).toBe("New project");
+        expect(edited.customer.companyName).toBe("Original Ltd");
+        await cancelOrder(order.id, 2);
         await expect(
             prisma.$transaction((tx) => assertOfferEditable(tx, offer.id)),
         ).rejects.toMatchObject({ code: "OFFER_ACCEPTED" });
         await expect(
-            updateOrder(
-                order.id,
-                { expectedVersion: 4, order: metadata },
-                "user",
-            ),
+            updateOrder(order.id, { expectedVersion: 3, order: metadata }),
         ).rejects.toMatchObject({ code: "ORDER_CANCELLED" });
     });
     it("resolves list counts, search and dashboard volumes through the accepted offer", async () => {
@@ -289,7 +276,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         const results = await search(order.orderId, "order");
         expect(results.items[0]?.id).toBe(order.id);
         const before = await getDashboardStats();
-        await cancelOrder(order.id, 1, "user");
+        await cancelOrder(order.id, 1);
         const after = await getDashboardStats();
         expect(after.totals.orders.volume_cents).toBe(
             before.totals.orders.volume_cents - 80000,

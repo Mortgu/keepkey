@@ -1,9 +1,8 @@
-import { ChevronRight, Pen, Trash, UndoDot } from "lucide-react";
+import { ChevronRight, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Link } from "@tanstack/react-router";
-import OfferDrawerHistory from "../drawer/offer-drawer-history";
 import OfferModal from "../modals/offer-modal";
 import type { Offer, OfferDocument } from '@keepit/schemas';
 import type { OfferModalMode } from "../modals/offer-modal-policy";
@@ -46,7 +45,6 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [openSections, setOpenSections] = useState<Array<string>>([]);
 
     const handleGenerateDocument = async () => {
@@ -205,15 +203,6 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="border"
-                        title={t("versionHistory.title")}
-                        onClick={() => setDrawerOpen(true)}
-                        icon={<UndoDot className="size-3" />}
-                        iconOnly
-                    />
-
-                    <Button
-                        size="xs"
-                        variant="border"
                         disabled={Boolean(offer.acceptedAt)}
                         title={offer.acceptedAt ? t("orders.acceptedHint") : t("orders.edit")}
                         onClick={() => offerModal.open()}
@@ -234,8 +223,6 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     />
                 </div>
             </div>
-
-            <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
 
             {orderModal.isOpen && (
                 <OrderModal

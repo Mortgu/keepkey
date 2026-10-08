@@ -4,7 +4,6 @@ import type {
     Offer,
     OfferFilterParams,
 
-    OfferRevision,
 
     OffersPage,
     Task,
@@ -41,18 +40,6 @@ export const deleteOffer = async (id: string) =>
 export const generateOfferDocument = async (id: string) =>
     api<Task>(`/api/offers/${id}/documents`, {
         method: "POST"
-    });
-
-/* Offer Revisions */
-export const getOfferRevisions = async (id: string) =>
-    api<Array<OfferRevision>>(`/api/offers/${id}/revisions`, {
-        method: "GET"
-    });
-
-export const restoreOfferRevision = async (id: string, revisionId: string, expectedVersion: number) =>
-    api<Offer>(`/api/offers/${id}/revisions/${revisionId}/restore`, {
-        method: "POST",
-        body: JSON.stringify({ expectedVersion }),
     });
 
 export const getTask = async (taskId: string) =>

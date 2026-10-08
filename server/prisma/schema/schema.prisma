@@ -33,8 +33,6 @@ model User {
   acceptedOrders Order[]
   confirmations  Confirmation[]
   invoices       Invoice[]
-  offerRevisions OfferRevision[]
-  orderRevisions OrderRevision[]
   tariffVersions TariffVersion[]
 
   documentTemplates DocumentTemplate[]

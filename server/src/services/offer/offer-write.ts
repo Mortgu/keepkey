@@ -3,10 +3,6 @@ import { OfferDerivationType, Prisma } from "@prisma/client";
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
 import {
-    OFFER_REVISION_SNAPSHOT_VERSION,
-    buildOfferRevisionSnapshot,
-} from "../../schemas/revision-schemas.js";
-import {
     calculateNetAmount,
     type PricedDiscount,
     type PricedFlatrate,
@@ -14,7 +10,7 @@ import {
     type PriceHeader,
 } from "./offer-pricing.js";
 
-/** Alles, was eine Revision festhält: Kopf plus Positionen, Flatrates und Rabatte. */
+/** Kopf plus Positionen, Flatrates und Rabatte eines Angebots. */
 export const offerLinesInclude = {
     offerPositions: true,
     offerFlatRates: true,
@@ -32,21 +28,6 @@ export function assertExpectedVersion(current: { version: number }, expectedVers
             "VERSION_CONFLICT",
         );
     }
-}
-
-/** Sichert den aktuellen Stand als Revision, bevor er überschrieben wird. */
-export async function recordRevision(tx: Prisma.TransactionClient, current: OfferWithLines, actorId: string): Promise<void> {
-    const snapshot = buildOfferRevisionSnapshot(current as unknown as Record<string, unknown>);
-
-    await tx.offerRevision.create({
-        data: {
-            offerId: current.id,
-            version: current.version,
-            changedById: actorId,
-            snapshotVersion: OFFER_REVISION_SNAPSHOT_VERSION,
-            snapshot: snapshot as Prisma.InputJsonValue,
-        },
-    });
 }
 
 /** Ersetzt Positionen, Flatrates und Rabatte eines bestehenden Angebots. */

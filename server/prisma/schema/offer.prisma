@@ -51,7 +51,6 @@ model Offer {
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
   offerDocuments OfferDocument[]
-  revisions      OfferRevision[]
 
   orders Order?
 
@@ -82,26 +81,6 @@ model Offer {
   @@index([supplierId])
   @@index([renewedFromOfferId])
   @@map("offer")
-}
-
-model OfferRevision {
-  id String @id @default(uuid())
-
-  version         Int
-  snapshotVersion Int  @default(1)
-  snapshot        Json
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  changedBy   User   @relation(fields: [changedById], references: [id])
-  changedById String
-
-  createdAt DateTime @default(now())
-
-  @@unique([offerId, version])
-  @@index([changedById])
-  @@map("offer_revision")
 }
 
 model OfferPosition {

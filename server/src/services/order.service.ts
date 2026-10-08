@@ -9,9 +9,6 @@ import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
     acceptOrderSchema,
     updateOrderMetadataSchema,
-    metadataSnapshot,
-    parseMetadataRevision,
-    ORDER_REVISION_SNAPSHOT_VERSION,
     type AcceptOrderInput,
     type UpdateOrderMetadataInput,
 } from "../schemas/order-inputs.js";
@@ -60,22 +57,6 @@ export async function getOrderById(id: string) {
     if (!order)
         throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
     return presentOrder(order);
-}
-export async function getOrderRevisions(orderId: string) {
-    await prisma.order.findUniqueOrThrow({
-        where: { id: orderId },
-        select: { id: true },
-    });
-    return prisma.orderRevision.findMany({
-        where: { orderId },
-        orderBy: { version: "desc" },
-        select: {
-            id: true,
-            version: true,
-            createdAt: true,
-            changedBy: { select: { id: true, name: true } },
-        },
-    });
 }
 /** A suggestion, not a reservation. The unique constraint rejects concurrent duplicates. */
 export async function getNextOrderNumber(): Promise<string> {
@@ -150,24 +131,6 @@ async function lockOrder(
         );
     return order;
 }
-async function saveRevision(
-    tx: Prisma.TransactionClient,
-    order: Parameters<typeof metadataSnapshot>[0] & {
-        id: string;
-        version: number;
-    },
-    actorId: string,
-) {
-    await tx.orderRevision.create({
-        data: {
-            orderId: order.id,
-            version: order.version,
-            changedById: actorId,
-            snapshotVersion: ORDER_REVISION_SNAPSHOT_VERSION,
-            snapshot: metadataSnapshot(order),
-        },
-    });
-}
 async function invalidateDocuments(
     tx: Prisma.TransactionClient,
     orderId: string,
@@ -180,12 +143,10 @@ async function invalidateDocuments(
 export async function updateOrder(
     id: string,
     input: UpdateOrderMetadataInput,
-    actorId: string,
 ) {
     const data = updateOrderMetadataSchema.parse(input);
     return prisma.$transaction(async (tx) => {
         const current = await lockOrder(tx, id, data.expectedVersion);
-        await saveRevision(tx, current, actorId);
         // Einkaufspreise werden (noch) nicht versioniert: ersetzen, fertig.
         const lines = data.positions
             ? await purchaseLinesForOffer(tx, current.offerId, data.positions)
@@ -204,58 +165,12 @@ export async function updateOrder(
         return order;
     });
 }
-export async function restoreOrderRevision(
-    id: string,
-    revisionId: string,
-    expectedVersion: number,
-    actorId: string,
-) {
-    return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
-        const revision = await tx.orderRevision.findFirst({
-            where: { id: revisionId, orderId: id },
-        });
-        if (!revision)
-            throw new AppException(
-                "Order revision not found",
-                404,
-                "ORDER_REVISION_NOT_FOUND",
-            );
-        let restored;
-        try {
-            restored = parseMetadataRevision(
-                revision.snapshot,
-                revision.snapshotVersion,
-            );
-        } catch {
-            throw new AppException(
-                "Invalid or unsupported order revision",
-                422,
-                "INVALID_REVISION_SNAPSHOT",
-            );
-        }
-        await saveRevision(tx, current, actorId);
-        const order = await tx.order.update({
-            where: { id },
-            data: {
-                ...restored,
-                date: new Date(restored.date),
-                contractStartDate: restored.contractStartDate ? new Date(restored.contractStartDate) : null,
-                version: { increment: 1 },
-            },
-        });
-        await invalidateDocuments(tx, id);
-        return order;
-    });
-}
 export async function cancelOrder(
     id: string,
     expectedVersion: number,
-    actorId: string,
 ) {
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
-        await saveRevision(tx, current, actorId);
+        await lockOrder(tx, id, expectedVersion);
         const order = await tx.order.update({
             where: { id },
             data: { cancelledAt: new Date(), version: { increment: 1 } },

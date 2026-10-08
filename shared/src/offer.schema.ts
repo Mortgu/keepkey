@@ -95,19 +95,6 @@ export const offerDocumentSchema = createOfferDocumentSchema.extend({
 });
 export type OfferDocument = z.infer<typeof offerDocumentSchema>;
 
-/* OfferRevision */
-export const offerRevisionSchema = z.object({
-    id: z.string(),
-    version: z.number().int().positive(),
-
-    createdAt: z.string(),
-    changedBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }),
-});
-export type OfferRevision = z.infer<typeof offerRevisionSchema>;
-
 /* Offer*/
 export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
 export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
@@ -242,10 +229,6 @@ export type Offer = z.infer<typeof offerSchema>;
 
 export const offerListSchema = z.array(offerSchema);
 export type OfferList = z.infer<typeof offerListSchema>;
-
-export const restoreOfferRevisionSchema = z.object({
-    expectedVersion: z.number().int().positive(),
-});
 
 /**
  * Filter der Angebotsliste — übertragen als Query-String.
