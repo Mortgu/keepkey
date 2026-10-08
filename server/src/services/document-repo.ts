@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import env from "../lib/env.js";
+import env from "../config/env.js";
 import { prisma } from "../lib/prismaClient.js";
 import type { DocumentArtifactScope } from "../lib/document-artifact-store.js";
 import type { DocumentType } from "@keepit/schemas";

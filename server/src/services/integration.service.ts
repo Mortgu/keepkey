@@ -1,4 +1,4 @@
-import env from "../lib/env.js";
+import env from "../config/env.js";
 import { pingTaskQueue } from "../workers/task-queue.js";
 import { getCloudStatus } from "./nextcloud.service.js";
 import { isS3Available } from "../lib/document-artifact-store.js";

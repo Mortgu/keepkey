@@ -4,7 +4,7 @@ import express, { type Express } from "express";
 import path from "path";
 
 import { auth } from "./lib/auth.js";
-import env from "./lib/env.js";
+import env from "./config/env.js";
 import { exceptionHandler } from "./middlewares/exception.middleware.js";
 import morganMiddleware from "./middlewares/morgan.middleware.js";
 import { requestIdMiddleware } from "./middlewares/request.middleware.js";

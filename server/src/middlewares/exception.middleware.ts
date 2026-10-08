@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { Prisma } from '@prisma/client';
 
-import env from "@/lib/env.js";
+import env from "@/config/env.js";
 import { AppException } from "@/lib/exceptions.js";
 import logger from "@/utils/logger.js";
 

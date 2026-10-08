@@ -6,7 +6,7 @@
  */
 import "./runtime/bootstrap.js";
 
-import env from "./lib/env.js";
+import env from "./config/env.js";
 import { prisma } from "./lib/prismaClient.js";
 import { startApi } from "./runtime/api-runtime.js";
 import { registerShutdown } from "./runtime/shutdown.js";

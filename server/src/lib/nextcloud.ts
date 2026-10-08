@@ -1,5 +1,5 @@
 import { createClient, FileStat, type WebDAVClient } from "webdav";
-import env from "./env.js";
+import env from "../config/env.js";
 import logger from "@/utils/logger.js";
 import { AppException } from "./exceptions.js";
 import type { CloudFileMetadata, FindFilesByIdResult } from "@keepit/schemas";

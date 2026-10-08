@@ -1,6 +1,6 @@
 import winston from 'winston';
 
-import env from '@/lib/env.js';
+import env from '@/config/env.js';
 import { getRequestContext } from '@/lib/request-context.js';
 
 const { combine, json, timestamp, colorize, printf, errors } = winston.format;

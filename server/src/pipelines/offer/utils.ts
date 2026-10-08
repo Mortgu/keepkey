@@ -1,8 +1,8 @@
-import {createRequire} from "module";
-import type {DXT} from "docxtemplater";
-import {Language} from "@prisma/client";
+import { createRequire } from "module";
+import type { DXT } from "docxtemplater";
+import { Language } from "@prisma/client";
 import path from "path";
-import env from "../../lib/env.js";
+import env from "../../config/env.js";
 import fs from "fs";
 
 // Require-Workaround für den Expression-Parser
@@ -18,7 +18,7 @@ export function interpolate(template: string, ctx: Record<string, unknown>): str
 }
 
 export const deepIterate = (obj: Record<string, unknown>, root: Record<string, unknown>, local: Record<string, unknown> = {}): Record<string, unknown> => {
-    const ctx = {...root, ...local};
+    const ctx = { ...root, ...local };
 
     for (const key in obj) {
         const value = obj[key];

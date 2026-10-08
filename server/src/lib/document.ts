@@ -1,6 +1,6 @@
 import { Task, TaskStatus, TaskTarget, TaskType } from "@prisma/client";
 import logger from "@/utils/logger.js";
-import env from "./env.js";
+import env from "../config/env.js";
 import { taskQueueKey } from "../workers/task-contract.js";
 import { getTaskQueue } from "../workers/task-queue.js";
 import { AppException } from "./exceptions.js";

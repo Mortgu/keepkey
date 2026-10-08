@@ -1,4 +1,3 @@
-import { FileStat } from "webdav";
 import {
     findFilesById,
     getNextCloudClient,
@@ -6,7 +5,7 @@ import {
     isNextcloudAvailable,
     isNextcloudConfigured,
 } from "../lib/nextcloud.js";
-import env from "../lib/env.js";
+import env from "../config/env.js";
 import { AppException } from "../lib/exceptions.js";
 
 const ALL_DIRECTORIES = [

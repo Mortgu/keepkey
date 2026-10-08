@@ -1,7 +1,7 @@
 import { createServer, type Server } from "node:http";
 
 import { createApp } from "@/app.js";
-import env from "@/lib/env.js";
+import env from "@/config/env.js";
 import { getNextcloudInitError, initNextcloud } from "@/lib/nextcloud.js";
 import logger from "@/utils/logger.js";
 import { closeTaskQueue } from "@/workers/task-queue.js";

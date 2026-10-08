@@ -1,7 +1,7 @@
 import { Task, TaskStatus, TaskTarget } from "@prisma/client";
 import { Job, Worker } from "bullmq";
 import type { Redis } from "ioredis";
-import env from "../lib/env.js";
+import env from "../config/env.js";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import confirmationTaskHandler from "./handlers/confirmation-handler.js";

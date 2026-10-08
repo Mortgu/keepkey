@@ -1,6 +1,6 @@
 import type { Worker } from "bullmq";
 
-import env from "@/lib/env.js";
+import env from "@/config/env.js";
 import { createWorkerConnection } from "@/lib/redis.js";
 import logger from "@/utils/logger.js";
 import registerTaskWorker from "@/workers/task-worker.js";
