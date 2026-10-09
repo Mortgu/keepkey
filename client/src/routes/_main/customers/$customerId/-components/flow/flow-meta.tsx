@@ -1,6 +1,6 @@
 import { ClipboardCheck, FileText, Receipt, ShoppingCart } from "lucide-react";
 import type { ReactNode } from "react";
-import type { StageKind, StageState } from "./flow-mock";
+import type { StageKind, StageState } from "./flow-types";
 
 /** Beschriftungen, Icons und Formatierung für Vorgangs-Tabelle und Vorgangs-Seite (Design-Prototyp). */
 

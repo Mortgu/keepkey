@@ -1,7 +1,7 @@
 import { Ban, Plus, TriangleAlert } from "lucide-react";
 import { cn } from "tailwind-variants";
 import { STATION } from "./flow-meta";
-import type { StageKind, StageState } from "./flow-mock";
+import type { StageKind, StageState } from "./flow-types";
 
 const NODE: Record<StageState, string> = {
     done: "bg-(--primary-600) text-(--text-inv) border-(--primary-600)",

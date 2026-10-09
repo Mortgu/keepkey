@@ -13,3 +13,8 @@ export function useOffers(filters: OfferFilterParams = {}) {
 
     return { items: data.items, nextCursor: data.nextCursor, isPending, error }
 }
+
+export function useOffer(id: string) {
+    const { data: offer, isPending, error } = useQuery(offerQueries.detail(id));
+    return { offer, isPending, error };
+}

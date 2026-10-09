@@ -1,15 +1,21 @@
 import type { Prisma } from "@prisma/client";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 
-/** Overlay frozen business fields while keeping live document/task metadata. */
+/**
+ * Overlay frozen business fields while keeping live document/task metadata.
+ *
+ * `orders` ist der (irreführend plural benannte) 1:1-Relationsname aus Prisma
+ * (siehe `offer.prisma`) — nach außen heißt das Feld `order`, wie im Shared-Schema.
+ */
 export function presentOffer<
-    T extends { id: string; acceptedSnapshot: Prisma.JsonValue | null },
+    T extends { id: string; acceptedSnapshot: Prisma.JsonValue | null; orders?: unknown },
 >(offer: T) {
-    const { acceptedSnapshot, ...publicOffer } = offer;
-    if (!acceptedSnapshot) return publicOffer;
+    const { acceptedSnapshot, orders, ...publicOffer } = offer;
+    const withOrder = { ...publicOffer, ...(orders !== undefined ? { order: orders } : {}) };
+    if (!acceptedSnapshot) return withOrder;
     const s = parseAcceptedOfferSnapshot(acceptedSnapshot);
     return {
-        ...publicOffer,
+        ...withOrder,
         customerId: s.customerId,
         contactPersonId: s.contactPersonId,
         supplierId: s.supplierId,

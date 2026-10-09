@@ -5,7 +5,6 @@ interface Props {
 }
 
 export default function CustomerGeneralTab({ }: Props) {
-
     return (
         <div></div>
     )

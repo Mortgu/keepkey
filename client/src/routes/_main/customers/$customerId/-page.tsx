@@ -1,7 +1,6 @@
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
-import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
 import CustomerFlowTab from "./-components/tabs/customer-flow-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
@@ -13,10 +12,7 @@ import { useCustomer, useModal } from "@/hooks";
 const TABS = [
     { value: "general", label: "Allgemein" },
     { value: "flow", label: "Vorgänge" },
-    { value: "offers", label: "Angebote" },
     { value: "prices", label: "Preise" },
-    { value: "orders", label: "Bestellungen" },
-    { value: "invoices", label: "Rechnungen" },
 ];
 
 export default function CustomerDetailPage() {
@@ -65,10 +61,6 @@ export default function CustomerDetailPage() {
                         )}
 
                         {tab === "flow" && <CustomerFlowTab customerId={customer.id} />}
-
-                        {tab === "offers" && (
-                            <CustomerOffersTab customer={customer} />
-                        )}
 
                         {tab === "prices" && (
                             <CustomerPricesTab customer={customer} />

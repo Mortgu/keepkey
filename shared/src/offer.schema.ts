@@ -5,6 +5,7 @@ import { contractSchema } from "./contract.schema.js";
 import { customerSchema } from "./customer.schema.js";
 import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
 import { flatrateSchema } from "./flatrate.schema.js";
+import { offerOrderSummarySchema } from "./offer-order-summary.schema.js";
 import { productSchema } from "./product.schema.js";
 import { userSchema } from "./user.schema.js";
 
@@ -214,6 +215,9 @@ export const offerSchema = z.object({
     renewedFromOfferId: z.string().nullable().optional(),
     derivationType: offerDerivationTypeSchema.nullable().optional(),
 
+    /** Nur gesetzt, wenn gezielt abgefragt (`includeOrder`/Einzelabruf) — s. `offerFilterSchema`. */
+    order: offerOrderSummarySchema.nullable().optional(),
+
     user: userSchema,
     customer: customerSchema,
     customerContactPerson: contactSchema,
@@ -246,6 +250,8 @@ export const offerFilterSchema = z.object({
     companyIds: z.union([z.string(), z.array(z.string())]).optional(),
     contactPersonIds: z.union([z.string(), z.array(z.string())]).optional(),
     productIds: z.union([z.string(), z.array(z.string())]).optional(),
+    /** Bestellung (mit AB/Rechnung-Kurzinfo) je Angebot mitladen — teurer, daher opt-in. */
+    includeOrder: z.enum(["true"]).optional(),
     sort: z.string().optional(),
     cursor: z.string().optional(),
     limit: z.coerce.number().int().positive().max(100).optional().default(50),

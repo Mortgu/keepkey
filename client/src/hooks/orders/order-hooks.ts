@@ -13,3 +13,8 @@ export function useNextOrderNumber() {
     const { data, isPending } = useQuery(orderQueries.nextNumber());
     return { nextOrderNumber: data?.orderId, isPending };
 }
+
+export function useOrder(id: string) {
+    const { data: order, isPending, error } = useQuery(orderQueries.detail(id));
+    return { order, isPending, error };
+}

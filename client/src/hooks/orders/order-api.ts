@@ -7,6 +7,9 @@ export type { CreateOrderInput, UpdateOrderInput };
 export const getOrders = (filters: OrderFilterParams = {}) =>
     api<Array<Order>>(`/api/orders?${formatQueryString(filters)}`, { method: "GET" });
 
+export const getOrderById = (id: string) =>
+    api<Order>(`/api/orders/${id}`, { method: "GET" });
+
 export const getNextOrderNumber = () =>
     api<{ orderId: string }>("/api/orders/next-number", { method: "GET" });
 

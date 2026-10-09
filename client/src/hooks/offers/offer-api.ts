@@ -19,6 +19,11 @@ export const getOffers = async (filters: OfferFilterParams) =>
         method: "GET"
     });
 
+export const getOffer = async (id: string) =>
+    api<Offer>(`/api/offers/${id}`, {
+        method: "GET"
+    });
+
 export const createOffer = (payload: CreateOfferInput) =>
     api<Offer>("/api/offers", {
         method: "POST",

@@ -5,8 +5,36 @@ import { presentOffer } from "../accepted-offer-view.js";
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
 
+/**
+ * Schlanke Order-Teilansicht fürs Angebot — nur Status, keine Artefakte.
+ * Reicht, um pro Angebot den Stufenzustand (Vorgänge-Tabelle/-Seite) abzuleiten,
+ * ohne für jede Zeile zusätzliche Requests auszulösen.
+ */
+const orderSummaryInclude = {
+    select: {
+        id: true,
+        orderId: true,
+        date: true,
+        cancelledAt: true,
+        version: true,
+        documents: { where: { deletedAt: null }, select: { status: true } },
+        confirmation: {
+            select: {
+                id: true, confirmationId: true, date: true,
+                documents: { select: { status: true } },
+            },
+        },
+        invoice: {
+            select: {
+                id: true, invoiceId: true, date: true,
+                documents: { select: { status: true } },
+            },
+        },
+    },
+} satisfies Prisma.Offer$ordersArgs;
+
 export async function getOffers(query: OfferFilterParams) {
-    const { search, status, companyIds, contactPersonIds, productIds, sort, cursor } = query;
+    const { search, status, companyIds, contactPersonIds, productIds, includeOrder, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);
     const limit = Number.isFinite(limitRaw) && limitRaw > 0
@@ -79,6 +107,7 @@ export async function getOffers(query: OfferFilterParams) {
                 }
             },
             offerDiscounts: true,
+            ...(includeOrder === "true" ? { orders: orderSummaryInclude } : {}),
         },
     });
 
@@ -111,8 +140,17 @@ export async function getOfferById(id: string) {
                     }
                 }
             },
-            offerFlatRates: true,
+            offerFlatRates: {
+                include: {
+                    flatRate: {
+                        include: { translations: true }
+                    }
+                }
+            },
             offerDiscounts: true,
+            // Aktuell kein anderer Aufrufer dieser Funktion — bei einem zweiten
+            // Aufrufer ggf. ebenfalls hinter einem Flag gaten.
+            orders: orderSummaryInclude,
         },
     });
 
