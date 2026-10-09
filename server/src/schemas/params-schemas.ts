@@ -33,7 +33,3 @@ export const customerContactParamsSchema = idParamsSchema.extend({
 export const tariffParamsSchema = idParamsSchema.extend({
     tariffId: z.string().min(1),
 });
-
-export const tariffVersionParamsSchema = tariffParamsSchema.extend({
-    versionId: z.string().min(1),
-});

@@ -124,18 +124,9 @@ model TariffCustomerPrice {
   @@map("tariff_customer_price")
 }
 
-enum TariffVersionReason {
-  /// Nutzer hat die Version explizit versiegelt
-  MANUAL
-  /// Beim Anlegen eines Angebots lazy versiegelt
-  OFFER
-  /// Zustand unmittelbar vor einem Wiederherstellen
-  RESTORE
-}
-
-/// Unveraenderlicher Stand einer Preistabelle. Dient zugleich als
-/// wiederherstellbare Version und als Preisgrundlage, die eine
-/// OfferPosition anpinnt.
+/// Unveraenderlicher Stand einer Preistabelle: die Preisgrundlage, die eine
+/// OfferPosition anpinnt. Entsteht lazy beim Bepreisen eines Angebots; gleicher
+/// Inhalt (Hash) ergibt keine neue Version.
 model TariffVersion {
   id String @id @default(cuid())
 
@@ -148,7 +139,6 @@ model TariffVersion {
   /// sha256 ueber den normalisierten Snapshot — Grundlage der Deduplizierung
   hash     String
   snapshot Json
-  reason   TariffVersionReason
 
   createdBy   User?   @relation(fields: [createdById], references: [id])
   createdById String?

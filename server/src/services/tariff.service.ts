@@ -1,4 +1,4 @@
-import { Prisma, TariffVersionReason, type TariffVersion } from "@prisma/client";
+import { Prisma, type TariffVersion } from "@prisma/client";
 import { type PositionPrice } from "@keepit/schemas";
 
 import { AppException } from "../lib/exceptions.js";
@@ -6,7 +6,6 @@ import { prisma } from "../lib/prismaClient.js";
 import {
     buildTariffVersionSnapshot,
     hashTariffSnapshot,
-    parseTariffVersionSnapshot,
 } from "../schemas/tariff-version-schema.js";
 import {
     calculatePrice,
@@ -206,12 +205,11 @@ const TARIFF_STRUCTURE_INCLUDE = {
  */
 export async function sealTariffVersion(
     tariffId: string,
-    reason: TariffVersionReason,
     actorId: string | null,
     tx?: Prisma.TransactionClient,
 ): Promise<TariffVersion> {
     if (!tx) {
-        return prisma.$transaction((client) => sealTariffVersion(tariffId, reason, actorId, client));
+        return prisma.$transaction((client) => sealTariffVersion(tariffId, actorId, client));
     }
 
     await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`tariff-version:${tariffId}`}))::text AS "lock"`;
@@ -239,7 +237,6 @@ export async function sealTariffVersion(
             version: (latest._max.version ?? 0) + 1,
             hash,
             snapshot: snapshot as unknown as Prisma.InputJsonValue,
-            reason,
             createdById: actorId,
         },
     });
@@ -296,42 +293,6 @@ export async function getTariff(tariffId: string) {
     }
 
     return tariff;
-}
-
-/**
- * Versionshistorie einer Preistabelle, neueste zuerst.
- *
- * `isCurrent` markiert die Version, deren Inhalt dem aktuellen Zustand der
- * Tabelle entspricht; `usageCount` zeigt, von wie vielen Angebotspositionen
- * diese Version als Preisgrundlage angepinnt wurde.
- */
-export async function getTariffVersions(tariffId: string) {
-    const tariff = await prisma.tariff.findUnique({
-        where: { id: tariffId },
-        include: TARIFF_STRUCTURE_INCLUDE,
-    });
-
-    if (!tariff) {
-        throw new AppException("Tariff not found.", 404, "TARIFF_NOT_FOUND");
-    }
-
-    const tiers = await prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
-    const currentHash = hashTariffSnapshot(buildTariffVersionSnapshot({ ...tariff, tiers }));
-
-    const versions = await prisma.tariffVersion.findMany({
-        where: { tariffId },
-        orderBy: { version: 'desc' },
-        include: {
-            createdBy: { select: { id: true, name: true } },
-            _count: { select: { offerPositions: true } },
-        },
-    });
-
-    return versions.map(({ _count, ...version }) => ({
-        ...version,
-        isCurrent: version.hash === currentHash,
-        usageCount: _count.offerPositions,
-    }));
 }
 
 /**
@@ -524,58 +485,6 @@ export async function deleteTariff(tariffId: string): Promise<void> {
 
     await prisma.tariff.delete({
         where: { id: tariffId }
-    });
-}
-
-/**
- * Setzt eine Preistabelle auf den Stand einer früheren Version zurück.
- *
- * Der aktuelle Zustand wird vorher als `RESTORE`-Version versiegelt und geht
- * damit nie verloren. Die Struktur wird in-place ersetzt — der `Tariff` selbst
- * bleibt bestehen, damit angepinnte Angebotsversionen und die an Koordinaten
- * hängenden Kundenpreise nicht brechen.
- */
-export async function restoreTariffVersion(tariffId: string, versionId: string, actorId: string) {
-    return prisma.$transaction(async (tx) => {
-        const version = await tx.tariffVersion.findUnique({ where: { id: versionId } });
-
-        if (!version || version.tariffId !== tariffId) {
-            throw new AppException("Tariff version not found.", 404, "TARIFF_VERSION_NOT_FOUND");
-        }
-
-        if (version.snapshotVersion !== 1) {
-            throw new AppException(
-                `Snapshot-Version ${version.snapshotVersion} wird nicht unterstützt.`,
-                422,
-                "UNSUPPORTED_SNAPSHOT_VERSION",
-            );
-        }
-
-        const snapshot = parseTariffVersionSnapshot(version.snapshot);
-
-        await sealTariffVersion(tariffId, TariffVersionReason.RESTORE, actorId, tx);
-
-        // Nur die Zellen dieses Tarifs. Die Mengenstaffeln gehören der Gruppe
-        // und werden von allen Verträgen darin geteilt — ein Restore eines
-        // einzelnen Tarifs darf sie nicht unter den Geschwistern wegziehen.
-        // Zellen auf einer Koordinate ohne Staffel bleiben erhalten und sind
-        // wieder erreichbar, sobald die Staffel zurückkommt.
-        await tx.tariffCell.deleteMany({ where: { tariffId } });
-
-        const cells = snapshot.cells.flatMap((cell) =>
-            cell.price === null
-                ? []
-                : [{ tariffId, duration: cell.duration, min_quantity: cell.min_quantity, price: cell.price }],
-        );
-
-        if (cells.length > 0) {
-            await tx.tariffCell.createMany({ data: cells });
-        }
-
-        return tx.tariff.findUniqueOrThrow({
-            where: { id: tariffId },
-            include: TARIFF_INCLUDE,
-        });
     });
 }
 

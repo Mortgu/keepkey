@@ -1,4 +1,4 @@
-import { Prisma, TariffVersionReason } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 
 import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
@@ -106,7 +106,7 @@ export async function pricePositions(
                 );
             }
 
-            const version = await sealTariffVersion(tariff.id, TariffVersionReason.OFFER, actorId, db);
+            const version = await sealTariffVersion(tariff.id, actorId, db);
 
             const eur_user_month = result.breakdown.unitPrice;
             const discount_cents = eur_user_month * position.quantity * (position.free_months ?? 0);

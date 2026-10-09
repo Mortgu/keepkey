@@ -3,24 +3,7 @@
         "create": "Create workload",
         "search": "Search workloads...",
         "pricing": {
-            "create": "Create pricing table",
-            "versions": {
-                "version": "Version {{version}}",
-                "current": "Current",
-                "usedIn_one": "used in {{count}} offer",
-                "usedIn_other": "used in {{count}} offers",
-                "restore": "Restore",
-                "empty": "No versions yet.",
-                "reason": {
-                    "MANUAL": "Sealed manually",
-                    "OFFER": "Sealed by offer",
-                    "RESTORE": "State before a restore"
-                }
-            },
-            "toast": {
-                "versionSealed": "Version {{version}} saved.",
-                "versionRestored": "Pricing table restored."
-            }
+            "create": "Create pricing table"
         }
     }
 }

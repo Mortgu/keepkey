@@ -4,7 +4,6 @@ import {
     getStandardDurations,
     getStandardTiers,
     getTariffGroups,
-    getTariffVersions,
 } from "./tariff-api";
 
 export const tariffQueries = {
@@ -12,14 +11,6 @@ export const tariffQueries = {
         return queryOptions({
             queryKey: tariffKeys.groups(),
             queryFn: getTariffGroups,
-        });
-    },
-
-    versions: (groupId: string, tariffId: string) => {
-        return queryOptions({
-            queryKey: tariffKeys.versions(tariffId),
-            queryFn: () => getTariffVersions(groupId, tariffId),
-            enabled: Boolean(groupId) && Boolean(tariffId),
         });
     },
 
