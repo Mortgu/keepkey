@@ -2,9 +2,9 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import type { DocumentTemplateKind, Language } from "@prisma/client";
-import env from "../src/lib/env.js";
-import { prisma } from "../src/lib/prismaClient.js";
-import { createTemplate, setActiveTemplate } from "../src/services/document-template.service.js";
+import env from "../src/config/env.js";
+import { prisma } from "../src/core/prisma.js";
+import { createTemplate, setActiveTemplate } from "../src/modules/documents/templates/document-template.service.js";
 
 /**
  * Übernimmt die mitgelieferten Vorlagen aus `TEMPLATES_DIR` in den

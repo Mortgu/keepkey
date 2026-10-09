@@ -4,13 +4,13 @@
  * `dist/api.js` und `dist/worker.js` als getrennte Services betreiben —
  * ohne Codeänderung, nur über das Startkommando.
  */
-import "./runtime/bootstrap.js";
+import "@/core/runtime/bootstrap.js";
 
-import env from "./config/env.js";
-import { prisma } from "./lib/prismaClient.js";
-import { startApi } from "./runtime/api-runtime.js";
-import { registerShutdown } from "./runtime/shutdown.js";
-import { startWorker } from "./runtime/worker-runtime.js";
+import env from "@/config/env.js";
+import { prisma } from "@/core/prisma.js";
+import { startApi } from "@/core/runtime/api-runtime.js";
+import { registerShutdown } from "@/core/runtime/shutdown.js";
+import { startWorker } from "@/core/runtime/worker-runtime.js";
 
 const worker = await startWorker();
 const api = await startApi();

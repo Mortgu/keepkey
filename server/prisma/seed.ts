@@ -1,4 +1,4 @@
-import { prisma } from "../src/lib/prismaClient.js";
+import { prisma } from "../src/core/prisma.js";
 import { seedOwner } from "./seeds/owner.js";
 import { seedSuppliers } from "./seeds/suppliers.js";
 import { seedContracts } from "./seeds/contracts.js";

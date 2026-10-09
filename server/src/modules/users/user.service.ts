@@ -1,0 +1,197 @@
+import { prisma } from "@/core/prisma.js";
+import { auth } from "@/core/auth.js";
+import { AppException } from "@/core/exceptions.js";
+import {
+    type CreateContactInput,
+    type CreateUserInput,
+    type UpdateUserInput, UserFilterParams
+} from "@keepit/schemas";
+
+/* ========== Queries ========== */
+
+export async function getAllUsers(query: UserFilterParams) {
+    const { search, sort } = query;
+
+    const where: {
+        name?: { contains: string };
+    } = {};
+
+    if (search && typeof search === "string") {
+        where.name = { contains: search };
+    }
+
+    const orderBy = sort === "createdAt:asc" ? { createdAt: "asc" as const } : { createdAt: "desc" as const };
+
+    return prisma.user.findMany({
+        where: Object.keys(where).length > 0 ? where : undefined,
+        orderBy,
+    });
+}
+
+export async function getUserById(id: string) {
+    const user = await prisma.user.findUnique({
+        where: { id },
+        include: {
+            acceptedOrders: true,
+            customer: {
+                include: {
+                    contactPersons: true,
+                },
+            },
+        },
+    });
+
+    if (!user) {
+        throw new AppException("User not found!", 404, "USER_NOT_FOUND");
+    }
+
+    return user;
+}
+
+export async function getSessionUser(userId: string) {
+    const user = await prisma.user.findUnique({
+        where: { id: userId },
+    });
+
+    if (!user) {
+        throw new AppException("No session found!", 404, "NO_SESSION");
+    }
+
+    return user;
+}
+
+/* ========== Mutations ========== */
+
+export async function createUser(input: CreateUserInput) {
+    const { email, password, firstName, lastName, salutation, phone } = input;
+
+    try {
+        const { user: createdUser } = await auth.api.createUser({
+            body: {
+                email,
+                password,
+                name: `${firstName} ${lastName}`,
+                role: "user",
+                data: {
+                    firstName,
+                    lastName,
+                    salutation,
+                    phone: phone || undefined,
+                },
+            },
+        });
+
+        return createdUser;
+    } catch (exception: any) {
+        throw new AppException(
+            "Something went wrong trying to create user: " + exception.message,
+            500,
+            "USER_CREATION_FAILED",
+        );
+    }
+}
+
+export async function updateUser(id: string, input: UpdateUserInput) {
+    if (!id) {
+        throw new AppException("Missing user id!", 400, "MISSING_ID");
+    }
+
+    const {
+        salutation,
+        firstName,
+        lastName,
+        phone,
+        email,
+        password,
+    } = input;
+
+    if (password) {
+        await setUserPassword(id, password);
+    }
+
+    try {
+        const user = await prisma.user.update({
+            where: { id },
+            data: {
+                name: `${firstName} ${lastName}`,
+                salutation,
+                firstName,
+                lastName,
+                phone,
+                email,
+            },
+        });
+
+        return user;
+    } catch (exception: any) {
+        throw new AppException(
+            "Something went wrong trying to update user: " + exception.message,
+            500,
+            "USER_UPDATE_FAILED",
+        );
+    }
+}
+
+async function setUserPassword(userId: string, password: string) {
+    const ctx = await auth.$context;
+    const { minPasswordLength, maxPasswordLength } = ctx.password.config;
+
+    if (password.length < minPasswordLength || password.length > maxPasswordLength) {
+        throw new AppException(
+            `Password must be between ${minPasswordLength} and ${maxPasswordLength} characters!`,
+            400,
+            "INVALID_PASSWORD_LENGTH",
+        );
+    }
+
+    const hash = await ctx.password.hash(password);
+    await ctx.internalAdapter.updatePassword(userId, hash);
+    // Log the employee out everywhere so the old password can't keep a session alive.
+    await ctx.internalAdapter.deleteUserSessions(userId);
+}
+
+export async function createContactPersons(userId: string, persons: Array<CreateContactInput>) {
+    return prisma.$transaction(async (tx) => {
+        const customer = await tx.customer.findUnique({
+            where: { id: userId },
+        });
+
+        if (!customer) {
+            throw new AppException("No customer linked to this account!", 400, "NO_CUSTOMER_LINKED");
+        }
+
+        const created = await tx.contactPerson.createMany({
+            data: persons.map(person => ({
+                ...person,
+                customerId: customer.id
+            })),
+        });
+        return created;
+    });
+}
+
+/* ========== Deletes ========== */
+
+export async function deleteUser(id: string): Promise<void> {
+    if (!id) {
+        throw new AppException("Missing user id!", 400, "MISSING_ID");
+    }
+
+    try {
+        await prisma.user.delete({
+            where: { id },
+        });
+    } catch (exception: any) {
+        throw new AppException(
+            "Something went wrong trying to delete user: " + exception.message,
+            500,
+            "USER_DELETE_FAILED",
+        );
+    }
+}
+
+export async function deleteAccount(userId: string): Promise<void> {
+    await prisma.user.delete({
+        where: { id: userId },
+    });
+}

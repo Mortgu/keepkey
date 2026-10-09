@@ -1,0 +1,427 @@
+import { parseAcceptedOfferSnapshot, parseAcceptedOfferTemplate } from "../accepted-offer.schema.js";
+import Docxtemplater from "docxtemplater";
+import InspectModule from "docxtemplater/js/inspect-module.js";
+import PizZip from "pizzip";
+
+import { prisma } from "@/core/prisma.js";
+import { contractOrderBy } from "@/modules/contracts/contract.service.js";
+import { loadTemplateForRendering } from "@/modules/documents/templates/document-template.service.js";
+import { OfferTemplate, offerTemplateSchema } from "../offer.template.schema.js";
+import { pickTranslation } from "@/core/i18n.js";
+import logger from "@/core/logger.js";
+import { calculatePrice } from "@/modules/tariffs/tariff-pricing.js";
+import { formatCentsToEur, formatDate } from "@/core/format.js";
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
+import { convertDocxToPdf } from "@/modules/documents/render/docx-to-pdf.js";
+import { z } from "zod";
+import { netCents } from "@keepit/schemas";
+import { PipelineStageError } from "@/modules/documents/generation/pipeline.js";
+import { OfferFetchData, OfferPipelineContext } from "./context.js";
+import { livePrice, storedPrice, toTemplateItem } from "./format/position-item.js";
+import { customParser, deepIterate } from "./utils.js";
+
+/* Helper function */
+export const fetchOfferData = async (offerId: string) => {
+    const [offer, contracts] = await Promise.all([
+        await prisma.offer.findUniqueOrThrow({
+            where: { id: offerId },
+            include: {
+                customer: true,
+                customerContactPerson: true,
+                user: true,
+                contract: { include: { translations: true } },
+                offerPositions: {
+                    include: {
+                        product: { include: { translations: true } },
+                    },
+                },
+                offerFlatRates: {
+                    include: {
+                        flatRate: { include: { translations: true } },
+                    },
+                },
+                offerDiscounts: true,
+            }
+        }),
+
+        await prisma.contract.findMany({
+            include: {
+                translations: true,
+            },
+            orderBy: contractOrderBy,
+        }),
+    ]);
+
+    if (offer.acceptedSnapshot) {
+        const s = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
+        // No current master data enters an accepted document's commercial content.
+        offer.customer = { ...offer.customer, ...s.customer };
+        offer.customerContactPerson = { ...offer.customerContactPerson, ...s.customerContactPerson };
+        offer.user = { ...offer.user, ...s.employee };
+        offer.language = s.language;
+        offer.contract = { ...offer.contract, translations: s.contract.translations.map(t => ({
+            ...t, contractId: s.contract.id, createdAt: s.contract.createdAt, updatedAt: s.contract.updatedAt,
+        })) };
+        offer.offerPositions = s.positions.map(p => ({
+            ...p, offerId: offer.id, tariffVersionId: p.tariffVersionId ?? null, updatedAt: p.createdAt,
+            product: { ...p.product, translations: p.product.translations.map(t => ({
+                ...t, productId: p.productId, description: t.description ?? null, table: t.table ?? null,
+            })) },
+        }));
+        offer.offerFlatRates = s.flatRates.map(f => ({ ...f, offerId: offer.id,
+            flatRate: { ...f.flatRate, translations: f.flatRate.translations.map(t => ({
+                ...t, flatRateId: f.flatRateId, table: t.table ?? "",
+            })) },
+        }));
+    }
+    return { offer, contracts };
+}
+
+/* Stage function */
+export const fetchOfferAction = async (context: OfferPipelineContext) => {
+    try {
+        context.fetchedData = await fetchOfferData(context.offerId);
+    } catch (exception: any) {
+        if (exception instanceof PrismaClientKnownRequestError) {
+            logger.error("[pipline]: Prisma error: Something failed while trying to fetch data!")
+        }
+
+        logger.error(exception);
+        throw new PipelineStageError("An error occurred! Please try again later.");
+    }
+}
+
+/* Helper function */
+export const formatOfferData = async (fetchedData: OfferFetchData): Promise<OfferTemplate> => {
+    const { offer, contracts } = fetchedData;
+    const language = offer.language;
+    const customerId = offer.customerId;
+
+    // Vertrag und Laufzeit stehen am Angebot. Die frühere Gruppierung nach
+    // `contractId_duration_months` konnte deshalb entfallen: sie zerlegte eine
+    // Menge, die per Modell nur noch eine Gruppe hat.
+    const duration = offer.duration_months;
+    const contractName = pickTranslation(offer.contract.translations, language)!.name;
+
+    const products = offer.offerPositions.map(pos => toTemplateItem(
+        pos,
+        storedPrice(pos),
+        {
+            language,
+            contractName,
+            validUntil: offer.validUntil,
+            durationLabel: `${duration} Monate`,
+        },
+    ));
+
+    const otherContracts = contracts.filter(c => c.id !== offer.contractId);
+
+    const productNames = offer.offerPositions
+        .map(p => pickTranslation(p.product.translations, language)?.name ?? "")
+        .join(" & ");
+
+    const groups: OfferTemplate["groups"] = [];
+    const offerContractT = pickTranslation(offer.contract.translations, language)!;
+
+    groups.push({
+        names: productNames,
+        contract: offerContractT.name,
+        features: offerContractT.features,
+        _duration: duration,
+        duration: `${duration} Monate`,
+    });
+
+    if (offer.featureComparison) {
+        for (const otherContract of otherContracts) {
+            const otherContractT = pickTranslation(otherContract.translations, language)!;
+            groups.push({
+                names: productNames,
+                contract: otherContractT.name,
+                features: otherContractT.features,
+                _duration: duration,
+                duration: `${duration} Monate`,
+            });
+        }
+    }
+
+    const flatrates = offer.offerFlatRates.map(fr => {
+        const frT = pickTranslation(fr.flatRate.translations, language)!;
+        return {
+            name: frT.name,
+            content: frT.table,
+            total: formatCentsToEur(fr.total_cents),
+        };
+    });
+    const flatratesTotal = offer.offerFlatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
+
+    const discounts = offer.offerDiscounts.map(d => ({
+        title: d.title,
+        description: d.description ?? "",
+        total: formatCentsToEur(-d.amount_cents),
+    }));
+    const discountsTotal = offer.offerDiscounts.reduce((sum, d) => sum + d.amount_cents, 0);
+
+    const tables: OfferTemplate["tables"] = [];
+
+    /**
+     * Baut eine Vertragstabelle.
+     *
+     * `live: false` ist der Normalfall — der Vertrag, für den das Angebot
+     * geschrieben wurde. Dann gelten die beim Anlegen festgeschriebenen Preise
+     * der Positionen, damit ein erneut erzeugtes Dokument dieselben Zahlen
+     * zeigt wie das verschickte.
+     *
+     * `live: true` gilt nur für die Vergleichstabellen anderer Verträge: diese
+     * Positionen wurden dort nie verkauft, es gibt also nichts Gespeichertes.
+     * Fehlt für einen Vergleichsvertrag eine Preistabelle, entfällt die
+     * Tabelle (`null`) — ein Vergleich ist optionales Beiwerk und darf die
+     * Erzeugung des Angebots nicht scheitern lassen.
+     *
+     * `withOfferWideTotals` steuert, ob Flatrates und Rabatte in die
+     * Tabellensumme eingehen. Sie gelten für das gesamte Angebot: bei mehreren
+     * Positionsgruppen (verschiedene Verträge oder Laufzeiten) sind die
+     * Tabellen Teilmengen desselben Angebots und dürften sie sonst mehrfach
+     * zählen. Die Vergleichsvarianten einer Gruppe sind dagegen vollständige
+     * Alternativen und bekommen sie jeweils mit.
+     */
+    const buildTableForContract = async (
+        contractId: string,
+        options: { live: boolean; withOfferWideTotals: boolean },
+    ): Promise<OfferTemplate["tables"][number] | null> => {
+        const tableContractName = pickTranslation(
+            contracts.find(c => c.id === contractId)!.translations,
+            language,
+        )!.name;
+
+        const items: OfferTemplate["products"] = [];
+        let itemsNetCents = 0;
+
+        for (const pos of offer.offerPositions) {
+            let price;
+
+            if (options.live) {
+                const result = await calculatePrice({
+                    productId: pos.productId,
+                    contractId,
+                    duration,
+                    quantity: pos.quantity,
+                    customerId,
+                });
+
+                if (!result.ok) return null;
+                price = livePrice(result.breakdown.unitPrice, pos, duration);
+            } else {
+                price = storedPrice(pos);
+            }
+
+            // Die Tabellensumme ist netto — im Dokument steht über ihr der
+            // Bruttopreis und darunter der Rabatt als eigene Zeile.
+            itemsNetCents += netCents(price);
+
+            items.push(toTemplateItem(pos, price, {
+                language,
+                contractName: tableContractName,
+                validUntil: offer.validUntil,
+                durationLabel: String(duration),
+            }));
+        }
+
+        const tableTotalCents = options.withOfferWideTotals
+            ? itemsNetCents + flatratesTotal - discountsTotal
+            : itemsNetCents;
+
+        return {
+            products: productNames,
+            contract: tableContractName,
+            duration: `${duration} Monaten`,
+            items,
+            flatrates: options.withOfferWideTotals ? flatrates : [],
+            total: formatCentsToEur(tableTotalCents),
+        };
+    };
+
+    const table = await buildTableForContract(
+        offer.contractId, { live: false, withOfferWideTotals: true },
+    );
+    if (table) tables.push(table);
+
+    if (offer.featureComparison) {
+        for (const otherContract of otherContracts) {
+            const comparison = await buildTableForContract(
+                otherContract.id, { live: true, withOfferWideTotals: true },
+            );
+            if (comparison) tables.push(comparison);
+        }
+    }
+
+    const cp = offer.customerContactPerson;
+    const customer = offer.customer;
+    const employee = offer.user;
+
+    return {
+        quoteId: offer.quoteId,
+        date: formatDate(offer.date),
+        paymentTerm: offer.paymentTerm,
+        validUntil: formatDate(offer.validUntil),
+        requestFrom: formatDate(offer.requestFrom),
+        supplierId: offer.supplierId ?? null,
+        compare: offer.featureComparison,
+
+        customer: {
+            id: customer.customerId,
+            companyName: customer.companyName,
+            street: customer.street,
+            zip: customer.zip,
+            city: customer.city,
+            fullName: `${cp.salutation ?? ""} ${cp.firstName} ${cp.lastName}`.trim(),
+            salutation: cp.salutation,
+            firstName: cp.firstName,
+            lastName: cp.lastName,
+            phone: customer.phone,
+            email: cp.email,
+        },
+
+        employee: {
+            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+            salutation: employee.salutation,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            phone: employee.phone ?? "",
+            email: employee.email,
+        },
+
+        product_names: productNames,
+        products,
+        groups,
+        tables,
+        discounts,
+    };
+}
+
+/* Stage function */
+export const formatFetchedDataAction = async (context: OfferPipelineContext) => {
+    if (!context.fetchedData || !context.fetchedData.offer || !context.fetchedData.contracts) {
+        throw new PipelineStageError("Fetched data is empty!");
+    }
+
+    try {
+        const formated = context.fetchedData.offer.acceptedSnapshot
+            ? parseAcceptedOfferTemplate(context.fetchedData.offer.acceptedSnapshot)
+            : await formatOfferData(context.fetchedData);
+        //console.dir(formated, { depth: null });
+        context.formatedData = offerTemplateSchema.parse(formated);
+    } catch (exception: any) {
+        if (exception instanceof z.ZodError) {
+            logger.error(exception)
+            logger.error('pipeline_offer_validation_failed', { issues: exception.issues });
+        } else {
+            logger.error(exception);
+        }
+        throw new PipelineStageError("An error occurred! Please try again later.");
+    }
+}
+
+export const postProcessingAction = async (context: OfferPipelineContext) => {
+    const { formatedData } = context;
+
+    if (!formatedData) {
+        throw new Error("Failed to postprocess! No formatted data!");
+    }
+
+    context.formatedData = deepIterate(
+        formatedData as Record<string, unknown>,
+        formatedData as Record<string, unknown>,
+    ) as unknown as OfferTemplate;
+}
+
+/* Drift detection: compare template tags against the offer schema. */
+const flattenTags = (tags: Record<string, unknown>, prefix = ""): string[] => {
+    const out: string[] = [];
+    for (const [k, v] of Object.entries(tags)) {
+        if (k === ".") continue; // self-reference loop element
+        const path = prefix ? `${prefix}.${k}` : k;
+        if (v && typeof v === "object" && Object.keys(v as object).length > 0) {
+            const children = flattenTags(v as Record<string, unknown>, path);
+            out.push(...children);
+        } else {
+            out.push(path);
+        }
+    }
+    return out;
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+const flattenSchema = (schema: any, prefix = ""): string[] => {
+    if (schema instanceof z.ZodObject) {
+        return Object.entries(schema.shape).flatMap(([k, v]: [string, any]) =>
+            flattenSchema(v, prefix ? `${prefix}.${k}` : k)
+        );
+    }
+    if (schema instanceof z.ZodArray) {
+        return flattenSchema(schema.element, prefix);
+    }
+    if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+        return flattenSchema(schema.unwrap(), prefix);
+    }
+    return prefix ? [prefix] : [];
+};
+
+export async function generateAction(context: OfferPipelineContext) {
+    const { formatedData } = context;
+    // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
+    const iModule = InspectModule();
+
+    const content = await loadTemplateForRendering("OFFER", context.fetchedData!.offer.language);
+
+    const zip = new PizZip(content);
+
+    const doc = new Docxtemplater(zip, {
+        modules: [iModule],
+        paragraphLoop: true,
+        linebreaks: true,
+        parser: customParser,
+    });
+
+    const tags = iModule.getAllTags();
+    const templatePaths = flattenTags(tags as Record<string, unknown>);
+
+    const schemaPaths = flattenSchema(offerTemplateSchema);
+    const uncovered = templatePaths.filter((t) => !schemaPaths.includes(t));
+    if (uncovered.length > 0) {
+        logger.warn(
+            `[pipeline]: Template tags not covered by offer schema (possible drift): ${uncovered.join(", ")
+            }`
+        );
+    }
+
+    doc.render(formatedData);
+
+    context.docxBuffer = doc.toBuffer();
+}
+
+export async function convertAction(context: OfferPipelineContext) {
+    const { docxBuffer } = context;
+
+    if (!docxBuffer) {
+        throw new PipelineStageError("Something went wrong! Empty docx buffer.");
+    }
+
+    context.pdfBuffer = await convertDocxToPdf(docxBuffer);
+}
+
+export async function createDisplayNameAction(context: OfferPipelineContext) {
+    const { fetchedData, version } = context;
+
+    if (!fetchedData || version === null) {
+        throw new PipelineStageError("Failed to create document display name.");
+    }
+
+    const { quoteId, customer, offerPositions, language } = fetchedData.offer;
+
+    const formatedCompanyName = customer.companyName.replaceAll(" ", "").trim();
+    const formatedWorkloads = offerPositions
+        .map((op) => (pickTranslation(op.product.translations, language)?.name ?? "").replaceAll(" ", "").trim())
+        .join("+");
+
+    context.displayName = `${quoteId}_AG_${formatedCompanyName}_Keepit-${formatedWorkloads}${version > 0 ? `_v${version}` : ''}`;
+}

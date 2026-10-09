@@ -1,0 +1,45 @@
+import { Request, Response } from "express";
+import { flatrateFilterSchema } from "@keepit/schemas";
+
+import * as flatRateService from "./flat-rate.service.js";
+
+/* ========== GET ========== */
+
+export const getFlatRates = async (request: Request, response: Response) => {
+    const filters = flatrateFilterSchema.parse(request.query);
+    const result = await flatRateService.getFlatRates(filters);
+    return response.status(200).json(result);
+};
+
+export const getFlatRate = async (request: Request, response: Response) => {
+    const flatrate = await flatRateService.getFlatRateById(request.params.id as string);
+    return response.status(200).json(flatrate);
+};
+
+/* ========== POST ========== */
+
+export const createFlatRate = async (request: Request, response: Response) => {
+    const flatrate = await flatRateService.createFlatRate(request.body);
+    return response.status(201).json(flatrate);
+};
+
+/* ========== UPDATE ========== */
+
+export const updateFlatRate = async (request: Request, response: Response) => {
+    const flatrate = await flatRateService.updateFlatRate(
+        request.params.id as string,
+        request.body,
+    );
+    return response.status(200).json(flatrate);
+};
+
+/* ========== DELETE ========== */
+
+export const deleteFlatRate = async (request: Request, response: Response) => {
+    await flatRateService.deleteFlatRate(request.params.id as string);
+
+    return response.status(200).json({
+        success: true,
+        message: "Successfully deleted flat rate!",
+    });
+};

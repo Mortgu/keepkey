@@ -4,7 +4,7 @@ import {
     S3Client,
     type CORSRule,
 } from "@aws-sdk/client-s3";
-import env from "../src/lib/env.js";
+import env from "../src/config/env.js";
 
 /**
  * Setzt die CORS-Regel, ohne die der Browser keine Ersatzdatei in den Bucket

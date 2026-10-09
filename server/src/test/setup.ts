@@ -1,6 +1,6 @@
 // Unit tests never use workspace credentials or connect to external services.
 import { vi } from "vitest";
-vi.mock("../lib/env.js", () => ({
+vi.mock("@/config/env.js", () => ({
     default: {
         NODE_ENV: "test",
         LOG_LEVEL: "error",

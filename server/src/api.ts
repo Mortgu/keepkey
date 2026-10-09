@@ -1,9 +1,9 @@
-import "./runtime/bootstrap.js";
+import "@/core/runtime/bootstrap.js";
 
-import env from "./config/env.js";
-import { prisma } from "./lib/prismaClient.js";
-import { startApi } from "./runtime/api-runtime.js";
-import { registerShutdown } from "./runtime/shutdown.js";
+import env from "@/config/env.js";
+import { prisma } from "@/core/prisma.js";
+import { startApi } from "@/core/runtime/api-runtime.js";
+import { registerShutdown } from "@/core/runtime/shutdown.js";
 
 const { shutdownSteps } = await startApi();
 

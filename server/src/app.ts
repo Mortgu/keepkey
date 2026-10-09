@@ -3,12 +3,12 @@ import cors from "cors";
 import express, { type Express } from "express";
 import path from "path";
 
-import { auth } from "./lib/auth.js";
-import env from "./config/env.js";
-import { exceptionHandler } from "./middlewares/exception.middleware.js";
-import morganMiddleware from "./middlewares/morgan.middleware.js";
-import { requestIdMiddleware } from "./middlewares/request.middleware.js";
-import router from "./routes/router.js";
+import { auth } from "@/core/auth.js";
+import env from "@/config/env.js";
+import { exceptionHandler } from "@/core/middleware/exception.middleware.js";
+import morganMiddleware from "@/core/middleware/morgan.middleware.js";
+import { requestIdMiddleware } from "@/core/middleware/request.middleware.js";
+import router from "@/router.js";
 
 /**
  * Baut die Express-App. Keine Initialisierung externer Dienste, kein
