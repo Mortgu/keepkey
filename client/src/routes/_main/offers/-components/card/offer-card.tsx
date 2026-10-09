@@ -14,8 +14,8 @@ import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import { formatEur } from "@/utils/utils";
 import type { Offer, OfferDocument } from '@keepit/schemas';
 import { Link } from "@tanstack/react-router";
-import OfferModal from "../modals/offer-modal";
-import type { OfferModalMode } from "../modals/offer-modal-policy";
+import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 
 type OfferListItemProps = {
     offer: Offer;

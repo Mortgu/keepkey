@@ -1,8 +1,8 @@
-import { createContext, useContext } from "react";
+import type { OfferModalFormApi } from "@/components/modules/modals/offer/_hooks/use-offer-modal-form";
+import type usePricingStatus from "@/components/modules/modals/offer/_hooks/use-pricing-status.offer-modal";
 import type { Offer, PriceHeader } from "@keepit/schemas";
+import { createContext, useContext } from "react";
 import type { OfferModalMode, OfferModalPolicy } from "./offer-modal-policy";
-import type { OfferModalFormApi } from "@/routes/_main/offers/-hooks/use-offer-modal-form";
-import type usePricingStatus from "@/routes/_main/offers/-hooks/use-pricing-status.offer-modal";
 
 /**
  * Modus, Policy und Quellangebot werden bis in die einzelnen Positionen hinein

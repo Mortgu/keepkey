@@ -26,7 +26,6 @@ import { Route as MainSuppliersIndexRouteImport } from './routes/_main/suppliers
 import { Route as MainTemplatesIndexRouteImport } from './routes/_main/templates/index'
 import { Route as MainWorkloadsIndexRouteImport } from './routes/_main/workloads/index'
 import { Route as MainCustomersCustomerIdIndexRouteImport } from './routes/_main/customers/$customerId/index'
-import { Route as MainOffersOfferIndexRouteImport } from './routes/_main/offers/$offer/index'
 import { Route as MainWorkloadsPricingIndexRouteImport } from './routes/_main/workloads/pricing/index'
 import { Route as MainCustomersCustomerIdVorgangFlowIdIndexRouteImport } from './routes/_main/customers/$customerId/vorgang/$flowId/index'
 
@@ -115,11 +114,6 @@ const MainCustomersCustomerIdIndexRoute =
     path: '/customers/$customerId/',
     getParentRoute: () => MainRouteRoute,
   } as any)
-const MainOffersOfferIndexRoute = MainOffersOfferIndexRouteImport.update({
-  id: '/offers/$offer/',
-  path: '/offers/$offer/',
-  getParentRoute: () => MainRouteRoute,
-} as any)
 const MainWorkloadsPricingIndexRoute =
   MainWorkloadsPricingIndexRouteImport.update({
     id: '/workloads/pricing/',
@@ -150,7 +144,6 @@ export interface FileRoutesByFullPath {
   '/templates/': typeof MainTemplatesIndexRoute
   '/workloads/': typeof MainWorkloadsIndexRoute
   '/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/offers/$offer/': typeof MainOffersOfferIndexRoute
   '/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
   '/customers/$customerId/vorgang/$flowId/': typeof MainCustomersCustomerIdVorgangFlowIdIndexRoute
 }
@@ -171,7 +164,6 @@ export interface FileRoutesByTo {
   '/templates': typeof MainTemplatesIndexRoute
   '/workloads': typeof MainWorkloadsIndexRoute
   '/customers/$customerId': typeof MainCustomersCustomerIdIndexRoute
-  '/offers/$offer': typeof MainOffersOfferIndexRoute
   '/workloads/pricing': typeof MainWorkloadsPricingIndexRoute
   '/customers/$customerId/vorgang/$flowId': typeof MainCustomersCustomerIdVorgangFlowIdIndexRoute
 }
@@ -194,7 +186,6 @@ export interface FileRoutesById {
   '/_main/templates/': typeof MainTemplatesIndexRoute
   '/_main/workloads/': typeof MainWorkloadsIndexRoute
   '/_main/customers/$customerId/': typeof MainCustomersCustomerIdIndexRoute
-  '/_main/offers/$offer/': typeof MainOffersOfferIndexRoute
   '/_main/workloads/pricing/': typeof MainWorkloadsPricingIndexRoute
   '/_main/customers/$customerId/vorgang/$flowId/': typeof MainCustomersCustomerIdVorgangFlowIdIndexRoute
 }
@@ -217,7 +208,6 @@ export interface FileRouteTypes {
     | '/templates/'
     | '/workloads/'
     | '/customers/$customerId/'
-    | '/offers/$offer/'
     | '/workloads/pricing/'
     | '/customers/$customerId/vorgang/$flowId/'
   fileRoutesByTo: FileRoutesByTo
@@ -238,7 +228,6 @@ export interface FileRouteTypes {
     | '/templates'
     | '/workloads'
     | '/customers/$customerId'
-    | '/offers/$offer'
     | '/workloads/pricing'
     | '/customers/$customerId/vorgang/$flowId'
   id:
@@ -260,7 +249,6 @@ export interface FileRouteTypes {
     | '/_main/templates/'
     | '/_main/workloads/'
     | '/_main/customers/$customerId/'
-    | '/_main/offers/$offer/'
     | '/_main/workloads/pricing/'
     | '/_main/customers/$customerId/vorgang/$flowId/'
   fileRoutesById: FileRoutesById
@@ -392,13 +380,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MainCustomersCustomerIdIndexRouteImport
       parentRoute: typeof MainRouteRoute
     }
-    '/_main/offers/$offer/': {
-      id: '/_main/offers/$offer/'
-      path: '/offers/$offer'
-      fullPath: '/offers/$offer/'
-      preLoaderRoute: typeof MainOffersOfferIndexRouteImport
-      parentRoute: typeof MainRouteRoute
-    }
     '/_main/workloads/pricing/': {
       id: '/_main/workloads/pricing/'
       path: '/workloads/pricing'
@@ -431,7 +412,6 @@ interface MainRouteRouteChildren {
   MainTemplatesIndexRoute: typeof MainTemplatesIndexRoute
   MainWorkloadsIndexRoute: typeof MainWorkloadsIndexRoute
   MainCustomersCustomerIdIndexRoute: typeof MainCustomersCustomerIdIndexRoute
-  MainOffersOfferIndexRoute: typeof MainOffersOfferIndexRoute
   MainWorkloadsPricingIndexRoute: typeof MainWorkloadsPricingIndexRoute
   MainCustomersCustomerIdVorgangFlowIdIndexRoute: typeof MainCustomersCustomerIdVorgangFlowIdIndexRoute
 }
@@ -451,7 +431,6 @@ const MainRouteRouteChildren: MainRouteRouteChildren = {
   MainTemplatesIndexRoute: MainTemplatesIndexRoute,
   MainWorkloadsIndexRoute: MainWorkloadsIndexRoute,
   MainCustomersCustomerIdIndexRoute: MainCustomersCustomerIdIndexRoute,
-  MainOffersOfferIndexRoute: MainOffersOfferIndexRoute,
   MainWorkloadsPricingIndexRoute: MainWorkloadsPricingIndexRoute,
   MainCustomersCustomerIdVorgangFlowIdIndexRoute:
     MainCustomersCustomerIdVorgangFlowIdIndexRoute,

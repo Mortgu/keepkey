@@ -1,11 +1,11 @@
-import { Plus } from "lucide-react";
-import { useTranslation } from "react-i18next";
-import { useState } from "react";
-import { useOfferModalContext } from "../offer-modal-context";
-import FlatrateItem from "./flatrate-item";
-import FlatrateForm from "./flatrate-form";
 import { Button } from "@/components";
-import useFlatrateOfferModal from "@/routes/_main/offers/-hooks/use-flatreate.offer-modal";
+import useFlatrateOfferModal from "@/components/modules/modals/offer/_hooks/use-flatreate.offer-modal";
+import { Plus } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useOfferModalContext } from "../offer-modal-context";
+import FlatrateForm from "./flatrate-form";
+import FlatrateItem from "./flatrate-item";
 
 export default function FlatrateSection() {
     const { t } = useTranslation();

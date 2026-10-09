@@ -1,3 +1,6 @@
+import { Breadcrumbs, RouteError, Tabs } from "@/components";
+import { useCustomer, useModal } from "@/hooks";
+import type { Customer } from "@keepit/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
@@ -5,9 +8,6 @@ import CustomerFlowTab from "./-components/tabs/customer-flow-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
 import { Route } from "./index";
-import type { Customer } from "@keepit/schemas";
-import { Breadcrumbs, RouteError, Tabs } from "@/components";
-import { useCustomer, useModal } from "@/hooks";
 
 const TABS = [
     { value: "general", label: "Allgemein" },
@@ -60,7 +60,9 @@ export default function CustomerDetailPage() {
                             <CustomerGeneralTab customer={customer} />
                         )}
 
-                        {tab === "flow" && <CustomerFlowTab customerId={customer.id} />}
+                        {tab === "flow" && (
+                            <CustomerFlowTab customerId={customer.id} />
+                        )}
 
                         {tab === "prices" && (
                             <CustomerPricesTab customer={customer} />

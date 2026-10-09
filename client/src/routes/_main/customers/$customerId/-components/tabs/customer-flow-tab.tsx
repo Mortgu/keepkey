@@ -1,10 +1,11 @@
 import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
+import OfferModal from "@/components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
 import { useLocale, useModal, useOffers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
 import type { Offer } from "@keepit/schemas";
 import { Link } from "@tanstack/react-router";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
@@ -104,7 +105,7 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
 
 export default function CustomerFlowTab({ customerId }: { customerId: string }) {
     const { t } = useTranslation();
-    const modal = useModal();
+    const modal = useModal<{ mode: OfferModalMode }>();
 
     const [searchQuery, setSearchQuery] = useState<string>('');
 
@@ -120,7 +121,19 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
         <div className="grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder={t("common.search")} />
-                <Button size="sm" icon={<Plus />} onClick={() => modal.open()}>Angebot erstellen</Button>
+
+                <Button size="sm" onClick={() => modal.open()}>
+                    {t("offers.create")}
+                </Button>
+
+                {/* Bestandsverträge ohne Ursprungsangebot im System. */}
+                <Button size="sm" variant="secondary" onClick={() => modal.open({ mode: "renewal" })}>
+                    {t("offers.createRenewal")}
+                </Button>
+
+                <Button size="sm" variant="secondary" onClick={() => modal.open({ mode: "extension" })}>
+                    {t("offers.createExtension")}
+                </Button>
             </div>
 
             {isPending && (
@@ -150,7 +163,11 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
             )}
 
             {modal.isOpen && (
-                <OfferModal key={modal.key} preselectedCustomerId={customerId} onClose={modal.close} />
+                <OfferModal
+                    key={modal.key}
+                    mode={modal.data?.mode}
+                    onClose={modal.close}
+                />
             )}
         </div>
     );

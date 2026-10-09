@@ -1,13 +1,5 @@
-import { coordinatesFrom } from "@keepit/schemas";
-import { Check, Pen, Tag } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { useOfferModalContext } from "../offer-modal-context";
-import type { OfferModalPositionValues } from "@/routes/_main/offers/-schemas/offer-modal-schema";
-import type { CreateOfferPositionInput } from "@keepit/schemas";
-import type { SyntheticEvent } from "react";
-import type { PositionField } from "../offer-modal-policy";
 import { Button, Checkbox, Input, NumberField, Select } from "@/components";
+import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
 import {
     useCustomerPriceOverride,
     useLocale,
@@ -18,6 +10,14 @@ import { ApiError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/errors";
 import { localized } from "@/lib/i18n-content";
 import { eurToCents, formatEur } from "@/utils/utils";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
+import { coordinatesFrom } from "@keepit/schemas";
+import { Check, Pen, Tag } from "lucide-react";
+import type { SyntheticEvent } from "react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useOfferModalContext } from "../offer-modal-context";
+import type { PositionField } from "../offer-modal-policy";
 
 interface Props {
     currentWorkload?: OfferModalPositionValues;

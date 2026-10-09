@@ -1,8 +1,8 @@
 import type { DropdownOption } from "@/components";
-import type { Offer } from '@keepit/schemas';
-import type { OfferModalValues } from "../-schemas/offer-modal-schema";
 import { useContracts, useCustomers, useLocale, useStandardDurations, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import type { Offer } from '@keepit/schemas';
+import type { OfferModalValues } from "../_schemas/offer-modal-schema";
 
 
 interface Props {

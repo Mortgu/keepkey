@@ -1,4 +1,6 @@
 import { Accordion, Breadcrumbs, Button } from "@/components";
+import OfferModal from "@/components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
 import { useCancelOrder, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
@@ -7,8 +9,6 @@ import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
-import type { OfferModalMode } from "@/routes/_main/offers/-components/modals/offer-modal-policy";
 import ConfirmationSection from "@/routes/_main/orders/-components/card/confirmation-section";
 import InvoiceSection from "@/routes/_main/orders/-components/card/invoice-section";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";

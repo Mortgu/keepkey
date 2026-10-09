@@ -1,11 +1,11 @@
-import { useTranslation } from "react-i18next";
-import OfferFilters from "./-components/offer-filters";
-import OfferList from "./-components/offer-list";
-import OfferModal from "./-components/modals/offer-modal";
-import useOfferFilters from "./-hooks/use-offer-filters";
-import type { OfferModalMode } from "./-components/modals/offer-modal-policy";
 import { Breadcrumbs, Button } from "@/components";
 import { useContacts, useCustomers, useModal, useProducts } from "@/hooks";
+import { useTranslation } from "react-i18next";
+import useOfferFilters from "../../../components/modules/modals/offer/_hooks/use-offer-filters";
+import OfferModal from "../../../components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "../../../components/modules/modals/offer/offer-modal-policy";
+import OfferFilters from "./-components/offer-filters";
+import OfferList from "./-components/offer-list";
 
 export function OfferPage() {
     const { t } = useTranslation();

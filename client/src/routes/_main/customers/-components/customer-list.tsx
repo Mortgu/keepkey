@@ -1,14 +1,14 @@
-import { Fragment, useMemo } from "react";
-import { useTranslation } from "react-i18next";
-import OfferModal from "../../offers/-components/modals/offer-modal";
-import OrderModal from "../../orders/-components/modal/order-modal";
-import { useCustomerActions } from "../-hooks/use-customer-actions";
-import CustomerListItem from "./customer-list-item";
-import CustomerModal from "./customer-modal";
-import type { Customer } from "@keepit/schemas";
-import type { CustomerFilters } from "../-page.hooks";
 import { RouteError } from "@/components";
 import { useCustomers, useModal } from "@/hooks";
+import type { Customer } from "@keepit/schemas";
+import { Fragment, useMemo } from "react";
+import { useTranslation } from "react-i18next";
+import { useCustomerActions } from "../-hooks/use-customer-actions";
+import type { CustomerFilters } from "../-page.hooks";
+import OfferModal from "../../../../components/modules/modals/offer/offer-modal";
+import OrderModal from "../../orders/-components/modal/order-modal";
+import CustomerListItem from "./customer-list-item";
+import CustomerModal from "./customer-modal";
 
 interface Props {
     filters: CustomerFilters;

@@ -1,10 +1,10 @@
-import { useQueries } from "@tanstack/react-query";
-import { coordinatesFrom } from "@keepit/schemas";
-import type { PriceHeader } from "@keepit/schemas";
-import type { OfferModalPositionValues } from "../-schemas/offer-modal-schema";
 import type { PriceSource } from "@/hooks";
 import { pricingQueries } from "@/hooks/pricing/pricing-queries";
 import { getErrorMessage } from "@/lib/errors";
+import type { PriceHeader } from "@keepit/schemas";
+import { coordinatesFrom } from "@keepit/schemas";
+import { useQueries } from "@tanstack/react-query";
+import type { OfferModalPositionValues } from "../_schemas/offer-modal-schema";
 
 interface Props {
     header: PriceHeader;

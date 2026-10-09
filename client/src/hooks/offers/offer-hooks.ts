@@ -18,3 +18,4 @@ export function useOffer(id: string) {
     const { data: offer, isPending, error } = useQuery(offerQueries.detail(id));
     return { offer, isPending, error };
 }
+
