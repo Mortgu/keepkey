@@ -4,9 +4,9 @@ import { loadDefaultFonts } from '@docx-editor.dev/fonts';
 import { DocxEditor, composeFontConfiguration } from '@docx-editor.dev/react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { DocxEditorRef, FontResolver } from '@docx-editor.dev/react';
 import { Button } from './button';
 import { showToast } from './toast';
+import type { DocxEditorRef, FontResolver } from '@docx-editor.dev/react';
 
 interface Props {
     document?: Uint8Array;

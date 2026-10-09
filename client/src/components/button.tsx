@@ -22,6 +22,7 @@ export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonEle
     children?: ReactNode;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- Stil-Helfer wird auch von Link-Buttons genutzt
 export const buttonStyles = tv({
     base: [
         'loading-none whitespace-pre',

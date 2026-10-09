@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 import * as offerService from "../services/offer/index.js";
 
@@ -19,7 +19,7 @@ export const getOfferRevisions = async (request: Request, response: Response) =>
     return response.status(200).json(revisions);
 };
 
-export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
+export const getNextQuoteId = async (request: Request, response: Response) => {
     const quoteId = await offerService.getNextQuoteId();
     return response.status(200).json(quoteId);
 };

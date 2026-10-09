@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
-import type { Offer } from "@keepit/schemas";
 import { defaultsFor } from "./use-order-modal";
 import { orderFormSchema } from "./use-order-form";
+import type { Offer } from "@keepit/schemas";
 
 const offer = {
     id: "offer-1",

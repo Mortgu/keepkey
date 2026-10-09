@@ -12,7 +12,7 @@ interface Options {
 
 export default function useOfferFilters({ customerId }: Options = {}) {
     const urlSearch = useSearch({ strict: false });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);

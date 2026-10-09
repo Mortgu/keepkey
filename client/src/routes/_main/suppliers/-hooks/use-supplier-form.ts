@@ -1,7 +1,8 @@
-import { useCreateSupplier, useUpdateSupplier } from "@/hooks";
-import { createSupplierSchema, type CreateSupplierInput, type Supplier } from "@keepit/schemas";
+import {   createSupplierSchema } from "@keepit/schemas";
 import { useForm } from "@tanstack/react-form";
+import type {CreateSupplierInput, Supplier} from "@keepit/schemas";
 import type { SyntheticEvent } from "react";
+import { useCreateSupplier, useUpdateSupplier } from "@/hooks";
 
 interface Props {
     currentSupplier?: Supplier | null;
@@ -25,7 +26,7 @@ export default function useSupplierForm({ currentSupplier, onClose }: Props) {
             onMount: createSupplierSchema,
             onChange: createSupplierSchema,
         },
-        onSubmit: async ({ value }) => {
+        onSubmit: ({ value }) => {
             if (currentSupplier) {
                 updateSupplier({ id: currentSupplier.id, supplier: value });
             } else {

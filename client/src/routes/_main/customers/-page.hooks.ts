@@ -11,7 +11,7 @@ const sortOptions = [
 
 export function useCustomerFilters() {
     const urlSearch = useSearch({ strict: false });
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+     
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
     const [sort, setSort] = useState(sortOptions[0].value);
     const [countryFilter, setCountryFilter] = useState<Array<string>>([]);

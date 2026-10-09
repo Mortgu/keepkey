@@ -57,7 +57,7 @@ export async function getExtensionPrice(
  * die Menge darf abweichen. Flatrates entfallen bewusst — sie sind vertragsweite
  * Pauschalen und wären in einer Nachbestellung eine Doppelfakturierung.
  */
-export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput, actorId: string | null) {
+export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput, _actorId: string | null) {
     const source = await prisma.offer.findUnique({
         where: { id: sourceOfferId },
         include: { offerPositions: true },

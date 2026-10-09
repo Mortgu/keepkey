@@ -8,11 +8,9 @@ import WorkloadItem from "./workload-item";
 import { Button, Checkbox, MultiSelectList } from "@/components";
 import useOfferModal from "@/routes/_main/offers/-hooks/use-offer.offer-modal";
 import useWorkloadOfferModal from "@/routes/_main/offers/-hooks/use-workloads.offer-modal";
-import { useLocale } from "@/hooks";
 
 export default function WorkloadSection() {
     const { t } = useTranslation();
-    const locale = useLocale();
 
     const { form, policy, sourceOffer, header } = useOfferModalContext();
 

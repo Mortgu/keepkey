@@ -1,33 +1,18 @@
-import { useEffect, useState } from "react";
-import { Eye, EyeOff, KeyRound } from "lucide-react";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 import useLoginForm from "../-hooks/use-login-form";
 import { Button, Input } from "@/components";
 import { getFormError } from "@/lib/utils";
-import { authClient } from "@/lib/auth-client";
 
 export function LoginFormComponent() {
     const { t } = useTranslation();
     const [showPassword, setShowPassword] = useState(false);
 
-    useEffect(() => {
-        const supportsConditional =
-            typeof PublicKeyCredential !== "undefined" &&
-            typeof PublicKeyCredential.isConditionalMediationAvailable === "function";
-        if (!supportsConditional) return;
-
-        PublicKeyCredential.isConditionalMediationAvailable().then((available) => {
-            if (!available) return;
-            void authClient.signIn.passkey({ autoFill: true });
-        });
-    }, []);
-
     const {
         form,
         handleSubmit,
-        handlePasskeySignIn,
-        passkeyLoading,
         rememberMe,
         setRememberMe,
         error
@@ -191,25 +176,6 @@ export function LoginFormComponent() {
                             )}
                         </form.Subscribe>
                     </form>
-
-                    {/* Divider */}
-                    <div className="flex items-center gap-3 my-3">
-                        <div className="h-px flex-1 bg-(--border)" />
-                        <span className="text-xs text-gray-400">{t("login.or")}</span>
-                        <div className="h-px flex-1 bg-(--border)" />
-                    </div>
-
-                    {/* Passkey sign-in */}
-                    <Button
-                        type="button"
-                        variant="secondary"
-                        icon={<KeyRound size={16} />}
-                        loading={passkeyLoading}
-                        onClick={handlePasskeySignIn}
-                        className="w-full"
-                    >
-                        {!passkeyLoading && t("login.passkey")}
-                    </Button>
                 </div>
             </div>
         </div>

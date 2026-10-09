@@ -11,8 +11,6 @@
     "hidePassword": "Hide password",
     "rememberMe": "Stay signed in",
     "forgotPassword": "Forgot password?",
-    "submit": "Sign in",
-    "or": "or",
-    "passkey": "Sign in with a passkey"
+    "submit": "Sign in"
   }
 }

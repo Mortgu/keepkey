@@ -1,8 +1,8 @@
 
+import { Pen, Trash } from "lucide-react";
 import type { User } from "@keepit/schemas";
 import { formatDate } from "@/lib/format";
 import { Button } from "@/components";
-import { Pen, Trash } from "lucide-react";
 import { useDeleteUser } from "@/hooks";
 
 interface UserListItemProps {

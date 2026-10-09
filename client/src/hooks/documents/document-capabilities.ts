@@ -1,6 +1,6 @@
-import type { DocumentCapabilities, DocumentReplaceBlocker } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { fetchDocumentCapabilities } from "./document-api";
+import type { DocumentCapabilities, DocumentReplaceBlocker } from "@keepit/schemas";
 
 const documentCapabilityKeys = {
     all: ["documents", "capabilities"] as const,

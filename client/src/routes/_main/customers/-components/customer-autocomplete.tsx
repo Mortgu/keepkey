@@ -1,9 +1,9 @@
-import { Input } from "@/components";
 import { Autocomplete } from "@base-ui/react";
 import { matchSorter } from 'match-sorter';
 import { useTranslation } from "react-i18next";
-import type { CustomerFilters } from "../-page.hooks";
 import { Search } from "lucide-react";
+import type { CustomerFilters } from "../-page.hooks";
+import { Input } from "@/components";
 
 export interface CustomerFuzzyItem {
     title: string;

@@ -1,7 +1,8 @@
-import { useUserManager } from "@/hooks";
-import { createUserSchema, type CreateUserInput, type User } from "@keepit/schemas";
+import {   createUserSchema } from "@keepit/schemas";
 import { useForm } from "@tanstack/react-form";
+import type {CreateUserInput, User} from "@keepit/schemas";
 import type { SyntheticEvent } from "react";
+import { useUserManager } from "@/hooks";
 
 interface Props {
     currentEmployee?: User | null;

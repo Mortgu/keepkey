@@ -25,6 +25,7 @@ export const uploadDocumentTemplateQuerySchema = z.object({
         .max(180)
         .refine((value) => value.toLowerCase().endsWith(".docx"), "Nur .docx-Dateien sind erlaubt!")
         .refine(
+        // eslint-disable-next-line no-control-regex -- Steuerzeichen in Dateinamen sind genau das, was abgelehnt wird
             (value) => !/[\\/\u0000-\u001f\u007f]/.test(value),
             "fileName contains invalid characters",
         ),

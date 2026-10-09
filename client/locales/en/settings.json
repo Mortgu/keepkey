@@ -17,24 +17,10 @@
       "new": "New password",
       "confirm": "Repeat new password"
     },
-    "passkey": {
-      "placeholder": "e.g. MacBook Touch ID",
-      "add": "Add",
-      "empty": "No passkeys registered yet.",
-      "rename": "Rename",
-      "remove": "Remove",
-      "fallbackName": "Passkey"
-    },
     "toast": {
       "profileSaved": "Profile saved.",
       "emailChanged": "Email address changed.",
-      "passwordChanged": "Password changed.",
-      "passkeyAdded": "Passkey added.",
-      "passkeyRemoved": "Passkey removed.",
-      "passkeyRenamed": "Passkey renamed.",
-      "passkeyAddFailed": "Passkey could not be added.",
-      "passkeyDeleteFailed": "Passkey could not be deleted.",
-      "passkeyRenameFailed": "Passkey could not be renamed."
+      "passwordChanged": "Password changed."
     }
   }
 }

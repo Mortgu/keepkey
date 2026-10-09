@@ -1,15 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
+    
     activateTemplate,
     deleteTemplate,
     renameTemplate,
     replaceTemplateContent,
-    uploadTemplate,
-    type UploadTemplateInput,
+    uploadTemplate
 } from "./template-api";
 import { templateKeys } from "./template-keys";
 import { templateQueries } from "./template-queries";
+import type {UploadTemplateInput} from "./template-api";
 
 export function useTemplates() {
     return useQuery(templateQueries.list());

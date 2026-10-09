@@ -1,6 +1,6 @@
 import { Suspense, lazy } from "react";
-import type { ComponentProps } from "react";
 import { Skeleton } from "./skeleton";
+import type { ComponentProps } from "react";
 
 /**
  * Nachgeladener DOCX-Editor.

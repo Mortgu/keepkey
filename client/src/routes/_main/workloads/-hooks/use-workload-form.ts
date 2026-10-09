@@ -1,7 +1,7 @@
-import { useCreateProduct } from "@/hooks";
-import { type Language, type ProductTranslationInput, type UpdateProductInput } from "@keepit/schemas";
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
+import type {Language, ProductTranslationInput, UpdateProductInput} from "@keepit/schemas";
+import { useCreateProduct } from "@/hooks";
 
 interface Props {
     product?: UpdateProductInput | null;

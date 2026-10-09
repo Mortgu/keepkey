@@ -50,7 +50,6 @@ router.post(
     validateParams(orderIdParamsSchema),
     validate(createConfirmationSchema),
     createConfirmation,
-  createInvoice,
 );
 router.post("/:orderId/confirmation/documents", validateParams(orderIdParamsSchema), regenerateConfirmation);
 

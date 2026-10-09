@@ -83,6 +83,8 @@ export default function DocumentCard({ type, parentId, document }: Props) {
         // stand hier vorher trotzdem "erfolgreich ersetzt".
         onDrop: async (acceptedFiles) => {
             const [file] = acceptedFiles;
+            // Ein leerer Drop liefert kein Element, auch wenn der Typ das nicht abbildet.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (file === undefined) return;
 
             try {
@@ -112,7 +114,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     const canPreview = (document.status === "GENERATED" || document.status === "UPLOADED") && Boolean(pdf);
 
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
-    const task = useDocumentTask(document.taskId);
+    useDocumentTask(document.taskId);
 
     const [bytes, setBytes] = useState<Uint8Array>();
     const [editDocx, setEditDocx] = useState<boolean>(false);

@@ -4,7 +4,8 @@
     "build": "pnpm -r --filter @keepit/schemas build && pnpm -r --filter !@keepit/schemas build",
     "dev": "pnpm -r --parallel dev",
     "test": "pnpm -r test",
-    "lint": "pnpm -r lint"
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r --if-present typecheck"
   },
   "packageManager": "pnpm@10.33.2",
   "engines": {

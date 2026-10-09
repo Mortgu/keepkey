@@ -30,5 +30,6 @@ export const renameDocumentSchema = z.object({
         .trim()
         .min(1, "displayName required!")
         .max(180, "displayName must not exceed 180 characters")
+        // eslint-disable-next-line no-control-regex -- Steuerzeichen in Dateinamen sind genau das, was abgelehnt wird
         .refine((value) => !/[\\/\u0000-\u001f\u007f]/.test(value), "displayName contains invalid characters"),
 });
