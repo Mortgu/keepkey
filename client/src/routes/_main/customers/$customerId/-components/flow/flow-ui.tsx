@@ -1,5 +1,5 @@
-import { cn } from "tailwind-variants";
 import { Ban, Plus, TriangleAlert } from "lucide-react";
+import { cn } from "tailwind-variants";
 import { STATION } from "./flow-meta";
 import type { StageKind, StageState } from "./flow-mock";
 

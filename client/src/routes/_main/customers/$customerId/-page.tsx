@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
 import CustomerOffersTab from "./-components/tabs/customer-offers-tab";
@@ -23,9 +23,18 @@ export default function CustomerDetailPage() {
     const { t } = useTranslation();
     const { customerId } = Route.useParams();
     const { customer, isPending, error } = useCustomer(customerId);
+    const { tab } = Route.useSearch();
+    const navigate = useNavigate();
 
     const modal = useModal<Customer>();
-    const [tab, setTab] = useState<string>(TABS[0].value);
+
+    const handleTabChange = (value: string) => {
+        void navigate({
+            to: "/customers/$customerId",
+            params: { customerId },
+            search: (prev) => ({ ...prev, tab: value as typeof tab }),
+        });
+    };
 
     if (error) return <div className="mx-4"><RouteError error={error} /></div>;
     if (isPending || !customer) return <div className="mx-4 p-4">Lädt…</div>;
@@ -47,7 +56,7 @@ export default function CustomerDetailPage() {
             <div className="w-full h-full flex">
                 <div className="w-full flex-2">
                     <div className="h-[42px] border-b border-(--border)">
-                        <Tabs tabs={TABS} value={tab} onChange={setTab} />
+                        <Tabs tabs={TABS} value={tab} onChange={handleTabChange} />
                     </div>
 
                     <div className="gap-4 py-6">

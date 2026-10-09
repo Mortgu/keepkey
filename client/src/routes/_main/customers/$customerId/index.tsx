@@ -3,7 +3,7 @@ import { z } from "zod";
 import CustomerDetailPage from "./-page";
 
 const customerDetailSearchSchema = z.object({
-    tab: z.enum(["offers", "orders", "invoices"]).catch("offers").default("offers"),
+    tab: z.enum(["general", "flow", "offers", "prices", "orders", "invoices"]).catch("general").default("general"),
 });
 
 export const Route = createFileRoute("/_main/customers/$customerId/")({

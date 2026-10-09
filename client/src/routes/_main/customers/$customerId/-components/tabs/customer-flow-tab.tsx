@@ -1,12 +1,11 @@
-import { useState } from "react";
-import { Link } from "@tanstack/react-router";
-import { cn } from "tailwind-variants";
-import { ChevronRight, Plus } from "lucide-react";
-import { MOCK_FLOWS, PHASE_LABELS } from "../flow/flow-mock";
-import { STATION, eur, stateTone } from "../flow/flow-meta";
-import { StageNode } from "../flow/flow-ui";
-import type { Flow, FlowStage, Phase } from "../flow/flow-mock";
 import { Button } from "@/components";
+import { Link } from "@tanstack/react-router";
+import { ChevronRight, Plus } from "lucide-react";
+import { useState } from "react";
+import { cn } from "tailwind-variants";
+import { STATION, eur, stateTone } from "../flow/flow-meta";
+import type { Flow, FlowStage, Phase } from "../flow/flow-mock";
+import { MOCK_FLOWS, PHASE_LABELS } from "../flow/flow-mock";
 
 /**
  * DESIGN-PROTOTYP — Reiter "Vorgänge" als Tabelle.
@@ -35,22 +34,19 @@ function StageCell({ stage }: { stage: FlowStage }) {
     }
 
     return (
-        <div className="flex min-w-0 items-center gap-2">
-            <StageNode kind={stage.kind} state={stage.state} size="sm" />
-            <div className="min-w-0">
-                <p className={cn(
-                    "truncate font-mono text-[13px] leading-tight",
-                    stage.state === "cancelled" ? "text-(--fg-3) line-through" : "text-(--text)",
-                )}>
-                    {stage.number}
-                </p>
-                <p className={cn("truncate text-[11px] leading-tight", stateTone(stage.state))}>
-                    {stage.state === "busy" ? "wird erzeugt"
-                        : stage.state === "failed" ? "fehlgeschlagen"
-                            : stage.state === "cancelled" ? "storniert"
-                                : stage.date}
-                </p>
-            </div>
+        <div className="grid  min-w-0">
+            <p className={cn(
+                "truncate  font-mono text-sm font-medium leading-tight",
+                stage.state === "cancelled" ? "text-(--fg-3) line-through" : "text-(--text)",
+            )}>
+                {stage.number}
+            </p>
+            <p className={cn("truncate text-xs leading-tight mt-0.5", stateTone(stage.state))}>
+                {stage.state === "busy" ? "wird erzeugt"
+                    : stage.state === "failed" ? "fehlgeschlagen"
+                        : stage.state === "cancelled" ? "storniert"
+                            : stage.date}
+            </p>
         </div>
     );
 }
