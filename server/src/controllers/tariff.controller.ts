@@ -111,7 +111,7 @@ export const deleteTariffGroup = async (request: Request, response: Response) =>
 };
 
 export const deleteTariff = async (request: Request, response: Response) => {
-    await tariffService.deleteTariff(request.params.tariffId as string);
+    await tariffService.deleteTariff(request.params.id as string, request.params.tariffId as string);
     return response.status(200).json({ success: true, message: "Tariff deleted." });
 };
 

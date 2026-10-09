@@ -3,7 +3,12 @@
         "create": "Create workload",
         "search": "Search workloads...",
         "pricing": {
-            "create": "Create pricing table"
+            "create": "Create pricing table",
+            "delete": {
+                "title": "Remove contract from this price table",
+                "confirm": "Remove contract “{{name}}” from this price table? The price table ({{count}} prices) and all related customer prices will be deleted.",
+                "done": "Contract “{{name}}” removed."
+            }
         }
     }
 }

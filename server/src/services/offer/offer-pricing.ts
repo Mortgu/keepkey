@@ -227,9 +227,11 @@ export async function priceFromPin(
         );
     }
 
-    const customerPrices = await prisma.tariffCustomerPrice.findMany({
-        where: { tariffId: version.tariffId, customerId },
-    });
+    // Ist die Preistabelle inzwischen entfernt, gibt es keine Kundenpreise mehr;
+    // die eingefrorene Staffel gilt weiter.
+    const customerPrices = version.tariffId
+        ? await prisma.tariffCustomerPrice.findMany({ where: { tariffId: version.tariffId, customerId } })
+        : [];
 
     const tariff = tariffFromSnapshot(parseTariffVersionSnapshot(version.snapshot), customerPrices);
 

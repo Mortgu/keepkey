@@ -130,8 +130,10 @@ model TariffCustomerPrice {
 model TariffVersion {
   id String @id @default(cuid())
 
-  tariff   Tariff @relation(fields: [tariffId], references: [id], onDelete: Restrict)
-  tariffId String
+  /// Null, nachdem die Preistabelle entfernt wurde, die Version aber noch von einer
+  /// angenommenen Angebotsposition angepinnt ist (die ist per Trigger unveraenderlich).
+  tariff   Tariff? @relation(fields: [tariffId], references: [id], onDelete: SetNull)
+  tariffId String?
 
   version         Int
   snapshotVersion Int @default(1)

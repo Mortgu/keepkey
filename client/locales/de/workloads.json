@@ -3,7 +3,12 @@
         "create": "Workload erstellen",
         "search": "Workloads durchsuchen...",
         "pricing": {
-            "create": "Preistabelle erstellen"
+            "create": "Preistabelle erstellen",
+            "delete": {
+                "title": "Vertrag aus dieser Preistabelle entfernen",
+                "confirm": "Vertrag „{{name}}“ aus dieser Preistabelle entfernen? Die Preistabelle ({{count}} Preise) und alle zugehörigen Kundenpreise werden gelöscht.",
+                "done": "Vertrag „{{name}}“ entfernt."
+            }
         }
     }
 }
