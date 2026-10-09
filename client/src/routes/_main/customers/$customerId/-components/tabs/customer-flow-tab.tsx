@@ -1,20 +1,22 @@
-import { Link } from "@tanstack/react-router";
-import { ChevronRight, Plus } from "lucide-react";
-import { useMemo, useState } from "react";
-import { cn } from "tailwind-variants";
-import { derivePhase, deriveStages } from "../flow/flow-derive";
-import { STATION, eur, stateTone } from "../flow/flow-meta";
-import { DERIVATION_LABEL, PHASE_LABELS } from "../flow/flow-types";
-import type { Offer } from "@keepit/schemas";
-import type { FlowStage, Phase } from "../flow/flow-types";
-import { Button, FilterTabBar, ListSkeleton, RouteError, Skeleton } from "@/components";
+import { Button, ListSkeleton, RouteError, Skeleton } from "@/components";
 import { useLocale, useModal, useOffers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
+import type { Offer } from "@keepit/schemas";
+import { Link } from "@tanstack/react-router";
+import { ChevronRight, Plus } from "lucide-react";
+import { useMemo } from "react";
+import { cn } from "tailwind-variants";
+import { derivePhase, deriveStages } from "../flow/flow-derive";
+import { STATE_LABEL, STATION, eur, stateTone } from "../flow/flow-meta";
+import type { FlowStage } from "../flow/flow-types";
+import { DERIVATION_LABEL } from "../flow/flow-types";
 
 /**
- * Reiter "Vorgänge" als Tabelle. Eine Zeile ist ein Vorgang (Angebot →
- * Bestellung → Auftragsbestätigung → Rechnung), eine Spalte je Beleg. Die
+ * Reiter "Vorgänge" als Tabelle. Eine Zeile ist ein Vorgang: das Angebot und
+ * die davon abhängigen, aber gleichrangigen Belege Bestellung (an den
+ * Zulieferer), Auftragsbestätigung und Rechnung (an den Kunden) — keine
+ * erzwungene Bearbeitungsreihenfolge, nur eine Übersicht je Spalte. Die
  * Zeile öffnet die Vorgangs-Seite. Zustand pro Spalte kommt aus `flow-derive.ts`,
  * berechnet aus dem Angebot samt (optional geladener) Bestellung.
  */
@@ -24,7 +26,7 @@ const KINDS = ["offer", "order", "confirmation", "invoice"] as const;
 
 function StageCell({ stage }: { stage: FlowStage }) {
     if (stage.state === "locked") {
-        return <span className="text-(--border-200)">—</span>;
+        return <span className="text-xs text-(--fg-3)">{STATE_LABEL.locked}</span>;
     }
 
     if (stage.state === "action") {
@@ -100,43 +102,18 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
     );
 }
 
-type Filter = "all" | Phase;
-
-const FILTERS: Array<Filter> = ["all", "open", "running", "billed", "cancelled"];
-
 export default function CustomerFlowTab({ customerId }: { customerId: string }) {
-    const [filter, setFilter] = useState<Filter>("all");
     const modal = useModal();
 
     const { items: offers, isPending, error } = useOffers({ companyIds: [customerId], includeOrder: "true" });
 
-    const withPhase = useMemo(
-        () => offers.map((offer) => {
-            const stages = deriveStages(offer);
-            return { offer, phase: derivePhase(offer, stages) };
-        }),
-        [offers],
-    );
-
-    const count = (f: Filter) => (f === "all" ? withPhase.length : withPhase.filter((x) => x.phase === f).length);
-    const visible = withPhase.filter((x) => filter === "all" || x.phase === filter);
-
-    const filterTabs = FILTERS.map((f) => ({
-        value: f,
-        label: `${f === "all" ? "Alle" : PHASE_LABELS[f]} · ${count(f)}`,
-    }));
-
-    if (error) return <RouteError error={error} />;
+    if (error) {
+        return <RouteError error={error} />;
+    }
 
     return (
         <div className="grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <FilterTabBar
-                    tabs={filterTabs}
-                    value={filter}
-                    onChange={(value) => setFilter(value as Filter)}
-                />
-
                 <Button size="sm" icon={<Plus />} onClick={() => modal.open()}>Angebot erstellen</Button>
             </div>
 
@@ -155,9 +132,9 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
                             <span />
                         </div>
 
-                        {visible.map(({ offer }) => <FlowTableRow key={offer.id} offer={offer} customerId={customerId} />)}
+                        {offers.map(offer => <FlowTableRow key={offer.id} offer={offer} customerId={customerId} />)}
 
-                        {visible.length === 0 && (
+                        {offers.length === 0 && (
                             <p className="py-8 text-center text-sm text-(--fg-3)">Keine Vorgänge in dieser Ansicht.</p>
                         )}
                     </div>

@@ -1,41 +1,50 @@
-import { useState } from "react";
-import { cn } from "tailwind-variants";
-import { Ban, Pen, Plus } from "lucide-react";
-import { vatTotals } from "@keepit/schemas";
-import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
-import { STATE_LABEL, STATION, eur, stateTone } from "../../../-components/flow/flow-meta";
-import { StageNode } from "../../../-components/flow/flow-ui";
-import { DERIVATION_LABEL, PHASE_LABELS } from "../../../-components/flow/flow-types";
-import type { ReactNode } from "react";
-import type { Customer, Offer, Order } from "@keepit/schemas";
-import type { OfferModalMode } from "@/routes/_main/offers/-components/modals/offer-modal-policy";
-import type { FlowStage } from "../../../-components/flow/flow-types";
 import { Accordion, Breadcrumbs, Button } from "@/components";
-import { useCancelOrder, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal  } from "@/hooks";
+import { useCancelOrder, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { localized } from "@/lib/i18n-content";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
-import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
-import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
+import type { OfferModalMode } from "@/routes/_main/offers/-components/modals/offer-modal-policy";
 import ConfirmationSection from "@/routes/_main/orders/-components/card/confirmation-section";
 import InvoiceSection from "@/routes/_main/orders/-components/card/invoice-section";
-import { localized } from "@/lib/i18n-content";
+import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
+import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
+import { formatEur } from "@/utils/utils";
+import type { Customer, Offer, Order } from "@keepit/schemas";
+import { vatTotals } from "@keepit/schemas";
+import { Ban, Pen, Plus } from "lucide-react";
+import type { ReactNode } from "react";
+import { useState } from "react";
+import { cn } from "tailwind-variants";
+import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
+import { STATE_LABEL, STATION, eur, stateTone } from "../../../-components/flow/flow-meta";
+import type { FlowStage } from "../../../-components/flow/flow-types";
+import { DERIVATION_LABEL, PHASE_LABELS } from "../../../-components/flow/flow-types";
+import { StageNode } from "../../../-components/flow/flow-ui";
 
 /**
- * Detailseite eines Vorgangs. Links die vier Belege untereinander in
- * Reihenfolge des Ablaufs, rechts die Zusammenfassung des Geschäfts. Jede
- * Stufe bindet dieselben Bausteine ein, die auch Angebots-/Bestellkarte
- * benutzen — keine eigene Logik, nur Wiederverwendung.
+ * Detailseite eines Vorgangs. Links die Belege zum Angebot: Bestellung (an
+ * den Zulieferer), Auftragsbestätigung und Rechnung (an den Kunden) sind
+ * eigenständige, vom Angebot abhängige, aber gleichrangige Belege — keine
+ * erzwungene Bearbeitungsreihenfolge. Rechts die Zusammenfassung des
+ * Geschäfts. Jede Stufe bindet dieselben Bausteine ein, die auch
+ * Angebots-/Bestellkarte benutzen — keine eigene Logik, nur Wiederverwendung.
  */
 
+// AB/Rechnung benötigen technisch (DB-FK) eine angelegte Bestellung, auch wenn
+// sie fachlich kein nachfolgender Schritt sind.
 const LOCKED_HINT: Partial<Record<FlowStage["kind"], string>> = {
-    confirmation: "Wird möglich, sobald die Bestellung angelegt ist.",
-    invoice: "Wird möglich, sobald die Bestellung angelegt ist.",
+    confirmation: "Noch nicht angelegt. Dafür wird eine angelegte Bestellung benötigt.",
+    invoice: "Noch nicht angelegt. Dafür wird eine angelegte Bestellung benötigt.",
+};
+
+const LOCKED_ACTION_LABEL: Partial<Record<FlowStage["kind"], string>> = {
+    confirmation: "Auftragsbestätigung anlegen",
+    invoice: "Rechnung anlegen",
 };
 
 /* ───────────────────────────────
@@ -80,7 +89,7 @@ function StageShell({ stage, headerActions, children }: {
     children?: ReactNode;
 }) {
     const { label } = STATION[stage.kind];
-    const muted = stage.state === "locked" || stage.state === "cancelled";
+    const muted = stage.state === "cancelled";
 
     return (
         <section id={stage.kind} className={cn("scroll-mt-4 rounded-md border border-(--border) bg-white", muted && "bg-(--page-bg)")}>
@@ -395,11 +404,25 @@ export default function FlowDetailView({ offer, order, customerId, customer }: {
                     <OfferStageSection stage={offerStage} offer={offer} />
                     <OrderStageSection stage={orderStage} offer={offer} order={order} />
 
-                    <StageShell stage={confirmationStage}>
+                    <StageShell
+                        stage={confirmationStage}
+                        headerActions={confirmationStage.state === "locked" && (
+                            <Button size="xs" icon={<Plus />} disabled title={LOCKED_HINT.confirmation}>
+                                {LOCKED_ACTION_LABEL.confirmation}
+                            </Button>
+                        )}
+                    >
                         {mountConfirmation && order && <ConfirmationSection order={order} />}
                     </StageShell>
 
-                    <StageShell stage={invoiceStage}>
+                    <StageShell
+                        stage={invoiceStage}
+                        headerActions={invoiceStage.state === "locked" && (
+                            <Button size="xs" icon={<Plus />} disabled title={LOCKED_HINT.invoice}>
+                                {LOCKED_ACTION_LABEL.invoice}
+                            </Button>
+                        )}
+                    >
                         {mountInvoice && order && <InvoiceSection order={order} />}
                     </StageShell>
                 </div>

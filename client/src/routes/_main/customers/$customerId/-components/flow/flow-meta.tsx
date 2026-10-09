@@ -13,8 +13,8 @@ export const STATION: Record<StageKind, { label: string; short: string; icon: Re
 
 export const STATE_LABEL: Record<StageState, string> = {
     done: "Angelegt",
-    action: "Nächster Schritt",
-    locked: "Noch nicht möglich",
+    action: "Noch nicht angelegt",
+    locked: "Noch nicht angelegt",
     busy: "Wird erzeugt",
     failed: "Fehlgeschlagen",
     cancelled: "Storniert",
