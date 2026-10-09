@@ -14,11 +14,6 @@ export const getOfferById = async (request: Request, response: Response) => {
     return response.status(200).json(offer);
 };
 
-export const getOfferRevisions = async (request: Request, response: Response) => {
-    const revisions = await offerService.getOfferRevisions(request.params.id as string);
-    return response.status(200).json(revisions);
-};
-
 export const getNextQuoteId = async (request: Request, response: Response) => {
     const quoteId = await offerService.getNextQuoteId();
     return response.status(200).json(quoteId);
@@ -52,16 +47,6 @@ export const createOffer = async (request: Request, response: Response) => {
 export const enqueueGeneration = async (request: Request, response: Response) => {
     const task = await offerService.enqueueGeneration(request.params.id as string);
     return response.status(200).json(task);
-};
-
-export const restoreOfferRevision = async (request: Request, response: Response) => {
-    const offer = await offerService.restoreOfferRevision(
-        request.params.id as string,
-        request.params.revisionId as string,
-        request.body.expectedVersion,
-        request.user!.id,
-    );
-    return response.status(200).json(offer);
 };
 
 export const renewOffer = async (request: Request, response: Response) => {

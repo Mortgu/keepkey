@@ -1,11 +1,11 @@
+import { Breadcrumbs, RouteError, Skeleton } from "@/components";
+import { useDashboardStats } from "@/hooks";
+import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
+import type { IntegrationEntry } from "@keepit/schemas";
 import OfferVolumeChart from "./-components/charts/offer-volume-chart";
-import IntegrationCard from "./-components/integration-card";
 import OffersOrdersChart from "./-components/charts/offers-orders-chart";
 import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
-import type { IntegrationEntry } from "@keepit/schemas";
-import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
-import { useDashboardStats } from "@/hooks";
-import { Breadcrumbs, RouteError, Skeleton } from "@/components";
+import IntegrationCard from "./-components/integration-card";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
 

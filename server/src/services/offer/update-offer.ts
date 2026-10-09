@@ -1,14 +1,13 @@
 import { UpdateOfferInput } from '@keepit/schemas';
 
-import { assertOfferEditable } from "../offer-acceptance.service.js";
 import { prisma } from "../../lib/prismaClient.js";
+import { assertOfferEditable } from "../offer-acceptance.service.js";
 import { assertStandardDuration } from "../tariff.service.js";
 import { calculateNetAmount, priceFlatrates, pricePositions } from "./offer-pricing.js";
 import {
     assertExpectedVersion,
     invalidateCurrentDocuments,
     offerLinesInclude,
-    recordRevision,
     replaceOfferLines,
 } from "./offer-write.js";
 
@@ -34,8 +33,6 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         const positions = await pricePositions(rawPositions, header, input.customerId, actorId, tx);
         const flatrates = await priceFlatrates(rawFlatrates, tx);
         const net_amount = calculateNetAmount(positions, flatrates, discounts);
-
-        await recordRevision(tx, current, actorId);
 
         const [offer] = await tx.offer.updateManyAndReturn({
             where: { id: offerId },

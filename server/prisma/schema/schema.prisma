@@ -32,8 +32,6 @@ model User {
   acceptedOrders Order[]
   confirmations  Confirmation[]
   invoices       Invoice[]
-  offerRevisions OfferRevision[]
-  orderRevisions OrderRevision[]
   tariffVersions TariffVersion[]
 
   documentTemplates DocumentTemplate[]
@@ -100,7 +98,7 @@ model Supplier {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  offers   Offer[]
+  offers Offer[]
 
   @@map("supplier")
 }

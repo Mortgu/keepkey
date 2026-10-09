@@ -1,12 +1,12 @@
 import { z } from "zod";
 import { isoDateTime } from './common.js';
-import { userSchema } from "./user.schema.js";
 import { contactSchema } from "./contact.schema.js";
-import { customerSchema } from "./customer.schema.js";
 import { contractSchema } from "./contract.schema.js";
-import { productSchema } from "./product.schema.js";
-import { flatrateSchema } from "./flatrate.schema.js";
+import { customerSchema } from "./customer.schema.js";
 import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
+import { flatrateSchema } from "./flatrate.schema.js";
+import { productSchema } from "./product.schema.js";
+import { userSchema } from "./user.schema.js";
 
 /* OfferPosition */
 
@@ -94,19 +94,6 @@ export const offerDocumentSchema = createOfferDocumentSchema.extend({
     updatedAt: isoDateTime,
 });
 export type OfferDocument = z.infer<typeof offerDocumentSchema>;
-
-/* OfferRevision */
-export const offerRevisionSchema = z.object({
-    id: z.string(),
-    version: z.number().int().positive(),
-
-    createdAt: z.string(),
-    changedBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }),
-});
-export type OfferRevision = z.infer<typeof offerRevisionSchema>;
 
 /* Offer*/
 export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
@@ -242,10 +229,6 @@ export type Offer = z.infer<typeof offerSchema>;
 
 export const offerListSchema = z.array(offerSchema);
 export type OfferList = z.infer<typeof offerListSchema>;
-
-export const restoreOfferRevisionSchema = z.object({
-    expectedVersion: z.number().int().positive(),
-});
 
 /**
  * Filter der Angebotsliste — übertragen als Query-String.

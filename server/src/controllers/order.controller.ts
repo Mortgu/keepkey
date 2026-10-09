@@ -20,11 +20,6 @@ export const getOrderById = async (request: Request, response: Response) => {
     return response.status(200).json(order);
 };
 
-export const getOrderRevisions = async (request: Request, response: Response) => {
-    const revisions = await orderService.getOrderRevisions(request.params.orderId as string);
-    return response.status(200).json(revisions);
-};
-
 /* ========== POST ========== */
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
@@ -47,16 +42,6 @@ export const createOrderTask = async (request: Request, response: Response) => {
 export const generateOrderDocument = async (request: Request, response: Response) => {
     const task = await orderService.generateOrderDocument(request.params.orderId as string);
     return response.status(200).json({ taskId: task.id });
-};
-
-export const restoreOrderRevision = async (request: Request, response: Response) => {
-    const order = await orderService.restoreOrderRevision(
-        request.params.orderId as string,
-        request.params.revisionId as string,
-        request.body.expectedVersion,
-        request.user!.id,
-    );
-    return response.status(200).json(order);
 };
 
 /* ========== PATCH ========== */

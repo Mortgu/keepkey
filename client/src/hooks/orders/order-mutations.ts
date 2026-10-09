@@ -1,16 +1,16 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { offerKeys } from "../offers/offers-keys";
 import { customerKeys } from "../customers/customer-keys";
-import { supplierKeys } from "../suppliers/supplier-keys";
 import { dashboardKeys } from "../dashboard/dashboard-keys";
+import { offerKeys } from "../offers/offers-keys";
 import { searchKeys } from "../search/search-keys";
+import { supplierKeys } from "../suppliers/supplier-keys";
 
-import { cancelOrder, createOrder, generateOrderDocument, restoreOrderRevision, updateOrder } from "./order-api";
-import { orderKeys } from "./order-keys";
-import { useNextOrderNumber, useOrders } from "./order-hooks";
+import { showToast } from "@/components";
 import type { QueryClient } from "@tanstack/react-query";
 import type { CreateOrderInput, UpdateOrderInput } from "./order-api";
-import { showToast } from "@/components";
+import { cancelOrder, createOrder, generateOrderDocument, updateOrder } from "./order-api";
+import { useNextOrderNumber, useOrders } from "./order-hooks";
+import { orderKeys } from "./order-keys";
 
 async function invalidateOrderViews(client: QueryClient) {
     await Promise.all([orderKeys.all, offerKeys.all, customerKeys.all, supplierKeys.all, dashboardKeys.all, searchKeys.all]
@@ -73,29 +73,6 @@ export function useGenerateOrderDocument() {
     return {
         generateOrderDocument: mutation.mutate,
         isGeneratingDocument: mutation.isPending,
-    };
-}
-
-export function useRestoreOrderRevision() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ orderId, revisionId, expectedVersion }: {
-            orderId: string;
-            revisionId: string;
-            expectedVersion: number;
-        }) => restoreOrderRevision(orderId, revisionId, expectedVersion),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: orderKeys.revisions(args.orderId) });
-        },
-    });
-
-    return {
-        restoreOrderRevision: mutation.mutateAsync,
-        isRestoringRevision: mutation.isPending,
-        restoringRevisionId: mutation.variables?.revisionId,
-        errorRestoringRevision: mutation.error,
     };
 }
 

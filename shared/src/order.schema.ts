@@ -1,9 +1,9 @@
 import { z } from 'zod';
-import { productSchema } from './product.schema.js';
 import { contractSchema } from './contract.schema.js';
+import { documentArtifactSchema, documentStatusSchema } from './document.schema.js';
 import { flatrateSchema } from './flatrate.schema.js';
-import { documentStatusSchema, documentArtifactSchema } from './document.schema.js';
 import { offerSchema } from './offer.schema.js';
+import { productSchema } from './product.schema.js';
 
 /* OrderPosition */
 /** Vertrag und Laufzeit stehen an der Bestellung, nicht hier — siehe {@link orderSchema}. */
@@ -84,19 +84,6 @@ export const orderDocumentSchema = z.object({
 });
 export type OrderDocument = z.infer<typeof orderDocumentSchema>;
 
-/* OrderRevision */
-export const orderRevisionSchema = z.object({
-    id: z.string(),
-    version: z.number().int(),
-
-    createdAt: z.string(),
-    changedBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }),
-});
-export type OrderRevision = z.infer<typeof orderRevisionSchema>;
-
 /* Shared write contract: orders contain metadata only. */
 const dateInput = z
     .string()
@@ -145,11 +132,6 @@ export type CreateOrderInput = z.infer<typeof createOrderSchema>;
 export type UpdateOrderInput = z.infer<
     typeof updateOrderSchema
 >;
-
-/* Restore Order Revision */
-export const restoreOrderRevisionSchema = z.object({
-    expectedVersion: z.number().int().positive(),
-});
 
 /* Order (entity) */
 export const orderSchema = z.object({

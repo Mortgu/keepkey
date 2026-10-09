@@ -51,12 +51,11 @@ model Offer {
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
   offerDocuments OfferDocument[]
-  revisions      OfferRevision[]
 
   orders Order?
 
   /// Dauerhafte Annahmesperre, unabhängig vom Lebenszyklus der Bestellung.
-  acceptedAt DateTime? @db.Timestamptz(6)
+  acceptedAt       DateTime? @db.Timestamptz(6)
   /// Versioniertes Dokumentdaten-Abbild einschließlich Stammdaten und Texten.
   acceptedSnapshot Json?
 
@@ -82,26 +81,6 @@ model Offer {
   @@index([supplierId])
   @@index([renewedFromOfferId])
   @@map("offer")
-}
-
-model OfferRevision {
-  id String @id @default(uuid())
-
-  version         Int
-  snapshotVersion Int  @default(1)
-  snapshot        Json
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  changedBy   User   @relation(fields: [changedById], references: [id])
-  changedById String
-
-  createdAt DateTime @default(now())
-
-  @@unique([offerId, version])
-  @@index([changedById])
-  @@map("offer_revision")
 }
 
 model OfferPosition {

@@ -1,31 +1,28 @@
-import { cancelOrder } from "@/controllers/order.controller.js";
-import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
-import { Router } from "express";
 import {
-  createConfirmation,
-  createInvoice,
-  createOrder,
-  createOrderTask,
-  deleteOrderById,
-  generateOrderDocument,
-  getAllOrders,
-  getNextOrderNumber,
-  getOrderById,
-  getConfirmation,
-  getInvoice,
-  getOrderRevisions,
-  regenerateConfirmation,
-  regenerateInvoice,
-  restoreOrderRevision,
-  updateOrder,
+    cancelOrder,
+    createConfirmation,
+    createInvoice,
+    createOrder,
+    createOrderTask,
+    deleteOrderById,
+    generateOrderDocument,
+    getAllOrders,
+    getConfirmation,
+    getInvoice,
+    getNextOrderNumber,
+    getOrderById,
+    regenerateConfirmation,
+    regenerateInvoice,
+    updateOrder
 } from "@/controllers/index.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
-import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
+import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
 import {
-  idParamsSchema,
-  orderIdParamsSchema,
-  orderRevisionParamsSchema,
+    idParamsSchema,
+    orderIdParamsSchema
 } from "@/schemas/params-schemas.js";
+import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema } from "@keepit/schemas";
+import { Router } from "express";
 
 const router = Router();
 
@@ -34,8 +31,6 @@ router.get("/", validateQuery(orderFilterSchema), getAllOrders);
 router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", validateParams(orderIdParamsSchema), getOrderById);
-
-router.get("/:orderId/revisions", validateParams(orderIdParamsSchema), getOrderRevisions);
 
 router.post(
     "/:orderId/documents",
@@ -65,13 +60,6 @@ router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), 
 
 router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
-router.post(
-    "/:orderId/revisions/:revisionId/restore",
-    validateParams(orderRevisionParamsSchema),
-    validate(restoreOrderRevisionSchema),
-    restoreOrderRevision,
-);
-
 router.patch(
     "/:orderId",
     validateParams(orderIdParamsSchema),
@@ -82,7 +70,6 @@ router.patch(
 router.post(
     "/:orderId/cancel",
     validateParams(orderIdParamsSchema),
-    validate(restoreOrderRevisionSchema),
     cancelOrder,
 );
 

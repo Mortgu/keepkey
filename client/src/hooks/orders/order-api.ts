@@ -1,6 +1,6 @@
-import type { CreateOrderInput, Order, OrderFilterParams, OrderRevision, UpdateOrderInput } from "@keepit/schemas";
 import { api } from "@/lib/api-client";
 import { formatQueryString } from "@/lib/utils";
+import type { CreateOrderInput, Order, OrderFilterParams, UpdateOrderInput } from "@keepit/schemas";
 
 export type { CreateOrderInput, UpdateOrderInput };
 
@@ -37,12 +37,3 @@ export const updateOrder = (orderId: string, input: UpdateOrderInput) =>
 
 export const generateOrderDocument = (orderId: string) =>
     api<{ taskId: string }>(`/api/orders/${orderId}/documents`, { method: "POST" });
-
-export const getOrderRevisions = (orderId: string) =>
-    api<Array<OrderRevision>>(`/api/orders/${orderId}/revisions`, { method: "GET" });
-
-export const restoreOrderRevision = (orderId: string, revisionId: string, expectedVersion: number) =>
-    api<Order>(`/api/orders/${orderId}/revisions/${revisionId}/restore`, {
-        method: "POST",
-        body: JSON.stringify({ expectedVersion }),
-    });

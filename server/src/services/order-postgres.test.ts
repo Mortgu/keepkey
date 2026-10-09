@@ -1,8 +1,21 @@
 /** Optional real-PostgreSQL concurrency tests. Only an explicitly supplied test URL is used. */
 import { randomUUID } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
-import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import pg from "pg";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { prisma } from "../lib/prismaClient.js";
+import { metadataSnapshot } from "../schemas/order-inputs.js";
+import { getCustomerById, getCustomers } from "./customer.service.js";
+import { getDashboardStats } from "./dashboard.service.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
+import {
+    cancelOrder,
+    createOrder,
+    getOrderById,
+    updateOrder,
+} from "./order.service.js";
+import { search } from "./search.service.js";
+import { getSuppliers } from "./supplier.service.js";
 
 const state = vi.hoisted(() => ({
     schema: `order_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -26,20 +39,6 @@ vi.mock("../lib/prismaClient.js", async () => {
 vi.mock("./document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
-import { prisma } from "../lib/prismaClient.js";
-import {
-    createOrder,
-    updateOrder,
-    getOrderById,
-    cancelOrder,
-    restoreOrderRevision,
-} from "./order.service.js";
-import { assertOfferEditable } from "./offer-acceptance.service.js";
-import { getCustomers, getCustomerById } from "./customer.service.js";
-import { getSuppliers } from "./supplier.service.js";
-import { getDashboardStats } from "./dashboard.service.js";
-import { search } from "./search.service.js";
-import { metadataSnapshot } from "../schemas/order-inputs.js";
 
 const integration = describe.skipIf(!process.env.ORDER_TEST_DATABASE_URL);
 integration("real PostgreSQL acceptance transactions", () => {
@@ -257,10 +256,7 @@ integration("real PostgreSQL acceptance transactions", () => {
             },
             "user",
         );
-        const revision = await prisma.orderRevision.findFirstOrThrow({
-            where: { orderId: order.id, version: 1 },
-        });
-        await restoreOrderRevision(order.id, revision.id, 2, "user");
+
         const restored = await getOrderById(order.id);
         expect(restored.net_amount).toBe(80000);
         expect(restored.projectNumber).toBeNull();
