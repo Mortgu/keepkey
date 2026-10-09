@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { showToast } from "@/components/modules/toast";
+import type { Contract, CreateContractInput } from '@keepit/schemas';
 import { createContract, deleteContract, reorderContracts, updateContract } from "./contract-api";
 import { contractKeys } from "./contract-keys";
-import type { Contract, CreateContractInput } from '@keepit/schemas';
-import { showToast } from "@/components/toast";
 
 export function useCreateContract() {
     const queryClient = useQueryClient();
