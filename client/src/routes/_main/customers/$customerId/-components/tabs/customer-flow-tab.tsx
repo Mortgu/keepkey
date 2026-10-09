@@ -1,11 +1,12 @@
-import { Button, ListSkeleton, RouteError, Skeleton } from "@/components";
+import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
 import { useLocale, useModal, useOffers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import OfferModal from "@/routes/_main/offers/-components/modals/offer-modal";
 import type { Offer } from "@keepit/schemas";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight, Plus } from "lucide-react";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../flow/flow-derive";
 import { STATE_LABEL, STATION, eur, stateTone } from "../flow/flow-meta";
@@ -25,16 +26,8 @@ const COLUMNS = "grid-cols-[minmax(240px,2.4fr)_repeat(4,minmax(124px,1fr))_112p
 const KINDS = ["offer", "order", "confirmation", "invoice"] as const;
 
 function StageCell({ stage }: { stage: FlowStage }) {
-    if (stage.state === "locked") {
+    if (stage.state === "locked" || stage.state === "action") {
         return <span className="text-xs text-(--fg-3)">{STATE_LABEL.locked}</span>;
-    }
-
-    if (stage.state === "action") {
-        return (
-            <span className="inline-flex items-center gap-1 rounded-full border border-dashed border-(--primary-400) bg-(--primary-50) px-2 py-0.5 text-xs font-medium text-(--primary-600)">
-                <Plus className="size-3" /> anlegen
-            </span>
-        );
     }
 
     return (
@@ -57,8 +50,13 @@ function StageCell({ stage }: { stage: FlowStage }) {
 
 function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string }) {
     const locale = useLocale();
+
     const stages = useMemo(() => deriveStages(offer), [offer]);
+
+    console.log(stages);
+
     const phase = derivePhase(offer, stages);
+
     const cancelled = phase === "cancelled";
 
     const { customerContactPerson: ccp } = offer;
@@ -90,7 +88,9 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
             </div>
 
             {stages.map((stage) => (
-                <div key={stage.kind} className="min-w-0"><StageCell stage={stage} /></div>
+                <div key={stage.kind} className="min-w-0">
+                    <StageCell stage={stage} />
+                </div>
             ))}
 
             <p className={cn("text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
@@ -103,9 +103,14 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
 }
 
 export default function CustomerFlowTab({ customerId }: { customerId: string }) {
+    const { t } = useTranslation();
     const modal = useModal();
 
-    const { items: offers, isPending, error } = useOffers({ companyIds: [customerId], includeOrder: "true" });
+    const [searchQuery, setSearchQuery] = useState<string>('');
+
+    const { items: offers, isPending, error } = useOffers({
+        companyIds: [customerId]
+    });
 
     if (error) {
         return <RouteError error={error} />;
@@ -114,12 +119,15 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     return (
         <div className="grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
+                <SearchBar value={searchQuery} onChange={setSearchQuery} placeholder={t("common.search")} />
                 <Button size="sm" icon={<Plus />} onClick={() => modal.open()}>Angebot erstellen</Button>
             </div>
 
-            {isPending ? (
+            {isPending && (
                 <ListSkeleton rows={3} skeleton={<Skeleton shape="rect" className="h-16" />} />
-            ) : (
+            )}
+
+            {!isPending && (
                 <div className="overflow-x-auto rounded-md border border-(--border) bg-white">
                     <div className="min-w-[940px]">
                         <div className={cn(

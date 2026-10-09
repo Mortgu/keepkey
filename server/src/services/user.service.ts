@@ -1,11 +1,11 @@
-import { prisma } from "../lib/prismaClient.js";
-import { auth } from "../lib/auth.js";
-import { AppException } from "../lib/exceptions.js";
 import {
     type CreateContactInput,
     type CreateUserInput,
     type UpdateUserInput, UserFilterParams
 } from "@keepit/schemas";
+import { auth } from "../lib/auth.js";
+import { AppException } from "../lib/exceptions.js";
+import { prisma } from "../lib/prismaClient.js";
 
 /* ========== Queries ========== */
 
@@ -32,7 +32,7 @@ export async function getUserById(id: string) {
     const user = await prisma.user.findUnique({
         where: { id },
         include: {
-            acceptedOrders: true,
+            orders: true,
             customer: {
                 include: {
                     contactPersons: true,

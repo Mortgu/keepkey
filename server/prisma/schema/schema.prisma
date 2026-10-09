@@ -22,16 +22,18 @@ model User {
   sessions      Session[]
   accounts      Account[]
 
-  role           String?
-  banned         Boolean?        @default(false)
-  banReason      String?
-  banExpires     DateTime?
-  customer       Customer?       @relation(fields: [customerId], references: [id])
-  customerId     String?
-  offers         Offer[]
-  acceptedOrders Order[]
-  confirmations  Confirmation[]
-  invoices       Invoice[]
+  role       String?
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  offers        Offer[]
+  orders        Order[]
+  confirmations Confirmation[]
+  invoices      Invoice[]
+
   tariffVersions TariffVersion[]
 
   documentTemplates DocumentTemplate[]

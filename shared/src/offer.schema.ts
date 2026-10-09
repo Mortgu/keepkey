@@ -250,8 +250,6 @@ export const offerFilterSchema = z.object({
     companyIds: z.union([z.string(), z.array(z.string())]).optional(),
     contactPersonIds: z.union([z.string(), z.array(z.string())]).optional(),
     productIds: z.union([z.string(), z.array(z.string())]).optional(),
-    /** Bestellung (mit AB/Rechnung-Kurzinfo) je Angebot mitladen — teurer, daher opt-in. */
-    includeOrder: z.enum(["true"]).optional(),
     sort: z.string().optional(),
     cursor: z.string().optional(),
     limit: z.coerce.number().int().positive().max(100).optional().default(50),

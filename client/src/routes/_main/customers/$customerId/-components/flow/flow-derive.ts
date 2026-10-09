@@ -4,8 +4,7 @@ import type { FlowStage, Phase, StageKind } from "./flow-types";
 type DocLike = { status: DocumentStatus };
 
 function documentsState(docs: ReadonlyArray<DocLike>): "busy" | "failed" | "done" {
-    if (docs.some((d) => d.status === "PENDING" || d.status === "PROCESSING")) return "busy";
-    if (docs.some((d) => d.status === "FAILED")) return "failed";
+
     return "done";
 }
 

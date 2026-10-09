@@ -1,9 +1,9 @@
 import { OfferFilterParams } from '@keepit/schemas';
 import type { Prisma } from "@prisma/client";
 
-import { presentOffer } from "../accepted-offer-view.js";
-import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { presentOffer } from "../accepted-offer-view.js";
 
 /**
  * Schlanke Order-Teilansicht fürs Angebot — nur Status, keine Artefakte.
@@ -34,7 +34,7 @@ const orderSummaryInclude = {
 } satisfies Prisma.Offer$ordersArgs;
 
 export async function getOffers(query: OfferFilterParams) {
-    const { search, status, companyIds, contactPersonIds, productIds, includeOrder, sort, cursor } = query;
+    const { search, status, companyIds, contactPersonIds, productIds, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);
     const limit = Number.isFinite(limitRaw) && limitRaw > 0
@@ -107,7 +107,7 @@ export async function getOffers(query: OfferFilterParams) {
                 }
             },
             offerDiscounts: true,
-            ...(includeOrder === "true" ? { orders: orderSummaryInclude } : {}),
+            orders: true
         },
     });
 
