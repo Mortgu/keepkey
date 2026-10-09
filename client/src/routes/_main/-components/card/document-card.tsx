@@ -1,6 +1,7 @@
 import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
 import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -48,10 +49,13 @@ interface Props {
     /** Id des Angebots bzw. der Bestellung. */
     parentId: string;
     document: OfferDocument | OrderDocument | ConfirmationDocument | InvoiceDocument;
+    /** Das Elternobjekt ist eingefroren (z.B. ein angenommenes Angebot) — Edit/Rename/Delete/Replace sind gesperrt. */
+    locked?: boolean;
 }
 
-export default function DocumentCard({ type, parentId, document }: Props) {
+export default function DocumentCard({ type, parentId, document, locked = false }: Props) {
     const locales = useLocale();
+    const { t } = useTranslation();
 
     const pdf = findDocumentArtifact(document.artifacts, "PDF");
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
@@ -61,7 +65,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
 
     const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
-    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
+    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile && !locked;
 
     /*
      * Beim Ersetzen wird die PDF serverseitig neu aus der DOCX erzeugt. Das
@@ -303,17 +307,32 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                                         <Eye size={14} /> Vorschau
                                                     </Menu.Item>
                                                 )}
-                                                <Menu.Item className={menuStyles().Item()} onClick={async () => {
-                                                    const result = await refetch();
-                                                    if (result.data) setBytes(result.data);
-                                                    setEditDocx(true)
-                                                }}>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={async () => {
+                                                        const result = await refetch();
+                                                        if (result.data) setBytes(result.data);
+                                                        setEditDocx(true)
+                                                    }}>
                                                     <Pencil size={14} /> Edit
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => renameModal.open()}>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={() => renameModal.open()}
+                                                >
                                                     <Pencil size={14} /> Rename File
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => mutations.deleteDocument(document.id)} data-danger>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={() => mutations.deleteDocument(document.id)}
+                                                    data-danger
+                                                >
                                                     <Trash2 size={14} /> Delete
                                                 </Menu.Item>
                                             </Menu.Popup>

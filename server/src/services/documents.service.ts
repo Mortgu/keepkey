@@ -97,6 +97,26 @@ async function requireGeneratedDocument(type: DocumentType, id: string) {
     return document;
 }
 
+/**
+ * Angenommene Angebote sind dauerhaft eingefroren — ihre Dokumente dürfen dann
+ * weder umbenannt, gelöscht noch ersetzt werden. Betrifft nur `offer`: andere
+ * Dokumenttypen kennen diesen Zustand nicht.
+ */
+async function assertOfferDocumentEditable(type: DocumentType, id: string) {
+    if (type !== "offer") return;
+    const doc = await prisma.offerDocument.findUnique({
+        where: { id },
+        select: { offer: { select: { acceptedAt: true } } },
+    });
+    if (doc?.offer.acceptedAt) {
+        throw new AppException(
+            "Accepted offers' documents can no longer be changed.",
+            409,
+            "OFFER_ACCEPTED",
+        );
+    }
+}
+
 /** Artefakt, das bereits auf Nextcloud liegt. */
 type UploadedArtifact = { id: string; remotePath: string };
 
@@ -161,6 +181,7 @@ export async function renameDocument(
     input: RenameDocumentInput,
 ) {
     const document = await requireGeneratedDocument(type, id);
+    await assertOfferDocumentEditable(type, id);
 
     if (!RENAMABLE_STATUSES.has(document.status)) {
         throw new AppException(
@@ -233,6 +254,7 @@ export async function renameDocument(
  */
 export async function deleteDocument(type: DocumentType, id: string): Promise<void> {
     const document = await requireGeneratedDocument(type, id);
+    await assertOfferDocumentEditable(type, id);
 
     if (BUSY_STATUSES.has(document.status)) {
         throw new AppException(
@@ -333,6 +355,7 @@ async function requireReplaceableArtifact(
     }
 
     const document = await requireGeneratedDocument(type, id);
+    await assertOfferDocumentEditable(type, id);
 
     if (!REPLACEABLE_STATUSES.has(document.status)) {
         throw new AppException(

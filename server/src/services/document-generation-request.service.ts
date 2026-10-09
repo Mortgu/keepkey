@@ -49,10 +49,16 @@ export function requestOfferGeneration(
     return requestGeneration({
         lockKey: `offer-generation:${offerId}`,
         target: TaskTarget.OFFER,
-        currentSourceVersion: async (tx) => (await tx.offer.findUniqueOrThrow({
-            where: { id: offerId },
-            select: { version: true },
-        })).version,
+        currentSourceVersion: async (tx) => {
+            const offer = await tx.offer.findUniqueOrThrow({
+                where: { id: offerId },
+                select: { version: true, acceptedAt: true },
+            });
+            if (offer.acceptedAt) {
+                throw new AppException("Accepted offers cannot generate new documents.", 409, "OFFER_ACCEPTED");
+            }
+            return offer.version;
+        },
         findActive: (tx, sourceVersion) => tx.offerDocument.findFirst({
             where: { offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },

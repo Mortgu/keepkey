@@ -145,7 +145,8 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                             variant="secondary"
                             size="xs"
                             loading={isGenerating}
-                            disabled={isGenerating}
+                            disabled={isGenerating || Boolean(offer.acceptedAt)}
+                            title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}
                             onClick={handleGenerateDocument}
                         >
                             Dokument generieren
@@ -158,6 +159,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                             type="offer"
                             parentId={offer.id}
                             document={document}
+                            locked={Boolean(offer.acceptedAt)}
                         />
                     ))}
 
