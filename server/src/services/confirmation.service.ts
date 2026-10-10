@@ -59,3 +59,25 @@ export async function regenerateConfirmation(orderId: string) {
     if (!confirmation) throw new AppException("Confirmation not found", 404, "CONFIRMATION_NOT_FOUND");
     return requestConfirmationGeneration(confirmation.id);
 }
+
+/**
+ * Löscht die AB unwiderruflich — nur solange kein aktives Dokument mehr
+ * existiert. Ein noch vorhandenes (nicht soft-gelöschtes) Dokument muss zuerst
+ * über den Dokument-Löschen-Flow entfernt werden.
+ */
+export async function deleteConfirmation(orderId: string): Promise<void> {
+    const confirmation = await prisma.confirmation.findUnique({
+        where: { orderId },
+        select: { id: true, documents: { where: { deletedAt: null }, select: { id: true } } },
+    });
+    if (!confirmation) throw new AppException("Confirmation not found", 404, "CONFIRMATION_NOT_FOUND");
+    if (confirmation.documents.length > 0) {
+        throw new AppException(
+            "Delete the confirmation's document first.",
+            409,
+            "CONFIRMATION_HAS_DOCUMENT",
+        );
+    }
+
+    await prisma.confirmation.delete({ where: { id: confirmation.id } });
+}

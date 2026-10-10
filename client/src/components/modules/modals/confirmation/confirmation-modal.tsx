@@ -5,30 +5,39 @@ import type { SyntheticEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
-interface Props {
-    onClose: () => void;
-}
-
 const confirmationSchema = z.object({
     confirmationId: z.string().min(1, "Required!"),
     date: z.string(),
-    vat: z.number(),
-})
+    taxRate: z.number(),
+});
 
-export default function ConfirmationModal({ onClose }: Props) {
+export type ConfirmationSubmitType = z.infer<typeof confirmationSchema>;
+
+interface Props {
+    data: ConfirmationSubmitType | null;
+    onClose: () => void;
+    onSubmit: (values: ConfirmationSubmitType) => Promise<void>;
+}
+
+export default function ConfirmationModal({ data, onClose, onSubmit }: Props) {
     const { t } = useTranslation();
+    const isEdit = data !== null;
 
     const form = useForm({
         defaultValues: {
-            confirmationId: "",
-            date: "",
-            vat: 0
+            confirmationId: data?.confirmationId ?? "",
+            date: data?.date ?? "",
+            taxRate: data?.taxRate ?? 0
         },
         validators: {
             onChange: confirmationSchema,
         },
         onSubmit: async ({ value }) => {
-
+            await onSubmit({
+                confirmationId: value.confirmationId.trim(),
+                date: value.date,
+                taxRate: value.taxRate
+            });
         }
     });
 
@@ -41,7 +50,10 @@ export default function ConfirmationModal({ onClose }: Props) {
 
     return (
         <Dialog defaultOpen onOpenChange={(np) => { if (!np) onClose(); }}>
-            <Dialog.Header title="Auftragsbestätigung erstellen" description="" />
+            <Dialog.Header
+                title={isEdit ? t("orders.confirmation.title") : t("orders.confirmation.create")}
+                description={isEdit ? "" : t("orders.confirmation.hint")}
+            />
             <Dialog.Body>
                 <form onSubmit={handleSubmit} className="grid items-end gap-4">
                     <form.Field name="confirmationId" children={(field) => (
@@ -51,6 +63,7 @@ export default function ConfirmationModal({ onClose }: Props) {
                             value={field.state.value}
                             error={getFormError(field.state.meta.errors)}
                             onChange={(e) => field.handleChange(e.target.value)}
+                            disabled={isEdit}
                         />
                     )} />
 
@@ -61,10 +74,11 @@ export default function ConfirmationModal({ onClose }: Props) {
                             label={t("orders.confirmation.date")}
                             error={getFormError(field.state.meta.errors)}
                             onChange={(e) => field.handleChange(e.target.value)}
+                            disabled={isEdit}
                         />
                     )} />
 
-                    <form.Field name="vat" children={(field) => (
+                    <form.Field name="taxRate" children={(field) => (
                         <NumberField
                             label={t("orders.vat.rate")}
                             min={0}
@@ -73,15 +87,18 @@ export default function ConfirmationModal({ onClose }: Props) {
                             suffix="%"
                             value={field.state.value}
                             error={getFormError(field.state.meta.errors)}
-                            onChange={(e) => field.handleChange(e.target.value)}
+                            onValueChange={(value) => field.handleChange(value ?? 0)}
+                            disabled={isEdit}
                         />
                     )} />
 
-                    <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
-                        <Button size="sm" type="submit" disabled={!canSubmit} loading={isSubmitting}>
-                            {t("button.create")}
-                        </Button>
-                    )} />
+                    {!isEdit && (
+                        <form.Subscribe selector={(state) => [state.canSubmit, state.isSubmitting]} children={([canSubmit, isSubmitting]) => (
+                            <Button size="sm" type="submit" disabled={!canSubmit} loading={isSubmitting}>
+                                {t("button.create")}
+                            </Button>
+                        )} />
+                    )}
                 </form>
             </Dialog.Body>
         </Dialog>

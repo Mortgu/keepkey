@@ -12,3 +12,6 @@ export const createConfirmation = (orderId: string, input: CreateConfirmationInp
 
 export const regenerateConfirmation = (orderId: string) =>
     api<Task>(`/api/orders/${orderId}/confirmation/documents`, { method: "POST" });
+
+export const deleteConfirmation = (orderId: string) =>
+    api<void>(`/api/orders/${orderId}/confirmation`, { method: "DELETE" });

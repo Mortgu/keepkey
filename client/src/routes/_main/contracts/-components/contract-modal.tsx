@@ -1,25 +1,25 @@
-import { useForm } from "@tanstack/react-form";
-import { useTranslation } from "react-i18next";
-import { Plus, Trash2 } from "lucide-react";
-import { useState } from "react";
-import { z } from "zod";
+import {
+  Button,
+  Dialog,
+  FieldInput,
+  FieldTextarea,
+  Input,
+  SegmentedLanguageToggle,
+} from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
+import {
+  useContractManager
+} from "@/hooks/contracts/contract-mutations";
 import type {
   Contract,
   ContractTranslationInput,
   Language
 } from "@keepit/schemas";
-import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    Input,
-    SegmentedLanguageToggle,
-} from "@/components";
-import {
-  useContractManager
-} from "@/hooks/contracts/contract-mutations";
+import { useForm } from "@tanstack/react-form";
+import { Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 
 interface ContractModalProps {
@@ -84,11 +84,11 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      e.preventDefault();
+    e.preventDefault();
 
-      e.stopPropagation();
+    e.stopPropagation();
 
-      contractForm.handleSubmit();
+    contractForm.handleSubmit();
 
   };
 

@@ -28,7 +28,9 @@
       "date": "Datum",
       "create": "AB erstellen",
       "regenerate": "Dokument neu erzeugen",
-      "noDocument": "Noch kein Dokument erzeugt."
+      "noDocument": "Noch kein Dokument erzeugt.",
+      "deleteConfirm": "Auftragsbestätigung {{number}} endgültig löschen?",
+      "deleteBlockedHint": "Löschen Sie zuerst das Dokument, um die AB löschen zu können."
     },
     "invoice": {
       "title": "Rechnung",

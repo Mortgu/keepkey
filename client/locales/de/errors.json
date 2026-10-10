@@ -81,6 +81,7 @@
   "CONFIRMATION_EXISTS": "Zu dieser Bestellung existiert bereits eine Auftragsbestätigung.",
   "CONFIRMATION_ID_TAKEN": "Diese AB-Nummer ist bereits vergeben.",
   "CONFIRMATION_NOT_FOUND": "Auftragsbestätigung nicht gefunden.",
+  "CONFIRMATION_HAS_DOCUMENT": "Die Auftragsbestätigung hat noch ein aktives Dokument. Löschen Sie zuerst das Dokument.",
   "INVOICE_EXISTS": "Zu dieser Bestellung existiert bereits eine Rechnung.",
   "INVOICE_ID_TAKEN": "Diese Rechnungsnummer ist bereits vergeben.",
   "INVOICE_NOT_FOUND": "Rechnung nicht gefunden.",

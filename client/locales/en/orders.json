@@ -28,7 +28,9 @@
       "date": "Date",
       "create": "Create confirmation",
       "regenerate": "Regenerate document",
-      "noDocument": "No document generated yet."
+      "noDocument": "No document generated yet.",
+      "deleteConfirm": "Permanently delete confirmation {{number}}?",
+      "deleteBlockedHint": "Delete the document first to be able to delete the confirmation."
     },
     "invoice": {
       "title": "Invoice",

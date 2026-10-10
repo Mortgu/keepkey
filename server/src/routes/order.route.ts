@@ -4,6 +4,7 @@ import {
     createInvoice,
     createOrder,
     createOrderTask,
+    deleteConfirmation,
     deleteOrderById,
     generateOrderDocument,
     getAllOrders,
@@ -47,6 +48,7 @@ router.post(
     createConfirmation,
 );
 router.post("/:orderId/confirmation/documents", validateParams(orderIdParamsSchema), regenerateConfirmation);
+router.delete("/:orderId/confirmation", validateParams(orderIdParamsSchema), deleteConfirmation);
 
 /* Rechnung — eine je Bestellung, Nummer vom Nutzer. */
 router.get("/:orderId/invoice", validateParams(orderIdParamsSchema), getInvoice);

@@ -13,7 +13,6 @@ import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import { formatEur } from "@/utils/utils";
 import type { Offer, OfferDocument } from '@keepit/schemas';
-import { Link } from "@tanstack/react-router";
 import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 
@@ -68,7 +67,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             <div className="flex items-start justify-between gap-4 px-4 py-3">
                 <div className="grid gap-0">
                     <div className="flex items-center gap-2">
-                        <Link to="/offers/$offer" params={{ offer: quoteId }} className="text-md font-mono font-semibold text-(--text) hover:underline">AG{quoteId}</Link>
+                        <a className="text-md font-mono font-semibold text-(--text)">AG{quoteId}</a>
                         {offer.derivationType === "RENEWAL" && (
                             <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                         )}

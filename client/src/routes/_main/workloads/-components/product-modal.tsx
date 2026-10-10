@@ -1,8 +1,16 @@
-import { z } from "zod";
-import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
+import {
+  Button,
+  Dialog,
+  FieldInput,
+  FieldTextarea,
+  SegmentedLanguageToggle,
+} from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
 import type {
   CreateProductInput,
   Language,
@@ -10,14 +18,6 @@ import type {
   ProductTranslationInput,
   UpdateProductInput
 } from '@keepit/schemas';
-import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    SegmentedLanguageToggle,
-} from "@/components";
 
 
 interface ProductModalProps {
@@ -73,11 +73,11 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      e.preventDefault();
+    e.preventDefault();
 
-      e.stopPropagation();
+    e.stopPropagation();
 
-      productForm.handleSubmit();
+    productForm.handleSubmit();
 
   };
 

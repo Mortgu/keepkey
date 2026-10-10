@@ -81,6 +81,7 @@
   "CONFIRMATION_EXISTS": "This order already has a confirmation.",
   "CONFIRMATION_ID_TAKEN": "This confirmation number is already in use.",
   "CONFIRMATION_NOT_FOUND": "Confirmation not found.",
+  "CONFIRMATION_HAS_DOCUMENT": "This confirmation still has an active document. Delete the document first.",
   "INVOICE_EXISTS": "This order already has an invoice.",
   "INVOICE_ID_TAKEN": "This invoice number is already in use.",
   "INVOICE_NOT_FOUND": "Invoice not found.",

@@ -1,8 +1,8 @@
 import { Accordion, Breadcrumbs, Button } from "@/components";
-import ConfirmationModal from "@/components/modules/modals/confirmation/confirmation-modal";
+import ConfirmationModal, { type ConfirmationSubmitType } from "@/components/modules/modals/confirmation/confirmation-modal";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useCancelOrder, useCreateConfirmation, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation } from "@/hooks";
+import { useCancelOrder, useCreateConfirmation, useDeleteConfirmation, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
@@ -15,7 +15,7 @@ import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
 import { formatEur } from "@/utils/utils";
 import type { Confirmation, Customer, Offer, Order } from "@keepit/schemas";
 import { vatTotals } from "@keepit/schemas";
-import { Ban, Pen, Plus } from "lucide-react";
+import { Ban, Pen, Plus, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -306,36 +306,52 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
 
 function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowStage; order: Order | null; confirmation: Confirmation | null }) {
     const { t } = useTranslation();
-    const modal = useModal();
+    const modal = useModal<ConfirmationSubmitType>();
 
     const {
         createConfirmation,
         isCreatingConfirmation,
         errorCreatingConfirmation
     } = useCreateConfirmation(order?.id!);
+
     const {
         regenerateConfirmation,
         isRegenerating
     } = useRegenerateConfirmation(order?.id!);
+
+    const {
+        deleteConfirmation,
+        isDeletingConfirmation,
+        errorDeletingConfirmation
+    } = useDeleteConfirmation(order?.id!);
+
+    // Löschen ist nur erlaubt, solange kein noch aktives (nicht gelöschtes) Dokument existiert.
+    const hasActiveDocument = Boolean(confirmation?.documents.some((d) => d.deletedAt == null));
+    const canDelete = Boolean(confirmation) && !hasActiveDocument;
+
+    const handleSubmit = async (values: ConfirmationSubmitType) => {
+        await createConfirmation(values);
+        modal.close();
+    };
+
+    const remove = async () => {
+        if (!confirmation) return;
+        if (!confirm(t("orders.confirmation.deleteConfirm", { number: confirmation.confirmationId }))) return;
+        try { await deleteConfirmation(); } catch { /* unten gerendert */ }
+    };
 
     const renderHeaderActions = () => (
         <>
             <Button
                 size="xs"
                 variant="secondary"
-                onClick={() => modal.open()}
+                onClick={() => modal.open(confirmation)}
                 disabled={stage.state === "locked"}
             >
-                {confirmation && (
-                    <>{t("button.edit")}</>
-                )}
-
-                {!confirmation && (
-                    <>{t("button.create")}</>
-                )}
+                {confirmation ? t("button.edit") : t("button.create")}
             </Button>
 
-            {confirmation?.documents && (
+            {confirmation && (
                 <Button
                     size="xs"
                     variant="primary"
@@ -346,18 +362,44 @@ function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowS
                     {t("orders.confirmation.regenerate")}
                 </Button>
             )}
+
+            {confirmation && (
+                <Button
+                    size="xs"
+                    variant="secondary"
+                    danger
+                    disabled={!canDelete || isDeletingConfirmation}
+                    loading={isDeletingConfirmation}
+                    title={!canDelete ? t("orders.confirmation.deleteBlockedHint") : undefined}
+                    onClick={remove}
+                    icon={<Trash2 className="size-3" />}
+                >
+                    {t("button.delete")}
+                </Button>
+            )}
         </>
     );
 
     return (
         <StageShell stage={stage} headerActions={renderHeaderActions()}>
+            {(errorCreatingConfirmation || errorDeletingConfirmation) && (
+                <p role="alert" className="px-4 pt-3 text-sm text-(--destructive)">
+                    {getErrorMessage(errorCreatingConfirmation ?? errorDeletingConfirmation)}
+                </p>
+            )}
+
             <div className="px-4">
                 {confirmation?.documents.map(document => (
-                    <DocumentCard key={document.id} type="confirmation" parentId={order!.id} document={document} />
+                    <DocumentCard key={document.id} type="confirmation" parentId={order?.id!} document={document} />
                 ))}
             </div>
+
             {modal.isOpen && (
-                <ConfirmationModal onClose={modal.close} />
+                <ConfirmationModal
+                    data={modal.data ?? null}
+                    onClose={modal.close}
+                    onSubmit={handleSubmit}
+                />
             )}
         </StageShell>
     );

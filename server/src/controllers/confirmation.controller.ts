@@ -19,3 +19,8 @@ export const regenerateConfirmation = async (request: Request, response: Respons
     const task = await confirmationService.regenerateConfirmation(request.params.orderId as string);
     return response.status(200).json(task);
 };
+
+export const deleteConfirmation = async (request: Request, response: Response) => {
+    await confirmationService.deleteConfirmation(request.params.orderId as string);
+    return response.status(204).send();
+};

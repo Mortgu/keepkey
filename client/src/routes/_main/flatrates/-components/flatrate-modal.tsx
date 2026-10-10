@@ -1,19 +1,19 @@
 import { useForm } from "@tanstack/react-form";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { createFlatrateSchema } from '@keepit/schemas';
 import type { CreateFlatrateTranslationInput, Flatrate, Language } from '@keepit/schemas';
+import { createFlatrateSchema } from '@keepit/schemas';
 
 import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    NumberField,
-    SegmentedLanguageToggle,
+	Button,
+	Dialog,
+	FieldInput,
+	FieldTextarea,
+	NumberField,
+	SegmentedLanguageToggle
 } from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
 import { centsToEur, eurToCents } from "@/utils/utils";
 
@@ -62,11 +62,11 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-	    e.preventDefault();
+		e.preventDefault();
 
-	    e.stopPropagation();
+		e.stopPropagation();
 
-	    form.handleSubmit();
+		form.handleSubmit();
 
 	};
 
