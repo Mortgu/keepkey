@@ -53,7 +53,11 @@ export function OfferPage() {
             <OfferList filters={filters} />
 
             {modal.isOpen && (
-                <OfferModal key={modal.key} mode={modal.data?.mode} onClose={modal.close} />
+                <OfferModal
+                    key={modal.key}
+                    mode={modal.data?.mode}
+                    onClose={modal.close}
+                />
             )}
         </div>
     );

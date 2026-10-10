@@ -1,24 +1,24 @@
 import { Accordion, Breadcrumbs, Button } from "@/components";
+import ConfirmationModal from "@/components/modules/modals/confirmation/confirmation-modal";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useCancelOrder, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal } from "@/hooks";
+import { useCancelOrder, useCreateConfirmation, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
-import DocumentCard from "@/routes/_main/-components/card/document-card";
+import { default as DocumentCard } from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import ConfirmationSection from "@/routes/_main/orders/-components/card/confirmation-section";
-import InvoiceSection from "@/routes/_main/orders/-components/card/invoice-section";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
 import { formatEur } from "@/utils/utils";
-import type { Customer, Offer, Order } from "@keepit/schemas";
+import type { Confirmation, Customer, Offer, Order } from "@keepit/schemas";
 import { vatTotals } from "@keepit/schemas";
 import { Ban, Pen, Plus } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
 import { STATE_LABEL, STATION, eur, stateTone } from "../../../-components/flow/flow-meta";
@@ -301,6 +301,69 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
 }
 
 /* ───────────────────────────────
+   Auftragsbestätigungs-Stufe
+   ─────────────────────────────── */
+
+function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowStage; order: Order | null; confirmation: Confirmation | null }) {
+    const { t } = useTranslation();
+    const modal = useModal();
+
+    const {
+        createConfirmation,
+        isCreatingConfirmation,
+        errorCreatingConfirmation
+    } = useCreateConfirmation(order?.id!);
+    const {
+        regenerateConfirmation,
+        isRegenerating
+    } = useRegenerateConfirmation(order?.id!);
+
+    const renderHeaderActions = () => (
+        <>
+            <Button
+                size="xs"
+                variant="secondary"
+                onClick={() => modal.open()}
+                disabled={stage.state === "locked"}
+            >
+                {confirmation && (
+                    <>{t("button.edit")}</>
+                )}
+
+                {!confirmation && (
+                    <>{t("button.create")}</>
+                )}
+            </Button>
+
+            {confirmation?.documents && (
+                <Button
+                    size="xs"
+                    variant="primary"
+                    onClick={() => regenerateConfirmation()}
+                    disabled={stage.state === "locked" || isRegenerating}
+                    loading={isRegenerating}
+                >
+                    {t("orders.confirmation.regenerate")}
+                </Button>
+            )}
+        </>
+    );
+
+    return (
+        <StageShell stage={stage} headerActions={renderHeaderActions()}>
+            <div className="px-4">
+                {confirmation?.documents.map(document => (
+                    <DocumentCard key={document.id} type="confirmation" parentId={order!.id} document={document} />
+                ))}
+            </div>
+            {modal.isOpen && (
+                <ConfirmationModal onClose={modal.close} />
+            )}
+        </StageShell>
+    );
+}
+
+/* ───────────────────────────────
    Seitenleiste
    ─────────────────────────────── */
 
@@ -341,9 +404,10 @@ function Summary({ offer, customer }: { offer: Offer; customer: Customer | undef
    Seite
    ─────────────────────────────── */
 
-export default function FlowDetailView({ offer, order, customerId, customer }: {
+export default function FlowDetailView({ offer, order, confirmation, customerId, customer }: {
     offer: Offer;
     order: Order | null;
+    confirmation: Confirmation | null;
     customerId: string;
     customer: Customer | undefined;
 }) {
@@ -401,30 +465,17 @@ export default function FlowDetailView({ offer, order, customerId, customer }: {
 
             <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <div className="grid gap-4">
+                    {/* Angebot / Offer */}
                     <OfferStageSection stage={offerStage} offer={offer} />
+
+                    {/* Bestellung / Order */}
                     <OrderStageSection stage={orderStage} offer={offer} order={order} />
 
-                    <StageShell
-                        stage={confirmationStage}
-                        headerActions={confirmationStage.state === "locked" && (
-                            <Button size="xs" icon={<Plus />} disabled title={LOCKED_HINT.confirmation}>
-                                {LOCKED_ACTION_LABEL.confirmation}
-                            </Button>
-                        )}
-                    >
-                        {mountConfirmation && order && <ConfirmationSection order={order} />}
-                    </StageShell>
+                    {/* Auftragsbestätigung / Confirmation */}
+                    <ConfirmationStageSection stage={confirmationStage} order={order} confirmation={confirmation} />
 
-                    <StageShell
-                        stage={invoiceStage}
-                        headerActions={invoiceStage.state === "locked" && (
-                            <Button size="xs" icon={<Plus />} disabled title={LOCKED_HINT.invoice}>
-                                {LOCKED_ACTION_LABEL.invoice}
-                            </Button>
-                        )}
-                    >
-                        {mountInvoice && order && <InvoiceSection order={order} />}
-                    </StageShell>
+                    {/* Rechnung / Invoice */}
+
                 </div>
 
                 <aside className="grid gap-4 lg:sticky lg:top-4">
