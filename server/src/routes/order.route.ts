@@ -5,6 +5,7 @@ import {
     createOrder,
     createOrderTask,
     deleteConfirmation,
+    deleteInvoice,
     deleteOrderById,
     generateOrderDocument,
     getAllOrders,
@@ -59,6 +60,7 @@ router.post(
     createInvoice,
 );
 router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), regenerateInvoice);
+router.delete("/:orderId/invoice", validateParams(orderIdParamsSchema), deleteInvoice);
 
 router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 

@@ -39,7 +39,9 @@
       "date": "Invoice date",
       "create": "Create invoice",
       "regenerate": "Regenerate document",
-      "noDocument": "No document generated yet."
+      "noDocument": "No document generated yet.",
+      "deleteConfirm": "Permanently delete invoice {{number}}?",
+      "deleteBlockedHint": "Delete the document first to be able to delete the invoice."
     },
     "purchase": {
       "title": "Purchase prices (order to the supplier)",

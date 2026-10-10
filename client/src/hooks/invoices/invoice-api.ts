@@ -14,5 +14,8 @@ export const createInvoice = (orderId: string, input: CreateInvoiceInput) =>
 export const regenerateInvoice = (orderId: string) =>
     api<Task>(`/api/orders/${orderId}/invoice/documents`, { method: "POST" });
 
+export const deleteInvoice = (orderId: string) =>
+    api<void>(`/api/orders/${orderId}/invoice`, { method: "DELETE" });
+
 export const getInvoices = (filters: InvoiceFilterParams = {}) =>
     api<Array<InvoiceListItem>>(`/api/invoices?${formatQueryString(filters)}`, { method: "GET" });

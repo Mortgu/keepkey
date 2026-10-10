@@ -24,3 +24,8 @@ export const regenerateInvoice = async (request: Request, response: Response) =>
     const task = await invoiceService.regenerateInvoice(request.params.orderId as string);
     return response.status(200).json(task);
 };
+
+export const deleteInvoice = async (request: Request, response: Response) => {
+    await invoiceService.deleteInvoice(request.params.orderId as string);
+    return response.status(204).send();
+};

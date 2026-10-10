@@ -39,7 +39,9 @@
       "date": "Rechnungsdatum",
       "create": "Rechnung erstellen",
       "regenerate": "Dokument neu erzeugen",
-      "noDocument": "Noch kein Dokument erzeugt."
+      "noDocument": "Noch kein Dokument erzeugt.",
+      "deleteConfirm": "Rechnung {{number}} endgültig löschen?",
+      "deleteBlockedHint": "Löschen Sie zuerst das Dokument, um die Rechnung löschen zu können."
     },
     "purchase": {
       "title": "Einkaufspreise (Bestellung an den Zulieferer)",

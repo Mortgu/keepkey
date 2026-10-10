@@ -42,7 +42,8 @@ export async function getAllInvoices(filters: InvoiceFilterParams = {}) {
 
 /**
  * Legt die Rechnung zur Bestellung an und stößt die Generierung an. Die
- * Rechnungsnummer ist danach fest — es gibt bewusst kein Update und kein Löschen.
+ * Rechnungsnummer ist danach fest — es gibt bewusst kein Update. Löschen ist
+ * nur möglich, solange kein Dokument (mehr) erzeugt wurde.
  */
 export async function createInvoice(orderId: string, input: CreateInvoiceInput, actorId: string) {
     const data = createInvoiceSchema.parse(input);
@@ -87,4 +88,26 @@ export async function regenerateInvoice(orderId: string) {
     const invoice = await prisma.invoice.findUnique({ where: { orderId }, select: { id: true } });
     if (!invoice) throw new AppException("Invoice not found", 404, "INVOICE_NOT_FOUND");
     return requestInvoiceGeneration(invoice.id);
+}
+
+/**
+ * Löscht die Rechnung unwiderruflich — nur solange kein aktives Dokument mehr
+ * existiert. Ein noch vorhandenes (nicht soft-gelöschtes) Dokument muss zuerst
+ * über den Dokument-Löschen-Flow entfernt werden.
+ */
+export async function deleteInvoice(orderId: string): Promise<void> {
+    const invoice = await prisma.invoice.findUnique({
+        where: { orderId },
+        select: { id: true, documents: { where: { deletedAt: null }, select: { id: true } } },
+    });
+    if (!invoice) throw new AppException("Invoice not found", 404, "INVOICE_NOT_FOUND");
+    if (invoice.documents.length > 0) {
+        throw new AppException(
+            "Delete the invoice's document first.",
+            409,
+            "INVOICE_HAS_DOCUMENT",
+        );
+    }
+
+    await prisma.invoice.delete({ where: { id: invoice.id } });
 }

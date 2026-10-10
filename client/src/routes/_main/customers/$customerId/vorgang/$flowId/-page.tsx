@@ -1,5 +1,5 @@
 import { RouteError } from "@/components";
-import { useConfirmation, useCustomer, useOffer, useOrder } from "@/hooks";
+import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
 import FlowDetailView from "./-components/flow-detail-view";
 import { Route } from "./index";
 
@@ -11,6 +11,7 @@ export default function FlowPage() {
     const { offer, isPending, error } = useOffer(flowId);
     const { order } = useOrder(offer?.order?.id ?? "");
     const { confirmation } = useConfirmation(offer?.order?.id ?? "");
+    const { invoice } = useInvoice(offer?.order?.id ?? "");
 
     if (error) {
         return (
@@ -31,6 +32,7 @@ export default function FlowPage() {
             offer={offer}
             order={order ?? null}
             confirmation={confirmation ?? null}
+            invoice={invoice ?? null}
             customerId={customerId}
             customer={customer}
         />

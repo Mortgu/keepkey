@@ -1,8 +1,9 @@
 import { Accordion, Breadcrumbs, Button } from "@/components";
 import ConfirmationModal, { type ConfirmationSubmitType } from "@/components/modules/modals/confirmation/confirmation-modal";
+import InvoiceModal, { type InvoiceSubmitType } from "@/components/modules/modals/invoice/invoice-modal";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useCancelOrder, useCreateConfirmation, useDeleteConfirmation, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation } from "@/hooks";
+import { useCancelOrder, useCreateConfirmation, useCreateInvoice, useDeleteConfirmation, useDeleteInvoice, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation, useRegenerateInvoice } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
@@ -13,7 +14,7 @@ import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
 import { formatEur } from "@/utils/utils";
-import type { Confirmation, Customer, Offer, Order } from "@keepit/schemas";
+import type { Confirmation, Customer, Invoice, Offer, Order } from "@keepit/schemas";
 import { vatTotals } from "@keepit/schemas";
 import { Ban, Pen, Plus, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
@@ -406,6 +407,111 @@ function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowS
 }
 
 /* ───────────────────────────────
+   Rechnungs-Stufe
+   ─────────────────────────────── */
+
+function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; order: Order | null; invoice: Invoice | null }) {
+    const { t } = useTranslation();
+    const modal = useModal<InvoiceSubmitType>();
+
+    const {
+        createInvoice,
+        isCreatingInvoice,
+        errorCreatingInvoice
+    } = useCreateInvoice(order?.id!);
+
+    const {
+        regenerateInvoice,
+        isRegenerating
+    } = useRegenerateInvoice(order?.id!);
+
+    const {
+        deleteInvoice,
+        isDeletingInvoice,
+        errorDeletingInvoice
+    } = useDeleteInvoice(order?.id!);
+
+    // Löschen ist nur erlaubt, solange kein noch aktives (nicht gelöschtes) Dokument existiert.
+    const hasActiveDocument = Boolean(invoice?.documents.some((d) => d.deletedAt == null));
+    const canDelete = Boolean(invoice) && !hasActiveDocument;
+
+    const handleSubmit = async (values: InvoiceSubmitType) => {
+        await createInvoice(values);
+        modal.close();
+    };
+
+    const remove = async () => {
+        if (!invoice) return;
+        if (!confirm(t("orders.invoice.deleteConfirm", { number: invoice.invoiceId }))) return;
+        try { await deleteInvoice(); } catch { /* unten gerendert */ }
+    };
+
+    const renderHeaderActions = () => (
+        <>
+            <Button
+                size="xs"
+                variant="secondary"
+                onClick={() => modal.open(invoice)}
+                disabled={stage.state === "locked"}
+            >
+                {invoice ? t("button.edit") : t("button.create")}
+            </Button>
+
+            {invoice && (
+                <Button
+                    size="xs"
+                    variant="primary"
+                    onClick={() => regenerateInvoice()}
+                    disabled={stage.state === "locked" || isRegenerating}
+                    loading={isRegenerating}
+                >
+                    {t("orders.invoice.regenerate")}
+                </Button>
+            )}
+
+            {invoice && (
+                <Button
+                    size="xs"
+                    variant="secondary"
+                    danger
+                    disabled={!canDelete || isDeletingInvoice}
+                    loading={isDeletingInvoice}
+                    title={!canDelete ? t("orders.invoice.deleteBlockedHint") : undefined}
+                    onClick={remove}
+                    icon={<Trash2 className="size-3" />}
+                >
+                    {t("button.delete")}
+                </Button>
+            )}
+        </>
+    );
+
+    return (
+        <StageShell stage={stage} headerActions={renderHeaderActions()}>
+            {(errorCreatingInvoice || errorDeletingInvoice) && (
+                <p role="alert" className="px-4 pt-3 text-sm text-(--destructive)">
+                    {getErrorMessage(errorCreatingInvoice ?? errorDeletingInvoice)}
+                </p>
+            )}
+
+            <div className="px-4">
+                {invoice?.documents.map(document => (
+                    <DocumentCard key={document.id} type="invoice" parentId={order?.id!} document={document} />
+                ))}
+            </div>
+
+            {modal.isOpen && (
+                <InvoiceModal
+                    data={modal.data ?? null}
+                    onClose={modal.close}
+                    onSubmit={handleSubmit}
+                />
+            )}
+        </StageShell>
+    );
+}
+
+/* ───────────────────────────────
    Seitenleiste
    ─────────────────────────────── */
 
@@ -446,10 +552,11 @@ function Summary({ offer, customer }: { offer: Offer; customer: Customer | undef
    Seite
    ─────────────────────────────── */
 
-export default function FlowDetailView({ offer, order, confirmation, customerId, customer }: {
+export default function FlowDetailView({ offer, order, confirmation, invoice, customerId, customer }: {
     offer: Offer;
     order: Order | null;
     confirmation: Confirmation | null;
+    invoice: Invoice | null;
     customerId: string;
     customer: Customer | undefined;
 }) {
@@ -517,7 +624,7 @@ export default function FlowDetailView({ offer, order, confirmation, customerId,
                     <ConfirmationStageSection stage={confirmationStage} order={order} confirmation={confirmation} />
 
                     {/* Rechnung / Invoice */}
-
+                    <InvoiceStageSection stage={invoiceStage} order={order} invoice={invoice} />
                 </div>
 
                 <aside className="grid gap-4 lg:sticky lg:top-4">
