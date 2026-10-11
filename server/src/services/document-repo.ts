@@ -41,6 +41,15 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id, deletedAt: null },
                     include: { artifacts: true },
                 }),
+                /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
+                readModel: async (id: string) => (await client.offerDocument.findUnique({
+                    where: { id },
+                    select: { model: true },
+                }))?.model ?? null,
+                writeModel: (id: string, model: Prisma.InputJsonValue) => client.offerDocument.update({
+                    where: { id },
+                    data: { model },
+                }),
                 reloadWithArtifacts: (id: string) => client.offerDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },
@@ -58,6 +67,15 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 findWithArtifacts: (id: string) => client.orderDocument.findFirst({
                     where: { id, deletedAt: null },
                     include: { artifacts: true },
+                }),
+                /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
+                readModel: async (id: string) => (await client.orderDocument.findUnique({
+                    where: { id },
+                    select: { model: true },
+                }))?.model ?? null,
+                writeModel: (id: string, model: Prisma.InputJsonValue) => client.orderDocument.update({
+                    where: { id },
+                    data: { model },
                 }),
                 reloadWithArtifacts: (id: string) => client.orderDocument.findUnique({
                     where: { id },
@@ -77,6 +95,15 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id, deletedAt: null },
                     include: { artifacts: true },
                 }),
+                /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
+                readModel: async (id: string) => (await client.confirmationDocument.findUnique({
+                    where: { id },
+                    select: { model: true },
+                }))?.model ?? null,
+                writeModel: (id: string, model: Prisma.InputJsonValue) => client.confirmationDocument.update({
+                    where: { id },
+                    data: { model },
+                }),
                 reloadWithArtifacts: (id: string) => client.confirmationDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },
@@ -94,6 +121,15 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 findWithArtifacts: (id: string) => client.invoiceDocument.findFirst({
                     where: { id, deletedAt: null },
                     include: { artifacts: true },
+                }),
+                /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
+                readModel: async (id: string) => (await client.invoiceDocument.findUnique({
+                    where: { id },
+                    select: { model: true },
+                }))?.model ?? null,
+                writeModel: (id: string, model: Prisma.InputJsonValue) => client.invoiceDocument.update({
+                    where: { id },
+                    data: { model },
                 }),
                 reloadWithArtifacts: (id: string) => client.invoiceDocument.findUnique({
                     where: { id },

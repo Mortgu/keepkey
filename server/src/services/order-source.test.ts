@@ -9,7 +9,7 @@ vi.mock("./document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
 import { presentOrder } from "./order-source.js";
-import { formatOrderData } from "../pipelines/order/actions.js";
+import { formatOrderData } from "../pipelines/order/build-order.js";
 import {
     parseAcceptedOfferSnapshot,
     serializeAcceptedOfferSnapshot,

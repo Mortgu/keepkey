@@ -51,6 +51,30 @@ export const generatedDocumentSchema = z.object({
 });
 export type GeneratedDocument = z.infer<typeof generatedDocumentSchema>;
 
+/**
+ * Hinweise zu einer ersetzten Datei. Sie blockieren nie — der Nutzer darf
+ * Dokumente bewusst anpassen; sie zeigen nur, wo die Datei vom erzeugten Stand
+ * abweicht (siehe `checkReplacement` im Server).
+ */
+export const replacementWarningSchema = z.discriminatedUnion("code", [
+    /** Die Datei gehört zu einem anderen Dokument. */
+    z.object({ code: z.literal("DOCUMENT_MISMATCH"), expected: z.string(), found: z.string() }),
+    /** Ein Feld im Dokument zeigt etwas anderes als die gespeicherten Daten. */
+    z.object({
+        code: z.literal("FIELD_CHANGED"),
+        field: z.string(),
+        expected: z.string(),
+        actual: z.string(),
+    }),
+]);
+export type ReplacementWarning = z.infer<typeof replacementWarningSchema>;
+
+/** Antwort auf das Ersetzen einer Datei: das Dokument samt Hinweisen. */
+export const replacedDocumentSchema = generatedDocumentSchema.extend({
+    warnings: z.array(replacementWarningSchema),
+});
+export type ReplacedDocument = z.infer<typeof replacedDocumentSchema>;
+
 export const findDocumentArtifact = (
     artifacts: Array<DocumentArtifact>,
     format: DocumentFormat,

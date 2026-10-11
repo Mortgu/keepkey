@@ -1,4 +1,4 @@
-import { DocumentStatus, TaskTarget } from "@prisma/client";
+import { DocumentStatus, Prisma, TaskTarget } from "@prisma/client";
 import { storeDocumentArtifacts } from "../lib/document-artifact-store.js";
 import { enqueueTask } from "../lib/document.js";
 import { AppException } from "../lib/exceptions.js";
@@ -79,7 +79,12 @@ export async function generateConfirmationDocument(taskId: string): Promise<void
     if (!assertDocumentCanBeGenerated(document, "ConfirmationDocument")) return;
 
     const built = await buildConfirmation(document.confirmationId);
-    const rendered = await renderDocument("CONFIRMATION", built.language, built.data);
+    const rendered = await renderDocument(
+        "CONFIRMATION",
+        built.language,
+        built.data,
+        { documentType: "confirmation", documentId: document.id },
+    );
 
     const files = await storeDocumentArtifacts(
         "confirmations",
@@ -97,6 +102,7 @@ export async function generateConfirmationDocument(taskId: string): Promise<void
                 data: {
                     status: DocumentStatus.GENERATED,
                     displayName: built.displayName,
+                    model: rendered.model as Prisma.InputJsonValue,
                     error: null,
                     isCurrent: true,
                 },

@@ -15,6 +15,7 @@ import {
     type StoredDocumentArtifact,
 } from "../lib/document-artifact-store.js";
 import { assertDocxBuffer } from "../lib/docx.js";
+import { checkReplacement, diffControls, isUserWarning, withAdoptedValue } from "../lib/replacement-check.js";
 import { convertDocxToPdf } from "../lib/docx-to-pdf.js";
 import { AppException } from "../lib/exceptions.js";
 import {
@@ -25,7 +26,7 @@ import {
 } from "../lib/nextcloud-document-store.js";
 import { prisma } from "../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import type { DocumentCapabilities, DocumentFormatParam, DocumentType } from "@keepit/schemas";
+import type { DocumentCapabilities, DocumentFormatParam, DocumentType, ReplacementWarning } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
 import { documentTable } from "./document-repo.js";
 
@@ -515,6 +516,8 @@ export async function confirmReplacementUpload(
         throw error;
     }
 
+    const warnings = await inspectReplacement(type, id, content);
+
     let pdfContent: Buffer;
     try {
         pdfContent = await convertDocxToPdf(content);
@@ -603,7 +606,103 @@ export async function confirmReplacementUpload(
         }
     }
 
-    return requireGeneratedDocument(type, id);
+    return { ...await requireGeneratedDocument(type, id), warnings };
+}
+
+/**
+ * Prüft eine hochgeladene DOCX gegen das Modell, aus dem das Dokument erzeugt
+ * wurde. Die Prüfung ist eine Hilfe, kein Tor: scheitert sie, wird der Upload
+ * trotzdem übernommen.
+ */
+async function inspectReplacement(
+    type: DocumentType,
+    id: string,
+    docx: Buffer,
+): Promise<ReplacementWarning[]> {
+    try {
+        const warnings = checkReplacement({
+            documentType: type,
+            documentId: id,
+            model: await documentTable(type).readModel(id),
+            docx,
+        });
+        const silent = warnings.filter((warning) => !isUserWarning(warning));
+        if (silent.length > 0) {
+            logger.info('document_replacement_not_comparable', {
+                documentId: id,
+                reasons: silent.map((warning) => warning.code),
+            });
+        }
+        return warnings.filter(isUserWarning);
+    } catch (error) {
+        logger.error('document_replacement_inspection_failed', {
+            documentId: id,
+            error: (error as Error).message,
+        });
+        return [];
+    }
+}
+
+/**
+ * Übernimmt abweichende Feldwerte aus der abgelegten DOCX ins gespeicherte
+ * Modell des Dokuments — danach gilt die Datei für diese Felder als Stand.
+ * Angebot, Bestellung und ihre Version bleiben unberührt: es ändert sich nur,
+ * womit künftige Ersetzungen verglichen werden.
+ *
+ * Die Werte werden hier aus der DOCX gelesen, nicht vom Client entgegen-
+ * genommen. Ein Feld, das inzwischen nicht mehr abweicht, wird übergangen
+ * (der Aufruf ist wiederholbar); ein Feld, dessen Wert nicht zum Typ im Modell
+ * passt, lehnt den ganzen Aufruf ab, bevor etwas geschrieben wird.
+ */
+export async function adoptModelChanges(type: DocumentType, id: string, fields: string[]) {
+    const document = await requireGeneratedDocument(type, id);
+    await assertOfferDocumentEditable(type, id);
+
+    const docx = findArtifact(document.artifacts, DocumentFormat.DOCX);
+    if (!docx) throw new AppException("File not found", 404, "FILE_NOT_FOUND");
+    const content = await getDocumentArtifact(docx.objectKey);
+
+    return prisma.$transaction(async (tx) => {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`document-model:${id}`}))::text AS "lock"`;
+
+        // Wurde die Datei zwischenzeitlich ersetzt, passen die Werte oben nicht mehr.
+        const current = await findGeneratedDocument(type, id, tx);
+        if (findArtifact(current?.artifacts ?? [], DocumentFormat.DOCX)?.objectKey !== docx.objectKey) {
+            throw new AppException("Das Dokument wurde zwischenzeitlich verändert.", 409, "DOCUMENT_STATE_CHANGED");
+        }
+
+        const table = documentTable(type, tx);
+        let model: unknown = await table.readModel(id);
+        if (model === null) {
+            throw new AppException(
+                "Für dieses Dokument wurden keine Daten gespeichert.",
+                409,
+                "MODEL_UNAVAILABLE",
+            );
+        }
+
+        const changes = new Map(diffControls(model, content).map((change) => [change.field, change]));
+        const adopted: string[] = [];
+        for (const field of new Set(fields)) {
+            const change = changes.get(field);
+            if (!change) continue;
+
+            // `actual` ist der Text aus der Datei mit vereinheitlichtem Leerraum.
+            const next = withAdoptedValue(model, field, change.actual);
+            if (!next) {
+                throw new AppException(
+                    `Der Wert von „${field}“ passt nicht zum gespeicherten Feld.`,
+                    422,
+                    "FIELD_NOT_ADOPTABLE",
+                );
+            }
+            model = next;
+            adopted.push(field);
+        }
+
+        if (adopted.length > 0) await table.writeModel(id, model as Prisma.InputJsonValue);
+        return { adopted };
+    });
 }
 
 /**

@@ -1,4 +1,4 @@
-import { DocumentStatus, TaskTarget } from "@prisma/client";
+import { DocumentStatus, Prisma, TaskTarget } from "@prisma/client";
 import { storeDocumentArtifacts } from "../lib/document-artifact-store.js";
 import { enqueueTask } from "../lib/document.js";
 import { AppException } from "../lib/exceptions.js";
@@ -79,7 +79,12 @@ export async function generateInvoiceDocument(taskId: string): Promise<void> {
     if (!assertDocumentCanBeGenerated(document, "InvoiceDocument")) return;
 
     const built = await buildInvoice(document.invoiceId);
-    const rendered = await renderDocument("INVOICE", built.language, built.data);
+    const rendered = await renderDocument(
+        "INVOICE",
+        built.language,
+        built.data,
+        { documentType: "invoice", documentId: document.id },
+    );
 
     const files = await storeDocumentArtifacts(
         "invoices",
@@ -97,6 +102,7 @@ export async function generateInvoiceDocument(taskId: string): Promise<void> {
                 data: {
                     status: DocumentStatus.GENERATED,
                     displayName: built.displayName,
+                    model: rendered.model as Prisma.InputJsonValue,
                     error: null,
                     isCurrent: true,
                 },

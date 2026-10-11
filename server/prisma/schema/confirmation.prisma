@@ -48,6 +48,10 @@ model ConfirmationDocument {
   /// @openapi.ignore
   uploadToken String?
 
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
   confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
   confirmationId String
 

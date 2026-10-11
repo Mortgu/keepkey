@@ -145,6 +145,10 @@ model OfferDocument {
   /// @openapi.ignore
   uploadToken String?
 
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 

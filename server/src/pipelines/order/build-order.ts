@@ -1,12 +1,11 @@
-import Docxtemplater from "docxtemplater";
 import type { Language } from "@prisma/client";
-import PizZip from "pizzip";
 import { getOrderById } from "../../services/order.service.js";
-import { loadTemplateForRendering } from "../../services/document-template.service.js";
+import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
 import { pickTranslation } from "../../utils/i18n.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
-import { customParser, deepIterate } from "../offer/utils.js";
-import { OrderFetchedData, OrderFormattedData } from "./context.js";
+
+export type OrderFetchedData = Awaited<ReturnType<typeof fetchOrderData>>;
+export type OrderFormattedData = Awaited<ReturnType<typeof formatOrderData>>;
 
 export async function fetchOrderData(orderId: string) {
     return { order: await getOrderById(orderId) };
@@ -186,33 +185,34 @@ export function withPurchasePrices(
     };
 }
 
-export async function postprocessing(formatedData?: OrderFormattedData): Promise<OrderFormattedData> {
-    if (!formatedData) {
-        throw new Error("Failed to postprocess! No formatted data!");
-    }
+/**
+ * Alles, was die Bestellvorlage braucht — eine Funktion, von oben nach unten:
+ * Bestellung laden, mit Verkaufspreisen formatieren, für den Zulieferer auf
+ * Einkaufspreise umstellen, Namen bilden.
+ *
+ * `version` kommt vom `OrderDocument` und steht immer im Dateinamen.
+ */
+export async function buildOrder(orderId: string, version: number): Promise<{
+    data: Record<string, unknown>;
+    language: Language;
+    displayName: string;
+}> {
+    const fetched = await fetchOrderData(orderId);
+    const { order } = fetched;
 
-    return deepIterate(
-        formatedData as Record<string, unknown>,
-        formatedData as Record<string, unknown>,
-    ) as unknown as OrderFormattedData;
-}
+    // Verkaufspreise formatieren, dann für den Zulieferer auf Einkauf umstellen.
+    const data = withPurchasePrices(await formatOrderData(fetched), order);
+    orderTemplateSchema.parse(data);
 
+    const company = order.customer.companyName.replaceAll(" ", "").trim();
+    const workloads = order.orderPositions
+        .map((p) => (pickTranslation(p.product.translations, "DE")?.name ?? "").replaceAll(" ", ""))
+        .join("+");
 
-export async function generating(
-    formatedData: OrderFormattedData | undefined,
-    language: Language,
-): Promise<Buffer> {
-    const content = await loadTemplateForRendering("ORDER", language);
-
-    const zip = new PizZip(content);
-
-    const doc = new Docxtemplater(zip, {
-        paragraphLoop: true,
-        linebreaks: true,
-        parser: customParser,
-    });
-
-    doc.render(formatedData);
-
-    return doc.toBuffer();
+    return {
+        data,
+        // Die Sprache steckt am Kunden, nicht an der Bestellung — hier liegt beides zusammen vor.
+        language: order.language,
+        displayName: `${order.orderId}_BE_${company}_Keepit-${workloads}_v${version}`,
+    };
 }

@@ -4,7 +4,6 @@ import {
     StoredDocumentArtifacts,
 } from "../lib/document-artifact-store.js";
 import { artifactPair } from "../lib/document-artifacts.js";
-import { PipelineContext, PipelineStageError } from "../pipelines/pipeline.js";
 import logger from "@/utils/logger.js";
 
 /**
@@ -12,12 +11,6 @@ import logger from "@/utils/logger.js";
  * Bewusst nur reine Helfer ohne Bezug zu einer bestimmten Dokumenttabelle —
  * der Ablauf je Typ steht ausgeschrieben in seiner eigenen Funktion.
  */
-
-export type GeneratedDocument = {
-    displayName: string;
-    docxBuffer: Buffer;
-    pdfBuffer: Buffer;
-};
 
 const COMPLETED_DOCUMENT_STATUSES = new Set<DocumentStatus>([
     DocumentStatus.GENERATED,
@@ -67,20 +60,6 @@ export async function artifactsWereFinalized(
         logger.error(cleanupError);
     }
     return false;
-}
-
-export function getGeneratedDocument(context: PipelineContext): GeneratedDocument {
-    if (!context.displayName || !context.docxBuffer || !context.pdfBuffer) {
-        throw new PipelineStageError(
-            "Pipeline completed without a display name, DOCX buffer, or PDF buffer.",
-        );
-    }
-
-    return {
-        displayName: context.displayName,
-        docxBuffer: context.docxBuffer,
-        pdfBuffer: context.pdfBuffer,
-    };
 }
 
 export async function createArtifactDocuments(

@@ -75,3 +75,12 @@ export const resyncDocument = async (request: Request, response: Response) => {
     );
     return response.status(204).send();
 };
+
+export const adoptModelChanges = async (request: Request, response: Response) => {
+    const result = await documentsService.adoptModelChanges(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.body.fields as string[],
+    );
+    return response.status(200).json(result);
+};

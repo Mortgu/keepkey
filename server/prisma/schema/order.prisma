@@ -43,6 +43,10 @@ model OrderDocument {
   /// @openapi.ignore
   uploadToken String?
 
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
 

@@ -55,6 +55,10 @@ model InvoiceDocument {
   /// @openapi.ignore
   uploadToken String?
 
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
   invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
   invoiceId String
 

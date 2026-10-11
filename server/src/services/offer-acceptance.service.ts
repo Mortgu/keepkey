@@ -1,4 +1,4 @@
-import { formatOfferData } from "../pipelines/offer/actions.js";
+import { formatOfferData } from "../pipelines/offer/build-offer.js";
 import type { Prisma } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
 import { contractOrderBy } from "./contract.service.js";

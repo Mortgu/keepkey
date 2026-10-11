@@ -2,7 +2,7 @@ import { prisma } from "../../lib/prismaClient.js";
 import { getOrderById } from "../../services/order.service.js";
 import { formatDate, formatEur } from "../../utils/utils.js";
 import { confirmationTemplateSchema } from "../../schemas/templates/confirmation.template.schema.js";
-import { formatOrderData } from "../order/actions.js";
+import { formatOrderData } from "../order/build-order.js";
 import type { Language } from "@prisma/client";
 
 /**

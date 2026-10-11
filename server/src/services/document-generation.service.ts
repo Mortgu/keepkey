@@ -1,16 +1,14 @@
-import { DocumentStatus } from "@prisma/client";
+import { DocumentStatus, Prisma } from "@prisma/client";
 import { storeDocumentArtifacts } from "../lib/document-artifact-store.js";
 import { prisma } from "../lib/prismaClient.js";
-import { OfferPipelineContext } from "../pipelines/offer/context.js";
-import { offerStages } from "../pipelines/offer/stages.js";
-import { OrderPipelineContext } from "../pipelines/order/context.js";
-import { orderStages } from "../pipelines/order/stages.js";
-import { runPipeline } from "../pipelines/pipeline.js";
+import { renderDocument } from "../lib/render-document.js";
+import { buildOffer } from "../pipelines/offer/build-offer.js";
+import { buildOrder } from "../pipelines/order/build-order.js";
+import { offerTemplateSchema } from "../schemas/templates/offer.template.schema.js";
 import {
     artifactsWereFinalized,
     assertDocumentCanBeGenerated,
     createArtifactDocuments,
-    getGeneratedDocument,
 } from "./document-generation.helpers.js";
 
 export async function generateOfferDocument(taskId: string): Promise<void> {
@@ -30,21 +28,20 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
         throw new Error(`OfferDocument ${offerDocument.id} is stale and must be regenerated.`);
     }
 
-    const context = await runPipeline<OfferPipelineContext>({
-        offerId: offerDocument.offerId,
-        version: offerDocument.version,
-        docxBuffer: null,
-        pdfBuffer: null,
-        displayName: null,
-    }, offerStages);
-
-    const generated = getGeneratedDocument(context);
+    const built = await buildOffer(offerDocument.offerId, offerDocument.version);
+    const rendered = await renderDocument(
+        "OFFER",
+        built.language,
+        built.data,
+        { documentType: "offer", documentId: offerDocument.id },
+        { schema: offerTemplateSchema },
+    );
 
     const files = await storeDocumentArtifacts(
         "offers",
         offerDocument.id,
-        generated.docxBuffer,
-        generated.pdfBuffer,
+        rendered.docxBuffer,
+        rendered.pdfBuffer,
         taskId,
     );
 
@@ -71,7 +68,8 @@ export async function generateOfferDocument(taskId: string): Promise<void> {
                 },
                 data: {
                     status: DocumentStatus.GENERATED,
-                    displayName: generated.displayName,
+                    displayName: built.displayName,
+                    model: rendered.model as Prisma.InputJsonValue,
                     error: null,
                     isCurrent: true,
                 },
@@ -109,19 +107,18 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
         throw new Error(`OrderDocument ${orderDocument.id} is stale and must be regenerated.`);
     }
 
-    const context = await runPipeline<OrderPipelineContext>({
-        orderId: orderDocument.orderId,
-        version: orderDocument.version,
-        docxBuffer: null,
-        pdfBuffer: null,
-        displayName: null,
-    }, orderStages);
-    const generated = getGeneratedDocument(context);
+    const built = await buildOrder(orderDocument.orderId, orderDocument.version);
+    const rendered = await renderDocument(
+        "ORDER",
+        built.language,
+        built.data,
+        { documentType: "order", documentId: orderDocument.id },
+    );
     const files = await storeDocumentArtifacts(
         "orders",
         orderDocument.id,
-        generated.docxBuffer,
-        generated.pdfBuffer,
+        rendered.docxBuffer,
+        rendered.pdfBuffer,
         taskId,
     );
 
@@ -148,7 +145,8 @@ export async function generateOrderDocument(taskId: string): Promise<void> {
                 },
                 data: {
                     status: DocumentStatus.GENERATED,
-                    displayName: generated.displayName,
+                    displayName: built.displayName,
+                    model: rendered.model as Prisma.InputJsonValue,
                     error: null,
                     isCurrent: true,
                 },

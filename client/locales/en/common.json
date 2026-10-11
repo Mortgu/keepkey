@@ -62,7 +62,19 @@
     "toast": {
       "replaced": "File replaced.",
       "saved": "File saved.",
-      "fileRejected": "File rejected: {{reason}}"
+      "fileRejected": "File rejected: {{reason}}",
+      "warning": {
+        "documentMismatch": "This file belongs to a different document."
+      },
+      "adopted": "Changes adopted."
+    },
+    "changes": {
+      "title": "Differences in the file",
+      "description": "The replaced file differs from the generated version. Adopting updates the stored data of this document — the offer, prices and version stay unchanged.",
+      "generated": "Generated",
+      "inFile": "In the file",
+      "ignore": "Ignore",
+      "adopt": "Adopt selection ({{count}})"
     }
   },
   "documentPreview": {

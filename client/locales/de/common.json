@@ -62,7 +62,19 @@
     "toast": {
       "replaced": "Datei wurde ersetzt.",
       "saved": "Datei wurde gespeichert.",
-      "fileRejected": "Datei abgelehnt: {{reason}}"
+      "fileRejected": "Datei abgelehnt: {{reason}}",
+      "warning": {
+        "documentMismatch": "Die Datei gehört zu einem anderen Dokument."
+      },
+      "adopted": "Änderungen wurden übernommen."
+    },
+    "changes": {
+      "title": "Abweichungen in der Datei",
+      "description": "Die ersetzte Datei weicht vom erzeugten Stand ab. Beim Übernehmen werden die gespeicherten Daten dieses Dokuments aktualisiert — Angebot, Preise und Version bleiben unverändert.",
+      "generated": "Erzeugt",
+      "inFile": "In der Datei",
+      "ignore": "Ignorieren",
+      "adopt": "Auswahl übernehmen ({{count}})"
     }
   },
   "documentPreview": {

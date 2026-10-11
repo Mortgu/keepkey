@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { orderFixture } from "../../test/order-fixtures.js";
 import { presentOrder } from "../../services/order-source.js";
-import { formatOrderData, withPurchasePrices } from "./actions.js";
+import { formatOrderData, withPurchasePrices } from "./build-order.js";
 import { formatEur } from "../../utils/utils.js";
 
 /**
