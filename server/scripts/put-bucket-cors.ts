@@ -7,8 +7,8 @@ import {
 import env from "../src/lib/env.js";
 
 /**
- * Setzt die CORS-Regel, ohne die der Browser keine Ersatzdatei in den Bucket
- * legen kann.
+ * Setzt die CORS-Regeln, ohne die der Browser weder Ersatzdateien in den Bucket
+ * legen noch signierte Downloads lesen kann.
  *
  * Warum als Script und nicht als abgetippter `aws s3api`-Befehl:
  *
@@ -61,25 +61,52 @@ const appOrigins = env.CORS_ORIGIN.split(",").map((origin) => origin.trim()).fil
 const distinct = (values: Array<string>) => [...new Set(values)];
 
 /**
- * Führt die vorhandenen Regeln unserer Origins mit dem zusammen, was der Upload
- * braucht. Bestehende Methoden und Header bleiben erhalten: Eine Umgebung, die
- * dem Browser bewusst mehr erlaubt, soll das nach diesem Lauf immer noch tun.
+ * true, wenn die Regel ausschließlich Origins bedient, die dieses Script
+ * verwaltet — die ersetzen wir. Die "null"-Redirect-Origin zählt dazu: Eine
+ * Regel nur mit ihr ist mit Sicherheit für unsere Downloads gesetzt.
  */
-function managedRule(existing: Array<CORSRule>): CORSRule {
+function isManaged(rule: CORSRule): boolean {
+    const origins = rule.AllowedOrigins ?? [];
+    const managed = new Set([...appOrigins, REDIRECT_ORIGIN]);
+    return origins.length > 0 && origins.every((origin) => managed.has(origin));
+}
+
+/**
+ * Führt die vorhandenen verwalteten Regeln mit dem zusammen, was Upload und
+ * Download brauchen, und verteilt die Origins auf **je eine eigene Regel**.
+ *
+ * Warum eine Regel pro Origin: Garage (getestet an v2.3.0) schreibt bei einer
+ * passenden Regel die gesamte AllowedOrigins-Liste in den Header
+ * `Access-Control-Allow-Origin` — komma-joiniert statt nur die Origin des
+ * Requests. Ein Wert wie "http://localhost:5173, null" ist nach CORS-Spezifikation
+ * ungültig, Firefox verwirft die Antwort. Mit genau einer Origin pro Regel
+ * echoed Garage nur diesen einen Wert. Gegenüber AWS S3 ist das ebenso
+ * unschädlich: AWS echoed ohnehin die Request-Origin.
+ *
+ * Bestehende Methoden und Header bleiben erhalten: Eine Umgebung, die dem
+ * Browser bewusst mehr erlaubt, soll das nach diesem Lauf immer noch tun.
+ */
+function managedRules(existing: Array<CORSRule>): Array<CORSRule> {
     const mine = existing.filter(isManaged);
 
-    return {
-        AllowedOrigins: distinct([
-            ...mine.flatMap((rule) => rule.AllowedOrigins ?? []),
-            ...appOrigins,
-            REDIRECT_ORIGIN,
-        ]),
-        AllowedMethods: distinct([...mine.flatMap((rule) => rule.AllowedMethods ?? []), ...REQUIRED_METHODS]),
-        // Der Upload schickt den Content-Type mit, mit dem die URL signiert wurde.
-        AllowedHeaders: distinct([...mine.flatMap((rule) => rule.AllowedHeaders ?? []), "*"]),
-        ExposeHeaders: distinct([...mine.flatMap((rule) => rule.ExposeHeaders ?? []), ...REQUIRED_EXPOSED]),
-        MaxAgeSeconds: mine.find((rule) => rule.MaxAgeSeconds !== undefined)?.MaxAgeSeconds ?? 3000,
-    };
+    const origins = distinct([
+        ...mine.flatMap((rule) => rule.AllowedOrigins ?? []),
+        ...appOrigins,
+        REDIRECT_ORIGIN,
+    ]);
+    const allowedMethods = distinct([...mine.flatMap((rule) => rule.AllowedMethods ?? []), ...REQUIRED_METHODS]);
+    // Der Upload schickt den Content-Type mit, mit dem die URL signiert wurde.
+    const allowedHeaders = distinct([...mine.flatMap((rule) => rule.AllowedHeaders ?? []), "*"]);
+    const exposeHeaders = distinct([...mine.flatMap((rule) => rule.ExposeHeaders ?? []), ...REQUIRED_EXPOSED]);
+    const maxAgeSeconds = mine.find((rule) => rule.MaxAgeSeconds !== undefined)?.MaxAgeSeconds ?? 3000;
+
+    return origins.map((origin) => ({
+        AllowedOrigins: [origin],
+        AllowedMethods: allowedMethods,
+        AllowedHeaders: allowedHeaders,
+        ExposeHeaders: exposeHeaders,
+        MaxAgeSeconds: maxAgeSeconds,
+    }));
 }
 
 async function currentRules(): Promise<Array<CORSRule>> {
@@ -94,11 +121,6 @@ async function currentRules(): Promise<Array<CORSRule>> {
     }
 }
 
-/** true, wenn die Regel eine unserer Origins bedient — die ersetzen wir. */
-function isManaged(rule: CORSRule): boolean {
-    return (rule.AllowedOrigins ?? []).some((origin) => appOrigins.includes(origin));
-}
-
 async function main() {
     if (appOrigins.length === 0) {
         throw new Error("CORS_ORIGIN ist leer — ohne Origin gibt es keine Regel zu setzen.");
@@ -106,7 +128,9 @@ async function main() {
 
     const existing = await currentRules();
     const foreign = existing.filter((rule) => !isManaged(rule));
-    const rules = [...foreign, managedRule(existing)];
+    // Verwaltete Regeln zuerst: Ihre Origins sind eindeutig, eine fremde
+    // Wildcard-Regel darf sie nicht überlagern.
+    const rules = [...managedRules(existing), ...foreign];
 
     console.log(`Bucket   : ${env.S3_BUCKET} @ ${env.S3_ENDPOINT} (${env.S3_REGION})`);
     console.log(`Origins  : ${appOrigins.join(", ")}`);
