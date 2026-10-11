@@ -14,12 +14,16 @@ type Props = {
 
 /**
  * Zeigt, wo eine ersetzte Datei vom erzeugten Stand abweicht. Die Datei selbst
- * ist längst übernommen — hier entscheidet der Nutzer nur, ob die gespeicherten
- * Daten des Dokuments die neuen Werte bekommen oder die Abweichung bleibt.
+ * ist längst übernommen — hier entscheidet der Nutzer nur, ob die neuen Werte
+ * auch ins Angebot geschrieben werden oder die Abweichung bleibt. Felder, die
+ * sich nicht übernehmen lassen (Stammdaten, Beträge, …), stehen zur Ansicht da.
  */
 export function ReplacementChangesModal({ changes, isPending, onClose, onAdopt }: Props) {
   const { t } = useTranslation();
-  const [selected, setSelected] = useState(() => new Set(changes.map((change) => change.field)));
+  // Vorausgewählt wird, was sich übernehmen lässt; der Rest bleibt nur zur Ansicht.
+  const [selected, setSelected] = useState(
+    () => new Set(changes.filter((change) => change.adoptable).map((change) => change.field)),
+  );
 
   const toggle = (field: string) => setSelected((current) => {
     const next = new Set(current);
@@ -50,6 +54,7 @@ export function ReplacementChangesModal({ changes, isPending, onClose, onAdopt }
               <Checkbox
                 label={change.field}
                 checked={selected.has(change.field)}
+                disabled={!change.adoptable}
                 onChange={() => toggle(change.field)}
               />
               <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 pl-6 text-sm">
@@ -58,6 +63,9 @@ export function ReplacementChangesModal({ changes, isPending, onClose, onAdopt }
                 <dt className="text-(--text-500)">{t("documents.changes.inFile")}</dt>
                 <dd className="font-medium">{change.actual || "—"}</dd>
               </dl>
+              {!change.adoptable && (
+                <p className="pl-6 text-xs text-(--text-500)">{t("documents.changes.notAdoptable")}</p>
+              )}
             </li>
           ))}
         </ul>
@@ -66,9 +74,11 @@ export function ReplacementChangesModal({ changes, isPending, onClose, onAdopt }
         <Button variant="border" size="sm" onClick={onClose} disabled={isPending}>
           {t("documents.changes.ignore")}
         </Button>
-        <Button size="sm" onClick={adopt} loading={isPending} disabled={selected.size === 0 || isPending}>
-          {t("documents.changes.adopt", { count: selected.size })}
-        </Button>
+        {changes.some((change) => change.adoptable) && (
+          <Button size="sm" onClick={adopt} loading={isPending} disabled={selected.size === 0 || isPending}>
+            {t("documents.changes.adopt", { count: selected.size })}
+          </Button>
+        )}
       </Dialog.Footer>
     </Dialog>
   );

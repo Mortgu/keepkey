@@ -26,10 +26,10 @@ export const confirmReplacementSchema = z.object({
 });
 
 /**
- * Welche abweichenden Felder ins gespeicherte Modell übernommen werden sollen.
+ * Welche abweichenden Felder ins Angebot übernommen werden sollen.
  * Die Werte kommen bewusst nicht vom Client, sondern aus der abgelegten DOCX.
  */
-export const adoptModelChangesSchema = z.object({
+export const adoptChangesSchema = z.object({
     fields: z.array(z.string().min(1).max(200)).min(1).max(100),
 });
 

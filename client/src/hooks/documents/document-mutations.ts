@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-    adoptModelChanges,
+    adoptChanges,
     confirmReplacementUpload,
     deleteDocument,
     putReplacementFile,
@@ -68,10 +68,11 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
-    // Das Modell steckt in keiner Antwort der API — es gibt nichts neu zu laden.
+    // Das Angebot hat sich geändert (neue Version) — Listen und Detail neu laden.
     const adoptMutation = useMutation({
         mutationFn: ({ documentId, fields }: { documentId: string; fields: Array<string> }) =>
-            adoptModelChanges(type, documentId, fields),
+            adoptChanges(type, documentId, fields),
+        onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
     const resyncMutation = useMutation({
@@ -83,8 +84,8 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         replaceDocumentFile: replaceMutation.mutateAsync,
         isReplacingDocumentFile: replaceMutation.isPending,
         errorReplacingDocumentFile: replaceMutation.error,
-        adoptModelChanges: adoptMutation.mutateAsync,
-        isAdoptingModelChanges: adoptMutation.isPending,
+        adoptChanges: adoptMutation.mutateAsync,
+        isAdoptingChanges: adoptMutation.isPending,
         resyncDocument: resyncMutation.mutateAsync,
         isResyncingDocument: resyncMutation.isPending,
         errorResyncingDocument: resyncMutation.error,

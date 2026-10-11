@@ -16,6 +16,7 @@ import {
 } from "../lib/document-artifact-store.js";
 import { assertDocxBuffer } from "../lib/docx.js";
 import { checkReplacement, diffControls, isUserWarning, withAdoptedValue } from "../lib/replacement-check.js";
+import { offerAdoptions } from "../pipelines/offer/offer-adoption.js";
 import { convertDocxToPdf } from "../lib/docx-to-pdf.js";
 import { AppException } from "../lib/exceptions.js";
 import {
@@ -29,6 +30,7 @@ import logger from "@/utils/logger.js";
 import type { DocumentCapabilities, DocumentFormatParam, DocumentType, ReplacementWarning } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "./document-upload.service.js";
 import { documentTable } from "./document-repo.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
 
 export type RenameDocumentInput = { displayName: string };
 
@@ -610,6 +612,24 @@ export async function confirmReplacementUpload(
 }
 
 /**
+ * Ob sich Änderungen dieses Dokuments ins Angebot übernehmen lassen: nur für
+ * Angebote, nur beim aktuellen Dokument des unveränderten Angebots. Wurde das
+ * Angebot nach dem Erzeugen geändert (oder ist es angenommen), würde ein Wert
+ * aus der Datei einen neueren Stand überschreiben.
+ */
+async function canAdoptIntoSource(type: DocumentType, id: string): Promise<boolean> {
+    if (type !== "offer") return false;
+
+    const document = await prisma.offerDocument.findUnique({
+        where: { id },
+        select: { isCurrent: true, sourceVersion: true, offer: { select: { version: true, acceptedAt: true } } },
+    });
+    return Boolean(document?.isCurrent)
+        && document?.sourceVersion === document?.offer.version
+        && !document?.offer.acceptedAt;
+}
+
+/**
  * Prüft eine hochgeladene DOCX gegen das Modell, aus dem das Dokument erzeugt
  * wurde. Die Prüfung ist eine Hilfe, kein Tor: scheitert sie, wird der Upload
  * trotzdem übernommen.
@@ -633,7 +653,13 @@ async function inspectReplacement(
                 reasons: silent.map((warning) => warning.code),
             });
         }
-        return warnings.filter(isUserWarning);
+
+        const adoptNow = warnings.some((warning) => warning.code === "FIELD_CHANGED")
+            && await canAdoptIntoSource(type, id);
+        return warnings.filter(isUserWarning).map((warning): ReplacementWarning =>
+            warning.code === "FIELD_CHANGED"
+                ? { ...warning, adoptable: adoptNow && Boolean(offerAdoptions[warning.field]?.parse(warning.actual)) }
+                : warning);
     } catch (error) {
         logger.error('document_replacement_inspection_failed', {
             documentId: id,
@@ -644,20 +670,32 @@ async function inspectReplacement(
 }
 
 /**
- * Übernimmt abweichende Feldwerte aus der abgelegten DOCX ins gespeicherte
- * Modell des Dokuments — danach gilt die Datei für diese Felder als Stand.
- * Angebot, Bestellung und ihre Version bleiben unberührt: es ändert sich nur,
- * womit künftige Ersetzungen verglichen werden.
+ * Übernimmt abweichende Feldwerte aus der abgelegten DOCX ins Angebot.
  *
- * Die Werte werden hier aus der DOCX gelesen, nicht vom Client entgegen-
- * genommen. Ein Feld, das inzwischen nicht mehr abweicht, wird übergangen
- * (der Aufruf ist wiederholbar); ein Feld, dessen Wert nicht zum Typ im Modell
- * passt, lehnt den ganzen Aufruf ab, bevor etwas geschrieben wird.
+ * Der Wert kommt hier aus der DOCX, nicht vom Client. Geschrieben wird nur,
+ * was `offerAdoptions` kennt; ein anderes oder nicht lesbares Feld lehnt den
+ * ganzen Aufruf ab, bevor etwas geändert wird. Ein Feld, das inzwischen nicht
+ * mehr abweicht, wird übergangen (der Aufruf ist wiederholbar).
+ *
+ * Das Angebot erhält wie bei jeder Änderung eine neue Version. Das Dokument
+ * bleibt das aktuelle: seine Datei enthält den Wert ja schon, es wird deshalb
+ * der neuen Version zugeordnet statt als veraltet zu gelten. Nur das *aktuelle*
+ * Dokument eines unveränderten Angebots darf schreiben — sonst würde ein Wert
+ * aus einer älteren Datei einen neueren Stand überschreiben.
+ *
+ * Gesperrt sind angenommene Angebote; alle anderen Dokumenttypen kennen
+ * keine Übernahme (ihre Werte sind beim Anlegen festgeschrieben).
  */
-export async function adoptModelChanges(type: DocumentType, id: string, fields: string[]) {
-    const document = await requireGeneratedDocument(type, id);
-    await assertOfferDocumentEditable(type, id);
+export async function adoptChanges(type: DocumentType, id: string, fields: string[]) {
+    if (type !== "offer") {
+        throw new AppException(
+            "Änderungen lassen sich nur in Angebote übernehmen.",
+            422,
+            "ADOPTION_NOT_SUPPORTED",
+        );
+    }
 
+    const document = await requireGeneratedDocument(type, id);
     const docx = findArtifact(document.artifacts, DocumentFormat.DOCX);
     if (!docx) throw new AppException("File not found", 404, "FILE_NOT_FOUND");
     const content = await getDocumentArtifact(docx.objectKey);
@@ -665,42 +703,66 @@ export async function adoptModelChanges(type: DocumentType, id: string, fields: 
     return prisma.$transaction(async (tx) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`document-model:${id}`}))::text AS "lock"`;
 
+        // Sperrt das Angebot und lehnt angenommene ab.
+        const offerId = (await tx.offerDocument.findUnique({ where: { id }, select: { offerId: true } }))?.offerId;
+        if (!offerId) throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
+        await assertOfferEditable(tx, offerId);
+
         // Wurde die Datei zwischenzeitlich ersetzt, passen die Werte oben nicht mehr.
         const current = await findGeneratedDocument(type, id, tx);
         if (findArtifact(current?.artifacts ?? [], DocumentFormat.DOCX)?.objectKey !== docx.objectKey) {
             throw new AppException("Das Dokument wurde zwischenzeitlich verändert.", 409, "DOCUMENT_STATE_CHANGED");
         }
 
-        const table = documentTable(type, tx);
-        let model: unknown = await table.readModel(id);
-        if (model === null) {
+        const [row, offer] = await Promise.all([
+            tx.offerDocument.findUniqueOrThrow({ where: { id }, select: { isCurrent: true, sourceVersion: true } }),
+            tx.offer.findUniqueOrThrow({ where: { id: offerId }, select: { version: true } }),
+        ]);
+        if (!row.isCurrent || row.sourceVersion !== offer.version) {
             throw new AppException(
-                "Für dieses Dokument wurden keine Daten gespeichert.",
+                "Das Angebot wurde nach dem Erzeugen dieses Dokuments geändert. Erzeuge das Dokument neu.",
                 409,
-                "MODEL_UNAVAILABLE",
+                "DOCUMENT_NOT_CURRENT",
             );
         }
 
+        let model: unknown = await documentTable(type, tx).readModel(id);
+        if (model === null) {
+            throw new AppException("Für dieses Dokument wurden keine Daten gespeichert.", 409, "MODEL_UNAVAILABLE");
+        }
+
         const changes = new Map(diffControls(model, content).map((change) => [change.field, change]));
+        const data: Prisma.OfferUpdateInput = {};
         const adopted: string[] = [];
         for (const field of new Set(fields)) {
             const change = changes.get(field);
             if (!change) continue;
 
-            // `actual` ist der Text aus der Datei mit vereinheitlichtem Leerraum.
-            const next = withAdoptedValue(model, field, change.actual);
-            if (!next) {
+            const parsed = offerAdoptions[field]?.parse(change.actual);
+            const next = parsed ? withAdoptedValue(model, field, parsed.display) : null;
+            if (!parsed || !next) {
                 throw new AppException(
-                    `Der Wert von „${field}“ passt nicht zum gespeicherten Feld.`,
+                    `„${field}“ lässt sich nicht ins Angebot übernehmen.`,
                     422,
                     "FIELD_NOT_ADOPTABLE",
                 );
             }
+            Object.assign(data, parsed.data);
             model = next;
             adopted.push(field);
         }
 
-        if (adopted.length > 0) await table.writeModel(id, model as Prisma.InputJsonValue);
+        if (adopted.length > 0) {
+            const { version } = await tx.offer.update({
+                where: { id: offerId },
+                data: { ...data, version: { increment: 1 } },
+                select: { version: true },
+            });
+            await tx.offerDocument.update({
+                where: { id },
+                data: { model: model as Prisma.InputJsonValue, sourceVersion: version },
+            });
+        }
         return { adopted };
     });
 }

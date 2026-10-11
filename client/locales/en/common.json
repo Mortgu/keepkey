@@ -66,15 +66,16 @@
       "warning": {
         "documentMismatch": "This file belongs to a different document."
       },
-      "adopted": "Changes adopted."
+      "adopted": "Changes were adopted into the offer."
     },
     "changes": {
       "title": "Differences in the file",
-      "description": "The replaced file differs from the generated version. Adopting updates the stored data of this document — the offer, prices and version stay unchanged.",
+      "description": "The replaced file differs from the generated version. Adopting writes the values into the offer. The offer gets a new version, the document stays current.",
       "generated": "Generated",
       "inFile": "In the file",
       "ignore": "Ignore",
-      "adopt": "Adopt selection ({{count}})"
+      "adopt": "Adopt selection ({{count}})",
+      "notAdoptable": "Cannot be adopted into the offer — ignore only. Change such values in the offer form and regenerate the document."
     }
   },
   "documentPreview": {

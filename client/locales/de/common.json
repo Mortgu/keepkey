@@ -66,15 +66,16 @@
       "warning": {
         "documentMismatch": "Die Datei gehört zu einem anderen Dokument."
       },
-      "adopted": "Änderungen wurden übernommen."
+      "adopted": "Änderungen wurden ins Angebot übernommen."
     },
     "changes": {
       "title": "Abweichungen in der Datei",
-      "description": "Die ersetzte Datei weicht vom erzeugten Stand ab. Beim Übernehmen werden die gespeicherten Daten dieses Dokuments aktualisiert — Angebot, Preise und Version bleiben unverändert.",
+      "description": "Die ersetzte Datei weicht vom erzeugten Stand ab. Beim Übernehmen werden die Werte ins Angebot geschrieben. Das Angebot erhält dabei eine neue Version, das Dokument bleibt aktuell.",
       "generated": "Erzeugt",
       "inFile": "In der Datei",
       "ignore": "Ignorieren",
-      "adopt": "Auswahl übernehmen ({{count}})"
+      "adopt": "Auswahl übernehmen ({{count}})",
+      "notAdoptable": "Lässt sich nicht ins Angebot übernehmen — nur ignorieren. Ändere solche Werte in der Angebotsmaske und erzeuge das Dokument neu."
     }
   },
   "documentPreview": {

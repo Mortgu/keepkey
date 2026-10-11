@@ -13,13 +13,18 @@ import { readProvenance } from "./docx-provenance.js";
  * die nur ins Protokoll gehören: Editor-Speicherstände tragen keine Herkunft,
  * und Dokumente aus der Zeit vor den Snapshots haben kein Modell.
  */
+export type FieldChange = { field: string; expected: string; actual: string };
+
 export type CheckedWarning =
-    | ReplacementWarning
+    | Exclude<ReplacementWarning, { code: "FIELD_CHANGED" }>
+    | ({ code: "FIELD_CHANGED" } & FieldChange)
     | { code: "PROVENANCE_MISSING" }
     | { code: "MODEL_UNAVAILABLE" };
 
-/** Nur diese Hinweise gehen an den Nutzer. */
-export const isUserWarning = (warning: CheckedWarning): warning is ReplacementWarning =>
+/** Nur diese Hinweise gehen an den Nutzer — das Feld `adoptable` ergänzt der Aufrufer. */
+export const isUserWarning = (
+    warning: CheckedWarning,
+): warning is Exclude<CheckedWarning, { code: "PROVENANCE_MISSING" | "MODEL_UNAVAILABLE" }> =>
     warning.code !== "PROVENANCE_MISSING" && warning.code !== "MODEL_UNAVAILABLE";
 
 const normalize = (text: string) => text.replace(/\s+/g, " ").trim();
@@ -35,8 +40,6 @@ function scalarAt(model: unknown, path: string): string | null {
     return typeof current === "string" || typeof current === "number" ? String(current) : null;
 }
 
-export type FieldChange = Extract<ReplacementWarning, { code: "FIELD_CHANGED" }>;
-
 /**
  * Felder, deren Content Control etwas anderes zeigt als das Modell. Tags, die
  * das Modell nicht kennt, sind andere Controls und werden übergangen. Bei
@@ -51,7 +54,7 @@ export function diffControls(model: unknown, docx: Buffer): FieldChange[] {
 
         const actual = found.find((text) => normalize(text) !== normalize(expected));
         if (actual !== undefined) {
-            changes.push({ code: "FIELD_CHANGED", field, expected: normalize(expected), actual: normalize(actual) });
+            changes.push({ field, expected: normalize(expected), actual: normalize(actual) });
         }
     }
 
@@ -79,7 +82,10 @@ export function checkReplacement(input: {
         return [...warnings, { code: "MODEL_UNAVAILABLE" }];
     }
 
-    return [...warnings, ...diffControls(model, docx)];
+    return [
+        ...warnings,
+        ...diffControls(model, docx).map((change) => ({ code: "FIELD_CHANGED" as const, ...change })),
+    ];
 }
 
 /**

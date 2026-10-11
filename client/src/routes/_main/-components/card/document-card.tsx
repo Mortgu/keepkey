@@ -370,10 +370,10 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                 {changes && (
                     <ReplacementChangesModal
                         changes={changes}
-                        isPending={mutations.isAdoptingModelChanges}
+                        isPending={mutations.isAdoptingChanges}
                         onClose={() => setChanges(null)}
                         onAdopt={async (fields) => {
-                            await mutations.adoptModelChanges({ documentId: document.id, fields });
+                            await mutations.adoptChanges({ documentId: document.id, fields });
                             showToast.success("documents.toast.adopted");
                         }}
                     />

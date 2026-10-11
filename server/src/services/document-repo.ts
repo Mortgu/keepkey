@@ -46,10 +46,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id },
                     select: { model: true },
                 }))?.model ?? null,
-                writeModel: (id: string, model: Prisma.InputJsonValue) => client.offerDocument.update({
-                    where: { id },
-                    data: { model },
-                }),
                 reloadWithArtifacts: (id: string) => client.offerDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },
@@ -73,10 +69,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id },
                     select: { model: true },
                 }))?.model ?? null,
-                writeModel: (id: string, model: Prisma.InputJsonValue) => client.orderDocument.update({
-                    where: { id },
-                    data: { model },
-                }),
                 reloadWithArtifacts: (id: string) => client.orderDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },
@@ -100,10 +92,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id },
                     select: { model: true },
                 }))?.model ?? null,
-                writeModel: (id: string, model: Prisma.InputJsonValue) => client.confirmationDocument.update({
-                    where: { id },
-                    data: { model },
-                }),
                 reloadWithArtifacts: (id: string) => client.confirmationDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },
@@ -127,10 +115,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                     where: { id },
                     select: { model: true },
                 }))?.model ?? null,
-                writeModel: (id: string, model: Prisma.InputJsonValue) => client.invoiceDocument.update({
-                    where: { id },
-                    data: { model },
-                }),
                 reloadWithArtifacts: (id: string) => client.invoiceDocument.findUnique({
                     where: { id },
                     include: { artifacts: true },

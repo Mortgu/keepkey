@@ -76,8 +76,8 @@ export const resyncDocument = async (request: Request, response: Response) => {
     return response.status(204).send();
 };
 
-export const adoptModelChanges = async (request: Request, response: Response) => {
-    const result = await documentsService.adoptModelChanges(
+export const adoptChanges = async (request: Request, response: Response) => {
+    const result = await documentsService.adoptChanges(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.body.fields as string[],

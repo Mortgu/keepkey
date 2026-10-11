@@ -89,9 +89,7 @@ describe("diffControls", () => {
     it("liefert nur die abweichenden Felder", () => {
         const changes = diffControls(model, docx([["paymentTerm", "14 Tage"], ["customer.firstName", "Anna"]], {}));
 
-        expect(changes).toEqual([
-            { code: "FIELD_CHANGED", field: "paymentTerm", expected: "30 Tage", actual: "14 Tage" },
-        ]);
+        expect(changes).toEqual([{ field: "paymentTerm", expected: "30 Tage", actual: "14 Tage" }]);
     });
 });
 

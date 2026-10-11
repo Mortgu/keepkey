@@ -65,6 +65,8 @@ export const replacementWarningSchema = z.discriminatedUnion("code", [
         field: z.string(),
         expected: z.string(),
         actual: z.string(),
+        /** Ob sich der Wert ins Angebot übernehmen lässt — sonst bleibt nur, ihn zu ignorieren. */
+        adoptable: z.boolean(),
     }),
 ]);
 export type ReplacementWarning = z.infer<typeof replacementWarningSchema>;
