@@ -3,6 +3,7 @@
  * einen Use Case ab; geteilt werden nur Preisfindung (`offer-pricing`) und
  * wiederkehrende Schreibschritte (`offer-write`).
  */
+export { adoptChanges } from "./adopt-document-changes.js";
 export { createOffer, renewOffer } from "./create-offer.js";
 export { deleteOffer } from "./delete-offer.js";
 export { extendOffer, getExtensionPrice } from "./extend-offer.js";

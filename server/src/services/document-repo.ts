@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import env from "../lib/env.js";
 import { prisma } from "../lib/prismaClient.js";
+import { AppException } from "../lib/exceptions.js";
 import type { DocumentArtifactScope } from "../lib/document-artifact-store.js";
 import type { DocumentType } from "@keepit/schemas";
 
@@ -28,19 +29,28 @@ export type DocumentWithArtifacts = NonNullable<
     Awaited<ReturnType<ReturnType<typeof documentTable>["findWithArtifacts"]>>
 >;
 
+/** 404-auslösender Wrapper um `findWithArtifacts` — ein fehlendes Dokument ist nie ein gültiges Ergebnis für den Aufrufer. */
+async function requireFrom<T>(find: () => Promise<T | null>): Promise<T> {
+    const document = await find();
+    if (!document) throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
+    return document;
+}
+
 export function documentTable(type: DocumentType, client: Prisma.TransactionClient = prisma) {
     switch (type) {
-        case "offer":
+        case "offer": {
+            const findWithArtifacts = (id: string) => client.offerDocument.findFirst({
+                where: { id, deletedAt: null },
+                include: { artifacts: true },
+            });
             return {
                 scope: "offers" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
                     pdfDirectory: env.NEXTCLOUD_OFFER_PDF_PATH,
                     docxDirectory: env.NEXTCLOUD_OFFER_ORIGINAL_PATH,
                 },
-                findWithArtifacts: (id: string) => client.offerDocument.findFirst({
-                    where: { id, deletedAt: null },
-                    include: { artifacts: true },
-                }),
+                findWithArtifacts,
+                requireWithArtifacts: (id: string) => requireFrom(() => findWithArtifacts(id)),
                 /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
                 readModel: async (id: string) => (await client.offerDocument.findUnique({
                     where: { id },
@@ -53,17 +63,20 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.offerDocument.updateMany({ where, data }),
             };
-        case "order":
+        }
+        case "order": {
+            const findWithArtifacts = (id: string) => client.orderDocument.findFirst({
+                where: { id, deletedAt: null },
+                include: { artifacts: true },
+            });
             return {
                 scope: "orders" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
                     pdfDirectory: env.NEXTCLOUD_ORDER_PDF_PATH,
                     docxDirectory: env.NEXTCLOUD_ORDER_ORIGINAL_PATH,
                 },
-                findWithArtifacts: (id: string) => client.orderDocument.findFirst({
-                    where: { id, deletedAt: null },
-                    include: { artifacts: true },
-                }),
+                findWithArtifacts,
+                requireWithArtifacts: (id: string) => requireFrom(() => findWithArtifacts(id)),
                 /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
                 readModel: async (id: string) => (await client.orderDocument.findUnique({
                     where: { id },
@@ -76,17 +89,20 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.orderDocument.updateMany({ where, data }),
             };
-        case "confirmation":
+        }
+        case "confirmation": {
+            const findWithArtifacts = (id: string) => client.confirmationDocument.findFirst({
+                where: { id, deletedAt: null },
+                include: { artifacts: true },
+            });
             return {
                 scope: "confirmations" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
                     pdfDirectory: env.NEXTCLOUD_CONFIRMATION_PDF_PATH,
                     docxDirectory: env.NEXTCLOUD_CONFIRMATION_ORIGINAL_PATH,
                 },
-                findWithArtifacts: (id: string) => client.confirmationDocument.findFirst({
-                    where: { id, deletedAt: null },
-                    include: { artifacts: true },
-                }),
+                findWithArtifacts,
+                requireWithArtifacts: (id: string) => requireFrom(() => findWithArtifacts(id)),
                 /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
                 readModel: async (id: string) => (await client.confirmationDocument.findUnique({
                     where: { id },
@@ -99,17 +115,20 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.confirmationDocument.updateMany({ where, data }),
             };
-        case "invoice":
+        }
+        case "invoice": {
+            const findWithArtifacts = (id: string) => client.invoiceDocument.findFirst({
+                where: { id, deletedAt: null },
+                include: { artifacts: true },
+            });
             return {
                 scope: "invoices" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
                     pdfDirectory: env.NEXTCLOUD_INVOICE_PDF_PATH,
                     docxDirectory: env.NEXTCLOUD_INVOICE_ORIGINAL_PATH,
                 },
-                findWithArtifacts: (id: string) => client.invoiceDocument.findFirst({
-                    where: { id, deletedAt: null },
-                    include: { artifacts: true },
-                }),
+                findWithArtifacts,
+                requireWithArtifacts: (id: string) => requireFrom(() => findWithArtifacts(id)),
                 /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
                 readModel: async (id: string) => (await client.invoiceDocument.findUnique({
                     where: { id },
@@ -122,5 +141,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.invoiceDocument.updateMany({ where, data }),
             };
+        }
     }
 }

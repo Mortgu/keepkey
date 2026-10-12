@@ -1,8 +1,10 @@
 import { formatOfferData } from "../pipelines/offer/build-offer.js";
 import type { Prisma } from "@prisma/client";
 import { AppException } from "../lib/exceptions.js";
+import { prisma } from "../lib/prismaClient.js";
 import { contractOrderBy } from "./contract.service.js";
 import { serializeAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
+import type { DocumentType } from "@keepit/schemas";
 
 export const acceptanceInclude = {
     customer: true,
@@ -88,4 +90,42 @@ export async function acceptOffer(
         data: { isCurrent: false },
     });
     return acceptedAt;
+}
+
+/**
+ * Angenommene Angebote sind dauerhaft eingefroren — ihre Dokumente dürfen dann
+ * weder umbenannt, gelöscht noch ersetzt werden. Betrifft nur `offer`: andere
+ * Dokumenttypen kennen diesen Zustand nicht.
+ */
+export async function assertOfferDocumentEditable(type: DocumentType, id: string) {
+    if (type !== "offer") return;
+    const doc = await prisma.offerDocument.findUnique({
+        where: { id },
+        select: { offer: { select: { acceptedAt: true } } },
+    });
+    if (doc?.offer.acceptedAt) {
+        throw new AppException(
+            "Accepted offers' documents can no longer be changed.",
+            409,
+            "OFFER_ACCEPTED",
+        );
+    }
+}
+
+/**
+ * Ob sich Änderungen dieses Dokuments ins Angebot übernehmen lassen: nur für
+ * Angebote, nur beim aktuellen Dokument des unveränderten Angebots. Wurde das
+ * Angebot nach dem Erzeugen geändert (oder ist es angenommen), würde ein Wert
+ * aus der Datei einen neueren Stand überschreiben.
+ */
+export async function canAdoptIntoSource(type: DocumentType, id: string): Promise<boolean> {
+    if (type !== "offer") return false;
+
+    const document = await prisma.offerDocument.findUnique({
+        where: { id },
+        select: { isCurrent: true, sourceVersion: true, offer: { select: { version: true, acceptedAt: true } } },
+    });
+    return Boolean(document?.isCurrent)
+        && document?.sourceVersion === document?.offer.version
+        && !document?.offer.acceptedAt;
 }
