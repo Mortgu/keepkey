@@ -3,7 +3,7 @@ import { createInvoiceSchema, type CreateInvoiceInput, type InvoiceFilterParams 
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
-import { requestInvoiceGeneration } from "./invoice-generation.service.js";
+import { requestInvoiceGeneration } from "./document-generation-request.service.js";
 
 const withDocuments = {
     documents: {

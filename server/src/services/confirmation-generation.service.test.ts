@@ -1,83 +1,87 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { DocumentStatus } from "@prisma/client";
 
 const fake = vi.hoisted(() => {
-    const tx = {
-        $queryRaw: vi.fn(async () => []),
-        confirmationDocument: {
-            findFirst: vi.fn(async (): Promise<unknown> => null),
-            findMany: vi.fn(async (): Promise<Array<{ id: string }>> => []),
-            create: vi.fn(async () => ({})),
-        },
-        task: { create: vi.fn(async () => ({ id: "task-new" })) },
-    };
+    const tx = { documentArtifact: { create: vi.fn(async (args: { data: Record<string, unknown> }) => args.data) } };
     return {
         tx,
-        confirmation: { findUnique: vi.fn(async (): Promise<unknown> => ({ id: "conf-1", order: { cancelledAt: null } })) },
-        enqueueTask: vi.fn(async () => {}),
-        deleteDocument: vi.fn(async () => {}),
+        transaction: vi.fn((fn: (tx: unknown) => unknown) => fn(tx)),
+        findFirst: vi.fn(async (): Promise<{
+            id: string;
+            status: DocumentStatus;
+            sourceVersion: number | null;
+            confirmationId: string;
+            artifacts: { format: string }[];
+        } | null> => ({
+            id: "doc-1",
+            status: DocumentStatus.PROCESSING,
+            sourceVersion: null,
+            confirmationId: "conf-1",
+            artifacts: [],
+        })),
+        buildConfirmation: vi.fn(async () => ({ data: {}, language: "DE" as const, displayName: "AB-1" })),
+        renderDocument: vi.fn(async () => ({
+            docxBuffer: Buffer.from("docx"),
+            pdfBuffer: Buffer.from("pdf"),
+            model: {},
+            modelHash: "hash",
+        })),
+        storeDocumentArtifacts: vi.fn(async () => ({
+            pdf: { objectKey: "pdf-key", size: 1, sha256: "a" },
+            docx: { objectKey: "docx-key", size: 1, sha256: "b" },
+        })),
+        removeDocumentArtifacts: vi.fn(async () => {}),
+        updateMany: vi.fn(async () => ({ count: 1 })),
     };
 });
 
 vi.mock("../lib/prismaClient.js", () => ({
-    prisma: {
-        confirmation: fake.confirmation,
-        $transaction: vi.fn((fn: (tx: unknown) => unknown) => fn(fake.tx)),
-    },
+    prisma: { confirmationDocument: { findFirst: fake.findFirst }, $transaction: fake.transaction },
 }));
-vi.mock("../lib/document.js", () => ({ enqueueTask: fake.enqueueTask }));
-vi.mock("./documents.service.js", () => ({ deleteDocument: fake.deleteDocument }));
+vi.mock("../pipelines/confirmation/build-confirmation.js", () => ({ buildConfirmation: fake.buildConfirmation }));
+vi.mock("../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
+vi.mock("../lib/document-artifact-store.js", () => ({
+    storeDocumentArtifacts: fake.storeDocumentArtifacts,
+    removeDocumentArtifacts: fake.removeDocumentArtifacts,
+}));
+vi.mock("./document-repo.js", () => ({
+    documentTable: () => ({ scope: "confirmations", updateMany: fake.updateMany, findWithArtifacts: vi.fn(async () => null) }),
+}));
 
-import { requestConfirmationGeneration } from "./confirmation-generation.service.js";
+const { generateConfirmationDocument } = await import("./confirmation-generation.service.js");
 
-describe("requestConfirmationGeneration", () => {
+describe("generateConfirmationDocument", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        fake.tx.confirmationDocument.findFirst.mockResolvedValue(null);
-        fake.tx.confirmationDocument.findMany.mockResolvedValue([]);
-        fake.confirmation.findUnique.mockResolvedValue({ id: "conf-1", order: { cancelledAt: null } });
+        fake.updateMany.mockResolvedValue({ count: 1 });
     });
 
-    it("creates task + pending document and enqueues it", async () => {
-        const task = await requestConfirmationGeneration("conf-1");
+    it("builds from the confirmationId, never checks staleness, and finalizes as a new version", async () => {
+        await generateConfirmationDocument("task-1");
 
-        expect(task.id).toBe("task-new");
-        expect(fake.tx.task.create).toHaveBeenCalledWith({
-            data: { status: "PENDING", type: "GENERATION", target: "CONFIRMATION" },
-        });
-        expect(fake.tx.confirmationDocument.create).toHaveBeenCalledWith({
-            data: { confirmationId: "conf-1", status: "PENDING", taskId: "task-new" },
-        });
-        expect(fake.enqueueTask).toHaveBeenCalledWith("task-new", { markFailedOnError: true });
-        expect(fake.deleteDocument).not.toHaveBeenCalled();
+        expect(fake.buildConfirmation).toHaveBeenCalledWith("conf-1");
+        expect(fake.renderDocument).toHaveBeenCalledWith(
+            "CONFIRMATION",
+            "DE",
+            {},
+            { documentType: "confirmation", documentId: "doc-1" },
+            { schema: undefined },
+        );
+        expect(fake.updateMany).toHaveBeenCalledWith(
+            { confirmationId: "conf-1", isCurrent: true },
+            { isCurrent: false },
+        );
+        expect(fake.tx.documentArtifact.create).toHaveBeenCalledTimes(2);
+        expect(fake.updateMany).toHaveBeenCalledWith(
+            { id: "doc-1", deletedAt: null, status: DocumentStatus.PROCESSING },
+            expect.objectContaining({ status: DocumentStatus.GENERATED, displayName: "AB-1", isCurrent: true }),
+        );
     });
 
-    it("replaces the previous document instead of versioning", async () => {
-        fake.tx.confirmationDocument.findMany.mockResolvedValue([{ id: "doc-old" }]);
+    it("does nothing when the task's document cannot be found", async () => {
+        fake.findFirst.mockResolvedValue(null);
 
-        await requestConfirmationGeneration("conf-1");
-
-        expect(fake.deleteDocument).toHaveBeenCalledWith("confirmation", "doc-old");
-        expect(fake.tx.confirmationDocument.create).toHaveBeenCalledOnce();
-    });
-
-    it("re-uses a running generation and does not touch existing documents", async () => {
-        fake.tx.confirmationDocument.findFirst.mockResolvedValue({ task: { id: "task-active" } });
-        fake.tx.confirmationDocument.findMany.mockResolvedValue([{ id: "doc-old" }]);
-
-        const task = await requestConfirmationGeneration("conf-1");
-
-        expect(task.id).toBe("task-active");
-        expect(fake.tx.task.create).not.toHaveBeenCalled();
-        expect(fake.deleteDocument).not.toHaveBeenCalled();
-        expect(fake.enqueueTask).toHaveBeenCalledWith("task-active", { markFailedOnError: false });
-    });
-
-    it("refuses cancelled orders and unknown confirmations", async () => {
-        fake.confirmation.findUnique.mockResolvedValue({ id: "conf-1", order: { cancelledAt: new Date() } });
-        await expect(requestConfirmationGeneration("conf-1")).rejects.toMatchObject({ code: "ORDER_CANCELLED" });
-
-        fake.confirmation.findUnique.mockResolvedValue(null);
-        await expect(requestConfirmationGeneration("nope")).rejects.toMatchObject({ statusCode: 404 });
-        expect(fake.enqueueTask).not.toHaveBeenCalled();
+        await expect(generateConfirmationDocument("task-1")).rejects.toThrow("for task task-1 was not found");
+        expect(fake.buildConfirmation).not.toHaveBeenCalled();
     });
 });

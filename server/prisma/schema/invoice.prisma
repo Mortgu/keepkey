@@ -31,6 +31,9 @@ model Invoice {
 
   documents InvoiceDocument[]
 
+  /// @openapi.ignore
+  documentVersion Int @default(0)
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -40,8 +43,10 @@ model Invoice {
 }
 
 /// Dieselben Spalten wie die anderen Dokumenttabellen (siehe
-/// `ConfirmationDocument`), keine Versionierung: eine neue Generierung ersetzt
-/// das vorherige Dokument.
+/// `ConfirmationDocument`) — Versionierung wie dort: jede Generierung legt
+/// eine neue Version an, keine wird automatisch gelöscht. `sourceVersion`
+/// bleibt immer `null`, da die Rechnungskonditionen ab Anlage unveränderlich
+/// sind.
 model InvoiceDocument {
   id String @id @default(cuid())
 
@@ -72,5 +77,6 @@ model InvoiceDocument {
   deletedAt DateTime? @db.Timestamptz(6)
 
   @@index([invoiceId])
+  @@unique([invoiceId, version])
   @@map("invoice_document")
 }

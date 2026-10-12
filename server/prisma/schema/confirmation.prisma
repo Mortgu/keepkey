@@ -24,6 +24,9 @@ model Confirmation {
 
   documents ConfirmationDocument[]
 
+  /// @openapi.ignore
+  documentVersion Int @default(0)
+
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
@@ -33,8 +36,10 @@ model Confirmation {
 
 /// Dieselben Spalten wie OfferDocument/OrderDocument, damit Umbenennen,
 /// Löschen, Download und Nextcloud-Upload über `document-repo.ts` unverändert
-/// funktionieren. Anders als dort gibt es keine Versionierung: Eine neue
-/// Generierung ersetzt das vorherige Dokument (`deletedAt`), `version` bleibt 0.
+/// funktionieren. Versioniert wie dort: jede Generierung legt eine neue Version
+/// an, keine wird automatisch gelöscht. `sourceVersion` bleibt immer `null` —
+/// die Konditionen der AB sind ab Anlage unveränderlich, es gibt also nichts,
+/// wogegen eine Generierung veralten könnte.
 model ConfirmationDocument {
   id String @id @default(cuid())
 
@@ -65,5 +70,6 @@ model ConfirmationDocument {
   deletedAt DateTime? @db.Timestamptz(6)
 
   @@index([confirmationId])
+  @@unique([confirmationId, version])
   @@map("confirmation_document")
 }

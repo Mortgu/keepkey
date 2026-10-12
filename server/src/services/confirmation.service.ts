@@ -3,7 +3,7 @@ import { createConfirmationSchema, type CreateConfirmationInput } from "@keepit/
 import { AppException } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
-import { requestConfirmationGeneration } from "./confirmation-generation.service.js";
+import { requestConfirmationGeneration } from "./document-generation-request.service.js";
 
 const withDocuments = {
     documents: {
