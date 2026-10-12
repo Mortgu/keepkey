@@ -6,6 +6,7 @@ const employee = z.object({
     firstName: z.string(),
     lastName: z.string(),
     salutation: z.string(),
+    fullName: z.string(),
 
     phone: z.string().nullish().transform(v => v ?? ''),
     email: z.string(),

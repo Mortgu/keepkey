@@ -1,6 +1,7 @@
 import type { Language } from "@prisma/client";
 import type { OfferTemplate, OfferTemplateItem } from "@/schemas/templates/offer.template.schema.js";
-import { pickTranslation } from "@/utils/i18n.js";
+import { pickTranslation, translateFields } from "@/utils/i18n.js";
+import { formatParty } from "@/utils/party.js";
 import { formatCentsToEur, formatDate } from "@/utils/utils.js";
 import type { OfferModel, PositionAmounts, PositionModel } from "./offer-model.js";
 
@@ -54,12 +55,12 @@ function presentItem(
     price: PositionAmounts,
     context: { language: Language; contractName: string; validUntil: string | null; durationLabel: string },
 ): OfferTemplateItem {
-    const translation = pickTranslation(position.translations, context.language);
+    const translation = translateFields(position.translations, context.language, { name: "", description: "", table: "" });
 
     return {
-        name: translation?.name ?? "",
-        description: translation?.description ?? "",
-        content: translation?.table ?? "",
+        name: translation.name,
+        description: translation.description,
+        content: translation.table,
         quantity: String(position.quantity),
         eur_user_month: formatCentsToEur(price.eur_user_month),
         duration: context.durationLabel,
@@ -87,7 +88,7 @@ export function presentOffer(model: OfferModel): OfferTemplate {
     const offerContract = contractName(model.contract);
 
     const productNames = model.positions
-        .map((p) => pickTranslation(p.translations, language)?.name ?? "")
+        .map((p) => translateFields(p.translations, language, { name: "" }).name)
         .join(" & ");
 
     const products = model.positions.map((position) => presentItem(position, position, {
@@ -152,22 +153,16 @@ export function presentOffer(model: OfferModel): OfferTemplate {
             street: customer.street,
             zip: customer.zip,
             city: customer.city,
-            fullName: `${cp.salutation ?? ""} ${cp.firstName} ${cp.lastName}`.trim(),
-            salutation: cp.salutation,
-            firstName: cp.firstName,
-            lastName: cp.lastName,
-            phone: customer.phone,
-            email: cp.email,
+            ...formatParty({ salutation: cp.salutation, firstName: cp.firstName, lastName: cp.lastName, phone: customer.phone, email: cp.email }),
         },
 
-        employee: {
-            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
+        employee: formatParty({
             salutation: employee.salutation,
             firstName: employee.firstName,
             lastName: employee.lastName,
-            phone: employee.phone ?? "",
+            phone: employee.phone,
             email: employee.email,
-        },
+        }),
 
         product_names: productNames,
         products,

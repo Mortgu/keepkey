@@ -1,7 +1,8 @@
 import type { Language } from "@prisma/client";
 import { getOrderById } from "../../services/order.service.js";
 import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
-import { pickTranslation } from "../../utils/i18n.js";
+import { translateFields } from "../../utils/i18n.js";
+import { formatParty } from "../../utils/party.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 
 export type OrderFetchedData = Awaited<ReturnType<typeof fetchOrderData>>;
@@ -26,27 +27,24 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     // Vertrag und Laufzeit gelten fuer die ganze Bestellung. Sie werden einmal
     // aufgeloest und an jede Position gehaengt, damit das Template weiterhin
     // `position.contract` und `position.duration_months` lesen kann.
-    const orderContractT = pickTranslation(order.contract.translations, lang);
     const contract = {
         ...order.contract,
-        name: orderContractT?.name ?? "",
-        features: orderContractT?.features ?? [],
-        table: orderContractT?.table ?? "",
+        ...translateFields(order.contract.translations, lang, { name: "", features: [] as string[], table: "" }),
     };
     const duration_months = order.duration_months;
 
     const orderPositions = order.orderPositions.map((position) => {
-        const pt = pickTranslation(position.product.translations, lang);
+        const pt = translateFields(position.product.translations, lang, { name: "", description: "", table: "" });
         return {
             ...position,
             duration_months,
             contract,
-            product: { ...position.product, name: pt?.name ?? "", description: pt?.description ?? "", table: pt?.table ?? "" },
+            product: { ...position.product, ...pt },
         };
     });
     const flatRates = order.flatRates.map((fr) => {
-        const ft = pickTranslation(fr.flatRate.translations, lang);
-        return { ...fr, flatRate: { ...fr.flatRate, name: ft?.name ?? "", table: ft?.table ?? "" } };
+        const ft = translateFields(fr.flatRate.translations, lang, { name: "", table: "" });
+        return { ...fr, flatRate: { ...fr.flatRate, ...ft } };
     });
 
     const products = orderPositions.map((position) => ({
@@ -123,22 +121,16 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             zip: customer.zip || "",
             city: customer.city || "",
 
-            fullName: `${ccp.salutation ?? ""} ${ccp.firstName} ${ccp.lastName}`.trim(),
-            salutation: ccp.salutation || "",
-            firstName: ccp.firstName || "",
-            lastName: ccp.lastName || "",
-            phone: customer.phone || "",
-            email: customer.email || "",
+            ...formatParty({ salutation: ccp.salutation, firstName: ccp.firstName, lastName: ccp.lastName, phone: customer.phone, email: customer.email }),
         },
 
-        employee: {
-            fullName: `${employee.salutation} ${employee.firstName} ${employee.lastName}`,
-            salutation: employee.salutation || "",
-            firstName: employee.firstName || "",
-            lastName: employee.lastName || "",
-            phone: employee.phone || "",
-            email: employee.email || "",
-        },
+        employee: formatParty({
+            salutation: employee.salutation,
+            firstName: employee.firstName,
+            lastName: employee.lastName,
+            phone: employee.phone,
+            email: employee.email,
+        }),
     };
 }
 
@@ -206,7 +198,7 @@ export async function buildOrder(orderId: string, version: number): Promise<{
 
     const company = order.customer.companyName.replaceAll(" ", "").trim();
     const workloads = order.orderPositions
-        .map((p) => (pickTranslation(p.product.translations, "DE")?.name ?? "").replaceAll(" ", ""))
+        .map((p) => translateFields(p.product.translations, "DE", { name: "" }).name.replaceAll(" ", ""))
         .join("+");
 
     return {

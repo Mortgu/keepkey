@@ -2,7 +2,8 @@ import type { Language } from "@prisma/client";
 import { prisma } from "../../lib/prismaClient.js";
 import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
 import { getOrderById } from "../../services/order.service.js";
-import { pickTranslation } from "../../utils/i18n.js";
+import { translateFields } from "../../utils/i18n.js";
+import { formatParty } from "../../utils/party.js";
 import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
 
 /** "30 Tage" / "14 days" → 30 / 14; sonst null. */
@@ -49,7 +50,7 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
     let pos = 0;
     const items = [
         ...order.orderPositions.map((p) => {
-            const table = pickTranslation(p.product.translations, lang)?.table ?? "";
+            const { table } = translateFields(p.product.translations, lang, { table: "" });
 
             return {
                 pos: ++pos,
@@ -63,7 +64,7 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
         }),
         ...order.flatRates.map((fr) => ({
             pos: ++pos,
-            description: pickTranslation(fr.flatRate.translations, lang)?.table ?? "",
+            description: translateFields(fr.flatRate.translations, lang, { table: "" }).table,
             quantity: fr.quantity,
             unitPrice: eur(fr.quantity ? fr.total_cents / fr.quantity : 0),
             gross: eur(fr.total_cents),
@@ -112,23 +113,24 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
         customer: {
             id: customer.customerId,
             companyName: customer.companyName,
-            firstName: ccp.firstName,
-            lastName: ccp.lastName,
-            salutation: ccp.salutation ?? "",
-            fullName: `${ccp.salutation ?? ""} ${ccp.firstName} ${ccp.lastName}`.trim(),
-            phone: customer.phone,
-            email: customer.invoiceEmail || customer.email,
             street: customer.street ?? "",
             zip: customer.zip ?? "",
             city: customer.city ?? "",
+            ...formatParty({
+                salutation: ccp.salutation,
+                firstName: ccp.firstName,
+                lastName: ccp.lastName,
+                phone: customer.phone,
+                email: customer.invoiceEmail || customer.email,
+            }),
         },
-        employee: {
+        employee: formatParty({
+            salutation: employee.salutation,
             firstName: employee.firstName,
             lastName: employee.lastName,
-            salutation: employee.salutation,
             phone: employee.phone,
             email: employee.email,
-        },
+        }),
 
         projectDescription: order.projectDescription ?? "",
         orderDetails: order.orderDetails ?? "",
