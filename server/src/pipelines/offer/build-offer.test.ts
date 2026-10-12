@@ -7,10 +7,11 @@ vi.mock("@/utils/products.js", () => ({
     calculatePrice: (...args: unknown[]) => calculatePrice(...args),
 }));
 
-const { formatOfferData } = await import("./build-offer.js");
+const { formatOfferData, buildOfferDocument } = await import("./build-offer.js");
 const { computeOfferModel } = await import("./compute-offer.js");
 const { presentOffer, withNumberPrefixes } = await import("./present-offer.js");
 const { offerFixture: fixture } = await import("./offer.fixture.js");
+const { serializeAcceptedOfferSnapshot } = await import("../../schemas/accepted-offer.js");
 
 describe("formatOfferData", () => {
     beforeEach(() => {
@@ -68,6 +69,126 @@ describe("Angebotsmodell", () => {
         model.contract.translations = [];
 
         expect(() => presentOffer(model)).toThrow(/No translation available for contract c-base/);
+    });
+});
+
+describe("angenommenes Angebot", () => {
+    beforeEach(() => {
+        calculatePrice.mockReset().mockImplementation(async ({ contractId }: { contractId: string }) =>
+            contractId === "c-broken" ? { ok: false } : { ok: true, breakdown: { unitPrice: 700 } });
+    });
+
+    const iso = (s: string) => new Date(`${s}T12:00:00.000Z`);
+    const timestamps = { createdAt: iso("2026-01-01"), updatedAt: iso("2026-01-01") };
+
+    function frozenCommercialSource() {
+        return {
+            supplierId: "SUP-1",
+            customerId: "cust-1",
+            contactPersonId: "contact-1",
+            employeeId: "user-1",
+            contractId: "c-base",
+            duration_months: 24,
+            paymentTerm: "30 Tage",
+            language: "DE" as const,
+            validUntil: iso("2026-11-01"),
+            requestFrom: iso("2026-09-15"),
+            net_amount: 166000,
+            customer: {
+                id: "cust-1", customerId: "K-100", companyName: "Frozen Corp GmbH", language: "DE" as const,
+                email: "info@frozen.test", invoiceEmail: "billing@frozen.test", phone: "030 1",
+                street: "Weg 1", city: "Berlin", zip: "12345", country: "DE", currency: "EUR" as const,
+                taxRate: 19, salutation: null, ...timestamps,
+            },
+            customerContactPerson: {
+                id: "contact-1", customerId: "cust-1", salutation: "Frau", firstName: "Anna", lastName: "Muster",
+                email: "anna@frozen.test", ...timestamps,
+            },
+            employee: {
+                id: "user-1", name: "Max Verkauf", salutation: "Herr", firstName: "Max", lastName: "Verkauf",
+                email: "max@keepit.test", phone: null, ...timestamps,
+            },
+            contract: {
+                id: "c-base",
+                translations: [
+                    { language: "DE" as const, name: "Basic", features: ["Backup"], table: "" },
+                    { language: "EN" as const, name: "Basic", features: ["Backup"], table: "" },
+                ],
+                ...timestamps,
+            },
+            positions: [
+                {
+                    id: "p-1", productId: "prod-1",
+                    product: {
+                        id: "prod-1",
+                        translations: [
+                            { language: "DE" as const, name: "Legacy Product", description: "M365", table: "Tabelle M365" },
+                            { language: "EN" as const, name: "Legacy Product", description: null, table: null },
+                        ],
+                        ...timestamps,
+                    },
+                    quantity: 10, optional: false, total_cents: 120000, discount_cents: 10000, free_months: 2,
+                    eur_user_month: 500, ...timestamps,
+                },
+                {
+                    id: "p-2", productId: "prod-2",
+                    product: {
+                        id: "prod-2",
+                        translations: [
+                            { language: "DE" as const, name: "Salesforce", description: null, table: null },
+                            { language: "EN" as const, name: "Salesforce", description: null, table: null },
+                        ],
+                        ...timestamps,
+                    },
+                    quantity: 5, optional: true, total_cents: 36000, discount_cents: 0, free_months: 0,
+                    eur_user_month: 300, ...timestamps,
+                },
+            ],
+            flatRates: [
+                {
+                    id: "fr-1", flatRateId: "flatrate-1",
+                    flatRate: {
+                        id: "flatrate-1", total_cents: 25000,
+                        translations: [
+                            { language: "DE" as const, name: "Setup", description: null, table: "Setup-Tabelle" },
+                            { language: "EN" as const, name: "Setup", description: null, table: "Setup table" },
+                        ],
+                        ...timestamps,
+                    },
+                    quantity: 1, total_cents: 25000,
+                },
+            ],
+            discounts: [
+                { id: "disc-1", title: "Treuerabatt", description: null, amount_cents: 5000, ...timestamps },
+            ],
+        };
+    }
+
+    async function acceptedSnapshotFixture() {
+        const frozenTemplateBasis = fixture({ customerCompanyName: "Frozen Corp GmbH", productName: "Legacy Product" });
+        const offerTemplate = await formatOfferData(frozenTemplateBasis);
+        return serializeAcceptedOfferSnapshot(frozenCommercialSource(), offerTemplate);
+    }
+
+    it("stellt den Dateinamen aus dem eingefrorenen Snapshot dar, nicht aus dem aktuellen Stand", async () => {
+        const acceptedSnapshot = await acceptedSnapshotFixture();
+        const renamed = fixture({ acceptedSnapshot, customerCompanyName: "Renamed Corp AG", productName: "New Product Name" });
+
+        const built = await buildOfferDocument(renamed, 0);
+
+        expect(built.displayName).toContain("FrozenCorpGmbH");
+        expect(built.displayName).toContain("LegacyProduct");
+        expect(built.displayName).not.toContain("RenamedCorpAG");
+        expect(built.displayName).not.toContain("NewProductName");
+    });
+
+    it("stellt den Dateinamen aus dem aktuellen Stand dar, wenn kein Snapshot existiert", async () => {
+        const live = fixture({ customerCompanyName: "Live Corp AG", productName: "Current Product" });
+
+        const built = await buildOfferDocument(live, 0);
+
+        expect(built.displayName).toContain("LiveCorpAG");
+        expect(built.displayName).toContain("CurrentProduct");
     });
 });
 

@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
-import { presentOffer } from "../accepted-offer-view.js";
+import { presentAcceptedOffer } from "../accepted-offer-view.js";
 
 /**
  * Schlanke Order-Teilansicht fürs Angebot — nur Status, keine Artefakte.
@@ -113,7 +113,7 @@ export async function getOffers(query: OfferFilterParams) {
 
     const nextCursor = items.length === limit ? items[items.length - 1]?.id ?? null : null;
 
-    return { items: items.map(presentOffer), nextCursor };
+    return { items: items.map(presentAcceptedOffer), nextCursor };
 }
 
 export async function getOfferById(id: string) {
@@ -158,7 +158,7 @@ export async function getOfferById(id: string) {
         throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
     }
 
-    return presentOffer(offer);
+    return presentAcceptedOffer(offer);
 }
 
 export async function getNextQuoteId(): Promise<number> {

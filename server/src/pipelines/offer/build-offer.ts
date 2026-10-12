@@ -1,7 +1,8 @@
-import { parseAcceptedOfferSnapshot, parseAcceptedOfferTemplate } from "../../schemas/accepted-offer.js";
+import { parseAcceptedOfferTemplate } from "../../schemas/accepted-offer.js";
 
 import { prisma } from "@/lib/prismaClient.js";
 import { contractOrderBy } from "@/services/contract.service.js";
+import { presentAcceptedOffer } from "@/services/accepted-offer-view.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import logger from "@/utils/logger.js";
@@ -41,28 +42,6 @@ export const fetchOfferData = async (offerId: string) => {
         }),
     ]);
 
-    if (offer.acceptedSnapshot) {
-        const s = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
-        // No current master data enters an accepted document's commercial content.
-        offer.customer = { ...offer.customer, ...s.customer };
-        offer.customerContactPerson = { ...offer.customerContactPerson, ...s.customerContactPerson };
-        offer.user = { ...offer.user, ...s.employee };
-        offer.language = s.language;
-        offer.contract = { ...offer.contract, translations: s.contract.translations.map(t => ({
-            ...t, contractId: s.contract.id, createdAt: s.contract.createdAt, updatedAt: s.contract.updatedAt,
-        })) };
-        offer.offerPositions = s.positions.map(p => ({
-            ...p, offerId: offer.id, tariffVersionId: p.tariffVersionId ?? null, updatedAt: p.createdAt,
-            product: { ...p.product, translations: p.product.translations.map(t => ({
-                ...t, productId: p.productId, description: t.description ?? null, table: t.table ?? null,
-            })) },
-        }));
-        offer.offerFlatRates = s.flatRates.map(f => ({ ...f, offerId: offer.id,
-            flatRate: { ...f.flatRate, translations: f.flatRate.translations.map(t => ({
-                ...t, flatRateId: f.flatRateId, table: t.table ?? "",
-            })) },
-        }));
-    }
     return { offer, contracts };
 }
 
@@ -73,19 +52,17 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
     presentOffer(await computeOfferModel(fetchedData));
 
 /**
- * Alles, was die Angebotsvorlage braucht — eine Funktion, von oben nach unten:
- * Angebot laden, formatieren (bei angenommenen Angeboten aus dem Snapshot),
- * gegen das Schema prüfen, Namen bilden.
+ * Alles, was die Angebotsvorlage braucht, aus bereits geladenen Daten: formatieren
+ * (bei angenommenen Angeboten aus dem Snapshot), gegen das Schema prüfen, Namen bilden.
  *
  * `version` kommt vom `OfferDocument` und steht im Dateinamen, sobald es eine
  * Neufassung ist.
  */
-export async function buildOffer(offerId: string, version: number): Promise<{
+export async function buildOfferDocument(fetched: OfferFetchData, version: number): Promise<{
     data: Record<string, unknown>;
     language: Language;
     displayName: string;
 }> {
-    const fetched = await fetchOfferData(offerId);
     const { offer } = fetched;
 
     let data: OfferTemplate;
@@ -98,19 +75,26 @@ export async function buildOffer(offerId: string, version: number): Promise<{
         ));
     } catch (exception) {
         if (exception instanceof z.ZodError) {
-            logger.error('offer_template_validation_failed', { offerId, issues: exception.issues });
+            logger.error('offer_template_validation_failed', { offerId: offer.id, issues: exception.issues });
         }
         throw exception;
     }
 
-    const company = offer.customer.companyName.replaceAll(" ", "").trim();
-    const workloads = offer.offerPositions
-        .map((op) => (pickTranslation(op.product.translations, offer.language)?.name ?? "").replaceAll(" ", "").trim())
+    // Eingefroren bei einem angenommenen Angebot, sonst der aktuelle Stand — dieselbe
+    // Überlagerung wie die API-Ansicht (`presentAcceptedOffer`), keine zweite eigene.
+    const named = presentAcceptedOffer(offer);
+    const company = named.customer.companyName.replaceAll(" ", "").trim();
+    const workloads = named.offerPositions
+        .map((op) => (pickTranslation(op.product.translations, named.language)?.name ?? "").replaceAll(" ", "").trim())
         .join("+");
 
     return {
         data,
-        language: offer.language,
+        language: named.language,
         displayName: `${offer.quoteId}_AG_${company}_Keepit-${workloads}${version > 0 ? `_v${version}` : ''}`,
     };
+}
+
+export async function buildOffer(offerId: string, version: number) {
+    return buildOfferDocument(await fetchOfferData(offerId), version);
 }

@@ -7,7 +7,7 @@ import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
  * `orders` ist der (irreführend plural benannte) 1:1-Relationsname aus Prisma
  * (siehe `offer.prisma`) — nach außen heißt das Feld `order`, wie im Shared-Schema.
  */
-export function presentOffer<
+export function presentAcceptedOffer<
     T extends { id: string; acceptedSnapshot: Prisma.JsonValue | null; orders?: unknown },
 >(offer: T) {
     const { acceptedSnapshot, orders, ...publicOffer } = offer;

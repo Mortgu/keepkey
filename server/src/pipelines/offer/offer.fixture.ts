@@ -13,10 +13,17 @@ const contract = (id: string, de: string, en: string, features: string[]) => ({
 });
 
 /** Zwei Positionen (eine mit Freimonaten, eine optional), Flatrate, Rabatt, zwei Vergleichsverträge. */
-export function offerFixture(overrides: { language?: "DE" | "EN"; featureComparison?: boolean } = {}): OfferFetchData {
+export function offerFixture(overrides: {
+    language?: "DE" | "EN";
+    featureComparison?: boolean;
+    acceptedSnapshot?: unknown;
+    customerCompanyName?: string;
+    productName?: string;
+} = {}): OfferFetchData {
     const base = contract("c-base", "Basic", "Basic", ["Backup"]);
     const plus = contract("c-plus", "Plus", "Plus", ["Backup", "Restore"]);
     const broken = contract("c-broken", "Broken", "Broken", ["x"]);
+    const productName = overrides.productName ?? "Microsoft 365";
 
     return {
         offer: {
@@ -32,10 +39,10 @@ export function offerFixture(overrides: { language?: "DE" | "EN"; featureCompari
             paymentTerm: "30 Tage",
             supplierId: "SUP-1",
             featureComparison: overrides.featureComparison ?? true,
-            acceptedSnapshot: null,
+            acceptedSnapshot: overrides.acceptedSnapshot ?? null,
             contract: base,
             customer: {
-                customerId: "K-100", companyName: "ACME GmbH", street: "Weg 1", zip: "12345",
+                customerId: "K-100", companyName: overrides.customerCompanyName ?? "ACME GmbH", street: "Weg 1", zip: "12345",
                 city: "Berlin", phone: "030 1", email: "info@acme.test",
             },
             customerContactPerson: {
@@ -48,7 +55,7 @@ export function offerFixture(overrides: { language?: "DE" | "EN"; featureCompari
                 {
                     id: "p-1", productId: "prod-1", quantity: 10, free_months: 2, optional: false,
                     eur_user_month: 500, total_cents: 120000, discount_cents: 10000,
-                    product: { translations: [t("DE", "Microsoft 365", { description: "M365", table: "Tabelle M365" }), t("EN", "Microsoft 365")] },
+                    product: { translations: [t("DE", productName, { description: "M365", table: "Tabelle M365" }), t("EN", productName)] },
                 },
                 {
                     id: "p-2", productId: "prod-2", quantity: 5, free_months: 0, optional: true,
