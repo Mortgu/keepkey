@@ -341,6 +341,13 @@ function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowS
         try { await deleteConfirmation(); } catch { /* unten gerendert */ }
     };
 
+    // Storniert und nie angelegt: keine Aktionen/Inhalt, StageShell zeigt den
+    // "Entfällt"-Hinweis (stage.state === "cancelled" bedeutet laut
+    // deriveDerivedDoc genau diesen Fall — kein Subdokument vorhanden).
+    if (stage.state === "cancelled") {
+        return <StageShell stage={stage} />;
+    }
+
     const renderHeaderActions = () => (
         <>
             <Button
@@ -445,6 +452,13 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
         if (!confirm(t("orders.invoice.deleteConfirm", { number: invoice.invoiceId }))) return;
         try { await deleteInvoice(); } catch { /* unten gerendert */ }
     };
+
+    // Storniert und nie angelegt: keine Aktionen/Inhalt, StageShell zeigt den
+    // "Entfällt"-Hinweis (stage.state === "cancelled" bedeutet laut
+    // deriveDerivedDoc genau diesen Fall — kein Subdokument vorhanden).
+    if (stage.state === "cancelled") {
+        return <StageShell stage={stage} />;
+    }
 
     const renderHeaderActions = () => (
         <>
@@ -568,12 +582,6 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
     const positions = offer.offerPositions
         .map((p) => localized(p.product.translations, locale, "name"))
         .join(", ");
-
-    const orderSummary = offer.order ?? null;
-    // Historische AB/Rechnung bleiben auch nach Stornierung sichtbar — nur wenn
-    // nie eine angelegt wurde, entfällt die Sektion ganz (statischer Hinweis).
-    const mountConfirmation = Boolean(order) && !(orderSummary?.cancelledAt && !orderSummary.confirmation);
-    const mountInvoice = Boolean(order) && !(orderSummary?.cancelledAt && !orderSummary.invoice);
 
     return (
         <div className="grid gap-5 mx-4 pb-10">
