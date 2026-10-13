@@ -133,6 +133,11 @@ function StageShell({ stage, headerActions, children }: {
     );
 }
 
+/** Storniert und nie angelegt (siehe deriveDerivedDoc): kein Inhalt, StageShell zeigt den "Entfällt"-Hinweis. */
+function cancelledStageShell(stage: FlowStage): ReactNode | null {
+    return stage.state === "cancelled" ? <StageShell stage={stage} /> : null;
+}
+
 /* ───────────────────────────────
    Angebots-Stufe
    ─────────────────────────────── */
@@ -341,12 +346,8 @@ function ConfirmationStageSection({ stage, order, confirmation }: { stage: FlowS
         try { await deleteConfirmation(); } catch { /* unten gerendert */ }
     };
 
-    // Storniert und nie angelegt: keine Aktionen/Inhalt, StageShell zeigt den
-    // "Entfällt"-Hinweis (stage.state === "cancelled" bedeutet laut
-    // deriveDerivedDoc genau diesen Fall — kein Subdokument vorhanden).
-    if (stage.state === "cancelled") {
-        return <StageShell stage={stage} />;
-    }
+    const cancelledView = cancelledStageShell(stage);
+    if (cancelledView) return cancelledView;
 
     const renderHeaderActions = () => (
         <>
@@ -453,12 +454,8 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
         try { await deleteInvoice(); } catch { /* unten gerendert */ }
     };
 
-    // Storniert und nie angelegt: keine Aktionen/Inhalt, StageShell zeigt den
-    // "Entfällt"-Hinweis (stage.state === "cancelled" bedeutet laut
-    // deriveDerivedDoc genau diesen Fall — kein Subdokument vorhanden).
-    if (stage.state === "cancelled") {
-        return <StageShell stage={stage} />;
-    }
+    const cancelledView = cancelledStageShell(stage);
+    if (cancelledView) return cancelledView;
 
     const renderHeaderActions = () => (
         <>

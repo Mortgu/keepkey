@@ -2,7 +2,7 @@ import type { ButtonComponentProps } from "@/components";
 import { Button } from "@/components";
 import { Loader2 } from "lucide-react";
 import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
-import { forwardRef, useId } from "react";
+import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 import type { ComponentSize } from "../tokens";
 import {
@@ -16,7 +16,7 @@ import {
     FIELD_STATE_WITHIN,
     fieldState,
 } from "../tokens";
-import { Field } from "./field";
+import { Field, useFieldId } from "./field";
 import { selectOnFocus } from "./select-on-focus";
 
 type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
@@ -140,8 +140,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
 
         // Ohne eigene id fehlte dem Label das htmlFor-Ziel — Select und NumberField
         // lösen genau das schon über useId(); hier derselbe Fallback.
-        const generatedId = useId();
-        const id = rest.id ?? generatedId;
+        const id = useFieldId(rest.id);
 
         // Das Präfix ist Teil der Bedeutung des Felds ("AG" vor der Nummer), nicht
         // bloß Dekor — ohne diese Verknüpfung bliebe es für Screenreader unsichtbar.

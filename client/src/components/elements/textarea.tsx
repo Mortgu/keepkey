@@ -5,10 +5,11 @@ import {
     FIELD_FOCUS,
     FIELD_PADDING,
     FIELD_STATE,
-    fieldState
+    fieldState,
+    useFieldId
 } from "@/components";
 import type { TextareaHTMLAttributes } from "react";
-import { forwardRef, useId } from "react";
+import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
 
 export interface TextareaComponentProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
@@ -51,8 +52,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaComponentProps>(
     ({ className, size, label, error, errorTooltip, warning, warningTooltip, ...rest }, ref) => {
         // Ohne eigene id fehlte dem Label das htmlFor-Ziel — derselbe Fallback
         // wie bei Select und NumberField.
-        const generatedId = useId();
-        const id = rest.id ?? generatedId;
+        const id = useFieldId(rest.id);
 
         return (
             <Field
