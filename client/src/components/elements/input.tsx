@@ -138,10 +138,14 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
         const state = fieldState(error, warning);
         const styles = inputStyles({ input_size: size, state, disabled: Boolean(disabled) });
 
+        // Ohne eigene id fehlte dem Label das htmlFor-Ziel — Select und NumberField
+        // lösen genau das schon über useId(); hier derselbe Fallback.
+        const generatedId = useId();
+        const id = rest.id ?? generatedId;
+
         // Das Präfix ist Teil der Bedeutung des Felds ("AG" vor der Nummer), nicht
         // bloß Dekor — ohne diese Verknüpfung bliebe es für Screenreader unsichtbar.
-        const generatedId = useId();
-        const prefixId = `${rest.id ?? generatedId}-prefix`;
+        const prefixId = `${id}-prefix`;
 
         // Zahlenfelder markieren ihren Wert beim Fokus von selbst; Textfelder nur
         // auf Ansage. Ein eigener Handler der Call-Site wird angehängt, nicht ersetzt.
@@ -160,7 +164,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                 errorTooltip={errorTooltip}
                 warning={warning}
                 warningTooltip={warningTooltip}
-                htmlFor={rest.id}
+                htmlFor={id}
             >
                 <div className={styles.group({ className })}>
                     {prefix != null && (
@@ -175,6 +179,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
                         aria-describedby={prefix != null ? prefixId : undefined}
                         className={styles.input({ className: inputClassName })}
                         {...rest}
+                        id={id}
                         type={type}
                         onFocus={handleFocus}
                     />

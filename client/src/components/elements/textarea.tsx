@@ -8,7 +8,7 @@ import {
     fieldState
 } from "@/components";
 import type { TextareaHTMLAttributes } from "react";
-import { forwardRef } from "react";
+import { forwardRef, useId } from "react";
 import { tv } from "tailwind-variants";
 
 export interface TextareaComponentProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
@@ -48,22 +48,30 @@ const styles = tv({
 });
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaComponentProps>(
-    ({ className, size, label, error, errorTooltip, warning, warningTooltip, ...rest }, ref) => (
-        <Field
-            label={label}
-            error={error}
-            errorTooltip={errorTooltip}
-            warning={warning}
-            warningTooltip={warningTooltip}
-            htmlFor={rest.id}
-        >
-            <textarea
-                ref={ref}
-                className={styles({ input_size: size, state: fieldState(error, warning), className })}
-                {...rest}
-            />
-        </Field>
-    ),
+    ({ className, size, label, error, errorTooltip, warning, warningTooltip, ...rest }, ref) => {
+        // Ohne eigene id fehlte dem Label das htmlFor-Ziel — derselbe Fallback
+        // wie bei Select und NumberField.
+        const generatedId = useId();
+        const id = rest.id ?? generatedId;
+
+        return (
+            <Field
+                label={label}
+                error={error}
+                errorTooltip={errorTooltip}
+                warning={warning}
+                warningTooltip={warningTooltip}
+                htmlFor={id}
+            >
+                <textarea
+                    ref={ref}
+                    className={styles({ input_size: size, state: fieldState(error, warning), className })}
+                    {...rest}
+                    id={id}
+                />
+            </Field>
+        );
+    },
 );
 
 Textarea.displayName = "Textarea";
