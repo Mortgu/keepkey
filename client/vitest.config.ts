@@ -6,5 +6,9 @@ export default defineConfig({
         conditions: ["development"],
         alias: { "@": fileURLToPath(new URL("./src", import.meta.url)) },
     },
-    test: { include: ["src/**/*.test.ts"] },
+    test: {
+        include: ["src/**/*.test.ts", "src/**/*.test.tsx"],
+        environment: "jsdom",
+        setupFiles: ["./vitest.setup.ts"],
+    },
 });
