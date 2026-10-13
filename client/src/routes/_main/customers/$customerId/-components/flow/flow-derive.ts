@@ -3,7 +3,8 @@ import type { FlowStage, Phase, StageKind } from "./flow-types";
 
 type DocLike = { status: DocumentStatus };
 
-function documentsState(docs: ReadonlyArray<DocLike>): "busy" | "failed" | "done" {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Stub, pre-existing (unrelated to #51); real per-document status derivation is still a TODO
+function documentsState(_docs: ReadonlyArray<DocLike>): "busy" | "failed" | "done" {
 
     return "done";
 }
