@@ -76,11 +76,11 @@ export default function CustomerModal({
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      e.preventDefault();
+    e.preventDefault();
 
-      e.stopPropagation();
+    e.stopPropagation();
 
-      customerForm.handleSubmit();
+    customerForm.handleSubmit();
 
   };
 
@@ -93,12 +93,12 @@ export default function CustomerModal({
       <Dialog.Header title={isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"} />
       <Dialog.Body>
         {
-        errorCreatingCustomer ? (
-          <div className="p-4 bg-red-50 mb-2">
-            <p>{errorCreatingCustomer.message}</p>
-          </div>
-        ) : null
-      }
+          errorCreatingCustomer ? (
+            <div className="p-4 bg-red-50 mb-2">
+              <p>{errorCreatingCustomer.message}</p>
+            </div>
+          ) : null
+        }
         <form id="customer-form" onSubmit={handleSubmit} className="grid gap-4">
           <div className="flex items-center gap-4">
             <customerForm.Field name="customerId" children={(field) => (
