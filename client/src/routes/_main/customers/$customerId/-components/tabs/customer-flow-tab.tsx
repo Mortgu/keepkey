@@ -30,13 +30,13 @@ function StageCells({ stage }: { stage: FlowStage }) {
     return (
         <>
             <p className={cn(
-                "min-w-0 truncate font-mono text-sm font-medium",
+                "min-w-0 truncate pr-2 font-mono text-sm font-medium",
                 inactive && "font-sans text-xs font-normal text-(--fg-3)",
                 stage.state === "cancelled" ? "text-(--fg-3) line-through" : !inactive && "text-(--text)",
             )}>
                 {inactive ? STATE_LABEL.locked : stage.number}
             </p>
-            <p className={cn("min-w-0 truncate text-xs", stateTone(stage.state))}>
+            <p className={cn("min-w-0 truncate pr-6 text-xs", stateTone(stage.state))}>
                 {inactive ? null
                     : stage.state === "busy" ? "wird erzeugt"
                         : stage.state === "failed" ? "fehlgeschlagen"
@@ -59,7 +59,7 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
             to="/customers/$customerId/vorgang/$flowId"
             params={{ customerId, flowId: offer.id }}
             className={cn(
-                "grid items-center gap-x-3 border-b border-(--border) px-4 py-3 outline-none transition-colors last:border-b-0",
+                "grid items-center border-b border-(--border) px-4 py-3 outline-none transition-colors last:border-b-0",
                 "hover:bg-(--page-bg) focus-visible:shadow-[inset_0_0_0_2px_var(--primary-400)]",
                 COLUMNS,
                 cancelled && "bg-(--page-bg)",
@@ -69,7 +69,7 @@ function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string 
                 <StageCells key={stage.kind} stage={stage} />
             ))}
 
-            <p className={cn("text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
+            <p className={cn("pr-3 text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
                 {eur(offer.net_amount)}
             </p>
 
@@ -119,16 +119,16 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
                 <div className="overflow-x-auto rounded-md border border-(--border) bg-white">
                     <div className="min-w-[1000px]">
                         <div className={cn(
-                            "grid gap-x-3 border-b border-(--border) bg-(--page-bg) px-4 py-2 text-[11px] font-medium uppercase tracking-wide text-(--fg-3)",
+                            "grid border-b border-(--border) bg-(--page-bg) px-4 py-2 text-[11px] font-medium uppercase tracking-wide text-(--fg-3)",
                             COLUMNS,
                         )}>
                             {KINDS.map((kind) => (
                                 <Fragment key={kind}>
-                                    <span className="truncate">{STATION[kind].short} Nr.</span>
-                                    <span>Datum</span>
+                                    <span className="truncate pr-2">{STATION[kind].short} Nr.</span>
+                                    <span className="pr-6">Datum</span>
                                 </Fragment>
                             ))}
-                            <span className="text-right">Netto</span>
+                            <span className="pr-3 text-right">Netto</span>
                             <span />
                         </div>
 
