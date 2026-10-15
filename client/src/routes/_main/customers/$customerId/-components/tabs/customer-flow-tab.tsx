@@ -123,15 +123,13 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
                             COLUMNS,
                         )}>
                             {KINDS.map((kind) => (
-                                <span key={kind} className="col-span-2 row-start-1">{STATION[kind].short}</span>
-                            ))}
-                            {KINDS.map((kind) => (
                                 <Fragment key={kind}>
-                                    <span className="row-start-2 normal-case tracking-normal">Nr.</span>
-                                    <span className="row-start-2 normal-case tracking-normal">Datum</span>
+                                    <span className="truncate">{STATION[kind].short} Nr.</span>
+                                    <span>Datum</span>
                                 </Fragment>
                             ))}
-                            <span className="col-start-9 row-span-2 row-start-1 self-end text-right">Netto</span>
+                            <span className="text-right">Netto</span>
+                            <span />
                         </div>
 
                         {offers.map(offer => <FlowTableRow key={offer.id} offer={offer} customerId={customerId} />)}
