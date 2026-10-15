@@ -1,18 +1,16 @@
 import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useLocale, useModal, useOffers } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
+import { useModal, useOffers } from "@/hooks";
 import type { Offer } from "@keepit/schemas";
 import { Link } from "@tanstack/react-router";
 import { ChevronRight } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../flow/flow-derive";
 import { STATE_LABEL, STATION, eur, stateTone } from "../flow/flow-meta";
 import type { FlowStage } from "../flow/flow-types";
-import { DERIVATION_LABEL } from "../flow/flow-types";
 
 /**
  * Reiter "Vorgänge" als Tabelle. Eine Zeile ist ein Vorgang: das Angebot und
@@ -23,75 +21,52 @@ import { DERIVATION_LABEL } from "../flow/flow-types";
  * berechnet aus dem Angebot samt (optional geladener) Bestellung.
  */
 
-const COLUMNS = "grid-cols-[minmax(240px,2.4fr)_repeat(4,minmax(124px,1fr))_112px_20px]";
+const COLUMNS = "grid-cols-[repeat(4,minmax(104px,1fr)_minmax(84px,0.8fr))_96px_16px]";
 const KINDS = ["offer", "order", "confirmation", "invoice"] as const;
 
-function StageCell({ stage }: { stage: FlowStage }) {
-    if (stage.state === "locked" || stage.state === "action") {
-        return <span className="text-xs text-(--fg-3)">{STATE_LABEL.locked}</span>;
-    }
+function StageCells({ stage }: { stage: FlowStage }) {
+    const inactive = stage.state === "locked" || stage.state === "action";
 
     return (
-        <div className="grid min-w-0">
+        <>
             <p className={cn(
-                "truncate  font-mono text-sm font-medium leading-tight",
-                stage.state === "cancelled" ? "text-(--fg-3) line-through" : "text-(--text)",
+                "min-w-0 truncate font-mono text-sm font-medium",
+                inactive && "font-sans text-xs font-normal text-(--fg-3)",
+                stage.state === "cancelled" ? "text-(--fg-3) line-through" : !inactive && "text-(--text)",
             )}>
-                {stage.number}
+                {inactive ? STATE_LABEL.locked : stage.number}
             </p>
-            <p className={cn("truncate text-xs leading-tight mt-0.5", stateTone(stage.state))}>
-                {stage.state === "busy" ? "wird erzeugt"
-                    : stage.state === "failed" ? "fehlgeschlagen"
-                        : stage.state === "cancelled" ? "storniert"
-                            : stage.date}
+            <p className={cn("min-w-0 truncate text-xs", stateTone(stage.state))}>
+                {inactive ? null
+                    : stage.state === "busy" ? "wird erzeugt"
+                        : stage.state === "failed" ? "fehlgeschlagen"
+                            : stage.state === "cancelled" ? "storniert"
+                                : stage.date}
             </p>
-        </div>
+        </>
     );
 }
 
 function FlowTableRow({ offer, customerId }: { offer: Offer; customerId: string }) {
-    const locale = useLocale();
-
     const stages = useMemo(() => deriveStages(offer), [offer]);
-
-    console.log(stages);
 
     const phase = derivePhase(offer, stages);
 
     const cancelled = phase === "cancelled";
-
-    const { customerContactPerson: ccp } = offer;
-    const positions = offer.offerPositions
-        .map((p) => localized(p.product.translations, locale, "name"))
-        .join(", ");
 
     return (
         <Link
             to="/customers/$customerId/vorgang/$flowId"
             params={{ customerId, flowId: offer.id }}
             className={cn(
-                "grid items-center gap-x-4 border-b border-(--border) px-4 py-3 outline-none transition-colors last:border-b-0",
+                "grid items-center gap-x-3 border-b border-(--border) px-4 py-3 outline-none transition-colors last:border-b-0",
                 "hover:bg-(--page-bg) focus-visible:shadow-[inset_0_0_0_2px_var(--primary-400)]",
                 COLUMNS,
                 cancelled && "bg-(--page-bg)",
             )}
         >
-            <div className="min-w-0">
-                <p className="truncate text-[14px] font-medium">{positions || `AG${offer.quoteId}`}</p>
-                <p className="mt-0.5 flex items-center gap-2 truncate text-xs text-(--fg-3)">
-                    <span className="truncate">{`${ccp.firstName} ${ccp.lastName}`.trim()}</span>
-                    {offer.derivationType && (
-                        <span className="rounded bg-(--subtle-50) px-1.5 py-px text-[11px] text-(--fg-2)">
-                            {DERIVATION_LABEL[offer.derivationType]}
-                        </span>
-                    )}
-                </p>
-            </div>
-
             {stages.map((stage) => (
-                <div key={stage.kind} className="min-w-0">
-                    <StageCell stage={stage} />
-                </div>
+                <StageCells key={stage.kind} stage={stage} />
             ))}
 
             <p className={cn("text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
@@ -142,15 +117,21 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
 
             {!isPending && (
                 <div className="overflow-x-auto rounded-md border border-(--border) bg-white">
-                    <div className="min-w-[940px]">
+                    <div className="min-w-[1000px]">
                         <div className={cn(
-                            "grid gap-x-4 border-b border-(--border) bg-(--page-bg) px-4 py-2 text-[11px] font-medium uppercase tracking-wide text-(--fg-3)",
+                            "grid gap-x-3 border-b border-(--border) bg-(--page-bg) px-4 py-2 text-[11px] font-medium uppercase tracking-wide text-(--fg-3)",
                             COLUMNS,
                         )}>
-                            <span>Vorgang</span>
-                            {KINDS.map((kind) => <span key={kind}>{STATION[kind].short}</span>)}
-                            <span className="text-right">Netto</span>
-                            <span />
+                            {KINDS.map((kind) => (
+                                <span key={kind} className="col-span-2 row-start-1">{STATION[kind].short}</span>
+                            ))}
+                            {KINDS.map((kind) => (
+                                <Fragment key={kind}>
+                                    <span className="row-start-2 normal-case tracking-normal">Nr.</span>
+                                    <span className="row-start-2 normal-case tracking-normal">Datum</span>
+                                </Fragment>
+                            ))}
+                            <span className="col-start-9 row-span-2 row-start-1 self-end text-right">Netto</span>
                         </div>
 
                         {offers.map(offer => <FlowTableRow key={offer.id} offer={offer} customerId={customerId} />)}
