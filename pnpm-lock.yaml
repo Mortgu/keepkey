@@ -46,6 +46,9 @@ importers:
       '@tanstack/react-router':
         specifier: ^1.167.5
         version: 1.170.18(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@tanstack/react-table':
+        specifier: ^9.3.1
+        version: 9.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       better-auth:
         specifier: ^1.6.16
         version: 1.6.24(@prisma/client@7.9.0(prisma@7.9.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(magicast@0.5.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3))(typescript@5.9.3))(@tanstack/react-start@1.168.32(esbuild@0.28.1)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(rolldown@1.1.5)(vite@8.1.5(@types/node@24.13.3)(esbuild@0.28.1)(jiti@2.7.0)(tsx@4.23.1)(yaml@2.9.0)))(mysql2@3.15.3)(pg@8.22.0)(prisma@7.9.0(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(magicast@0.5.3)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(typescript@5.9.3))(react-dom@19.2.8(react@19.2.8))(react@19.2.8)(solid-js@1.9.14)(vitest@4.1.10)
@@ -1953,11 +1956,23 @@ packages:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
+  '@tanstack/react-store@0.11.2':
+    resolution: {integrity: sha512-oj5O5DmiMWE+ih+SioX2ayC1kbK7d3fpLx0B75fPJr9nY3zU+hoW010yr64qXsY/9fyiLVE2bn5mGNV3owm8RQ==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
   '@tanstack/react-store@0.9.3':
     resolution: {integrity: sha512-y2iHd/N9OkoQbFJLUX1T9vbc2O9tjH0pQRgTcx1/Nz4IlwLvkgpuglXUx+mXt0g5ZDFrEeDnONPqkbfxXJKwRg==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  '@tanstack/react-table@9.3.1':
+    resolution: {integrity: sha512-E6Ya5TnY6EaGyZYIUqig/29Lr/gJSAubQkLJFqiWkUl5nRCr0Xr9hvJot+NiRTtG+TzGxHTiqUW3bnLtQxlHug==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      react: '>=18'
 
   '@tanstack/router-cli@1.167.21':
     resolution: {integrity: sha512-VAWzT0f1XHJx1ORNBDCjgCRHhBck0UDBYx5yldUlZgPyuDw/ip1s9pcn8h8ZE3jdTQ5e/nF4brFE/RhRca7rRQ==}
@@ -2028,8 +2043,15 @@ packages:
   '@tanstack/store@0.11.0':
     resolution: {integrity: sha512-WlzzCt3xi0G6pCAJu1U+2jiECwabETDpQDi3hfkFZvJii9AuZqEKbOiVarX1/bWhTNjU486yQtJCCasi/0q+Cw==}
 
+  '@tanstack/store@0.11.2':
+    resolution: {integrity: sha512-sJ4mjol8uQsHV0gOJzzjwXfh2Fwm+Sz0+8deqiTm4jGbMdjzNSW+xZCFm0kUa870uhd8yi+DpKnZb5Kc4apa0Q==}
+
   '@tanstack/store@0.9.3':
     resolution: {integrity: sha512-8reSzl/qGWGGVKhBoxXPMWzATSbZLZFWhwBAFO9NAyp0TxzfBP0mIrGb8CP8KrQTmvzXlR/vFPPUrHTLBGyFyw==}
+
+  '@tanstack/table-core@9.3.1':
+    resolution: {integrity: sha512-zQvlxSNi2qGM3L4jh85Z6hqMfdIR5qOfD9KHOU32nuKFJGN0RlJ7UvV1lsPb1fPVhpFYI0VP3jJGxLdLDpTKjQ==}
+    engines: {node: '>=20'}
 
   '@tanstack/virtual-file-routes@1.162.0':
     resolution: {integrity: sha512-uhOeFyxLcU41HzvrxsGpiWdcMbScY1EDgbZ5K7DVRMYInbLYWAC0EA/kx9wXAoSM8q82bUG2hRl8+EAjE6XAbA==}
@@ -6935,12 +6957,27 @@ snapshots:
       react-dom: 19.2.8(react@19.2.8)
       use-sync-external-store: 1.6.0(react@19.2.8)
 
+  '@tanstack/react-store@0.11.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@tanstack/store': 0.11.2
+      react: 19.2.8
+      react-dom: 19.2.8(react@19.2.8)
+      use-sync-external-store: 1.6.0(react@19.2.8)
+
   '@tanstack/react-store@0.9.3(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
     dependencies:
       '@tanstack/store': 0.9.3
       react: 19.2.8
       react-dom: 19.2.8(react@19.2.8)
       use-sync-external-store: 1.6.0(react@19.2.8)
+
+  '@tanstack/react-table@9.3.1(react-dom@19.2.8(react@19.2.8))(react@19.2.8)':
+    dependencies:
+      '@tanstack/react-store': 0.11.2(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
+      '@tanstack/table-core': 9.3.1
+      react: 19.2.8
+    transitivePeerDependencies:
+      - react-dom
 
   '@tanstack/router-cli@1.167.21':
     dependencies:
@@ -7141,7 +7178,13 @@ snapshots:
 
   '@tanstack/store@0.11.0': {}
 
+  '@tanstack/store@0.11.2': {}
+
   '@tanstack/store@0.9.3': {}
+
+  '@tanstack/table-core@9.3.1':
+    dependencies:
+      '@tanstack/store': 0.11.2
 
   '@tanstack/virtual-file-routes@1.162.0': {}
 
