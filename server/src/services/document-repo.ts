@@ -1,7 +1,7 @@
 import { Prisma } from "@prisma/client";
 import env from "../lib/env.js";
 import { prisma } from "../lib/prismaClient.js";
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import type { DocumentArtifactScope } from "../lib/document-artifact-store.js";
 import type { DocumentType } from "@keepit/schemas";
 
@@ -36,8 +36,8 @@ async function requireFrom<T>(find: () => Promise<T | null>): Promise<T> {
     return document;
 }
 
-/** Für alle Typen außer `offer`: keiner kennt den Zustand "eingefroren". */
-const neverEditable = { assertEditable: async () => {}, canAdopt: async () => false };
+/** Die Übernahme editierter Felder aus einer ersetzten DOCX ist eine reine Angebots-Funktion. */
+const canAdoptNever = { canAdopt: async () => false };
 
 export function documentTable(type: DocumentType, client: Prisma.TransactionClient = prisma) {
     switch (type) {
@@ -74,13 +74,11 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                         where: { id },
                         select: { offer: { select: { acceptedAt: true } } },
                     });
-                    if (doc?.offer.acceptedAt) {
-                        throw new AppException(
-                            "Accepted offers' documents can no longer be changed.",
-                            409,
-                            "OFFER_ACCEPTED",
-                        );
-                    }
+                    assertNotFrozen(
+                        doc?.offer.acceptedAt,
+                        "OFFER_ACCEPTED",
+                        "Accepted offers' documents can no longer be changed.",
+                    );
                 },
                 /**
                  * Ob sich Änderungen dieses Dokuments ins Angebot übernehmen lassen: nur beim
@@ -123,7 +121,19 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.orderDocument.updateMany({ where, data }),
-                ...neverEditable,
+                /** Stornierte Bestellungen sind eingefroren — ihre Dokumente bleiben unverändert. */
+                assertEditable: async (id: string) => {
+                    const doc = await client.orderDocument.findUnique({
+                        where: { id },
+                        select: { order: { select: { cancelledAt: true } } },
+                    });
+                    assertNotFrozen(
+                        doc?.order.cancelledAt,
+                        "ORDER_CANCELLED",
+                        "Cancelled orders' documents can no longer be changed.",
+                    );
+                },
+                ...canAdoptNever,
             };
         }
         case "confirmation": {
@@ -150,7 +160,19 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.confirmationDocument.updateMany({ where, data }),
-                ...neverEditable,
+                /** Eine AB zu einer stornierten Bestellung ist eingefroren wie die Bestellung selbst. */
+                assertEditable: async (id: string) => {
+                    const doc = await client.confirmationDocument.findUnique({
+                        where: { id },
+                        select: { confirmation: { select: { order: { select: { cancelledAt: true } } } } },
+                    });
+                    assertNotFrozen(
+                        doc?.confirmation.order.cancelledAt,
+                        "ORDER_CANCELLED",
+                        "Cancelled orders' confirmations can no longer be changed.",
+                    );
+                },
+                ...canAdoptNever,
             };
         }
         case "invoice": {
@@ -177,7 +199,19 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.invoiceDocument.updateMany({ where, data }),
-                ...neverEditable,
+                /** Eine Rechnung zu einer stornierten Bestellung ist eingefroren wie die Bestellung selbst. */
+                assertEditable: async (id: string) => {
+                    const doc = await client.invoiceDocument.findUnique({
+                        where: { id },
+                        select: { invoice: { select: { order: { select: { cancelledAt: true } } } } },
+                    });
+                    assertNotFrozen(
+                        doc?.invoice.order.cancelledAt,
+                        "ORDER_CANCELLED",
+                        "Cancelled orders' invoices can no longer be changed.",
+                    );
+                },
+                ...canAdoptNever,
             };
         }
     }

@@ -1,4 +1,4 @@
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { Prisma, Task, TaskTarget } from "@prisma/client";
 import { enqueueTask } from "../lib/document.js";
 import { prisma } from "../lib/prismaClient.js";
@@ -60,9 +60,7 @@ export function requestOfferGeneration(
                 where: { id: offerId },
                 select: { version: true, acceptedAt: true },
             });
-            if (offer.acceptedAt) {
-                throw new AppException("Accepted offers cannot generate new documents.", 409, "OFFER_ACCEPTED");
-            }
+            assertNotFrozen(offer.acceptedAt, "OFFER_ACCEPTED", "Accepted offers cannot generate new documents.");
             return offer.version;
         },
         findActive: (tx, sourceVersion) => tx.offerDocument.findFirst({
@@ -97,7 +95,7 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
         currentSourceVersion: async (tx) => {
             await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${orderId}`}))::text AS "lock"`;
             const order = await tx.order.findUniqueOrThrow({ where: { id: orderId }, select: { version: true, cancelledAt: true } });
-            if (order.cancelledAt) throw new AppException("Cancelled orders cannot generate documents.", 409, "ORDER_CANCELLED");
+            assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return order.version;
         },
         findActive: (tx, sourceVersion) => tx.orderDocument.findFirst({
@@ -139,9 +137,7 @@ export function requestConfirmationGeneration(confirmationId: string): Promise<T
                 select: { order: { select: { cancelledAt: true } } },
             });
             if (!confirmation) throw new AppException("Confirmation not found", 404, "CONFIRMATION_NOT_FOUND");
-            if (confirmation.order.cancelledAt) {
-                throw new AppException("Cancelled orders cannot generate documents.", 409, "ORDER_CANCELLED");
-            }
+            assertNotFrozen(confirmation.order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return null;
         },
         findActive: (tx, sourceVersion) => tx.confirmationDocument.findFirst({
@@ -182,9 +178,7 @@ export function requestInvoiceGeneration(invoiceId: string): Promise<Task> {
                 select: { order: { select: { cancelledAt: true } } },
             });
             if (!invoice) throw new AppException("Invoice not found", 404, "INVOICE_NOT_FOUND");
-            if (invoice.order.cancelledAt) {
-                throw new AppException("Cancelled orders cannot generate documents.", 409, "ORDER_CANCELLED");
-            }
+            assertNotFrozen(invoice.order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return null;
         },
         findActive: (tx, sourceVersion) => tx.invoiceDocument.findFirst({

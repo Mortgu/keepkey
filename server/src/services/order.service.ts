@@ -1,5 +1,5 @@
 import { Prisma } from "@prisma/client";
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
@@ -124,12 +124,7 @@ async function lockOrder(
             409,
             "VERSION_CONFLICT",
         );
-    if (order.cancelledAt)
-        throw new AppException(
-            "Cancelled orders cannot be changed.",
-            409,
-            "ORDER_CANCELLED",
-        );
+    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot be changed.");
     return order;
 }
 
@@ -189,13 +184,7 @@ export async function generateOrderDocument(orderId: string) {
         where: { id: orderId },
     });
 
-    if (order.cancelledAt) {
-        throw new AppException(
-            "Cancelled orders cannot generate documents.",
-            409,
-            "ORDER_CANCELLED",
-        );
-    }
+    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
 
     return requestOrderGeneration(orderId);
 }

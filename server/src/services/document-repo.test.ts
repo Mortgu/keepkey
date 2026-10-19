@@ -1,9 +1,17 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const offerDocumentFindUnique = vi.fn();
+const orderDocumentFindUnique = vi.fn();
+const confirmationDocumentFindUnique = vi.fn();
+const invoiceDocumentFindUnique = vi.fn();
 
 vi.mock("../lib/prismaClient.js", () => ({
-    prisma: { offerDocument: { findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args) } },
+    prisma: {
+        offerDocument: { findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args) },
+        orderDocument: { findUnique: (...args: unknown[]) => orderDocumentFindUnique(...args) },
+        confirmationDocument: { findUnique: (...args: unknown[]) => confirmationDocumentFindUnique(...args) },
+        invoiceDocument: { findUnique: (...args: unknown[]) => invoiceDocumentFindUnique(...args) },
+    },
 }));
 
 const { documentTable } = await import("./document-repo.js");
@@ -29,14 +37,66 @@ describe('documentTable("offer").assertEditable', () => {
     });
 });
 
-describe("documentTable(type).assertEditable for other document types", () => {
+describe('documentTable("order").assertEditable', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
-    it("is a no-op — never even queries", async () => {
+    it("rejects once the order behind the document is cancelled", async () => {
+        orderDocumentFindUnique.mockResolvedValue({ order: { cancelledAt: new Date() } });
+
+        await expect(documentTable("order").assertEditable("doc-1")).rejects.toMatchObject({
+            code: "ORDER_CANCELLED",
+            statusCode: 409,
+        });
+    });
+
+    it("passes for a document of an uncancelled order", async () => {
+        orderDocumentFindUnique.mockResolvedValue({ order: { cancelledAt: null } });
+
+        await expect(documentTable("order").assertEditable("doc-1")).resolves.toBeUndefined();
+    });
+});
+
+describe('documentTable("confirmation").assertEditable', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("rejects once the confirmation's order is cancelled", async () => {
+        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
+
+        await expect(documentTable("confirmation").assertEditable("doc-1")).rejects.toMatchObject({
+            code: "ORDER_CANCELLED",
+            statusCode: 409,
+        });
+    });
+
+    it("passes for a confirmation of an uncancelled order", async () => {
+        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
+
         await expect(documentTable("confirmation").assertEditable("doc-1")).resolves.toBeUndefined();
-        expect(offerDocumentFindUnique).not.toHaveBeenCalled();
+    });
+});
+
+describe('documentTable("invoice").assertEditable', () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+    });
+
+    it("rejects once the invoice's order is cancelled", async () => {
+        invoiceDocumentFindUnique.mockResolvedValue({ invoice: { order: { cancelledAt: new Date() } } });
+
+        await expect(documentTable("invoice").assertEditable("doc-1")).rejects.toMatchObject({
+            code: "ORDER_CANCELLED",
+            statusCode: 409,
+        });
+    });
+
+    it("passes for an invoice of an uncancelled order", async () => {
+        invoiceDocumentFindUnique.mockResolvedValue({ invoice: { order: { cancelledAt: null } } });
+
+        await expect(documentTable("invoice").assertEditable("doc-1")).resolves.toBeUndefined();
     });
 });
 
@@ -84,6 +144,6 @@ describe("documentTable(type).canAdopt for other document types", () => {
 
     it("is false — never even queries", async () => {
         expect(await documentTable("invoice").canAdopt("doc-1")).toBe(false);
-        expect(offerDocumentFindUnique).not.toHaveBeenCalled();
+        expect(invoiceDocumentFindUnique).not.toHaveBeenCalled();
     });
 });

@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const offerDocumentFindFirst = vi.fn();
 const offerDocumentFindUnique = vi.fn();
+const confirmationDocumentFindUnique = vi.fn();
 const offerDocumentUpdateMany = vi.fn();
 const documentArtifactUpdateMany = vi.fn();
 const moveDocumentArtifact = vi.fn();
@@ -13,13 +14,18 @@ vi.mock("../../lib/prismaClient.js", () => {
     // `documentTable()` routes to a different Prisma model per `DocumentType`;
     // tests here use both "offer" (to exercise the offer-lock guard, including
     // its `findUnique`-based `assertEditable`) and "confirmation" (to exercise
-    // the type-generic behaviour) against the same spies, since the two
-    // tables are structurally identical.
+    // the type-generic behaviour, including its own `findUnique`-based
+    // `assertEditable` against the order's `cancelledAt`) against the same
+    // `findFirst`/`updateMany` spies, since the two tables are structurally
+    // identical there.
     const updateManySpy = { updateMany: (...args: unknown[]) => offerDocumentUpdateMany(...args) };
-    const findFirstSpy = { findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args) };
     const offerDocumentSpy = {
         findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args),
         findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args),
+    };
+    const confirmationDocumentSpy = {
+        findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args),
+        findUnique: (...args: unknown[]) => confirmationDocumentFindUnique(...args),
     };
     const tx = {
         offerDocument: updateManySpy,
@@ -32,7 +38,7 @@ vi.mock("../../lib/prismaClient.js", () => {
     return {
         prisma: {
             offerDocument: offerDocumentSpy,
-            confirmationDocument: findFirstSpy,
+            confirmationDocument: confirmationDocumentSpy,
             $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
         },
     };
@@ -80,6 +86,26 @@ describe("offer document mutations once the offer is accepted", () => {
     });
 });
 
+describe("confirmation document mutations once the order is cancelled", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
+        offerDocumentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
+        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
+    });
+
+    it("renameDocument is rejected", async () => {
+        await expect(
+            renameDocument("confirmation", "doc-1", { displayName: "Neuer Name" }),
+        ).rejects.toMatchObject({ code: "ORDER_CANCELLED", statusCode: 409 });
+    });
+
+    it("deleteDocument is rejected", async () => {
+        await expect(
+            deleteDocument("confirmation", "doc-1"),
+        ).rejects.toMatchObject({ code: "ORDER_CANCELLED", statusCode: 409 });
+    });
+});
+
 describe("renameDocument moves an uploaded pair and rolls back on partial failure", () => {
     const uploadedDocument = {
         id: "doc-1",
@@ -93,6 +119,7 @@ describe("renameDocument moves an uploaded pair and rolls back on partial failur
     beforeEach(() => {
         vi.clearAllMocks();
         offerDocumentFindFirst.mockResolvedValue(uploadedDocument);
+        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
     });
 
     it("reverts the PDF move and rethrows when the DOCX move fails", async () => {

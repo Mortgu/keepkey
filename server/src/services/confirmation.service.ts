@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { createConfirmationSchema, type CreateConfirmationInput } from "@keepit/schemas";
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
 import { requestConfirmationGeneration } from "./document-generation-request.service.js";
@@ -29,7 +29,7 @@ export async function createConfirmation(orderId: string, input: CreateConfirmat
         select: { id: true, cancelledAt: true, confirmation: { select: { id: true } } },
     });
     if (!order) throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    if (order.cancelledAt) throw new AppException("Cancelled orders cannot be confirmed.", 409, "ORDER_CANCELLED");
+    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot be confirmed.");
     if (order.confirmation) throw new AppException("This order already has a confirmation.", 409, "CONFIRMATION_EXISTS");
 
     let confirmation;

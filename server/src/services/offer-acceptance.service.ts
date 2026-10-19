@@ -1,6 +1,6 @@
 import { formatOfferData } from "../pipelines/offer/build-offer.js";
 import type { Prisma } from "@prisma/client";
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { contractOrderBy } from "./contract.service.js";
 import { serializeAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 
@@ -35,13 +35,7 @@ export async function assertOfferEditable(
         where: { id: offerId },
         select: { acceptedAt: true },
     });
-    if (offer.acceptedAt) {
-        throw new AppException(
-            "Accepted offers cannot be changed. Create a new offer instead.",
-            409,
-            "OFFER_ACCEPTED",
-        );
-    }
+    assertNotFrozen(offer.acceptedAt, "OFFER_ACCEPTED", "Accepted offers cannot be changed. Create a new offer instead.");
 }
 
 export async function acceptOffer(

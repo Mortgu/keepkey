@@ -14,3 +14,14 @@ export class AppException extends Error {
         Error.captureStackTrace(this, this.constructor);
     }
 }
+
+/**
+ * Wirft, sobald `frozenAt` gesetzt ist — der wiederkehrende Fall "dieser
+ * Vorgang ist eingefroren" (Angebot angenommen, Bestellung storniert, …), der
+ * sonst an jeder prüfenden Stelle als eigenes `if (x) throw` stünde.
+ */
+export function assertNotFrozen(frozenAt: Date | null | undefined, code: string, message: string): void {
+    if (frozenAt) {
+        throw new AppException(message, 409, code);
+    }
+}

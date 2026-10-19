@@ -16,7 +16,7 @@ import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
 import { formatEur } from "@/utils/utils";
 import type { Confirmation, Customer, Invoice, Offer, Order } from "@keepit/schemas";
 import { vatTotals } from "@keepit/schemas";
-import { Ban, Pen, Plus, Trash2 } from "lucide-react";
+import { Ban, Dot, Pen, Plus, Trash2 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -99,13 +99,23 @@ function StageShell({ stage, headerActions, children }: {
                     <StageNode kind={stage.kind} state={stage.state} />
                     <div className="min-w-0">
                         <h2 className="text-[14px] font-medium">{label}</h2>
-                        <p className="flex items-center gap-2 text-xs">
+                        <p className="flex items-center gap-1 text-xs">
                             {stage.number && (
-                                <span className={cn("font-mono text-(--text)", stage.state === "cancelled" && "line-through")}>
-                                    {stage.number}
-                                </span>
+                                <>
+                                    <span className={cn("font-mono text-(--text)", stage.state === "cancelled" && "line-through")}>
+                                        {stage.number}
+                                    </span>
+                                    <Dot size={14} strokeOpacity={0.5} />
+                                </>
                             )}
-                            {stage.date && <span className="text-(--fg-3)">{formatDate(stage.date)}</span>}
+
+                            {stage.date && (
+                                <>
+                                    <span className="text-(--fg-3)">{stage.date}</span>
+                                    <Dot size={14} strokeOpacity={0.5} />
+                                </>
+                            )}
+
                             <span className={stateTone(stage.state)}>{stage.note ?? STATE_LABEL[stage.state]}</span>
                         </p>
                     </div>
@@ -146,6 +156,8 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
     const offerModal = useModal<{ mode: OfferModalMode }>();
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
     const locked = Boolean(offer.acceptedAt);
+
+    console.log(stage)
 
     return (
         <StageShell
@@ -528,6 +540,7 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
 
 function Summary({ offer, customer }: { offer: Offer; customer: Customer | undefined }) {
     const preview = vatTotals(offer.net_amount, customer?.taxRate ?? 0);
+    // TODO: THIS NEEDS TO BE TRANSLATABLE
     const rows: Array<[string, string]> = [
         ["Kunde", offer.customer.companyName],
         ["Ansprechpartner", `${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()],

@@ -1,6 +1,6 @@
 import { Prisma } from "@prisma/client";
 import { createInvoiceSchema, type CreateInvoiceInput, type InvoiceFilterParams } from "@keepit/schemas";
-import { AppException } from "../lib/exceptions.js";
+import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
 import { requestInvoiceGeneration } from "./document-generation-request.service.js";
@@ -58,7 +58,7 @@ export async function createInvoice(orderId: string, input: CreateInvoiceInput, 
         },
     });
     if (!order) throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    if (order.cancelledAt) throw new AppException("Cancelled orders cannot be invoiced.", 409, "ORDER_CANCELLED");
+    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot be invoiced.");
     if (order.invoice) throw new AppException("This order already has an invoice.", 409, "INVOICE_EXISTS");
 
     let invoice;
