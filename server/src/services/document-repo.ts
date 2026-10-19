@@ -36,6 +36,9 @@ async function requireFrom<T>(find: () => Promise<T | null>): Promise<T> {
     return document;
 }
 
+/** Für alle Typen außer `offer`: keiner kennt den Zustand "eingefroren". */
+const neverEditable = { assertEditable: async () => {}, canAdopt: async () => false };
+
 export function documentTable(type: DocumentType, client: Prisma.TransactionClient = prisma) {
     switch (type) {
         case "offer": {
@@ -62,6 +65,38 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.offerDocument.updateMany({ where, data }),
+                /**
+                 * Angenommene Angebote sind dauerhaft eingefroren — ihre Dokumente dürfen dann
+                 * weder umbenannt, gelöscht noch ersetzt werden.
+                 */
+                assertEditable: async (id: string) => {
+                    const doc = await client.offerDocument.findUnique({
+                        where: { id },
+                        select: { offer: { select: { acceptedAt: true } } },
+                    });
+                    if (doc?.offer.acceptedAt) {
+                        throw new AppException(
+                            "Accepted offers' documents can no longer be changed.",
+                            409,
+                            "OFFER_ACCEPTED",
+                        );
+                    }
+                },
+                /**
+                 * Ob sich Änderungen dieses Dokuments ins Angebot übernehmen lassen: nur beim
+                 * aktuellen Dokument des unveränderten Angebots. Wurde das Angebot nach dem
+                 * Erzeugen geändert (oder ist es angenommen), würde ein Wert aus der Datei
+                 * einen neueren Stand überschreiben.
+                 */
+                canAdopt: async (id: string): Promise<boolean> => {
+                    const document = await client.offerDocument.findUnique({
+                        where: { id },
+                        select: { isCurrent: true, sourceVersion: true, offer: { select: { version: true, acceptedAt: true } } },
+                    });
+                    return Boolean(document?.isCurrent)
+                        && document?.sourceVersion === document?.offer.version
+                        && !document?.offer.acceptedAt;
+                },
             };
         }
         case "order": {
@@ -88,6 +123,7 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.orderDocument.updateMany({ where, data }),
+                ...neverEditable,
             };
         }
         case "confirmation": {
@@ -114,6 +150,7 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.confirmationDocument.updateMany({ where, data }),
+                ...neverEditable,
             };
         }
         case "invoice": {
@@ -140,6 +177,7 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                 }),
                 updateMany: (where: DocumentWhere, data: DocumentUpdate) =>
                     client.invoiceDocument.updateMany({ where, data }),
+                ...neverEditable,
             };
         }
     }

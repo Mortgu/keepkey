@@ -5,6 +5,7 @@ import { contractOrderBy } from "@/services/contract.service.js";
 import { presentAcceptedOffer } from "@/services/accepted-offer-view.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
+import { generateOfferDisplayName } from "@/utils/documents.js";
 import logger from "@/utils/logger.js";
 import type { Language } from "@prisma/client";
 import { z } from "zod";
@@ -83,15 +84,13 @@ export async function buildOfferDocument(fetched: OfferFetchData, version: numbe
     // Eingefroren bei einem angenommenen Angebot, sonst der aktuelle Stand — dieselbe
     // Überlagerung wie die API-Ansicht (`presentAcceptedOffer`), keine zweite eigene.
     const named = presentAcceptedOffer(offer);
-    const company = named.customer.companyName.replaceAll(" ", "").trim();
     const workloads = named.offerPositions
-        .map((op) => (pickTranslation(op.product.translations, named.language)?.name ?? "").replaceAll(" ", "").trim())
-        .join("+");
+        .map((op) => (pickTranslation(op.product.translations, named.language)?.name ?? "").replaceAll(" ", "").trim());
 
     return {
         data,
         language: named.language,
-        displayName: `${offer.quoteId}_AG_${company}_Keepit-${workloads}${version > 0 ? `_v${version}` : ''}`,
+        displayName: generateOfferDisplayName(offer.quoteId, named.customer.companyName, workloads, version),
     };
 }
 

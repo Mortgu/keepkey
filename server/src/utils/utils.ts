@@ -20,6 +20,10 @@ export const formatCentsToEur = (value: number): string => {
   return formatEur(value / 100);
 }
 
+export const formatPercent = (value: number): string => {
+  return value.toLocaleString("de-DE", { minimumFractionDigits: 2 }) + " %";
+}
+
 export const formatDuration = (value: number): string => {
   switch (value) {
     case 12:

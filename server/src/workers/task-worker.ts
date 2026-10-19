@@ -50,7 +50,7 @@ export default function registerTaskWorker(connection: Redis) {
             return;
         }
 
-        const claimed = await markTaskRunning(taskId, token);
+        const claimed = await markTaskRunning(taskId, token, task.target);
         if (!claimed) {
             if (task.status === TaskStatus.COMPLETED) return;
             throw new Error(`Task ${taskId} could not be claimed.`);

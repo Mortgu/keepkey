@@ -1,10 +1,19 @@
-import { DocumentStatus, TaskStatus } from "@prisma/client";
+import { DocumentStatus, TaskStatus, type TaskTarget } from "@prisma/client";
 import type { Job } from "bullmq";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
+import { documentTable } from "@/services/document-repo.js";
 import type { TaskJobData } from "./task-contract.js";
 
-export async function markTaskRunning(taskId: string, runToken: string): Promise<boolean> {
+/** Nur diese vier `TaskTarget`-Werte haben überhaupt eine Dokumenttabelle; `RENEWAL` nie. */
+const DOCUMENT_TYPE_BY_TARGET = {
+    OFFER: "offer",
+    ORDER: "order",
+    CONFIRMATION: "confirmation",
+    INVOICE: "invoice",
+} as const satisfies Partial<Record<TaskTarget, string>>;
+
+export async function markTaskRunning(taskId: string, runToken: string, target: TaskTarget): Promise<boolean> {
     return prisma.$transaction(async (tx) => {
         const claimed = await tx.task.updateMany({
             where: {
@@ -20,38 +29,18 @@ export async function markTaskRunning(taskId: string, runToken: string): Promise
 
         if (claimed.count !== 1) return false;
 
-        await tx.offerDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.PROCESSING, error: null },
-        });
-        await tx.orderDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.PROCESSING, error: null },
-        });
-        await tx.confirmationDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.PROCESSING, error: null },
-        });
-        await tx.invoiceDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.PROCESSING, error: null },
-        });
+        // Ein Task gehört immer zu genau einem Zieltyp — nur dessen Tabelle anfassen.
+        const type = DOCUMENT_TYPE_BY_TARGET[target as keyof typeof DOCUMENT_TYPE_BY_TARGET];
+        if (type) {
+            await documentTable(type, tx).updateMany(
+                {
+                    taskId,
+                    status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
+                    artifacts: { none: {} },
+                },
+                { status: DocumentStatus.PROCESSING, error: null },
+            );
+        }
 
         return true;
     });
@@ -105,37 +94,17 @@ export async function handleTaskFailure(job: Job<TaskJobData> | undefined, error
 
         if (failed.count !== 1) return;
 
-        await tx.offerDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.FAILED, error: error.message },
-        });
-        await tx.orderDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.FAILED, error: error.message },
-        });
-        await tx.confirmationDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.FAILED, error: error.message },
-        });
-        await tx.invoiceDocument.updateMany({
-            where: {
-                taskId,
-                status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
-                artifacts: { none: {} },
-            },
-            data: { status: DocumentStatus.FAILED, error: error.message },
-        });
+        const current = await tx.task.findUnique({ where: { id: taskId }, select: { target: true } });
+        const type = current && DOCUMENT_TYPE_BY_TARGET[current.target as keyof typeof DOCUMENT_TYPE_BY_TARGET];
+        if (type) {
+            await documentTable(type, tx).updateMany(
+                {
+                    taskId,
+                    status: { in: [DocumentStatus.PENDING, DocumentStatus.PROCESSING, DocumentStatus.FAILED] },
+                    artifacts: { none: {} },
+                },
+                { status: DocumentStatus.FAILED, error: error.message },
+            );
+        }
     });
 }

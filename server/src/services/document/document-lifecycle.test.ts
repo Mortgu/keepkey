@@ -1,22 +1,26 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { AppException } from "../../lib/exceptions.js";
 
 const offerDocumentFindFirst = vi.fn();
+const offerDocumentFindUnique = vi.fn();
 const offerDocumentUpdateMany = vi.fn();
 const documentArtifactUpdateMany = vi.fn();
 const moveDocumentArtifact = vi.fn();
 const deleteDocumentArtifact = vi.fn();
 const uploadGeneratedDocument = vi.fn();
-const assertOfferDocumentEditable = vi.fn();
 const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
 vi.mock("../../lib/prismaClient.js", () => {
     // `documentTable()` routes to a different Prisma model per `DocumentType`;
-    // tests here use both "offer" (to exercise the offer-lock guard) and
-    // "confirmation" (to exercise the type-generic behaviour) against the
-    // same spies, since the two tables are structurally identical.
+    // tests here use both "offer" (to exercise the offer-lock guard, including
+    // its `findUnique`-based `assertEditable`) and "confirmation" (to exercise
+    // the type-generic behaviour) against the same spies, since the two
+    // tables are structurally identical.
     const updateManySpy = { updateMany: (...args: unknown[]) => offerDocumentUpdateMany(...args) };
     const findFirstSpy = { findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args) };
+    const offerDocumentSpy = {
+        findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args),
+        findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args),
+    };
     const tx = {
         offerDocument: updateManySpy,
         confirmationDocument: updateManySpy,
@@ -27,15 +31,12 @@ vi.mock("../../lib/prismaClient.js", () => {
     };
     return {
         prisma: {
-            offerDocument: findFirstSpy,
+            offerDocument: offerDocumentSpy,
             confirmationDocument: findFirstSpy,
             $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
         },
     };
 });
-vi.mock("../offer-acceptance.service.js", () => ({
-    assertOfferDocumentEditable: (...args: unknown[]) => assertOfferDocumentEditable(...args),
-}));
 vi.mock("../../lib/document-artifact-store.js", () => ({
     MIME_TYPES: { pdf: "application/pdf", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
     getDocumentDownloadUrl: vi.fn(async () => "https://example.test/download"),
@@ -63,9 +64,7 @@ describe("offer document mutations once the offer is accepted", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         offerDocumentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
-        assertOfferDocumentEditable.mockRejectedValue(
-            new AppException("Accepted offers' documents can no longer be changed.", 409, "OFFER_ACCEPTED"),
-        );
+        offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: new Date() } });
     });
 
     it("renameDocument is rejected", async () => {
@@ -94,7 +93,6 @@ describe("renameDocument moves an uploaded pair and rolls back on partial failur
     beforeEach(() => {
         vi.clearAllMocks();
         offerDocumentFindFirst.mockResolvedValue(uploadedDocument);
-        assertOfferDocumentEditable.mockResolvedValue(undefined);
     });
 
     it("reverts the PDF move and rethrows when the DOCX move fails", async () => {

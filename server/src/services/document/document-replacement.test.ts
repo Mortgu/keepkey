@@ -12,8 +12,8 @@ const storeObject = vi.fn();
 const browserEndpointIssue = vi.fn();
 const isS3Available = vi.fn();
 const bucketAllowsBrowserUploads = vi.fn();
-const assertOfferDocumentEditable = vi.fn();
-const canAdoptIntoSource = vi.fn();
+const assertEditable = vi.fn();
+const canAdopt = vi.fn();
 const documentArtifactUpdate = vi.fn();
 
 const document = {
@@ -36,16 +36,14 @@ vi.mock("../../lib/prismaClient.js", () => {
         },
     };
 });
-vi.mock("../offer-acceptance.service.js", () => ({
-    assertOfferDocumentEditable: (...args: unknown[]) => assertOfferDocumentEditable(...args),
-    canAdoptIntoSource: (...args: unknown[]) => canAdoptIntoSource(...args),
-}));
 vi.mock("../document-repo.js", () => ({
     documentTable: () => ({
         scope: "confirmations",
         findWithArtifacts: (...args: unknown[]) => findWithArtifacts(...args),
         requireWithArtifacts: (...args: unknown[]) => findWithArtifacts(...args),
         readModel: (...args: unknown[]) => readModel(...args),
+        assertEditable: (...args: unknown[]) => assertEditable(...args),
+        canAdopt: (...args: unknown[]) => canAdopt(...args),
     }),
 }));
 vi.mock("../../lib/document-artifact-store.js", () => ({
@@ -92,7 +90,7 @@ describe("offer document mutations once the offer is accepted", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         findWithArtifacts.mockResolvedValue({ ...document, status: "GENERATED" });
-        assertOfferDocumentEditable.mockRejectedValue(
+        assertEditable.mockRejectedValue(
             new AppException("Accepted offers' documents can no longer be changed.", 409, "OFFER_ACCEPTED"),
         );
     });
@@ -110,8 +108,8 @@ describe("confirmReplacementUpload warnings", () => {
         readModel.mockResolvedValue(model);
         findWithArtifacts.mockResolvedValue(document);
         storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
-        assertOfferDocumentEditable.mockResolvedValue(undefined);
-        canAdoptIntoSource.mockResolvedValue(false);
+        assertEditable.mockResolvedValue(undefined);
+        canAdopt.mockResolvedValue(false);
     });
 
     it("liefert keine Hinweise, wenn die Datei zum Modell passt", async () => {
@@ -178,11 +176,11 @@ describe("confirmReplacementUpload bei Angeboten", () => {
         findWithArtifacts.mockResolvedValue(document);
         storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
         getDocumentArtifact.mockResolvedValue(offerDocx({ text: "14 Tage" }));
-        assertOfferDocumentEditable.mockResolvedValue(undefined);
-        // Übernahmefähigkeit selbst ist Sache von `canAdoptIntoSource` (getestet
-        // in offer-acceptance.service.test.ts) — hier zählt nur, dass ihr
-        // Ergebnis korrekt ins `adoptable`-Flag durchgereicht wird.
-        canAdoptIntoSource.mockResolvedValue(true);
+        assertEditable.mockResolvedValue(undefined);
+        // Übernahmefähigkeit selbst ist Sache von `canAdopt` (getestet
+        // in document-repo.test.ts) — hier zählt nur, dass ihr Ergebnis
+        // korrekt ins `adoptable`-Flag durchgereicht wird.
+        canAdopt.mockResolvedValue(true);
     });
 
     const replace = () => confirmReplacementUpload("offer", "doc-1", "docx", KEY);
@@ -193,7 +191,7 @@ describe("confirmReplacementUpload bei Angeboten", () => {
     });
 
     it("markiert nichts als übernehmbar, wenn das Dokument nicht übernahmefähig ist", async () => {
-        canAdoptIntoSource.mockResolvedValue(false);
+        canAdopt.mockResolvedValue(false);
 
         expect((await replace()).warnings).toEqual([{ ...warning("paymentTerm"), adoptable: false }]);
     });
@@ -221,8 +219,8 @@ describe("confirmReplacementUpload swaps the stored pair", () => {
         readModel.mockResolvedValue(model);
         getDocumentArtifact.mockResolvedValue(uploadedDocx());
         storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
-        assertOfferDocumentEditable.mockResolvedValue(undefined);
-        canAdoptIntoSource.mockResolvedValue(false);
+        assertEditable.mockResolvedValue(undefined);
+        canAdopt.mockResolvedValue(false);
     });
 
     it("swaps both artifacts to the new objects and discards the previous pair", async () => {

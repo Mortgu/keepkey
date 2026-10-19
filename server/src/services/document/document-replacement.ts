@@ -24,7 +24,6 @@ import { prisma } from "../../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentCapabilities, DocumentFormatParam, DocumentType, ReplacementWarning } from "@keepit/schemas";
 import { documentTable } from "../document-repo.js";
-import { assertOfferDocumentEditable, canAdoptIntoSource } from "../offer-acceptance.service.js";
 
 /** Kurz genug, dass eine gesetzte CORS-Regel zügig sichtbar wird. */
 const CAPABILITIES_TTL_MS = 60_000;
@@ -73,7 +72,7 @@ async function requireReplaceableArtifact(
     }
 
     const document = await documentTable(type).requireWithArtifacts(id);
-    await assertOfferDocumentEditable(type, id);
+    await documentTable(type).assertEditable(id);
 
     if (!REPLACEABLE_STATUSES.has(document.status)) {
         throw new AppException(
@@ -202,7 +201,7 @@ async function inspectReplacement(
         }
 
         const adoptNow = warnings.some((warning) => warning.code === "FIELD_CHANGED")
-            && await canAdoptIntoSource(type, id);
+            && await documentTable(type).canAdopt(id);
         return warnings.filter(isUserWarning).map((warning): ReplacementWarning =>
             warning.code === "FIELD_CHANGED"
                 ? { ...warning, adoptable: adoptNow && Boolean(offerAdoptions[warning.field]?.parse(warning.actual)) }

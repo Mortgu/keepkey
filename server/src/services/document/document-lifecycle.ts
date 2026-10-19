@@ -17,7 +17,6 @@ import logger from "@/utils/logger.js";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { uploadGeneratedDocument } from "../document-upload.service.js";
 import { documentTable } from "../document-repo.js";
-import { assertOfferDocumentEditable } from "../offer-acceptance.service.js";
 
 export type RenameDocumentInput = { displayName: string };
 
@@ -40,6 +39,23 @@ const BUSY_STATUSES = new Set<DocumentStatus>([
 
 /** Artefakt, das bereits auf Nextcloud liegt. */
 type UploadedArtifact = { id: string; remotePath: string };
+
+/** Räumt beide Remote-Dateien eines Dokuments ab Nextcloud weg, sofern dort noch etwas liegt. */
+async function clearRemoteArtifacts(
+    pdf: { remotePath: string | null } | null,
+    docx: { remotePath: string | null } | null,
+): Promise<void> {
+    for (const artifact of [pdf, docx]) {
+        if (artifact?.remotePath) {
+            await deleteDocumentArtifact(artifact.remotePath);
+        }
+    }
+}
+
+/** Die IDs zweier optionaler Artefakte, ohne die fehlenden. */
+function artifactIds(pdf: { id: string } | null, docx: { id: string } | null): string[] {
+    return [pdf?.id, docx?.id].filter((value): value is string => Boolean(value));
+}
 
 /** Die Artefakte eines Dokuments, sofern beide hochgeladen sind. */
 function uploadedPair(artifacts: Array<{ id: string; format: DocumentFormat; remotePath: string | null }>) {
@@ -102,7 +118,7 @@ export async function renameDocument(
     input: RenameDocumentInput,
 ) {
     const document = await documentTable(type).requireWithArtifacts(id);
-    await assertOfferDocumentEditable(type, id);
+    await documentTable(type).assertEditable(id);
 
     if (!RENAMABLE_STATUSES.has(document.status)) {
         throw new AppException(
@@ -175,7 +191,7 @@ export async function renameDocument(
  */
 export async function deleteDocument(type: DocumentType, id: string): Promise<void> {
     const document = await documentTable(type).requireWithArtifacts(id);
-    await assertOfferDocumentEditable(type, id);
+    await documentTable(type).assertEditable(id);
 
     if (BUSY_STATUSES.has(document.status)) {
         throw new AppException(
@@ -187,11 +203,7 @@ export async function deleteDocument(type: DocumentType, id: string): Promise<vo
 
     const { pdf, docx } = artifactPair(document.artifacts);
 
-    for (const artifact of [pdf, docx]) {
-        if (artifact?.remotePath) {
-            await deleteDocumentArtifact(artifact.remotePath);
-        }
-    }
+    await clearRemoteArtifacts(pdf, docx);
 
     // Die Objektschlüssel tragen eine Generierungs-UUID und werden nie erneut
     // vergeben — die Artefaktzeilen dürfen sie also behalten.
@@ -220,7 +232,7 @@ export async function deleteDocument(type: DocumentType, id: string): Promise<vo
         }
 
         await tx.documentArtifact.updateMany({
-            where: { id: { in: [pdf?.id, docx?.id].filter((value): value is string => Boolean(value)) } },
+            where: { id: { in: artifactIds(pdf, docx) } },
             data: { remotePath: null, remoteEtag: null, uploadedAt: null },
         });
     });
@@ -276,11 +288,7 @@ export async function resyncDocument(type: DocumentType, id: string) {
 
     const { pdf, docx } = artifactPair(document.artifacts);
 
-    for (const artifact of [pdf, docx]) {
-        if (artifact?.remotePath) {
-            await deleteDocumentArtifact(artifact.remotePath);
-        }
-    }
+    await clearRemoteArtifacts(pdf, docx);
 
     await prisma.$transaction(async (tx) => {
         const where = { id, deletedAt: null, status: DocumentStatus.UPLOADED };
@@ -296,7 +304,7 @@ export async function resyncDocument(type: DocumentType, id: string) {
         }
 
         await tx.documentArtifact.updateMany({
-            where: { id: { in: [pdf?.id, docx?.id].filter((value): value is string => Boolean(value)) } },
+            where: { id: { in: artifactIds(pdf, docx) } },
             data: { remotePath: null, remoteEtag: null, uploadedAt: null, remoteSha256: null },
         });
     });

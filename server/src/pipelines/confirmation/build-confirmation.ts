@@ -1,6 +1,7 @@
 import { prisma } from "../../lib/prismaClient.js";
 import { getOrderById } from "../../services/order.service.js";
-import { formatDate, formatEur } from "../../utils/utils.js";
+import { sanitizeCompanyName } from "../../utils/documents.js";
+import { formatCentsToEur, formatDate, formatPercent } from "../../utils/utils.js";
 import { confirmationTemplateSchema } from "../../schemas/templates/confirmation.template.schema.js";
 import { formatOrderData } from "../order/build-order.js";
 import type { Language } from "@prisma/client";
@@ -22,28 +23,21 @@ export async function buildConfirmation(confirmationId: string): Promise<{
     const order = await getOrderById(confirmation.orderId);
 
     const base = await formatOrderData({ order });
-    // Steuerblock aus der Row — beim Anlegen festgelegt, Regenerieren rechnet nie neu.
-    const totals = {
-        netCents: confirmation.net_cents,
-        vatRate: confirmation.taxRate,
-        vatCents: confirmation.vat_cents,
-        grossCents: confirmation.gross_cents,
-    };
 
     const data = confirmationTemplateSchema.parse({
         ...base,
         confirmationId: confirmation.confirmationId,
         confirmationDate: formatDate(confirmation.date) ?? "",
-        netTotal: formatEur(totals.netCents / 100),
-        vatRate: `${totals.vatRate.toLocaleString("de-DE", { minimumFractionDigits: 2 })} %`,
-        vatAmount: formatEur(totals.vatCents / 100),
-        grossTotal: formatEur(totals.grossCents / 100),
+        // Steuerblock aus der Row — beim Anlegen festgelegt, Regenerieren rechnet nie neu.
+        netTotal: formatCentsToEur(confirmation.net_cents),
+        vatRate: formatPercent(confirmation.taxRate),
+        vatAmount: formatCentsToEur(confirmation.vat_cents),
+        grossTotal: formatCentsToEur(confirmation.gross_cents),
     });
 
-    const company = order.customer.companyName.replaceAll(" ", "").trim();
     return {
         data,
         language: order.language,
-        displayName: `${confirmation.confirmationId}_AB_${company}`,
+        displayName: `${confirmation.confirmationId}_AB_${sanitizeCompanyName(order.customer.companyName)}`,
     };
 }

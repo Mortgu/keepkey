@@ -6,9 +6,9 @@ vi.mock("../lib/prismaClient.js", () => ({
     prisma: { offerDocument: { findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args) } },
 }));
 
-const { assertOfferDocumentEditable, canAdoptIntoSource } = await import("./offer-acceptance.service.js");
+const { documentTable } = await import("./document-repo.js");
 
-describe("assertOfferDocumentEditable", () => {
+describe('documentTable("offer").assertEditable', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -16,7 +16,7 @@ describe("assertOfferDocumentEditable", () => {
     it("rejects once the offer behind the document is accepted", async () => {
         offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: new Date() } });
 
-        await expect(assertOfferDocumentEditable("offer", "doc-1")).rejects.toMatchObject({
+        await expect(documentTable("offer").assertEditable("doc-1")).rejects.toMatchObject({
             code: "OFFER_ACCEPTED",
             statusCode: 409,
         });
@@ -25,16 +25,22 @@ describe("assertOfferDocumentEditable", () => {
     it("passes for an unaccepted offer's document", async () => {
         offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: null } });
 
-        await expect(assertOfferDocumentEditable("offer", "doc-1")).resolves.toBeUndefined();
+        await expect(documentTable("offer").assertEditable("doc-1")).resolves.toBeUndefined();
+    });
+});
+
+describe("documentTable(type).assertEditable for other document types", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    it("knows nothing about other document types — never even queries", async () => {
-        await expect(assertOfferDocumentEditable("confirmation", "doc-1")).resolves.toBeUndefined();
+    it("is a no-op — never even queries", async () => {
+        await expect(documentTable("confirmation").assertEditable("doc-1")).resolves.toBeUndefined();
         expect(offerDocumentFindUnique).not.toHaveBeenCalled();
     });
 });
 
-describe("canAdoptIntoSource", () => {
+describe('documentTable("offer").canAdopt', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
@@ -49,29 +55,35 @@ describe("canAdoptIntoSource", () => {
     it("is true for the current document of an unchanged, unaccepted offer", async () => {
         offerDocumentFindUnique.mockResolvedValue(current());
 
-        expect(await canAdoptIntoSource("offer", "doc-1")).toBe(true);
+        expect(await documentTable("offer").canAdopt("doc-1")).toBe(true);
     });
 
     it("is false once the offer has moved past the document's source version", async () => {
         offerDocumentFindUnique.mockResolvedValue(current({ offer: { version: 5, acceptedAt: null } }));
 
-        expect(await canAdoptIntoSource("offer", "doc-1")).toBe(false);
+        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
     });
 
     it("is false for a document that is no longer the current one", async () => {
         offerDocumentFindUnique.mockResolvedValue(current({ isCurrent: false }));
 
-        expect(await canAdoptIntoSource("offer", "doc-1")).toBe(false);
+        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
     });
 
     it("is false once the offer is accepted", async () => {
         offerDocumentFindUnique.mockResolvedValue(current({ offer: { version: 4, acceptedAt: new Date() } }));
 
-        expect(await canAdoptIntoSource("offer", "doc-1")).toBe(false);
+        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
+    });
+});
+
+describe("documentTable(type).canAdopt for other document types", () => {
+    beforeEach(() => {
+        vi.clearAllMocks();
     });
 
-    it("is false for other document types — never even queries", async () => {
-        expect(await canAdoptIntoSource("invoice", "doc-1")).toBe(false);
+    it("is false — never even queries", async () => {
+        expect(await documentTable("invoice").canAdopt("doc-1")).toBe(false);
         expect(offerDocumentFindUnique).not.toHaveBeenCalled();
     });
 });

@@ -59,11 +59,7 @@ export const renewOffer = async (request: Request, response: Response) => {
 };
 
 export const extendOffer = async (request: Request, response: Response) => {
-    const offer = await offerService.extendOffer(
-        request.params.id as string,
-        request.body,
-        request.user!.id,
-    );
+    const offer = await offerService.extendOffer(request.params.id as string, request.body);
     return response.status(200).json(offer);
 };
 

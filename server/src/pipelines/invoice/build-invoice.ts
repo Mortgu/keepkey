@@ -4,7 +4,8 @@ import { invoiceContract } from "../../schemas/templates/invoice.template.schema
 import { getOrderById } from "../../services/order.service.js";
 import { translateFields } from "../../utils/i18n.js";
 import { formatParty } from "../../utils/party.js";
-import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { sanitizeCompanyName } from "../../utils/documents.js";
+import { formatCentsToEur, formatDate, formatDuration, formatPercent } from "../../utils/utils.js";
 
 /** "30 Tage" / "14 days" → 30 / 14; sonst null. */
 export function paymentTermDays(paymentTerm: string): number | null {
@@ -45,7 +46,6 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
     ]);
     const lang = order.language;
     const { customer, customerContactPerson: ccp, employee } = order;
-    const eur = (cents: number) => formatEur(cents / 100);
 
     let pos = 0;
     const items = [
@@ -56,41 +56,31 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
                 pos: ++pos,
                 description: table,
                 quantity: p.quantity,
-                unitPrice: eur(p.eur_user_month),
-                gross: eur(p.total_cents + p.discount_cents),
-                discount: p.discount_cents ? eur(-p.discount_cents) : "",
-                total: eur(p.total_cents),
+                unitPrice: formatCentsToEur(p.eur_user_month),
+                gross: formatCentsToEur(p.total_cents + p.discount_cents),
+                discount: p.discount_cents ? formatCentsToEur(-p.discount_cents) : "",
+                total: formatCentsToEur(p.total_cents),
             };
         }),
         ...order.flatRates.map((fr) => ({
             pos: ++pos,
             description: translateFields(fr.flatRate.translations, lang, { table: "" }).table,
             quantity: fr.quantity,
-            unitPrice: eur(fr.quantity ? fr.total_cents / fr.quantity : 0),
-            gross: eur(fr.total_cents),
+            unitPrice: formatCentsToEur(fr.quantity ? fr.total_cents / fr.quantity : 0),
+            gross: formatCentsToEur(fr.total_cents),
             discount: "",
-            total: eur(fr.total_cents),
+            total: formatCentsToEur(fr.total_cents),
         })),
         ...order.discounts.map((d) => ({
             pos: ++pos,
             description: d.title,
             quantity: 1,
-            unitPrice: eur(-d.amount_cents),
-            gross: eur(-d.amount_cents),
+            unitPrice: formatCentsToEur(-d.amount_cents),
+            gross: formatCentsToEur(-d.amount_cents),
             discount: "",
-            total: eur(-d.amount_cents),
+            total: formatCentsToEur(-d.amount_cents),
         })),
     ];
-
-    // Steuerblock aus der Row — beim Anlegen aus offer.net_amount festgelegt,
-    // Regenerieren rechnet nie neu. Die Zeilen oben müssen dieselbe Summe ergeben
-    // (Test), sonst stimmt die Darstellung nicht mit dem Beleg überein.
-    const totals = {
-        netCents: invoice.net_cents,
-        vatRate: invoice.taxRate,
-        vatCents: invoice.vat_cents,
-        grossCents: invoice.gross_cents,
-    };
 
     const days = paymentTermDays(order.paymentTerm);
     const start = order.contractStartDate ? new Date(order.contractStartDate) : null;
@@ -136,16 +126,18 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
         orderDetails: order.orderDetails ?? "",
         items,
 
-        netTotal: eur(totals.netCents),
-        vatRate: `${totals.vatRate.toLocaleString("de-DE", { minimumFractionDigits: 2 })} %`,
-        vatAmount: eur(totals.vatCents),
-        grossTotal: eur(totals.grossCents),
+        // Steuerblock aus der Row — beim Anlegen aus offer.net_amount festgelegt,
+        // Regenerieren rechnet nie neu. Die Zeilen oben müssen dieselbe Summe ergeben
+        // (Test), sonst stimmt die Darstellung nicht mit dem Beleg überein.
+        netTotal: formatCentsToEur(invoice.net_cents),
+        vatRate: formatPercent(invoice.taxRate),
+        vatAmount: formatCentsToEur(invoice.vat_cents),
+        grossTotal: formatCentsToEur(invoice.gross_cents),
     });
 
-    const company = customer.companyName.replaceAll(" ", "").trim();
     return {
         data,
         language: lang,
-        displayName: `${invoice.invoiceId}_RE_${company}`,
+        displayName: `${invoice.invoiceId}_RE_${sanitizeCompanyName(customer.companyName)}`,
     };
 }

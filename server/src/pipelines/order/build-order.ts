@@ -3,7 +3,8 @@ import { getOrderById } from "../../services/order.service.js";
 import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
 import { translateFields } from "../../utils/i18n.js";
 import { formatParty } from "../../utils/party.js";
-import { formatDate, formatDuration, formatEur } from "../../utils/utils.js";
+import { sanitizeCompanyName } from "../../utils/documents.js";
+import { formatCentsToEur, formatDate, formatDuration } from "../../utils/utils.js";
 
 export type OrderFetchedData = Awaited<ReturnType<typeof fetchOrderData>>;
 export type OrderFormattedData = Awaited<ReturnType<typeof formatOrderData>>;
@@ -65,7 +66,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             contract,
             duration_months,
             duration: formatDuration(duration_months),
-            total: formatEur(group_total / 100),
+            total: formatCentsToEur(group_total),
             // `item.total_cents` ist bereits netto (Freimonate abgezogen, siehe
             // presentOrder); `discount_cents` ist der abgezogene Betrag.
             items: group.map((item) => ({
@@ -79,10 +80,10 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
                 contract,
                 duration_months,
                 price: {
-                    unit: formatEur(item.eur_user_month / 100),
-                    gross: formatEur((item.total_cents + item.discount_cents) / 100),
-                    discount: item.discount_cents ? formatEur(-item.discount_cents / 100) : "",
-                    total: formatEur(item.total_cents / 100),
+                    unit: formatCentsToEur(item.eur_user_month),
+                    gross: formatCentsToEur(item.total_cents + item.discount_cents),
+                    discount: item.discount_cents ? formatCentsToEur(-item.discount_cents) : "",
+                    total: formatCentsToEur(item.total_cents),
                 },
             })),
         };
@@ -91,7 +92,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     const orderFlatRates = flatRates.map((fr) => ({
         ...fr,
         price: {
-            total: formatEur(fr.total_cents / 100),
+            total: formatCentsToEur(fr.total_cents),
         },
     }));
 
@@ -105,8 +106,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         orderDetails: order.orderDetails ?? "",
         products, groups: grouped, tables: grouped,
         flatRates: orderFlatRates, flatrates: orderFlatRates,
-        total: formatEur(order.net_amount / 100),
-        discounts: order.discounts.map(d => ({ ...d, total: formatEur(-d.amount_cents / 100) })),
+        total: formatCentsToEur(order.net_amount),
+        discounts: order.discounts.map(d => ({ ...d, total: formatCentsToEur(-d.amount_cents) })),
         date: formatDate(order.date),
         paymentTerm: order.paymentTerm,
         validUntil: order.validUntil ? formatDate(order.validUntil) : "",
@@ -149,7 +150,7 @@ export function withPurchasePrices(
 
     const groups = formatted.groups.map((group) => ({
         ...group,
-        total: formatEur(order.purchase_net_amount / 100),
+        total: formatCentsToEur(order.purchase_net_amount),
         items: group.items.map((item) => {
             const purchase = byId.get(item.offerPositionId);
             if (!purchase) return item;
@@ -157,10 +158,10 @@ export function withPurchasePrices(
             return {
                 ...item,
                 price: {
-                    unit: formatEur(purchase.purchase_eur_user_month / 100),
-                    gross: formatEur(purchase.purchase_total_cents / 100),
-                    discount: purchase.purchase_discount_cents ? formatEur(-purchase.purchase_discount_cents / 100) : "",
-                    total: formatEur(net / 100),
+                    unit: formatCentsToEur(purchase.purchase_eur_user_month),
+                    gross: formatCentsToEur(purchase.purchase_total_cents),
+                    discount: purchase.purchase_discount_cents ? formatCentsToEur(-purchase.purchase_discount_cents) : "",
+                    total: formatCentsToEur(net),
                 },
             };
         }),
@@ -170,7 +171,7 @@ export function withPurchasePrices(
         ...formatted,
         groups,
         tables: groups,
-        total: formatEur(order.purchase_net_amount / 100),
+        total: formatCentsToEur(order.purchase_net_amount),
         // Zum Abgleich für Vorlagen, die beides zeigen wollen.
         customerTotal: formatted.total,
         duration: formatDuration(duration),
@@ -196,7 +197,7 @@ export async function buildOrder(orderId: string, version: number): Promise<{
     const data = withPurchasePrices(await formatOrderData(fetched), order);
     orderTemplateSchema.parse(data);
 
-    const company = order.customer.companyName.replaceAll(" ", "").trim();
+    const company = sanitizeCompanyName(order.customer.companyName);
     const workloads = order.orderPositions
         .map((p) => translateFields(p.product.translations, "DE", { name: "" }).name.replaceAll(" ", ""))
         .join("+");
