@@ -1,6 +1,5 @@
 import type { DocumentStatus, Offer } from "@keepit/schemas";
 import type { FlowStage, Phase, StageKind } from "./flow-types";
-import { formatDate } from "@/lib/format";
 
 type DocLike = { status: DocumentStatus };
 
@@ -35,16 +34,16 @@ export function deriveStages(offer: Offer): Stages {
         kind: "offer",
         state: documentsState(offer.offerDocuments),
         number: `AG${offer.quoteId}`,
-        date: formatDate(offer.date),
+        date: offer.date,
     };
 
     let orderStage: FlowStage;
     if (!order) {
         orderStage = { kind: "order", state: "action", actionLabel: "Bestellung anlegen" };
     } else if (order.cancelledAt) {
-        orderStage = { kind: "order", state: "cancelled", number: `BE${order.orderId}`, date: formatDate(order.date) };
+        orderStage = { kind: "order", state: "cancelled", number: `BE${order.orderId}`, date: order.date };
     } else {
-        orderStage = { kind: "order", state: documentsState(order.documents), number: `BE${order.orderId}`, date: formatDate(order.date) };
+        orderStage = { kind: "order", state: documentsState(order.documents), number: `BE${order.orderId}`, date: order.date };
     }
 
     const confirmationStage: FlowStage = !order

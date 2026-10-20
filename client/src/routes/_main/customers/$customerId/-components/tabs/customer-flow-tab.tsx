@@ -23,8 +23,9 @@ import type { FlowStage, Phase, StageKind } from "../flow/flow-types";
 import type { Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
 import { useModal, useOffers } from "@/hooks";
+import { formatDate } from "@/lib/format";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
-import { Button, ListSkeleton, MultiDropdown, RouteError, SearchBar, Skeleton } from "@/components";
+import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
 
 /**
  * Reiter "Vorgänge" als Tabelle. Eine Zeile ist ein Vorgang: das Angebot und
@@ -71,7 +72,7 @@ function toFlowRow(offer: Offer): FlowRow {
     const stages = deriveStages(offer);
     const phase = derivePhase(offer, stages);
     const searchText = [
-        ...stages.flatMap((stage) => [stage.number, stage.date]),
+        ...stages.flatMap((stage) => [stage.number, stage.date && formatDate(stage.date)]),
         eur(offer.net_amount),
         PHASE_LABELS[phase],
     ].filter(Boolean).join(" ").toLowerCase();
@@ -143,7 +144,7 @@ function StageCells({ stage }: { stage: FlowStage }) {
                     : stage.state === "busy" ? "wird erzeugt"
                         : stage.state === "failed" ? "fehlgeschlagen"
                             : stage.state === "cancelled" ? "storniert"
-                                : stage.date}
+                                : stage.date && formatDate(stage.date)}
             </p>
         </>
     );
@@ -207,20 +208,18 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     return (
         <div className="w-full grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <MultiDropdown
+                {/*<MultiDropdown
                     label="Status"
                     options={PHASE_OPTIONS}
                     values={(phaseColumn.getFilterValue() as Array<string> | undefined) ?? []}
                     onChange={(values) => phaseColumn.setFilterValue(values.length > 0 ? values : undefined)}
-                />
+                />*/}
 
                 <SearchBar
                     value={(table.state.globalFilter as string | undefined) ?? ""}
                     onChange={(value) => table.setGlobalFilter(value)}
                     placeholder={t("common.search")}
                 />
-
-
 
                 <Button size="sm" onClick={() => modal.open()}>
                     {t("offers.create")}
