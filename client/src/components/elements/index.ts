@@ -21,6 +21,7 @@ export * from './select-on-focus';
 export * from './select-styles';
 export * from './skeleton';
 export * from './sort-dropdown';
+export * from './spinner';
 export * from './textarea';
 export * from './tooltip';
 

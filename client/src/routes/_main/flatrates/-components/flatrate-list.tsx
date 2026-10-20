@@ -1,8 +1,8 @@
 
-import { LoaderCircle } from "lucide-react";
 import FlatRateItem from "./flatrate-item";
 import type { Flatrate } from "@keepit/schemas";
 import type { FlatrateFilters } from "../-hooks/use-flatrate-filters";
+import { Spinner } from "@/components";
 import { useFlatRates } from "@/hooks";
 
 interface Props {
@@ -17,7 +17,7 @@ export default function FlatRateList({ filters, onEdit }: Props) {
     <div className="grid gap-4">
       {isPending && (
         <div className="w-full flex items-center justify-center py-8">
-          <LoaderCircle className="animate-spin" />
+          <Spinner />
         </div>
       )}
 

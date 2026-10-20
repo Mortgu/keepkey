@@ -1,5 +1,5 @@
 import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
-import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
+import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
@@ -9,7 +9,7 @@ import { Menu } from "@base-ui/react";
 import { handleReplacementWarnings } from "./replacement-warnings";
 import type { ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument } from "@keepit/schemas";
 import type { FieldChange } from "@/components";
-import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, ReplacementChangesModal, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, ReplacementChangesModal, Spinner, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
     replaceBlockerMessage,
@@ -349,7 +349,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                             {/* Loader Circle */}
                             {isBusy && (
                                 <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
-                                    <LoaderCircle size={16} strokeWidth={2} className="animate-spin" />
+                                    <Spinner size={16} />
                                 </div>
                             )}
                         </div>

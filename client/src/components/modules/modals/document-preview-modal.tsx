@@ -1,9 +1,9 @@
-import { Button, Dialog } from "@/components";
+import { Button, Dialog, Spinner } from "@/components";
 import { documentDownloadUrl } from "@/hooks";
 import { api } from "@/lib/api-client";
 import type { DocumentType } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
-import { Download, LoaderCircle } from "lucide-react";
+import { Download } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -59,7 +59,7 @@ export function DocumentPreviewModal({ type, documentId, artifactId, title, onCl
       </Dialog.Header>
 
       <div className="flex min-h-0 flex-1 items-center justify-center">
-        {isPending && <LoaderCircle size={24} className="animate-spin text-(--text-secondary)" />}
+        {isPending && <Spinner size={24} className="text-(--text-secondary)" />}
         {isError && (
           <div className="grid justify-items-center gap-3 text-sm">
             <p className="text-red-500">{t("documentPreview.loadFailed")}</p>

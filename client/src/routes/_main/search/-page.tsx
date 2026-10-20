@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
-import { Clock, LoaderCircle, Search, X } from "lucide-react";
+import { Clock, Search, X } from "lucide-react";
 import { tv } from "tailwind-variants";
 import SearchResultRow from "./-components/search-result-row";
 import { loadRecent, saveRecent } from "./-search-recents";
 import { Route } from "./index";
 import type { SearchResultItem, SearchType } from "@keepit/schemas";
-import { Breadcrumbs } from "@/components";
+import { Breadcrumbs, Spinner } from "@/components";
 import { useDebouncedValue } from "@/hooks/use-debounce";
 import { useSearch } from "@/hooks/search/search-hooks";
 
@@ -132,7 +132,7 @@ export default function SearchPage() {
                         className="flex-1 border-none outline-none text-sm text-(--text) bg-transparent"
                     />
 
-                    {isFetching && <LoaderCircle size={14} className="animate-spin text-(--text-secondary) shrink-0" />}
+                    {isFetching && <Spinner size={14} className="text-(--text-secondary) shrink-0" />}
 
                     {query && (
                         <button

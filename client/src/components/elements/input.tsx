@@ -1,6 +1,5 @@
 import type { ButtonComponentProps } from "@/components";
 import { Button } from "@/components";
-import { Loader2 } from "lucide-react";
 import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
@@ -18,6 +17,7 @@ import {
 } from "../tokens";
 import { Field, useFieldId } from "./field";
 import { selectOnFocus } from "./select-on-focus";
+import { Spinner } from "./spinner";
 
 type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 
@@ -187,7 +187,7 @@ export const Input = forwardRef<HTMLInputElement, InputComponentProps>(
 
                     {loading && (
                         <span className={styles.addon({ className: "pl-0 text-(--border-200)" })}>
-                            <Loader2 size={16} className="animate-spin border-t-(--primary)" />
+                            <Spinner size={16} label={false} />
                         </span>
                     )}
 

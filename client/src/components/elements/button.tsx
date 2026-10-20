@@ -1,9 +1,9 @@
-import { LoaderCircle } from 'lucide-react';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
 import type { ComponentSize, ComponentVariant } from '../tokens';
 import { ACTION_FOCUS, ACTION_ICON, ACTION_SIZE } from '../tokens';
+import { Spinner } from './spinner';
 
 export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ComponentVariant;
@@ -121,7 +121,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonComponentProps>(
         children,
         ...rest
     }, ref) => {
-        const resolvedIcon = loading ? <LoaderCircle className="animate-spin" /> : icon;
+        const resolvedIcon = loading ? <Spinner label={false} /> : icon;
         return (
             <button
                 ref={ref}

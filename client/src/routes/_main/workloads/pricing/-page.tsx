@@ -1,5 +1,4 @@
 import { t } from "i18next";
-import { LoaderCircle } from "lucide-react";
 import { useMemo } from "react";
 import PricingTable from "./-components/pricing-table";
 import StandardDurations from "./-components/standard-durations";
@@ -7,7 +6,7 @@ import StandardTiers from "./-components/standard-tiers";
 import TariffGroupModal from "./-components/tariff-group-modal";
 import { useModal, useProducts, useTariffGroups } from "@/hooks";
 import { useCreateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
-import { Breadcrumbs, Button, RouteError } from "@/components";
+import { Breadcrumbs, Button, RouteError, Spinner } from "@/components";
 
 export default function PricingPage() {
     const { groups, isPending, error } = useTariffGroups();
@@ -22,7 +21,7 @@ export default function PricingPage() {
 
     if (isPending) {
         return (
-            <LoaderCircle className="size-4" />
+            <Spinner className="size-4" />
         )
     }
 

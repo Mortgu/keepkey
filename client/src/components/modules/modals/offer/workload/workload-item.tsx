@@ -1,11 +1,11 @@
-import { Button } from "@/components";
+import { Button, Spinner } from "@/components";
 import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
 import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { formatEur } from "@/utils/utils";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { coordinatesFrom } from "@keepit/schemas";
-import { CircleAlert, LoaderCircle, Pen, Tag, Trash, X } from "lucide-react";
+import { CircleAlert, Pen, Tag, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useOfferModalContext } from "../offer-modal-context";
@@ -45,7 +45,7 @@ export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Pr
         return (
             <div className="grid bg-(--subtle-50) border border-(--border) rounded-md">
                 <div className="flex items-center justify-center px-4 py-3 gap-4">
-                    <LoaderCircle size={14} className="animate-spin" />
+                    <Spinner size={14} />
                 </div>
             </div>
         );
@@ -76,7 +76,7 @@ export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Pr
                         <div className="flex items-center gap-8">
                             <div className="grid">
                                 <p className="text-xs text-(--text-secondary)">Total</p>
-                                {pricePending && <LoaderCircle size={14} className="animate-spin" />}
+                                {pricePending && <Spinner size={14} />}
                                 {!pricePending && <p className="text-sm font-semibold">{formatEur(totalCents)}</p>}
                             </div>
 
@@ -89,7 +89,7 @@ export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Pr
                                         <Tag size={10} aria-label={t("offerModal.customer_price")} />
                                     )}
                                 </p>
-                                {pricePending && <LoaderCircle size={14} className="animate-spin" />}
+                                {pricePending && <Spinner size={14} />}
                                 {!pricePending && (
                                     <p className={`text-sm font-semibold ${isCustomerPrice ? "text-(--info)" : ""}`}
                                         title={isCustomerPrice ? t("offerModal.customer_price") : undefined}>

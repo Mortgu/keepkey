@@ -1,10 +1,9 @@
 import { useTranslation } from "react-i18next";
-import { LoaderCircle } from "lucide-react";
 import SupplierModal from "./-components/supplier-modal";
 import useSupplierFilters from "./-hooks/use-supplier-filters";
 import SupplierListItem from "./-components/supplier-list-item";
 import type { Supplier } from "@keepit/schemas";
-import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/components";
+import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown, Spinner } from "@/components";
 import { useModal, useSuppliers } from "@/hooks";
 
 export default function SupplierPage() {
@@ -48,7 +47,7 @@ export default function SupplierPage() {
 
                 {pendingSuppliers && (
                     <div className="py-8 flex items-center justify-center">
-                        <LoaderCircle className="animate-spin" />
+                        <Spinner />
                     </div>
                 )}
 

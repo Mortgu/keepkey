@@ -1,4 +1,4 @@
-import { Breadcrumbs, RouteError, Tabs } from "@/components";
+import { Breadcrumbs, RouteError, Spinner, Tabs } from "@/components";
 import { useCustomer, useModal } from "@/hooks";
 import type { Customer } from "@keepit/schemas";
 import { useNavigate } from "@tanstack/react-router";
@@ -33,7 +33,7 @@ export default function CustomerDetailPage() {
     };
 
     if (error) return <div className="mx-4"><RouteError error={error} /></div>;
-    if (isPending || !customer) return <div className="mx-4 p-4">Lädt…</div>;
+    if (isPending || !customer) return <div className="mx-4 p-4"><Spinner /></div>;
 
     return (
         <div className="grid mx-4">
