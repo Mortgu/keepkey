@@ -2,22 +2,16 @@ import { ClipboardCheck, FileText, Receipt, ShoppingCart } from "lucide-react";
 import type { ReactNode } from "react";
 import type { StageKind, StageState } from "./flow-types";
 
-/** Beschriftungen, Icons und Formatierung für Vorgangs-Tabelle und Vorgangs-Seite (Design-Prototyp). */
+/**
+ * Icons und Formatierung für Vorgangs-Tabelle und Vorgangs-Seite (Design-Prototyp).
+ * Die Texte liegen in `flows.json`: `flows.station.<kind>.label|short`, `flows.state.<state>`.
+ */
 
-export const STATION: Record<StageKind, { label: string; short: string; icon: ReactNode }> = {
-    offer: { label: "Angebot", short: "Angebot", icon: <FileText className="size-3.5" /> },
-    order: { label: "Bestellung", short: "Bestellung", icon: <ShoppingCart className="size-3.5" /> },
-    confirmation: { label: "Auftragsbestätigung", short: "Auftragsbest.", icon: <ClipboardCheck className="size-3.5" /> },
-    invoice: { label: "Rechnung", short: "Rechnung", icon: <Receipt className="size-3.5" /> },
-};
-
-export const STATE_LABEL: Record<StageState, string> = {
-    done: "Angelegt",
-    action: "Noch nicht angelegt",
-    locked: "Noch nicht angelegt",
-    busy: "Wird erzeugt",
-    failed: "Fehlgeschlagen",
-    cancelled: "Storniert",
+export const STATION_ICON: Record<StageKind, ReactNode> = {
+    offer: <FileText className="size-3.5" />,
+    order: <ShoppingCart className="size-3.5" />,
+    confirmation: <ClipboardCheck className="size-3.5" />,
+    invoice: <Receipt className="size-3.5" />,
 };
 
 const TEXT_TONE: Record<StageState, string> = {

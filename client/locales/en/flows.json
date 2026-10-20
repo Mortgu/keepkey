@@ -1,0 +1,81 @@
+{
+    "flows": {
+        "phase": {
+            "open": "Offer open",
+            "running": "In progress",
+            "billed": "Billed",
+            "cancelled": "Cancelled"
+        },
+        "derivation": {
+            "RENEWAL": "Renewal",
+            "LICENSE_EXTENSION": "Extension"
+        },
+        "station": {
+            "offer": { "label": "Offer", "short": "Offer" },
+            "order": { "label": "Order", "short": "Order" },
+            "confirmation": { "label": "Order confirmation", "short": "Confirmation" },
+            "invoice": { "label": "Invoice", "short": "Invoice" }
+        },
+        "state": {
+            "done": "Created",
+            "action": "Not created yet",
+            "locked": "Not created yet",
+            "busy": "Generating",
+            "failed": "Failed",
+            "cancelled": "Cancelled"
+        },
+        "stateInline": {
+            "busy": "generating",
+            "failed": "failed",
+            "cancelled": "cancelled"
+        },
+        "create": {
+            "offer": "Create offer",
+            "order": "Create order",
+            "confirmation": "Create order confirmation",
+            "invoice": "Create invoice"
+        },
+        "table": {
+            "number": "{{station}} no.",
+            "date": "Date",
+            "net": "Net",
+            "empty": "No transactions in this view.",
+            "noMatch": "No transactions match the search or filter.",
+            "truncated": "Showing the latest {{count}} transactions; search and filter do not include older ones.",
+            "phaseFilter": "Status"
+        },
+        "detail": {
+            "overview": "Process",
+            "net": "net",
+            "lockedHint": "Not created yet. This requires an existing order.",
+            "cancelledHint": "Not applicable because the order was cancelled.",
+            "actionHint": "Not created yet. You assign the number when creating it; it cannot be changed afterwards.",
+            "acceptedLocked": "Accepted offers can no longer be changed.",
+            "renew": "Renew",
+            "extend": "Extend",
+            "cancel": "Cancel",
+            "cancelConfirm": "Cancel order {{number}}?",
+            "generateDocument": "Generate document",
+            "noDocuments": "No documents generated yet.",
+            "products": "Products",
+            "documents": "Documents",
+            "details": "Details",
+            "projectNumber": "Project number",
+            "projectDescription": "Project description",
+            "orderDetails": "Details",
+            "contractStart": "Contract start"
+        },
+        "summary": {
+            "title": "Summary",
+            "customer": "Customer",
+            "contact": "Contact person",
+            "duration": "Term",
+            "durationMonths_one": "{{count}} month",
+            "durationMonths_other": "{{count}} months",
+            "paymentTerm": "Payment term",
+            "net": "Net",
+            "vat": "VAT (current rate)",
+            "gross": "Gross (estimated)"
+        }
+    }
+}

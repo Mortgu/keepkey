@@ -9,6 +9,7 @@ import dashboardEN from '../locales/en/dashboard.json';
 import employeesEN from '../locales/en/employees.json';
 import errorsEN from '../locales/en/errors.json';
 import flatratesEN from '../locales/en/flatrates.json';
+import flowsEN from '../locales/en/flows.json';
 import invoicesEN from '../locales/en/invoices.json';
 import loginEN from '../locales/en/login.json';
 import offersEN from '../locales/en/offers.json';
@@ -27,6 +28,7 @@ import dashboardDE from '../locales/de/dashboard.json';
 import employeesDE from '../locales/de/employees.json';
 import errorsDE from '../locales/de/errors.json';
 import flatratesDE from '../locales/de/flatrates.json';
+import flowsDE from '../locales/de/flows.json';
 import invoicesDE from '../locales/de/invoices.json';
 import loginDE from '../locales/de/login.json';
 import offersDE from '../locales/de/offers.json';
@@ -60,6 +62,7 @@ const en = {
         ...dashboardEN,
         ...employeesEN,
         ...flatratesEN,
+        ...flowsEN,
         ...invoicesEN,
         ...loginEN,
         ...offersEN,
@@ -83,6 +86,7 @@ const de = {
         ...dashboardDE,
         ...employeesDE,
         ...flatratesDE,
+        ...flowsDE,
         ...invoicesDE,
         ...loginDE,
         ...offersDE,

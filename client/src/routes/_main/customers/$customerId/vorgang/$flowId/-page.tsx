@@ -1,10 +1,12 @@
 import { RouteError } from "@/components";
 import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
+import { useTranslation } from "react-i18next";
 import FlowDetailView from "./-components/flow-detail-view";
 import { Route } from "./index";
 
 /** Seite eines Vorgangs — `flowId` ist die Angebots-Id. */
 export default function FlowPage() {
+    const { t } = useTranslation();
     const { customerId, flowId } = Route.useParams();
 
     const { customer } = useCustomer(customerId);
@@ -23,7 +25,7 @@ export default function FlowPage() {
 
     if (isPending || !offer) {
         return (
-            <div className="mx-4 p-4">Lädt…</div>
+            <div className="mx-4 p-4">{t("common.loading")}</div>
         );
     }
 

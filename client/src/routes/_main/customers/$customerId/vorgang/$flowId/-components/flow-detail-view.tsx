@@ -22,9 +22,8 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
-import { STATE_LABEL, STATION, eur, stateTone } from "../../../-components/flow/flow-meta";
+import { eur, stateTone } from "../../../-components/flow/flow-meta";
 import type { FlowStage } from "../../../-components/flow/flow-types";
-import { DERIVATION_LABEL, PHASE_LABELS } from "../../../-components/flow/flow-types";
 import { StageNode } from "../../../-components/flow/flow-ui";
 
 /**
@@ -36,25 +35,15 @@ import { StageNode } from "../../../-components/flow/flow-ui";
  * Angebots-/Bestellkarte benutzen — keine eigene Logik, nur Wiederverwendung.
  */
 
-// AB/Rechnung benötigen technisch (DB-FK) eine angelegte Bestellung, auch wenn
-// sie fachlich kein nachfolgender Schritt sind.
-const LOCKED_HINT: Partial<Record<FlowStage["kind"], string>> = {
-    confirmation: "Noch nicht angelegt. Dafür wird eine angelegte Bestellung benötigt.",
-    invoice: "Noch nicht angelegt. Dafür wird eine angelegte Bestellung benötigt.",
-};
-
-const LOCKED_ACTION_LABEL: Partial<Record<FlowStage["kind"], string>> = {
-    confirmation: "Auftragsbestätigung anlegen",
-    invoice: "Rechnung anlegen",
-};
-
 /* ───────────────────────────────
    Strecke (Kurzüberblick, springt zum Abschnitt)
    ─────────────────────────────── */
 
 function Overview({ stages }: { stages: ReadonlyArray<FlowStage> }) {
+    const { t } = useTranslation();
+
     return (
-        <nav aria-label="Ablauf" className="grid grid-cols-4 rounded-md border border-(--border) bg-white">
+        <nav aria-label={t("flows.detail.overview")} className="grid grid-cols-4 rounded-md border border-(--border) bg-white">
             {stages.map((stage) => (
                 <a
                     key={stage.kind}
@@ -64,14 +53,14 @@ function Overview({ stages }: { stages: ReadonlyArray<FlowStage> }) {
                     <StageNode kind={stage.kind} state={stage.state} />
                     <span className="min-w-0">
                         <span className="block truncate text-[11px] font-medium uppercase tracking-wide text-(--fg-3)">
-                            {STATION[stage.kind].label}
+                            {t(`flows.station.${stage.kind}.label`)}
                         </span>
                         <span className={cn(
                             "block truncate text-[13px]",
                             stage.number ? "font-mono text-(--text)" : stateTone(stage.state),
                             stage.state === "cancelled" && "line-through",
                         )}>
-                            {stage.number ?? STATE_LABEL[stage.state]}
+                            {stage.number ?? t(`flows.state.${stage.state}`)}
                         </span>
                     </span>
                 </a>
@@ -89,7 +78,7 @@ function StageShell({ stage, headerActions, children }: {
     headerActions?: ReactNode;
     children?: ReactNode;
 }) {
-    const { label } = STATION[stage.kind];
+    const { t } = useTranslation();
     const muted = stage.state === "cancelled";
 
     return (
@@ -98,7 +87,7 @@ function StageShell({ stage, headerActions, children }: {
                 <div className="flex min-w-0 items-center gap-3">
                     <StageNode kind={stage.kind} state={stage.state} />
                     <div className="min-w-0">
-                        <h2 className="text-[14px] font-medium">{label}</h2>
+                        <h2 className="text-[14px] font-medium">{t(`flows.station.${stage.kind}.label`)}</h2>
                         <p className="flex items-center gap-1 text-xs">
                             {stage.number && (
                                 <>
@@ -116,7 +105,7 @@ function StageShell({ stage, headerActions, children }: {
                                 </>
                             )}
 
-                            <span className={stateTone(stage.state)}>{stage.note ?? STATE_LABEL[stage.state]}</span>
+                            <span className={stateTone(stage.state)}>{stage.note ?? t(`flows.state.${stage.state}`)}</span>
                         </p>
                     </div>
                 </div>
@@ -124,18 +113,18 @@ function StageShell({ stage, headerActions, children }: {
                 {headerActions && <div className="flex flex-wrap gap-1.5">{headerActions}</div>}
             </header>
 
+            {/* AB/Rechnung benötigen technisch (DB-FK) eine angelegte Bestellung, auch wenn
+                sie fachlich kein nachfolgender Schritt sind. */}
             {stage.state === "locked" && (
-                <p className="px-4 py-4 text-[13px] text-(--fg-3)">{LOCKED_HINT[stage.kind]}</p>
+                <p className="px-4 py-4 text-[13px] text-(--fg-3)">{t("flows.detail.lockedHint")}</p>
             )}
 
             {stage.state === "cancelled" && !children && (
-                <p className="px-4 py-4 text-[13px] text-(--fg-3)">Entfällt, weil die Bestellung storniert wurde.</p>
+                <p className="px-4 py-4 text-[13px] text-(--fg-3)">{t("flows.detail.cancelledHint")}</p>
             )}
 
             {stage.state === "action" && !children && (
-                <p className="px-4 py-4 text-[13px] text-(--fg-3)">
-                    Noch nicht angelegt. Die Nummer vergeben Sie beim Anlegen; sie lässt sich danach nicht mehr ändern.
-                </p>
+                <p className="px-4 py-4 text-[13px] text-(--fg-3)">{t("flows.detail.actionHint")}</p>
             )}
 
             {children}
@@ -153,6 +142,7 @@ function cancelledStageShell(stage: FlowStage): ReactNode | null {
    ─────────────────────────────── */
 
 function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer }) {
+    const { t } = useTranslation();
     const offerModal = useModal<{ mode: OfferModalMode }>();
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
     const locked = Boolean(offer.acceptedAt);
@@ -168,18 +158,18 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
                         size="xs"
                         variant="border"
                         disabled={locked}
-                        title={locked ? "Angenommene Angebote können nicht mehr geändert werden." : "Bearbeiten"}
+                        title={locked ? t("flows.detail.acceptedLocked") : t("button.edit")}
                         onClick={() => offerModal.open()}
                         icon={<Pen className="size-3" />}
                         iconOnly
                     />
-                    <Button size="xs" variant="secondary" onClick={() => offerModal.open({ mode: "renewal" })}>Verlängern</Button>
-                    <Button size="xs" variant="secondary" onClick={() => offerModal.open({ mode: "extension" })}>Erweitern</Button>
+                    <Button size="xs" variant="secondary" onClick={() => offerModal.open({ mode: "renewal" })}>{t("flows.detail.renew")}</Button>
+                    <Button size="xs" variant="secondary" onClick={() => offerModal.open({ mode: "extension" })}>{t("flows.detail.extend")}</Button>
                 </>
             )}
         >
             <Accordion defaultValue={["documents"]}>
-                <Accordion.Section value="products" label="Produkte">
+                <Accordion.Section value="products" label={t("flows.detail.products")}>
                     {offer.offerPositions.map((position) => (
                         <PositionRow key={position.id} position={position} contract={offer.contract} durationMonths={offer.duration_months} />
                     ))}
@@ -193,7 +183,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
 
                 <Accordion.Section
                     value="documents"
-                    label="Dokumente"
+                    label={t("flows.detail.documents")}
                     aside={(
                         <Button
                             className="min-w-fit h-auto rounded-none border-l border-(--border) px-4"
@@ -203,7 +193,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
                             disabled={isGenerating || locked}
                             onClick={() => generateOfferDocument({ offerId: offer.id })}
                         >
-                            Dokument generieren
+                            {t("flows.detail.generateDocument")}
                         </Button>
                     )}
                 >
@@ -211,7 +201,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
                         <DocumentCard key={document.id} type="offer" parentId={offer.id} document={document} locked={locked} />
                     ))}
                     {offer.offerDocuments.length === 0 && (
-                        <p className="py-4 text-center text-sm text-(--fg-3)">Noch keine Dokumente generiert!</p>
+                        <p className="py-4 text-center text-sm text-(--fg-3)">{t("flows.detail.noDocuments")}</p>
                     )}
                 </Accordion.Section>
             </Accordion>
@@ -228,6 +218,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
    ─────────────────────────────── */
 
 function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: Offer; order: Order | null }) {
+    const { t } = useTranslation();
     const orderModal = useModal();
     const [editing, setEditing] = useState(false);
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
@@ -238,7 +229,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
             <StageShell
                 stage={stage}
                 headerActions={(
-                    <Button size="xs" icon={<Plus />} onClick={() => orderModal.open()}>Bestellung anlegen</Button>
+                    <Button size="xs" icon={<Plus />} onClick={() => orderModal.open()}>{t("flows.create.order")}</Button>
                 )}
             >
                 {orderModal.isOpen && <OrderModal key={orderModal.key} offer={offer} onClose={orderModal.close} />}
@@ -248,7 +239,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
 
     const cancelled = Boolean(order.cancelledAt);
     const cancel = async () => {
-        if (!confirm(`Bestellung ${order.orderId} stornieren?`)) return;
+        if (!confirm(t("flows.detail.cancelConfirm", { number: order.orderId }))) return;
         try { await cancelOrder({ orderId: order.id, expectedVersion: order.version }); } catch { /* unten gerendert */ }
     };
 
@@ -257,8 +248,8 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
             stage={stage}
             headerActions={(
                 <>
-                    <Button size="xs" variant="secondary" disabled={cancelled} onClick={() => setEditing(true)} icon={<Pen className="size-3" />}>Bearbeiten</Button>
-                    <Button size="xs" variant="secondary" danger disabled={cancelled || isCancellingOrder} loading={isCancellingOrder} onClick={cancel} icon={<Ban className="size-3" />}>Stornieren</Button>
+                    <Button size="xs" variant="secondary" disabled={cancelled} onClick={() => setEditing(true)} icon={<Pen className="size-3" />}>{t("button.edit")}</Button>
+                    <Button size="xs" variant="secondary" danger disabled={cancelled || isCancellingOrder} loading={isCancellingOrder} onClick={cancel} icon={<Ban className="size-3" />}>{t("flows.detail.cancel")}</Button>
                 </>
             )}
         >
@@ -267,7 +258,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
             )}
 
             <Accordion defaultValue={["documents"]}>
-                <Accordion.Section value="products" label="Produkte">
+                <Accordion.Section value="products" label={t("flows.detail.products")}>
                     {order.orderPositions.map((position) => (
                         <PositionRow key={position.id} position={position} contract={order.contract} durationMonths={order.duration_months} />
                     ))}
@@ -279,18 +270,18 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
                     ))}
                 </Accordion.Section>
 
-                <Accordion.Section value="details" label="Details">
+                <Accordion.Section value="details" label={t("flows.detail.details")}>
                     <dl className="grid gap-2 py-3 text-sm">
-                        <dt>Projektnummer</dt><dd>{order.projectNumber || "—"}</dd>
-                        <dt>Projektbeschreibung</dt><dd>{order.projectDescription || "—"}</dd>
-                        <dt>Details</dt><dd>{order.orderDetails || "—"}</dd>
-                        <dt>Vertragsbeginn</dt><dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
+                        <dt>{t("flows.detail.projectNumber")}</dt><dd>{order.projectNumber || "—"}</dd>
+                        <dt>{t("flows.detail.projectDescription")}</dt><dd>{order.projectDescription || "—"}</dd>
+                        <dt>{t("flows.detail.orderDetails")}</dt><dd>{order.orderDetails || "—"}</dd>
+                        <dt>{t("flows.detail.contractStart")}</dt><dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
                     </dl>
                 </Accordion.Section>
 
                 <Accordion.Section
                     value="documents"
-                    label="Dokumente"
+                    label={t("flows.detail.documents")}
                     aside={(
                         <Button
                             className="min-w-fit h-auto rounded-none border-l border-(--border) px-4"
@@ -300,7 +291,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
                             disabled={isGeneratingDocument || cancelled}
                             onClick={() => generateOrderDocument({ orderId: order.id })}
                         >
-                            Dokument generieren
+                            {t("flows.detail.generateDocument")}
                         </Button>
                     )}
                 >
@@ -308,7 +299,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
                         <DocumentCard key={document.id} type="order" parentId={order.id} document={document} />
                     ))}
                     {order.documents.length === 0 && (
-                        <p className="py-4 text-center text-sm text-(--fg-3)">Noch keine Dokumente generiert!</p>
+                        <p className="py-4 text-center text-sm text-(--fg-3)">{t("flows.detail.noDocuments")}</p>
                     )}
                 </Accordion.Section>
             </Accordion>
@@ -539,18 +530,18 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
    ─────────────────────────────── */
 
 function Summary({ offer, customer }: { offer: Offer; customer: Customer | undefined }) {
+    const { t } = useTranslation();
     const preview = vatTotals(offer.net_amount, customer?.taxRate ?? 0);
-    // TODO: THIS NEEDS TO BE TRANSLATABLE
     const rows: Array<[string, string]> = [
-        ["Kunde", offer.customer.companyName],
-        ["Ansprechpartner", `${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()],
-        ["Laufzeit", `${offer.duration_months} Monate`],
-        ["Zahlungsziel", offer.paymentTerm],
+        [t("flows.summary.customer"), offer.customer.companyName],
+        [t("flows.summary.contact"), `${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()],
+        [t("flows.summary.duration"), t("flows.summary.durationMonths", { count: offer.duration_months })],
+        [t("flows.summary.paymentTerm"), offer.paymentTerm],
     ];
 
     return (
         <section className="rounded-md border border-(--border) bg-white">
-            <h2 className="border-b border-(--border) px-4 py-3 text-[14px] font-medium">Zusammenfassung</h2>
+            <h2 className="border-b border-(--border) px-4 py-3 text-[14px] font-medium">{t("flows.summary.title")}</h2>
             <dl className="grid gap-2 px-4 py-3 text-[13px]">
                 {rows.map(([term, value]) => (
                     <div key={term} className="flex justify-between gap-3">
@@ -560,12 +551,12 @@ function Summary({ offer, customer }: { offer: Offer; customer: Customer | undef
                 ))}
             </dl>
             <dl className="grid gap-1.5 border-t border-(--border) px-4 py-3 text-[13px] tabular-nums">
-                <div className="flex justify-between"><dt className="text-(--fg-3)">Netto</dt><dd>{formatEur(offer.net_amount)}</dd></div>
+                <div className="flex justify-between"><dt className="text-(--fg-3)">{t("flows.summary.net")}</dt><dd>{formatEur(offer.net_amount)}</dd></div>
                 <div className="flex justify-between">
-                    <dt className="text-(--fg-3)">MwSt. (akt. Satz)</dt><dd>{formatEur(preview.vatCents)}</dd>
+                    <dt className="text-(--fg-3)">{t("flows.summary.vat")}</dt><dd>{formatEur(preview.vatCents)}</dd>
                 </div>
                 <div className="flex justify-between text-[15px] font-medium">
-                    <dt>Brutto (geschätzt)</dt><dd>{formatEur(preview.grossCents)}</dd>
+                    <dt>{t("flows.summary.gross")}</dt><dd>{formatEur(preview.grossCents)}</dd>
                 </div>
             </dl>
         </section>
@@ -584,6 +575,7 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
     customerId: string;
     customer: Customer | undefined;
 }) {
+    const { t } = useTranslation();
     const locale = useLocale();
     const stages = deriveStages(offer);
     const phase = derivePhase(offer, stages);
@@ -600,8 +592,8 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
-                        { label: "Kunden", to: "/customers" },
+                        { label: t("nav.dashboard"), to: "/" },
+                        { label: t("section.customers"), to: "/customers" },
                         { label: customer?.companyName ?? "…", to: "/customers/$customerId", params: { customerId } },
                         { label: positions || `AG${offer.quoteId}` },
                     ]}
@@ -614,17 +606,17 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
                         <h1 className="text-xl font-medium">{positions || `AG${offer.quoteId}`}</h1>
                         {offer.derivationType && (
                             <span className="rounded bg-(--subtle-50) px-1.5 py-px text-xs text-(--fg-2)">
-                                {DERIVATION_LABEL[offer.derivationType]}
+                                {t(`flows.derivation.${offer.derivationType}`)}
                             </span>
                         )}
                     </div>
                     <p className="mt-1 text-sm text-(--fg-3)">
-                        {`${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()} · {PHASE_LABELS[phase]}
+                        {`${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()} · {t(`flows.phase.${phase}`)}
                     </p>
                 </div>
                 <div className="text-right">
                     <p className="text-xl font-medium tabular-nums">{eur(offer.net_amount)}</p>
-                    <p className="text-xs text-(--fg-3)">netto</p>
+                    <p className="text-xs text-(--fg-3)">{t("flows.detail.net")}</p>
                 </div>
             </div>
 

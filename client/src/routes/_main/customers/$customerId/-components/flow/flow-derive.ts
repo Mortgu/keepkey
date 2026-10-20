@@ -39,7 +39,7 @@ export function deriveStages(offer: Offer): Stages {
 
     let orderStage: FlowStage;
     if (!order) {
-        orderStage = { kind: "order", state: "action", actionLabel: "Bestellung anlegen" };
+        orderStage = { kind: "order", state: "action" };
     } else if (order.cancelledAt) {
         orderStage = { kind: "order", state: "cancelled", number: `BE${order.orderId}`, date: order.date };
     } else {

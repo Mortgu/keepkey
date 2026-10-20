@@ -14,7 +14,8 @@
     "sales": "Vertrieb",
     "management": "Verwaltung",
     "settings": "Einstellungen",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "dashboard": "Dashboard"
   },
   "section": {
     "workloads": "Workloads",

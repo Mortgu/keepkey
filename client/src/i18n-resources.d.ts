@@ -6,8 +6,9 @@ import type offers from "../../locales/en/offers.json";
 import type versionHistory from "../../locales/en/versionHistory.json";
 import type dashboard from "../../locales/en/dashboard.json";
 import type errors from "../../locales/en/errors.json";
+import type flows from "../../locales/en/flows.json";
 
-type AppResources = typeof common & typeof offers & typeof versionHistory & typeof dashboard & typeof errors;
+type AppResources = typeof common & typeof offers & typeof versionHistory & typeof dashboard & typeof errors & typeof flows;
 
 declare module "i18next" {
   interface CustomTypeOptions {

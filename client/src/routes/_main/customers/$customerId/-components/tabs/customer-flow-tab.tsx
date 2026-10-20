@@ -15,9 +15,9 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../flow/flow-derive";
-import { STATE_LABEL, STATION, eur, stateTone } from "../flow/flow-meta";
-import { PHASE_LABELS } from "../flow/flow-types";
+import { eur, stateTone } from "../flow/flow-meta";
 import type { ReactNode } from "react";
+import type { TFunction } from "i18next";
 import type { Column, ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { FlowStage, Phase, StageKind } from "../flow/flow-types";
 import type { Offer } from "@keepit/schemas";
@@ -68,13 +68,13 @@ function rawDate(offer: Offer, kind: StageKind): string | undefined {
     }
 }
 
-function toFlowRow(offer: Offer): FlowRow {
+function toFlowRow(offer: Offer, t: TFunction): FlowRow {
     const stages = deriveStages(offer);
     const phase = derivePhase(offer, stages);
     const searchText = [
         ...stages.flatMap((stage) => [stage.number, stage.date && formatDate(stage.date)]),
         eur(offer.net_amount),
-        PHASE_LABELS[phase],
+        t(`flows.phase.${phase}`),
     ].filter(Boolean).join(" ").toLowerCase();
 
     return { offer, stages, phase, searchText };
@@ -105,8 +105,6 @@ const columns: Array<ColumnDef<typeof features, FlowRow>> = [
     { id: "phase", accessorFn: (row) => row.phase, filterFn: "arrIncludesSome", enableSorting: false },
 ];
 
-const PHASE_OPTIONS = (Object.keys(PHASE_LABELS) as Array<Phase>).map((phase) => ({ value: phase, label: PHASE_LABELS[phase] }));
-
 function SortHeader({ column, children, className }: { column: FlowColumn; children: ReactNode; className?: string }) {
     const sorted = column.getIsSorted();
     const Icon = sorted === "asc" ? ArrowUp : sorted === "desc" ? ArrowDown : ChevronsUpDown;
@@ -128,6 +126,7 @@ function SortHeader({ column, children, className }: { column: FlowColumn; child
 }
 
 function StageCells({ stage }: { stage: FlowStage }) {
+    const { t } = useTranslation();
     const inactive = stage.state === "locked" || stage.state === "action";
 
     console.log(stage);
@@ -139,14 +138,13 @@ function StageCells({ stage }: { stage: FlowStage }) {
                 inactive && "font-sans text-sm font-normal text-(--fg-3)",
                 stage.state === "cancelled" ? "text-(--fg-3) line-through" : !inactive && "text-(--text)",
             )}>
-                {inactive ? stage.state === "action" ? stage.actionLabel : STATE_LABEL.locked : stage.number}
+                {inactive ? stage.state === "action" ? t(`flows.create.${stage.kind}`) : t("flows.state.locked") : stage.number}
             </p>
             <p className={cn("min-w-0 truncate pr-6 text-sm", stateTone(stage.state))}>
                 {inactive ? "-"
-                    : stage.state === "busy" ? "wird erzeugt"
-                        : stage.state === "failed" ? "fehlgeschlagen"
-                            : stage.state === "cancelled" ? "storniert"
-                                : stage.date && formatDate(stage.date)}
+                    : stage.state === "busy" || stage.state === "failed" || stage.state === "cancelled"
+                        ? t(`flows.stateInline.${stage.state}`)
+                        : stage.date && formatDate(stage.date)}
             </p>
         </>
     );
@@ -189,7 +187,7 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     });
 
     console.dir("offers: ", offers);
-    const data = useMemo(() => offers.map(toFlowRow), [offers]);
+    const data = useMemo(() => offers.map((offer) => toFlowRow(offer, t)), [offers, t]);
     console.dir("data: ", data);
 
     const table = useTable({
@@ -207,14 +205,15 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
 
     const column = (id: string) => table.getColumn(id)!;
     const phaseColumn = column("phase");
+    const netColumn = column("net");
     const rows = table.getRowModel().rows;
 
     return (
         <div className="w-full grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
                 {/*<MultiDropdown
-                    label="Status"
-                    options={PHASE_OPTIONS}
+                    label={t("flows.table.phaseFilter")}
+                    options={(["open", "running", "billed", "cancelled"] as const).map((phase) => ({ value: phase, label: t(`flows.phase.${phase}`) }))}
                     values={(phaseColumn.getFilterValue() as Array<string> | undefined) ?? []}
                     onChange={(values) => phaseColumn.setFilterValue(values.length > 0 ? values : undefined)}
                 />*/}
@@ -252,13 +251,13 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
                         )}>
                             {KINDS.map((kind) => [
                                 <SortHeader key={`${kind}Number`} column={column(`${kind}Number`)} className="pr-2">
-                                    {STATION[kind].short} Nr.
+                                    {t("flows.table.number", { station: t(`flows.station.${kind}.short`) })}
                                 </SortHeader>,
                                 <SortHeader key={`${kind}Date`} column={column(`${kind}Date`)} className="pr-6">
-                                    Datum
+                                    {t("flows.table.date")}
                                 </SortHeader>,
                             ])}
-                            <SortHeader column={column("net")} className="justify-end pr-3">Netto</SortHeader>
+                            <SortHeader column={netColumn} className="justify-end pr-3">{t("flows.table.net")}</SortHeader>
                             <span />
                         </div>
 
@@ -272,7 +271,7 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
 
                         {rows.length === 0 && (
                             <p className="py-8 text-center text-sm text-(--fg-3)">
-                                {data.length === 0 ? "Keine Vorgänge in dieser Ansicht." : "Keine Vorgänge passen zu Suche oder Filter."}
+                                {data.length === 0 ? t("flows.table.empty") : t("flows.table.noMatch")}
                             </p>
                         )}
                     </div>
@@ -281,7 +280,7 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
 
             {nextCursor && (
                 <p className="text-xs text-(--fg-3)">
-                    Es werden die neuesten {PAGE_LIMIT} Vorgänge angezeigt; Suche und Filter berücksichtigen ältere nicht.
+                    {t("flows.table.truncated", { count: PAGE_LIMIT })}
                 </p>
             )}
 

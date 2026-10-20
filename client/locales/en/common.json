@@ -14,7 +14,8 @@
     "sales": "Sales",
     "management": "Management",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "dashboard": "Dashboard"
   },
   "section": {
     "workloads": "Workloads",

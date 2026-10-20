@@ -1,6 +1,6 @@
 import { Ban, Plus, TriangleAlert } from "lucide-react";
 import { cn } from "tailwind-variants";
-import { STATION } from "./flow-meta";
+import { STATION_ICON } from "./flow-meta";
 import type { StageKind, StageState } from "./flow-types";
 
 const NODE: Record<StageState, string> = {
@@ -17,7 +17,7 @@ export function StageNode({ kind, state, size = "md" }: { kind: StageKind; state
     const glyph = state === "cancelled" ? <Ban className="size-3.5" />
         : state === "failed" ? <TriangleAlert className="size-3.5" />
             : state === "action" ? <Plus className="size-3.5" />
-                : STATION[kind].icon;
+                : STATION_ICON[kind];
 
     return (
         <span className={cn(

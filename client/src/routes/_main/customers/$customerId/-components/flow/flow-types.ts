@@ -14,8 +14,6 @@ export type StageState = "done" | "action" | "locked" | "busy" | "failed" | "can
 
 export type Phase = "open" | "running" | "billed" | "cancelled";
 
-export const DERIVATION_LABEL = { RENEWAL: "Verlängerung", LICENSE_EXTENSION: "Erweiterung" } as const;
-
 export interface FlowStage {
     kind: StageKind;
     state: StageState;
@@ -23,12 +21,4 @@ export interface FlowStage {
     date?: string;
     /** Kurzer Statustext unter der Nummer. */
     note?: string;
-    actionLabel?: string;
 }
-
-export const PHASE_LABELS: Record<Phase, string> = {
-    open: "Angebot offen",
-    running: "In Abwicklung",
-    billed: "Abgerechnet",
-    cancelled: "Storniert",
-};
