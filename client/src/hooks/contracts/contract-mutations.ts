@@ -78,7 +78,7 @@ export function useReorderContracts() {
         },
         onError: (error, _, context) => {
             queryClient.setQueryData(contractKeys.lists(), context?.previous);
-            showToast.error("", { message: error.message });
+            showToast.error("common.errorGeneric", { message: error.message });
         },
         onSettled: () => queryClient.invalidateQueries({
             queryKey: contractKeys.lists(),

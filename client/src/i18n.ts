@@ -39,6 +39,7 @@ import suppliersDE from '../locales/de/suppliers.json';
 import templatesDE from '../locales/de/templates.json';
 import versionHistoryDE from '../locales/de/versionHistory.json';
 import workloadsDE from '../locales/de/workloads.json';
+import type { ParseKeys } from 'i18next';
 
 /*
  * Eine Sprachdatei je Route, dazu `common` für Geteiltes.
@@ -53,8 +54,10 @@ import workloadsDE from '../locales/de/workloads.json';
  * `getErrorMessage` schlägt sie als `errors.<CODE>` nach.
  *
  * Eine neue Route braucht: Datei anlegen, hier importieren, unten einreihen.
+ * Die Schlüssel-Typen (`i18n-resources.d.ts`) leiten sich aus `en` ab und
+ * brauchen keine eigene Eintragung.
  */
-const en = {
+export const en = {
     translation: {
         ...commonEN,
         ...contractsEN,
@@ -111,5 +114,8 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
     },
     resources: { en, de },
 });
+
+/** Jeder gültige Schlüssel des `translation`-Namensraums, z. B. `"flows.phase.open"`. */
+export type TranslationKey = ParseKeys;
 
 export default i18n;

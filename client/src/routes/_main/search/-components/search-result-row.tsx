@@ -2,6 +2,8 @@ import { FileText, ShoppingCart, Users } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { SearchResultItem, SearchType } from "@keepit/schemas";
 import type { ReactNode } from "react";
+import type { TFunction } from "i18next";
+import type { TranslationKey } from "@/i18n";
 
 const TYPE_ICON: Record<SearchType, ReactNode> = {
     offer: <FileText size={16} />,
@@ -15,7 +17,7 @@ const TYPE_COLOR: Record<SearchType, string> = {
     customer: "text-[#4B7CBF]",
 };
 
-const TYPE_LABEL_KEY: Record<SearchType, string> = {
+const TYPE_LABEL_KEY: Record<SearchType, TranslationKey> = {
     offer: "search.typeLabels.offer",
     order: "search.typeLabels.order",
     customer: "search.typeLabels.customer",
@@ -45,7 +47,7 @@ function highlight(text: string, query: string): ReactNode {
  * Ab einer Woche kippt es auf das Datum: „vor 34 Tagen" beantwortet keine Frage,
  * die ein Datum nicht besser beantwortet.
  */
-function formatRelativeDate(iso: string, t: (key: string, opts?: Record<string, unknown>) => string): string {
+function formatRelativeDate(iso: string, t: TFunction): string {
     const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);

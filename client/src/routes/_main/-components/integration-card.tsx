@@ -1,6 +1,7 @@
 import { tv } from "tailwind-variants";
 import { useTranslation } from "react-i18next";
 import { RotateCcw, Settings } from "lucide-react";
+import type { TranslationKey } from "@/i18n";
 import { Button } from "@/components";
 
 export type IntegrationStatus =
@@ -44,7 +45,7 @@ const statusText = tv({
     },
 });
 
-const STATUS_LABEL_KEYS: Record<IntegrationStatus, string> = {
+const STATUS_LABEL_KEYS: Record<IntegrationStatus, TranslationKey> = {
     connected: "dashboard.status.connected",
     checking: "dashboard.status.checking",
     failed: "dashboard.status.failed",
