@@ -130,6 +130,8 @@ function SortHeader({ column, children, className }: { column: FlowColumn; child
 function StageCells({ stage }: { stage: FlowStage }) {
     const inactive = stage.state === "locked" || stage.state === "action";
 
+    console.log(stage);
+
     return (
         <>
             <p className={cn(
@@ -137,7 +139,7 @@ function StageCells({ stage }: { stage: FlowStage }) {
                 inactive && "font-sans text-sm font-normal text-(--fg-3)",
                 stage.state === "cancelled" ? "text-(--fg-3) line-through" : !inactive && "text-(--text)",
             )}>
-                {inactive ? STATE_LABEL.locked : stage.number}
+                {inactive ? stage.state === "action" ? stage.actionLabel : STATE_LABEL.locked : stage.number}
             </p>
             <p className={cn("min-w-0 truncate pr-6 text-sm", stateTone(stage.state))}>
                 {inactive ? "-"
@@ -186,7 +188,9 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
         limit: PAGE_LIMIT,
     });
 
+    console.dir("offers: ", offers);
     const data = useMemo(() => offers.map(toFlowRow), [offers]);
+    console.dir("data: ", data);
 
     const table = useTable({
         features,
@@ -258,7 +262,13 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
                             <span />
                         </div>
 
-                        {rows.map((row) => <FlowTableRow key={row.original.offer.id} row={row.original} customerId={customerId} />)}
+                        {rows.map((row) => (
+                            <FlowTableRow
+                                key={row.original.offer.id}
+                                row={row.original}
+                                customerId={customerId}
+                            />
+                        ))}
 
                         {rows.length === 0 && (
                             <p className="py-8 text-center text-sm text-(--fg-3)">

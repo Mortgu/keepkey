@@ -107,7 +107,12 @@ export async function getOffers(query: OfferFilterParams) {
                 }
             },
             offerDiscounts: true,
-            orders: true
+            orders: {
+                include: {
+                    confirmation: true,
+                    invoice: true,
+                }
+            },
         },
     });
 
