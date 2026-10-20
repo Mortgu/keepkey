@@ -1,6 +1,12 @@
 import { useMemo } from "react";
 import { useLocale } from "./use-locale";
-import { formatCurrency, formatDate, formatEur, formatNumber } from "@/lib/format";
+import { formatDate, formatEur, formatNumber } from "@/lib/format";
+
+export interface Formatters {
+    formatDate: (date: Date | string) => string;
+    formatEur: (cent: number) => string;
+    formatNumber: (value: number) => string;
+}
 
 /**
  * Datums-, Zahlen- und Euro-Formatierer in der aktiven Sprache.
@@ -13,12 +19,11 @@ import { formatCurrency, formatDate, formatEur, formatNumber } from "@/lib/forma
  *
  * Das Ergebnis ist je Sprache stabil und taugt damit als Abhängigkeit.
  */
-export function useFormatters() {
+export function useFormatters(): Formatters {
     const language = useLocale();
 
     return useMemo(() => ({
         formatDate: (date: Date | string) => formatDate(date, language),
-        formatCurrency: (value: number) => formatCurrency(value, language),
         formatEur: (cent: number) => formatEur(cent, language),
         formatNumber: (value: number) => formatNumber(value, language),
     }), [language]);

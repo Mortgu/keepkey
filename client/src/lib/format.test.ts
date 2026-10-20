@@ -1,8 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatCurrency, formatDate, formatEur, formatNumber } from "./format";
-
-/** Intl setzt geschützte Leerzeichen (U+00A0, U+202F); für den Vergleich zählen sie als normale. */
-const plain = (s: string) => s.replace(/[\u00A0\u202F]/g, " ");
+import { plain } from "./format.test-utils";
 
 describe("formatDate", () => {
     it("schreibt das Datum auf Deutsch wie bisher", () => {

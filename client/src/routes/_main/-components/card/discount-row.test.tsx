@@ -2,9 +2,7 @@ import { act, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import DiscountRow from "./discount-row";
 import i18n from "@/i18n";
-
-/** Intl setzt geschützte Leerzeichen (U+00A0, U+202F); für den Vergleich zählen sie als normale. */
-const plain = (s: string | null) => (s ?? "").replace(/[\u00A0\u202F]/g, " ");
+import { plain } from "@/lib/format.test-utils";
 
 describe("DiscountRow", () => {
     afterEach(async () => {

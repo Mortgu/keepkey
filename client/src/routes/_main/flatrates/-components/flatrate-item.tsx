@@ -10,7 +10,7 @@ interface Props {
 }
 
 export default function FlatRateItem({ flatrate, onEdit }: Props) {
-  const { formatDate } = useFormatters();
+  const { formatDate, formatEur } = useFormatters();
   const { deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
 
   const locale = useLocale();
@@ -36,7 +36,7 @@ export default function FlatRateItem({ flatrate, onEdit }: Props) {
           <div className="flex items-center gap-2 text-md text-gray-500 mr-2">
             <span>Gesamt: </span>
             <span className="text-gray-900 font-medium font-mono">
-              {(flatrate.total_cents / 100).toFixed(2)} €
+              {formatEur(flatrate.total_cents)}
             </span>
           </div>
 

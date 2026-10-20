@@ -22,6 +22,7 @@ import type { Column, ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { FlowStage, Phase, StageKind } from "../flow/flow-types";
 import type { Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
+import type { Formatters } from "@/hooks";
 import { useFormatters, useModal, useOffers } from "@/hooks";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
@@ -66,8 +67,6 @@ function rawDate(offer: Offer, kind: StageKind): string | undefined {
         case "invoice": return order?.invoice?.date;
     }
 }
-
-type Formatters = ReturnType<typeof useFormatters>;
 
 function toFlowRow(offer: Offer, t: TFunction, { formatDate, formatEur }: Formatters): FlowRow {
     const stages = deriveStages(offer);

@@ -46,4 +46,19 @@ export default defineConfig([
       }],
     },
   },
+  {
+    // Komponenten formatieren über useFormatters(): nur so ist die Sprache eine
+    // Eingabe, und ein Sprachwechsel formatiert bereits gerenderte Ansichten neu.
+    files: ["src/**/*.tsx"],
+    ignores: ["**/*.test.tsx"],
+    rules: {
+      "no-restricted-imports": ["error", {
+        paths: [{
+          name: "@/lib/format",
+          importNames: ["formatDate", "formatEur", "formatNumber", "formatCurrency"],
+          message: "Sprachabhängig formatieren über useFormatters() aus @/hooks.",
+        }],
+      }],
+    },
+  },
 ]);

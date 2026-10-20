@@ -4,6 +4,8 @@ import type { SearchResultItem, SearchType } from "@keepit/schemas";
 import type { ReactNode } from "react";
 import type { TFunction } from "i18next";
 import type { TranslationKey } from "@/i18n";
+import type { Formatters } from "@/hooks";
+import { useFormatters } from "@/hooks";
 
 const TYPE_ICON: Record<SearchType, ReactNode> = {
     offer: <FileText size={16} />,
@@ -47,7 +49,7 @@ function highlight(text: string, query: string): ReactNode {
  * Ab einer Woche kippt es auf das Datum: „vor 34 Tagen" beantwortet keine Frage,
  * die ein Datum nicht besser beantwortet.
  */
-function formatRelativeDate(iso: string, t: TFunction): string {
+function formatRelativeDate(iso: string, t: TFunction, formatDate: Formatters["formatDate"]): string {
     const minutes = Math.floor((Date.now() - new Date(iso).getTime()) / 60_000);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
@@ -57,7 +59,7 @@ function formatRelativeDate(iso: string, t: TFunction): string {
     if (hours < 24) return t("search.hoursAgo", { count: hours });
     if (days < 7) return t("search.daysAgo", { count: days });
 
-    return new Date(iso).toLocaleDateString();
+    return formatDate(iso);
 }
 
 interface Props {
@@ -68,6 +70,7 @@ interface Props {
 
 export default function SearchResultRow({ item, query, onSelect }: Props) {
     const { t } = useTranslation();
+    const { formatDate } = useFormatters();
 
     return (
         <button
@@ -91,7 +94,7 @@ export default function SearchResultRow({ item, query, onSelect }: Props) {
             </span>
 
             <span className="text-[11px] text-(--text-secondary) shrink-0">
-                {formatRelativeDate(item.updatedAt, t)}
+                {formatRelativeDate(item.updatedAt, t, formatDate)}
             </span>
         </button>
     );
