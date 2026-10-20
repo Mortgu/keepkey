@@ -2,8 +2,7 @@ import { Dot } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { Offer } from "@keepit/schemas";
 import { Badge } from "@/components";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     offer: Offer;
@@ -16,6 +15,7 @@ const isExpired = (offer: Offer) =>
 
 /** Ein Angebot in der Auswahlliste des Dialogs „Bestellung anlegen“. */
 export default function OrderModalOfferCard({ offer, selected, onSelect }: Props) {
+    const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
     const ccp = offer.customerContactPerson;
 

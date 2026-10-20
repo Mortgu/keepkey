@@ -5,9 +5,8 @@ import AddContractsModal from "./add-contracts-modal";
 import EditProductsModal from "./edit-products-modal";
 import type { TariffGroup } from "@keepit/schemas";
 import { Button } from "@/components";
-import { useContracts, useLocale, useModal, useProducts } from "@/hooks";
+import { useContracts, useFormatters, useLocale, useModal, useProducts } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatDate } from "@/lib/format";
 import { useCreateTariff, useDeleteTariffGroup, useUpdateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
@@ -15,6 +14,7 @@ type Props = {
 }
 
 export default function PricingTable({ group }: Props) {
+    const { formatDate } = useFormatters();
     const locale = useLocale();
 
     // Fehler melden die Mutationen über den globalen onError in main.tsx —

@@ -24,6 +24,3 @@ const TEXT_TONE: Record<StageState, string> = {
 };
 
 export const stateTone = (state: StageState) => TEXT_TONE[state];
-
-export const eur = (cents: number) =>
-    new Intl.NumberFormat("de-DE", { style: "currency", currency: "EUR" }).format(cents / 100);

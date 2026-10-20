@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
 import { NumberField } from "@/components";
-import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
+import { centsToEur, eurToCents } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     groupId: string;
@@ -17,6 +18,7 @@ interface Props {
  * fehlt der Preis, existiert schlicht keine Zeile, und das Eintragen legt sie an.
  */
 export default function TariffCellComponent({ groupId, tariffId, duration, minQuantity, price }: Props) {
+    const { formatEur } = useFormatters();
     const [edit, setEdit] = useState<boolean>(false);
     const [draft, setDraft] = useState<number | null>(null);
 

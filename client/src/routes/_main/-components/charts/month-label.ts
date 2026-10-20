@@ -1,6 +1,5 @@
 import type { Language } from "@keepit/schemas";
-
-const LOCALES: Record<Language, string> = { DE: "de-DE", EN: "en-GB" };
+import { LOCALES } from "@/lib/format";
 
 /**
  * `2026-08` → „Aug. 26".

@@ -4,8 +4,7 @@ import { useState } from "react";
 import TariffComponent from "./tariff-component";
 import type { TariffBase } from "@keepit/schemas";
 import { Button, showToast } from "@/components";
-import { useLocale } from "@/hooks";
-import { formatDate } from "@/lib/format";
+import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 import { useDeleteTariff } from "@/hooks/tariffs/tariff-mutations";
 
@@ -14,6 +13,7 @@ type Props = {
 }
 
 export default function PricingTableItem({ tariff }: Props) {
+    const { formatDate } = useFormatters();
     const locale = useLocale();
     const { t } = useTranslation();
     const { deleteTariff, isPending: deleting } = useDeleteTariff();

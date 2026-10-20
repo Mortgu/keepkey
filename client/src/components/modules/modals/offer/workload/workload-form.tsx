@@ -2,6 +2,7 @@ import { Button, Checkbox, Input, NumberField, Select } from "@/components";
 import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
 import {
     useCustomerPriceOverride,
+    useFormatters,
     useLocale,
     usePositionPrice,
     useProducts,
@@ -9,7 +10,7 @@ import {
 import { ApiError } from "@/lib/api-client";
 import { getErrorMessage } from "@/lib/errors";
 import { localized } from "@/lib/i18n-content";
-import { eurToCents, formatEur } from "@/utils/utils";
+import { eurToCents } from "@/utils/utils";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { coordinatesFrom } from "@keepit/schemas";
 import { Check, Pen, Tag } from "lucide-react";
@@ -33,6 +34,7 @@ interface Props {
  * Policy — im Angebot alles, in der Verlängerung das Produkt nicht.
  */
 export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Props) {
+    const { formatEur } = useFormatters();
     const locale = useLocale();
     const { t } = useTranslation();
     const { policy, sourceOffer, header } = useOfferModalContext();

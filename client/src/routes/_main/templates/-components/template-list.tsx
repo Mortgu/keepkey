@@ -23,16 +23,17 @@ import {
 import {
     getTemplateContent,
     templateDownloadUrl,
+    useFormatters,
     useTemplateMutations,
     useTemplates,
 } from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
-import { formatDate } from "@/lib/format";
 
 /** Welcher Slot gerade eine Datei erwartet — der Upload-Dialog kennt keinen eigenen. */
 type PendingUpload = { kind: DocumentTemplateKind; language: DocumentTemplateSlot["language"] };
 
 export default function TemplateList() {
+    const { formatDate } = useFormatters();
     const { t } = useTranslation();
 
     const { data: templates, isPending, error } = useTemplates();

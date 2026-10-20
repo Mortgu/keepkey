@@ -1,8 +1,7 @@
 import { Button, Spinner } from "@/components";
 import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
-import { useContract, useLocale, usePositionPrice, useProduct } from "@/hooks";
+import { useContract, useFormatters, useLocale, usePositionPrice, useProduct } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
 import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { coordinatesFrom } from "@keepit/schemas";
 import { CircleAlert, Pen, Tag, Trash, X } from "lucide-react";
@@ -21,6 +20,7 @@ interface Props {
 }
 
 export default function WorkloadItem({ index, workload, updateFn, deleteFn }: Props) {
+    const { formatEur } = useFormatters();
     const { t } = useTranslation();
     const locale = useLocale();
     const { policy, sourceOffer, header, pricing } = useOfferModalContext();

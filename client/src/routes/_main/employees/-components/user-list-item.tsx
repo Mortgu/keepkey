@@ -1,9 +1,8 @@
 
 import { Pen, Trash } from "lucide-react";
 import type { User } from "@keepit/schemas";
-import { formatDate } from "@/lib/format";
 import { Button } from "@/components";
-import { useDeleteUser } from "@/hooks";
+import { useDeleteUser, useFormatters } from "@/hooks";
 
 interface UserListItemProps {
   user: User;
@@ -11,6 +10,7 @@ interface UserListItemProps {
 }
 
 export default function UserListItem({ user, onEdit }: UserListItemProps) {
+  const { formatDate } = useFormatters();
   const { deleteUser, isDeletingUser } = useDeleteUser();
 
   const handleDeleteUser = (id: string) => {

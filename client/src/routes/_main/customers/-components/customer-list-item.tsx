@@ -3,8 +3,7 @@ import { Pen, Trash, User } from "lucide-react";
 import ContactsModal from "./contact/contacts-modal";
 import type {SyntheticEvent} from "react";
 import type { Customer } from "@keepit/schemas";
-import { formatDate } from "@/lib/format";
-import { useDeleteCustomer, useModal } from "@/hooks";
+import { useDeleteCustomer, useFormatters, useModal } from "@/hooks";
 import { Button } from "@/components";
 
 interface Props {
@@ -15,6 +14,7 @@ interface Props {
 }
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
+    const { formatDate } = useFormatters();
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
     const contactsModal = useModal();
 

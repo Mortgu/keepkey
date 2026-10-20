@@ -3,12 +3,10 @@ import PurchasePriceTable from "../purchase-price-table";
 import type useOrderModal from "../../-hooks/use-order-modal";
 import type { Offer } from "@keepit/schemas";
 import { Badge, Input, Textarea } from "@/components";
-import { useLocale, useSuppliers } from "@/hooks";
+import { useFormatters, useLocale, useSuppliers } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
-import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 import { getFormError } from "@/lib/utils";
-import { formatEur } from "@/utils/utils";
 
 type Modal = ReturnType<typeof useOrderModal>;
 
@@ -26,6 +24,7 @@ interface Props {
  * im Dialog-Footer verweist per `form`-Attribut darauf.
  */
 export default function OrderModalDetail({ offer, form, rows, error, formId }: Props) {
+    const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
     const locale = useLocale();
     const { suppliers } = useSuppliers();

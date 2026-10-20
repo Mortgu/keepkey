@@ -13,14 +13,14 @@ import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     order: Order;
 }
 
 export default function OrderCard({ order }: Props) {
+    const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
     const [editing, setEditing] = useState(false);
     const { cancelOrder, isCancellingOrder, errorCancellingOrder } = useCancelOrder();

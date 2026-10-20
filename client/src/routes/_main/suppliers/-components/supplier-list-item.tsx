@@ -1,8 +1,7 @@
 import { Dot, Pen, Trash } from "lucide-react";
 import type { Supplier } from "@keepit/schemas";
-import { useDeleteSupplier } from "@/hooks";
+import { useDeleteSupplier, useFormatters } from "@/hooks";
 import { Badge, Button } from "@/components";
-import { formatDate } from "@/lib/format";
 
 type Props = {
     supplier: Supplier;
@@ -10,6 +9,7 @@ type Props = {
 };
 
 export default function SupplierListItem({ supplier, onEdit }: Props) {
+    const { formatDate } = useFormatters();
     const { deleteSupplier, isDeletingSupplier } = useDeleteSupplier();
 
     const handleDeleteSupplier = () => {

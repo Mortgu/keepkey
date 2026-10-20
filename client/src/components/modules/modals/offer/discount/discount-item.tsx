@@ -2,8 +2,8 @@ import { Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import DiscountForm from "./discount-form";
 import type { CreateOfferDiscountInput } from "@keepit/schemas";
-import { formatEur } from "@/utils/utils";
 import { Button } from "@/components";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     discount: CreateOfferDiscountInput;
@@ -13,6 +13,7 @@ interface Props {
 }
 
 export default function DiscountItem({ discount, updateFn, deleteFn }: Props) {
+    const { formatEur } = useFormatters();
     const [isEdit, setEdit] = useState<boolean>(false);
 
     return (

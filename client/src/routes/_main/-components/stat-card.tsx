@@ -1,4 +1,4 @@
-import { formatEur } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     title: string;
@@ -7,6 +7,7 @@ interface Props {
 }
 
 export default function StatCard({ title, total, volume }: Props) {
+    const { formatEur } = useFormatters();
     return (
         <div className="flex-1 grid gap-2 py-3 px-4">
             <div className="flex items-center">

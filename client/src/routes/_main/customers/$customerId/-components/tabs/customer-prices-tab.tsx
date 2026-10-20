@@ -1,10 +1,9 @@
 import { Trash } from "lucide-react";
 import type { Customer, CustomerPriceRow } from "@keepit/schemas";
 import { Button, RouteError, Skeleton } from "@/components";
-import { useCustomerPrices, useLocale } from "@/hooks";
+import { useCustomerPrices, useFormatters, useLocale } from "@/hooks";
 import { useDeleteCustomerPrice } from "@/hooks/pricing/pricing-mutations";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
 
 interface Props {
     customer: Customer;
@@ -30,6 +29,7 @@ function quantityRange(row: CustomerPriceRow): string {
  * Preise ließen sich dadurch weder nachvollziehen noch zurücknehmen.
  */
 export default function CustomerPricesTab({ customer }: Props) {
+    const { formatEur } = useFormatters();
     const locale = useLocale();
     const { prices, isPending, error } = useCustomerPrices(customer.id);
     const { deleteCustomerPrice, isPending: deleting, error: deleteError } = useDeleteCustomerPrice();

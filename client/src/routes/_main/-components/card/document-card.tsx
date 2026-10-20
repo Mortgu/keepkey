@@ -16,12 +16,12 @@ import {
     useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
+    useFormatters,
     useLocale,
-    useModal
+    useModal,
 } from "@/hooks";
 import { api } from "@/lib/api-client";
 import { getDocumentStatus } from "@/utils/status";
-import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
 
 const cardStyles = tv({
@@ -56,6 +56,7 @@ interface Props {
 }
 
 export default function DocumentCard({ type, parentId, document, locked = false }: Props) {
+    const { formatDate } = useFormatters();
     const locales = useLocale();
     const { t } = useTranslation();
 

@@ -1,9 +1,9 @@
 import { useTranslation } from "react-i18next";
 import type { PurchaseRow } from "../-hooks/use-order-form";
 import { Input } from "@/components";
-import { useLocale } from "@/hooks";
+import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
+import { centsToEur, eurToCents } from "@/utils/utils";
 
 interface Props {
     rows: Array<PurchaseRow>;
@@ -23,6 +23,7 @@ const lineNet = (row: PurchaseRow, unitCents: number) =>
  * sie haben keinen Einkaufspreis.
  */
 export default function PurchasePriceTable({ rows, values, onChange, disabled }: Props) {
+    const { formatEur } = useFormatters();
     const { t } = useTranslation();
     const locale = useLocale();
 

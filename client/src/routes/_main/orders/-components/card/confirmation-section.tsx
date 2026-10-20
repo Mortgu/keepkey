@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next";
 import { vatTotals } from "@keepit/schemas";
 import type { Order } from "@keepit/schemas";
 import { Button, Input, ListSkeleton, NumberField, Skeleton } from "@/components";
-import { useConfirmation, useCreateConfirmation, useCustomer, useRegenerateConfirmation } from "@/hooks";
+import { useConfirmation, useCreateConfirmation, useCustomer, useFormatters, useRegenerateConfirmation } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 
 interface Props {
@@ -19,6 +17,7 @@ interface Props {
  * ist nach dem Anlegen fest.
  */
 export default function ConfirmationSection({ order }: Props) {
+    const { formatDate, formatEur, formatNumber } = useFormatters();
     const { t } = useTranslation();
     const { confirmation, isPending, error } = useConfirmation(order.id);
     const { createConfirmation, isCreatingConfirmation, errorCreatingConfirmation } = useCreateConfirmation(order.id);
@@ -97,7 +96,7 @@ export default function ConfirmationSection({ order }: Props) {
                 <p className="text-sm text-(--text-secondary)">
                     {t("orders.vat.preview", {
                         net: formatEur(preview.netCents),
-                        rate: effectiveRate.toLocaleString("de-DE"),
+                        rate: formatNumber(effectiveRate),
                         vat: formatEur(preview.vatCents),
                         gross: formatEur(preview.grossCents),
                     })}
@@ -123,7 +122,7 @@ export default function ConfirmationSection({ order }: Props) {
                     <div className="flex items-center gap-1">
                         <dt className="text-(--text-secondary)">{t("orders.vat.stored")}:</dt>
                         <dd className="font-mono">
-                            {formatEur(confirmation.net_cents)} + {confirmation.taxRate.toLocaleString("de-DE")} % = {formatEur(confirmation.gross_cents)}
+                            {formatEur(confirmation.net_cents)} + {formatNumber(confirmation.taxRate)} % = {formatEur(confirmation.gross_cents)}
                         </dd>
                     </div>
                 </dl>

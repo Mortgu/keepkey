@@ -15,15 +15,14 @@ import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../flow/flow-derive";
-import { eur, stateTone } from "../flow/flow-meta";
+import { stateTone } from "../flow/flow-meta";
 import type { ReactNode } from "react";
 import type { TFunction } from "i18next";
 import type { Column, ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { FlowStage, Phase, StageKind } from "../flow/flow-types";
 import type { Offer } from "@keepit/schemas";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useModal, useOffers } from "@/hooks";
-import { formatDate } from "@/lib/format";
+import { useFormatters, useModal, useOffers } from "@/hooks";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
 
@@ -68,12 +67,14 @@ function rawDate(offer: Offer, kind: StageKind): string | undefined {
     }
 }
 
-function toFlowRow(offer: Offer, t: TFunction): FlowRow {
+type Formatters = ReturnType<typeof useFormatters>;
+
+function toFlowRow(offer: Offer, t: TFunction, { formatDate, formatEur }: Formatters): FlowRow {
     const stages = deriveStages(offer);
     const phase = derivePhase(offer, stages);
     const searchText = [
         ...stages.flatMap((stage) => [stage.number, stage.date && formatDate(stage.date)]),
-        eur(offer.net_amount),
+        formatEur(offer.net_amount),
         t(`flows.phase.${phase}`),
     ].filter(Boolean).join(" ").toLowerCase();
 
@@ -127,6 +128,7 @@ function SortHeader({ column, children, className }: { column: FlowColumn; child
 
 function StageCells({ stage }: { stage: FlowStage }) {
     const { t } = useTranslation();
+    const { formatDate } = useFormatters();
     const inactive = stage.state === "locked" || stage.state === "action";
 
     console.log(stage);
@@ -152,6 +154,7 @@ function StageCells({ stage }: { stage: FlowStage }) {
 
 function FlowTableRow({ row, customerId }: { row: FlowRow; customerId: string }) {
     const cancelled = row.phase === "cancelled";
+    const { formatEur } = useFormatters();
 
     return (
         <Link
@@ -169,7 +172,7 @@ function FlowTableRow({ row, customerId }: { row: FlowRow; customerId: string })
             ))}
 
             <p className={cn("pr-3 text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
-                {eur(row.offer.net_amount)}
+                {formatEur(row.offer.net_amount)}
             </p>
 
             <ChevronRight className="size-4 text-(--fg-3)" />
@@ -180,6 +183,7 @@ function FlowTableRow({ row, customerId }: { row: FlowRow; customerId: string })
 export default function CustomerFlowTab({ customerId }: { customerId: string }) {
     const { t } = useTranslation();
     const modal = useModal<{ mode: OfferModalMode }>();
+    const formatters = useFormatters();
 
     const { items: offers, nextCursor, isPending, error } = useOffers({
         companyIds: [customerId],
@@ -187,7 +191,7 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     });
 
     console.dir("offers: ", offers);
-    const data = useMemo(() => offers.map((offer) => toFlowRow(offer, t)), [offers, t]);
+    const data = useMemo(() => offers.map((offer) => toFlowRow(offer, t, formatters)), [offers, t, formatters]);
     console.dir("data: ", data);
 
     const table = useTable({

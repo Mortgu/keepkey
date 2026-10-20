@@ -3,9 +3,8 @@ import ConfirmationModal, { type ConfirmationSubmitType } from "@/components/mod
 import InvoiceModal, { type InvoiceSubmitType } from "@/components/modules/modals/invoice/invoice-modal";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useCancelOrder, useCreateConfirmation, useCreateInvoice, useDeleteConfirmation, useDeleteInvoice, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation, useRegenerateInvoice } from "@/hooks";
+import { useCancelOrder, useCreateConfirmation, useCreateInvoice, useDeleteConfirmation, useDeleteInvoice, useFormatters, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation, useRegenerateInvoice } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
-import { formatDate } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import { default as DocumentCard } from "@/routes/_main/-components/card/document-card";
@@ -13,7 +12,6 @@ import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
-import { formatEur } from "@/utils/utils";
 import type { Confirmation, Customer, Invoice, Offer, Order } from "@keepit/schemas";
 import { vatTotals } from "@keepit/schemas";
 import { Ban, Dot, Pen, Plus, Trash2 } from "lucide-react";
@@ -22,7 +20,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
-import { eur, stateTone } from "../../../-components/flow/flow-meta";
+import { stateTone } from "../../../-components/flow/flow-meta";
 import type { FlowStage } from "../../../-components/flow/flow-types";
 import { StageNode } from "../../../-components/flow/flow-ui";
 
@@ -219,6 +217,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
 
 function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: Offer; order: Order | null }) {
     const { t } = useTranslation();
+    const { formatDate } = useFormatters();
     const orderModal = useModal();
     const [editing, setEditing] = useState(false);
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
@@ -531,6 +530,7 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
 
 function Summary({ offer, customer }: { offer: Offer; customer: Customer | undefined }) {
     const { t } = useTranslation();
+    const { formatEur } = useFormatters();
     const preview = vatTotals(offer.net_amount, customer?.taxRate ?? 0);
     const rows: Array<[string, string]> = [
         [t("flows.summary.customer"), offer.customer.companyName],
@@ -576,6 +576,7 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
     customer: Customer | undefined;
 }) {
     const { t } = useTranslation();
+    const { formatEur } = useFormatters();
     const locale = useLocale();
     const stages = deriveStages(offer);
     const phase = derivePhase(offer, stages);
@@ -615,7 +616,7 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
                     </p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xl font-medium tabular-nums">{eur(offer.net_amount)}</p>
+                    <p className="text-xl font-medium tabular-nums">{formatEur(offer.net_amount)}</p>
                     <p className="text-xs text-(--fg-3)">{t("flows.detail.net")}</p>
                 </div>
             </div>

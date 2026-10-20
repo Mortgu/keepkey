@@ -3,10 +3,8 @@ import { useTranslation } from "react-i18next";
 import { vatTotals } from "@keepit/schemas";
 import type { Order } from "@keepit/schemas";
 import { Button, Input, ListSkeleton, NumberField, Skeleton } from "@/components";
-import { useCreateInvoice, useCustomer, useInvoice, useRegenerateInvoice } from "@/hooks";
+import { useCreateInvoice, useCustomer, useFormatters, useInvoice, useRegenerateInvoice } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 
 interface Props {
@@ -19,6 +17,7 @@ interface Props {
  * ist nach dem Anlegen fest.
  */
 export default function InvoiceSection({ order }: Props) {
+    const { formatDate, formatEur, formatNumber } = useFormatters();
     const { t } = useTranslation();
     const { invoice, isPending, error } = useInvoice(order.id);
     const { createInvoice, isCreatingInvoice, errorCreatingInvoice } = useCreateInvoice(order.id);
@@ -97,7 +96,7 @@ export default function InvoiceSection({ order }: Props) {
                 <p className="text-sm text-(--text-secondary)">
                     {t("orders.vat.preview", {
                         net: formatEur(preview.netCents),
-                        rate: effectiveRate.toLocaleString("de-DE"),
+                        rate: formatNumber(effectiveRate),
                         vat: formatEur(preview.vatCents),
                         gross: formatEur(preview.grossCents),
                     })}
@@ -123,7 +122,7 @@ export default function InvoiceSection({ order }: Props) {
                     <div className="flex items-center gap-1">
                         <dt className="text-(--text-secondary)">{t("orders.vat.stored")}:</dt>
                         <dd className="font-mono">
-                            {formatEur(invoice.net_cents)} + {invoice.taxRate.toLocaleString("de-DE")} % = {formatEur(invoice.gross_cents)}
+                            {formatEur(invoice.net_cents)} + {formatNumber(invoice.taxRate)} % = {formatEur(invoice.gross_cents)}
                         </dd>
                     </div>
                 </dl>

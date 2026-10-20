@@ -1,9 +1,8 @@
 import { Pen, Trash } from "lucide-react";
 import type { Flatrate } from "@keepit/schemas";
 import { Button } from "@/components";
-import { useDeleteFlatRate, useLocale } from "@/hooks";
+import { useDeleteFlatRate, useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatDate } from "@/lib/format";
 
 interface Props {
   flatrate: Flatrate;
@@ -11,6 +10,7 @@ interface Props {
 }
 
 export default function FlatRateItem({ flatrate, onEdit }: Props) {
+  const { formatDate } = useFormatters();
   const { deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
 
   const locale = useLocale();

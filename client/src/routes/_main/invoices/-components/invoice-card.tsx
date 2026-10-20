@@ -2,14 +2,15 @@ import { Link } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import type { InvoiceListItem } from "@keepit/schemas";
 import { Badge } from "@/components";
-import { formatDate } from "@/lib/format";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     invoice: InvoiceListItem;
 }
 
 export default function InvoiceCard({ invoice }: Props) {
+    const { formatDate } = useFormatters();
     const { t } = useTranslation();
     const current = invoice.documents.at(0);
 

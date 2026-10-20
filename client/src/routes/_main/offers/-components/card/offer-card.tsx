@@ -3,15 +3,13 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { Accordion, Badge, Button } from "@/components";
-import { useModal } from "@/hooks";
+import { useFormatters, useModal } from "@/hooks";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { formatDate } from "@/lib/format";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
-import { formatEur } from "@/utils/utils";
 import type { Offer, OfferDocument } from '@keepit/schemas';
 import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
@@ -21,6 +19,7 @@ type OfferListItemProps = {
 };
 
 export default function OfferCard({ offer }: OfferListItemProps) {
+    const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
 
     /** `data` trägt nur die Variante — die Quelle ist immer das Angebot dieser Karte. */
