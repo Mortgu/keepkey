@@ -118,4 +118,7 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
 /** Jeder gültige Schlüssel des `translation`-Namensraums, z. B. `"flows.phase.open"`. */
 export type TranslationKey = ParseKeys;
 
+/** Ein Server-Fehlercode, für den `errors.json` eine Übersetzung führt. */
+export type ErrorCode = keyof typeof en.translation.errors;
+
 export default i18n;

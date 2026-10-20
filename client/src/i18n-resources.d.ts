@@ -8,14 +8,12 @@ type AppResources = typeof en;
 
 declare module "i18next" {
   interface CustomTypeOptions {
-    defaultNS: "translation";
     resources: AppResources;
   }
 }
 
 declare module "react-i18next" {
   interface CustomTypeOptions {
-    defaultNS: "translation";
     resources: AppResources;
   }
 }
