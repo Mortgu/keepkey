@@ -24,6 +24,9 @@ const env = createEnv({
         S3_SECRET_ACCESS_KEY: z.string().min(1),
         S3_FORCE_PATH_STYLE: z.string().default("true").transform((value) => value === "true"),
 
+        /** Gleiche Begründung wie bei `S3_ENDPOINT`: Schema verpflichtend. */
+        GOTENBERG_URL: z.url({ protocol: /^https?$/ }),
+
         DATABASE_URL: z.url(),
 
         PORT: z.coerce.number(),
