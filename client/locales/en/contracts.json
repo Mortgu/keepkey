@@ -1,6 +1,27 @@
 {
   "contracts": {
     "description": "Central contract management",
-    "create": "Create contract"
+    "create": "Create contract",
+    "default": "Default",
+    "noFeatures": "No features defined!",
+    "move": "Move {{name}}",
+    "loadError": {
+      "title": "Error",
+      "message": "Something went wrong trying to fetch contracts!"
+    },
+    "modal": {
+      "editTitle": "Edit contract",
+      "createTitle": "Create new contract",
+      "name": "Name ({{language}})",
+      "features": "Features ({{language}}):",
+      "featurePlaceholder": "Feature {{number}}",
+      "removeFeature": "Remove feature",
+      "addFeature": "Add feature",
+      "table": "Table ({{language}})",
+      "tablePlaceholder": "Data volume"
+    },
+    "validation": {
+      "nameMin": "At least 1 character!"
+    }
   }
 }

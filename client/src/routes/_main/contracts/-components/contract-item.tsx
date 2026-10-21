@@ -1,6 +1,7 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Pen, Trash } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 import type { Contract } from "@keepit/schemas";
 import { Button } from "@/components";
@@ -16,6 +17,7 @@ interface ContractListItemProps {
 }
 
 export default function ContractListItem({ contract, isDefault, onEdit }: ContractListItemProps) {
+  const { t } = useTranslation();
   const { formatDate } = useFormatters();
   const locale = useLocale();
 
@@ -41,7 +43,7 @@ export default function ContractListItem({ contract, isDefault, onEdit }: Contra
           ref={setActivatorNodeRef}
           {...attributes}
           {...listeners}
-          aria-label={`${name} verschieben`}
+          aria-label={t("contracts.move", { name })}
           className="-ml-1 p-1 rounded text-gray-400 hover:text-(--text) hover:bg-gray-100 cursor-grab active:cursor-grabbing touch-none"
         >
           <GripVertical size={16} />
@@ -52,7 +54,7 @@ export default function ContractListItem({ contract, isDefault, onEdit }: Contra
             <p className="text-md font-medium">{name}</p>
             {isDefault && (
               <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-50 text-green-700 border border-green-200">
-                Standard
+                {t("contracts.default")}
               </span>
             )}
           </div>
@@ -72,7 +74,7 @@ export default function ContractListItem({ contract, isDefault, onEdit }: Contra
           ))}
 
           {features.length === 0 && (
-            <p className="text-sm text-(--destructive)">Keine Features hinterlegt!</p>
+            <p className="text-sm text-(--destructive)">{t("contracts.noFeatures")}</p>
           )}
         </ul>
       </div>
