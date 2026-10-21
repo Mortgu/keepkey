@@ -41,6 +41,10 @@
       "failed": "Connection failed",
       "notConfigured": "Not configured"
     },
+    "meta": {
+      "url": "Address",
+      "endpoint": "Endpoint"
+    },
     "retry": "Retry"
   }
 }

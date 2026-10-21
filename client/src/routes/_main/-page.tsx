@@ -64,7 +64,7 @@ export default function DashboardPage() {
                 {/* Title + Description */}
                 <div className="grid gap-1">
                     <h1 className="text-xl font-medium">{t("dashboard.title")}</h1>
-                    <p className='text-sm text-gray-500'>{t("dashboard.description")}</p>
+                    <p className='text-sm text-(--text-secondary)'>{t("dashboard.description")}</p>
                 </div>
             </div>
 

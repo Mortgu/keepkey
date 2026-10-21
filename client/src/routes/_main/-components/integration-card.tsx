@@ -52,6 +52,15 @@ const STATUS_LABEL_KEYS: Record<IntegrationStatus, TranslationKey> = {
     not_configured: "dashboard.status.notConfigured",
 };
 
+/**
+ * Der Server liefert Meta-Angaben als freie Schlüssel (`Record<string, string>`).
+ * Bekannte Schlüssel werden übersetzt, unbekannte erscheinen unverändert.
+ */
+const META_LABEL_KEYS: Partial<Record<string, TranslationKey>> = {
+    url: "dashboard.meta.url",
+    endpoint: "dashboard.meta.endpoint",
+};
+
 export default function IntegrationCard(props: Props) {
     const {
         name,
@@ -100,12 +109,16 @@ export default function IntegrationCard(props: Props) {
 
             {showMeta && (
                 <div className='flex items-center gap-4 bg-white px-4 py-2 rounded-lg border-t border-(--border)'>
-                    {meta?.map((item) => (
-                        <p key={item.label}>
-                            <span className='text-gray-500'>{item.label}: </span>
-                            {item.value}
-                        </p>
-                    ))}
+                    {meta?.map((item) => {
+                        const labelKey = META_LABEL_KEYS[item.label];
+                        const label = labelKey ? t(labelKey) : item.label;
+                        return (
+                            <p key={item.label}>
+                                <span className='text-gray-500'>{label}: </span>
+                                {item.value}
+                            </p>
+                        );
+                    })}
                 </div>
             )}
         </div>

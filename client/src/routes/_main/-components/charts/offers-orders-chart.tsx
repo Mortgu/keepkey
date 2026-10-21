@@ -5,9 +5,6 @@ import { monthLabel } from "./month-label";
 import type { DashboardMonth } from "@keepit/schemas";
 import { useLocale } from "@/hooks";
 
-const TICK_STYLE = { fontSize: 11, fill: "var(--neutral-400)" };
-const TOOLTIP_CURSOR = { fill: "var(--subtle-50)" };
-
 interface Props {
     months: Array<DashboardMonth>;
 }
@@ -51,7 +48,7 @@ export default function OffersOrdersChart({ months }: Props) {
                     dataKey="label"
                     tickLine={false}
                     axisLine={false}
-                    tick={TICK_STYLE}
+                    tick={{ fontSize: 11, fill: "var(--neutral-400)" }}
                     interval="preserveStartEnd"
                 />
 
@@ -62,10 +59,10 @@ export default function OffersOrdersChart({ months }: Props) {
                     tickLine={false}
                     axisLine={false}
                     width={28}
-                    tick={TICK_STYLE}
+                    tick={{ fontSize: 11, fill: "var(--neutral-400)" }}
                 />
 
-                <Tooltip cursor={TOOLTIP_CURSOR} />
+                <Tooltip cursor={{ fill: "var(--subtle-50)" }} />
                 <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12 }} />
 
                 <Bar
