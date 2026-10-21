@@ -26,14 +26,9 @@ RUN pnpm install --frozen-lockfile --prod --config.confirmModulesPurge=false
 
 
 FROM node:22-slim
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-    libreoffice \
-    libreoffice-writer \
-    default-jre \
-    ghostscript \
-    && rm -rf /var/lib/apt/lists/*
-
+# Dokumentkonvertierung läuft seit #58 über den Gotenberg-Sidecar (HTTP),
+# nicht mehr lokal — deshalb kein libreoffice/default-jre/ghostscript mehr
+# im Laufzeit-Image. Siehe #56/#59.
 WORKDIR /app/server
 
 COPY --from=builder /app/node_modules ../node_modules

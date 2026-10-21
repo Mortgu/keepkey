@@ -47,8 +47,9 @@ docker run --rm --network=[NETWORK_NAME] --env-file .env docker.io/oskarsammet/a
 
 ### Herunterfahren
 `SHUTDOWN_TIMEOUT_MS` (Default 8 s) muss unter der Grace Period der Plattform
-liegen, damit laufende Jobs (LibreOffice-Konvertierung) nach SIGTERM noch
-fertig werden — z. B. `--stop-grace-period=120s` mit `SHUTDOWN_TIMEOUT_MS=110000`.
+liegen, damit laufende Jobs (Dokumentkonvertierung über den Gotenberg-Sidecar)
+nach SIGTERM noch fertig werden — z. B. `--stop-grace-period=120s` mit
+`SHUTDOWN_TIMEOUT_MS=110000`.
 
 ## Railway
 
