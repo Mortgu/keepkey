@@ -1,6 +1,7 @@
 import { useForm } from "@tanstack/react-form";
 import z from "zod";
 import type {Language, ProductTranslationInput, UpdateProductInput} from "@keepit/schemas";
+import type { TranslationKey } from "@/i18n";
 import { useCreateProduct } from "@/hooks";
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const langFields = z.object({
-    name: z.string().min(1, "Mindestens 1 Zeichen"),
+    name: z.string().min(1, "workloads.validation.nameRequired" satisfies TranslationKey),
     description: z.string(),
     table: z.string(),
 });

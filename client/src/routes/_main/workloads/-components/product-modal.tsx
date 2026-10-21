@@ -3,6 +3,14 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import type {
+  CreateProductInput,
+  Language,
+
+  ProductTranslationInput,
+  UpdateProductInput
+} from '@keepit/schemas';
+import type { TranslationKey } from "@/i18n";
 import {
   Button,
   Dialog,
@@ -11,13 +19,6 @@ import {
   SegmentedLanguageToggle,
 } from "@/components";
 import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
-import type {
-  CreateProductInput,
-  Language,
-
-  ProductTranslationInput,
-  UpdateProductInput
-} from '@keepit/schemas';
 
 
 interface ProductModalProps {
@@ -27,7 +28,7 @@ interface ProductModalProps {
 }
 
 const langFields = z.object({
-  name: z.string().min(1, "Mindestens 1 Zeichen"),
+  name: z.string().min(1, "workloads.validation.nameRequired" satisfies TranslationKey),
   description: z.string(),
   table: z.string(),
 });
@@ -87,7 +88,7 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}>
+      <Dialog.Header title={isEdit ? t("workloads.product.titleEdit") : t("workloads.product.titleCreate")}>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
           value={language}
@@ -98,16 +99,16 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
         <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
           <productForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-1">
-              <FieldInput field={field} label={`Produkt Name (${language})`} placeholder="Produkt Name" />
+              <FieldInput field={field} label={t("workloads.product.nameLabel", { language })} placeholder={t("workloads.product.namePlaceholder")} />
             </div>
           )} />
 
           <productForm.Field name={`${language}.description`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={`Produkt Beschreibung (${language})`} placeholder="Produkt Beschreibung" />
+            <FieldTextarea field={field} rows={5} label={t("workloads.product.descriptionLabel", { language })} placeholder={t("workloads.product.descriptionPlaceholder")} />
           )} />
 
           <productForm.Field name={`${language}.table`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
+            <FieldTextarea field={field} rows={5} label={t("workloads.product.tableLabel", { language })} placeholder={t("workloads.product.tablePlaceholder")} />
           )} />
         </form>
       </Dialog.Body>

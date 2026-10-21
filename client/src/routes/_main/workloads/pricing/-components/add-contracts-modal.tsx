@@ -3,13 +3,13 @@ import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import type { Contract } from "@keepit/schemas";
 import type {DropdownOption} from "@/components";
+import type { TranslationKey } from "@/i18n";
 import {
     Button,
     Dialog,
     MultiSelectList,
 } from "@/components";
-import { getFormError } from "@/lib/utils";
-import { useLocale } from "@/hooks";
+import { useFormError, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 interface AddContractsModalProps {
@@ -21,7 +21,7 @@ interface AddContractsModalProps {
 }
 
 const addContractsSchema = z.object({
-    contracts: z.array(z.string().min(1)).min(1, "Mindestens 1 Vertrag auswählen"),
+    contracts: z.array(z.string().min(1)).min(1, "workloads.validation.contractsRequired" satisfies TranslationKey),
 });
 
 export default function AddContractsModal({
@@ -33,6 +33,7 @@ export default function AddContractsModal({
 }: AddContractsModalProps) {
     const { t } = useTranslation();
     const locale = useLocale();
+    const formError = useFormError();
 
     const options: Array<DropdownOption> = contracts
         .filter(c => !excludeContractIds.has(c.id))
@@ -77,25 +78,25 @@ export default function AddContractsModal({
             defaultOpen
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <Dialog.Header title="Verträge hinzufügen" />
+            <Dialog.Header title={t("workloads.pricing.addContracts.title")} />
             <Dialog.Body>
                 <form id="add-contracts-form" onSubmit={handleSubmit} className="grid gap-4">
                     <form.Field name="contracts" children={(field) => (
                         <div className="grid gap-1">
-                            <label className="text-sm text-gray-500">Verträge</label>
+                            <label className="text-sm text-gray-500">{t("workloads.pricing.addContracts.contracts")}</label>
                             <MultiSelectList
                                 options={options}
                                 values={field.state.value}
                                 onChange={field.handleChange}
                             />
-                            {getFormError(field.state.meta.errors) && (
+                            {formError(field.state.meta.errors) && (
                                 <p className="text-sm text-red-500">
-                                    {getFormError(field.state.meta.errors)}
+                                    {formError(field.state.meta.errors)}
                                 </p>
                             )}
                             {options.length === 0 && (
                                 <p className="text-sm text-(--fg-3)">
-                                    Alle Verträge sind bereits dieser Preistabelle zugeordnet.
+                                    {t("workloads.pricing.addContracts.allAssigned")}
                                 </p>
                             )}
                         </div>

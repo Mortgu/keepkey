@@ -30,7 +30,9 @@ export default function ProductAutocomplete({ items, filters }: Props) {
                     <Autocomplete.Popup className="w-(--anchor-width) max-w-(--available-width) border border-(--border) bg-white text-neutral-950 rounded-md">
                         <Autocomplete.Empty>
                             <div className="py-3 pr-4 pl-2 text-sm leading-4 text-neutral-500">
-                                No results found for "{<Autocomplete.Value />}"
+                                <Autocomplete.Value>
+                                    {(value) => t("workloads.noResults", { query: value })}
+                                </Autocomplete.Value>
                             </div>
                         </Autocomplete.Empty>
 

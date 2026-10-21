@@ -1,5 +1,5 @@
-import { t } from "i18next";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import PricingTable from "./-components/pricing-table";
 import StandardDurations from "./-components/standard-durations";
 import StandardTiers from "./-components/standard-tiers";
@@ -9,6 +9,7 @@ import { useCreateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
 import { Breadcrumbs, Button, RouteError, Spinner } from "@/components";
 
 export default function PricingPage() {
+    const { t } = useTranslation();
     const { groups, isPending, error } = useTariffGroups();
     const { createTariffGroup, isPending: creatingGroup } = useCreateTariffGroup();
     const { products } = useProducts();
@@ -33,8 +34,8 @@ export default function PricingPage() {
                     maxItems={4}
                     items={[
                         { label: t("nav.dashboard"), to: "/" },
-                        { label: "Workloads", to: "/workloads" },
-                        { label: "Pricing", to: "/workloads/pricing" },
+                        { label: t("section.workloads") },
+                        { label: t("section.workload_pricing"), to: "/workloads/pricing" },
                     ]}
                 />
 

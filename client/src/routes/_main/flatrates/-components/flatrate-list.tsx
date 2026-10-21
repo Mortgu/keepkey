@@ -1,4 +1,4 @@
-
+import { useTranslation } from "react-i18next";
 import FlatRateItem from "./flatrate-item";
 import type { Flatrate } from "@keepit/schemas";
 import type { FlatrateFilters } from "../-hooks/use-flatrate-filters";
@@ -11,6 +11,7 @@ interface Props {
 }
 
 export default function FlatRateList({ filters, onEdit }: Props) {
+  const { t } = useTranslation();
   const { flatRates, isPending, error } = useFlatRates(filters.params);
 
   return (
@@ -23,8 +24,8 @@ export default function FlatRateList({ filters, onEdit }: Props) {
 
       {error && (
         <div className="w-full grid items-center justify-start py-8">
-          <p className="text-(--destructive) text-lg font-semibold">Error</p>
-          <p className="text-(--destructive) font-medium">Something went wrong trying to fetch flatrates!</p>
+          <p className="text-(--destructive) text-lg font-semibold">{t("flatrates.loadError.title")}</p>
+          <p className="text-(--destructive) font-medium">{t("flatrates.loadError.message")}</p>
         </div>
       )}
 

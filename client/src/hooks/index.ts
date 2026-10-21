@@ -3,6 +3,7 @@ export * from './use-modal';
 export * from './use-locale';
 export * from './use-formatters';
 export * from './use-debounce';
+export * from './use-form-error';
 export * from './search/search-hooks';
 export * from './contracts/contract-hooks';
 export * from './contracts/contract-mutations';

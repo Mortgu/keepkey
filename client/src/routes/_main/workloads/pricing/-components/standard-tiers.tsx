@@ -1,5 +1,6 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, NumberField, RouteError, Skeleton } from "@/components";
 import { useStandardTiers } from "@/hooks";
 import { useCreateStandardTier, useDeleteStandardTier } from "@/hooks/tariffs/tariff-mutations";
@@ -9,6 +10,7 @@ import { useCreateStandardTier, useDeleteStandardTier } from "@/hooks/tariffs/ta
  * Beide Achsen gelten global; je Tarif unterscheiden sich nur die Preise.
  */
 export default function StandardTiers() {
+    const { t } = useTranslation();
     const { tiers, isPending, error } = useStandardTiers();
     const { createTier, isPending: creating, error: createError } = useCreateStandardTier();
     const { deleteTier, isPending: deleting, error: deleteError } = useDeleteStandardTier();
@@ -27,10 +29,9 @@ export default function StandardTiers() {
     return (
         <div className="grid gap-3 border border-(--border) rounded-md bg-white px-4 py-3">
             <div className="grid gap-0.5">
-                <h2 className="text-md font-medium">Standard-Mengenstaffeln</h2>
+                <h2 className="text-md font-medium">{t("workloads.pricing.tiers.title")}</h2>
                 <p className="text-sm text-(--text-secondary)">
-                    Gelten für alle Preistabellen. Eine Staffel zu entfernen löscht keine hinterlegten
-                    Preise — sie sind nur nicht mehr erreichbar, bis die Staffel zurückkommt.
+                    {t("workloads.pricing.tiers.description")}
                 </p>
             </div>
 
@@ -42,7 +43,7 @@ export default function StandardTiers() {
                 {isPending && <Skeleton className="h-[32px] w-40" />}
 
                 {!isPending && tiers.length === 0 && (
-                    <p className="text-sm text-(--text-secondary)">Noch keine Staffel hinterlegt.</p>
+                    <p className="text-sm text-(--text-secondary)">{t("workloads.pricing.tiers.empty")}</p>
                 )}
 
                 {tiers.map(tier => (
@@ -57,7 +58,7 @@ export default function StandardTiers() {
                             werden danach von der Nachbarstaffel überdeckt. */}
                         {tier.priceCount > 0 && (
                             <span className="text-(--text-secondary)">
-                                · {tier.priceCount} {tier.priceCount === 1 ? "Preis" : "Preise"}
+                                {t("workloads.pricing.tiers.priceCount", { count: tier.priceCount })}
                             </span>
                         )}
 
@@ -67,8 +68,8 @@ export default function StandardTiers() {
                             iconOnly
                             icon={<Trash className="size-3" />}
                             title={tier.priceCount > 0
-                                ? `Staffel entfernen. Die ${tier.priceCount} Preise auf dieser Stufe bleiben erhalten, gelten aber nicht mehr — die dann greifende Nachbarstaffel liefert ihren eigenen Preis.`
-                                : "Staffel aus der Liste entfernen"}
+                                ? t("workloads.pricing.tiers.removeWithPrices", { count: tier.priceCount })
+                                : t("workloads.pricing.tiers.remove")}
                             disabled={deleting}
                             onClick={() => deleteTier(tier.id)}
                         />
@@ -78,11 +79,11 @@ export default function StandardTiers() {
 
             <div className="flex items-end gap-2">
                 <div className="w-32">
-                    <NumberField size="xs" min={1} step={1} label="Ab Menge" value={min}
+                    <NumberField size="xs" min={1} step={1} label={t("workloads.pricing.tiers.from")} value={min}
                         onValueChange={(value) => setMin(value)} />
                 </div>
                 <div className="w-32">
-                    <NumberField size="xs" min={1} step={1} label="Bis" placeholder="∞" value={max}
+                    <NumberField size="xs" min={1} step={1} label={t("workloads.pricing.tiers.to")} placeholder="∞" value={max}
                         onValueChange={(value) => setMax(value)} />
                 </div>
                 <Button
@@ -93,7 +94,7 @@ export default function StandardTiers() {
                     loading={creating}
                     onClick={handleAdd}
                 >
-                    Hinzufügen
+                    {t("workloads.pricing.add")}
                 </Button>
             </div>
         </div>

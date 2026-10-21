@@ -1,15 +1,15 @@
+import { Check, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type {
     InputComponentProps,
     NumberFieldComponentProps,
     SelectComponentProps,
     TextareaComponentProps
 } from "@/components";
-import { Input, NumberField, Select, Textarea } from "@/components";
-import { getFormError } from "@/lib/utils";
-import { Check, Eye, EyeOff } from "lucide-react";
 import type { ChangeEvent } from "react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import { Input, NumberField, Select, Textarea } from "@/components";
+import { useFormError } from "@/hooks/use-form-error";
 
 /* ──────────────────────────────────────────────────────────────────────
    A `BindableField` is the structural slice of TanStack Form's `FieldApi`
@@ -42,11 +42,12 @@ export function FieldInput<TValue = string>({
     onChange,
     ...rest
 }: FieldInputProps<TValue>) {
+    const formError = useFormError();
     return (
         <Input
             id={field.name}
             value={(field.state.value ?? "") as InputComponentProps["value"]}
-            error={getFormError(field.state.meta.errors)}
+            error={formError(field.state.meta.errors)}
             onBlur={field.handleBlur}
             onChange={
                 onChange
@@ -111,11 +112,12 @@ export function FieldTextarea<TValue = string>({
     onChange,
     ...rest
 }: FieldTextareaProps<TValue>) {
+    const formError = useFormError();
     return (
         <Textarea
             id={field.name}
             value={(field.state.value ?? "") as TextareaComponentProps["value"]}
-            error={getFormError(field.state.meta.errors)}
+            error={formError(field.state.meta.errors)}
             onBlur={field.handleBlur}
             onChange={
                 onChange
@@ -140,12 +142,13 @@ export function FieldNumber<TValue = number | null>({
     onValueChange,
     ...rest
 }: FieldNumberProps<TValue>) {
+    const formError = useFormError();
     return (
         <NumberField
             id={field.name}
             name={field.name}
             value={(field.state.value ?? null) as number | null}
-            error={getFormError(field.state.meta.errors)}
+            error={formError(field.state.meta.errors)}
             onBlur={field.handleBlur}
             onValueChange={
                 onValueChange
@@ -174,11 +177,12 @@ export function FieldSelect<TValue = string>({
     onValueChange,
     ...rest
 }: FieldSelectProps<TValue>) {
+    const formError = useFormError();
     return (
         <Select
             id={field.name}
             value={(field.state.value ?? null) as string | null}
-            error={getFormError(field.state.meta.errors)}
+            error={formError(field.state.meta.errors)}
             onBlur={field.handleBlur}
             onValueChange={
                 onValueChange

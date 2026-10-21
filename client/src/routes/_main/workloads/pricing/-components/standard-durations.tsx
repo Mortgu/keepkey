@@ -1,5 +1,6 @@
 import { Plus, Trash } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Button, NumberField, RouteError, Skeleton } from "@/components";
 import { useStandardDurations } from "@/hooks";
 import { useCreateStandardDuration, useDeleteStandardDuration } from "@/hooks/tariffs/tariff-mutations";
@@ -10,6 +11,7 @@ import { useCreateStandardDuration, useDeleteStandardDuration } from "@/hooks/ta
  * sich die Laufzeit eines Angebots wählen, bevor ein Produkt feststeht.
  */
 export default function StandardDurations() {
+    const { t } = useTranslation();
     const { durations, isPending, error } = useStandardDurations();
     const { createStandardDuration, isPending: creating, error: createError } = useCreateStandardDuration();
     const { deleteStandardDuration, isPending: deleting } = useDeleteStandardDuration();
@@ -26,9 +28,9 @@ export default function StandardDurations() {
     return (
         <div className="grid gap-3 border border-(--border) rounded-md bg-white px-4 py-3">
             <div className="grid gap-0.5">
-                <h2 className="text-md font-medium">Standardlaufzeiten</h2>
+                <h2 className="text-md font-medium">{t("workloads.pricing.durations.title")}</h2>
                 <p className="text-sm text-(--text-secondary)">
-                    Gelten für alle Tarifgruppen und bestimmen, welche Laufzeiten in einem Angebot wählbar sind.
+                    {t("workloads.pricing.durations.description")}
                 </p>
             </div>
 
@@ -39,7 +41,7 @@ export default function StandardDurations() {
                 {isPending && <Skeleton className="h-[32px] w-40" />}
 
                 {!isPending && durations.length === 0 && (
-                    <p className="text-sm text-(--text-secondary)">Noch keine Laufzeit hinterlegt.</p>
+                    <p className="text-sm text-(--text-secondary)">{t("workloads.pricing.durations.empty")}</p>
                 )}
 
                 {durations.map(duration => (
@@ -47,13 +49,13 @@ export default function StandardDurations() {
                         key={duration.id}
                         className="flex items-center gap-1 border border-(--border) rounded-md pl-3 pr-1 py-1 text-sm tabular-nums"
                     >
-                        {duration.months} Monate
+                        {t("workloads.pricing.months", { count: duration.months })}
                         <Button
                             variant="link"
                             size="xs"
                             iconOnly
                             icon={<Trash className="size-3" />}
-                            title="Laufzeit aus der Liste entfernen"
+                            title={t("workloads.pricing.durations.remove")}
                             disabled={deleting}
                             onClick={() => deleteStandardDuration(duration.id)}
                         />
@@ -67,8 +69,8 @@ export default function StandardDurations() {
                         size="xs"
                         min={1}
                         step={1}
-                        label="Neue Laufzeit"
-                        placeholder="Monate"
+                        label={t("workloads.pricing.durations.newLabel")}
+                        placeholder={t("workloads.pricing.durations.placeholder")}
                         value={months}
                         onValueChange={(value) => setMonths(value)}
                     />
@@ -81,7 +83,7 @@ export default function StandardDurations() {
                     loading={creating}
                     onClick={handleAdd}
                 >
-                    Hinzufügen
+                    {t("workloads.pricing.add")}
                 </Button>
             </div>
         </div>
