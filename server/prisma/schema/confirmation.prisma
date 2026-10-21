@@ -22,7 +22,7 @@ model Confirmation {
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
 
-  documents ConfirmationDocument[]
+  documents Document[]
 
   /// @openapi.ignore
   documentVersion Int @default(0)
@@ -32,44 +32,4 @@ model Confirmation {
 
   @@index([createdById])
   @@map("confirmation")
-}
-
-/// Dieselben Spalten wie OfferDocument/OrderDocument, damit Umbenennen,
-/// Löschen, Download und Nextcloud-Upload über `document-repo.ts` unverändert
-/// funktionieren. Versioniert wie dort: jede Generierung legt eine neue Version
-/// an, keine wird automatisch gelöscht. `sourceVersion` bleibt immer `null` —
-/// die Konditionen der AB sind ab Anlage unveränderlich, es gibt also nichts,
-/// wogegen eine Generierung veralten könnte.
-model ConfirmationDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  /// @openapi.ignore
-  uploadToken String?
-
-  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
-  /// @openapi.ignore
-  model Json?
-
-  confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
-  confirmationId String
-
-  artifacts DocumentArtifact[] @relation("ConfirmationDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@index([confirmationId])
-  @@unique([confirmationId, version])
-  @@map("confirmation_document")
 }

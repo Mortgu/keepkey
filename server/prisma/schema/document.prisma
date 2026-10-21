@@ -7,6 +7,15 @@ enum DocumentStatus {
   FAILED
 }
 
+/// Zu welchem Elterntyp ein `Document` gehört. Spiegelt `DocumentType` aus
+/// `@keepit/schemas`.
+enum DocumentOwnerType {
+  OFFER
+  ORDER
+  CONFIRMATION
+  INVOICE
+}
+
 enum DocumentFormat {
   PDF
   DOCX
@@ -26,24 +35,67 @@ model DocumentArtifact {
   remoteEtag   String?
   remoteSha256 String?
 
-  offerDocument   OfferDocument? @relation("OfferDocumentArtifacts", fields: [offerDocumentId], references: [id], onDelete: Cascade)
-  offerDocumentId String?
-
-  orderDocument   OrderDocument? @relation("OrderDocumentArtifacts", fields: [orderDocumentId], references: [id], onDelete: Cascade)
-  orderDocumentId String?
-
-  confirmationDocument   ConfirmationDocument? @relation("ConfirmationDocumentArtifacts", fields: [confirmationDocumentId], references: [id], onDelete: Cascade)
-  confirmationDocumentId String?
-
-  invoiceDocument   InvoiceDocument? @relation("InvoiceDocumentArtifacts", fields: [invoiceDocumentId], references: [id], onDelete: Cascade)
-  invoiceDocumentId String?
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([offerDocumentId, format])
-  @@unique([orderDocumentId, format])
-  @@unique([confirmationDocumentId, format])
-  @@unique([invoiceDocumentId, format])
+  @@unique([documentId, format])
   @@map("document")
+}
+
+/// Ein generiertes oder hochgeladenes Dokument (eine Version) zu Angebot,
+/// Bestellung, AB oder Rechnung. Ersetzt die früheren vier Tabellen
+/// offer_document/order_document/confirmation_document/invoice_document.
+/// Genau der zu `type` passende Eltern-FK ist gesetzt — erzwungen durch den
+/// handgeschriebenen CHECK `document_record_type_owner_check` (Migration
+/// 20261021224925_consolidate_document_tables). Ein neuer Dokumenttyp braucht
+/// einen Enum-Wert, eine FK-Spalte und eine Zeile in diesem CHECK.
+/// Versioniert (ADR-0001): jede Generierung legt eine neue Version an.
+model Document {
+  id String @id @default(cuid())
+
+  type DocumentOwnerType
+
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
+
+  error       String?
+  /// @openapi.ignore
+  uploadToken String?
+
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
+  offer   Offer?  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String?
+
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String?
+
+  confirmation   Confirmation? @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
+  confirmationId String?
+
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId String?
+
+  artifacts DocumentArtifact[]
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @unique
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+
+  @@unique([offerId, version])
+  @@unique([orderId, version])
+  @@unique([confirmationId, version])
+  @@unique([invoiceId, version])
+  @@map("document_record")
 }

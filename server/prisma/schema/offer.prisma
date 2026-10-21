@@ -50,7 +50,7 @@ model Offer {
 
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
-  offerDocuments OfferDocument[]
+  offerDocuments Document[]
 
   orders Order?
 
@@ -130,39 +130,6 @@ model OfferFlatRate {
   @@index([offerId])
   @@index([flatRateId])
   @@map("offer_flat_rate")
-}
-
-model OfferDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  /// @openapi.ignore
-  uploadToken String?
-
-  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
-  /// @openapi.ignore
-  model Json?
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  artifacts DocumentArtifact[] @relation("OfferDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([offerId, version])
-  @@map("offer_document")
 }
 
 model OfferDiscount {
