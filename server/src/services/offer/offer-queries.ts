@@ -165,8 +165,3 @@ export async function getOfferById(id: string) {
 
     return presentAcceptedOffer(offer);
 }
-
-export async function getNextQuoteId(): Promise<number> {
-    const quoteId = 0; //await getLatestQuoteId();
-    return quoteId + 1;
-}

@@ -14,11 +14,6 @@ export const getOfferById = async (request: Request, response: Response) => {
     return response.status(200).json(offer);
 };
 
-export const getNextQuoteId = async (request: Request, response: Response) => {
-    const quoteId = await offerService.getNextQuoteId();
-    return response.status(200).json(quoteId);
-};
-
 /* ========== DELETE ========== */
 
 export const deleteOffer = async (request: Request, response: Response) => {
