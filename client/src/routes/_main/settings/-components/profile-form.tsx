@@ -4,22 +4,24 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
+import type { TranslationKey } from "@/i18n";
 import { Button, FieldInput, showToast } from "@/components";
 import { useAuth } from "@/context/auth-context";
 import { userKeys } from "@/hooks/users/user-keys";
 import { authClient } from "@/lib/auth-client.ts";
 
+/** Meldungen sind Übersetzungsschlüssel — übersetzt wird bei der Anzeige. */
+const profileSchema = z.object({
+    salutation: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
+    firstName: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
+    lastName: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
+    phone: z.string(),
+});
+
 export default function ProfileForm() {
     const { t } = useTranslation();
     const { user } = useAuth();
     const queryClient = useQueryClient();
-
-    const profileSchema = z.object({
-        salutation: z.string().min(1, t("validation.required")),
-        firstName: z.string().min(1, t("validation.required")),
-        lastName: z.string().min(1, t("validation.required")),
-        phone: z.string(),
-    });
 
     const profileForm = useForm({
         defaultValues: {

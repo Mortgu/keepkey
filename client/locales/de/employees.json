@@ -2,6 +2,19 @@
   "employees": {
     "description": "Zentrale Verwaltung der Angestellten",
     "searchPlaceholder": "Angestellte durchsuchen…",
-    "create": "Angestellten anlegen"
+    "create": "Angestellten anlegen",
+    "edit": "Angestellten bearbeiten",
+    "delete": "Angestellten löschen",
+    "deleteConfirm": "Möchten Sie \"{{name}}\" wirklich löschen?",
+    "modal": {
+      "editTitle": "Angestellten bearbeiten",
+      "createTitle": "Neuen Angestellten anlegen",
+      "salutation": "Anrede",
+      "firstName": "Vorname",
+      "lastName": "Nachname",
+      "email": "E-Mail",
+      "phone": "Telefonnummer",
+      "password": "Passwort"
+    }
   }
 }

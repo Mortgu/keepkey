@@ -4,19 +4,21 @@ import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
+import type { TranslationKey } from "@/i18n";
 import { Button, FieldInput, Input, showToast } from "@/components";
 import { useAuth } from "@/context/auth-context";
 import { userKeys } from "@/hooks/users/user-keys";
 import { authClient } from "@/lib/auth-client.ts";
 
+/** Meldungen sind Übersetzungsschlüssel — übersetzt wird bei der Anzeige. */
+const emailSchema = z.object({
+    newEmail: z.email("settings.validation.email" satisfies TranslationKey),
+});
+
 export default function EmailForm() {
     const { t } = useTranslation();
     const { user } = useAuth();
     const queryClient = useQueryClient();
-
-    const emailSchema = z.object({
-        newEmail: z.email(t("validation.email")),
-    });
 
     const emailForm = useForm({
         defaultValues: {

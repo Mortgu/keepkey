@@ -17,16 +17,16 @@ export default function SupplierModal({ onClose, currentSupplier }: Props) {
             defaultOpen
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <Dialog.Header title={currentSupplier ? "Update Supplier" : "Create Supplier"} />
+            <Dialog.Header title={currentSupplier ? t("suppliers.modal.editTitle") : t("suppliers.modal.createTitle")} />
             <Dialog.Body>
                 <form id={formId} onSubmit={handleSubmit} className="grid gap-4">
                     <div className="flex items-center gap-2">
                         <form.Field name="name" children={(field) => (
-                            <FieldInput field={field} label="Name" />
+                            <FieldInput field={field} label={t("suppliers.modal.name")} />
                         )} />
 
                         <form.Field name="supplierId" children={(field) => (
-                            <FieldInput field={field} label="id" />
+                            <FieldInput field={field} label={t("suppliers.modal.supplierId")} />
                         )} />
                     </div>
                 </form>

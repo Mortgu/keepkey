@@ -1,6 +1,27 @@
 {
   "contracts": {
     "description": "Zentrale Tarifverwaltung",
-    "create": "Tarif erstellen"
+    "create": "Tarif erstellen",
+    "default": "Standard",
+    "noFeatures": "Keine Features hinterlegt!",
+    "move": "{{name}} verschieben",
+    "loadError": {
+      "title": "Fehler",
+      "message": "Beim Laden der Tarife ist etwas schiefgelaufen!"
+    },
+    "modal": {
+      "editTitle": "Vertrag bearbeiten",
+      "createTitle": "Neuen Vertrag anlegen",
+      "name": "Name ({{language}})",
+      "features": "Features ({{language}}):",
+      "featurePlaceholder": "Feature {{number}}",
+      "removeFeature": "Feature entfernen",
+      "addFeature": "Feature hinzufügen",
+      "table": "Tabelle ({{language}})",
+      "tablePlaceholder": "Datenvolumen"
+    },
+    "validation": {
+      "nameMin": "Mindestens 1 Zeichen!"
+    }
   }
 }
