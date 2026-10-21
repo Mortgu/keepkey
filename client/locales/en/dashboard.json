@@ -1,5 +1,11 @@
 {
   "dashboard": {
+    "title": "Overview",
+    "description": "Status of connected services and key figures for the last 12 months.",
+    "statCard": {
+      "total": "Total:",
+      "volume": "Volume:"
+    },
     "recentOffers": "Recent offers",
     "recentOrders": "Recent orders",
     "integrations": "Integrations",

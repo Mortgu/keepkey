@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useFormatters } from "@/hooks";
 
 interface Props {
@@ -7,6 +8,7 @@ interface Props {
 }
 
 export default function StatCard({ title, total, volume }: Props) {
+    const { t } = useTranslation();
     const { formatEur } = useFormatters();
     return (
         <div className="flex-1 grid gap-2 py-3 px-4">
@@ -16,13 +18,13 @@ export default function StatCard({ title, total, volume }: Props) {
 
             <div className="flex items-center gap-8">
                 <div className="grid gap-1">
-                    <span className="text-sm text-(--text-secondary)">Insgesamt:</span>
+                    <span className="text-sm text-(--text-secondary)">{t("dashboard.statCard.total")}</span>
                     <p className="text-2xl font-semibold font-mono">
                         {total}
                     </p>
                 </div>
                 <div className="grid gap-1">
-                    <span className="text-sm text-(--text-secondary)">Volumen:</span>
+                    <span className="text-sm text-(--text-secondary)">{t("dashboard.statCard.volume")}</span>
                     <p className="text-2xl font-semibold font-mono">
                         {formatEur(volume)}
                     </p>

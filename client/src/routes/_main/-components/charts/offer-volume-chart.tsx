@@ -6,6 +6,8 @@ import type { DashboardMonth } from "@keepit/schemas";
 import { useFormatters, useLocale } from "@/hooks";
 import { centsToEur } from "@/utils/utils";
 
+const TICK_STYLE = { fontSize: 11, fill: "var(--neutral-400)" };
+
 interface Props {
     months: Array<DashboardMonth>;
 }
@@ -59,7 +61,7 @@ export default function OfferVolumeChart({ months }: Props) {
                     dataKey="label"
                     tickLine={false}
                     axisLine={false}
-                    tick={{ fontSize: 11, fill: "var(--neutral-400)" }}
+                    tick={TICK_STYLE}
                     interval="preserveStartEnd"
                 />
 
