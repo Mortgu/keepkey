@@ -5,7 +5,7 @@ import type { DocumentType } from "@keepit/schemas";
 import { prisma } from "../lib/prismaClient.js";
 import { renderDocument } from "../lib/render-document.js";
 import { storeDocumentArtifacts } from "../lib/document-artifact-store.js";
-import { documentTable, type DocumentWhere } from "./document-repo.js";
+import { documentTable } from "./document-repo.js";
 import {
     artifactsWereFinalized,
     assertDocumentCanBeGenerated,
@@ -51,7 +51,7 @@ export type GenerationAdapter<TDoc extends GeneratedDocument> = {
      */
     recheckNotStale: (tx: Prisma.TransactionClient, doc: TDoc) => Promise<void>;
     /** `where`, das alle anderen aktuellen Versionen dieser Quelle trifft. */
-    demoteSiblingsWhere: (doc: TDoc) => DocumentWhere;
+    demoteSiblingsWhere: (doc: TDoc) => Prisma.DocumentWhereInput;
 };
 
 export async function runGeneration<TDoc extends GeneratedDocument>(
