@@ -3,6 +3,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import { createCustomerSchema } from "@keepit/schemas";
+import { contactPersonNameFields } from "./contact/contact-person-fields";
 import type { Customer } from "@keepit/schemas";
 import type { TranslationKey } from "@/i18n";
 import { Button, Dialog, FieldInput, FieldSelect, NumberField, Select } from "@/components";
@@ -18,9 +19,10 @@ const invalidEmail = "validation.email" satisfies TranslationKey;
 
 /* Strikte UI-Validierung für das Kunden-Formular. Bewusst strenger als
  * createCustomerSchema (das dem nullable DB/Server-Modell folgt): email
- * required + formatgeprüft, Adressen required. customerId/language/currency
- * werden vom Basis-Schema geerbt (nullish/enum); die Normalisierung von
- * null/"" übernimmt das Server-Schema.
+ * required + formatgeprüft, Adressen required. customerId wird hier explizit
+ * als string | undefined überschrieben (nicht geerbt);
+ * language/currency werden vom Basis-Schema geerbt (enum). Die Normalisierung
+ * von null/"" übernimmt das Server-Schema.
  *
  * Meldungen sind Übersetzungsschlüssel und werden erst bei der Anzeige
  * aufgelöst (useFormError) — deshalb liegt das Schema im Client. */
@@ -34,9 +36,7 @@ const customerFormSchema = createCustomerSchema.extend({
   zip: z.string(),
   phone: z.string(),
   contactPersons: z.array(z.object({
-    salutation: z.string().min(1, "customer.validation.salutationMissing" satisfies TranslationKey),
-    firstName: z.string().min(1, "customer.validation.firstNameMissing" satisfies TranslationKey),
-    lastName: z.string().min(1, "customer.validation.lastNameMissing" satisfies TranslationKey),
+    ...contactPersonNameFields,
     email: z.union([z.literal(""), z.email(invalidEmail)]),
   })),
 });
@@ -121,7 +121,7 @@ export default function CustomerModal({
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? t("customer.modal.editTitle") : t("customer.modal.createTitle")} />
+      <Dialog.Header title={isEdit ? t("customer.edit") : t("customer.modal.createTitle")} />
       <Dialog.Body>
         {
           errorCreatingCustomer ? (

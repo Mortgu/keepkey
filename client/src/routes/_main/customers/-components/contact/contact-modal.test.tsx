@@ -33,5 +33,6 @@ describe("ContactModal", () => {
         expect(screen.getByText("Last name missing")).toBeTruthy();
         expect(screen.getByText("Add contact person")).toBeTruthy();
         expect(screen.getByText("First name")).toBeTruthy();
+        expect(screen.getByLabelText("Email")).toBeTruthy();
     });
 });

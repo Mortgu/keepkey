@@ -18,7 +18,6 @@
         },
         "modal": {
             "createTitle": "Neuen Kunden anlegen",
-            "editTitle": "Kunden bearbeiten",
             "customerNumber": "Kunden-Nr.",
             "companyName": "Firmenname",
             "phone": "Telefonnummer",
@@ -35,12 +34,13 @@
             "removeContactPerson": "Ansprechpartner entfernen"
         },
         "contact": {
-            "listTitle": "Kunden Kontaktpersonen",
+            "listTitle": "Kunden-Kontaktpersonen",
             "createTitle": "Kontaktperson hinzufügen",
             "editTitle": "Kontaktperson bearbeiten",
             "salutation": "Anrede",
             "firstName": "Vorname",
-            "lastName": "Nachname"
+            "lastName": "Nachname",
+            "email": "E-Mail"
         },
         "salutationLine": {
             "title": "Anredezeile",

@@ -1,15 +1,14 @@
 import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
+import { contactPersonNameFields } from "./contact-person-fields";
 import type { Contact } from "@keepit/schemas";
 import type { TranslationKey } from "@/i18n";
 import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
 import { Button, Dialog, FieldInput } from "@/components";
 
 const contactPersonSchema = z.object({
-    salutation: z.string().min(1, "customer.validation.salutationMissing" satisfies TranslationKey),
-    firstName: z.string().min(1, "customer.validation.firstNameMissing" satisfies TranslationKey),
-    lastName: z.string().min(1, "customer.validation.lastNameMissing" satisfies TranslationKey),
+    ...contactPersonNameFields,
     email: z.email("validation.email" satisfies TranslationKey).nullable(),
 });
 
@@ -89,7 +88,7 @@ export default function ContactModal({ customerId, contact, onClose }: Props) {
                     </div>
 
                     <contactForm.Field name="email" children={(field) => (
-                        <FieldInput field={field} label={t("customer.modal.email")} className="bg-white" />
+                        <FieldInput field={field} label={t("customer.contact.email")} className="bg-white" />
                     )} />
                 </form>
             </Dialog.Body>

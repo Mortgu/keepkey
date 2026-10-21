@@ -18,7 +18,6 @@
         },
         "modal": {
             "createTitle": "Create new customer",
-            "editTitle": "Edit customer",
             "customerNumber": "Customer no.",
             "companyName": "Company name",
             "phone": "Phone number",
@@ -40,7 +39,8 @@
             "editTitle": "Edit contact person",
             "salutation": "Salutation",
             "firstName": "First name",
-            "lastName": "Last name"
+            "lastName": "Last name",
+            "email": "Email"
         },
         "salutationLine": {
             "title": "Salutation line",
