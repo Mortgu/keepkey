@@ -71,19 +71,7 @@ export async function enqueueTask(taskId: string, options: { markFailedOnError?:
             where: { id: taskId, status: TaskStatus.PENDING },
             data: { status: TaskStatus.FAILED, error: exception.message },
           }),
-          prisma.offerDocument.updateMany({
-            where: { taskId, status: "PENDING" },
-            data: { status: "FAILED", error: exception.message },
-          }),
-          prisma.orderDocument.updateMany({
-            where: { taskId, status: "PENDING" },
-            data: { status: "FAILED", error: exception.message },
-          }),
-          prisma.confirmationDocument.updateMany({
-            where: { taskId, status: "PENDING" },
-            data: { status: "FAILED", error: exception.message },
-          }),
-          prisma.invoiceDocument.updateMany({
+          prisma.document.updateMany({
             where: { taskId, status: "PENDING" },
             data: { status: "FAILED", error: exception.message },
           }),
