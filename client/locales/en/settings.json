@@ -17,6 +17,13 @@
       "new": "New password",
       "confirm": "Repeat new password"
     },
+    "validation": {
+      "required": "Required",
+      "email": "Invalid email address",
+      "passwordMin": "At least {{count}} characters",
+      "passwordMax": "At most {{count}} characters",
+      "passwordMismatch": "Passwords do not match"
+    },
     "toast": {
       "profileSaved": "Profile saved.",
       "emailChanged": "Email address changed.",
