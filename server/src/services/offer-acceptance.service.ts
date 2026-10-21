@@ -2,6 +2,7 @@ import { formatOfferData } from "../pipelines/offer/build-offer.js";
 import type { Prisma } from "@prisma/client";
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { contractOrderBy } from "./contract.service.js";
+import { documentOwnerType } from "./document-repo.js";
 import { serializeAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 
 export const acceptanceInclude = {
@@ -78,7 +79,7 @@ export async function acceptOffer(
     });
     // Reject in-flight document jobs that loaded live master data before acceptance.
     await tx.document.updateMany({
-        where: { type: "OFFER", offerId, isCurrent: true },
+        where: { type: documentOwnerType("offer"), offerId, isCurrent: true },
         data: { isCurrent: false },
     });
     return acceptedAt;

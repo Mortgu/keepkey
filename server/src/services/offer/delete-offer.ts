@@ -1,5 +1,6 @@
 import { assertOfferEditable } from "../offer-acceptance.service.js";
 import { prisma } from "../../lib/prismaClient.js";
+import { documentOwnerType } from "../document-repo.js";
 import { AppException } from "../../lib/exceptions.js";
 
 export async function deleteOffer(id: string): Promise<void> {
@@ -8,7 +9,7 @@ export async function deleteOffer(id: string): Promise<void> {
 
         await assertOfferEditable(tx, id);
 
-        if (await tx.document.count({ where: { type: "OFFER", offerId: id } }) > 0) {
+        if (await tx.document.count({ where: { type: documentOwnerType("offer"), offerId: id } }) > 0) {
             throw new AppException(
                 "Offers with document history cannot be deleted.",
                 409,

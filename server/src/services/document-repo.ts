@@ -51,10 +51,22 @@ function typedOperations(type: DocumentOwnerType, client: Prisma.TransactionClie
     };
 }
 
+const OWNER_TYPES: Record<DocumentType, DocumentOwnerType> = {
+    offer: DocumentOwnerType.OFFER,
+    order: DocumentOwnerType.ORDER,
+    confirmation: DocumentOwnerType.CONFIRMATION,
+    invoice: DocumentOwnerType.INVOICE,
+};
+
+/** Der `type`-Diskriminator in document_record für einen `DocumentType`. */
+export function documentOwnerType(type: DocumentType): DocumentOwnerType {
+    return OWNER_TYPES[type];
+}
+
 export function documentTable(type: DocumentType, client: Prisma.TransactionClient = prisma) {
+    const ownerType = documentOwnerType(type);
     switch (type) {
         case "offer": {
-            const ownerType = DocumentOwnerType.OFFER;
             return {
                 scope: "offers" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
@@ -95,7 +107,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
             };
         }
         case "order": {
-            const ownerType = DocumentOwnerType.ORDER;
             return {
                 scope: "orders" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
@@ -119,7 +130,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
             };
         }
         case "confirmation": {
-            const ownerType = DocumentOwnerType.CONFIRMATION;
             return {
                 scope: "confirmations" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {
@@ -143,7 +153,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
             };
         }
         case "invoice": {
-            const ownerType = DocumentOwnerType.INVOICE;
             return {
                 scope: "invoices" satisfies DocumentArtifactScope as DocumentArtifactScope,
                 nextcloud: {

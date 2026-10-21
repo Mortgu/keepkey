@@ -1,5 +1,6 @@
 import type { DocumentFormat, DocumentStatus } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 import { buildOffer } from "../pipelines/offer/build-offer.js";
 import { buildOrder } from "../pipelines/order/build-order.js";
 import { offerTemplateSchema } from "../schemas/templates/offer.template.schema.js";
@@ -20,7 +21,7 @@ const offerAdapter: GenerationAdapter<OfferDocumentForGeneration> = {
     typeName: "OfferDocument",
     type: "offer",
     findByTask: async (taskId) => requireOwner(await prisma.document.findFirst({
-        where: { taskId, type: "OFFER", deletedAt: null },
+        where: { taskId, type: documentOwnerType("offer"), deletedAt: null },
         include: { offer: { select: { version: true } }, artifacts: true },
     }), "offerId", "offer"),
     currentParentVersion: (doc) => doc.offer.version,
@@ -59,7 +60,7 @@ const orderAdapter: GenerationAdapter<OrderDocumentForGeneration> = {
     typeName: "OrderDocument",
     type: "order",
     findByTask: async (taskId) => requireOwner(await prisma.document.findFirst({
-        where: { taskId, type: "ORDER", deletedAt: null },
+        where: { taskId, type: documentOwnerType("order"), deletedAt: null },
         include: { order: { select: { version: true } }, artifacts: true },
     }), "orderId", "order"),
     currentParentVersion: (doc) => doc.order.version,

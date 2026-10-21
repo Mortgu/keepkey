@@ -1,5 +1,6 @@
 import type { DocumentFormat, DocumentStatus } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 import { buildInvoice } from "../pipelines/invoice/build-invoice.js";
 import { runGeneration, type GenerationAdapter } from "./document-generation.js";
 import { requireOwner } from "./document-generation.helpers.js";
@@ -20,7 +21,7 @@ const invoiceAdapter: GenerationAdapter<InvoiceDocumentForGeneration> = {
     typeName: "InvoiceDocument",
     type: "invoice",
     findByTask: async (taskId) => requireOwner(await prisma.document.findFirst({
-        where: { taskId, type: "INVOICE", deletedAt: null },
+        where: { taskId, type: documentOwnerType("invoice"), deletedAt: null },
         include: { artifacts: true },
     }), "invoiceId"),
     currentParentVersion: () => null,
