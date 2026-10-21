@@ -129,8 +129,8 @@ async function lockOrder(
 }
 
 async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string) {
-    await tx.orderDocument.updateMany({
-        where: { orderId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: "ORDER", orderId, isCurrent: true },
         data: { isCurrent: false },
     });
 }

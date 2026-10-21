@@ -1,9 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const offerDocumentFindFirst = vi.fn();
-const offerDocumentFindUnique = vi.fn();
-const confirmationDocumentFindUnique = vi.fn();
-const offerDocumentUpdateMany = vi.fn();
+const documentFindFirst = vi.fn();
+const ownerFindFirst = vi.fn();
+const documentUpdateMany = vi.fn();
 const documentArtifactUpdateMany = vi.fn();
 const moveDocumentArtifact = vi.fn();
 const deleteDocumentArtifact = vi.fn();
@@ -11,25 +10,16 @@ const uploadGeneratedDocument = vi.fn();
 const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
 vi.mock("../../lib/prismaClient.js", () => {
-    // `documentTable()` routes to a different Prisma model per `DocumentType`;
-    // tests here use both "offer" (to exercise the offer-lock guard, including
-    // its `findUnique`-based `assertEditable`) and "confirmation" (to exercise
-    // the type-generic behaviour, including its own `findUnique`-based
-    // `assertEditable` against the order's `cancelledAt`) against the same
-    // `findFirst`/`updateMany` spies, since the two tables are structurally
-    // identical there.
-    const updateManySpy = { updateMany: (...args: unknown[]) => offerDocumentUpdateMany(...args) };
-    const offerDocumentSpy = {
-        findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args),
-        findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args),
-    };
-    const confirmationDocumentSpy = {
-        findFirst: (...args: unknown[]) => offerDocumentFindFirst(...args),
-        findUnique: (...args: unknown[]) => confirmationDocumentFindUnique(...args),
+    // `documentTable()` queries the single `document` delegate filtered by
+    // `type`. Lookups with a `select` are the facade's owner checks
+    // (`assertEditable`: offer `acceptedAt`, confirmation's order
+    // `cancelledAt`); everything else loads the document with its artifacts.
+    const document = {
+        findFirst: (args: { select?: unknown }) => (args.select ? ownerFindFirst(args) : documentFindFirst(args)),
+        updateMany: (...args: unknown[]) => documentUpdateMany(...args),
     };
     const tx = {
-        offerDocument: updateManySpy,
-        confirmationDocument: updateManySpy,
+        document,
         documentArtifact: {
             update: vi.fn(),
             updateMany: (...args: unknown[]) => documentArtifactUpdateMany(...args),
@@ -37,8 +27,7 @@ vi.mock("../../lib/prismaClient.js", () => {
     };
     return {
         prisma: {
-            offerDocument: offerDocumentSpy,
-            confirmationDocument: confirmationDocumentSpy,
+            document,
             $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
         },
     };
@@ -69,8 +58,8 @@ const { renameDocument, deleteDocument, resyncDocument } = await import("./docum
 describe("offer document mutations once the offer is accepted", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        offerDocumentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
-        offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: new Date() } });
+        documentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
+        ownerFindFirst.mockResolvedValue({ offer: { acceptedAt: new Date() } });
     });
 
     it("renameDocument is rejected", async () => {
@@ -89,8 +78,8 @@ describe("offer document mutations once the offer is accepted", () => {
 describe("confirmation document mutations once the order is cancelled", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        offerDocumentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
-        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
+        documentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
+        ownerFindFirst.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
     });
 
     it("renameDocument is rejected", async () => {
@@ -118,8 +107,8 @@ describe("renameDocument moves an uploaded pair and rolls back on partial failur
 
     beforeEach(() => {
         vi.clearAllMocks();
-        offerDocumentFindFirst.mockResolvedValue(uploadedDocument);
-        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
+        documentFindFirst.mockResolvedValue(uploadedDocument);
+        ownerFindFirst.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
     });
 
     it("reverts the PDF move and rethrows when the DOCX move fails", async () => {
@@ -133,7 +122,7 @@ describe("renameDocument moves an uploaded pair and rolls back on partial failur
         ).rejects.toThrow("docx move failed");
 
         expect(moveDocumentArtifact).toHaveBeenNthCalledWith(3, "new/name.pdf", "name.pdf");
-        expect(offerDocumentUpdateMany).not.toHaveBeenCalled();
+        expect(documentUpdateMany).not.toHaveBeenCalled();
     });
 
     it("reports an inconsistent state when the rollback itself fails", async () => {
@@ -165,18 +154,18 @@ describe("resyncDocument", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        offerDocumentFindFirst.mockResolvedValue(uploadedDocument);
+        documentFindFirst.mockResolvedValue(uploadedDocument);
     });
 
     it("clears the remote trace and re-uploads", async () => {
-        offerDocumentUpdateMany.mockResolvedValue({ count: 1 });
+        documentUpdateMany.mockResolvedValue({ count: 1 });
 
         await resyncDocument("confirmation", "doc-1");
 
         expect(deleteDocumentArtifact).toHaveBeenCalledWith("old/name.pdf");
         expect(deleteDocumentArtifact).toHaveBeenCalledWith("old/name.docx");
-        expect(offerDocumentUpdateMany).toHaveBeenCalledWith({
-            where: { id: "doc-1", deletedAt: null, status: "UPLOADED" },
+        expect(documentUpdateMany).toHaveBeenCalledWith({
+            where: { id: "doc-1", deletedAt: null, status: "UPLOADED", type: "CONFIRMATION" },
             data: { status: "GENERATED" },
         });
         expect(documentArtifactUpdateMany).toHaveBeenCalledWith({
@@ -187,7 +176,7 @@ describe("resyncDocument", () => {
     });
 
     it("rejects when the document changed in the meantime", async () => {
-        offerDocumentUpdateMany.mockResolvedValue({ count: 0 });
+        documentUpdateMany.mockResolvedValue({ count: 0 });
 
         await expect(resyncDocument("confirmation", "doc-1")).rejects.toMatchObject({
             code: "DOCUMENT_STATE_CHANGED",
