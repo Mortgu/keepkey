@@ -1,6 +1,6 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { DATE_SORTS, useSortOptions } from "@/lib/sort-options";
+import { DATE_SORTS, useSort } from "@/lib/sort-options";
 
 interface Props {
     customerId?: string;
@@ -10,8 +10,7 @@ export default function useOrderFilters({ customerId }: Props = {}) {
     const urlSearch = useSearch({ strict: false });
 
     const [searchQuery, setSearchQuery] = useState<string>(urlSearch.search || "");
-    const sortOptions = useSortOptions(DATE_SORTS);
-    const [sort, setSort] = useState<string>(DATE_SORTS[0]);
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
 
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
 
@@ -22,7 +21,7 @@ export default function useOrderFilters({ customerId }: Props = {}) {
     const params = useMemo(() => ({
         search: searchQuery || undefined,
         companyIds: allCustomersIds.length > 0 ? allCustomersIds : undefined,
-        sort: sort || undefined,
+        sort,
     }), [searchQuery, allCustomersIds, sort]);
 
     const removeCustomerFilter = (id: string) =>

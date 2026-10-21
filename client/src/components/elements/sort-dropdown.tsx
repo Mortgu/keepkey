@@ -5,15 +5,15 @@ import { useTranslation } from "react-i18next";
 import type { ComponentSize } from "../tokens";
 import { selectStyles } from "./select-styles";
 
-export interface SortOption {
-  value: string;
+export interface SortOption<TValue extends string = string> {
+  value: TValue;
   label: string;
 }
 
-interface SortDropdownProps {
-  value: string;
-  onChange: (value: string) => void;
-  options: Array<SortOption>;
+interface SortDropdownProps<TValue extends string> {
+  value: TValue;
+  onChange: (value: TValue) => void;
+  options: Array<SortOption<TValue>>;
   className?: string;
   size?: ComponentSize;
 }
@@ -45,7 +45,7 @@ export const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => (
  * Einfachauswahl als Popover. Wie `MultiDropdown` auf base-ui `Select`, nur ohne
  * `multiple` — Größe und Fokus kommen über `buttonStyles` aus den Tokens.
  */
-export function SortDropdown({ value, onChange, options, className, size = "sm" }: SortDropdownProps) {
+export function SortDropdown<TValue extends string>({ value, onChange, options, className, size = "sm" }: SortDropdownProps<TValue>) {
   const { t } = useTranslation();
   const styles = selectStyles();
 

@@ -1,5 +1,6 @@
 import { LOCALES } from "./format";
 import type { Currency, Language } from "@keepit/schemas";
+import type { SelectOption } from "@/components";
 
 export interface CountryConfig {
     /** ISO-3166-Code; daraus entsteht der Anzeigename in der aktiven Sprache. */
@@ -23,12 +24,8 @@ export const COUNTRIES: Array<CountryConfig> = [
 export const findCountryByName = (name?: string | null): CountryConfig =>
     COUNTRIES.find((c) => c.name === name) ?? COUNTRIES[0];
 
-const LANGUAGES: Array<Language> = ["DE", "EN"];
-
-interface Option<TValue extends string = string> {
-    value: TValue;
-    label: string;
-}
+/** Die Inhaltssprachen — dieselben, für die es ein Zahlen-/Datumsformat gibt. */
+const LANGUAGES = Object.keys(LOCALES) as Array<Language>;
 
 /*
  * Länder- und Sprachnamen kommen aus `Intl.DisplayNames` statt aus den
@@ -38,13 +35,13 @@ interface Option<TValue extends string = string> {
  */
 
 /** Länder als Auswahl: Wert ist der gespeicherte Name, Beschriftung in `language`. */
-export function countryOptions(language: Language): Array<Option> {
+export function countryOptions(language: Language): Array<SelectOption> {
     const names = new Intl.DisplayNames(LOCALES[language], { type: "region" });
     return COUNTRIES.map((c) => ({ value: c.name, label: names.of(c.code) ?? c.name }));
 }
 
 /** Inhaltssprachen (DE/EN) als Auswahl, beschriftet in `language`. */
-export function languageOptions(language: Language): Array<Option<Language>> {
+export function languageOptions(language: Language): Array<SelectOption<Language>> {
     const names = new Intl.DisplayNames(LOCALES[language], { type: "language" });
     return LANGUAGES.map((code) => ({ value: code, label: names.of(code.toLowerCase()) ?? code }));
 }

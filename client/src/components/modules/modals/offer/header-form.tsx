@@ -3,10 +3,10 @@ import { useOfferModalContext } from "./offer-modal-context";
 import { OFFER_MODAL_FORM_ID } from "./offer-modal-policy";
 import type { HeaderField } from "./offer-modal-policy";
 import type { SyntheticEvent } from "react";
-import type { Language } from "@keepit/schemas";
 import { getFormError } from "@/lib/utils";
 import { useContracts, useCustomers, useLocale, useStandardDurations, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
+import { languageOptions } from "@/lib/countries";
 import { Input, Select } from "@/components";
 
 /** Der Datumsteil eines ISO-Zeitstempels, wie ihn `<input type="date">` erwartet. */
@@ -22,7 +22,7 @@ const fromDateInput = (value: string) => (value ? `${value}T00:00:00.000Z` : nul
  */
 export default function HeaderForm() {
     const { t } = useTranslation();
-    const locale = useLocale();
+    const language = useLocale();
     const { form, policy } = useOfferModalContext();
 
     const { customers } = useCustomers();
@@ -142,7 +142,7 @@ export default function HeaderForm() {
                                 options={contracts.length > 0
                                     ? contracts.map(contract => ({
                                         value: contract.id,
-                                        label: localized(contract.translations, locale, "name"),
+                                        label: localized(contract.translations, language, "name"),
                                     }))
                                     : [{ value: "", label: "-" }]}
                                 onValueChange={field.handleChange}
@@ -259,11 +259,8 @@ export default function HeaderForm() {
                                 label={t("offerModal.language")}
                                 value={field.state.value}
                                 disabled={locked("language")}
-                                options={[
-                                    { value: "DE", label: "Deutsch" },
-                                    { value: "EN", label: "Englisch" },
-                                ]}
-                                onValueChange={(language) => field.handleChange(language as Language)}
+                                options={languageOptions(language)}
+                                onValueChange={field.handleChange}
                             />
                         )} />
                     )}

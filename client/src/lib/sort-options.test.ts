@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
-import { DATE_AND_NAME_SORTS, sortItems, useSortOptions } from "./sort-options";
+import { DATE_AND_NAME_SORTS, DATE_SORTS, sortItems, useSort, useSortOptions } from "./sort-options";
 import i18n from "@/i18n";
 
 const items = [
@@ -62,5 +62,18 @@ describe("useSortOptions", () => {
         expect(result.current.map((o) => o.value)).toEqual([
             "createdAt:desc", "createdAt:asc", "companyName:asc", "companyName:desc",
         ]);
+    });
+});
+
+describe("useSort", () => {
+    it("startet mit der ersten Option, liefert die Optionen und übernimmt eine neue Auswahl", () => {
+        const { result } = renderHook(() => useSort(DATE_SORTS));
+
+        expect(result.current.sort).toBe("createdAt:desc");
+        expect(result.current.sortOptions.map((o) => o.value)).toEqual(["createdAt:desc", "createdAt:asc"]);
+
+        act(() => result.current.setSort("createdAt:asc"));
+
+        expect(result.current.sort).toBe("createdAt:asc");
     });
 });

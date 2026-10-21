@@ -23,7 +23,7 @@ export default function CustomerModal({
   currentCustomer = null,
 }: CustomerModalProps) {
   const { t } = useTranslation();
-  const uiLanguage = useLocale();
+  const language = useLocale();
   const isEdit = currentCustomer !== null;
 
   const { createCustomer, errorCreatingCustomer } = useCreateCustomer();
@@ -142,7 +142,7 @@ export default function CustomerModal({
                   id={field.name}
                   size="sm"
                   label="Land"
-                  options={countryOptions(uiLanguage)}
+                  options={countryOptions(language)}
                   placeholder="Land wählen"
                   value={field.state.value}
                   error={getFormError(field.state.meta.errors)}
@@ -159,7 +159,7 @@ export default function CustomerModal({
 
             <customerForm.Field name="language" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <FieldSelect field={field} size="sm" label="Sprache" options={languageOptions(uiLanguage)} />
+                <FieldSelect field={field} size="sm" label="Sprache" options={languageOptions(language)} />
               </div>
             )} />
 

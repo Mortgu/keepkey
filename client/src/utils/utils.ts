@@ -1,5 +1,5 @@
 import type { TaskStatus } from "@keepit/schemas";
-import i18n from "@/i18n";
+import type { TranslationKey } from "@/i18n";
 
 /**
  * Preise werden durchgehend in Cent gespeichert und übertragen, in der
@@ -34,6 +34,12 @@ export type RemainingTerm = {
 
 const MS_PER_DAY = 86_400_000;
 
+/*
+ * Die Laufzeit-Helfer bleiben rein: Ein ungültiges Datum wirft einen RangeError,
+ * dessen `message` ein Übersetzungsschlüssel ist. Übersetzt wird erst dort, wo
+ * der Fehler angezeigt wird (`t(error.message)`), in der dann aktiven Sprache.
+ */
+
 const startOfDay = (d: Date) =>
   Date.UTC(d.getFullYear(), d.getMonth(), d.getDate());
 
@@ -42,7 +48,7 @@ export function getRemainingTerm(from: Date | string, until: Date | string): Rem
   const end = typeof until === "string" ? new Date(until) : until;
 
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    throw new RangeError(i18n.t("common.invalidDate"));
+    throw new RangeError("common.invalidDate" satisfies TranslationKey);
   }
 
   const totalDays = Math.round((startOfDay(end) - startOfDay(start)) / MS_PER_DAY);
@@ -104,7 +110,7 @@ export function getRemainingTermFromStart(
   const startDate = typeof start === "string" ? new Date(start) : start;
 
   if (Number.isNaN(startDate.getTime())) {
-    throw new RangeError(i18n.t("common.invalidStartDate"));
+    throw new RangeError("common.invalidStartDate" satisfies TranslationKey);
   }
 
   const endDate = addDuration(startDate, duration);

@@ -1,17 +1,16 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { DATE_SORTS, useSortOptions } from "@/lib/sort-options";
+import { DATE_SORTS, useSort } from "@/lib/sort-options";
 
 export default function useEmployeeFilters() {
     const urlSearch = useSearch({ strict: false });
 
     const [searchQuery, setSearchQuery] = useState<string>(urlSearch.search ?? "");
-    const sortOptions = useSortOptions(DATE_SORTS);
-    const [sort, setSort] = useState<string>(DATE_SORTS[0]);
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
 
     const params = useMemo(() => ({
         search: searchQuery || undefined,
-        sort: sort || undefined,
+        sort,
     }), [searchQuery, sort]);
 
     return {

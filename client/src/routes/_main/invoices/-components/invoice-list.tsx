@@ -4,15 +4,14 @@ import InvoiceCard from "./invoice-card";
 import type { Customer } from "@keepit/schemas";
 import { useCustomers, useInvoices } from "@/hooks";
 import { FilterChip, ListSkeleton, MultiDropdown, RouteError, SearchBar, Skeleton, SortDropdown } from "@/components";
-import { DATE_SORTS, sortItems, useSortOptions } from "@/lib/sort-options";
+import { DATE_SORTS, sortItems, useSort } from "@/lib/sort-options";
 
 export default function InvoiceList() {
     const { t } = useTranslation();
 
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
-    const sortOptions = useSortOptions(DATE_SORTS);
-    const [sort, setSort] = useState<(typeof DATE_SORTS)[number]>(DATE_SORTS[0]);
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter] = useState<Array<string>>([]);
 
@@ -42,7 +41,7 @@ export default function InvoiceList() {
             {/* Header */}
             <div className='flex justify-between items-center gap-4'>
                 <div className="w-full flex items-center gap-2">
-                    <SortDropdown value={sort} onChange={(value) => setSort(value as typeof sort)} options={sortOptions} />
+                    <SortDropdown value={sort} onChange={setSort} options={sortOptions} />
 
                     <MultiDropdown label="Kunde" options={customerFilterOptions}
                         values={customerFilter} onChange={setCustomerFilter} />

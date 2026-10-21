@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useSearch } from "@tanstack/react-router";
-import { DATE_SORTS, useSortOptions } from "@/lib/sort-options";
+import { DATE_SORTS, useSort } from "@/lib/sort-options";
 
 interface Options {
     customerId?: string;
@@ -10,8 +10,7 @@ export default function useOfferFilters({ customerId }: Options = {}) {
     const urlSearch = useSearch({ strict: false });
      
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
-    const sortOptions = useSortOptions(DATE_SORTS);
-    const [sort, setSort] = useState<string>(DATE_SORTS[0]);
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter, setContactPersonFilter] = useState<Array<string>>([]);
     const [productFilter, setProductFilter] = useState<Array<string>>([]);

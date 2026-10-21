@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import type { SortOption } from "@/components/elements/sort-dropdown";
+import type { SortOption } from "@/components";
 import type { TranslationKey } from "@/i18n";
 
 /*
@@ -45,7 +46,17 @@ export function sortItems<T extends Record<SortField<TValue>, string>, TValue ex
 }
 
 /** Die Optionen für `SortDropdown`, beschriftet in der aktiven Sprache. */
-export function useSortOptions(values: ReadonlyArray<SortValue>): Array<SortOption> {
+export function useSortOptions<TValue extends SortValue>(values: ReadonlyArray<TValue>): Array<SortOption<TValue>> {
     const { t } = useTranslation();
     return values.map((value) => ({ value, label: t(LABEL_KEYS[value]) }));
+}
+
+/**
+ * Sortierzustand einer Liste: die gewählte Option (Start ist die erste aus
+ * `values`), ihr Setter und die beschrifteten Optionen für `SortDropdown`.
+ */
+export function useSort<TValue extends SortValue>(values: readonly [TValue, ...Array<TValue>]) {
+    const [sort, setSort] = useState<TValue>(values[0]);
+    const sortOptions = useSortOptions(values);
+    return { sort, setSort, sortOptions };
 }
