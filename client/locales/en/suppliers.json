@@ -2,6 +2,19 @@
   "suppliers": {
     "description": "Central management of suppliers",
     "searchPlaceholder": "Search suppliers…",
-    "create": "Create supplier"
+    "create": "Create supplier",
+    "offerCount_one": "{{count}} offer",
+    "offerCount_other": "{{count}} offers",
+    "orderCount_one": "{{count}} order",
+    "orderCount_other": "{{count}} orders",
+    "edit": "Edit supplier",
+    "delete": "Delete supplier",
+    "deleteConfirm": "Are you sure?",
+    "modal": {
+      "editTitle": "Edit supplier",
+      "createTitle": "Create supplier",
+      "name": "Name",
+      "supplierId": "ID"
+    }
   }
 }

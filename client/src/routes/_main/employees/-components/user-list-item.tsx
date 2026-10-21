@@ -1,5 +1,6 @@
 
 import { Pen, Trash } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { User } from "@keepit/schemas";
 import { Button } from "@/components";
 import { useDeleteUser, useFormatters } from "@/hooks";
@@ -10,11 +11,12 @@ interface UserListItemProps {
 }
 
 export default function UserListItem({ user, onEdit }: UserListItemProps) {
+  const { t } = useTranslation();
   const { formatDate } = useFormatters();
   const { deleteUser, isDeletingUser } = useDeleteUser();
 
   const handleDeleteUser = (id: string) => {
-    if (confirm(`Möchten Sie "${user.name}" wirklich löschen?`)) {
+    if (confirm(t("employees.deleteConfirm", { name: user.name }))) {
       deleteUser(id);
     }
 
@@ -40,7 +42,7 @@ export default function UserListItem({ user, onEdit }: UserListItemProps) {
             variant="border"
             icon={<Pen size={14} />}
             iconOnly
-            aria-label="Zulieferer bearbeiten"
+            aria-label={t("employees.edit")}
             onClick={() => onEdit(user)}
           />
 
@@ -49,7 +51,7 @@ export default function UserListItem({ user, onEdit }: UserListItemProps) {
             variant="border"
             icon={<Trash size={14} />}
             iconOnly
-            aria-label="Zulieferer löschen"
+            aria-label={t("employees.delete")}
             onClick={() => handleDeleteUser(user.id)}
             loading={isDeletingUser}
           />

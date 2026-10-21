@@ -12,6 +12,7 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
+import { useTranslation } from "react-i18next";
 import ContractListItem from "./contract-item";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Contract } from "@keepit/schemas";
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function ContractList({ onEdit }: Props) {
+    const { t } = useTranslation();
     const { contracts, isPending, error } = useContracts();
     const { reorderContracts } = useReorderContracts();
 
@@ -53,8 +55,8 @@ export default function ContractList({ onEdit }: Props) {
 
             {error && (
                 <div className="w-full grid items-center justify-start py-8">
-                    <p className="text-(--destructive) text-lg font-semibold">Error</p>
-                    <p className="text-(--destructive) font-medium">Something went wrong trying to fetch flatrates!</p>
+                    <p className="text-(--destructive) text-lg font-semibold">{t("contracts.loadError.title")}</p>
+                    <p className="text-(--destructive) font-medium">{t("contracts.loadError.message")}</p>
                 </div>
             )}
 
