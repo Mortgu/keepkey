@@ -6,7 +6,7 @@ import { offerAdoptions } from "../../pipelines/offer/offer-adoption.js";
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
 import type { DocumentType } from "@keepit/schemas";
-import { documentTable } from "../document-repo.js";
+import { documentOwnerType, documentTable } from "../document-repo.js";
 import { assertOfferEditable } from "../offer-acceptance.service.js";
 
 /**
@@ -44,7 +44,7 @@ export async function adoptChanges(type: DocumentType, id: string, fields: strin
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`document-model:${id}`}))::text AS "lock"`;
 
         // Sperrt das Angebot und lehnt angenommene ab.
-        const offerId = (await tx.document.findUnique({ where: { id, type: "OFFER" }, select: { offerId: true } }))?.offerId;
+        const offerId = (await tx.document.findUnique({ where: { id, type: documentOwnerType("offer") }, select: { offerId: true } }))?.offerId;
         if (!offerId) throw new AppException("Document not found", 404, "DOCUMENT_NOT_FOUND");
         await assertOfferEditable(tx, offerId);
 
@@ -55,7 +55,7 @@ export async function adoptChanges(type: DocumentType, id: string, fields: strin
         }
 
         const [row, offer] = await Promise.all([
-            tx.document.findUniqueOrThrow({ where: { id, type: "OFFER" }, select: { isCurrent: true, sourceVersion: true } }),
+            tx.document.findUniqueOrThrow({ where: { id, type: documentOwnerType("offer") }, select: { isCurrent: true, sourceVersion: true } }),
             tx.offer.findUniqueOrThrow({ where: { id: offerId }, select: { version: true } }),
         ]);
         if (!row.isCurrent || row.sourceVersion !== offer.version) {
@@ -99,7 +99,7 @@ export async function adoptChanges(type: DocumentType, id: string, fields: strin
                 select: { version: true },
             });
             await tx.document.update({
-                where: { id, type: "OFFER" },
+                where: { id, type: documentOwnerType("offer") },
                 data: { model: model as Prisma.InputJsonValue, sourceVersion: version },
             });
         }

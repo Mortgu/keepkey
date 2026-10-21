@@ -2,6 +2,7 @@ import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { Prisma, Task, TaskTarget } from "@prisma/client";
 import { enqueueTask } from "../lib/document.js";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 
 type GenerationRequestAdapter = {
     lockKey: string;
@@ -64,7 +65,7 @@ export function requestOfferGeneration(
             return offer.version;
         },
         findActive: (tx, sourceVersion) => tx.document.findFirst({
-            where: { type: "OFFER", offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { type: documentOwnerType("offer"), offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.offer.update({
@@ -75,7 +76,7 @@ export function requestOfferGeneration(
         createDocument: async (tx, taskId, version, sourceVersion) => {
             await tx.document.create({
                 data: {
-                    type: "OFFER",
+                    type: documentOwnerType("offer"),
                     displayName: displayNameForVersion(version),
                     offerId,
                     version,
@@ -100,7 +101,7 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
             return order.version;
         },
         findActive: (tx, sourceVersion) => tx.document.findFirst({
-            where: { type: "ORDER", orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { type: documentOwnerType("order"), orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.order.update({
@@ -111,7 +112,7 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
         createDocument: async (tx, taskId, version, sourceVersion) => {
             await tx.document.create({
                 data: {
-                    type: "ORDER",
+                    type: documentOwnerType("order"),
                     orderId,
                     version,
                     sourceVersion,
@@ -143,7 +144,7 @@ export function requestConfirmationGeneration(confirmationId: string): Promise<T
             return null;
         },
         findActive: (tx, sourceVersion) => tx.document.findFirst({
-            where: { type: "CONFIRMATION", confirmationId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { type: documentOwnerType("confirmation"), confirmationId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.confirmation.update({
@@ -154,7 +155,7 @@ export function requestConfirmationGeneration(confirmationId: string): Promise<T
         createDocument: async (tx, taskId, version, sourceVersion) => {
             await tx.document.create({
                 data: {
-                    type: "CONFIRMATION",
+                    type: documentOwnerType("confirmation"),
                     confirmationId,
                     version,
                     sourceVersion,
@@ -185,7 +186,7 @@ export function requestInvoiceGeneration(invoiceId: string): Promise<Task> {
             return null;
         },
         findActive: (tx, sourceVersion) => tx.document.findFirst({
-            where: { type: "INVOICE", invoiceId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+            where: { type: documentOwnerType("invoice"), invoiceId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.invoice.update({
@@ -196,7 +197,7 @@ export function requestInvoiceGeneration(invoiceId: string): Promise<Task> {
         createDocument: async (tx, taskId, version, sourceVersion) => {
             await tx.document.create({
                 data: {
-                    type: "INVOICE",
+                    type: documentOwnerType("invoice"),
                     invoiceId,
                     version,
                     sourceVersion,

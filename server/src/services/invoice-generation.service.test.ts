@@ -44,7 +44,8 @@ vi.mock("../lib/document-artifact-store.js", () => ({
     storeDocumentArtifacts: fake.storeDocumentArtifacts,
     removeDocumentArtifacts: fake.removeDocumentArtifacts,
 }));
-vi.mock("./document-repo.js", () => ({
+vi.mock("./document-repo.js", async (importOriginal) => ({
+    documentOwnerType: (await importOriginal<typeof import("./document-repo.js")>()).documentOwnerType,
     documentTable: () => ({ scope: "invoices", updateMany: fake.updateMany, findWithArtifacts: vi.fn(async () => null) }),
 }));
 

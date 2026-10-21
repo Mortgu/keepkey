@@ -43,7 +43,8 @@ vi.mock("../../lib/prismaClient.js", () => {
 vi.mock("../offer-acceptance.service.js", () => ({
     assertOfferEditable: (...args: unknown[]) => assertOfferEditable(...args),
 }));
-vi.mock("../document-repo.js", () => ({
+vi.mock("../document-repo.js", async (importOriginal) => ({
+    documentOwnerType: (await importOriginal<typeof import("../document-repo.js")>()).documentOwnerType,
     documentTable: () => ({
         scope: "offers",
         findWithArtifacts: (...args: unknown[]) => findWithArtifacts(...args),
