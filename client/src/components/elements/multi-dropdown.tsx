@@ -1,6 +1,7 @@
 import { buttonStyles } from "@/components";
 import { Select } from "@base-ui/react";
 import { Check, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { ComponentSize } from "../tokens";
 import { selectStyles } from "./select-styles";
 
@@ -25,6 +26,7 @@ export interface MultiDropdownProps {
  * Eingabefeld.
  */
 export function MultiDropdown({ label, options, values, onChange, className, size = "sm" }: MultiDropdownProps) {
+  const { t } = useTranslation();
   const styles = selectStyles();
   const count = values.length;
 
@@ -81,7 +83,7 @@ export function MultiDropdown({ label, options, values, onChange, className, siz
                     onClick={() => onChange([])}
                     className="text-xs text-(--text-secondary) cursor-pointer hover:text-(--text) transition-colors"
                   >
-                    Clear selection
+                    {t("common.clearSelection")}
                   </button>
                 </div>
               </>

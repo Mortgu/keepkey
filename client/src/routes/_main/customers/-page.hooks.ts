@@ -1,19 +1,14 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useCustomers } from "@/hooks";
-
-const sortOptions = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-    { value: "companyName:asc", label: "Name A–Z" },
-    { value: "companyName:desc", label: "Name Z–A" },
-];
+import { DATE_AND_NAME_SORTS, useSortOptions } from "@/lib/sort-options";
 
 export function useCustomerFilters() {
     const urlSearch = useSearch({ strict: false });
      
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
-    const [sort, setSort] = useState(sortOptions[0].value);
+    const sortOptions = useSortOptions(DATE_AND_NAME_SORTS);
+    const [sort, setSort] = useState<string>(DATE_AND_NAME_SORTS[0]);
     const [countryFilter, setCountryFilter] = useState<Array<string>>([]);
     const [languageFilter, setLanguageFilter] = useState<Array<string>>([]);
 

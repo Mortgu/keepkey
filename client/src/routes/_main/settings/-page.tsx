@@ -23,7 +23,7 @@ export default function SettingsPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("nav.settings"), to: "/settings" },
                     ]}
                 />

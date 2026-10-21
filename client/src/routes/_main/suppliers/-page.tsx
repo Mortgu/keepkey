@@ -25,7 +25,7 @@ export default function SupplierPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.suppliers"), to: "/suppliers" },
                     ]}
                 />

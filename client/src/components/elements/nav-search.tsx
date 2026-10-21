@@ -3,6 +3,9 @@ import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import { Search } from "lucide-react";
 
+/** Tastenkürzel, kein Text: in jeder Sprache gleich. */
+const SHORTCUT_HINT = "⌘K";
+
 /**
  * Einstieg in die Suche aus der Navigation.
  *
@@ -41,7 +44,7 @@ export function NavSearch() {
             </span>
 
             <span className="shrink-0 rounded border border-(--fg-2) px-1.5 py-px text-[11px] text-(--fg-3)">
-                ⌘K
+                {SHORTCUT_HINT}
             </span>
         </button>
     );

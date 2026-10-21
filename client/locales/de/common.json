@@ -47,7 +47,27 @@
     "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten.",
     "months": "Monate",
     "increment": "Wert erhöhen",
-    "decrement": "Wert verringern"
+    "decrement": "Wert verringern",
+    "sort": {
+      "label": "Sortierung:",
+      "createdAtDesc": "Datum – neuestes zuerst",
+      "createdAtAsc": "Datum – ältestes zuerst",
+      "nameAsc": "Name A–Z",
+      "nameDesc": "Name Z–A"
+    },
+    "clearSelection": "Auswahl aufheben",
+    "breadcrumb": {
+      "label": "Navigationspfad",
+      "showHidden_one": "{{count}} weitere Ebene anzeigen",
+      "showHidden_other": "{{count}} weitere Ebenen anzeigen"
+    },
+    "segmentedControl": "Auswahl",
+    "fieldIssue": {
+      "error": "Fehlerdetails",
+      "warning": "Warnungsdetails"
+    },
+    "invalidDate": "Ungültiges Datum",
+    "invalidStartDate": "Ungültiges Startdatum"
   },
   "validation": {
     "required": "Pflichtfeld",

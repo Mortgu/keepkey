@@ -111,7 +111,7 @@ export default function SearchPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("search.title"), to: "/search" },
                     ]}
                 />

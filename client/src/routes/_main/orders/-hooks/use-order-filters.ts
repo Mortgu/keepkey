@@ -1,10 +1,6 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-
-const sortOptions = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-];
+import { DATE_SORTS, useSortOptions } from "@/lib/sort-options";
 
 interface Props {
     customerId?: string;
@@ -14,7 +10,8 @@ export default function useOrderFilters({ customerId }: Props = {}) {
     const urlSearch = useSearch({ strict: false });
 
     const [searchQuery, setSearchQuery] = useState<string>(urlSearch.search || "");
-    const [sort, setSort] = useState(sortOptions[0].value);
+    const sortOptions = useSortOptions(DATE_SORTS);
+    const [sort, setSort] = useState<string>(DATE_SORTS[0]);
 
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
 

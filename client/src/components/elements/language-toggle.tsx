@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
 import type { ComponentSize } from "../tokens";
 import type { LanguageToggleProps } from "./language-toggle-options";
@@ -62,8 +63,9 @@ export function SegmentedToggle<TValue extends string = string>({
   optionClassName,
   thumbClassName,
   size = "sm",
-  "aria-label": ariaLabel = "Segmented control",
+  "aria-label": ariaLabel,
 }: SegmentedToggleProps<TValue>) {
+  const { t } = useTranslation();
   const activeIndex = Math.max(
     0,
     options.findIndex((option) => option.value === value),
@@ -74,7 +76,7 @@ export function SegmentedToggle<TValue extends string = string>({
   return (
     <div
       role="tablist"
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t("common.segmentedControl")}
       className={cn(
         "relative inline-flex rounded-md border border-(--border) bg-(--subtle-50)",
         sizeStyles.container,
@@ -133,11 +135,12 @@ export const SegmentedLanguageToggle = ({
   onChange,
   className,
   size,
-  "aria-label": ariaLabel = "Language",
+  "aria-label": ariaLabel,
 }: LanguageToggleProps) => {
+  const { t } = useTranslation();
   return (
     <SegmentedToggle
-      aria-label={ariaLabel}
+      aria-label={ariaLabel ?? t("common.language")}
       className={className}
       size={size}
       options={options.map((option) => ({

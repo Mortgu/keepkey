@@ -4,12 +4,12 @@ import { useTranslation } from "react-i18next";
 import { customerFormSchema } from "@keepit/schemas";
 import type { Customer, CustomerFormInput } from "@keepit/schemas";
 import { Button, Dialog, FieldInput, FieldSelect, NumberField, Select } from "@/components";
-import { useCreateCustomer, useUpdateCustomer } from "@/hooks";
+import { useCreateCustomer, useLocale, useUpdateCustomer } from "@/hooks";
 import {
-  COUNTRY_OPTIONS,
   CURRENCY_OPTIONS,
-  LANGUAGE_OPTIONS,
+  countryOptions,
   findCountryByName,
+  languageOptions,
 } from "@/lib/countries";
 import { getFormError } from "@/lib/utils";
 
@@ -23,6 +23,7 @@ export default function CustomerModal({
   currentCustomer = null,
 }: CustomerModalProps) {
   const { t } = useTranslation();
+  const uiLanguage = useLocale();
   const isEdit = currentCustomer !== null;
 
   const { createCustomer, errorCreatingCustomer } = useCreateCustomer();
@@ -141,7 +142,7 @@ export default function CustomerModal({
                   id={field.name}
                   size="sm"
                   label="Land"
-                  options={COUNTRY_OPTIONS}
+                  options={countryOptions(uiLanguage)}
                   placeholder="Land wählen"
                   value={field.state.value}
                   error={getFormError(field.state.meta.errors)}
@@ -158,7 +159,7 @@ export default function CustomerModal({
 
             <customerForm.Field name="language" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <FieldSelect field={field} size="sm" label="Sprache" options={LANGUAGE_OPTIONS} />
+                <FieldSelect field={field} size="sm" label="Sprache" options={languageOptions(uiLanguage)} />
               </div>
             )} />
 

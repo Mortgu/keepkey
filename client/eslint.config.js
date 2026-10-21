@@ -41,6 +41,8 @@ export default defineConfig([
           exclude: [
             "className", "value", "defaultValue", "form", "size", "variant", "side",
             "to", "type", "id", "name", "dataKey", "fill", "stroke", "strokeDasharray",
+            // Routenpräfixe der Navigationsgruppen.
+            "paths",
           ],
         },
       }],

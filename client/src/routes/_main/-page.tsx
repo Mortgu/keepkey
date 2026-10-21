@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Breadcrumbs, RouteError, Skeleton } from "@/components";
 import { useDashboardStats } from "@/hooks";
 import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
@@ -15,6 +16,7 @@ function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCard
 }
 
 export default function DashboardPage() {
+    const { t } = useTranslation();
     const { months, isPending: statsPending, error: statsError } = useDashboardStats();
     const { data, isPending, isFetching, error, refetch } = useIntegrationStatus();
 
@@ -46,7 +48,7 @@ export default function DashboardPage() {
                 <Breadcrumbs
                     size="sm"
                     maxItems={4}
-                    items={[{ label: "Dashboard", to: "/" }]}
+                    items={[{ label: t("nav.dashboard"), to: "/" }]}
                 />
             </div>
 

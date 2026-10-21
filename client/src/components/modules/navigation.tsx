@@ -111,7 +111,7 @@ export function Navigation() {
                     <NavLink
                         to="/"
                         icon={<LayoutGrid size={ICON_SIZE} />}
-                        label="Dashboard"
+                        label={t("nav.dashboard")}
                     />
                 </Section>
 

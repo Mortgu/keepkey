@@ -1,4 +1,5 @@
 import { Check } from 'lucide-react';
+import { useTranslation } from "react-i18next";
 import type { DropdownOption } from './multi-dropdown';
 
 export interface MultiSelectListProps {
@@ -9,6 +10,7 @@ export interface MultiSelectListProps {
 }
 
 export function MultiSelectList({ options, values, onChange, className }: MultiSelectListProps) {
+  const { t } = useTranslation();
   const toggle = (v: string) =>
     onChange(values.includes(v) ? values.filter(x => x !== v) : [...values, v]);
 
@@ -50,7 +52,7 @@ export function MultiSelectList({ options, values, onChange, className }: MultiS
             onClick={() => onChange([])}
             className="text-xs text-(--fg-3) bg-transparent border-none cursor-pointer p-0 hover:text-(--text) transition-colors"
           >
-            Clear selection
+            {t("common.clearSelection")}
           </button>
         </div>
       )}

@@ -42,7 +42,7 @@ export default function CustomerDetailPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.customers"), to: "/customers" },
                         { label: customer.companyName },
                     ]}

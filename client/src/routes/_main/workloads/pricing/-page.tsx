@@ -32,7 +32,7 @@ export default function PricingPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: "Workloads", to: "/workloads" },
                         { label: "Pricing", to: "/workloads/pricing" },
                     ]}

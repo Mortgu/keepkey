@@ -6,11 +6,12 @@ import CustomerAutocomplete from "./-components/customer-autocomplete";
 import type {CustomerFuzzyItem} from "./-components/customer-autocomplete";
 import type { Customer } from "@keepit/schemas";
 import { Breadcrumbs, Button, MultiDropdown } from "@/components";
-import { useCustomers, useModal } from "@/hooks";
-import { COUNTRY_OPTIONS, LANGUAGE_OPTIONS } from "@/lib/countries";
+import { useCustomers, useLocale, useModal } from "@/hooks";
+import { countryOptions, languageOptions } from "@/lib/countries";
 
 export default function CustomerPage() {
     const { t } = useTranslation();
+    const language = useLocale();
     const modal = useModal<Customer>();
 
     const { filters } = useCustomerPage();
@@ -28,7 +29,7 @@ export default function CustomerPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.customers"), to: "/customers" },
                     ]}
                 />
@@ -37,14 +38,14 @@ export default function CustomerPage() {
             <div className="w-full flex items-center gap-2">
                 <MultiDropdown
                     label={t("common.country")}
-                    options={COUNTRY_OPTIONS}
+                    options={countryOptions(language)}
                     values={filters.countryFilter}
                     onChange={filters.setCountryFilter}
                 />
 
                 <MultiDropdown
                     label={t('common.language')}
-                    options={LANGUAGE_OPTIONS}
+                    options={languageOptions(language)}
                     values={filters.languageFilter}
                     onChange={filters.setLanguageFilter}
                 />

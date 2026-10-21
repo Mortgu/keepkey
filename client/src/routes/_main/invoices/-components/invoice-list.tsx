@@ -4,18 +4,15 @@ import InvoiceCard from "./invoice-card";
 import type { Customer } from "@keepit/schemas";
 import { useCustomers, useInvoices } from "@/hooks";
 import { FilterChip, ListSkeleton, MultiDropdown, RouteError, SearchBar, Skeleton, SortDropdown } from "@/components";
-
-const sort_options = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-];
+import { DATE_SORTS, sortItems, useSortOptions } from "@/lib/sort-options";
 
 export default function InvoiceList() {
     const { t } = useTranslation();
 
     const [searchInput, setSearchInput] = useState("");
     const [search, setSearch] = useState("");
-    const [sort, setSort] = useState(sort_options[0].value);
+    const sortOptions = useSortOptions(DATE_SORTS);
+    const [sort, setSort] = useState<(typeof DATE_SORTS)[number]>(DATE_SORTS[0]);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter] = useState<Array<string>>([]);
 
@@ -38,18 +35,14 @@ export default function InvoiceList() {
         search: search || undefined,
         customerIds: customerFilter.length ? customerFilter : undefined,
     });
-    const sorted = useMemo(() => {
-        const list = [...invoices];
-        list.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-        return sort === "createdAt:desc" ? list.reverse() : list;
-    }, [invoices, sort]);
+    const sorted = useMemo(() => sortItems(invoices, sort), [invoices, sort]);
 
     return (
         <Fragment>
             {/* Header */}
             <div className='flex justify-between items-center gap-4'>
                 <div className="w-full flex items-center gap-2">
-                    <SortDropdown value={sort} onChange={setSort} options={sort_options} />
+                    <SortDropdown value={sort} onChange={(value) => setSort(value as typeof sort)} options={sortOptions} />
 
                     <MultiDropdown label="Kunde" options={customerFilterOptions}
                         values={customerFilter} onChange={setCustomerFilter} />

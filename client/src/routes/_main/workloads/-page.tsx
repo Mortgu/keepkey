@@ -26,7 +26,7 @@ export default function ProductPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: "Workloads", to: "/workloads" },
                     ]}
                 />

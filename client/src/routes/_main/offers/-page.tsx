@@ -24,7 +24,7 @@ export function OfferPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.offers"), to: "/offers" },
                     ]}
                 />

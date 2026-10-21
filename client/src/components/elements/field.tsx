@@ -2,6 +2,7 @@ import { cn } from "@/lib/utils";
 import { AlertCircle, AlertTriangle } from "lucide-react";
 import type { ReactNode } from "react";
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 
 /** Resolves a field's id: the caller's explicit id, or a generated fallback — so a label can always be linked to its control. */
 export function useFieldId(id?: string): string {
@@ -22,6 +23,7 @@ export function LabelBadge({
     label: string;
     tooltip?: string;
 }) {
+    const { t } = useTranslation();
     const isError = kind === "error";
     const colorClasses = isError
         ? "bg-(--destructive-subtle) text-(--destructive) border border-(--destructive-line)"
@@ -37,7 +39,7 @@ export function LabelBadge({
             )}
             tabIndex={0}
             role="button"
-            aria-label={`${kind} details`}
+            aria-label={t(isError ? "common.fieldIssue.error" : "common.fieldIssue.warning")}
         >
             <Icon size={11} strokeWidth={2.5} className="shrink-0" />
             {label}

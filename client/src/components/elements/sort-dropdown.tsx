@@ -1,6 +1,7 @@
 import { buttonStyles } from "@/components";
 import { Select } from "@base-ui/react";
 import { Check, ChevronDown } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { ComponentSize } from "../tokens";
 import { selectStyles } from "./select-styles";
 
@@ -45,6 +46,7 @@ export const SortIcon = ({ dir }: { dir: 'asc' | 'desc' | null }) => (
  * `multiple` — Größe und Fokus kommen über `buttonStyles` aus den Tokens.
  */
 export function SortDropdown({ value, onChange, options, className, size = "sm" }: SortDropdownProps) {
+  const { t } = useTranslation();
   const styles = selectStyles();
 
   const selected = options.find(o => o.value === value);
@@ -62,7 +64,7 @@ export function SortDropdown({ value, onChange, options, className, size = "sm" 
         <span className="text-(--text-secondary) flex items-center">
           <SortIcon dir={dir} />
         </span>
-        <span className="text-(--text-600) font-normal">Sort:</span>
+        <span className="text-(--text-600) font-normal">{t("common.sort.label")}</span>
         <span className="font-medium text-(--text)">{selected?.label ?? options[0]?.label}</span>
         <Select.Icon className={styles.Icon()}>
           <ChevronDown size={12} />

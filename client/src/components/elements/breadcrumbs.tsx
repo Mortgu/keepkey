@@ -3,6 +3,7 @@ import { ACTION_FOCUS } from "@/components";
 import type { LinkProps } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { MoreHorizontal } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { ReactNode } from "react";
 import * as React from "react";
 import { tv } from "tailwind-variants";
@@ -142,10 +143,11 @@ export function Breadcrumbs({
     size = "sm",
     separator,
     maxItems = 0,
-    label = "Breadcrumb",
+    label,
     className,
     ...props
 }: BreadcrumbsProps) {
+    const { t } = useTranslation();
     const [expanded, setExpanded] = React.useState(false);
 
     const collapsed =
@@ -164,7 +166,7 @@ export function Breadcrumbs({
     if (items.length === 0) return null;
 
     return (
-        <nav aria-label={label} className={className} {...props}>
+        <nav aria-label={label ?? t("common.breadcrumb.label")} className={className} {...props}>
             <ol className={`${listStyles()} ${TEXT_SIZE[size]}`}>
                 {visible.map((item, index) => {
                     const isLast = index === visible.length - 1;
@@ -180,7 +182,7 @@ export function Breadcrumbs({
                                 <button
                                     type="button"
                                     onClick={() => setExpanded(true)}
-                                    aria-label={`${items.length - 3} weitere Ebenen anzeigen`}
+                                    aria-label={t("common.breadcrumb.showHidden", { count: items.length - 3 })}
                                     className={itemStyles({ interactive: true })}
                                 >
                                     <MoreHorizontal size={iconSize} aria-hidden="true" />

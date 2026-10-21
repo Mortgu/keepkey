@@ -1,4 +1,5 @@
 import type { TaskStatus } from "@keepit/schemas";
+import i18n from "@/i18n";
 
 /**
  * Preise werden durchgehend in Cent gespeichert und übertragen, in der
@@ -41,7 +42,7 @@ export function getRemainingTerm(from: Date | string, until: Date | string): Rem
   const end = typeof until === "string" ? new Date(until) : until;
 
   if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
-    throw new RangeError("Ungültiges Datum");
+    throw new RangeError(i18n.t("common.invalidDate"));
   }
 
   const totalDays = Math.round((startOfDay(end) - startOfDay(start)) / MS_PER_DAY);
@@ -103,7 +104,7 @@ export function getRemainingTermFromStart(
   const startDate = typeof start === "string" ? new Date(start) : start;
 
   if (Number.isNaN(startDate.getTime())) {
-    throw new RangeError("Ungültiges Startdatum");
+    throw new RangeError(i18n.t("common.invalidStartDate"));
   }
 
   const endDate = addDuration(startDate, duration);
