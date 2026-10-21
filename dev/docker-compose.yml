@@ -49,6 +49,20 @@ services:
       timeout: 5s
       retries: 10
 
+  gotenberg:
+    image: gotenberg/gotenberg:8.38.1
+    container_name: keepit_gotenberg
+    # Nur im eigenen Netz erreichbar — kein öffentlicher Port in Produktion.
+    # Lokal exponiert, damit man die Konvertierung bei Bedarf direkt testen kann.
+    ports:
+      - "3080:3000"
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:3000/health" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   garage-webui:
     image: khairul169/garage-webui:1.1.0
     container_name: keepit_garage_webui
@@ -80,6 +94,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      gotenberg:
+        condition: service_healthy
     restart: "no"
 
   # API + Worker in einem Prozess (dist/server.js, Default des Images).
@@ -97,6 +113,8 @@ services:
       migrate:
         condition: service_completed_successfully
       garage:
+        condition: service_healthy
+      gotenberg:
         condition: service_healthy
     restart: always
 
