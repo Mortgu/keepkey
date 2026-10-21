@@ -6,17 +6,16 @@
         "validation": {
             "productsRequired": "Mindestens 1 Produkt auswählen",
             "productsAssigned": "Mindestens 1 Produkt muss zugeordnet sein",
-            "contractsRequired": "Mindestens 1 Vertrag auswählen",
-            "nameRequired": "Mindestens 1 Zeichen"
+            "contractsRequired": "Mindestens 1 Vertrag auswählen"
         },
-        "product": {
-            "titleCreate": "Produkt erstellen",
-            "titleEdit": "Produkt bearbeiten",
-            "nameLabel": "Produkt Name ({{language}})",
+        "modal": {
+            "createTitle": "Produkt erstellen",
+            "editTitle": "Produkt bearbeiten",
+            "name": "Produkt Name ({{language}})",
             "namePlaceholder": "Produkt Name",
-            "descriptionLabel": "Produkt Beschreibung ({{language}})",
+            "description": "Produkt Beschreibung ({{language}})",
             "descriptionPlaceholder": "Produkt Beschreibung",
-            "tableLabel": "Tabelle Beschreibung ({{language}})",
+            "table": "Tabelle Beschreibung ({{language}})",
             "tablePlaceholder": "Tabellen Beschreibung"
         },
         "pricing": {

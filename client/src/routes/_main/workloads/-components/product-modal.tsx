@@ -28,7 +28,7 @@ interface ProductModalProps {
 }
 
 const langFields = z.object({
-  name: z.string().min(1, "workloads.validation.nameRequired" satisfies TranslationKey),
+  name: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
   description: z.string(),
   table: z.string(),
 });
@@ -88,7 +88,7 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? t("workloads.product.titleEdit") : t("workloads.product.titleCreate")}>
+      <Dialog.Header title={isEdit ? t("workloads.modal.editTitle") : t("workloads.modal.createTitle")}>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
           value={language}
@@ -99,16 +99,16 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
         <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
           <productForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-1">
-              <FieldInput field={field} label={t("workloads.product.nameLabel", { language })} placeholder={t("workloads.product.namePlaceholder")} />
+              <FieldInput field={field} label={t("workloads.modal.name", { language })} placeholder={t("workloads.modal.namePlaceholder")} />
             </div>
           )} />
 
           <productForm.Field name={`${language}.description`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={t("workloads.product.descriptionLabel", { language })} placeholder={t("workloads.product.descriptionPlaceholder")} />
+            <FieldTextarea field={field} rows={5} label={t("workloads.modal.description", { language })} placeholder={t("workloads.modal.descriptionPlaceholder")} />
           )} />
 
           <productForm.Field name={`${language}.table`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={t("workloads.product.tableLabel", { language })} placeholder={t("workloads.product.tablePlaceholder")} />
+            <FieldTextarea field={field} rows={5} label={t("workloads.modal.table", { language })} placeholder={t("workloads.modal.tablePlaceholder")} />
           )} />
         </form>
       </Dialog.Body>

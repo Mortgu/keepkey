@@ -74,7 +74,8 @@
     "email": "Ungültige E-Mail-Adresse",
     "passwordMin": "Mindestens {{count}} Zeichen",
     "passwordMax": "Höchstens {{count}} Zeichen",
-    "passwordMismatch": "Passwörter stimmen nicht überein"
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "minOneChar": "Mindestens 1 Zeichen"
   },
   "docxEditor": {
     "noBuffer": "Der Editor konnte die Datei nicht lesen."

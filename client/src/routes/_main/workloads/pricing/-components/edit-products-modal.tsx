@@ -7,6 +7,7 @@ import type { TranslationKey } from "@/i18n";
 import {
     Button,
     Dialog,
+    Field,
     MultiSelectList,
 } from "@/components";
 import { useFormError, useLocale } from "@/hooks";
@@ -80,19 +81,13 @@ export default function EditProductsModal({
             <Dialog.Body>
                 <form id="edit-products-form" onSubmit={handleSubmit} className="grid gap-4">
                     <form.Field name="products" children={(field) => (
-                        <div className="grid gap-1">
-                            <label className="text-sm text-gray-500">{t("workloads.pricing.products")}</label>
+                        <Field label={t("workloads.pricing.products")} error={formError(field.state.meta.errors)}>
                             <MultiSelectList
                                 options={options}
                                 values={field.state.value}
                                 onChange={field.handleChange}
                             />
-                            {formError(field.state.meta.errors) && (
-                                <p className="text-sm text-red-500">
-                                    {formError(field.state.meta.errors)}
-                                </p>
-                            )}
-                        </div>
+                        </Field>
                     )} />
                 </form>
             </Dialog.Body>

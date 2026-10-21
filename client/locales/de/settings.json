@@ -17,13 +17,6 @@
       "new": "Neues Passwort",
       "confirm": "Neues Passwort wiederholen"
     },
-    "validation": {
-      "required": "Pflichtfeld",
-      "email": "Ungültige E-Mail-Adresse",
-      "passwordMin": "Mindestens {{count}} Zeichen",
-      "passwordMax": "Höchstens {{count}} Zeichen",
-      "passwordMismatch": "Passwörter stimmen nicht überein"
-    },
     "toast": {
       "profileSaved": "Profil gespeichert.",
       "emailChanged": "E-Mail-Adresse geändert.",

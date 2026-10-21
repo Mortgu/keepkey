@@ -86,7 +86,7 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 			defaultOpen
 			onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
 		>
-			<Dialog.Header title={isEdit ? t("flatrates.modal.titleEdit") : t("flatrates.modal.titleCreate")}>
+			<Dialog.Header title={isEdit ? t("flatrates.modal.editTitle") : t("flatrates.modal.createTitle")}>
 				<SegmentedLanguageToggle
 					options={DEFAULT_LANGUAGE_OPTIONS}
 					value={language}
@@ -98,14 +98,14 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 					<form.Field name={`translations[${langIndex}].name`}>
 						{(field) => (
 							<div className="grid gap-1">
-								<FieldInput field={field} label={t("flatrates.modal.nameLabel", { language })} placeholder={t("flatrates.modal.namePlaceholder")} />
+								<FieldInput field={field} label={t("flatrates.modal.name", { language })} placeholder={t("flatrates.modal.namePlaceholder")} />
 							</div>
 						)}
 					</form.Field>
 
 					<form.Field name={`translations[${langIndex}].table`}>
 						{(field) => (
-							<FieldTextarea field={field} rows={4} label={t("flatrates.modal.tableLabel", { language })} placeholder={t("flatrates.modal.tablePlaceholder")} />
+							<FieldTextarea field={field} rows={4} label={t("flatrates.modal.table", { language })} placeholder={t("flatrates.modal.tablePlaceholder")} />
 						)}
 					</form.Field>
 

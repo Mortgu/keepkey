@@ -5,10 +5,6 @@
     "default": "Standard",
     "noFeatures": "Keine Features hinterlegt!",
     "move": "{{name}} verschieben",
-    "loadError": {
-      "title": "Fehler",
-      "message": "Beim Laden der Tarife ist etwas schiefgelaufen!"
-    },
     "modal": {
       "editTitle": "Vertrag bearbeiten",
       "createTitle": "Neuen Vertrag anlegen",
@@ -19,9 +15,6 @@
       "addFeature": "Feature hinzufügen",
       "table": "Tabelle ({{language}})",
       "tablePlaceholder": "Datenvolumen"
-    },
-    "validation": {
-      "nameMin": "Mindestens 1 Zeichen!"
     }
   }
 }

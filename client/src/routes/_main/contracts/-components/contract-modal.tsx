@@ -29,7 +29,7 @@ interface ContractModalProps {
 }
 
 const langFields = z.object({
-  name: z.string().min(1, "contracts.validation.nameMin" satisfies TranslationKey),
+  name: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
   features: z.array(z.string()),
   table: z.string(),
 });

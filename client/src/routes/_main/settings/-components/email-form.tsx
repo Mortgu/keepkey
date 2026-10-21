@@ -12,7 +12,7 @@ import { authClient } from "@/lib/auth-client.ts";
 
 /** Meldungen sind Übersetzungsschlüssel — übersetzt wird bei der Anzeige. */
 const emailSchema = z.object({
-    newEmail: z.email("settings.validation.email" satisfies TranslationKey),
+    newEmail: z.email("validation.email" satisfies TranslationKey),
 });
 
 export default function EmailForm() {

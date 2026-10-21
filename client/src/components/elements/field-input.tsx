@@ -8,8 +8,9 @@ import type {
     TextareaComponentProps
 } from "@/components";
 import type { ChangeEvent } from "react";
+import type { FormErrorParams } from "@/hooks";
 import { Input, NumberField, Select, Textarea } from "@/components";
-import { useFormError } from "@/hooks/use-form-error";
+import { useFormError } from "@/hooks";
 
 /* ──────────────────────────────────────────────────────────────────────
    A `BindableField` is the structural slice of TanStack Form's `FieldApi`
@@ -35,14 +36,17 @@ export interface FieldInputProps<TValue = string>
     extends Omit<InputComponentProps, "value" | "onChange" | "onBlur" | "id" | "error"> {
     field: BindableField<TValue>;
     onChange?: (e: ChangeEvent<HTMLInputElement>, field: BindableField<TValue>) => void;
+    /** Interpolationswerte für übersetzte Fehlermeldungen, siehe {@link useFormError}. */
+    errorParams?: FormErrorParams;
 }
 
 export function FieldInput<TValue = string>({
     field,
     onChange,
+    errorParams,
     ...rest
 }: FieldInputProps<TValue>) {
-    const formError = useFormError();
+    const formError = useFormError(errorParams);
     return (
         <Input
             id={field.name}
@@ -64,12 +68,20 @@ export function FieldInput<TValue = string>({
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 128;
 
+/** Die Längengrenzen für `validation.passwordMin`/`passwordMax` — sie stehen nur hier. */
+const PASSWORD_ERROR_PARAMS: FormErrorParams = {
+    "validation.passwordMin": { count: PASSWORD_MIN_LENGTH },
+    "validation.passwordMax": { count: PASSWORD_MAX_LENGTH },
+};
+
 /**
  * Wie {@link FieldInput}, mit Augen-Symbol zum Ein-/Ausblenden des Passworts.
  * Mit `showRequirements` steht darunter, was das Passwort erfüllen muss.
+ * Meldet das Schema `validation.passwordMin`/`passwordMax`, erscheint die Grenze im Text.
  */
 export function FieldPasswordInput<TValue = string>({
     showRequirements = false,
+    errorParams,
     ...props
 }: Omit<FieldInputProps<TValue>, "type" | "rightButton"> & { showRequirements?: boolean }) {
     const { t } = useTranslation();
@@ -81,6 +93,7 @@ export function FieldPasswordInput<TValue = string>({
         <div className="grid gap-1.5">
             <FieldInput
                 {...props}
+                errorParams={{ ...PASSWORD_ERROR_PARAMS, ...errorParams }}
                 type={visible ? "text" : "password"}
                 rightButton={{
                     variant: "ghost",

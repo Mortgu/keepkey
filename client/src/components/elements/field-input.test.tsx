@@ -30,6 +30,18 @@ describe("FieldInput-Fehlermeldung", () => {
         expect(screen.queryByText("Select at least 1 product")).not.toBeNull();
     });
 
+    it("setzt Parameter in die übersetzte Meldung ein", async () => {
+        await act(() => i18n.changeLanguage("de"));
+        render(
+            <FieldInput
+                field={fieldWithError("validation.passwordMin" satisfies TranslationKey)}
+                errorParams={{ "validation.passwordMin": { count: 12 } }}
+            />,
+        );
+
+        expect(screen.queryByText("Mindestens 12 Zeichen")).not.toBeNull();
+    });
+
     it("zeigt eine Meldung ohne Schlüssel unverändert an", async () => {
         await act(() => i18n.changeLanguage("en"));
         render(<FieldInput field={fieldWithError("Name ist erforderlich")} />);

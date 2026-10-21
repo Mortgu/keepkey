@@ -3,16 +3,12 @@
         "create": "Flatrate erstellen",
         "search": "Pauschalen durchsuchen…",
         "total": "Gesamt:",
-        "loadError": {
-            "title": "Fehler",
-            "message": "Die Pauschalen konnten nicht geladen werden."
-        },
         "modal": {
-            "titleCreate": "Neue Flatrate anlegen",
-            "titleEdit": "Flatrate bearbeiten",
-            "nameLabel": "Name ({{language}})",
+            "createTitle": "Neue Flatrate anlegen",
+            "editTitle": "Flatrate bearbeiten",
+            "name": "Name ({{language}})",
             "namePlaceholder": "Flatrate Name",
-            "tableLabel": "Tabelle ({{language}})",
+            "table": "Tabelle ({{language}})",
             "tablePlaceholder": "Tabellenbeschreibung",
             "price": "Preis"
         }

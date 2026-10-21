@@ -12,9 +12,9 @@ import { authClient } from "@/lib/auth-client.ts";
 
 /** Meldungen sind Übersetzungsschlüssel — übersetzt wird bei der Anzeige. */
 const profileSchema = z.object({
-    salutation: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
-    firstName: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
-    lastName: z.string().min(1, "settings.validation.required" satisfies TranslationKey),
+    salutation: z.string().min(1, "validation.required" satisfies TranslationKey),
+    firstName: z.string().min(1, "validation.required" satisfies TranslationKey),
+    lastName: z.string().min(1, "validation.required" satisfies TranslationKey),
     phone: z.string(),
 });
 

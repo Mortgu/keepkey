@@ -12,11 +12,10 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { useTranslation } from "react-i18next";
 import ContractListItem from "./contract-item";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Contract } from "@keepit/schemas";
-import { Spinner } from "@/components";
+import { RouteError, Spinner } from "@/components";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 import { useReorderContracts } from "@/hooks/contracts/contract-mutations";
 
@@ -25,7 +24,6 @@ interface Props {
 }
 
 export default function ContractList({ onEdit }: Props) {
-    const { t } = useTranslation();
     const { contracts, isPending, error } = useContracts();
     const { reorderContracts } = useReorderContracts();
 
@@ -53,12 +51,7 @@ export default function ContractList({ onEdit }: Props) {
                 </div>
             )}
 
-            {error && (
-                <div className="w-full grid items-center justify-start py-8">
-                    <p className="text-(--destructive) text-lg font-semibold">{t("contracts.loadError.title")}</p>
-                    <p className="text-(--destructive) font-medium">{t("contracts.loadError.message")}</p>
-                </div>
-            )}
+            {error && <RouteError error={error} />}
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={contracts.map((contract) => contract.id)} strategy={verticalListSortingStrategy}>

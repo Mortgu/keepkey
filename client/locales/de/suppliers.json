@@ -11,8 +11,8 @@
     "delete": "Zulieferer löschen",
     "deleteConfirm": "Bist du dir sicher?",
     "modal": {
-      "editTitle": "Lieferant bearbeiten",
-      "createTitle": "Lieferant erstellen",
+      "editTitle": "Zulieferer bearbeiten",
+      "createTitle": "Zulieferer erstellen",
       "name": "Name",
       "supplierId": "ID"
     }

@@ -1,18 +1,14 @@
 {
     "flatrates": {
-        "create": "Create flatrate",
+        "create": "Create flat rate",
         "search": "Search flat rates…",
         "total": "Total:",
-        "loadError": {
-            "title": "Error",
-            "message": "Something went wrong trying to fetch flat rates!"
-        },
         "modal": {
-            "titleCreate": "Create new flat rate",
-            "titleEdit": "Edit flat rate",
-            "nameLabel": "Name ({{language}})",
+            "createTitle": "Create new flat rate",
+            "editTitle": "Edit flat rate",
+            "name": "Name ({{language}})",
             "namePlaceholder": "Flat rate name",
-            "tableLabel": "Table ({{language}})",
+            "table": "Table ({{language}})",
             "tablePlaceholder": "Table description",
             "price": "Price"
         }

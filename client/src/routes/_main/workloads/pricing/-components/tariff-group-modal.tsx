@@ -9,6 +9,7 @@ import type { TranslationKey } from "@/i18n";
 import {
     Button,
     Dialog,
+    Field,
     MultiSelectList,
 } from "@/components";
 import { useFormError, useLocale } from "@/hooks";
@@ -85,24 +86,20 @@ export default function TariffGroupModal({
             <Dialog.Body>
                 <form id="tariff-group-form" onSubmit={handleSubmit} className="grid gap-4">
                     <form.Field name="products" children={(field) => (
-                        <div className="grid gap-1">
-                            <label className="text-sm text-gray-500">{t("workloads.pricing.products")}</label>
-                            <MultiSelectList
-                                options={options}
-                                values={field.state.value}
-                                onChange={field.handleChange}
-                            />
-                            {formError(field.state.meta.errors) && (
-                                <p className="text-sm text-red-500">
-                                    {formError(field.state.meta.errors)}
-                                </p>
-                            )}
-                            {options.length === 0 && (
-                                <p className="text-sm text-(--fg-3)">
-                                    {t("workloads.pricing.groupModal.allAssigned")}
-                                </p>
-                            )}
-                        </div>
+                        <Field label={t("workloads.pricing.products")} error={formError(field.state.meta.errors)}>
+                            <div className="grid gap-1">
+                                <MultiSelectList
+                                    options={options}
+                                    values={field.state.value}
+                                    onChange={field.handleChange}
+                                />
+                                {options.length === 0 && (
+                                    <p className="text-sm text-(--fg-3)">
+                                        {t("workloads.pricing.groupModal.allAssigned")}
+                                    </p>
+                                )}
+                            </div>
+                        </Field>
                     )} />
                 </form>
             </Dialog.Body>

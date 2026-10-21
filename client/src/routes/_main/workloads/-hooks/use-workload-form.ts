@@ -9,7 +9,7 @@ interface Props {
 }
 
 const langFields = z.object({
-    name: z.string().min(1, "workloads.validation.nameRequired" satisfies TranslationKey),
+    name: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
     description: z.string(),
     table: z.string(),
 });
