@@ -1,6 +1,76 @@
 {
     "customer": {
         "create": "Create Customer",
-        "edit": "Edit Customer"
+        "edit": "Edit Customer",
+        "noResults": "No results found for “{{query}}”",
+        "validation": {
+            "salutationMissing": "Salutation missing",
+            "firstNameMissing": "First name missing",
+            "lastNameMissing": "Last name missing"
+        },
+        "list": {
+            "contactPerson": "Contact person",
+            "offers": "Offers",
+            "orders": "Orders",
+            "createOffer": "Create offer",
+            "createOrder": "Create order",
+            "confirmDelete": "Do you really want to delete the customer {{name}}?"
+        },
+        "modal": {
+            "createTitle": "Create new customer",
+            "editTitle": "Edit customer",
+            "customerNumber": "Customer no.",
+            "companyName": "Company name",
+            "phone": "Phone number",
+            "email": "Email",
+            "invoiceEmail": "Invoice email",
+            "countryPlaceholder": "Select country",
+            "currency": "Currency",
+            "taxRate": "Tax rate (%)",
+            "street": "Street",
+            "city": "City",
+            "zip": "Postal code",
+            "contactPersons": "Contact persons",
+            "addContactPerson": "Add contact person",
+            "removeContactPerson": "Remove contact person"
+        },
+        "contact": {
+            "listTitle": "Customer contact persons",
+            "createTitle": "Add contact person",
+            "editTitle": "Edit contact person",
+            "salutation": "Salutation",
+            "firstName": "First name",
+            "lastName": "Last name"
+        },
+        "salutationLine": {
+            "title": "Salutation line",
+            "placeholder": "e.g. Dear Ms. Müller, ..."
+        },
+        "detail": {
+            "tabs": {
+                "general": "General",
+                "flow": "Transactions",
+                "prices": "Prices"
+            }
+        },
+        "prices": {
+            "empty": "No individual price is stored for this customer — the list prices apply.",
+            "contract": "Contract",
+            "product": "Product",
+            "duration": "Term",
+            "quantity": "Quantity",
+            "customerPrice": "Customer price",
+            "listPrice": "List price",
+            "deviation": "Deviation",
+            "months_one": "{{count}} month",
+            "months_other": "{{count}} months",
+            "from": "from {{min}}",
+            "allProducts": "all products of the group",
+            "allProductsHint": "Legacy entry: applies to every product of the tariff group.",
+            "tierMissing": "Tier missing",
+            "orphanHint": "This quantity tier is not among the standard tiers. The price is kept but never applies — no quantity matches it any more.",
+            "noListPrice": "No list price is stored at this coordinate — the customer price stands alone.",
+            "remove": "Remove customer price — the list price applies again afterwards."
+        }
     }
 }

@@ -37,7 +37,7 @@ export default function SalutationLineModal({ onClose, contactPerson }: Salutati
             defaultOpen
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <Dialog.Header title="Anredezeile" description={fullName} />
+            <Dialog.Header title={t("customer.salutationLine.title")} description={fullName} />
             <Dialog.Body>
                 <form id="salutation-line-form" onSubmit={handleSubmit} className="grid gap-4">
                     <form.Field name="salutationLine" children={(field) => (
@@ -45,8 +45,8 @@ export default function SalutationLineModal({ onClose, contactPerson }: Salutati
                             id={field.name}
                             size="sm"
                             rows={5}
-                            label="Anredezeile"
-                            placeholder="z.B. Sehr geehrte Frau Müller, ..."
+                            label={t("customer.salutationLine.title")}
+                            placeholder={t("customer.salutationLine.placeholder")}
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                         />

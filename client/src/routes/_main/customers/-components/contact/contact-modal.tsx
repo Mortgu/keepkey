@@ -2,14 +2,15 @@ import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type { Contact } from "@keepit/schemas";
+import type { TranslationKey } from "@/i18n";
 import { useCreateCustomerContact, useUpdateCustomerContact } from "@/hooks";
 import { Button, Dialog, FieldInput } from "@/components";
 
 const contactPersonSchema = z.object({
-    salutation: z.string().min(1, "Anrede fehlt"),
-    firstName: z.string().min(1, "Vorname fehlt"),
-    lastName: z.string().min(1, "Nachname fehlt"),
-    email: z.email().nullable(),
+    salutation: z.string().min(1, "customer.validation.salutationMissing" satisfies TranslationKey),
+    firstName: z.string().min(1, "customer.validation.firstNameMissing" satisfies TranslationKey),
+    lastName: z.string().min(1, "customer.validation.lastNameMissing" satisfies TranslationKey),
+    email: z.email("validation.email" satisfies TranslationKey).nullable(),
 });
 
 interface Props {
@@ -70,25 +71,25 @@ export default function ContactModal({ customerId, contact, onClose }: Props) {
             size="lg"
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <Dialog.Header title={contact ? "Kontaktperson bearbeiten" : "Kontaktperson hinzufügen"} />
+            <Dialog.Header title={contact ? t("customer.contact.editTitle") : t("customer.contact.createTitle")} />
             <Dialog.Body>
                 <form id={`contact-form-${contact?.id ?? "new"}`} onSubmit={handleSubmit} className="grid gap-4">
                     <div className="flex items-center gap-2">
                         <contactForm.Field name="salutation" children={(field) => (
-                            <FieldInput field={field} label="Anrede" className="bg-white" />
+                            <FieldInput field={field} label={t("customer.contact.salutation")} className="bg-white" />
                         )} />
 
                         <contactForm.Field name="firstName" children={(field) => (
-                            <FieldInput field={field} label="Vorname" className="bg-white" />
+                            <FieldInput field={field} label={t("customer.contact.firstName")} className="bg-white" />
                         )} />
 
                         <contactForm.Field name="lastName" children={(field) => (
-                            <FieldInput field={field} label="Nachname" className="bg-white" />
+                            <FieldInput field={field} label={t("customer.contact.lastName")} className="bg-white" />
                         )} />
                     </div>
 
                     <contactForm.Field name="email" children={(field) => (
-                        <FieldInput field={field} label="E-Mail" className="bg-white" />
+                        <FieldInput field={field} label={t("customer.modal.email")} className="bg-white" />
                     )} />
                 </form>
             </Dialog.Body>

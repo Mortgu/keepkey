@@ -1,6 +1,76 @@
 {
     "customer": {
         "create": "Kunden anlegen",
-        "edit": "Kunden bearbeiten"
+        "edit": "Kunden bearbeiten",
+        "noResults": "Keine Ergebnisse für „{{query}}“",
+        "validation": {
+            "salutationMissing": "Anrede fehlt",
+            "firstNameMissing": "Vorname fehlt",
+            "lastNameMissing": "Nachname fehlt"
+        },
+        "list": {
+            "contactPerson": "Ansprechpartner",
+            "offers": "Angebote",
+            "orders": "Bestellungen",
+            "createOffer": "Angebot erstellen",
+            "createOrder": "Bestellung erstellen",
+            "confirmDelete": "Möchten Sie den Kunden {{name}} wirklich löschen?"
+        },
+        "modal": {
+            "createTitle": "Neuen Kunden anlegen",
+            "editTitle": "Kunden bearbeiten",
+            "customerNumber": "Kunden-Nr.",
+            "companyName": "Firmenname",
+            "phone": "Telefonnummer",
+            "email": "E-Mail",
+            "invoiceEmail": "Rechnungs-E-Mail",
+            "countryPlaceholder": "Land wählen",
+            "currency": "Währung",
+            "taxRate": "Steuersatz (%)",
+            "street": "Straße",
+            "city": "Stadt",
+            "zip": "Postleitzahl",
+            "contactPersons": "Ansprechpartner",
+            "addContactPerson": "Ansprechpartner hinzufügen",
+            "removeContactPerson": "Ansprechpartner entfernen"
+        },
+        "contact": {
+            "listTitle": "Kunden Kontaktpersonen",
+            "createTitle": "Kontaktperson hinzufügen",
+            "editTitle": "Kontaktperson bearbeiten",
+            "salutation": "Anrede",
+            "firstName": "Vorname",
+            "lastName": "Nachname"
+        },
+        "salutationLine": {
+            "title": "Anredezeile",
+            "placeholder": "z.B. Sehr geehrte Frau Müller, ..."
+        },
+        "detail": {
+            "tabs": {
+                "general": "Allgemein",
+                "flow": "Vorgänge",
+                "prices": "Preise"
+            }
+        },
+        "prices": {
+            "empty": "Für diesen Kunden ist kein eigener Preis hinterlegt — es gelten die Listenpreise.",
+            "contract": "Tarif",
+            "product": "Produkt",
+            "duration": "Laufzeit",
+            "quantity": "Menge",
+            "customerPrice": "Kundenpreis",
+            "listPrice": "Listenpreis",
+            "deviation": "Abweichung",
+            "months_one": "{{count}} Monat",
+            "months_other": "{{count}} Monate",
+            "from": "ab {{min}}",
+            "allProducts": "alle Produkte der Gruppe",
+            "allProductsHint": "Altbestand: gilt für jedes Produkt der Tarifgruppe.",
+            "tierMissing": "Staffel fehlt",
+            "orphanHint": "Diese Mengenstufe steht nicht in den Standard-Staffeln. Der Preis bleibt erhalten, greift aber nicht — es gibt keine Menge mehr, die ihn trifft.",
+            "noListPrice": "An dieser Koordinate ist kein Listenpreis hinterlegt — der Kundenpreis steht allein.",
+            "remove": "Kundenpreis entfernen — danach gilt wieder der Listenpreis."
+        }
     }
 }

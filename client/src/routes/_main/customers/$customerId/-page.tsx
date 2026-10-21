@@ -1,6 +1,3 @@
-import { Breadcrumbs, RouteError, Spinner, Tabs } from "@/components";
-import { useCustomer, useModal } from "@/hooks";
-import type { Customer } from "@keepit/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
@@ -8,12 +5,16 @@ import CustomerFlowTab from "./-components/tabs/customer-flow-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
 import { Route } from "./index";
+import type { TranslationKey } from "@/i18n";
+import type { Customer } from "@keepit/schemas";
+import { useCustomer, useModal } from "@/hooks";
+import { Breadcrumbs, RouteError, Spinner, Tabs } from "@/components";
 
 const TABS = [
-    { value: "general", label: "Allgemein" },
-    { value: "flow", label: "Vorgänge" },
-    { value: "prices", label: "Preise" },
-];
+    { value: "general", labelKey: "customer.detail.tabs.general" },
+    { value: "flow", labelKey: "customer.detail.tabs.flow" },
+    { value: "prices", labelKey: "customer.detail.tabs.prices" },
+] as const satisfies ReadonlyArray<{ value: string; labelKey: TranslationKey }>;
 
 export default function CustomerDetailPage() {
     const { t } = useTranslation();
@@ -52,7 +53,11 @@ export default function CustomerDetailPage() {
             <div className="w-full h-full flex">
                 <div className="w-full flex-2">
                     <div className="h-[42px] border-b border-(--border)">
-                        <Tabs tabs={TABS} value={tab} onChange={handleTabChange} />
+                        <Tabs
+                            tabs={TABS.map(({ value, labelKey }) => ({ value, label: t(labelKey) }))}
+                            value={tab}
+                            onChange={handleTabChange}
+                        />
                     </div>
 
                     <div className="gap-4 py-6">

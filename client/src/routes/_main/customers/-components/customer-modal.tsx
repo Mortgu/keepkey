@@ -1,17 +1,46 @@
 import { useForm } from "@tanstack/react-form";
 import { Plus, Trash2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { customerFormSchema } from "@keepit/schemas";
-import type { Customer, CustomerFormInput } from "@keepit/schemas";
+import { z } from "zod";
+import { createCustomerSchema } from "@keepit/schemas";
+import type { Customer } from "@keepit/schemas";
+import type { TranslationKey } from "@/i18n";
 import { Button, Dialog, FieldInput, FieldSelect, NumberField, Select } from "@/components";
-import { useCreateCustomer, useLocale, useUpdateCustomer } from "@/hooks";
+import { useCreateCustomer, useFormError, useLocale, useUpdateCustomer } from "@/hooks";
 import {
   CURRENCY_OPTIONS,
   countryOptions,
   findCountryByName,
   languageOptions,
 } from "@/lib/countries";
-import { getFormError } from "@/lib/utils";
+
+const invalidEmail = "validation.email" satisfies TranslationKey;
+
+/* Strikte UI-Validierung für das Kunden-Formular. Bewusst strenger als
+ * createCustomerSchema (das dem nullable DB/Server-Modell folgt): email
+ * required + formatgeprüft, Adressen required. customerId/language/currency
+ * werden vom Basis-Schema geerbt (nullish/enum); die Normalisierung von
+ * null/"" übernimmt das Server-Schema.
+ *
+ * Meldungen sind Übersetzungsschlüssel und werden erst bei der Anzeige
+ * aufgelöst (useFormError) — deshalb liegt das Schema im Client. */
+const customerFormSchema = createCustomerSchema.extend({
+  customerId: z.union([z.string(), z.undefined()]),
+  companyName: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
+  email: z.email(invalidEmail),
+  invoiceEmail: z.union([z.email(invalidEmail), z.undefined()]),
+  street: z.string(),
+  city: z.string(),
+  zip: z.string(),
+  phone: z.string(),
+  contactPersons: z.array(z.object({
+    salutation: z.string().min(1, "customer.validation.salutationMissing" satisfies TranslationKey),
+    firstName: z.string().min(1, "customer.validation.firstNameMissing" satisfies TranslationKey),
+    lastName: z.string().min(1, "customer.validation.lastNameMissing" satisfies TranslationKey),
+    email: z.union([z.literal(""), z.email(invalidEmail)]),
+  })),
+});
+type CustomerFormInput = z.infer<typeof customerFormSchema>;
 
 interface CustomerModalProps {
   onClose: () => void;
@@ -23,6 +52,7 @@ export default function CustomerModal({
   currentCustomer = null,
 }: CustomerModalProps) {
   const { t } = useTranslation();
+  const formError = useFormError();
   const language = useLocale();
   const isEdit = currentCustomer !== null;
 
@@ -91,7 +121,7 @@ export default function CustomerModal({
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? "Kunden bearbeiten" : "Neuen Kunden anlegen"} />
+      <Dialog.Header title={isEdit ? t("customer.modal.editTitle") : t("customer.modal.createTitle")} />
       <Dialog.Body>
         {
           errorCreatingCustomer ? (
@@ -104,19 +134,19 @@ export default function CustomerModal({
           <div className="flex items-center gap-4">
             <customerForm.Field name="customerId" children={(field) => (
               <div className="flex gap-2">
-                <FieldInput field={field} label="Kunden-Nr." size="sm" />
+                <FieldInput field={field} label={t("customer.modal.customerNumber")} size="sm" />
               </div>
             )} />
 
             <customerForm.Field name="companyName" children={(field) => (
               <div className="flex-3 grid gap-2">
-                <FieldInput field={field} label="Firmenname" size="sm" />
+                <FieldInput field={field} label={t("customer.modal.companyName")} size="sm" />
               </div>
             )} />
 
             <customerForm.Field name="phone" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <FieldInput field={field} label="Telefonnummer" size="sm" />
+                <FieldInput field={field} label={t("customer.modal.phone")} size="sm" />
               </div>
             )} />
           </div>
@@ -124,13 +154,13 @@ export default function CustomerModal({
           <div className="flex items-center gap-4">
             <customerForm.Field name="email" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <FieldInput field={field} label="E-Mail" size="sm" />
+                <FieldInput field={field} label={t("customer.modal.email")} size="sm" />
               </div>
             )} />
 
             <customerForm.Field name="invoiceEmail" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <FieldInput field={field} label="Rechnungs E-Mail" size="sm" />
+                <FieldInput field={field} label={t("customer.modal.invoiceEmail")} size="sm" />
               </div>
             )} />
           </div>
@@ -141,11 +171,11 @@ export default function CustomerModal({
                 <Select
                   id={field.name}
                   size="sm"
-                  label="Land"
+                  label={t("common.country")}
                   options={countryOptions(language)}
-                  placeholder="Land wählen"
+                  placeholder={t("customer.modal.countryPlaceholder")}
                   value={field.state.value}
-                  error={getFormError(field.state.meta.errors)}
+                  error={formError(field.state.meta.errors)}
                   onValueChange={(country) => {
                     const cfg = findCountryByName(country);
                     field.handleChange(cfg.name);
@@ -159,13 +189,13 @@ export default function CustomerModal({
 
             <customerForm.Field name="language" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <FieldSelect field={field} size="sm" label="Sprache" options={languageOptions(language)} />
+                <FieldSelect field={field} size="sm" label={t("common.language")} options={languageOptions(language)} />
               </div>
             )} />
 
             <customerForm.Field name="currency" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <FieldSelect field={field} size="sm" label="Währung" options={CURRENCY_OPTIONS} />
+                <FieldSelect field={field} size="sm" label={t("customer.modal.currency")} options={CURRENCY_OPTIONS} />
               </div>
             )} />
 
@@ -177,7 +207,7 @@ export default function CustomerModal({
                   max={100}
                   step={0.1}
                   onValueChange={(value) => field.handleChange(value ?? 0)}
-                  label="Steuersatz (%)" />
+                  label={t("customer.modal.taxRate")} />
               </div>
             )} />
           </div>
@@ -185,19 +215,19 @@ export default function CustomerModal({
           <div className="flex items-center gap-4">
             <customerForm.Field name="street" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <FieldInput field={field} size="sm" label="Straße" />
+                <FieldInput field={field} size="sm" label={t("customer.modal.street")} />
               </div>
             )} />
 
             <customerForm.Field name="city" children={(field) => (
               <div className="flex-2 grid gap-2">
-                <FieldInput field={field} size="sm" label="Stadt" />
+                <FieldInput field={field} size="sm" label={t("customer.modal.city")} />
               </div>
             )} />
 
             <customerForm.Field name="zip" children={(field) => (
               <div className="flex-1 grid gap-2">
-                <FieldInput field={field} size="sm" label="Postleitzahl" />
+                <FieldInput field={field} size="sm" label={t("customer.modal.zip")} />
               </div>
             )} />
           </div>
@@ -205,33 +235,33 @@ export default function CustomerModal({
           {!isEdit && (
             <customerForm.Field name="contactPersons" mode="array" children={(field) => (
               <div className="grid gap-2 border-t border-gray-200 pt-4">
-                <span className="text-sm text-gray-500">Ansprechpartner</span>
+                <span className="text-sm text-gray-500">{t("customer.modal.contactPersons")}</span>
 
                 {field.state.value.map((_, index) => (
                   <div key={index} className="flex items-start gap-2">
                     <customerForm.Field name={`contactPersons[${index}].salutation`} children={(itemField) => (
                       <div className="flex-1 min-w-0 grid grid-cols-1 gap-2">
-                        <FieldInput field={itemField} size="sm" label="Anrede" />
+                        <FieldInput field={itemField} size="sm" label={t("customer.contact.salutation")} />
                       </div>
                     )} />
                     <customerForm.Field name={`contactPersons[${index}].firstName`} children={(itemField) => (
                       <div className="flex-2 min-w-0 grid grid-cols-1 gap-2">
-                        <FieldInput field={itemField} size="sm" label="Vorname" />
+                        <FieldInput field={itemField} size="sm" label={t("customer.contact.firstName")} />
                       </div>
                     )} />
                     <customerForm.Field name={`contactPersons[${index}].lastName`} children={(itemField) => (
                       <div className="flex-2 min-w-0 grid grid-cols-1 gap-2">
-                        <FieldInput field={itemField} size="sm" label="Nachname" />
+                        <FieldInput field={itemField} size="sm" label={t("customer.contact.lastName")} />
                       </div>
                     )} />
                     <customerForm.Field name={`contactPersons[${index}].email`} children={(itemField) => (
                       <div className="flex-3 min-w-0 grid grid-cols-1 gap-2">
-                        <FieldInput field={itemField} size="sm" label="E-Mail" />
+                        <FieldInput field={itemField} size="sm" label={t("customer.modal.email")} />
                       </div>
                     )} />
                     <Button variant="secondary" size="sm" type="button" className="mt-6"
                       icon={<Trash2 className="size-4" />} iconOnly
-                      aria-label="Ansprechpartner entfernen"
+                      aria-label={t("customer.modal.removeContactPerson")}
                       onClick={() => field.removeValue(index)} />
                   </div>
                 ))}
@@ -239,7 +269,7 @@ export default function CustomerModal({
                 <Button type="button" variant="secondary" size="sm" className="justify-self-start"
                   icon={<Plus className="size-4" />}
                   onClick={() => field.pushValue({ salutation: "", firstName: "", lastName: "", email: "" })}>
-                  Ansprechpartner hinzufügen
+                  {t("customer.modal.addContactPerson")}
                 </Button>
               </div>
             )} />
