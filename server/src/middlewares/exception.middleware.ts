@@ -16,6 +16,11 @@ type ResolvedError = {
     body: Record<string, unknown> & { code: string; message: string };
 }
 
+/* TODO: Why code and message if the code is the translation key to the message?
+ *  Is it that the code is for the translations of the title and message is the displayed body? But then the Title is translated and the body not?
+ *  What about errors that are not in thouse maps? Where are they translated?? 
+*/
+
 const prismaErrorMap: Record<string, errorMapProps> = {
     P2002: { status: 409, code: "PRISMA_UNIQUE_CONSTRAINT", message: "Ein Eintrag mit diesen Werten existiert bereits." },
     P2003: { status: 409, code: "PRISMA_FOREIGN_KEY", message: "Dieser Datensatz kann nicht gelöscht werden, da er noch verwendet wird." },
