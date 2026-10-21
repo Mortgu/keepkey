@@ -14,12 +14,12 @@
     "reset_price": "Zurücksetzen",
     "no_tariff_hint": "Für dieses Produkt gibt es keine Preistabelle — ein Kundenpreis hängt an einem Tarif. Ordne das Produkt zuerst einer Tarifgruppe zu.",
     "customer": "Kunde",
-    "contract": "Vertrag",
+    "contract": "Tarif",
     "duration": "Laufzeit",
     "employee": "Unser Ansprechpartner",
     "contact": "Ihr Ansprechpartner",
     "quoteId": "Angebotsnummer",
-    "supplierId": "Lieferant",
+    "supplierId": "Zulieferer",
     "paymentTerm": "Zahlungsbedingung",
     "validFrom": "Gültig vom",
     "validUntil": "Gültig bis",
@@ -53,7 +53,7 @@
   "licenseExtension": {
     "title": "Lizenzerweiterung für {{orderId}}",
     "title_standalone": "Lizenzerweiterung (ohne Ursprungsangebot)",
-    "hint": "Zusätzliche Seats werden zu den Preisen des Ursprungsangebots berechnet. Produkt, Vertrag und Laufzeit bleiben unverändert.",
+    "hint": "Zusätzliche Seats werden zu den Preisen des Ursprungsangebots berechnet. Produkt, Tarif und Laufzeit bleiben unverändert.",
     "no_snapshot": "Für diese Position existiert keine eingefrorene Preistabelle — gerechnet wird mit ihrem gespeicherten Stückpreis, ohne Mengenstaffel."
   },
   "derived": {

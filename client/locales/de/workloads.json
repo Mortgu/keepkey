@@ -6,7 +6,7 @@
         "validation": {
             "productsRequired": "Mindestens 1 Produkt auswählen",
             "productsAssigned": "Mindestens 1 Produkt muss zugeordnet sein",
-            "contractsRequired": "Mindestens 1 Vertrag auswählen"
+            "contractsRequired": "Mindestens 1 Tarif auswählen"
         },
         "modal": {
             "createTitle": "Produkt erstellen",
@@ -32,9 +32,9 @@
                 "title": "Produkte bearbeiten"
             },
             "addContracts": {
-                "title": "Verträge hinzufügen",
-                "contracts": "Verträge",
-                "allAssigned": "Alle Verträge sind bereits dieser Preistabelle zugeordnet."
+                "title": "Tarife hinzufügen",
+                "contracts": "Tarife",
+                "allAssigned": "Alle Tarife sind bereits dieser Preistabelle zugeordnet."
             },
             "durations": {
                 "title": "Standardlaufzeiten",
@@ -67,9 +67,9 @@
                 "remove": "Alle Preise auf Mengenstufe {{min}} in dieser Preistabelle entfernen"
             },
             "delete": {
-                "title": "Vertrag aus dieser Preistabelle entfernen",
-                "confirm": "Vertrag „{{name}}“ aus dieser Preistabelle entfernen? Die Preistabelle ({{count}} Preise) und alle zugehörigen Kundenpreise werden gelöscht.",
-                "done": "Vertrag „{{name}}“ entfernt."
+                "title": "Tarif aus dieser Preistabelle entfernen",
+                "confirm": "Tarif „{{name}}“ aus dieser Preistabelle entfernen? Die Preistabelle ({{count}} Preise) und alle zugehörigen Kundenpreise werden gelöscht.",
+                "done": "Tarif „{{name}}“ entfernt."
             }
         }
     }

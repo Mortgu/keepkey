@@ -53,7 +53,7 @@ export default function CustomerPricesTab({ customer }: Props) {
                 <table className="w-full text-sm">
                     <thead className="bg-(--page-bg) border-b border-(--border) text-left">
                         <tr>
-                            <th className="px-4 py-2 font-medium">Vertrag</th>
+                            <th className="px-4 py-2 font-medium">Tarif</th>
                             <th className="px-4 py-2 font-medium">Produkt</th>
                             <th className="px-4 py-2 font-medium">Laufzeit</th>
                             <th className="px-4 py-2 font-medium">Menge</th>

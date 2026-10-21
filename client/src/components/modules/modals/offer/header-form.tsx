@@ -190,7 +190,7 @@ export default function HeaderForm() {
                         )} />
                     )}
 
-                    {/* Lieferant */}
+                    {/* Zulieferer */}
                     {shows("supplierId") && (
                         <form.Field name="supplierId" children={(field) => (
                             <Select

@@ -6,8 +6,8 @@
     "noFeatures": "Keine Features hinterlegt!",
     "move": "{{name}} verschieben",
     "modal": {
-      "editTitle": "Vertrag bearbeiten",
-      "createTitle": "Neuen Vertrag anlegen",
+      "editTitle": "Tarif bearbeiten",
+      "createTitle": "Neuen Tarif anlegen",
       "name": "Name ({{language}})",
       "features": "Features ({{language}}):",
       "featurePlaceholder": "Feature {{number}}",

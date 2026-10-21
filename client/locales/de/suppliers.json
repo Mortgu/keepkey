@@ -1,8 +1,8 @@
 {
   "suppliers": {
-    "description": "Zentrale Verwaltung der Lieferanten",
-    "searchPlaceholder": "Lieferanten durchsuchen…",
-    "create": "Lieferant erstellen",
+    "description": "Zentrale Verwaltung der Zulieferer",
+    "searchPlaceholder": "Zulieferer durchsuchen…",
+    "create": "Zulieferer erstellen",
     "offerCount_one": "{{count}} Angebot",
     "offerCount_other": "{{count}} Angebote",
     "orderCount_one": "{{count}} Bestellung",
