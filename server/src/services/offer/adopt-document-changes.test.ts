@@ -24,7 +24,7 @@ const document = {
 vi.mock("../../lib/prismaClient.js", () => {
     const tx = {
         $queryRaw: vi.fn(),
-        offerDocument: {
+        document: {
             findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args),
             findUniqueOrThrow: (...args: unknown[]) => offerDocumentFindUniqueOrThrow(...args),
             update: (...args: unknown[]) => offerDocumentUpdate(...args),
@@ -101,9 +101,11 @@ describe("adoptChanges", () => {
         });
         // Das Dokument gehört danach zur neuen Version und behält seinen Status.
         expect(offerDocumentUpdate).toHaveBeenCalledWith({
-            where: { id: "doc-1" },
+            where: { id: "doc-1", type: "OFFER" },
             data: { model: { paymentTerm: "14 Tage" }, sourceVersion: 5 },
         });
+        expect(offerDocumentFindUnique).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "doc-1", type: "OFFER" } }));
+        expect(offerDocumentFindUniqueOrThrow).toHaveBeenCalledWith(expect.objectContaining({ where: { id: "doc-1", type: "OFFER" } }));
         expect(assertOfferEditable).toHaveBeenCalledWith(expect.anything(), "offer-1");
     });
 

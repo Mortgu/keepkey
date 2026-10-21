@@ -46,8 +46,8 @@ export async function replaceOfferLines(
 
 /** Nach einer inhaltlichen Änderung passt kein bisher erzeugtes Dokument mehr. */
 export async function invalidateCurrentDocuments(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    await tx.offerDocument.updateMany({
-        where: { offerId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: "OFFER", offerId, isCurrent: true },
         data: { isCurrent: false },
     });
 }

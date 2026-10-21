@@ -77,8 +77,8 @@ export async function acceptOffer(
         data: { acceptedAt, acceptedSnapshot, version: { increment: 1 } },
     });
     // Reject in-flight document jobs that loaded live master data before acceptance.
-    await tx.offerDocument.updateMany({
-        where: { offerId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: "OFFER", offerId, isCurrent: true },
         data: { isCurrent: false },
     });
     return acceptedAt;

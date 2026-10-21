@@ -8,7 +8,7 @@ export async function deleteOffer(id: string): Promise<void> {
 
         await assertOfferEditable(tx, id);
 
-        if (await tx.offerDocument.count({ where: { offerId: id } }) > 0) {
+        if (await tx.document.count({ where: { type: "OFFER", offerId: id } }) > 0) {
             throw new AppException(
                 "Offers with document history cannot be deleted.",
                 409,

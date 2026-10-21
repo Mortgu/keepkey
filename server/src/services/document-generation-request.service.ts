@@ -63,8 +63,8 @@ export function requestOfferGeneration(
             assertNotFrozen(offer.acceptedAt, "OFFER_ACCEPTED", "Accepted offers cannot generate new documents.");
             return offer.version;
         },
-        findActive: (tx, sourceVersion) => tx.offerDocument.findFirst({
-            where: { offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+        findActive: (tx, sourceVersion) => tx.document.findFirst({
+            where: { type: "OFFER", offerId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.offer.update({
@@ -73,8 +73,9 @@ export function requestOfferGeneration(
             select: { documentVersion: true },
         })).documentVersion,
         createDocument: async (tx, taskId, version, sourceVersion) => {
-            await tx.offerDocument.create({
+            await tx.document.create({
                 data: {
+                    type: "OFFER",
                     displayName: displayNameForVersion(version),
                     offerId,
                     version,
@@ -98,8 +99,8 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
             assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return order.version;
         },
-        findActive: (tx, sourceVersion) => tx.orderDocument.findFirst({
-            where: { orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+        findActive: (tx, sourceVersion) => tx.document.findFirst({
+            where: { type: "ORDER", orderId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.order.update({
@@ -108,8 +109,9 @@ export function requestOrderGeneration(orderId: string): Promise<Task> {
             select: { documentVersion: true },
         })).documentVersion,
         createDocument: async (tx, taskId, version, sourceVersion) => {
-            await tx.orderDocument.create({
+            await tx.document.create({
                 data: {
+                    type: "ORDER",
                     orderId,
                     version,
                     sourceVersion,
@@ -140,8 +142,8 @@ export function requestConfirmationGeneration(confirmationId: string): Promise<T
             assertNotFrozen(confirmation.order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return null;
         },
-        findActive: (tx, sourceVersion) => tx.confirmationDocument.findFirst({
-            where: { confirmationId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+        findActive: (tx, sourceVersion) => tx.document.findFirst({
+            where: { type: "CONFIRMATION", confirmationId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.confirmation.update({
@@ -150,8 +152,9 @@ export function requestConfirmationGeneration(confirmationId: string): Promise<T
             select: { documentVersion: true },
         })).documentVersion,
         createDocument: async (tx, taskId, version, sourceVersion) => {
-            await tx.confirmationDocument.create({
+            await tx.document.create({
                 data: {
+                    type: "CONFIRMATION",
                     confirmationId,
                     version,
                     sourceVersion,
@@ -181,8 +184,8 @@ export function requestInvoiceGeneration(invoiceId: string): Promise<Task> {
             assertNotFrozen(invoice.order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
             return null;
         },
-        findActive: (tx, sourceVersion) => tx.invoiceDocument.findFirst({
-            where: { invoiceId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
+        findActive: (tx, sourceVersion) => tx.document.findFirst({
+            where: { type: "INVOICE", invoiceId, sourceVersion, deletedAt: null, status: { in: ["PENDING", "PROCESSING"] } },
             select: { task: true },
         }),
         nextVersion: async (tx) => (await tx.invoice.update({
@@ -191,8 +194,9 @@ export function requestInvoiceGeneration(invoiceId: string): Promise<Task> {
             select: { documentVersion: true },
         })).documentVersion,
         createDocument: async (tx, taskId, version, sourceVersion) => {
-            await tx.invoiceDocument.create({
+            await tx.document.create({
                 data: {
+                    type: "INVOICE",
                     invoiceId,
                     version,
                     sourceVersion,
