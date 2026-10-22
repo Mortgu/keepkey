@@ -77,5 +77,14 @@
   "ORDER_CANCELLED": "Diese Bestellung wurde storniert und kann nicht mehr geändert werden.",
   "ORDER_DELETE_FORBIDDEN": "Bestellungen können nur storniert werden.",
   "INVALID_ACCEPTED_OFFER_SNAPSHOT": "Die gespeicherten Angebotsdaten sind ungültig.",
-  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten."
+  "VALIDATION_ERROR": "Bitte prüfe die eingegebenen Daten.",
+  "CONFIRMATION_EXISTS": "Zu dieser Bestellung existiert bereits eine Auftragsbestätigung.",
+  "CONFIRMATION_ID_TAKEN": "Diese AB-Nummer ist bereits vergeben.",
+  "CONFIRMATION_NOT_FOUND": "Auftragsbestätigung nicht gefunden.",
+  "CONFIRMATION_HAS_DOCUMENT": "Die Auftragsbestätigung hat noch ein aktives Dokument. Löschen Sie zuerst das Dokument.",
+  "INVOICE_EXISTS": "Zu dieser Bestellung existiert bereits eine Rechnung.",
+  "INVOICE_ID_TAKEN": "Diese Rechnungsnummer ist bereits vergeben.",
+  "INVOICE_NOT_FOUND": "Rechnung nicht gefunden.",
+  "INVOICE_HAS_DOCUMENT": "Die Rechnung hat noch ein aktives Dokument. Löschen Sie zuerst das Dokument.",
+  "PURCHASE_POSITIONS_MISMATCH": "Die Einkaufspreise passen nicht zu den Positionen des Angebots. Bitte Dialog neu öffnen."
 }

@@ -2,3 +2,10 @@ packages:
   - client
   - server
   - shared
+
+onlyBuiltDependencies:
+  - "@prisma/engines"
+  - prisma
+  - esbuild
+  - msgpackr-extract
+  - unrs-resolver

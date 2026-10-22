@@ -1,7 +1,10 @@
 {
   "invoices": {
     "description": "Zentrale Verwaltung der Rechnungen",
-    "searchPlaceholder": "AG-Nr. suchen…",
-    "create": "Rechnung erstellen"
+    "searchPlaceholder": "Rechnungs-, Bestell-Nr. oder Kunde suchen…",
+    "create": "Rechnung erstellen",
+    "order": "Bestellung",
+    "date": "Datum",
+    "empty": "Noch keine Rechnungen. Rechnungen werden an der Bestellung erstellt."
   }
 }

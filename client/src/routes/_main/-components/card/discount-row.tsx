@@ -1,12 +1,14 @@
 import type { OfferDiscount } from "@keepit/schemas";
-import { formatEur } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 type Props = {
-    discount: OfferDiscount;
+    /** Angebot- und Bestellrabatte teilen Titel/Beschreibung/Betrag — nur diese Felder werden gerendert. */
+    discount: Pick<OfferDiscount, "title" | "description" | "amount_cents">;
 };
 
 export default function DiscountRow({ discount }: Props) {
     const { title, description, amount_cents } = discount;
+    const { formatEur } = useFormatters();
 
     return (
         <div className="flex items-center justify-between gap-2 py-3 border-b border-(--border) last:border-0">

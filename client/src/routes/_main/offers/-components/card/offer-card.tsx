@@ -1,28 +1,25 @@
-import { ChevronRight, Pen, Trash, UndoDot } from "lucide-react";
+import { ChevronRight, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
-import OfferDrawerHistory from "../drawer/offer-drawer-history";
-import OfferModal from "../modals/offer-modal";
-import type { OfferModalMode } from "../modals/offer-modal-policy";
-import type { Offer, OfferDocument } from '@keepit/schemas';
 import { Accordion, Badge, Button } from "@/components";
+import { useFormatters, useModal } from "@/hooks";
+import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import OrderCreateModal from "@/routes/_main/orders/-components/order-create-modal";
-import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
-import { useModal } from "@/hooks";
-import { formatDate } from "@/lib/format";
-import { formatEur } from "@/utils/utils";
-import { Link } from "@tanstack/react-router";
+import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
+import type { Offer, OfferDocument } from '@keepit/schemas';
+import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 
 type OfferListItemProps = {
     offer: Offer;
 };
 
 export default function OfferCard({ offer }: OfferListItemProps) {
+    const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
 
     /** `data` trägt nur die Variante — die Quelle ist immer das Angebot dieser Karte. */
@@ -46,7 +43,6 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
 
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
     const [openSections, setOpenSections] = useState<Array<string>>([]);
 
     const handleGenerateDocument = async () => {
@@ -70,7 +66,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             <div className="flex items-start justify-between gap-4 px-4 py-3">
                 <div className="grid gap-0">
                     <div className="flex items-center gap-2">
-                        <Link to="/offers/$offer" params={{ offer: quoteId }} className="text-md font-mono font-semibold text-(--text) hover:underline">AG{quoteId}</Link>
+                        <a className="text-md font-mono font-semibold text-(--text)">AG{quoteId}</a>
                         {offer.derivationType === "RENEWAL" && (
                             <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                         )}
@@ -147,7 +143,8 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                             variant="secondary"
                             size="xs"
                             loading={isGenerating}
-                            disabled={isGenerating}
+                            disabled={isGenerating || Boolean(offer.acceptedAt)}
+                            title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}
                             onClick={handleGenerateDocument}
                         >
                             Dokument generieren
@@ -160,6 +157,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                             type="offer"
                             parentId={offer.id}
                             document={document}
+                            locked={Boolean(offer.acceptedAt)}
                         />
                     ))}
 
@@ -205,15 +203,6 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     <Button
                         size="xs"
                         variant="border"
-                        title={t("versionHistory.title")}
-                        onClick={() => setDrawerOpen(true)}
-                        icon={<UndoDot className="size-3" />}
-                        iconOnly
-                    />
-
-                    <Button
-                        size="xs"
-                        variant="border"
                         disabled={Boolean(offer.acceptedAt)}
                         title={offer.acceptedAt ? t("orders.acceptedHint") : t("orders.edit")}
                         onClick={() => offerModal.open()}
@@ -235,14 +224,11 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </div>
             </div>
 
-            <OfferDrawerHistory open={drawerOpen} onClose={() => setDrawerOpen(false)} offer={offer} />
-
             {orderModal.isOpen && (
-                <OrderCreateModal
+                <OrderModal
                     key={orderModal.key}
                     offer={offer}
                     onClose={orderModal.close}
-                    onCreated={orderModal.close}
                 />
             )}
 

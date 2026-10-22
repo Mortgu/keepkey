@@ -1,9 +1,9 @@
-import { Input } from "@/components";
 import { Autocomplete } from "@base-ui/react";
 import { matchSorter } from 'match-sorter';
 import { useTranslation } from "react-i18next";
-import type { CustomerFilters } from "../-page.hooks";
 import { Search } from "lucide-react";
+import type { CustomerFilters } from "../-page.hooks";
+import { Input } from "@/components";
 
 export interface CustomerFuzzyItem {
     title: string;
@@ -30,7 +30,9 @@ export default function CustomerAutocomplete({ items, filters }: Props) {
                     <Autocomplete.Popup className="w-(--anchor-width) max-w-(--available-width) border border-(--border) bg-white text-neutral-950 rounded-md">
                         <Autocomplete.Empty>
                             <div className="py-3 pr-4 pl-2 text-sm leading-4 text-neutral-500">
-                                No results found for "{<Autocomplete.Value />}"
+                                <Autocomplete.Value>
+                                    {(value) => t("customer.noResults", { query: value })}
+                                </Autocomplete.Value>
                             </div>
                         </Autocomplete.Empty>
 

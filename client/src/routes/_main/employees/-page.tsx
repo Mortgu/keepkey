@@ -19,7 +19,7 @@ export default function EmployeePage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.employees"), to: "/employees" },
                     ]}
                 />

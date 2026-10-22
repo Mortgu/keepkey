@@ -2,7 +2,9 @@
   "templates": {
     "kind": {
       "OFFER": "Angebotsvorlagen",
-      "ORDER": "Bestellvorlagen"
+      "ORDER": "Bestellvorlagen",
+      "CONFIRMATION": "Auftragsbestätigungsvorlagen",
+      "INVOICE": "Rechnungsvorlagen"
     },
     "language": {
       "DE": "Deutsch",

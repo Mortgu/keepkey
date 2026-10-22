@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { Pen, Trash, User } from "lucide-react";
-import type { Customer } from "@keepit/schemas";
-import { type SyntheticEvent } from "react";
-import { formatDate } from "@/lib/format";
-import { useDeleteCustomer, useModal } from "@/hooks";
-import { Button } from "@/components";
+import { useTranslation } from "react-i18next";
 import ContactsModal from "./contact/contacts-modal";
+import type {SyntheticEvent} from "react";
+import type { Customer } from "@keepit/schemas";
+import { useDeleteCustomer, useFormatters, useModal } from "@/hooks";
+import { Button } from "@/components";
 
 interface Props {
     customer: Customer;
@@ -15,13 +15,15 @@ interface Props {
 }
 
 export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCreateOrder }: Props) {
+    const { t } = useTranslation();
+    const { formatDate } = useFormatters();
     const { deleteCustomer, isDeletingCustomer } = useDeleteCustomer();
     const contactsModal = useModal();
 
     const handleDeleteCustomer = (event: SyntheticEvent<HTMLButtonElement>) => {
         event.preventDefault();
 
-        if (confirm(`Möchten Sie den Kunden ${customer.companyName} wirklich löschen?`)) {
+        if (confirm(t("customer.list.confirmDelete", { name: customer.companyName }))) {
             deleteCustomer({ customerId: customer.id });
         }
 
@@ -40,7 +42,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
 
                 <div className="flex items-center">
                     <div className="grid gap-1 text-right border-r border-(--border) pr-6">
-                        <p className="text-xs text-gray-400">Ansprechpartner</p>
+                        <p className="text-xs text-gray-400">{t("customer.list.contactPerson")}</p>
                         <p className="text-md">
                             {customer.contactPersons.length ? (
                                 <span>
@@ -56,11 +58,11 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                         </p>
                     </div>
                     <div className="grid gap-1 text-right border-r border-(--border) px-6">
-                        <p className="text-xs text-gray-400">Angebote</p>
+                        <p className="text-xs text-gray-400">{t("customer.list.offers")}</p>
                         <p className="font-mono text-md">{customer._count.offers}</p>
                     </div>
                     <div className="grid gap-1 text-right pl-6">
-                        <p className="text-xs text-gray-400">Bestellungen</p>
+                        <p className="text-xs text-gray-400">{t("customer.list.orders")}</p>
                         <p className="font-mono text-md">{customer._count.orders}</p>
                     </div>
                 </div>
@@ -69,8 +71,8 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
 
             <div className="flex items-center justify-between px-2 py-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
-                    <Button size="xs" variant="border" onClick={onCreateOffer}>Angebot erstellen</Button>
-                    <Button size="xs" variant="border" onClick={onCreateOrder}>Bestellung erstellen</Button>
+                    <Button size="xs" variant="border" onClick={onCreateOffer}>{t("customer.list.createOffer")}</Button>
+                    <Button size="xs" variant="border" onClick={onCreateOrder}>{t("customer.list.createOrder")}</Button>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -105,7 +107,7 @@ export default function CustomerListItem({ customer, onEdit, onCreateOffer, onCr
                 <ContactsModal
                     key={contactsModal.key}
                     customerId={customer.id}
-                    contacts={customer.contactPersons ?? []}
+                    contacts={customer.contactPersons}
                     onClose={contactsModal.close}
                 />
             )}

@@ -22,25 +22,25 @@ export default function UserModal({ onClose, currentEmployee }: Props) {
             defaultOpen
             onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
         >
-            <Dialog.Header title={currentEmployee ? "Angestellten bearbeiten" : "Neuen Angestellten anlegen"} />
+            <Dialog.Header title={currentEmployee ? t("employees.modal.editTitle") : t("employees.modal.createTitle")} />
             <Dialog.Body>
                 <form id={formId} onSubmit={handleSubmit} className="grid gap-4">
                     <div className="flex items-center gap-4">
                         <form.Field name="salutation" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} label="Anrede" size="sm" />
+                                <FieldInput field={field} label={t("employees.modal.salutation")} size="sm" />
                             </div>
                         )} />
 
                         <form.Field name="firstName" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} size="sm" label="Vorname" />
+                                <FieldInput field={field} size="sm" label={t("employees.modal.firstName")} />
                             </div>
                         )} />
 
                         <form.Field name="lastName" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} size="sm" label="Nachname" />
+                                <FieldInput field={field} size="sm" label={t("employees.modal.lastName")} />
                             </div>
                         )} />
                     </div>
@@ -48,19 +48,19 @@ export default function UserModal({ onClose, currentEmployee }: Props) {
                     <div className="flex items-center gap-4">
                         <form.Field name="email" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} label="E-Mail" size="sm" />
+                                <FieldInput field={field} label={t("employees.modal.email")} size="sm" />
                             </div>
                         )} />
 
                         <form.Field name="phone" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldInput field={field} label="Telefonnummer" size="sm" />
+                                <FieldInput field={field} label={t("employees.modal.phone")} size="sm" />
                             </div>
                         )} />
 
                         <form.Field name="password" children={(field) => (
                             <div className="flex-1 grid gap-2">
-                                <FieldPasswordInput field={field} size="sm" label="Passwort" showRequirements />
+                                <FieldPasswordInput field={field} size="sm" label={t("employees.modal.password")} showRequirements />
                             </div>
                         )} />
                     </div>

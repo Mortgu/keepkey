@@ -25,6 +25,8 @@ const offerTemplateProductGroupSchema = z.object({
     features: z.array(z.string()),
     _duration: z.number({}), // The raw number
     duration: z.string(),    // The formated string
+    /** "1. ", "2. " … bei Vergleichsangeboten, sonst leer. Fehlt in älteren Snapshots. */
+    numberPrefix: z.string().default(""),
 });
 
 export type OfferTemplateGroup = z.infer<typeof offerTemplateProductGroupSchema>;
@@ -81,6 +83,8 @@ export const offerTemplateSchema = z.object({
         products: z.string(),
         contract: z.string(),
         duration: z.string(), // Jahre
+        /** Wie bei den Gruppen. */
+        numberPrefix: z.string().default(""),
         items: z.array(offerTemplateProductItemSchema),
         flatrates: z.array(z.object({
             name: z.string(),

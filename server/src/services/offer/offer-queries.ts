@@ -1,26 +1,60 @@
 import { OfferFilterParams } from '@keepit/schemas';
+import type { Prisma } from "@prisma/client";
 
-import { presentOffer } from "../accepted-offer-view.js";
-import { prisma } from "../../lib/prismaClient.js";
 import { AppException } from "../../lib/exceptions.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { presentAcceptedOffer } from "../accepted-offer-view.js";
+
+/**
+ * Schlanke Order-Teilansicht fürs Angebot — nur Status, keine Artefakte.
+ * Reicht, um pro Angebot den Stufenzustand (Vorgänge-Tabelle/-Seite) abzuleiten,
+ * ohne für jede Zeile zusätzliche Requests auszulösen.
+ */
+const orderSummaryInclude = {
+    select: {
+        id: true,
+        orderId: true,
+        date: true,
+        cancelledAt: true,
+        version: true,
+        documents: { where: { deletedAt: null }, select: { status: true } },
+        confirmation: {
+            select: {
+                id: true, confirmationId: true, date: true,
+                documents: { select: { status: true } },
+            },
+        },
+        invoice: {
+            select: {
+                id: true, invoiceId: true, date: true,
+                documents: { select: { status: true } },
+            },
+        },
+    },
+} satisfies Prisma.Offer$ordersArgs;
 
 export async function getOffers(query: OfferFilterParams) {
-    const { search, companyIds, contactPersonIds, productIds, sort, cursor } = query;
+    const { search, status, companyIds, contactPersonIds, productIds, sort, cursor } = query;
 
     const limitRaw = Number(query.limit);
     const limit = Number.isFinite(limitRaw) && limitRaw > 0
         ? Math.min(Math.trunc(limitRaw), 100)
         : 50;
 
-    const where: {
-        quoteId?: { contains: string };
-        customerId?: { in: string[] };
-        contactPersonId?: { in: string[] };
-        offerPositions?: { some: { productId: { in: string[] } } };
-    } = {};
+    const where: Prisma.OfferWhereInput = {};
 
-    if (search && typeof search === "string") {
-        where.quoteId = { contains: search };
+    if (search && typeof search === "string" && search.trim()) {
+        const contains = { contains: search.trim(), mode: "insensitive" as const };
+        where.OR = [
+            { quoteId: contains },
+            { customer: { companyName: contains } },
+            { customerContactPerson: { firstName: contains } },
+            { customerContactPerson: { lastName: contains } },
+        ];
+    }
+
+    if (status === "open") {
+        where.acceptedAt = null;
     }
 
     if (companyIds) {
@@ -73,12 +107,18 @@ export async function getOffers(query: OfferFilterParams) {
                 }
             },
             offerDiscounts: true,
+            orders: {
+                include: {
+                    confirmation: true,
+                    invoice: true,
+                }
+            },
         },
     });
 
     const nextCursor = items.length === limit ? items[items.length - 1]?.id ?? null : null;
 
-    return { items: items.map(presentOffer), nextCursor };
+    return { items: items.map(presentAcceptedOffer), nextCursor };
 }
 
 export async function getOfferById(id: string) {
@@ -105,8 +145,17 @@ export async function getOfferById(id: string) {
                     }
                 }
             },
-            offerFlatRates: true,
+            offerFlatRates: {
+                include: {
+                    flatRate: {
+                        include: { translations: true }
+                    }
+                }
+            },
             offerDiscounts: true,
+            // Aktuell kein anderer Aufrufer dieser Funktion — bei einem zweiten
+            // Aufrufer ggf. ebenfalls hinter einem Flag gaten.
+            orders: orderSummaryInclude,
         },
     });
 
@@ -114,10 +163,5 @@ export async function getOfferById(id: string) {
         throw new AppException("Offer not found!", 404, "OFFER_NOT_FOUND");
     }
 
-    return presentOffer(offer);
-}
-
-export async function getNextQuoteId(): Promise<number> {
-    const quoteId = 0; //await getLatestQuoteId();
-    return quoteId + 1;
+    return presentAcceptedOffer(offer);
 }

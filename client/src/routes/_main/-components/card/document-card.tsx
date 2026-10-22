@@ -1,26 +1,27 @@
 import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
-import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, LoaderCircle, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
+import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
 import { useDropzone } from "react-dropzone";
+import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
-import { toast } from "react-toastify";
-import { useRef, useState } from "react";
-import '@docx-editor.dev/core/styles/editor.css';
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Menu } from "@base-ui/react";
-import type { DocxEditorRef } from "@docx-editor.dev/react";
-import type { DocumentType, OfferDocument, OrderDocument } from "@keepit/schemas";
-import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, Tooltip, buttonStyles, menuStyles } from "@/components";
+import { handleReplacementWarnings } from "./replacement-warnings";
+import type { ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument } from "@keepit/schemas";
+import type { FieldChange } from "@/components";
+import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, ReplacementChangesModal, Spinner, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
 import {
     documentDownloadUrl,
+    replaceBlockerMessage,
     useDocumentCapabilities,
     useDocumentMutations,
     useDocumentTask,
+    useFormatters,
     useLocale,
-    useModal
+    useModal,
 } from "@/hooks";
 import { api } from "@/lib/api-client";
 import { getDocumentStatus } from "@/utils/status";
-import { formatDate } from "@/lib/format";
 import { formatBytesToKB } from "@/lib/utils";
 
 const cardStyles = tv({
@@ -49,21 +50,27 @@ interface Props {
     type: DocumentType;
     /** Id des Angebots bzw. der Bestellung. */
     parentId: string;
-    document: OfferDocument | OrderDocument;
+    document: OfferDocument | OrderDocument | ConfirmationDocument | InvoiceDocument;
+    /** Das Elternobjekt ist eingefroren (z.B. ein angenommenes Angebot) — Edit/Rename/Delete/Replace sind gesperrt. */
+    locked?: boolean;
 }
 
-export default function DocumentCard({ type, parentId, document }: Props) {
+export default function DocumentCard({ type, parentId, document, locked = false }: Props) {
+    const { formatDate } = useFormatters();
     const locales = useLocale();
+    const { t } = useTranslation();
 
     const pdf = findDocumentArtifact(document.artifacts, "PDF");
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
 
     const mutations = useDocumentMutations(type, parentId);
+    // Abweichungen der zuletzt ersetzten Datei, über die der Nutzer noch entscheidet.
+    const [changes, setChanges] = useState<Array<FieldChange> | null>(null);
 
     const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
 
     const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
-    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile;
+    const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile && !locked;
 
     /*
      * Beim Ersetzen wird die PDF serverseitig neu aus der DOCX erzeugt. Das
@@ -85,24 +92,30 @@ export default function DocumentCard({ type, parentId, document }: Props) {
         // stand hier vorher trotzdem "erfolgreich ersetzt".
         onDrop: async (acceptedFiles) => {
             const [file] = acceptedFiles;
+            // Ein leerer Drop liefert kein Element, auch wenn der Typ das nicht abbildet.
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
             if (file === undefined) return;
 
             try {
-                await mutations.replaceDocumentFile({
+                const replaced = await mutations.replaceDocumentFile({
                     documentId: document.id,
                     format: "docx",
                     file,
                 });
-                toast.success("Datei wurde ersetzt.");
-            } catch (error) {
-                toast.error(error instanceof Error ? error.message : "Datei konnte nicht ersetzt werden.");
+                showToast.success("documents.toast.replaced");
+                handleReplacementWarnings(replaced.warnings, setChanges);
+            } catch {
+                // Der globale onError-Handler zeigt die Server-Meldung bereits an.
             }
         },
-        onDropRejected(fileRejections, _) {
-            toast.error(`File rejected! ${fileRejections.map(r => r.errors.map(e => e.message).join(" & "))}`)
+        onDropRejected(fileRejections) {
+            const reason = fileRejections
+                .flatMap(r => r.errors.map(e => e.message))
+                .join(" & ");
+            showToast.error("documents.toast.fileRejected", { vars: { reason } });
         },
         onError(err) {
-            toast.error(`File rejected! ${err.message}`)
+            showToast.error("documents.toast.fileRejected", { vars: { reason: err.message } });
         },
     });
     const styles = cardStyles({ focused: dropzone.isFocused });
@@ -111,9 +124,8 @@ export default function DocumentCard({ type, parentId, document }: Props) {
     const canPreview = (document.status === "GENERATED" || document.status === "UPLOADED") && Boolean(pdf);
 
     const remoteOutdated = hasOutdatedRemote(document.artifacts);
-    const task = useDocumentTask(document.taskId);
+    useDocumentTask(document.taskId);
 
-    const editorRef = useRef<DocxEditorRef>(null);
     const [bytes, setBytes] = useState<Uint8Array>();
     const [editDocx, setEditDocx] = useState<boolean>(false);
 
@@ -254,9 +266,10 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Download Button */}
                             {(document.status === "GENERATED" || document.status === "UPLOADED") && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger
+                                        className={menuStyles().Trigger()}
+                                        render={<Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />}
+                                    />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
@@ -275,16 +288,24 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Menu Button */}
                             {(document.status !== "UPLOADING" && !isBusy) && (
                                 <Menu.Root>
-                                    <Menu.Trigger className={menuStyles().Trigger()}>
-                                        <Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />
-                                    </Menu.Trigger>
+                                    <Menu.Trigger
+                                        className={menuStyles().Trigger()}
+                                        render={<Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />}
+                                    />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
                                                 <Menu.Item className={menuStyles().Item()} disabled>
                                                     <ExternalLink size={14} /> View in NextCloud
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => dropzone.open()}>
+                                                {/* react-dropzone liefert zur Laufzeit `open: null`, solange die
+                                                    Zone deaktiviert ist — entgegen seiner Typen. */}
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={!canReplace}
+                                                    title={canReplace ? undefined : replaceBlockerMessage(replaceBlocker)}
+                                                    onClick={() => { if (canReplace) dropzone.open(); }}
+                                                >
                                                     <Replace size={14} /> Replace File
                                                 </Menu.Item>
                                                 {canPreview && (
@@ -292,17 +313,32 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                                                         <Eye size={14} /> Vorschau
                                                     </Menu.Item>
                                                 )}
-                                                <Menu.Item className={menuStyles().Item()} onClick={async () => {
-                                                    const result = await refetch();
-                                                    if (result.data) setBytes(result.data);
-                                                    setEditDocx(true)
-                                                }}>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={async () => {
+                                                        const result = await refetch();
+                                                        if (result.data) setBytes(result.data);
+                                                        setEditDocx(true)
+                                                    }}>
                                                     <Pencil size={14} /> Edit
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => renameModal.open()}>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={() => renameModal.open()}
+                                                >
                                                     <Pencil size={14} /> Rename File
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => mutations.deleteDocument(document.id)} data-danger>
+                                                <Menu.Item
+                                                    className={menuStyles().Item()}
+                                                    disabled={locked}
+                                                    title={locked ? t("orders.acceptedHint") : undefined}
+                                                    onClick={() => mutations.deleteDocument(document.id)}
+                                                    data-danger
+                                                >
                                                     <Trash2 size={14} /> Delete
                                                 </Menu.Item>
                                             </Menu.Popup>
@@ -314,7 +350,7 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                             {/* Loader Circle */}
                             {isBusy && (
                                 <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
-                                    <LoaderCircle size={16} strokeWidth={2} className="animate-spin" />
+                                    <Spinner size={16} />
                                 </div>
                             )}
                         </div>
@@ -332,6 +368,17 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                     />
                 )}
 
+                {changes && (
+                    <ReplacementChangesModal
+                        changes={changes}
+                        isPending={mutations.isAdoptingChanges}
+                        onClose={() => setChanges(null)}
+                        onAdopt={async (fields) => {
+                            await mutations.adoptChanges({ documentId: document.id, fields });
+                            showToast.success("documents.toast.adopted");
+                        }}
+                    />
+                )}
                 {renameModal.isOpen && (
                     <DocumentRenameModal
                         key={renameModal.key}
@@ -355,15 +402,17 @@ export default function DocumentCard({ type, parentId, document }: Props) {
                         displayName={document.displayName ?? document.id + ".docx"}
                         onSave={async (file) => {
                             try {
-                                await mutations.replaceDocumentFile({
+                                const replaced = await mutations.replaceDocumentFile({
                                     documentId: document.id,
                                     format: "docx",
                                     file,
                                 });
-                                toast.success("Datei wurde gespeichert.");
+                                showToast.success("documents.toast.saved");
                                 setEditDocx(false);
-                            } catch (error) {
-                                toast.error(error instanceof Error ? error.message : "Datei konnte nicht gespeichert werden.");
+                                handleReplacementWarnings(replaced.warnings, setChanges);
+                            } catch {
+                                // Editor offen lassen, damit nichts verloren geht;
+                                // der globale onError-Handler meldet den Fehler.
                             }
                         }}
                         onClose={() => {

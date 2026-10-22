@@ -10,6 +10,7 @@ enum TaskTarget {
   ORDER
   RENEWAL
   INVOICE
+  CONFIRMATION
 }
 
 enum TaskType {
@@ -35,6 +36,8 @@ model Task {
 
   offerDocuments OfferDocument[]
   orderDocuments OrderDocument[]
+  confirmationDocuments ConfirmationDocument[]
+  invoiceDocuments      InvoiceDocument[]
 
   @@map("task")
 }

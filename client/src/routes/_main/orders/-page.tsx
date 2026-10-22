@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import OrderList from "./-components/order-list";
-import OrderModal from "./-components/order-select-modal";
+import OrderModal from "./-components/modal/order-modal";
 import useOrderFilters from "./-hooks/use-order-filters";
 import { Breadcrumbs, Button, SearchBar, SortDropdown } from "@/components";
 import { useModal } from "@/hooks";
@@ -18,7 +18,7 @@ export function OrderPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.orders"), to: "/orders" },
                     ]}
                 />

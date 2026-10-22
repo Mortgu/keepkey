@@ -10,8 +10,6 @@ import {
     deleteTariff,
     deleteTariffCell,
     deleteTariffGroup,
-    restoreTariffVersion,
-    sealTariffVersion,
     updateStandardTier,
     updateTariffCell,
     updateTariffGroup,
@@ -23,16 +21,9 @@ import type {
     UpdateTariffGroupInput,
 } from "@keepit/schemas";
 
-/**
- * Strukturänderungen an Staffeln oder Zellen.
- *
- * Die Versionsliste muss mit invalidiert werden: Sie hängt unterhalb von `all`
- * und wird von `lists()` nicht erfasst — ohne das bliebe die `isCurrent`-Markierung
- * nach jeder Preisänderung veraltet stehen.
- */
+/** Strukturänderungen an Staffeln oder Zellen. */
 const invalidateStructure = (queryClient: QueryClient) => {
     queryClient.invalidateQueries({ queryKey: tariffKeys.lists() });
-    queryClient.invalidateQueries({ queryKey: tariffKeys.allVersions() });
 };
 
 const invalidateAll = (queryClient: QueryClient) => {
@@ -129,29 +120,6 @@ export function useDeleteTariff() {
         invalidateAll,
     );
     return { deleteTariff: mutate, isPending, error };
-}
-
-/* ───────────────────────────────
-   Version
-   ─────────────────────────────── */
-
-export function useSealTariffVersion() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId }: { groupId: string; tariffId: string }) => sealTariffVersion(groupId, tariffId),
-        invalidateStructure,
-    );
-    return { sealVersion: mutateAsync, isPending, error };
-}
-
-export function useRestoreTariffVersion() {
-    const { mutateAsync, isPending, error } = useTariffMutation(
-        ({ groupId, tariffId, versionId }: { groupId: string; tariffId: string; versionId: string }) =>
-            restoreTariffVersion(groupId, tariffId, versionId),
-        // Ein Restore ersetzt die gesamte Struktur und legt zusätzlich eine
-        // RESTORE-Version an — deshalb alles invalidieren.
-        invalidateAll,
-    );
-    return { restoreVersion: mutateAsync, isPending, error };
 }
 
 /* ───────────────────────────────

@@ -23,9 +23,11 @@ export function formatQueryString(obj: object): string {
 
     for (const [key, value] of Object.entries(obj)) {
         if (value !== undefined && value !== null) {
-            Array.isArray(value) ?
-                value.forEach(v => params.append(key, v)) :
+            if (Array.isArray(value)) {
+                value.forEach(v => params.append(key, v));
+            } else {
                 params.append(key, String(value));
+            }
         }
     }
     return params.toString();

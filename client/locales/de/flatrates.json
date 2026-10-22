@@ -1,6 +1,16 @@
 {
     "flatrates": {
         "create": "Flatrate erstellen",
-        "search": "Pauschalen durchsuchen…"
+        "search": "Pauschalen durchsuchen…",
+        "total": "Gesamt:",
+        "modal": {
+            "createTitle": "Neue Flatrate anlegen",
+            "editTitle": "Flatrate bearbeiten",
+            "name": "Name ({{language}})",
+            "namePlaceholder": "Flatrate Name",
+            "table": "Tabelle ({{language}})",
+            "tablePlaceholder": "Tabellenbeschreibung",
+            "price": "Preis"
+        }
     }
 }

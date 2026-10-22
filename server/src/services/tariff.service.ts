@@ -1,4 +1,4 @@
-import { Prisma, TariffVersionReason, type TariffVersion } from "@prisma/client";
+import { Prisma, type TariffVersion } from "@prisma/client";
 import { type PositionPrice } from "@keepit/schemas";
 
 import { AppException } from "../lib/exceptions.js";
@@ -6,7 +6,6 @@ import { prisma } from "../lib/prismaClient.js";
 import {
     buildTariffVersionSnapshot,
     hashTariffSnapshot,
-    parseTariffVersionSnapshot,
 } from "../schemas/tariff-version-schema.js";
 import {
     calculatePrice,
@@ -206,12 +205,11 @@ const TARIFF_STRUCTURE_INCLUDE = {
  */
 export async function sealTariffVersion(
     tariffId: string,
-    reason: TariffVersionReason,
     actorId: string | null,
     tx?: Prisma.TransactionClient,
 ): Promise<TariffVersion> {
     if (!tx) {
-        return prisma.$transaction((client) => sealTariffVersion(tariffId, reason, actorId, client));
+        return prisma.$transaction((client) => sealTariffVersion(tariffId, actorId, client));
     }
 
     await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`tariff-version:${tariffId}`}))::text AS "lock"`;
@@ -239,7 +237,6 @@ export async function sealTariffVersion(
             version: (latest._max.version ?? 0) + 1,
             hash,
             snapshot: snapshot as unknown as Prisma.InputJsonValue,
-            reason,
             createdById: actorId,
         },
     });
@@ -296,42 +293,6 @@ export async function getTariff(tariffId: string) {
     }
 
     return tariff;
-}
-
-/**
- * Versionshistorie einer Preistabelle, neueste zuerst.
- *
- * `isCurrent` markiert die Version, deren Inhalt dem aktuellen Zustand der
- * Tabelle entspricht; `usageCount` zeigt, von wie vielen Angebotspositionen
- * diese Version als Preisgrundlage angepinnt wurde.
- */
-export async function getTariffVersions(tariffId: string) {
-    const tariff = await prisma.tariff.findUnique({
-        where: { id: tariffId },
-        include: TARIFF_STRUCTURE_INCLUDE,
-    });
-
-    if (!tariff) {
-        throw new AppException("Tariff not found.", 404, "TARIFF_NOT_FOUND");
-    }
-
-    const tiers = await prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
-    const currentHash = hashTariffSnapshot(buildTariffVersionSnapshot({ ...tariff, tiers }));
-
-    const versions = await prisma.tariffVersion.findMany({
-        where: { tariffId },
-        orderBy: { version: 'desc' },
-        include: {
-            createdBy: { select: { id: true, name: true } },
-            _count: { select: { offerPositions: true } },
-        },
-    });
-
-    return versions.map(({ _count, ...version }) => ({
-        ...version,
-        isCurrent: version.hash === currentHash,
-        usageCount: _count.offerPositions,
-    }));
 }
 
 /**
@@ -456,30 +417,67 @@ export async function updateTariffGroup(id: string, input: UpdateTariffGroupInpu
 }
 
 /**
- * Löscht eine Tarifgruppe samt ihrer Preistabellen.
+ * Schutzregel für das Entfernen von Preistabellen: Offene Angebote (noch nicht
+ * angenommen) beziehen ihre Preise über den Tarif und dürfen ihn nicht
+ * verlieren. Angenommene Angebote blockieren nicht — ihre Preise stehen im
+ * `acceptedSnapshot`; die angepinnte `TariffVersion`
+ * bleibt verwaist erhalten, damit Erweiterungen weiter mit der eingefrorenen Staffel rechnen.
  *
- * Die Versionsprüfung ist dieselbe wie in {@link deleteTariff} und hier nicht
- * verzichtbar: das Löschen cascadet über die Gruppe auf ihre `Tariff`-Zeilen,
- * an denen `TariffVersion` per `onDelete: Restrict` hängt. Ohne diese Prüfung
- * käme der Fremdschlüsselfehler roh als 500 zurück statt als verständliche
- * Meldung — und der Schutz der angepinnten Angebotspreise wäre eine
- * Zufallseigenschaft der Datenbank statt einer Regel der Fachlogik.
+ * Läuft unter demselben Advisory Lock wie {@link sealTariffVersion}, damit kein
+ * Angebot gleichzeitig eine Version des Tarifs anlegt.
  */
-export async function deleteTariffGroup(id: string): Promise<void> {
-    const versionCount = await prisma.tariffVersion.count({
-        where: { tariff: { tariffGroupId: id } },
-    });
-
-    if (versionCount > 0) {
-        throw new AppException(
-            "Tarifgruppen mit Versionshistorie können nicht gelöscht werden.",
-            409,
-            "TARIFF_HAS_VERSIONS",
-        );
+async function assertNoOpenOffersUse(
+    tx: Prisma.TransactionClient,
+    tariffs: ReadonlyArray<{ id: string; contractId: string; tariffGroupId: string }>,
+): Promise<void> {
+    for (const tariff of tariffs) {
+        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`tariff-version:${tariff.id}`}))::text AS "lock"`;
     }
 
-    await prisma.tariffGroup.delete({
-        where: { id },
+    const openOffers = await tx.offer.findMany({
+        where: {
+            acceptedAt: null,
+            OR: tariffs.map((tariff) => ({
+                contractId: tariff.contractId,
+                offerPositions: {
+                    some: { product: { tariffGroupProducts: { some: { tariffGroupId: tariff.tariffGroupId } } } },
+                },
+            })),
+        },
+        select: { quoteId: true },
+        orderBy: { quoteId: "asc" },
+        take: 5,
+    });
+
+    if (openOffers.length > 0) {
+        throw new AppException(
+            `Die Preistabelle wird noch von offenen Angeboten verwendet (${openOffers.map((offer) => offer.quoteId).join(", ")}). `
+            + "Nehmen Sie die Angebote an oder löschen Sie sie zuerst.",
+            409,
+            "TARIFF_IN_OPEN_OFFERS",
+        );
+    }
+}
+
+/**
+ * Löscht eine Tarifgruppe samt ihrer Preistabellen. Es gilt dieselbe Regel wie
+ * in {@link deleteTariff}.
+ */
+export async function deleteTariffGroup(id: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+        const tariffs = await tx.tariff.findMany({
+            where: { tariffGroupId: id },
+            select: { id: true, contractId: true, tariffGroupId: true },
+        });
+
+        if (tariffs.length > 0) {
+            await assertNoOpenOffersUse(tx, tariffs);
+        }
+
+        await tx.tariffVersion.deleteMany({
+            where: { tariff: { tariffGroupId: id }, offerPositions: { none: {} } },
+        });
+        await tx.tariffGroup.delete({ where: { id } });
     });
 }
 
@@ -511,71 +509,26 @@ export async function createTariff(tariffGroupId: string, input: CreateTariffInp
     });
 }
 
-export async function deleteTariff(tariffId: string): Promise<void> {
-    const versionCount = await prisma.tariffVersion.count({ where: { tariffId } });
-
-    if (versionCount > 0) {
-        throw new AppException(
-            "Preistabellen mit Versionshistorie können nicht gelöscht werden.",
-            409,
-            "TARIFF_HAS_VERSIONS",
-        );
-    }
-
-    await prisma.tariff.delete({
-        where: { id: tariffId }
-    });
-}
-
 /**
- * Setzt eine Preistabelle auf den Stand einer früheren Version zurück.
- *
- * Der aktuelle Zustand wird vorher als `RESTORE`-Version versiegelt und geht
- * damit nie verloren. Die Struktur wird in-place ersetzt — der `Tariff` selbst
- * bleibt bestehen, damit angepinnte Angebotsversionen und die an Koordinaten
- * hängenden Kundenpreise nicht brechen.
+ * Entfernt einen Vertrag aus einer Preistabellen-Gruppe (die `Tariff`-Zeile mit
+ * Zellen und Kundenpreisen). Blockiert, solange offene Angebote den Tarif nutzen.
  */
-export async function restoreTariffVersion(tariffId: string, versionId: string, actorId: string) {
-    return prisma.$transaction(async (tx) => {
-        const version = await tx.tariffVersion.findUnique({ where: { id: versionId } });
-
-        if (!version || version.tariffId !== tariffId) {
-            throw new AppException("Tariff version not found.", 404, "TARIFF_VERSION_NOT_FOUND");
-        }
-
-        if (version.snapshotVersion !== 1) {
-            throw new AppException(
-                `Snapshot-Version ${version.snapshotVersion} wird nicht unterstützt.`,
-                422,
-                "UNSUPPORTED_SNAPSHOT_VERSION",
-            );
-        }
-
-        const snapshot = parseTariffVersionSnapshot(version.snapshot);
-
-        await sealTariffVersion(tariffId, TariffVersionReason.RESTORE, actorId, tx);
-
-        // Nur die Zellen dieses Tarifs. Die Mengenstaffeln gehören der Gruppe
-        // und werden von allen Verträgen darin geteilt — ein Restore eines
-        // einzelnen Tarifs darf sie nicht unter den Geschwistern wegziehen.
-        // Zellen auf einer Koordinate ohne Staffel bleiben erhalten und sind
-        // wieder erreichbar, sobald die Staffel zurückkommt.
-        await tx.tariffCell.deleteMany({ where: { tariffId } });
-
-        const cells = snapshot.cells.flatMap((cell) =>
-            cell.price === null
-                ? []
-                : [{ tariffId, duration: cell.duration, min_quantity: cell.min_quantity, price: cell.price }],
-        );
-
-        if (cells.length > 0) {
-            await tx.tariffCell.createMany({ data: cells });
-        }
-
-        return tx.tariff.findUniqueOrThrow({
+export async function deleteTariff(groupId: string, tariffId: string): Promise<void> {
+    await prisma.$transaction(async (tx) => {
+        const tariff = await tx.tariff.findUnique({
             where: { id: tariffId },
-            include: TARIFF_INCLUDE,
+            select: { id: true, contractId: true, tariffGroupId: true },
         });
+
+        if (!tariff || tariff.tariffGroupId !== groupId) {
+            throw new AppException("Tariff not found.", 404, "TARIFF_NOT_FOUND");
+        }
+
+        await assertNoOpenOffersUse(tx, [tariff]);
+        // Versionen, die keine Angebotsposition anpinnt, sind wertlos. Angepinnte
+        // bleiben (verwaist), weil Positionen angenommener Angebote unveränderlich sind.
+        await tx.tariffVersion.deleteMany({ where: { tariffId, offerPositions: { none: {} } } });
+        await tx.tariff.delete({ where: { id: tariffId } });
     });
 }
 

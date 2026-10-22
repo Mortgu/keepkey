@@ -1,23 +1,26 @@
+import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 import type {
     CreateOfferInput,
     ExtendOfferInput,
     Offer,
     OfferFilterParams,
 
-    OfferRevision,
-
     OffersPage,
     Task,
 
     UpdateOfferInput
 } from "@keepit/schemas";
-import { api } from "@/lib/api-client";
-import { formatQueryString } from "@/lib/utils";
 
 
 /* Offer */
 export const getOffers = async (filters: OfferFilterParams) =>
     api<OffersPage>(`/api/offers?${formatQueryString(filters)}`, {
+        method: "GET"
+    });
+
+export const getOffer = async (id: string) =>
+    api<Offer>(`/api/offers/${id}`, {
         method: "GET"
     });
 
@@ -41,18 +44,6 @@ export const deleteOffer = async (id: string) =>
 export const generateOfferDocument = async (id: string) =>
     api<Task>(`/api/offers/${id}/documents`, {
         method: "POST"
-    });
-
-/* Offer Revisions */
-export const getOfferRevisions = async (id: string) =>
-    api<Array<OfferRevision>>(`/api/offers/${id}/revisions`, {
-        method: "GET"
-    });
-
-export const restoreOfferRevision = async (id: string, revisionId: string, expectedVersion: number) =>
-    api<Offer>(`/api/offers/${id}/revisions/${revisionId}/restore`, {
-        method: "POST",
-        body: JSON.stringify({ expectedVersion }),
     });
 
 export const getTask = async (taskId: string) =>

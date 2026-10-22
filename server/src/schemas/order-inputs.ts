@@ -11,6 +11,7 @@ export function metadataSnapshot(order: {
     projectNumber: string | null;
     projectDescription: string | null;
     orderDetails: string | null;
+    contractStartDate: Date | null;
 }) {
     return {
         order: orderMetadataSchema.parse({
@@ -19,6 +20,7 @@ export function metadataSnapshot(order: {
             projectNumber: order.projectNumber,
             projectDescription: order.projectDescription,
             orderDetails: order.orderDetails,
+            contractStartDate: order.contractStartDate?.toISOString() ?? null,
         }),
     };
 }

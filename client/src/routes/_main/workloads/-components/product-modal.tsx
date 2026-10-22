@@ -1,7 +1,7 @@
-import { z } from "zod";
-import { useTranslation } from "react-i18next";
 import { useForm } from "@tanstack/react-form";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
 
 import type {
   CreateProductInput,
@@ -10,14 +10,15 @@ import type {
   ProductTranslationInput,
   UpdateProductInput
 } from '@keepit/schemas';
+import type { TranslationKey } from "@/i18n";
 import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    SegmentedLanguageToggle,
+  Button,
+  Dialog,
+  FieldInput,
+  FieldTextarea,
+  SegmentedLanguageToggle,
 } from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
 
 
 interface ProductModalProps {
@@ -27,7 +28,7 @@ interface ProductModalProps {
 }
 
 const langFields = z.object({
-  name: z.string().min(1, "Mindestens 1 Zeichen"),
+  name: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
   description: z.string(),
   table: z.string(),
 });
@@ -73,11 +74,11 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      e.preventDefault();
+    e.preventDefault();
 
-      e.stopPropagation();
+    e.stopPropagation();
 
-      productForm.handleSubmit();
+    productForm.handleSubmit();
 
   };
 
@@ -87,7 +88,7 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? "Produkt bearbeiten" : "Produkt erstellen"}>
+      <Dialog.Header title={isEdit ? t("workloads.modal.editTitle") : t("workloads.modal.createTitle")}>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
           value={language}
@@ -98,16 +99,16 @@ export default function ProductModal({ onClose, submitFn, currentItem = null }: 
         <form id="product-form" onSubmit={handleSubmit} className="grid gap-4">
           <productForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-1">
-              <FieldInput field={field} label={`Produkt Name (${language})`} placeholder="Produkt Name" />
+              <FieldInput field={field} label={t("workloads.modal.name", { language })} placeholder={t("workloads.modal.namePlaceholder")} />
             </div>
           )} />
 
           <productForm.Field name={`${language}.description`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={`Produkt Beschreibung (${language})`} placeholder="Produkt Beschreibung" />
+            <FieldTextarea field={field} rows={5} label={t("workloads.modal.description", { language })} placeholder={t("workloads.modal.descriptionPlaceholder")} />
           )} />
 
           <productForm.Field name={`${language}.table`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={`Tabelle Beschreibung (${language})`} placeholder="Tabellen Beschreibung" />
+            <FieldTextarea field={field} rows={5} label={t("workloads.modal.table", { language })} placeholder={t("workloads.modal.tablePlaceholder")} />
           )} />
         </form>
       </Dialog.Body>

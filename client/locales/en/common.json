@@ -14,7 +14,8 @@
     "sales": "Sales",
     "management": "Management",
     "settings": "Settings",
-    "logout": "Log out"
+    "logout": "Log out",
+    "dashboard": "Dashboard"
   },
   "section": {
     "workloads": "Workloads",
@@ -46,10 +47,58 @@
     "errorGeneric": "An unexpected error occurred.",
     "months": "months",
     "increment": "Increase value",
-    "decrement": "Decrease value"
+    "decrement": "Decrease value",
+    "sort": {
+      "label": "Sort:",
+      "createdAtDesc": "Date – newest first",
+      "createdAtAsc": "Date – oldest first",
+      "nameAsc": "Name A–Z",
+      "nameDesc": "Name Z–A"
+    },
+    "clearSelection": "Clear selection",
+    "breadcrumb": {
+      "label": "Breadcrumb",
+      "showHidden_one": "Show {{count}} more level",
+      "showHidden_other": "Show {{count}} more levels"
+    },
+    "segmentedControl": "Selection",
+    "fieldIssue": {
+      "error": "Error details",
+      "warning": "Warning details"
+    },
+    "invalidDate": "Invalid date",
+    "invalidStartDate": "Invalid start date"
+  },
+  "validation": {
+    "required": "Required",
+    "email": "Invalid email address",
+    "passwordMin": "At least {{count}} characters",
+    "passwordMax": "At most {{count}} characters",
+    "passwordMismatch": "Passwords do not match",
+    "minOneChar": "At least 1 character"
   },
   "docxEditor": {
     "noBuffer": "The editor could not read the file."
+  },
+  "documents": {
+    "toast": {
+      "replaced": "File replaced.",
+      "saved": "File saved.",
+      "fileRejected": "File rejected: {{reason}}",
+      "warning": {
+        "documentMismatch": "This file belongs to a different document."
+      },
+      "adopted": "Changes were adopted into the offer."
+    },
+    "changes": {
+      "title": "Differences in the file",
+      "description": "The replaced file differs from the generated version. Adopting writes the values into the offer. The offer gets a new version, the document stays current.",
+      "generated": "Generated",
+      "inFile": "In the file",
+      "ignore": "Ignore",
+      "adopt": "Adopt selection ({{count}})",
+      "notAdoptable": "Cannot be adopted into the offer — ignore only. Change such values in the offer form and regenerate the document."
+    }
   },
   "documentPreview": {
     "title": "Preview",

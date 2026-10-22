@@ -1,7 +1,20 @@
 {
   "suppliers": {
-    "description": "Zentrale Verwaltung der Lieferanten",
-    "searchPlaceholder": "Lieferanten durchsuchen…",
-    "create": "Lieferant erstellen"
+    "description": "Zentrale Verwaltung der Zulieferer",
+    "searchPlaceholder": "Zulieferer durchsuchen…",
+    "create": "Zulieferer erstellen",
+    "offerCount_one": "{{count}} Angebot",
+    "offerCount_other": "{{count}} Angebote",
+    "orderCount_one": "{{count}} Bestellung",
+    "orderCount_other": "{{count}} Bestellungen",
+    "edit": "Zulieferer bearbeiten",
+    "delete": "Zulieferer löschen",
+    "deleteConfirm": "Bist du dir sicher?",
+    "modal": {
+      "editTitle": "Zulieferer bearbeiten",
+      "createTitle": "Zulieferer erstellen",
+      "name": "Name",
+      "supplierId": "ID"
+    }
   }
 }

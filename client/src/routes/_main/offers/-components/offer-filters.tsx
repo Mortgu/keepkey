@@ -1,9 +1,9 @@
-import { useTranslation } from "react-i18next";
-import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
-import type { OfferFilters } from "../-hooks/use-offer-filters";
-import type { Contact, Customer, Product } from "@keepit/schemas";
-import { useLocale } from "@/hooks";
 import { MultiDropdown, SearchBar, SortDropdown } from "@/components";
+import { useLocale } from "@/hooks";
+import type { Contact, Customer, Product } from "@keepit/schemas";
+import { useTranslation } from "react-i18next";
+import { useOfferFilterOptions } from "../../../../components/modules/modals/offer/_hooks/use-offer-filter-options";
+import type { OfferFilters } from "../../../../components/modules/modals/offer/_hooks/use-offer-filters";
 
 interface Props {
     filters: OfferFilters;

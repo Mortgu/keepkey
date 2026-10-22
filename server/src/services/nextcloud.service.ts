@@ -1,4 +1,3 @@
-import { FileStat } from "webdav";
 import {
     findFilesById,
     getNextCloudClient,

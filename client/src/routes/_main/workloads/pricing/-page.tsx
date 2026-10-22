@@ -1,26 +1,19 @@
-import { t } from "i18next";
-import { LoaderCircle } from "lucide-react";
-import { toast } from "react-toastify";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import PricingTable from "./-components/pricing-table";
 import StandardDurations from "./-components/standard-durations";
 import StandardTiers from "./-components/standard-tiers";
 import TariffGroupModal from "./-components/tariff-group-modal";
 import { useModal, useProducts, useTariffGroups } from "@/hooks";
 import { useCreateTariffGroup } from "@/hooks/tariffs/tariff-mutations";
-import { Breadcrumbs, Button } from "@/components";
+import { Breadcrumbs, Button, RouteError, Spinner } from "@/components";
 
 export default function PricingPage() {
+    const { t } = useTranslation();
     const { groups, isPending, error } = useTariffGroups();
     const { createTariffGroup, isPending: creatingGroup } = useCreateTariffGroup();
     const { products } = useProducts();
     const modal = useModal();
-
-    useEffect(() => {
-        if (error) {
-            toast.error(error.message);
-        }
-    }, [error]);
 
     const assignedProductIds = useMemo(
         () => new Set(groups.flatMap(g => g.products.map(p => p.productId))),
@@ -29,7 +22,7 @@ export default function PricingPage() {
 
     if (isPending) {
         return (
-            <LoaderCircle className="size-4" />
+            <Spinner className="size-4" />
         )
     }
 
@@ -40,9 +33,9 @@ export default function PricingPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
-                        { label: "Workloads", to: "/workloads" },
-                        { label: "Pricing", to: "/workloads/pricing" },
+                        { label: t("nav.dashboard"), to: "/" },
+                        { label: t("section.workloads") },
+                        { label: t("section.workload_pricing"), to: "/workloads/pricing" },
                     ]}
                 />
 
@@ -53,6 +46,8 @@ export default function PricingPage() {
             </div>
 
             <div className="grid gap-4">
+                {error && <RouteError error={error} />}
+
                 <div className="grid gap-4 md:grid-cols-2">
                     <StandardDurations />
                     <StandardTiers />

@@ -1,4 +1,4 @@
-import { prisma } from "../lib/prismaClient.js";
+import { Prisma, prisma } from "../lib/prismaClient.js";
 
 interface PriceCalculatorProps {
     productId: string;
@@ -234,15 +234,24 @@ export function selectPrice(
  *
  * `customerId` verengt die geladenen Overrides auf einen Kunden, damit fremde
  * Kundenpreise die Datenbank nie verlassen.
+ *
+ * `db` erlaubt, innerhalb einer laufenden Transaktion zu lesen — sonst würde
+ * jeder Aufruf eine eigene Verbindung aus dem Pool ziehen, während die äußere
+ * Transaktion bereits eine hält.
  */
-export async function loadTariffForPricing(productId: string, contractId: string, customerId?: string) {
-    const groupProduct = await prisma.tariffGroupProduct.findUnique({
+export async function loadTariffForPricing(
+    productId: string,
+    contractId: string,
+    customerId?: string,
+    db: Prisma.TransactionClient = prisma,
+) {
+    const groupProduct = await db.tariffGroupProduct.findUnique({
         where: { productId },
     });
 
     if (!groupProduct) return null;
 
-    const tariff = await prisma.tariff.findUnique({
+    const tariff = await db.tariff.findUnique({
         where: { tariffGroupId_contractId: { tariffGroupId: groupProduct.tariffGroupId, contractId } },
         include: {
             cells: { orderBy: [{ duration: 'asc' }, { min_quantity: 'asc' }] },
@@ -252,7 +261,7 @@ export async function loadTariffForPricing(productId: string, contractId: string
 
     if (!tariff) return null;
 
-    const tiers = await prisma.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
+    const tiers = await db.standardTier.findMany({ orderBy: { min_quantity: 'asc' } });
 
     return { ...tariff, tiers };
 }

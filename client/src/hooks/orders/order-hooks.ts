@@ -1,6 +1,6 @@
+import type { OrderFilterParams } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { orderQueries } from "./order-queries";
-import type { OrderFilterParams } from "@keepit/schemas";
 
 const EMPTY_ARRAY: Array<never> = [];
 
@@ -14,7 +14,7 @@ export function useNextOrderNumber() {
     return { nextOrderNumber: data?.orderId, isPending };
 }
 
-export function useOrderRevisions(orderId: string) {
-    const { data = EMPTY_ARRAY, isPending, error } = useQuery(orderQueries.revisions(orderId));
-    return { revisions: data, isPending, error };
+export function useOrder(id: string) {
+    const { data: order, isPending, error } = useQuery(orderQueries.detail(id));
+    return { order, isPending, error };
 }

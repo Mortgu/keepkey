@@ -9,6 +9,7 @@ import dashboardEN from '../locales/en/dashboard.json';
 import employeesEN from '../locales/en/employees.json';
 import errorsEN from '../locales/en/errors.json';
 import flatratesEN from '../locales/en/flatrates.json';
+import flowsEN from '../locales/en/flows.json';
 import invoicesEN from '../locales/en/invoices.json';
 import loginEN from '../locales/en/login.json';
 import offersEN from '../locales/en/offers.json';
@@ -27,6 +28,7 @@ import dashboardDE from '../locales/de/dashboard.json';
 import employeesDE from '../locales/de/employees.json';
 import errorsDE from '../locales/de/errors.json';
 import flatratesDE from '../locales/de/flatrates.json';
+import flowsDE from '../locales/de/flows.json';
 import invoicesDE from '../locales/de/invoices.json';
 import loginDE from '../locales/de/login.json';
 import offersDE from '../locales/de/offers.json';
@@ -37,6 +39,7 @@ import suppliersDE from '../locales/de/suppliers.json';
 import templatesDE from '../locales/de/templates.json';
 import versionHistoryDE from '../locales/de/versionHistory.json';
 import workloadsDE from '../locales/de/workloads.json';
+import type { ParseKeys } from 'i18next';
 
 /*
  * Eine Sprachdatei je Route, dazu `common` für Geteiltes.
@@ -51,8 +54,10 @@ import workloadsDE from '../locales/de/workloads.json';
  * `getErrorMessage` schlägt sie als `errors.<CODE>` nach.
  *
  * Eine neue Route braucht: Datei anlegen, hier importieren, unten einreihen.
+ * Die Schlüssel-Typen (`i18n-resources.d.ts`) leiten sich aus `en` ab und
+ * brauchen keine eigene Eintragung.
  */
-const en = {
+export const en = {
     translation: {
         ...commonEN,
         ...contractsEN,
@@ -60,6 +65,7 @@ const en = {
         ...dashboardEN,
         ...employeesEN,
         ...flatratesEN,
+        ...flowsEN,
         ...invoicesEN,
         ...loginEN,
         ...offersEN,
@@ -83,6 +89,7 @@ const de = {
         ...dashboardDE,
         ...employeesDE,
         ...flatratesDE,
+        ...flowsDE,
         ...invoicesDE,
         ...loginDE,
         ...offersDE,
@@ -107,5 +114,11 @@ i18n.use(LanguageDetector).use(initReactI18next).init({
     },
     resources: { en, de },
 });
+
+/** Jeder gültige Schlüssel des `translation`-Namensraums, z. B. `"flows.phase.open"`. */
+export type TranslationKey = ParseKeys;
+
+/** Ein Server-Fehlercode, für den `errors.json` eine Übersetzung führt. */
+export type ErrorCode = keyof typeof en.translation.errors;
 
 export default i18n;

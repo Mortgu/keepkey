@@ -1,19 +1,21 @@
 import { useForm } from "@tanstack/react-form";
-import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-import { createFlatrateSchema } from '@keepit/schemas';
+import { createFlatrateSchema, flatrateTranslationSchema } from '@keepit/schemas';
+import { z } from "zod";
 import type { CreateFlatrateTranslationInput, Flatrate, Language } from '@keepit/schemas';
+import type { TranslationKey } from "@/i18n";
 
 import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    NumberField,
-    SegmentedLanguageToggle,
+	Button,
+	Dialog,
+	FieldInput,
+	FieldTextarea,
+	NumberField,
+	SegmentedLanguageToggle
 } from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
 import { useCreateFlatRate, useUpdateFlatRate } from "@/hooks";
 import { centsToEur, eurToCents } from "@/utils/utils";
 
@@ -21,6 +23,14 @@ interface Props {
 	currentFlatrate?: Flatrate | null;
 	onClose: () => void;
 }
+
+/* Das geteilte Schema meldet leere Felder mit einem festen englischen Text
+   ("Required!"), den auch der Server nutzt. Im Formular gilt dieselbe Regel,
+   nur mit Übersetzungsschlüssel — aufgelöst wird er bei der Anzeige. */
+const required = z.string().nonempty("validation.required" satisfies TranslationKey);
+const flatrateFormSchema = createFlatrateSchema.extend({
+	translations: z.array(flatrateTranslationSchema.extend({ name: required, table: required })).min(1),
+});
 
 function seedLang(translations: Array<CreateFlatrateTranslationInput> | undefined, lang: Language) {
 	const t = translations?.find((x) => x.language === lang);
@@ -46,8 +56,8 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 			]
 		},
 		validators: {
-			onChange: createFlatrateSchema,
-			onMount: createFlatrateSchema,
+			onChange: flatrateFormSchema,
+			onMount: flatrateFormSchema,
 		},
 		onSubmit: async ({ value }) => {
 			if (isEdit) {
@@ -62,11 +72,11 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-	    e.preventDefault();
+		e.preventDefault();
 
-	    e.stopPropagation();
+		e.stopPropagation();
 
-	    form.handleSubmit();
+		form.handleSubmit();
 
 	};
 
@@ -76,7 +86,7 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 			defaultOpen
 			onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
 		>
-			<Dialog.Header title={isEdit ? "Flatrate bearbeiten" : "Neue Flatrate anlegen"}>
+			<Dialog.Header title={isEdit ? t("flatrates.modal.editTitle") : t("flatrates.modal.createTitle")}>
 				<SegmentedLanguageToggle
 					options={DEFAULT_LANGUAGE_OPTIONS}
 					value={language}
@@ -88,14 +98,14 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 					<form.Field name={`translations[${langIndex}].name`}>
 						{(field) => (
 							<div className="grid gap-1">
-								<FieldInput field={field} label={`Name (${language})`} placeholder="Flatrate Name" />
+								<FieldInput field={field} label={t("flatrates.modal.name", { language })} placeholder={t("flatrates.modal.namePlaceholder")} />
 							</div>
 						)}
 					</form.Field>
 
 					<form.Field name={`translations[${langIndex}].table`}>
 						{(field) => (
-							<FieldTextarea field={field} rows={4} label={`Tabelle (${language})`} placeholder="Tabellenbeschreibung" />
+							<FieldTextarea field={field} rows={4} label={t("flatrates.modal.table", { language })} placeholder={t("flatrates.modal.tablePlaceholder")} />
 						)}
 					</form.Field>
 
@@ -107,7 +117,7 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 								min={0.01}
 								step={0.01}
 								format={{ minimumFractionDigits: 2, maximumFractionDigits: 2 }}
-								label="Preis"
+								label={t("flatrates.modal.price")}
 								suffix="€"
 								value={centsToEur(field.state.value)}
 								onValueChange={(value) => field.handleChange(value === null ? 0 : eurToCents(value))}

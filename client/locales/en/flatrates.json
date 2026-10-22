@@ -1,6 +1,16 @@
 {
     "flatrates": {
-        "create": "Create flatrate",
-        "search": "Search flat rates…"
+        "create": "Create flat rate",
+        "search": "Search flat rates…",
+        "total": "Total:",
+        "modal": {
+            "createTitle": "Create new flat rate",
+            "editTitle": "Edit flat rate",
+            "name": "Name ({{language}})",
+            "namePlaceholder": "Flat rate name",
+            "table": "Table ({{language}})",
+            "tablePlaceholder": "Table description",
+            "price": "Price"
+        }
     }
 }

@@ -1,6 +1,20 @@
 {
   "contracts": {
     "description": "Central contract management",
-    "create": "Create contract"
+    "create": "Create contract",
+    "default": "Default",
+    "noFeatures": "No features defined!",
+    "move": "Move {{name}}",
+    "modal": {
+      "editTitle": "Edit contract",
+      "createTitle": "Create new contract",
+      "name": "Name ({{language}})",
+      "features": "Features ({{language}}):",
+      "featurePlaceholder": "Feature {{number}}",
+      "removeFeature": "Remove feature",
+      "addFeature": "Add feature",
+      "table": "Table ({{language}})",
+      "tablePlaceholder": "Data volume"
+    }
   }
 }

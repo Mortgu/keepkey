@@ -1,79 +1,63 @@
-import { BookmarkPlus, ChevronDown, UndoDot } from "lucide-react";
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
+import { ChevronDown, Trash } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { useState } from "react";
 import TariffComponent from "./tariff-component";
-import { TariffVersionList } from "./tariff-version-list";
 import type { TariffBase } from "@keepit/schemas";
-import { Button, Drawer } from "@/components";
-import { useLocale } from "@/hooks";
-import { formatDate } from "@/lib/format";
+import { Button, showToast } from "@/components";
+import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { useSealTariffVersion } from "@/hooks/tariffs/tariff-mutations";
+import { useDeleteTariff } from "@/hooks/tariffs/tariff-mutations";
 
 type Props = {
     tariff: TariffBase;
 }
 
 export default function PricingTableItem({ tariff }: Props) {
+    const { formatDate } = useFormatters();
     const locale = useLocale();
+    const { t } = useTranslation();
+    const { deleteTariff, isPending: deleting } = useDeleteTariff();
 
     const [open, setOpen] = useState<boolean>(false);
-    const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
-
-    const { sealVersion, isPending: sealingVersion, error: errorSealingVersion } = useSealTariffVersion();
 
     const contract = tariff.contract;
+    const contractName = localized(contract.translations, locale, "name");
 
-    useEffect(() => {
-        if (errorSealingVersion) {
-            toast.error(errorSealingVersion.message);
-        }
-    }, [errorSealingVersion])
+    const handleDelete = () => {
+        if (!confirm(t("workloads.pricing.delete.confirm", { name: contractName, count: tariff.cells.length }))) return;
 
-    const handleSeal = async () => {
-        const version = await sealVersion({ groupId: tariff.tariffGroupId, tariffId: tariff.id });
-        toast.success(`Version ${version.version} gespeichert.`);
-        setDrawerOpen(true);
+        // Schlägt das Entfernen fehl (z. B. wegen offener Angebote), zeigt der globale onError-Handler die Server-Meldung.
+        deleteTariff(
+            { groupId: tariff.tariffGroupId, tariffId: tariff.id },
+            { onSuccess: () => showToast.success("workloads.pricing.delete.done", { vars: { name: contractName } }) },
+        );
     };
 
     return (
         <div>
             <div className="flex items-center justify-between border-b border-(--border) last:border-none">
-                <div className="w-full px-4 py-2 hover:bg-(--page-bg) cursor-pointer border-r border-(--border) select-none"
+                <div className="w-full px-4 py-2 hover:bg-(--page-bg) cursor-pointer select-none"
                     onClick={() => setOpen(!open)}>
                     <div className="flex items-center gap-4">
                         <Button size="fit_xs" variant="link" icon={<ChevronDown className="size-4" />} iconOnly />
                         <div>
-                            <p>{localized(contract.translations, locale, "name")}</p>
+                            <p>{contractName}</p>
                             <p className="text-sm text-(--text-secondary)">{formatDate(tariff.createdAt)}</p>
                         </div>
                     </div>
                 </div>
 
-                <div className="px-2 py-2 flex items-center gap-2">
-                    <Button size="sm" variant="secondary" icon={<UndoDot className="size-3.5" />} iconOnly
-                        title="Versionshistorie"
-                        onClick={() => setDrawerOpen(true)} />
-                    <Button size="sm" variant="secondary" icon={<BookmarkPlus className="size-3.5" />} iconOnly
-                        title="Aktuellen Stand als Version speichern"
-                        onClick={handleSeal}
-                        loading={sealingVersion} disabled={sealingVersion} />
+                <div className="px-2 py-2 border-l border-(--border)">
+                    <Button size="sm" variant="secondary" icon={<Trash className="size-3.5" />} iconOnly
+                        title={t("workloads.pricing.delete.title")}
+                        onClick={handleDelete}
+                        loading={deleting} disabled={deleting} />
                 </div>
             </div>
 
             {open && (
                 <TariffComponent tariff={tariff} />
             )}
-
-            <Drawer open={drawerOpen} onClose={() => setDrawerOpen(false)} wide>
-                <Drawer.Header eyebrow={localized(contract.translations, locale, "name")} title="Versionen"
-                    subtitle="Frühere Stände dieser Preistabelle" />
-                <Drawer.Body>
-                    {drawerOpen && (
-                        <TariffVersionList groupId={tariff.tariffGroupId} tariffId={tariff.id} />
-                    )}
-                </Drawer.Body>
-            </Drawer>
         </div>
     )
 }

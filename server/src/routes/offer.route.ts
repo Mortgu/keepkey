@@ -7,27 +7,22 @@ import {
   extendOffer,
   getExtensionPrice,
   getOfferById,
-  getOfferRevisions,
   getOffers,
   renewOffer,
-  restoreOfferRevision,
   updateOffer,
 } from "@/controllers/offer.controller.js";
 
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
+  idParamsSchema,
+  offerPositionParamsSchema
+} from "@/schemas/params-schemas.js";
+import {
   createOfferSchema,
   extendOfferSchema,
   extensionPriceQuerySchema,
-  offerFilterSchema,
-  restoreOfferRevisionSchema,
-  updateOfferSchema,
+  offerFilterSchema, updateOfferSchema
 } from '@keepit/schemas';
-import {
-  idParamsSchema,
-  offerPositionParamsSchema,
-  offerRevisionParamsSchema,
-} from "@/schemas/params-schemas.js";
 
 const router = Router();
 
@@ -58,28 +53,15 @@ router.post('/:id/extend', validateParams(idParamsSchema), validate(extendOfferS
 
 /* [GET] /api/offers/:offerId/positions/:positionId/extension-price */
 router.get(
-    '/:offerId/positions/:positionId/extension-price',
-    validateParams(offerPositionParamsSchema),
-    validateQuery(extensionPriceQuerySchema),
-    getExtensionPrice,
+  '/:offerId/positions/:positionId/extension-price',
+  validateParams(offerPositionParamsSchema),
+  validateQuery(extensionPriceQuerySchema),
+  getExtensionPrice,
 );
 
 /* ========== Offer Documents ========== */
 
 /* [POST] /api/offers/:id/documents */
 router.post('/:id/documents', validateParams(idParamsSchema), enqueueGeneration);
-
-/* ========== Offer Revisions ========== */
-
-/* [GET] /api/offers/:id/revisions */
-router.get('/:id/revisions', validateParams(idParamsSchema), getOfferRevisions);
-
-/* [POST] /api/offers/:id/revisions/:revisionId/restore */
-router.post(
-    '/:id/revisions/:revisionId/restore',
-    validateParams(offerRevisionParamsSchema),
-    validate(restoreOfferRevisionSchema),
-    restoreOfferRevision,
-);
 
 export default router;

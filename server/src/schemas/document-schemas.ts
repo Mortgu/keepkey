@@ -25,10 +25,19 @@ export const confirmReplacementSchema = z.object({
     objectKey: z.string().min(1),
 });
 
+/**
+ * Welche abweichenden Felder ins Angebot übernommen werden sollen.
+ * Die Werte kommen bewusst nicht vom Client, sondern aus der abgelegten DOCX.
+ */
+export const adoptChangesSchema = z.object({
+    fields: z.array(z.string().min(1).max(200)).min(1).max(100),
+});
+
 export const renameDocumentSchema = z.object({
     displayName: z.string()
         .trim()
         .min(1, "displayName required!")
         .max(180, "displayName must not exceed 180 characters")
+        // eslint-disable-next-line no-control-regex -- Steuerzeichen in Dateinamen sind genau das, was abgelehnt wird
         .refine((value) => !/[\\/\u0000-\u001f\u007f]/.test(value), "displayName contains invalid characters"),
 });

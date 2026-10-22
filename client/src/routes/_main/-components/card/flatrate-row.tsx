@@ -1,7 +1,6 @@
 import type { OfferFlatrate, OrderFlatRate } from "@keepit/schemas";
-import { useLocale } from "@/hooks";
+import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
 
 type Props = {
     flatrate: OfferFlatrate | OrderFlatRate;
@@ -9,6 +8,7 @@ type Props = {
 
 /** Eine Flatrate-Zeile in Angebots- und Bestellkarte. */
 export default function FlatRateRow({ flatrate }: Props) {
+    const { formatEur } = useFormatters();
     const { flatRate, quantity, total_cents } = flatrate;
 
     const locale = useLocale();

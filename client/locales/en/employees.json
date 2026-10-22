@@ -2,6 +2,19 @@
   "employees": {
     "description": "Central management of employees",
     "searchPlaceholder": "Search employees…",
-    "create": "Create employee"
+    "create": "Create employee",
+    "edit": "Edit employee",
+    "delete": "Delete employee",
+    "deleteConfirm": "Do you really want to delete \"{{name}}\"?",
+    "modal": {
+      "editTitle": "Edit employee",
+      "createTitle": "Create new employee",
+      "salutation": "Salutation",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone number",
+      "password": "Password"
+    }
   }
 }

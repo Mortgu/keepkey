@@ -1,16 +1,18 @@
 import { useForm } from "@tanstack/react-form";
 import { useQueryClient } from "@tanstack/react-query";
-import { toast } from "react-toastify";
 import { z } from "zod";
 import { useTranslation } from "react-i18next";
 import type { SyntheticEvent } from "react";
 
-import { Button, FieldInput, Input } from "@/components";
+import type { TranslationKey } from "@/i18n";
+import { Button, FieldInput, Input, showToast } from "@/components";
 import { useAuth } from "@/context/auth-context";
+import { userKeys } from "@/hooks/users/user-keys";
 import { authClient } from "@/lib/auth-client.ts";
 
+/** Meldungen sind Übersetzungsschlüssel — übersetzt wird bei der Anzeige. */
 const emailSchema = z.object({
-    newEmail: z.email("Ungültige E-Mail!"),
+    newEmail: z.email("validation.email" satisfies TranslationKey),
 });
 
 export default function EmailForm() {
@@ -31,12 +33,12 @@ export default function EmailForm() {
             });
 
             if (error) {
-                toast.error(error.message);
+                showToast.error("common.errorGeneric", { message: error.message });
                 return;
             }
 
-            await queryClient.invalidateQueries({ queryKey: ["session"] });
-            toast.success("E-Mail-Adresse geändert");
+            await queryClient.invalidateQueries({ queryKey: userKeys.session() });
+            showToast.success("settings.toast.emailChanged");
             formApi.reset();
         },
     });
@@ -51,10 +53,10 @@ export default function EmailForm() {
         <div className="grid gap-4 bg-(--page-bg) p-4 rounded-md border border-(--border) overflow-hidden">
             <form onSubmit={handleSubmit} className="grid gap-4">
                 <div className="flex items-center justify-center gap-4">
-                    <Input label="Aktuelle E-Mail" size="sm" value={user?.email ?? ""} disabled />
+                    <Input label={t("settings.email.current")} size="sm" value={user?.email ?? ""} disabled />
 
                     <emailForm.Field name="newEmail" children={(field) => (
-                        <FieldInput field={field} label="Neue E-Mail-Adresse" size="sm" />
+                        <FieldInput field={field} label={t("settings.email.new")} size="sm" />
                     )} />
                 </div>
 

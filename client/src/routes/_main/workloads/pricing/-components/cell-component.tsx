@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useUpdateTariffCell } from "@/hooks/tariffs/tariff-mutations";
 import { NumberField } from "@/components";
-import { centsToEur, eurToCents, formatEur } from "@/utils/utils";
+import { centsToEur, eurToCents } from "@/utils/utils";
+import { useFormatters } from "@/hooks";
 
 interface Props {
     groupId: string;
@@ -17,6 +19,8 @@ interface Props {
  * fehlt der Preis, existiert schlicht keine Zeile, und das Eintragen legt sie an.
  */
 export default function TariffCellComponent({ groupId, tariffId, duration, minQuantity, price }: Props) {
+    const { t } = useTranslation();
+    const { formatEur } = useFormatters();
     const [edit, setEdit] = useState<boolean>(false);
     const [draft, setDraft] = useState<number | null>(null);
 
@@ -69,7 +73,7 @@ export default function TariffCellComponent({ groupId, tariffId, duration, minQu
                 <p className="text-sm font-normal">{formatEur(price)}</p>
             )}
             {!edit && price === null && (
-                <p className="text-sm font-normal text-(--text-secondary)" title="Kein Preis hinterlegt">–</p>
+                <p className="text-sm font-normal text-(--text-secondary)" title={t("workloads.pricing.cell.noPrice")}>–</p>
             )}
         </td>
     )

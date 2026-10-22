@@ -1,3 +1,4 @@
+.DS_Store
 .idea
 .idea/dataSources.xml
 .idea/inspectionProfiles/Project_Default.xml
@@ -22,3 +23,6 @@ dist/*
 /client/.tanstack
 
 .env.docker
+# Handbuch
+manual/site/
+manual/.venv/

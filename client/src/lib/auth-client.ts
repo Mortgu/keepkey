@@ -1,6 +1,5 @@
 import { createAuthClient } from "better-auth/react";
 import { adminClient, inferAdditionalFields } from "better-auth/client/plugins";
-import { passkeyClient } from "@better-auth/passkey/client";
 import { BASE_URL } from "./api-client.ts";
 
 
@@ -28,6 +27,5 @@ export const authClient = createAuthClient({
                 },
             },
         }),
-        passkeyClient(),
     ],
 });

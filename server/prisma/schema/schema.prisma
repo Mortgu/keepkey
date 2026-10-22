@@ -21,18 +21,19 @@ model User {
   updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
-  passkeys      Passkey[]
 
-  role           String?
-  banned         Boolean?        @default(false)
-  banReason      String?
-  banExpires     DateTime?
-  customer       Customer?       @relation(fields: [customerId], references: [id])
-  customerId     String?
-  offers         Offer[]
-  acceptedOrders Order[]
-  offerRevisions OfferRevision[]
-  orderRevisions OrderRevision[]
+  role       String?
+  banned     Boolean?  @default(false)
+  banReason  String?
+  banExpires DateTime?
+  customer   Customer? @relation(fields: [customerId], references: [id])
+  customerId String?
+
+  offers        Offer[]
+  orders        Order[]
+  confirmations Confirmation[]
+  invoices      Invoice[]
+
   tariffVersions TariffVersion[]
 
   documentTemplates DocumentTemplate[]
@@ -99,8 +100,7 @@ model Supplier {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  offers   Offer[]
-  invoices Invoice[]
+  offers Offer[]
 
   @@map("supplier")
 }

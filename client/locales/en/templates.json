@@ -2,7 +2,9 @@
   "templates": {
     "kind": {
       "OFFER": "Offer templates",
-      "ORDER": "Order templates"
+      "ORDER": "Order templates",
+      "CONFIRMATION": "Order confirmation templates",
+      "INVOICE": "Invoice templates"
     },
     "language": {
       "DE": "German",

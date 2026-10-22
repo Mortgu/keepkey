@@ -1,5 +1,5 @@
-import { localized } from "@/lib/i18n-content";
 import type { DocumentStatus, Language } from "@keepit/schemas";
+import { localized } from "@/lib/i18n-content";
 
 interface translatableDocumentStatus {
     language: Language;

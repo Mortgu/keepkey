@@ -1,5 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createOffer, deleteOffer, extendOffer, generateOfferDocument, renewOffer, restoreOfferRevision, updateOffer } from "./offer-api";
+import {
+    createOffer,
+    deleteOffer,
+    extendOffer,
+    generateOfferDocument,
+    renewOffer,
+    updateOffer
+} from "./offer-api";
 import { useOffers } from "./offer-hooks";
 import { offerKeys } from "./offers-keys";
 
@@ -97,28 +104,6 @@ export function useGenerateOfferDocument() {
         generateOfferDocument: mutation.mutateAsync,
         isGenerating: mutation.isPending,
         errorGenerating: mutation.error,
-    }
-}
-
-export function useRestoreOfferRevision() {
-    const queryClient = useQueryClient();
-
-    const mutation = useMutation({
-        mutationFn: ({ offerId, revisionId, expectedVersion }: {
-            offerId: string, revisionId: string, expectedVersion: number
-        }) => restoreOfferRevision(offerId, revisionId, expectedVersion),
-        onSuccess: (_, args) => {
-            queryClient.invalidateQueries({ queryKey: offerKeys.lists() });
-            queryClient.invalidateQueries({ queryKey: offerKeys.detail(args.offerId) });
-            queryClient.invalidateQueries({ queryKey: offerKeys.revisions(args.offerId) });
-        },
-    });
-
-    return {
-        restoreOfferRevision: mutation.mutateAsync,
-        isRestoringRevision: mutation.isPending,
-        restoringRevisionId: mutation.variables?.revisionId,
-        errorRestoringRevision: mutation.error,
     }
 }
 

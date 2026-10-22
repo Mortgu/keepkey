@@ -32,6 +32,7 @@
   },
   "renewal": {
     "title": "Renewal for {{orderId}}",
+    "title_standalone": "Renewal (without source offer)",
     "period_section": "Period",
     "start_date": "Start date",
     "valid_until": "Valid until",
@@ -51,6 +52,7 @@
   },
   "licenseExtension": {
     "title": "License extension for {{orderId}}",
+    "title_standalone": "License extension (without source offer)",
     "hint": "Additional seats are billed at the prices of the source offer. Product, contract and duration stay unchanged.",
     "no_snapshot": "No frozen price table exists for this position — calculated with its stored unit price, without volume tiers."
   },
@@ -74,6 +76,8 @@
       "renewalStub": "Generating an offer from a renewal is coming in a later step."
     },
     "create": "Create offer",
+    "createRenewal": "Renewal",
+    "createExtension": "License extension",
     "description": "Central management of offers"
   }
 }
