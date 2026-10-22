@@ -1,25 +1,30 @@
-import { cancelOrder } from "@/controllers/order.controller.js";
-import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
-import { Router } from "express";
 import {
-  createOrder,
-  createOrderTask,
-  deleteOrderById,
-  generateOrderDocument,
-  getAllOrders,
-  getNextOrderNumber,
-  getOrderById,
-  getOrderRevisions,
-  restoreOrderRevision,
-  updateOrder,
+    cancelOrder,
+    createConfirmation,
+    createInvoice,
+    createOrder,
+    createOrderTask,
+    deleteConfirmation,
+    deleteInvoice,
+    deleteOrderById,
+    generateOrderDocument,
+    getAllOrders,
+    getConfirmation,
+    getInvoice,
+    getNextOrderNumber,
+    getOrderById,
+    regenerateConfirmation,
+    regenerateInvoice,
+    updateOrder
 } from "@/controllers/index.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
-import { orderFilterSchema, restoreOrderRevisionSchema } from "@keepit/schemas";
+import { acceptOrderSchema, updateOrderMetadataSchema } from "@/schemas/order-inputs.js";
 import {
-  idParamsSchema,
-  orderIdParamsSchema,
-  orderRevisionParamsSchema,
+    idParamsSchema,
+    orderIdParamsSchema
 } from "@/schemas/params-schemas.js";
+import { createConfirmationSchema, createInvoiceSchema, orderFilterSchema } from "@keepit/schemas";
+import { Router } from "express";
 
 const router = Router();
 
@@ -29,22 +34,35 @@ router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", validateParams(orderIdParamsSchema), getOrderById);
 
-router.get("/:orderId/revisions", validateParams(orderIdParamsSchema), getOrderRevisions);
-
 router.post(
     "/:orderId/documents",
     validateParams(orderIdParamsSchema),
     generateOrderDocument,
 );
 
-router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
-
+/* Auftragsbestätigung — eine je Bestellung, Nummer vom Nutzer. */
+router.get("/:orderId/confirmation", validateParams(orderIdParamsSchema), getConfirmation);
 router.post(
-    "/:orderId/revisions/:revisionId/restore",
-    validateParams(orderRevisionParamsSchema),
-    validate(restoreOrderRevisionSchema),
-    restoreOrderRevision,
+    "/:orderId/confirmation",
+    validateParams(orderIdParamsSchema),
+    validate(createConfirmationSchema),
+    createConfirmation,
 );
+router.post("/:orderId/confirmation/documents", validateParams(orderIdParamsSchema), regenerateConfirmation);
+router.delete("/:orderId/confirmation", validateParams(orderIdParamsSchema), deleteConfirmation);
+
+/* Rechnung — eine je Bestellung, Nummer vom Nutzer. */
+router.get("/:orderId/invoice", validateParams(orderIdParamsSchema), getInvoice);
+router.post(
+    "/:orderId/invoice",
+    validateParams(orderIdParamsSchema),
+    validate(createInvoiceSchema),
+    createInvoice,
+);
+router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), regenerateInvoice);
+router.delete("/:orderId/invoice", validateParams(orderIdParamsSchema), deleteInvoice);
+
+router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
 router.patch(
     "/:orderId",
@@ -56,7 +74,6 @@ router.patch(
 router.post(
     "/:orderId/cancel",
     validateParams(orderIdParamsSchema),
-    validate(restoreOrderRevisionSchema),
     cancelOrder,
 );
 

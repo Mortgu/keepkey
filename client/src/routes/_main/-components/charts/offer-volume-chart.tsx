@@ -3,8 +3,8 @@ import { Area, AreaChart, CartesianGrid, Tooltip, XAxis } from "recharts";
 import ChartCard from "./chart-card";
 import { monthLabel } from "./month-label";
 import type { DashboardMonth } from "@keepit/schemas";
-import { useLocale } from "@/hooks";
-import { centsToEur, formatEur } from "@/utils/utils";
+import { useFormatters, useLocale } from "@/hooks";
+import { centsToEur } from "@/utils/utils";
 
 interface Props {
     months: Array<DashboardMonth>;
@@ -19,6 +19,7 @@ interface Props {
  * steht wie überall sonst.
  */
 export default function OfferVolumeChart({ months }: Props) {
+    const { formatEur } = useFormatters();
     const { t } = useTranslation();
     const locale = useLocale();
 

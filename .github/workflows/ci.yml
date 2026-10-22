@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main, experimental]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      # Echte Postgres-Instanz für die Annahme-/Locking-Tests (order-postgres.test.ts).
+      # Die Tests legen je Lauf ein eigenes Schema an und räumen es wieder ab.
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: keepit
+          POSTGRES_PASSWORD: keepit
+          POSTGRES_DB: keepit_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U keepit -d keepit_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      ORDER_TEST_DATABASE_URL: postgresql://keepit:keepit@localhost:5432/keepit_test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # Client und Server konsumieren shared/dist; der Prisma-Client muss vor tsc existieren.
+      - run: pnpm --filter @keepit/schemas build
+      - run: pnpm --filter server exec prisma generate
+        env:
+          DATABASE_URL: postgresql://keepit:keepit@localhost:5432/keepit_test
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Tests
+        run: pnpm test

@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { t } from "i18next";
+import { useTranslation } from "react-i18next";
 import { ArrowLeft } from "lucide-react";
 import type { Customer } from "@keepit/schemas";
 import { Button } from "@/components";
@@ -10,6 +10,7 @@ interface Props {
 }
 
 export default function CustomerDetailPageHeader({ customer, onEdit }: Props) {
+    const { t } = useTranslation();
 
     return (
         <div className="grid gap-4 px-8 py-6 border-b border-(--border)">
@@ -19,7 +20,7 @@ export default function CustomerDetailPageHeader({ customer, onEdit }: Props) {
                 </Link>
                 <div className="flex-1 grid gap-1">
                     <p className="flex items-center gap-1 font-light text-sm text-gray-400">
-                        <Link to="/customers" className="hover:underline">Customers</Link>
+                        <Link to="/customers" className="hover:underline">{t("section.customers")}</Link>
                         <span className="text-(--text)">/</span>
                         <span className="text-(--text)">{customer.companyName}</span>
                     </p>

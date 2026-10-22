@@ -2,8 +2,75 @@
     "workloads": {
         "create": "Workload erstellen",
         "search": "Workloads durchsuchen...",
+        "noResults": "Keine Ergebnisse für „{{query}}“",
+        "validation": {
+            "productsRequired": "Mindestens 1 Produkt auswählen",
+            "productsAssigned": "Mindestens 1 Produkt muss zugeordnet sein",
+            "contractsRequired": "Mindestens 1 Tarif auswählen"
+        },
+        "modal": {
+            "createTitle": "Produkt erstellen",
+            "editTitle": "Produkt bearbeiten",
+            "name": "Produkt Name ({{language}})",
+            "namePlaceholder": "Produkt Name",
+            "description": "Produkt Beschreibung ({{language}})",
+            "descriptionPlaceholder": "Produkt Beschreibung",
+            "table": "Tabelle Beschreibung ({{language}})",
+            "tablePlaceholder": "Tabellen Beschreibung"
+        },
         "pricing": {
-            "create": "Preistabelle erstellen"
+            "create": "Preistabelle erstellen",
+            "add": "Hinzufügen",
+            "months_one": "{{count}} Monat",
+            "months_other": "{{count}} Monate",
+            "products": "Produkte",
+            "groupModal": {
+                "title": "Neue Preistabelle",
+                "allAssigned": "Alle Produkte sind bereits einer Preistabelle zugeordnet."
+            },
+            "editProducts": {
+                "title": "Produkte bearbeiten"
+            },
+            "addContracts": {
+                "title": "Tarife hinzufügen",
+                "contracts": "Tarife",
+                "allAssigned": "Alle Tarife sind bereits dieser Preistabelle zugeordnet."
+            },
+            "durations": {
+                "title": "Standardlaufzeiten",
+                "description": "Gelten für alle Tarifgruppen und bestimmen, welche Laufzeiten in einem Angebot wählbar sind.",
+                "empty": "Noch keine Laufzeit hinterlegt.",
+                "remove": "Laufzeit aus der Liste entfernen",
+                "newLabel": "Neue Laufzeit",
+                "placeholder": "Monate"
+            },
+            "tiers": {
+                "title": "Standard-Mengenstaffeln",
+                "description": "Gelten für alle Preistabellen. Eine Staffel zu entfernen löscht keine hinterlegten Preise — sie sind nur nicht mehr erreichbar, bis die Staffel zurückkommt.",
+                "empty": "Noch keine Staffel hinterlegt.",
+                "priceCount_one": "· {{count}} Preis",
+                "priceCount_other": "· {{count}} Preise",
+                "remove": "Staffel aus der Liste entfernen",
+                "removeWithPrices_one": "Staffel entfernen. Der {{count}} Preis auf dieser Stufe bleibt erhalten, gilt aber nicht mehr — die dann greifende Nachbarstaffel liefert ihren eigenen Preis.",
+                "removeWithPrices_other": "Staffel entfernen. Die {{count}} Preise auf dieser Stufe bleiben erhalten, gelten aber nicht mehr — die dann greifende Nachbarstaffel liefert ihren eigenen Preis.",
+                "from": "Ab Menge",
+                "to": "Bis"
+            },
+            "cell": {
+                "noPrice": "Kein Preis hinterlegt"
+            },
+            "orphan": {
+                "columnHint": "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar.",
+                "rowHint": "Diese Mengenstufe steht nicht in den Standard-Staffeln. Die Preise bleiben erhalten, werden aber von der Staffel überdeckt, die diese Menge jetzt abdeckt — sie gelten also nicht mehr.",
+                "from": "ab {{min}}",
+                "notInTiers": "nicht in der Staffelliste",
+                "remove": "Alle Preise auf Mengenstufe {{min}} in dieser Preistabelle entfernen"
+            },
+            "delete": {
+                "title": "Tarif aus dieser Preistabelle entfernen",
+                "confirm": "Tarif „{{name}}“ aus dieser Preistabelle entfernen? Die Preistabelle ({{count}} Preise) und alle zugehörigen Kundenpreise werden gelöscht.",
+                "done": "Tarif „{{name}}“ entfernt."
+            }
         }
     }
 }

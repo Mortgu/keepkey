@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createContract, deleteContract, reorderContracts, updateContract } from "./contract-api";
 import { contractKeys } from "./contract-keys";
 import type { Contract, CreateContractInput } from '@keepit/schemas';
-import { showToast } from "@/components/toast";
+import { showToast } from "@/components/modules/toast";
+import { getErrorMessage } from "@/lib/errors";
 
 export function useCreateContract() {
     const queryClient = useQueryClient();
@@ -78,7 +79,7 @@ export function useReorderContracts() {
         },
         onError: (error, _, context) => {
             queryClient.setQueryData(contractKeys.lists(), context?.previous);
-            showToast.error("", { message: error.message });
+            showToast.error("common.errorGeneric", { message: getErrorMessage(error) });
         },
         onSettled: () => queryClient.invalidateQueries({
             queryKey: contractKeys.lists(),

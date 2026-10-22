@@ -13,6 +13,7 @@ import cloudRouter from './nextcloud.route.js';
 import integrationsRouter from './integrations.route.js';
 import offerRouter from "./offer.route.js";
 import orderRouter from "./order.route.js";
+import invoiceRouter from "./invoice.route.js";
 import productRouter from "./product.route.js";
 import searchRouter from './search.route.js';
 import supplierRouter from "./supplier.route.js";
@@ -39,6 +40,7 @@ router.use("/contracts", requireSession, contractRouter);
 
 /* /api/orders */
 router.use("/orders", requireSession, orderRouter);
+router.use("/invoices", requireSession, invoiceRouter);
 
 /* /api/customers */
 router.use("/customers", requireSession, customerRouter);

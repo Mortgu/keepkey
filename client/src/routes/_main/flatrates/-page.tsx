@@ -19,8 +19,8 @@ export default function FlatratePage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
-                        { label: "Flatrates", to: "/flatrates" },
+                        { label: t("nav.dashboard"), to: "/" },
+                        { label: t("section.flatRates"), to: "/flatrates" },
                     ]}
                 />
 

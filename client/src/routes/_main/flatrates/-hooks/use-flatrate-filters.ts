@@ -1,19 +1,15 @@
 import { useSearch } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-
-const sortOptions = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-];
+import { DATE_SORTS, useSort } from "@/lib/sort-options";
 
 export default function useFlatrateFilters() {
     const urlSearch = useSearch({ strict: false });
     const [searchInput, setSearchInput] = useState(urlSearch.search ?? "");
-    const [sort, setSort] = useState<string>(sortOptions[0].value);
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
 
     const params = useMemo(() => ({
         search: searchInput || undefined,
-        sort: sort as "createdAt:asc" | "createdAt:desc",
+        sort,
     }), [searchInput, sort]);
 
     return {

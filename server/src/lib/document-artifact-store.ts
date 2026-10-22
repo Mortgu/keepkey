@@ -9,6 +9,8 @@ import {
     type S3ClientConfig,
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { DocumentFormat } from "@prisma/client";
+import type { DocumentFormatParam } from "@keepit/schemas";
 import env from "./env.js";
 
 export type StoredDocumentArtifact = {
@@ -22,8 +24,16 @@ export type StoredDocumentArtifacts = {
     docx: StoredDocumentArtifact;
 };
 
-export type DocumentArtifactScope = "offers" | "orders";
+export type DocumentArtifactScope = "offers" | "orders" | "confirmations" | "invoices";
 const DOWNLOAD_URL_TTL_SECONDS = 5 * 60;
+
+export const MIME_TYPES: Record<DocumentFormatParam, string> = {
+    pdf: "application/pdf",
+    docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+};
+
+export const toDocumentFormat = (format: DocumentFormatParam): DocumentFormat =>
+    format === "pdf" ? DocumentFormat.PDF : DocumentFormat.DOCX;
 
 /**
  * Etwas großzügiger als beim Download: hier lädt der Nutzer eine Datei über

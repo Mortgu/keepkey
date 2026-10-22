@@ -1,9 +1,9 @@
 import { Pen, Trash } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Flatrate } from "@keepit/schemas";
 import { Button } from "@/components";
-import { useDeleteFlatRate, useLocale, useUpdateFlatRate } from "@/hooks";
+import { useDeleteFlatRate, useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatDate } from "@/lib/format";
 
 interface Props {
   flatrate: Flatrate;
@@ -11,8 +11,9 @@ interface Props {
 }
 
 export default function FlatRateItem({ flatrate, onEdit }: Props) {
+  const { t } = useTranslation();
+  const { formatDate, formatEur } = useFormatters();
   const { deleteFlatRate, isDeletingFlatRate } = useDeleteFlatRate();
-  const { updateFlatRate } = useUpdateFlatRate();
 
   const locale = useLocale();
 
@@ -35,9 +36,9 @@ export default function FlatRateItem({ flatrate, onEdit }: Props) {
         <div className="flex items-center justify-between w-full px-4 py-2 gap-4 bg-white border-t border-(--border)">
 
           <div className="flex items-center gap-2 text-md text-gray-500 mr-2">
-            <span>Gesamt: </span>
+            <span>{t("flatrates.total")}</span>
             <span className="text-gray-900 font-medium font-mono">
-              {(flatrate.total_cents / 100).toFixed(2)} €
+              {formatEur(flatrate.total_cents)}
             </span>
           </div>
 

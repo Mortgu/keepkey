@@ -58,6 +58,26 @@ export type PositionPrice = z.infer<typeof positionPriceSchema>;
 export const netCents = (price: Pick<PositionPrice, "total_cents" | "discount_cents">): number =>
     price.total_cents - price.discount_cents;
 
+export type VatTotals = {
+    netCents: number;
+    vatRate: number;
+    vatCents: number;
+    grossCents: number;
+};
+
+/**
+ * Mehrwertsteuer auf einen Nettobetrag — für Auftragsbestätigung und Rechnung.
+ *
+ * `taxRate` in Prozent (19 = 19 %), wie an `Customer.taxRate` hinterlegt und im
+ * Accepted-Snapshot eingefroren. Gerundet wird einmal, kaufmännisch, auf den
+ * Cent — damit Netto + MwSt exakt Brutto ergibt und sich beim Summieren mehrerer
+ * Positionen keine Rundungsdifferenzen einschleichen.
+ */
+export const vatTotals = (netCents: number, taxRate: number): VatTotals => {
+    const vatCents = Math.round(netCents * taxRate / 100);
+    return { netCents, vatRate: taxRate, vatCents, grossCents: netCents + vatCents };
+};
+
 /**
  * Koordinaten, die einen Preis im Tarif eindeutig adressieren.
  *

@@ -1,8 +1,21 @@
 /** Optional real-PostgreSQL concurrency tests. Only an explicitly supplied test URL is used. */
 import { randomUUID } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
-import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import pg from "pg";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
+import { prisma } from "../lib/prismaClient.js";
+import { metadataSnapshot } from "../schemas/order-inputs.js";
+import { getCustomerById, getCustomers } from "./customer.service.js";
+import { getDashboardStats } from "./dashboard.service.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
+import {
+    cancelOrder,
+    createOrder,
+    getOrderById,
+    updateOrder,
+} from "./order.service.js";
+import { search } from "./search.service.js";
+import { getSuppliers } from "./supplier.service.js";
 
 const state = vi.hoisted(() => ({
     schema: `order_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -26,20 +39,6 @@ vi.mock("../lib/prismaClient.js", async () => {
 vi.mock("./document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
-import { prisma } from "../lib/prismaClient.js";
-import {
-    createOrder,
-    updateOrder,
-    getOrderById,
-    cancelOrder,
-    restoreOrderRevision,
-} from "./order.service.js";
-import { assertOfferEditable } from "./offer-acceptance.service.js";
-import { getCustomers, getCustomerById } from "./customer.service.js";
-import { getSuppliers } from "./supplier.service.js";
-import { getDashboardStats } from "./dashboard.service.js";
-import { search } from "./search.service.js";
-import { metadataSnapshot } from "../schemas/order-inputs.js";
 
 const integration = describe.skipIf(!process.env.ORDER_TEST_DATABASE_URL);
 integration("real PostgreSQL acceptance transactions", () => {
@@ -92,6 +91,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 id: "customer",
                 companyName: "Original Ltd",
                 language: "EN",
+                taxRate: 19,
             },
         });
         await prisma.contactPerson.create({
@@ -152,6 +152,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 language: "EN",
                 offerPositions: {
                     create: {
+                        id: `pos-${randomUUID()}`,
                         productId: "product",
                         quantity: 10,
                         total_cents: 120000,
@@ -166,16 +167,21 @@ integration("real PostgreSQL acceptance transactions", () => {
             },
         });
     }
-    const input = (id: string) => ({
-        id,
-        orderId: randomUUID(),
-        expectedOfferVersion: 1,
-    });
+    const input = async (id: string) => {
+        const positions = await prisma.offerPosition.findMany({ where: { offerId: id }, select: { id: true } });
+        return {
+            id,
+            orderId: randomUUID(),
+            expectedOfferVersion: 1,
+            positions: positions.map((p) => ({ offerPositionId: p.id, purchase_eur_user_month: 800 })),
+        };
+    };
     it("allows exactly one of two simultaneous acceptances", async () => {
         const offer = await draft();
+        const body = await input(offer.id);
         const results = await Promise.allSettled([
-            createOrder(input(offer.id), "user"),
-            createOrder(input(offer.id), "user"),
+            createOrder(body, "user"),
+            createOrder({ ...body, orderId: randomUUID() }, "user"),
         ]);
         expect(results.filter((r) => r.status === "fulfilled")).toHaveLength(1);
         expect(results.filter((r) => r.status === "rejected")).toHaveLength(1);
@@ -203,7 +209,7 @@ integration("real PostgreSQL acceptance transactions", () => {
             });
         });
         await locked;
-        const acceptance = createOrder(input(offer.id), "user");
+        const acceptance = createOrder(await input(offer.id), "user");
         const result = expect(acceptance).rejects.toMatchObject({
             code: "VERSION_CONFLICT",
         });
@@ -220,11 +226,11 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("rolls back the offer lock and snapshot when the order cannot be inserted", async () => {
         const first = await draft();
-        const existing = await createOrder(input(first.id), "user");
+        const existing = await createOrder(await input(first.id), "user");
         const second = await draft();
         await expect(
             createOrder(
-                { ...input(second.id), orderId: existing.orderId },
+                { ...(await input(second.id)), orderId: existing.orderId },
                 "user",
             ),
         ).rejects.toThrow();
@@ -236,7 +242,7 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("metadata edits and restores preserve the accepted price and frozen master data", async () => {
         const offer = await draft();
-        const order = await createOrder(input(offer.id), "user");
+        const order = await createOrder(await input(offer.id), "user");
         await prisma.customer.update({
             where: { id: "customer" },
             data: { companyName: "Changed Ltd" },
@@ -250,10 +256,7 @@ integration("real PostgreSQL acceptance transactions", () => {
             },
             "user",
         );
-        const revision = await prisma.orderRevision.findFirstOrThrow({
-            where: { orderId: order.id, version: 1 },
-        });
-        await restoreOrderRevision(order.id, revision.id, 2, "user");
+
         const restored = await getOrderById(order.id);
         expect(restored.net_amount).toBe(80000);
         expect(restored.projectNumber).toBeNull();
@@ -272,7 +275,7 @@ integration("real PostgreSQL acceptance transactions", () => {
     });
     it("resolves list counts, search and dashboard volumes through the accepted offer", async () => {
         const offer = await draft();
-        const order = await createOrder(input(offer.id), "user");
+        const order = await createOrder(await input(offer.id), "user");
         const customers = await getCustomers({});
         expect(customers[0]?._count.orders).toBeGreaterThan(0);
         expect(

@@ -1,7 +1,7 @@
-import { queryOptions } from "@tanstack/react-query";
-import { getOfferRevisions, getOffers } from "./offer-api";
-import { offerKeys } from "./offers-keys";
 import type { OfferFilterParams } from "@keepit/schemas";
+import { queryOptions } from "@tanstack/react-query";
+import { getOffer, getOffers } from "./offer-api";
+import { offerKeys } from "./offers-keys";
 
 export const offerQueries = {
     list: (filters: OfferFilterParams = {}) => {
@@ -11,11 +11,11 @@ export const offerQueries = {
         });
     },
 
-    revisions: (offerId: string) => {
+    detail: (id: string) => {
         return queryOptions({
-            queryKey: offerKeys.revisions(offerId),
-            queryFn: () => getOfferRevisions(offerId),
-            enabled: Boolean(offerId),
+            queryKey: offerKeys.detail(id),
+            queryFn: () => getOffer(id),
+            enabled: Boolean(id),
         });
     },
 };

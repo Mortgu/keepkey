@@ -9,7 +9,7 @@ vi.mock("./document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
 import { presentOrder } from "./order-source.js";
-import { formatOrderData } from "../pipelines/order/actions.js";
+import { formatOrderData } from "../pipelines/order/build-order.js";
 import {
     parseAcceptedOfferSnapshot,
     serializeAcceptedOfferSnapshot,
@@ -83,9 +83,14 @@ describe("accepted offer order data", () => {
         expect(orderTemplateSchema.safeParse(formatted).success).toBe(true);
         expect(formatted.customer.fullName).toBe("First Last");
     });
-    it("requires the version shown at acceptance", () => {
+    it("requires the version shown at acceptance and purchase prices for the supplier", () => {
+        const positions = [{ offerPositionId: "position", purchase_eur_user_month: 800 }];
         expect(
-            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1" })
+            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1", positions })
+                .success,
+        ).toBe(false);
+        expect(
+            acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1", expectedOfferVersion: 1 })
                 .success,
         ).toBe(false);
         expect(
@@ -93,6 +98,7 @@ describe("accepted offer order data", () => {
                 id: "offer",
                 orderId: "AB-1",
                 expectedOfferVersion: 1,
+                positions,
             }).success,
         ).toBe(true);
     });
@@ -118,8 +124,24 @@ describe("accepted offer order data", () => {
                 order: { ...input.order, date: "invalid" },
             }).success,
         ).toBe(false);
+        expect(
+            updateOrderMetadataSchema.safeParse({
+                ...input,
+                order: { ...input.order, contractStartDate: "invalid" },
+            }).success,
+        ).toBe(false);
+        expect(
+            updateOrderMetadataSchema.safeParse({
+                ...input,
+                order: { ...input.order, contractStartDate: "2026-11-01" },
+            }).success,
+        ).toBe(true);
         expect(parseMetadataRevision(input, 1)).toEqual(input.order);
         expect(() => parseMetadataRevision(input, 2)).toThrow();
+    });
+    it("still reads revision snapshots written before contractStartDate existed", () => {
+        const { contractStartDate: _omitted, ...legacy } = metadataSnapshot(orderFixture()).order;
+        expect(parseMetadataRevision({ order: legacy }, 1)).toEqual(legacy);
     });
     it.each(["order.docx", "order.en.docx"])(
         "renders the bundled %s with order, offer and project numbers",

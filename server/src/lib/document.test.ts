@@ -6,6 +6,8 @@ vi.mock("./prismaClient.js", () => ({
         task: { updateMany: vi.fn(), update: vi.fn() },
         offerDocument: { updateMany: vi.fn() },
         orderDocument: { updateMany: vi.fn() },
+        confirmationDocument: { updateMany: vi.fn() },
+        invoiceDocument: { updateMany: vi.fn() },
     },
 }));
 

@@ -18,9 +18,6 @@ import {
     getTariffGroup,
     getTariffGroups,
     getTariffPrice,
-    getTariffVersions,
-    restoreTariffVersion,
-    sealTariffVersion,
     updateStandardTier,
     updateTariffCell,
     updateTariffGroup,
@@ -30,7 +27,6 @@ import { validate, validateParams, validateQuery } from "@/middlewares/zod.middl
 import {
     idParamsSchema,
     tariffParamsSchema,
-    tariffVersionParamsSchema,
 } from "@/schemas/params-schemas.js";
 import {
     createStandardDurationSchema,
@@ -109,15 +105,6 @@ router.get('/:id/:tariffId', validateParams(tariffParamsSchema), getTariff);
 
 /* [DELETE] /api/tariffs/:id/:tariffId — Tariff löschen */
 router.delete('/:id/:tariffId', validateParams(tariffParamsSchema), deleteTariff);
-
-/* [GET] /api/tariffs/:id/:tariffId/versions — Versionshistorie */
-router.get('/:id/:tariffId/versions', validateParams(tariffParamsSchema), getTariffVersions);
-
-/* [POST] /api/tariffs/:id/:tariffId/versions — aktuellen Stand versiegeln */
-router.post('/:id/:tariffId/versions', validateParams(tariffParamsSchema), sealTariffVersion);
-
-/* [POST] /api/tariffs/:id/:tariffId/versions/:versionId/restore */
-router.post('/:id/:tariffId/versions/:versionId/restore', validateParams(tariffVersionParamsSchema), restoreTariffVersion);
 
 /* [PATCH] /api/tariffs/:id/:tariffId/cell — Preis an einer Koordinate setzen */
 router.patch('/:id/:tariffId/cell', validateParams(tariffParamsSchema), validate(updateTariffCellSchema), updateTariffCell);

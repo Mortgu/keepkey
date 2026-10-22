@@ -1,7 +1,14 @@
+import { LOCALES } from "./format";
 import type { Currency, Language } from "@keepit/schemas";
+import type { SelectOption } from "@/components";
 
 export interface CountryConfig {
+    /** ISO-3166-Code; daraus entsteht der Anzeigename in der aktiven Sprache. */
     code: string;
+    /**
+     * Der am Kunden gespeicherte Wert (historisch der deutsche Name). Er ist ein
+     * Datenwert und kein Anzeigetext — angezeigt wird {@link countryOptions}.
+     */
     name: string;
     language: Language;
     currency: Currency;
@@ -17,12 +24,27 @@ export const COUNTRIES: Array<CountryConfig> = [
 export const findCountryByName = (name?: string | null): CountryConfig =>
     COUNTRIES.find((c) => c.name === name) ?? COUNTRIES[0];
 
-export const COUNTRY_OPTIONS = COUNTRIES.map((c) => ({ value: c.name, label: c.name }));
+/** Die Inhaltssprachen — dieselben, für die es ein Zahlen-/Datumsformat gibt. */
+const LANGUAGES = Object.keys(LOCALES) as Array<Language>;
 
-export const LANGUAGE_OPTIONS = [
-    { value: "DE", label: "Deutsch" },
-    { value: "EN", label: "Englisch" },
-];
+/*
+ * Länder- und Sprachnamen kommen aus `Intl.DisplayNames` statt aus den
+ * Sprachdateien: die Namen sind dort für jede Sprache gepflegt. Die Sprache ist
+ * Parameter, damit Komponenten sie über `useLocale()` als Eingabe haben und ein
+ * Sprachwechsel neu beschriftet.
+ */
+
+/** Länder als Auswahl: Wert ist der gespeicherte Name, Beschriftung in `language`. */
+export function countryOptions(language: Language): Array<SelectOption> {
+    const names = new Intl.DisplayNames(LOCALES[language], { type: "region" });
+    return COUNTRIES.map((c) => ({ value: c.name, label: names.of(c.code) ?? c.name }));
+}
+
+/** Inhaltssprachen (DE/EN) als Auswahl, beschriftet in `language`. */
+export function languageOptions(language: Language): Array<SelectOption<Language>> {
+    const names = new Intl.DisplayNames(LOCALES[language], { type: "language" });
+    return LANGUAGES.map((code) => ({ value: code, label: names.of(code.toLowerCase()) ?? code }));
+}
 
 export const CURRENCY_OPTIONS = [
     { value: "EUR", label: "EUR (€)" },

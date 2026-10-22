@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 
 import * as offerService from "../services/offer/index.js";
 
@@ -12,16 +12,6 @@ export const getOffers = async (request: Request, response: Response) => {
 export const getOfferById = async (request: Request, response: Response) => {
     const offer = await offerService.getOfferById(request.params.id as string);
     return response.status(200).json(offer);
-};
-
-export const getOfferRevisions = async (request: Request, response: Response) => {
-    const revisions = await offerService.getOfferRevisions(request.params.id as string);
-    return response.status(200).json(revisions);
-};
-
-export const getNextQuoteId = async (request: Request, response: Response, next: NextFunction) => {
-    const quoteId = await offerService.getNextQuoteId();
-    return response.status(200).json(quoteId);
 };
 
 /* ========== DELETE ========== */
@@ -54,16 +44,6 @@ export const enqueueGeneration = async (request: Request, response: Response) =>
     return response.status(200).json(task);
 };
 
-export const restoreOfferRevision = async (request: Request, response: Response) => {
-    const offer = await offerService.restoreOfferRevision(
-        request.params.id as string,
-        request.params.revisionId as string,
-        request.body.expectedVersion,
-        request.user!.id,
-    );
-    return response.status(200).json(offer);
-};
-
 export const renewOffer = async (request: Request, response: Response) => {
     const offer = await offerService.renewOffer(
         request.params.id as string,
@@ -74,11 +54,7 @@ export const renewOffer = async (request: Request, response: Response) => {
 };
 
 export const extendOffer = async (request: Request, response: Response) => {
-    const offer = await offerService.extendOffer(
-        request.params.id as string,
-        request.body,
-        request.user!.id,
-    );
+    const offer = await offerService.extendOffer(request.params.id as string, request.body);
     return response.status(200).json(offer);
 };
 

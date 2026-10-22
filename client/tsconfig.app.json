@@ -20,6 +20,7 @@
     },
     /* Bundler mode */
     "moduleResolution": "bundler",
+    "customConditions": ["development"],
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": true,

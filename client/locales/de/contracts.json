@@ -1,6 +1,20 @@
 {
   "contracts": {
     "description": "Zentrale Tarifverwaltung",
-    "create": "Tarif erstellen"
+    "create": "Tarif erstellen",
+    "default": "Standard",
+    "noFeatures": "Keine Features hinterlegt!",
+    "move": "{{name}} verschieben",
+    "modal": {
+      "editTitle": "Tarif bearbeiten",
+      "createTitle": "Neuen Tarif anlegen",
+      "name": "Name ({{language}})",
+      "features": "Features ({{language}}):",
+      "featurePlaceholder": "Feature {{number}}",
+      "removeFeature": "Feature entfernen",
+      "addFeature": "Feature hinzufügen",
+      "table": "Tabelle ({{language}})",
+      "tablePlaceholder": "Datenvolumen"
+    }
   }
 }

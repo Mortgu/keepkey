@@ -1,8 +1,7 @@
 import type { Contract, OfferPosition, OrderPosition } from "@keepit/schemas";
 import { Badge } from "@/components";
-import { useLocale } from "@/hooks";
+import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import { formatEur } from "@/utils/utils";
 
 type Props = {
     position: OfferPosition | OrderPosition;
@@ -20,6 +19,7 @@ type Props = {
  * `OfferPosition` ohne Freimonate — der Rabattblock entfällt dort deshalb.
  */
 export default function PositionRow({ position, contract, durationMonths }: Props) {
+    const { formatEur } = useFormatters();
     const { product, quantity, total_cents } = position;
 
     const locale = useLocale();

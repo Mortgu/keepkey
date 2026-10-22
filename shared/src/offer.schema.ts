@@ -1,12 +1,13 @@
 import { z } from "zod";
 import { isoDateTime } from './common.js';
-import { userSchema } from "./user.schema.js";
 import { contactSchema } from "./contact.schema.js";
-import { customerSchema } from "./customer.schema.js";
 import { contractSchema } from "./contract.schema.js";
-import { productSchema } from "./product.schema.js";
-import { flatrateSchema } from "./flatrate.schema.js";
+import { customerSchema } from "./customer.schema.js";
 import { documentArtifactSchema, documentStatusSchema } from "./document.schema.js";
+import { flatrateSchema } from "./flatrate.schema.js";
+import { offerOrderSummarySchema } from "./offer-order-summary.schema.js";
+import { productSchema } from "./product.schema.js";
+import { userSchema } from "./user.schema.js";
 
 /* OfferPosition */
 
@@ -95,20 +96,10 @@ export const offerDocumentSchema = createOfferDocumentSchema.extend({
 });
 export type OfferDocument = z.infer<typeof offerDocumentSchema>;
 
-/* OfferRevision */
-export const offerRevisionSchema = z.object({
-    id: z.string(),
-    version: z.number().int().positive(),
-
-    createdAt: z.string(),
-    changedBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }),
-});
-export type OfferRevision = z.infer<typeof offerRevisionSchema>;
-
 /* Offer*/
+export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
+export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
+
 export const createOfferSchema = z.object({
     customerId: z.string(),
     contactPersonId: z.string(),
@@ -137,6 +128,13 @@ export const createOfferSchema = z.object({
     flatrates: z.array(createOfferFlatrateSchema),
 
     discounts: z.array(createOfferDiscountSchema),
+
+    /**
+     * Verlängerung oder Lizenzerweiterung *ohne* Quellangebot — für Bestands-
+     * verträge, deren Ursprungsangebot nicht im System ist. Mit Quellangebot
+     * laufen beide über `/:id/renew` bzw. `/:id/extend`, wo der Typ feststeht.
+     */
+    derivationType: offerDerivationTypeSchema.nullable().optional(),
 });
 export type CreateOfferInput = z.infer<typeof createOfferSchema>;
 
@@ -147,8 +145,6 @@ export type UpdateOfferInput = z.infer<typeof updateOfferSchema>;
 
 /* Lizenzerweiterung */
 
-export const offerDerivationTypeSchema = z.enum(["RENEWAL", "LICENSE_EXTENSION"]);
-export type OfferDerivationType = z.infer<typeof offerDerivationTypeSchema>;
 
 /**
  * Eine Lizenzerweiterung bestellt zusätzliche Seats innerhalb eines laufenden
@@ -219,6 +215,9 @@ export const offerSchema = z.object({
     renewedFromOfferId: z.string().nullable().optional(),
     derivationType: offerDerivationTypeSchema.nullable().optional(),
 
+    /** Nur gesetzt, wenn gezielt abgefragt (`includeOrder`/Einzelabruf) — s. `offerFilterSchema`. */
+    order: offerOrderSummarySchema.nullable().optional(),
+
     user: userSchema,
     customer: customerSchema,
     customerContactPerson: contactSchema,
@@ -235,10 +234,6 @@ export type Offer = z.infer<typeof offerSchema>;
 export const offerListSchema = z.array(offerSchema);
 export type OfferList = z.infer<typeof offerListSchema>;
 
-export const restoreOfferRevisionSchema = z.object({
-    expectedVersion: z.number().int().positive(),
-});
-
 /**
  * Filter der Angebotsliste — übertragen als Query-String.
  *
@@ -248,7 +243,10 @@ export const restoreOfferRevisionSchema = z.object({
  * Strings sind.
  */
 export const offerFilterSchema = z.object({
+    /** Angebotsnr., Kundenfirma oder Ansprechpartner — ohne Groß-/Kleinschreibung. */
     search: z.string().optional(),
+    /** `open`: nur noch nicht angenommene Angebote. */
+    status: z.enum(["open"]).optional(),
     companyIds: z.union([z.string(), z.array(z.string())]).optional(),
     contactPersonIds: z.union([z.string(), z.array(z.string())]).optional(),
     productIds: z.union([z.string(), z.array(z.string())]).optional(),

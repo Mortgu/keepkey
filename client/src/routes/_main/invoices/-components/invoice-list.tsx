@@ -1,23 +1,17 @@
-import { Plus } from "lucide-react";
 import { Fragment, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import type {
-    Customer
-} from "@keepit/schemas";
-import { useCustomers, useModal } from "@/hooks";
-import { Button, FilterChip, MultiDropdown, SearchBar, SortDropdown } from "@/components";
-
-const sort_options = [
-    { value: "createdAt:desc", label: "Datum – neuestes zuerst" },
-    { value: "createdAt:asc", label: "Datum – ältestes zuerst" },
-];
+import InvoiceCard from "./invoice-card";
+import type { Customer } from "@keepit/schemas";
+import { useCustomers, useInvoices } from "@/hooks";
+import { FilterChip, ListSkeleton, MultiDropdown, RouteError, SearchBar, Skeleton, SortDropdown } from "@/components";
+import { DATE_SORTS, sortItems, useSort } from "@/lib/sort-options";
 
 export default function InvoiceList() {
-    const modal = useModal();
     const { t } = useTranslation();
 
     const [searchInput, setSearchInput] = useState("");
-    const [sort, setSort] = useState(sort_options[0].value);
+    const [search, setSearch] = useState("");
+    const { sort, setSort, sortOptions } = useSort(DATE_SORTS);
     const [customerFilter, setCustomerFilter] = useState<Array<string>>([]);
     const [contactPersonFilter] = useState<Array<string>>([]);
 
@@ -33,24 +27,27 @@ export default function InvoiceList() {
     const activeFilterCount = customerFilter.length + contactPersonFilter.length;
 
     const handleSearch = () => {
-        setSearchInput(searchInput);
+        setSearch(searchInput.trim());
     };
+
+    const { invoices, isPending, error } = useInvoices({
+        search: search || undefined,
+        customerIds: customerFilter.length ? customerFilter : undefined,
+    });
+    const sorted = useMemo(() => sortItems(invoices, sort), [invoices, sort]);
 
     return (
         <Fragment>
             {/* Header */}
             <div className='flex justify-between items-center gap-4'>
                 <div className="w-full flex items-center gap-2">
-                    <SortDropdown value={sort} onChange={setSort} options={sort_options} />
+                    <SortDropdown value={sort} onChange={setSort} options={sortOptions} />
 
                     <MultiDropdown label="Kunde" options={customerFilterOptions}
                         values={customerFilter} onChange={setCustomerFilter} />
 
                     <SearchBar value={searchInput} onChange={setSearchInput}
                         onSubmit={handleSearch} placeholder={t("invoices.searchPlaceholder")} />
-                </div>
-                <div className="flex items-center gap-2">
-                    <Button onClick={() => modal.open()} size='sm'>{t("button.create")} <Plus className='size-4' /></Button>
                 </div>
             </div>
 
@@ -64,6 +61,18 @@ export default function InvoiceList() {
                                 onRemove={() => setCustomerFilter(customerFilter.filter(i => i !== id))} />
                         );
                     })}
+                </div>
+            )}
+
+            {/* Rechnungen entstehen an der Bestellung — hier wird nur gelistet. */}
+            {isPending && <ListSkeleton rows={4} skeleton={<Skeleton className="h-24" />} />}
+            {error && <RouteError error={error} />}
+            {!isPending && !error && (
+                <div className="grid gap-3">
+                    {sorted.map((invoice) => <InvoiceCard key={invoice.id} invoice={invoice} />)}
+                    {sorted.length === 0 && (
+                        <p className="text-sm text-(--text-secondary) text-center py-8">{t("invoices.empty")}</p>
+                    )}
                 </div>
             )}
         </Fragment>

@@ -1,7 +1,6 @@
 import { useTranslation } from "react-i18next";
 
 import EmailForm from "./-components/email-form";
-import PasskeyForm from "./-components/passkey-form";
 import PasswordForm from "./-components/password-form";
 import ProfileForm from "./-components/profile-form";
 import { Breadcrumbs } from "@/components";
@@ -24,7 +23,7 @@ export default function SettingsPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("nav.settings"), to: "/settings" },
                     ]}
                 />
@@ -39,7 +38,6 @@ export default function SettingsPage() {
             <section className="grid gap-2">
                 <h2 className="text-md font-medium">{t("settings.security")}</h2>
                 <PasswordForm />
-                <PasskeyForm />
             </section>
         </div>
     );

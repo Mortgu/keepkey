@@ -1,12 +1,10 @@
 import { useTranslation } from "react-i18next";
 import SupplierModal from "./-components/supplier-modal";
 import useSupplierFilters from "./-hooks/use-supplier-filters";
-import type { Supplier } from "@keepit/schemas";
-import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown } from "@/components";
-import { useModal, useSuppliers } from "@/hooks";
 import SupplierListItem from "./-components/supplier-list-item";
-import { LoaderCircle } from "lucide-react";
-import { error } from "better-auth/api";
+import type { Supplier } from "@keepit/schemas";
+import { Breadcrumbs, Button, RouteError, SearchBar, SortDropdown, Spinner } from "@/components";
+import { useModal, useSuppliers } from "@/hooks";
 
 export default function SupplierPage() {
     const { t } = useTranslation();
@@ -27,7 +25,7 @@ export default function SupplierPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.suppliers"), to: "/suppliers" },
                     ]}
                 />
@@ -44,12 +42,12 @@ export default function SupplierPage() {
 
             <div className="grid gap-4">
                 {errorSuppliers && (
-                    <RouteError error={error} />
+                    <RouteError error={errorSuppliers} />
                 )}
 
                 {pendingSuppliers && (
                     <div className="py-8 flex items-center justify-center">
-                        <LoaderCircle className="animate-spin" />
+                        <Spinner />
                     </div>
                 )}
 
@@ -57,7 +55,7 @@ export default function SupplierPage() {
                     <SupplierListItem
                         key={supplier.id}
                         supplier={supplier}
-                        onEdit={(supplier) => modal.open(supplier)}
+                        onEdit={(selected) => modal.open(selected)}
                     />
                 ))}
             </div>

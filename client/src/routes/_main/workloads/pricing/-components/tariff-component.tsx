@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import { Trash } from "lucide-react";
 import TariffCellComponent from "./cell-component";
 import TariffTierComponent from "./tier-component";
@@ -11,13 +12,8 @@ type Props = {
     tariff: TariffBase;
 };
 
-const ORPHAN_COLUMN_HINT =
-    "Diese Laufzeit steht nicht in den Standardlaufzeiten — die Preise bleiben erhalten, sind im Angebot aber nicht wählbar.";
-
-const ORPHAN_ROW_HINT =
-    "Diese Mengenstufe steht nicht in den Standard-Staffeln. Die Preise bleiben erhalten, werden aber von der Staffel überdeckt, die diese Menge jetzt abdeckt — sie gelten also nicht mehr.";
-
 export default function TariffComponent({ tariff }: Props) {
+    const { t } = useTranslation();
     const { deleteCell } = useDeleteTariffCell();
     const { durations: standardDurations } = useStandardDurations();
     const { tiers } = useStandardTiers();
@@ -59,7 +55,7 @@ export default function TariffComponent({ tariff }: Props) {
                 max_quantity: tier.max_quantity,
             }));
 
-        const standardSet = new Set(tiers.map(t => t.min_quantity));
+        const standardSet = new Set(tiers.map(tier => tier.min_quantity));
         const orphans = [...new Set(tariff.cells.map(c => c.min_quantity))]
             .filter(min_quantity => !standardSet.has(min_quantity))
             .sort((a, b) => a - b)
@@ -90,9 +86,9 @@ export default function TariffComponent({ tariff }: Props) {
                                 <th key={column.duration} className="px-3 py-1 last:border-r-0 border-r border-(--border)">
                                     <div
                                         className={column.orphan ? "text-(--text-secondary)" : undefined}
-                                        title={column.orphan ? ORPHAN_COLUMN_HINT : undefined}
+                                        title={column.orphan ? t("workloads.pricing.orphan.columnHint") : undefined}
                                     >
-                                        <p className="font-medium text-md">{column.duration} Monate</p>
+                                        <p className="font-medium text-md">{t("workloads.pricing.months", { count: column.duration })}</p>
                                     </div>
                                 </th>
                             ))}
@@ -115,16 +111,16 @@ export default function TariffComponent({ tariff }: Props) {
                                     <td>
                                         <div
                                             className="flex items-center gap-2 px-3 py-1"
-                                            title={ORPHAN_ROW_HINT}
+                                            title={t("workloads.pricing.orphan.rowHint")}
                                         >
-                                            <span className="flex-1 tabular-nums">ab {row.min_quantity}</span>
-                                            <span className="text-xs">nicht in der Staffelliste</span>
+                                            <span className="flex-1 tabular-nums">{t("workloads.pricing.orphan.from", { min: row.min_quantity })}</span>
+                                            <span className="text-xs">{t("workloads.pricing.orphan.notInTiers")}</span>
                                             <Button
                                                 variant="link"
                                                 size="xs"
                                                 iconOnly
                                                 icon={<Trash className="size-3" />}
-                                                title={`Alle Preise auf Mengenstufe ${row.min_quantity} in dieser Preistabelle entfernen`}
+                                                title={t("workloads.pricing.orphan.remove", { min: row.min_quantity })}
                                                 onClick={() => deleteCell({
                                                     groupId,
                                                     tariffId: tariff.id,

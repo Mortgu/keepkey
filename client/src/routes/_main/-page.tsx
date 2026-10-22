@@ -1,14 +1,21 @@
 import { useTranslation } from "react-i18next";
 import OfferVolumeChart from "./-components/charts/offer-volume-chart";
-import IntegrationCard from "./-components/integration-card";
 import OffersOrdersChart from "./-components/charts/offers-orders-chart";
-import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
+import IntegrationCard from "./-components/integration-card";
 import type { IntegrationEntry } from "@keepit/schemas";
-import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
-import { useDashboardStats } from "@/hooks";
+import type { IntegrationCardMeta, IntegrationStatus } from "./-components/integration-card";
 import { Breadcrumbs, RouteError, Skeleton } from "@/components";
+import { useDashboardStats } from "@/hooks";
+import { useIntegrationStatus } from "@/hooks/integrations/integration-hooks";
 
 const CHECKING_STATUS: IntegrationStatus = "checking";
+
+/** Produktnamen — in jeder Sprache gleich, daher nicht in den Sprachdateien. */
+const INTEGRATION_NAMES = {
+    nextcloud: "NextCloud",
+    redis: "Redis",
+    s3: "S3 Storage",
+} as const;
 
 function toMeta(meta: Record<string, string> | undefined): Array<IntegrationCardMeta> | undefined {
     if (!meta) return undefined;
@@ -48,7 +55,7 @@ export default function DashboardPage() {
                 <Breadcrumbs
                     size="sm"
                     maxItems={4}
-                    items={[{ label: "Dashboard", to: "/" }]}
+                    items={[{ label: t("nav.dashboard"), to: "/" }]}
                 />
             </div>
 
@@ -56,16 +63,16 @@ export default function DashboardPage() {
             <div className="flex items-center justify-between mb-2">
                 {/* Title + Description */}
                 <div className="grid gap-1">
-                    <h1 className="text-xl font-medium">Overview</h1>
-                    <p className='text-sm text-gray-500'>Todo: Write a short page description text here</p>
+                    <h1 className="text-xl font-medium">{t("dashboard.title")}</h1>
+                    <p className='text-sm text-(--text-secondary)'>{t("dashboard.description")}</p>
                 </div>
             </div>
 
             {/* Integrations (Status + Infos) */}
             <div className='flex flex-wrap items-start gap-4 mb-4'>
-                {renderCard("NextCloud", data?.nextcloud)}
-                {renderCard("Redis", data?.redis)}
-                {renderCard("S3 Storage", data?.s3)}
+                {renderCard(INTEGRATION_NAMES.nextcloud, data?.nextcloud)}
+                {renderCard(INTEGRATION_NAMES.redis, data?.redis)}
+                {renderCard(INTEGRATION_NAMES.s3, data?.s3)}
             </div>
 
             {/* Kennzahlen der letzten 12 Monate */}

@@ -16,3 +16,17 @@ Rules:
 
 Always use migrations. `prisma db push` is not supported because hand-written SQL constraints are part of the schema.
 Always run `npx prisma generate` after migrating!
+
+## Agent skills
+
+### Issue tracker
+
+Issues live in GitHub Issues (`Mortgu/keepkey`), managed via the `gh` CLI. See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Default canonical labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`), used as-is. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context layout: one `GLOSSARY.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.

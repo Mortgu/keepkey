@@ -1,22 +1,23 @@
 import { useForm } from "@tanstack/react-form";
-import { useTranslation } from "react-i18next";
 import { Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { z } from "zod";
 import type {
   Contract,
   ContractTranslationInput,
   Language
 } from "@keepit/schemas";
+import type { TranslationKey } from "@/i18n";
 import {
-    Button,
-    DEFAULT_LANGUAGE_OPTIONS,
-    Dialog,
-    FieldInput,
-    FieldTextarea,
-    Input,
-    SegmentedLanguageToggle,
+  Button,
+  Dialog,
+  FieldInput,
+  FieldTextarea,
+  Input,
+  SegmentedLanguageToggle,
 } from "@/components";
+import { DEFAULT_LANGUAGE_OPTIONS } from "@/components/elements/language-toggle-options";
 import {
   useContractManager
 } from "@/hooks/contracts/contract-mutations";
@@ -28,7 +29,7 @@ interface ContractModalProps {
 }
 
 const langFields = z.object({
-  name: z.string().min(1, "Mindestens 1 Zeichen!"),
+  name: z.string().min(1, "validation.minOneChar" satisfies TranslationKey),
   features: z.array(z.string()),
   table: z.string(),
 });
@@ -84,11 +85,11 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
 
   const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 
-      e.preventDefault();
+    e.preventDefault();
 
-      e.stopPropagation();
+    e.stopPropagation();
 
-      contractForm.handleSubmit();
+    contractForm.handleSubmit();
 
   };
 
@@ -98,7 +99,7 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
       defaultOpen
       onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}
     >
-      <Dialog.Header title={isEdit ? "Vertrag bearbeiten" : "Neuen Vertrag anlegen"}>
+      <Dialog.Header title={isEdit ? t("contracts.modal.editTitle") : t("contracts.modal.createTitle")}>
         <SegmentedLanguageToggle
           options={DEFAULT_LANGUAGE_OPTIONS}
           value={language}
@@ -109,22 +110,22 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
         <form id="contract-form" onSubmit={handleSubmit} className="grid gap-4">
           <contractForm.Field name={`${language}.name`} children={(field) => (
             <div className="grid gap-2">
-              <FieldInput field={field} label={`Name (${language})`} />
+              <FieldInput field={field} label={t("contracts.modal.name", { language })} />
             </div>
           )} />
 
           <contractForm.Field name={`${language}.features`} mode="array" children={(field) => (
             <div className="grid gap-2">
-              <label className="text-sm text-gray-500">Features ({language}):</label>
+              <label className="text-sm text-gray-500">{t("contracts.modal.features", { language })}</label>
               <div className="grid gap-2">
                 {field.state.value.map((_, index) => (
                   <contractForm.Field key={index} name={`${language}.features[${index}]`} children={(itemField) => (
                     <div className="flex gap-2">
                       <Input value={itemField.state.value} onChange={(e) => itemField.handleChange(e.target.value)}
-                        onBlur={itemField.handleBlur} placeholder={`Feature ${index + 1}`} />
+                        onBlur={itemField.handleBlur} placeholder={t("contracts.modal.featurePlaceholder", { number: index + 1 })} />
                       <Button variant="secondary" size="sm" type="button"
                         icon={<Trash2 className="size-4" />} iconOnly
-                        aria-label="Feature entfernen"
+                        aria-label={t("contracts.modal.removeFeature")}
                         onClick={() => field.removeValue(index)} />
                     </div>
                   )} />
@@ -132,13 +133,13 @@ export default function ContractModal({ onClose, currentContract = null }: Contr
               </div>
               <Button type="button" variant="secondary" size="sm"
                 icon={<Plus className="size-4" />} onClick={() => field.pushValue("")}>
-                Feature hinzufügen
+                {t("contracts.modal.addFeature")}
               </Button>
             </div>
           )} />
 
           <contractForm.Field name={`${language}.table`} children={(field) => (
-            <FieldTextarea field={field} rows={5} label={`Tabelle (${language})`} placeholder="Datenvolumen" />
+            <FieldTextarea field={field} rows={5} label={t("contracts.modal.table", { language })} placeholder={t("contracts.modal.tablePlaceholder")} />
           )} />
         </form>
       </Dialog.Body>

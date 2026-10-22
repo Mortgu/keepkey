@@ -1,8 +1,8 @@
 import { Dot, Pen, Trash } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Supplier } from "@keepit/schemas";
-import { useDeleteSupplier } from "@/hooks";
+import { useDeleteSupplier, useFormatters } from "@/hooks";
 import { Badge, Button } from "@/components";
-import { formatDate } from "@/lib/format";
 
 type Props = {
     supplier: Supplier;
@@ -10,10 +10,12 @@ type Props = {
 };
 
 export default function SupplierListItem({ supplier, onEdit }: Props) {
+    const { t } = useTranslation();
+    const { formatDate } = useFormatters();
     const { deleteSupplier, isDeletingSupplier } = useDeleteSupplier();
 
     const handleDeleteSupplier = () => {
-        if (confirm("Bist du dir sicher?")) {
+        if (confirm(t("suppliers.deleteConfirm"))) {
             deleteSupplier(supplier.id);
         }
     }
@@ -35,9 +37,9 @@ export default function SupplierListItem({ supplier, onEdit }: Props) {
             <div className="flex items-center justify-between border-t border-(--border) px-4 py-2">
 
                 <div className="flex items-center">
-                    <p className="text-sm">{supplier._count.offers} Angebot</p>
+                    <p className="text-sm">{t("suppliers.offerCount", { count: supplier._count.offers })}</p>
                     <Dot size={18} />
-                    <p className="text-sm">{supplier._count.orders} Bestellungen</p>
+                    <p className="text-sm">{t("suppliers.orderCount", { count: supplier._count.orders })}</p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -46,7 +48,7 @@ export default function SupplierListItem({ supplier, onEdit }: Props) {
                         variant="border"
                         icon={<Pen size={14} />}
                         iconOnly
-                        aria-label="Zulieferer bearbeiten"
+                        aria-label={t("suppliers.edit")}
                         onClick={() => onEdit(supplier)}
                     />
                     <Button
@@ -54,7 +56,7 @@ export default function SupplierListItem({ supplier, onEdit }: Props) {
                         variant="border"
                         icon={<Trash size={14} />}
                         iconOnly
-                        aria-label="Zulieferer löschen"
+                        aria-label={t("suppliers.delete")}
                         onClick={handleDeleteSupplier}
                         loading={isDeletingSupplier}
                     />

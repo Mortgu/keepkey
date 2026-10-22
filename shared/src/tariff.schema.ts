@@ -361,32 +361,3 @@ export const tariffVersionSnapshotSchema = z.object({
     })),
 });
 export type TariffVersionSnapshot = z.infer<typeof tariffVersionSnapshotSchema>;
-
-export const tariffVersionReasonSchema = z.enum(["MANUAL", "OFFER", "RESTORE"]);
-export type TariffVersionReason = z.infer<typeof tariffVersionReasonSchema>;
-
-/** Unveränderlicher Stand einer Preistabelle. */
-export const tariffVersionSchema = z.object({
-    id: z.string(),
-    tariffId: z.string(),
-
-    version: z.number().int(),
-    snapshotVersion: z.number().int(),
-
-    hash: z.string(),
-    snapshot: tariffVersionSnapshotSchema,
-    reason: tariffVersionReasonSchema,
-
-    createdBy: z.object({
-        id: z.string(),
-        name: z.string(),
-    }).nullable(),
-
-    /** Inhalt entspricht dem aktuellen Stand der Tabelle. */
-    isCurrent: z.boolean(),
-    /** Anzahl Angebotspositionen, die diese Version als Preisgrundlage pinnen. */
-    usageCount: z.number().int(),
-
-    createdAt: z.string(),
-});
-export type TariffVersion = z.infer<typeof tariffVersionSchema>;

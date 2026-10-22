@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Loader } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { AuthContext } from "./auth-context.ts";
 import type { ReactNode } from "react";
+import { Spinner } from "@/components";
 import { authClient } from "@/lib/auth-client.ts";
 import { getSessionUser } from "@/hooks/users/user-api";
 import { userKeys } from "@/hooks/users/user-keys";
@@ -28,7 +28,7 @@ export function AuthProvider({ children }: Props) {
     if (isLoading) {
         return (
             <div>
-                <Loader className="animate-spin" />
+                <Spinner />
             </div>
         );
     }

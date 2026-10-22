@@ -7,17 +7,18 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "development": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
     "./cloud": {
+      "development": "./src/cloud.ts",
       "types": "./dist/cloud.d.ts",
       "default": "./dist/cloud.js"
     }
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch",
     "clean": "rm -rf dist"
   },
   "peerDependencies": {

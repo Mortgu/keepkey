@@ -32,7 +32,24 @@ export function getTaskQueue(): Queue<TaskJobData> {
 }
 
 export async function pingTaskQueue(): Promise<string> {
-    return getProducer().connection.ping();
+    const { connection } = getProducer();
+    // Ohne Offline-Queue scheitert ein Befehl, solange die (lazy angelegte)
+    // Verbindung noch aufgebaut wird — also auf "ready" oder den ersten Fehler warten.
+    if (connection.status === "wait" || connection.status === "connecting" || connection.status === "connect") {
+        await new Promise<void>((resolve, reject) => {
+            const onReady = () => {
+                connection.off("error", onError);
+                resolve();
+            };
+            const onError = (error: Error) => {
+                connection.off("ready", onReady);
+                reject(error);
+            };
+            connection.once("ready", onReady);
+            connection.once("error", onError);
+        });
+    }
+    return connection.ping();
 }
 
 export async function closeTaskQueue(): Promise<void> {

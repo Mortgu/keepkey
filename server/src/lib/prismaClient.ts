@@ -14,8 +14,12 @@ export const prisma: PrismaClient = globalForPrisma.prisma ?? new PrismaClient({
     adapter,
     omit: {
         task: { runToken: true },
-        offerDocument: { uploadToken: true },
-        orderDocument: { uploadToken: true },
+        // `model` ist der Render-Snapshot samt Kundendaten und Preisen: nie in
+        // API-Antworten, nur gezielt gelesen (`omit: { model: false }`).
+        offerDocument: { uploadToken: true, model: true },
+        orderDocument: { uploadToken: true, model: true },
+        confirmationDocument: { model: true },
+        invoiceDocument: { model: true },
     },
     log: env.NODE_ENV === 'development'
         ? ['error', 'warn']

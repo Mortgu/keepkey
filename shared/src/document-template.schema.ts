@@ -10,7 +10,7 @@ import { languageSchema } from "./language.schema.js";
  * benutzt. Vorlagen gibt es dagegen auch für Dokumentarten, die noch gar nicht
  * erzeugt werden können — `INVOICE` kommt später genau hier dazu.
  */
-export const documentTemplateKindSchema = z.enum(["OFFER", "ORDER"]);
+export const documentTemplateKindSchema = z.enum(["OFFER", "ORDER", "CONFIRMATION", "INVOICE"]);
 export type DocumentTemplateKind = z.infer<typeof documentTemplateKindSchema>;
 
 export const DOCUMENT_TEMPLATE_KINDS = documentTemplateKindSchema.options;

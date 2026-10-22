@@ -1,6 +1,26 @@
 {
   "settings": {
     "account": "Account",
-    "security": "Security"
+    "security": "Security",
+    "profile": {
+      "salutation": "Salutation",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "phone": "Phone number"
+    },
+    "email": {
+      "current": "Current email",
+      "new": "New email address"
+    },
+    "password": {
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Repeat new password"
+    },
+    "toast": {
+      "profileSaved": "Profile saved.",
+      "emailChanged": "Email address changed.",
+      "passwordChanged": "Password changed."
+    }
   }
 }

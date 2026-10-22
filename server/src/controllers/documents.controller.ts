@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
-import * as documentsService from "../services/documents.service.js";
+import * as documentsService from "../services/document/index.js";
+import * as offerService from "../services/offer/index.js";
 
 export const getDocumentCapabilities = async (_request: Request, response: Response) => {
     return response.status(200).json(await documentsService.getDocumentCapabilities());
@@ -74,4 +75,13 @@ export const resyncDocument = async (request: Request, response: Response) => {
         request.params.documentId as string,
     );
     return response.status(204).send();
+};
+
+export const adoptChanges = async (request: Request, response: Response) => {
+    const result = await offerService.adoptChanges(
+        request.params.type as DocumentType,
+        request.params.documentId as string,
+        request.body.fields as string[],
+    );
+    return response.status(200).json(result);
 };

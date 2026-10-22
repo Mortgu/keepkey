@@ -12,7 +12,7 @@ export function InvoicePage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.invoices"), to: "/invoices" },
                     ]}
                 />

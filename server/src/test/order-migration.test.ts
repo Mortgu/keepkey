@@ -34,7 +34,7 @@ beforeAll(async () => {
     await db.exec(`
         INSERT INTO "user" (id, name, salutation, "firstName", "lastName", email, "emailVerified", "createdAt", "updatedAt")
             VALUES ('user', 'Test User', '', 'Test', 'User', 'test@example.com', false, now(), now());
-        INSERT INTO customer (id, "companyName", "updatedAt") VALUES ('customer', 'Original Ltd', now());
+        INSERT INTO customer (id, "companyName", "taxRate", "updatedAt") VALUES ('customer', 'Original Ltd', 19, now());
         INSERT INTO contact_person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
         INSERT INTO product (id, "updatedAt") VALUES ('product', now());
@@ -74,9 +74,19 @@ afterEach(async () => {
 describe("order migration and PostgreSQL invariants", () => {
     it("removes the duplicated commercial tables and columns", async () => {
         const tables = await db.query(
-            `SELECT table_name FROM information_schema.tables WHERE table_name IN ('order_position', 'order_flat_rate')`,
+            `SELECT table_name FROM information_schema.tables WHERE table_name IN ('order_flat_rate')`,
         );
         expect(tables.rows).toEqual([]);
+        // `order_position` existiert wieder — aber nur mit der Einkaufsseite.
+        // Kundenkonditionen (Produkt, Menge, Verkaufspreis) bleiben im Snapshot.
+        const positionColumns = await db.query<{ column_name: string }>(
+            `SELECT column_name FROM information_schema.columns WHERE table_name = 'order_position'`,
+        );
+        const names = positionColumns.rows.map((c) => c.column_name);
+        expect(names).toEqual(expect.arrayContaining(["offerPositionId", "purchase_eur_user_month", "purchase_total_cents"]));
+        for (const customerColumn of ["productId", "quantity", "total_cents", "eur_user_month", "discount_cents"]) {
+            expect(names).not.toContain(customerColumn);
+        }
         const columns = await db.query<{ column_name: string }>(
             `SELECT column_name FROM information_schema.columns WHERE table_name = 'order'`,
         );

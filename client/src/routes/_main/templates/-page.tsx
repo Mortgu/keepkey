@@ -13,7 +13,7 @@ export default function TemplatePage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
+                        { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.templates"), to: "/templates" },
                     ]}
                 />

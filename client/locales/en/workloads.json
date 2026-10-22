@@ -2,8 +2,75 @@
     "workloads": {
         "create": "Create workload",
         "search": "Search workloads...",
+        "noResults": "No results found for “{{query}}”",
+        "validation": {
+            "productsRequired": "Select at least 1 product",
+            "productsAssigned": "At least 1 product must be assigned",
+            "contractsRequired": "Select at least 1 contract"
+        },
+        "modal": {
+            "createTitle": "Create product",
+            "editTitle": "Edit product",
+            "name": "Product name ({{language}})",
+            "namePlaceholder": "Product name",
+            "description": "Product description ({{language}})",
+            "descriptionPlaceholder": "Product description",
+            "table": "Table description ({{language}})",
+            "tablePlaceholder": "Table description"
+        },
         "pricing": {
-            "create": "Create pricing table"
+            "create": "Create pricing table",
+            "add": "Add",
+            "months_one": "{{count}} month",
+            "months_other": "{{count}} months",
+            "products": "Products",
+            "groupModal": {
+                "title": "New price table",
+                "allAssigned": "All products are already assigned to a price table."
+            },
+            "editProducts": {
+                "title": "Edit products"
+            },
+            "addContracts": {
+                "title": "Add contracts",
+                "contracts": "Contracts",
+                "allAssigned": "All contracts are already assigned to this price table."
+            },
+            "durations": {
+                "title": "Standard terms",
+                "description": "Apply to all tariff groups and determine which terms can be selected in an offer.",
+                "empty": "No term added yet.",
+                "remove": "Remove term from the list",
+                "newLabel": "New term",
+                "placeholder": "Months"
+            },
+            "tiers": {
+                "title": "Standard quantity tiers",
+                "description": "Apply to all price tables. Removing a tier does not delete any stored prices — they just become unreachable until the tier comes back.",
+                "empty": "No tier added yet.",
+                "priceCount_one": "· {{count}} price",
+                "priceCount_other": "· {{count}} prices",
+                "remove": "Remove tier from the list",
+                "removeWithPrices_one": "Remove tier. The {{count}} price on this tier is kept but no longer applies — the neighbouring tier that takes over supplies its own price.",
+                "removeWithPrices_other": "Remove tier. The {{count}} prices on this tier are kept but no longer apply — the neighbouring tier that takes over supplies its own price.",
+                "from": "From quantity",
+                "to": "To"
+            },
+            "cell": {
+                "noPrice": "No price set"
+            },
+            "orphan": {
+                "columnHint": "This term is not among the standard terms — its prices are kept but cannot be selected in an offer.",
+                "rowHint": "This quantity level is not among the standard tiers. Its prices are kept but are overridden by the tier that now covers this quantity — so they no longer apply.",
+                "from": "from {{min}}",
+                "notInTiers": "not in the tier list",
+                "remove": "Remove all prices on quantity level {{min}} in this price table"
+            },
+            "delete": {
+                "title": "Remove contract from this price table",
+                "confirm": "Remove contract “{{name}}” from this price table? The price table ({{count}} prices) and all related customer prices will be deleted.",
+                "done": "Contract “{{name}}” removed."
+            }
         }
     }
 }

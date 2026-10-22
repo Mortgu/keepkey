@@ -3,17 +3,18 @@ import { useTranslation } from "react-i18next";
 import { Check, Download, Pencil, Plus, Trash, Type } from "lucide-react";
 import {
     DOCUMENT_TEMPLATE_KINDS,
-    groupTemplatesBySlot,
-    type DocumentTemplate,
-    type DocumentTemplateKind,
-    type DocumentTemplateSlot,
+    
+    
+    
+    groupTemplatesBySlot
 } from "@keepit/schemas";
 import SectionCard from "./section-card";
+import type {DocumentTemplate, DocumentTemplateKind, DocumentTemplateSlot} from "@keepit/schemas";
 import {
     Button,
+    Dialog,
     DocumentDocxEditor,
     DocumentRenameModal,
-    Dialog,
     ListSkeleton,
     RouteError,
     Skeleton,
@@ -22,16 +23,17 @@ import {
 import {
     getTemplateContent,
     templateDownloadUrl,
+    useFormatters,
     useTemplateMutations,
     useTemplates,
 } from "@/hooks";
 import { formatBytesToKB } from "@/lib/utils";
-import { formatDate } from "@/lib/format";
 
 /** Welcher Slot gerade eine Datei erwartet — der Upload-Dialog kennt keinen eigenen. */
 type PendingUpload = { kind: DocumentTemplateKind; language: DocumentTemplateSlot["language"] };
 
 export default function TemplateList() {
+    const { formatDate } = useFormatters();
     const { t } = useTranslation();
 
     const { data: templates, isPending, error } = useTemplates();
@@ -54,7 +56,7 @@ export default function TemplateList() {
         );
     }
 
-    const slots = groupTemplatesBySlot(templates ?? []);
+    const slots = groupTemplatesBySlot(templates);
 
     const openUpload = (kind: DocumentTemplateKind, language: DocumentTemplateSlot["language"]) => {
         pendingUpload.current = { kind, language };

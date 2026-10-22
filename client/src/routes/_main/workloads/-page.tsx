@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
 import ProductModal from "./-components/product-modal";
-import { Breadcrumbs, Button, SortDropdown } from "@/components";
-import { useLocale, useModal, useProductManager } from "@/hooks";
 import useWorkloadFilters from "./-hooks/use-workload-filters";
 import ProductAutocomplete from "./-components/product-autocomplete";
-import { localized } from "@/lib/i18n-content";
-import type { Product } from "@keepit/schemas";
 import ProductItem from "./-components/product-item";
+import type { Product } from "@keepit/schemas";
+import { Breadcrumbs, Button, SortDropdown } from "@/components";
+import { useLocale, useModal, useProductManager } from "@/hooks";
+import { localized } from "@/lib/i18n-content";
 
 export default function ProductPage() {
     const locale = useLocale();
@@ -26,8 +26,9 @@ export default function ProductPage() {
                     size="sm"
                     maxItems={4}
                     items={[
-                        { label: "Dashboard", to: "/" },
-                        { label: "Workloads", to: "/workloads" },
+                        { label: t("nav.dashboard"), to: "/" },
+                        { label: t("section.workloads") },
+                        { label: t("section.workload_text"), to: "/workloads" },
                     ]}
                 />
             </div>
@@ -41,7 +42,7 @@ export default function ProductPage() {
 
                 <ProductAutocomplete
                     items={products.map(product => ({
-                        title: localized(product.translations, locale, "name") ?? "",
+                        title: localized(product.translations, locale, "name"),
                         description: localized(product.translations, locale, "description") ?? ""
                     }))}
                     filters={filters}

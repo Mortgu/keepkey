@@ -7,11 +7,6 @@ export function useTariffGroups() {
     return { groups, isPending, error };
 }
 
-export function useTariffVersionsHook(groupId: string, tariffId: string) {
-    const { data: versions = [], isPending, error } = useQuery(tariffQueries.versions(groupId, tariffId));
-    return { versions, isPending, error };
-}
-
 /**
  * Die global gepflegten Laufzeiten. Braucht weder Produkt noch Vertrag und
  * steht damit fest, bevor im Angebot eine Position existiert.

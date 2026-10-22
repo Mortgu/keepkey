@@ -1,7 +1,10 @@
 {
   "invoices": {
     "description": "Central management of invoices",
-    "searchPlaceholder": "Search quote no.…",
-    "create": "Create invoice"
+    "searchPlaceholder": "Search invoice no., order no. or customer…",
+    "create": "Create invoice",
+    "order": "Order",
+    "date": "Date",
+    "empty": "No invoices yet. Invoices are created on the order."
   }
 }

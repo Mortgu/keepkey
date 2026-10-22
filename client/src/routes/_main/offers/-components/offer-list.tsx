@@ -1,6 +1,6 @@
-import { useOfferFilterOptions } from "../-hooks/use-offer-filter-options";
+import { useOfferFilterOptions } from "../../../../components/modules/modals/offer/_hooks/use-offer-filter-options";
+import type { OfferFilters } from "../../../../components/modules/modals/offer/_hooks/use-offer-filters";
 import OfferCard from "./card/offer-card";
-import type { OfferFilters } from "../-hooks/use-offer-filters";
 
 import { FilterChip, ListSkeleton, OfferCardSkeleton, RouteError } from "@/components";
 import { useContacts, useCustomers, useLocale, useProducts } from "@/hooks";

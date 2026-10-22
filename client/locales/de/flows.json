@@ -1,0 +1,81 @@
+{
+    "flows": {
+        "phase": {
+            "open": "Angebot offen",
+            "running": "In Abwicklung",
+            "billed": "Abgerechnet",
+            "cancelled": "Storniert"
+        },
+        "derivation": {
+            "RENEWAL": "Verlängerung",
+            "LICENSE_EXTENSION": "Erweiterung"
+        },
+        "station": {
+            "offer": { "label": "Angebot", "short": "Angebot" },
+            "order": { "label": "Bestellung", "short": "Bestellung" },
+            "confirmation": { "label": "Auftragsbestätigung", "short": "Auftragsbest." },
+            "invoice": { "label": "Rechnung", "short": "Rechnung" }
+        },
+        "state": {
+            "done": "Angelegt",
+            "action": "Noch nicht angelegt",
+            "locked": "Noch nicht angelegt",
+            "busy": "Wird erzeugt",
+            "failed": "Fehlgeschlagen",
+            "cancelled": "Storniert"
+        },
+        "stateInline": {
+            "busy": "wird erzeugt",
+            "failed": "fehlgeschlagen",
+            "cancelled": "storniert"
+        },
+        "create": {
+            "offer": "Angebot anlegen",
+            "order": "Bestellung anlegen",
+            "confirmation": "Auftragsbestätigung anlegen",
+            "invoice": "Rechnung anlegen"
+        },
+        "table": {
+            "number": "{{station}} Nr.",
+            "date": "Datum",
+            "net": "Netto",
+            "empty": "Keine Vorgänge in dieser Ansicht.",
+            "noMatch": "Keine Vorgänge passen zu Suche oder Filter.",
+            "truncated": "Es werden die neuesten {{count}} Vorgänge angezeigt; Suche und Filter berücksichtigen ältere nicht.",
+            "phaseFilter": "Status"
+        },
+        "detail": {
+            "overview": "Ablauf",
+            "net": "netto",
+            "lockedHint": "Noch nicht angelegt. Dafür wird eine angelegte Bestellung benötigt.",
+            "cancelledHint": "Entfällt, weil die Bestellung storniert wurde.",
+            "actionHint": "Noch nicht angelegt. Die Nummer vergeben Sie beim Anlegen; sie lässt sich danach nicht mehr ändern.",
+            "acceptedLocked": "Angenommene Angebote können nicht mehr geändert werden.",
+            "renew": "Verlängern",
+            "extend": "Erweitern",
+            "cancel": "Stornieren",
+            "cancelConfirm": "Bestellung {{number}} stornieren?",
+            "generateDocument": "Dokument generieren",
+            "noDocuments": "Noch keine Dokumente generiert!",
+            "products": "Produkte",
+            "documents": "Dokumente",
+            "details": "Details",
+            "projectNumber": "Projektnummer",
+            "projectDescription": "Projektbeschreibung",
+            "orderDetails": "Details",
+            "contractStart": "Vertragsbeginn"
+        },
+        "summary": {
+            "title": "Zusammenfassung",
+            "customer": "Kunde",
+            "contact": "Ansprechpartner",
+            "duration": "Laufzeit",
+            "durationMonths_one": "{{count}} Monat",
+            "durationMonths_other": "{{count}} Monate",
+            "paymentTerm": "Zahlungsziel",
+            "net": "Netto",
+            "vat": "MwSt. (akt. Satz)",
+            "gross": "Brutto (geschätzt)"
+        }
+    }
+}

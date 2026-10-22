@@ -1,0 +1,75 @@
+/// Auftragsbestätigung (AB) zu einer Bestellung. Die AB-Nummer vergibt der
+/// Nutzer einmal; danach ist sie unveränderlich. Konditionen stehen am
+/// angenommenen Angebot — hier kommen nur MwSt und Brutto dazu, und die werden
+/// bei der Generierung aus `customer.taxRate` des Snapshots berechnet.
+model Confirmation {
+  id String @id @default(cuid())
+
+  /// AB-Nr., vom Nutzer vergeben.
+  confirmationId String   @unique
+  date           DateTime @default(now())
+
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  orderId String @unique
+
+  /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
+  /// `offer.net_amount`, der Satz aus dem Formular (Default: Kundensatz).
+  taxRate     Float
+  net_cents   Int
+  vat_cents   Int
+  gross_cents Int
+
+  createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
+  createdById String
+
+  documents ConfirmationDocument[]
+
+  /// @openapi.ignore
+  documentVersion Int @default(0)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@index([createdById])
+  @@map("confirmation")
+}
+
+/// Dieselben Spalten wie OfferDocument/OrderDocument, damit Umbenennen,
+/// Löschen, Download und Nextcloud-Upload über `document-repo.ts` unverändert
+/// funktionieren. Versioniert wie dort: jede Generierung legt eine neue Version
+/// an, keine wird automatisch gelöscht. `sourceVersion` bleibt immer `null` —
+/// die Konditionen der AB sind ab Anlage unveränderlich, es gibt also nichts,
+/// wogegen eine Generierung veralten könnte.
+model ConfirmationDocument {
+  id String @id @default(cuid())
+
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
+
+  error       String?
+  /// @openapi.ignore
+  uploadToken String?
+
+  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
+  /// @openapi.ignore
+  model Json?
+
+  confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
+  confirmationId String
+
+  artifacts DocumentArtifact[] @relation("ConfirmationDocumentArtifacts")
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @unique
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+
+  @@index([confirmationId])
+  @@unique([confirmationId, version])
+  @@map("confirmation_document")
+}

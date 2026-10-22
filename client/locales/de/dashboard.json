@@ -1,5 +1,11 @@
 {
   "dashboard": {
+    "title": "Übersicht",
+    "description": "Status der angebundenen Dienste und Kennzahlen der letzten 12 Monate.",
+    "statCard": {
+      "total": "Insgesamt:",
+      "volume": "Volumen:"
+    },
     "recentOffers": "Letzte Angebote",
     "recentOrders": "Letzte Bestellungen",
     "integrations": "Integrationen",
@@ -34,6 +40,10 @@
       "checking": "Verbindung wird geprüft…",
       "failed": "Verbindung fehlgeschlagen",
       "notConfigured": "Nicht konfiguriert"
+    },
+    "meta": {
+      "url": "Adresse",
+      "endpoint": "Endpunkt"
     },
     "retry": "Erneut prüfen"
   }

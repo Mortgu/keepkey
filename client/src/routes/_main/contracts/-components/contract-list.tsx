@@ -12,10 +12,10 @@ import {
     sortableKeyboardCoordinates,
     verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import { LoaderCircle } from "lucide-react";
 import ContractListItem from "./contract-item";
 import type { DragEndEvent } from "@dnd-kit/core";
 import type { Contract } from "@keepit/schemas";
+import { RouteError, Spinner } from "@/components";
 import { useContracts } from "@/hooks/contracts/contract-hooks";
 import { useReorderContracts } from "@/hooks/contracts/contract-mutations";
 
@@ -47,16 +47,11 @@ export default function ContractList({ onEdit }: Props) {
         <div className="grid gap-4">
             {isPending && (
                 <div className="w-full flex items-center justify-center py-8">
-                    <LoaderCircle className="animate-spin" />
+                    <Spinner />
                 </div>
             )}
 
-            {error && (
-                <div className="w-full grid items-center justify-start py-8">
-                    <p className="text-(--destructive) text-lg font-semibold">Error</p>
-                    <p className="text-(--destructive) font-medium">Something went wrong trying to fetch flatrates!</p>
-                </div>
-            )}
+            {error && <RouteError error={error} />}
 
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
                 <SortableContext items={contracts.map((contract) => contract.id)} strategy={verticalListSortingStrategy}>

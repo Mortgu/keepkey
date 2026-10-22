@@ -1,9 +1,6 @@
 import { Task } from "@prisma/client";
+import { generateInvoiceDocument } from "../../services/invoice-generation.service.js";
 
 export default async function invoiceTaskHandler(task: Task): Promise<void> {
-    if (!task) {
-        throw new Error("Invoice task handler was called without a task.");
-    }
-
-    throw new Error(`Invoice generation is not implemented (task ${task.id}).`);
+    await generateInvoiceDocument(task.id);
 }

@@ -6,7 +6,7 @@
 
 @theme {
   --font-sans: "Inter", sans-serif;
-  --font-mono: "Inter", monospace;
+  --font-mono: "IBM Plex", monospace;
 }
 
 :root {

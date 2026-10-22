@@ -1,7 +1,17 @@
-import { useCreateSupplier, useUpdateSupplier } from "@/hooks";
-import { createSupplierSchema, type CreateSupplierInput, type Supplier } from "@keepit/schemas";
+import {   createSupplierSchema } from "@keepit/schemas";
 import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
+import type {CreateSupplierInput, Supplier} from "@keepit/schemas";
 import type { SyntheticEvent } from "react";
+import type { TranslationKey } from "@/i18n";
+import { useCreateSupplier, useUpdateSupplier } from "@/hooks";
+
+/* Das geteilte Schema meldet einen leeren Namen mit einem festen englischen Text
+   ("Required!"), den auch der Server nutzt. Im Formular gilt dieselbe Regel,
+   nur mit Übersetzungsschlüssel — aufgelöst wird er bei der Anzeige. */
+const supplierFormSchema = createSupplierSchema.extend({
+    name: z.string().nonempty("validation.required" satisfies TranslationKey),
+});
 
 interface Props {
     currentSupplier?: Supplier | null;
@@ -22,10 +32,10 @@ export default function useSupplierForm({ currentSupplier, onClose }: Props) {
     const form = useForm({
         defaultValues: defaultValues,
         validators: {
-            onMount: createSupplierSchema,
-            onChange: createSupplierSchema,
+            onMount: supplierFormSchema,
+            onChange: supplierFormSchema,
         },
-        onSubmit: async ({ value }) => {
+        onSubmit: ({ value }) => {
             if (currentSupplier) {
                 updateSupplier({ id: currentSupplier.id, supplier: value });
             } else {

@@ -1,0 +1,105 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`offer.docx > mit Vergleich 1`] = `
+"| A N G E B O T |
+| Beleg-Nr.: | AG-0001 |
+| Datum: | 01. Oktober 2026 |
+| Zahlungsbedingung: | 30 Tage |
+| Angebot gültig bis: | 01. November 2026 |
+| Kunden-Nr.: |  |
+| Lieferanten-Nr.: |  |
+| Ihre Anfrage vom: | 15. September 2026 |
+| Ihr Ansprechpartner: | Frau Muster |
+| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.test |
+| dignum GmbH • Peterhofstr. 5 • 86438 Kissing • Germany |
+ACME GmbH
+Frau Anna Muster
+Weg 1
+12345 Berlin
+ 
+Keepit SaaS-Backup für Microsoft 365 & Salesforce
+Sehr geehrte(r) Frau Muster,
+hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup Lösung für Ihre Microsoft 365 & Salesforce Umgebung:
+Das Angebot ist unterteilt in folgende, alternative Offerten:
+* Keepit für Microsoft 365 & Salesforce
+* Im Vertrag „Basic“
+  * Backup
+* Vertragslaufzeit: 24 Monate
+* Zahlungsweise: im Voraus
+*
+* Keepit für Microsoft 365 & Salesforce
+* Im Vertrag „Plus“
+  * Backup
+  * Restore
+* Vertragslaufzeit: 24 Monate
+* Zahlungsweise: im Voraus
+*
+* Keepit für Microsoft 365 & Salesforce
+* Im Vertrag „Broken“
+  * x
+* Vertragslaufzeit: 24 Monate
+* Zahlungsweise: im Voraus
+*
+M365
+Insbesondere ergeben sich keine weiteren Kosten für z.B. Storage, Datenübertragung, Bereitstellung von Bandbreiten, etc. Der Preis enthält ebenfalls die Aufbewahrung der Daten in doppelter Kopie jedes Backup Images, jeweils an zwei getrennten Rechenzentrumsstandorten innerhalb Deutschlands (oder in der Schweiz, oder in Dänemark, etc.). Der Backup Storage befindet sich in der Keepit-eigenen Cloud, unabhängig von Microsoft und anderen Hyperscalern, und es handelt sich immer um Hot-Storage (drehende Festplatten) sowie einen unveränderbaren, Ransomware-sicheren Speicherplatz.
+Das Datenvolumen ist unbegrenzt - sowohl für Backup, als auch für Restore. Die Lizenzierung erfolgt auf Grundlage „aktiver User Lizenzen“ (bei M365 unterteilt in Microsoft E- bzw. A-/F-Lizenzen).
+Onboarding, Unterstützung bei Ersteinrichtung & Konfiguration sowie Einweisung / Schulung auf das Produkt sind in der Position 3. enthalten.
+* Keepit für Microsoft 365 & Salesforce „Basic“ mit einer Laufzeit von 24 Monaten
+| Pos. | Artikel / Leistung | Anz. | Euro User / / Monat | Anz. /  Monate  | Gesamt EUR |
+|  | Keepit - Backup Microsoft 365 & Salesforce |  |  |  | 0,00 |
+| * | Microsoft 365 / Tabelle M365 | 10 | 5,00 € | 24 | 1.200,00 € |
+| * | Projektrabatt / - erste 2 Monate kostenfrei / - bei einer Bestellung bis zum 01. November 2026 | 10 | 5,00 € | 2 | -100,00 € |
+| * | optional / Salesforce | 5 | 3,00 € | 24 | 360,00 € |
+| * | Setup / Setup-Tabelle | 1 |  |  | 250,00 € |
+| * | Treuerabatt | 1 |  |  | -50,00 € |
+|  | Summe Netto EUR |  | 1.660,00 € |
+* Keepit für Microsoft 365 & Salesforce „Plus“ mit einer Laufzeit von 24 Monaten
+| Pos. | Artikel / Leistung | Anz. | Euro User / / Monat | Anz. /  Monate  | Gesamt EUR |
+|  | Keepit - Backup Microsoft 365 & Salesforce |  |  |  | 0,00 |
+| * | Microsoft 365 / Tabelle M365 | 10 | 7,00 € | 24 | 1.680,00 € |
+| * | Projektrabatt / - erste 2 Monate kostenfrei / - bei einer Bestellung bis zum 01. November 2026 | 10 | 7,00 € | 2 | -140,00 € |
+| * | optional / Salesforce | 5 | 7,00 € | 24 | 840,00 € |
+| * | Setup / Setup-Tabelle | 1 |  |  | 250,00 € |
+| * | Treuerabatt | 1 |  |  | -50,00 € |
+|  | Summe Netto EUR |  | 2.580,00 € |"
+`;
+
+exports[`offer.docx > ohne Vergleich 1`] = `
+"| A N G E B O T |
+| Beleg-Nr.: | AG-0001 |
+| Datum: | 01. Oktober 2026 |
+| Zahlungsbedingung: | 30 Tage |
+| Angebot gültig bis: | 01. November 2026 |
+| Kunden-Nr.: |  |
+| Lieferanten-Nr.: |  |
+| Ihre Anfrage vom: | 15. September 2026 |
+| Ihr Ansprechpartner: | Frau Muster |
+| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.test |
+| dignum GmbH • Peterhofstr. 5 • 86438 Kissing • Germany |
+ACME GmbH
+Frau Anna Muster
+Weg 1
+12345 Berlin
+ 
+Keepit SaaS-Backup für Microsoft 365 & Salesforce
+Sehr geehrte(r) Frau Muster,
+hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup Lösung für Ihre Microsoft 365 & Salesforce Umgebung:
+Keepit für Microsoft 365 & Salesforce
+* Im Vertrag: „Basic“
+  * Backup
+* Vertragslaufzeit: 24 Monate
+* Zahlungsweise: im Voraus
+M365
+Insbesondere ergeben sich keine weiteren Kosten für z.B. Storage, Datenübertragung, Bereitstellung von Bandbreiten, etc. Der Preis enthält ebenfalls die Aufbewahrung der Daten in doppelter Kopie jedes Backup Images, jeweils an zwei getrennten Rechenzentrumsstandorten innerhalb Deutschlands (oder in der Schweiz, oder in Dänemark, etc.). Der Backup Storage befindet sich in der Keepit-eigenen Cloud, unabhängig von Microsoft und anderen Hyperscalern, und es handelt sich immer um Hot-Storage (drehende Festplatten) sowie einen unveränderbaren, Ransomware-sicheren Speicherplatz.
+Das Datenvolumen ist unbegrenzt - sowohl für Backup, als auch für Restore. Die Lizenzierung erfolgt auf Grundlage „aktiver User Lizenzen“ (bei M365 unterteilt in Microsoft E- bzw. A-/F-Lizenzen).
+Onboarding, Unterstützung bei Ersteinrichtung & Konfiguration sowie Einweisung / Schulung auf das Produkt sind in der Position 3. enthalten.
+Keepit für Microsoft 365 & Salesforce „Basic“ mit einer Laufzeit von 24 Monaten
+| Pos. | Artikel / Leistung | Anz. | Euro User / / Monat | Anz. /  Monate  | Gesamt EUR |
+|  | Keepit - Backup Microsoft 365 & Salesforce |  |  |  | 0,00 |
+| * | Microsoft 365 / Tabelle M365 | 10 | 5,00 € | 24 | 1.200,00 € |
+| * | Projektrabatt / - erste 2 Monate kostenfrei / - bei einer Bestellung bis zum 01. November 2026 | 10 | 5,00 € | 2 | -100,00 € |
+| * | optional / Salesforce | 5 | 3,00 € | 24 | 360,00 € |
+| * | Setup / Setup-Tabelle | 1 |  |  | 250,00 € |
+| * | Treuerabatt | 1 |  |  | -50,00 € |
+|  | Summe Netto EUR |  | 1.660,00 € |"
+`;

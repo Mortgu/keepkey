@@ -30,29 +30,6 @@ export type CreateCustomerInput = z.infer<typeof createCustomerSchema>;
 export const updateCustomerSchema = createCustomerSchema.omit({ contactPersons: true }).partial();
 export type UpdateCustomerInput = z.infer<typeof updateCustomerSchema>;
 
-/* Stricte UI-Validierung für das Kunden-Formular. Bewusst strenger als
- * createCustomerSchema (das dem nullable DB/Server-Modell folgt): email
- * required + formatgeprüft, Adressen required. customerId/language/currency
- * werden vom Basis-Schema geerbt (nullish/enum); die Normalisierung von
- * null/"" übernimmt das Server-Schema. */
-export const customerFormSchema = createCustomerSchema.extend({
-    customerId: z.union([z.string(), z.undefined()]),
-    companyName: z.string().min(1, "min. 1 Zeichen!"),
-    email: z.email(),
-    invoiceEmail: z.union([z.email(), z.undefined()]),
-    street: z.string(),
-    city: z.string(),
-    zip: z.string(),
-    phone: z.string(),
-    contactPersons: z.array(z.object({
-        salutation: z.string().min(1, "Anrede fehlt"),
-        firstName: z.string().min(1, "Vorname fehlt"),
-        lastName: z.string().min(1, "Nachname fehlt"),
-        email: z.union([z.literal(""), z.email()]),
-    })),
-});
-export type CustomerFormInput = z.infer<typeof customerFormSchema>;
-
 export const customerSchema = createCustomerSchema.extend({
     id: z.string(),
 

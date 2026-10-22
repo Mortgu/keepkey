@@ -9,6 +9,7 @@
     "number": "Bestell-Nr.",
     "projectNumber": "Projekt-Nr.",
     "date": "Bestelldatum",
+    "contractStartDate": "Vertragsbeginn (optional)",
     "projectDescription": "Projektbezug",
     "details": "Bestelldetails",
     "edit": "Bearbeiten",
@@ -19,6 +20,70 @@
     "accepted": "Angenommen",
     "acceptedHint": "Angenommene Angebote können nicht mehr geändert werden.",
     "selectOffer": "Angebot für Bestellung auswählen",
-    "emptyOffers": "Keine offenen Angebote verfügbar."
+    "emptyOffers": "Keine offenen Angebote verfügbar.",
+    "confirmation": {
+      "title": "Auftragsbestätigung",
+      "hint": "Die AB-Nummer wird einmal vergeben und danach nicht mehr geändert. Netto, MwSt. und Brutto werden aus dem angenommenen Angebot berechnet.",
+      "number": "AB-Nr.",
+      "date": "Datum",
+      "create": "AB erstellen",
+      "regenerate": "Dokument neu erzeugen",
+      "noDocument": "Noch kein Dokument erzeugt.",
+      "deleteConfirm": "Auftragsbestätigung {{number}} endgültig löschen?",
+      "deleteBlockedHint": "Löschen Sie zuerst das Dokument, um die AB löschen zu können."
+    },
+    "invoice": {
+      "title": "Rechnung",
+      "hint": "Die Rechnungsnummer wird einmal vergeben und danach nicht mehr geändert. Positionen, Netto, MwSt. und Brutto kommen aus der Bestellung.",
+      "number": "Rechnungs-Nr.",
+      "date": "Rechnungsdatum",
+      "create": "Rechnung erstellen",
+      "regenerate": "Dokument neu erzeugen",
+      "noDocument": "Noch kein Dokument erzeugt.",
+      "deleteConfirm": "Rechnung {{number}} endgültig löschen?",
+      "deleteBlockedHint": "Löschen Sie zuerst das Dokument, um die Rechnung löschen zu können."
+    },
+    "purchase": {
+      "title": "Einkaufspreise (Bestellung an den Zulieferer)",
+      "hint": "Je User und Monat, netto. Vorbelegt mit dem Verkaufspreis. Pauschalen und Rabatte des Angebots bleiben Kundensache.",
+      "product": "Produkt",
+      "quantity": "Menge",
+      "sales": "Verkauf",
+      "purchase": "Einkauf",
+      "lineTotal": "Netto",
+      "salesTotal": "Verkauf gesamt",
+      "purchaseTotal": "Einkauf gesamt",
+      "margin": "Marge",
+      "purchaseShort": "Einkauf",
+      "marginShort": "Marge",
+      "fallback": "Einkaufspreise noch nicht erfasst (entsprechen dem Verkaufspreis)."
+    },
+    "modal": {
+      "title": "Bestellung anlegen",
+      "pickHint": "Wähle das Angebot, das der Kunde angenommen hat.",
+      "fromOffer": "Aus Angebot AG{{quoteId}} · {{company}}",
+      "searchPlaceholder": "Angebotsnr., Kunde, Ansprechpartner…",
+      "resultCount_one": "{{count}} offenes Angebot",
+      "resultCount_other": "{{count}} offene Angebote",
+      "moreResults": "mehr vorhanden, Suche verfeinern",
+      "noMatch": "Kein offenes Angebot passt zu „{{query}}“.",
+      "expired": "abgelaufen",
+      "from": "vom {{date}}",
+      "netTotal": "Netto gesamt",
+      "offerDate": "Angebot vom",
+      "validUntil": "Gültig bis",
+      "supplier": "Zulieferer",
+      "contract": "Tarif · Laufzeit",
+      "orderData": "Bestelldaten",
+      "emptyTitle": "Noch kein Angebot ausgewählt",
+      "emptyHint": "Links suchen und anklicken. Hier siehst du dann Positionen, Betrag und Gültigkeit und trägst die Einkaufspreise ein.",
+      "noneSelected": "Noch kein Angebot gewählt",
+      "submit": "Bestellung anlegen"
+    },
+    "vat": {
+      "rate": "Steuersatz",
+      "preview": "Netto {{net}} + {{rate}} % MwSt. ({{vat}}) = Brutto {{gross}}. Der Satz wird mit dem Beleg gespeichert und ist danach fest.",
+      "stored": "Steuer"
+    }
   }
 }

@@ -17,11 +17,11 @@ export default function ContactsModal({ customerId, contacts, onClose }: Props) 
 
     return (
         <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
-            <Dialog.Header title="Kunden Kontaktpersonen" />
+            <Dialog.Header title={t("customer.contact.listTitle")} />
 
             <Dialog.Toolbar>
                 <SearchBar value="" onChange={() => { }} />
-                <Button size="sm" onClick={() => contactModal.open()}>Kunden anlegen</Button>
+                <Button size="sm" onClick={() => contactModal.open()}>{t("customer.contact.createTitle")}</Button>
             </Dialog.Toolbar>
 
             <Dialog.Body className="gap-4">

@@ -14,7 +14,8 @@
     "sales": "Vertrieb",
     "management": "Verwaltung",
     "settings": "Einstellungen",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "dashboard": "Dashboard"
   },
   "section": {
     "workloads": "Workloads",
@@ -22,7 +23,7 @@
     "workload_text": "Textbausteine",
     "pricing": "Preise",
     "flatRates": "Pauschalen",
-    "suppliers": "Lieferanten",
+    "suppliers": "Zulieferer",
     "contracts": "Tarife",
     "customers": "Kunden",
     "employees": "Angestellte",
@@ -46,10 +47,58 @@
     "errorGeneric": "Ein unerwarteter Fehler ist aufgetreten.",
     "months": "Monate",
     "increment": "Wert erhöhen",
-    "decrement": "Wert verringern"
+    "decrement": "Wert verringern",
+    "sort": {
+      "label": "Sortierung:",
+      "createdAtDesc": "Datum – neuestes zuerst",
+      "createdAtAsc": "Datum – ältestes zuerst",
+      "nameAsc": "Name A–Z",
+      "nameDesc": "Name Z–A"
+    },
+    "clearSelection": "Auswahl aufheben",
+    "breadcrumb": {
+      "label": "Navigationspfad",
+      "showHidden_one": "{{count}} weitere Ebene anzeigen",
+      "showHidden_other": "{{count}} weitere Ebenen anzeigen"
+    },
+    "segmentedControl": "Auswahl",
+    "fieldIssue": {
+      "error": "Fehlerdetails",
+      "warning": "Warnungsdetails"
+    },
+    "invalidDate": "Ungültiges Datum",
+    "invalidStartDate": "Ungültiges Startdatum"
+  },
+  "validation": {
+    "required": "Pflichtfeld",
+    "email": "Ungültige E-Mail-Adresse",
+    "passwordMin": "Mindestens {{count}} Zeichen",
+    "passwordMax": "Höchstens {{count}} Zeichen",
+    "passwordMismatch": "Passwörter stimmen nicht überein",
+    "minOneChar": "Mindestens 1 Zeichen"
   },
   "docxEditor": {
     "noBuffer": "Der Editor konnte die Datei nicht lesen."
+  },
+  "documents": {
+    "toast": {
+      "replaced": "Datei wurde ersetzt.",
+      "saved": "Datei wurde gespeichert.",
+      "fileRejected": "Datei abgelehnt: {{reason}}",
+      "warning": {
+        "documentMismatch": "Die Datei gehört zu einem anderen Dokument."
+      },
+      "adopted": "Änderungen wurden ins Angebot übernommen."
+    },
+    "changes": {
+      "title": "Abweichungen in der Datei",
+      "description": "Die ersetzte Datei weicht vom erzeugten Stand ab. Beim Übernehmen werden die Werte ins Angebot geschrieben. Das Angebot erhält dabei eine neue Version, das Dokument bleibt aktuell.",
+      "generated": "Erzeugt",
+      "inFile": "In der Datei",
+      "ignore": "Ignorieren",
+      "adopt": "Auswahl übernehmen ({{count}})",
+      "notAdoptable": "Lässt sich nicht ins Angebot übernehmen — nur ignorieren. Ändere solche Werte in der Angebotsmaske und erzeuge das Dokument neu."
+    }
   },
   "documentPreview": {
     "title": "Vorschau",

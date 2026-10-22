@@ -13,14 +13,6 @@ export const orderIdParamsSchema = z.object({
     orderId: z.string().min(1),
 });
 
-export const orderRevisionParamsSchema = orderIdParamsSchema.extend({
-    revisionId: z.string().min(1),
-});
-
-export const offerRevisionParamsSchema = idParamsSchema.extend({
-    revisionId: z.string().min(1),
-});
-
 export const offerPositionParamsSchema = z.object({
     offerId: z.string().min(1),
     positionId: z.string().min(1),
@@ -32,8 +24,4 @@ export const customerContactParamsSchema = idParamsSchema.extend({
 
 export const tariffParamsSchema = idParamsSchema.extend({
     tariffId: z.string().min(1),
-});
-
-export const tariffVersionParamsSchema = tariffParamsSchema.extend({
-    versionId: z.string().min(1),
 });
