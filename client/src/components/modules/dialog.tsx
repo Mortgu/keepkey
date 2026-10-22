@@ -1,9 +1,9 @@
-import { Button } from "@/components";
 import { Dialog as BaseDialog, ScrollArea } from "@base-ui/react";
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 import { tv } from "tailwind-variants";
+import type { ReactNode } from "react";
+import { Button } from "@/components";
 /**
  * Slots für einen base-ui-Dialog: Portal → Backdrop → Viewport → Popup,
  * darin Header / Toolbar / Body (scrollbar) / Actions.

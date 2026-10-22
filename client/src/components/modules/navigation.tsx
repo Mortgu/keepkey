@@ -1,5 +1,3 @@
-import { NavGroup, NavLink, NavSearch, NavUserMenu, SegmentedLanguageToggle, } from "@/components";
-import { useAuth } from "@/context/auth-context";
 import { useRouterState } from "@tanstack/react-router";
 import {
     ChevronDown,
@@ -16,11 +14,13 @@ import {
     UserCircle2,
     Users
 } from "lucide-react";
-import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { DEFAULT_LANGUAGE_OPTIONS } from "../elements/language-toggle-options";
+import type { ReactNode } from "react";
+import { useAuth } from "@/context/auth-context";
+import { NavGroup, NavLink, NavSearch, NavUserMenu, SegmentedLanguageToggle, } from "@/components";
 
 const ICON_SIZE = 14;
 

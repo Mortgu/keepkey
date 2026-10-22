@@ -1,7 +1,7 @@
-import { RouteError, Spinner } from "@/components";
-import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
 import FlowDetailView from "./-components/flow-detail-view";
 import { Route } from "./index";
+import { RouteError, Spinner } from "@/components";
+import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
 
 /** Seite eines Vorgangs — `flowId` ist die Angebots-Id. */
 export default function FlowPage() {

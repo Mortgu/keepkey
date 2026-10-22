@@ -1,8 +1,8 @@
-import { cn } from "@/lib/utils";
 import { AlertCircle, AlertTriangle } from "lucide-react";
-import type { ReactNode } from "react";
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
+import type { ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 /** Resolves a field's id: the caller's explicit id, or a generated fallback — so a label can always be linked to its control. */
 export function useFieldId(id?: string): string {

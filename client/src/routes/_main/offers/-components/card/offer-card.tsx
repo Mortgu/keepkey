@@ -2,6 +2,9 @@ import { ChevronRight, Pen, Trash } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
+import type { Offer, OfferDocument } from '@keepit/schemas';
+import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 import { Accordion, Badge, Button } from "@/components";
 import { useFormatters, useModal } from "@/hooks";
 import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
@@ -10,9 +13,6 @@ import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
-import type { Offer, OfferDocument } from '@keepit/schemas';
-import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
-import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 
 type OfferListItemProps = {
     offer: Offer;

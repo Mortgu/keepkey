@@ -1,6 +1,6 @@
+import { tv } from "tailwind-variants";
 import type { DocumentStatus } from "@keepit/schemas";
 import type { HTMLAttributes } from "react";
-import { tv } from "tailwind-variants";
 import type { ComponentSize } from "../tokens";
 
 export interface BadgeComponentProps extends HTMLAttributes<HTMLSpanElement> {

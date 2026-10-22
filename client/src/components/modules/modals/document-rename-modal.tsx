@@ -1,6 +1,6 @@
-import { Button, Dialog, Input } from "@/components";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Button, Dialog, Input } from "@/components";
 
 type Props = {
   initialValue: string;
