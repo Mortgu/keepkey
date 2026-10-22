@@ -27,6 +27,7 @@ const invalidate = (queryClient: QueryClient, type: DocumentType, parentId: stri
         queryClient.invalidateQueries({ queryKey: invoiceKeys.all });
     } else {
         queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: orderKeys.detail(parentId) });
     }
 };
 
