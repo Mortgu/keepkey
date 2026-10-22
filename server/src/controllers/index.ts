@@ -5,7 +5,6 @@ export * from './dashboard.controller.js';
 export * from './document-template.controller.js';
 export * from './documents.controller.js';
 export * from './flat-rate.controller.js';
-export * from './integrations.controller.js';
 export * from './nextcloud.controller.js';
 export * from './order.controller.js';
 export * from './confirmation.controller.js';
