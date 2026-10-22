@@ -67,7 +67,10 @@ export function useGenerateOrderDocument() {
 
     const mutation = useMutation({
         mutationFn: ({ orderId }: { orderId: string }) => generateOrderDocument(orderId),
-        onSuccess: () => queryClient.invalidateQueries({ queryKey: orderKeys.lists() }),
+        onSuccess: (_, args) => {
+            queryClient.invalidateQueries({ queryKey: orderKeys.lists() });
+            queryClient.invalidateQueries({ queryKey: orderKeys.detail(args.orderId) });
+        },
     });
 
     return {
