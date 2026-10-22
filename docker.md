@@ -101,9 +101,12 @@ ohne die Variable startet die App nicht.
    kein schwebendes `:8`). Service-Name `gotenberg`.
 2. Settings → Networking: **keine** Domain generieren. Der private Name ist
    damit `gotenberg.railway.internal`, Port `3000` (Gotenberg-Default).
-3. Settings → Deploy: Healthcheck Path `/health`, Restart Policy `On Failure`,
+3. Variables: `PORT=3000`. Gotenberg selbst ignoriert die Variable, aber
+   Railways Healthcheck prüft den Port aus `PORT` — ohne sie schlägt er mit
+   „service unavailable“ fehl, obwohl Gotenberg läuft.
+4. Settings → Deploy: Healthcheck Path `/health`, Restart Policy `On Failure`,
    eine Replica.
-4. Im Service `keepkey` die Variable setzen:
+5. Im Service `keepkey` die Variable setzen:
    `GOTENBERG_URL=http://${{gotenberg.RAILWAY_PRIVATE_DOMAIN}}:3000`
    (Referenz-Variable — folgt einer Umbenennung des Services automatisch).
 
