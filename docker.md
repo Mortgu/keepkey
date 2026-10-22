@@ -64,6 +64,85 @@ Ein Service, Dockerfile-Build, **kein** Custom Start Command (dann gilt
 Achtung: Ein Custom Start Command ersetzt bei Railway den `ENTRYPOINT`. Wer
 eins setzt, ruft das Skript explizit auf, z. B. `/app/docker-entrypoint.sh node dist/worker.js`.
 
+### Healthcheck und Neustart
+
+Von Hand in den Service-Settings gesetzt (Settings → Deploy). `railway.json` ist
+bei Railway abgekündigt (wird ab 2026-12-01 nicht mehr gelesen); der Nachfolger
+Infrastructure as Code (`.railway/railway.ts`) ist noch nicht eingeführt.
+
+- Healthcheck Path: `/api/auth/ok` (better-auth, ohne Login, antwortet `{"ok":true}`)
+- Restart Policy: `On Failure`, Max Retries `10`
+
+Der Healthcheck läuft **nur beim Deploy**: Railway schaltet den Traffic erst auf
+den neuen Deploy, wenn der Pfad 2xx liefert — ein kaputter Start geht so nicht
+live. Danach prüft Railway nichts mehr; das übernimmt Uptime Kuma (unten).
+Nach einer Trennung von API und Worker gilt der Healthcheck nur für den
+API-Service — der Worker hat keinen HTTP-Port.
+
+### Benachrichtigungen
+
+Bis Uptime Kuma Mails verschickt, ist Railway die einzige Alarmquelle: in den
+Account-Settings unter Notifications die E-Mails für abgestürzte und
+fehlgeschlagene Deploys einschalten. Das deckt auch den Fall ab, dass Kuma
+selbst (im selben Projekt) ausfällt.
+
+## Monitoring (Uptime Kuma)
+
+Uptime Kuma läuft als eigener Service im Railway-Projekt und prüft alle
+Systeme laufend — auch die privaten über `*.railway.internal`. Die App selbst
+hat dafür keinen Code. Benachrichtigungen per E-Mail (SMTP) sind noch nicht
+eingerichtet; bis dahin ist Kuma nur eine Statusübersicht.
+
+### 1. Service anlegen
+
+1. Im Projekt **Keepkey** → **Create** → **Template** → „Uptime Kuma“ wählen und
+   deployen. Das Template legt ein Volume für `/app/data` an (SQLite mit allen
+   Monitoren und dem Login) — prüfen, dass es unter dem Service auftaucht, sonst
+   ist nach jedem Neustart alles weg.
+2. Unter Settings → Networking eine Railway-Domain generieren (Port `3001`).
+3. **Sofort** die Domain öffnen und das Admin-Konto anlegen. Kuma vergibt es an
+   den ersten Besucher — wer zuerst kommt, ist Admin.
+4. In Kuma unter Settings → Security die Zwei-Faktor-Anmeldung einschalten.
+
+### 2. Postgres-User für Kuma
+
+Kuma bekommt einen eigenen User, der sich nur anmelden kann — nicht den der App.
+Im Postgres-Service unter **Data** (Query-Konsole) oder per
+`railway connect Postgres` ausführen, Passwort selbst erzeugen
+(z. B. `openssl rand -base64 24`):
+
+```sql
+CREATE ROLE kuma LOGIN PASSWORD '<passwort>';
+GRANT CONNECT ON DATABASE railway TO kuma;
+```
+
+Für `SELECT 1` braucht der User keine weiteren Rechte. Der Datenbankname steht
+in der Variable `PGDATABASE` des Postgres-Services (Default `railway`).
+
+### 3. Monitore
+
+In Kuma jeweils **Add New Monitor**, Intervall 60 s, Retries 2 (vermeidet
+Fehlalarme bei kurzen Aussetzern):
+
+| Name | Monitor-Typ | Ziel |
+|---|---|---|
+| App | HTTP(s) | `https://keepkey-production-0f23.up.railway.app/api/auth/ok` |
+| Postgres | PostgreSQL | `postgres://kuma:<passwort>@postgres.railway.internal:5432/railway`, Query `SELECT 1` |
+| Redis | Redis | Wert von `REDIS_URL` aus dem Redis-Service, mit Host `redis.railway.internal` |
+| NextCloud | HTTP(s) - Keyword | `<NEXTCLOUD_URL>/status.php`, Keyword `"maintenance":false` |
+| Gotenberg | HTTP(s) | `http://<gotenberg-service>.railway.internal:3000/health` — erst nach #60 |
+
+Die privaten Hostnamen entsprechen den Service-Namen in Railway (klein
+geschrieben). Schlägt ein privater Monitor mit „ENOTFOUND“ oder Timeout fehl,
+im Ziel-Service unter Settings → Networking den Private-Networking-Namen
+nachsehen. Lehnt Postgres die Verbindung wegen SSL ab, `?sslmode=require` an die
+URL hängen.
+
+Bewusst ohne Monitor:
+
+- **S3-Bucket**: von Railway verwaltet; ein unsignierter Request liefert nur 403.
+- **Worker**: kein HTTP-Port; ein Absturz fällt unter die Railway-Benachrichtigungen.
+
 ## Optional: API und Worker getrennt
 
 Erst sinnvoll, wenn die Dokumentgenerierung die API ausbremst (CPU, OOM) oder
