@@ -86,6 +86,41 @@ Account-Settings unter Notifications die E-Mails für abgestürzte und
 fehlgeschlagene Deploys einschalten. Das deckt auch den Fall ab, dass Kuma
 selbst (im selben Projekt) ausfällt.
 
+## Gotenberg (Dokumentkonvertierung)
+
+Die App rendert DOCX → PDF nicht selbst, sondern schickt die Datei per HTTP an
+Gotenberg (`POST /forms/libreoffice/convert`, siehe `server/src/lib/docx-to-pdf.ts`).
+Gotenberg läuft als eigener Service ohne öffentliche Domain und ist nur über
+das private Netz des Projekts erreichbar. `GOTENBERG_URL` ist Pflicht —
+ohne die Variable startet die App nicht.
+
+### Einrichtung auf Railway
+
+1. Im Projekt **Keepkey** → **Create** → **Docker Image** →
+   `gotenberg/gotenberg:8.38.1` (exakte Version wie in `dev/docker-compose.yml`,
+   kein schwebendes `:8`). Service-Name `gotenberg`.
+2. Settings → Networking: **keine** Domain generieren. Der private Name ist
+   damit `gotenberg.railway.internal`, Port `3000` (Gotenberg-Default).
+3. Settings → Deploy: Healthcheck Path `/health`, Restart Policy `On Failure`,
+   eine Replica.
+4. Im Service `keepkey` die Variable setzen:
+   `GOTENBERG_URL=http://${{gotenberg.RAILWAY_PRIVATE_DOMAIN}}:3000`
+   (Referenz-Variable — folgt einer Umbenennung des Services automatisch).
+
+### Umstellung von Produktion
+
+Reihenfolge einhalten, sonst startet die App ohne `GOTENBERG_URL` nicht:
+
+1. Gotenberg wie oben deployen, Status grün.
+2. `GOTENBERG_URL` im Service `keepkey` setzen. Der Redeploy des aktuellen
+   `main` ignoriert die Variable — harmlos.
+3. Erst jetzt den Gotenberg-Stand nach `main` mergen.
+4. In Produktion ein echtes Dokument (Angebot, Bestellung, Rechnung oder
+   Bestätigung) erzeugen und prüfen, dass das PDF korrekt aussieht.
+   Schlägt es fehl: im Log nach `gotenberg_unreachable` suchen (Netz/URL) bzw.
+   die Logs des Gotenberg-Service ansehen (Dokument abgelehnt).
+5. Kuma-Monitor für Gotenberg anlegen (unten).
+
 ## Monitoring (Uptime Kuma)
 
 Uptime Kuma läuft als eigener Service im Railway-Projekt und prüft alle
@@ -130,7 +165,7 @@ Fehlalarme bei kurzen Aussetzern):
 | Postgres | PostgreSQL | `postgres://kuma:<passwort>@postgres.railway.internal:5432/railway`, Query `SELECT 1` |
 | Redis | Redis | Wert von `REDIS_URL` aus dem Redis-Service, mit Host `redis.railway.internal` |
 | NextCloud | HTTP(s) - Keyword | `<NEXTCLOUD_URL>/status.php`, Keyword `"maintenance":false` |
-| Gotenberg | HTTP(s) | `http://<gotenberg-service>.railway.internal:3000/health` — erst nach #60 |
+| Gotenberg | HTTP(s) | `http://gotenberg.railway.internal:3000/health` — sobald der Service läuft |
 
 Die privaten Hostnamen entsprechen den Service-Namen in Railway (klein
 geschrieben). Schlägt ein privater Monitor mit „ENOTFOUND“ oder Timeout fehl,
