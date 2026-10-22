@@ -10,7 +10,6 @@ import documentTemplateRouter from './document-template.route.js';
 import documentRouter from './document.route.js';
 import flatRatesRouter from "./flatrate.route.js";
 import cloudRouter from './nextcloud.route.js';
-import integrationsRouter from './integrations.route.js';
 import offerRouter from "./offer.route.js";
 import orderRouter from "./order.route.js";
 import invoiceRouter from "./invoice.route.js";
@@ -65,9 +64,6 @@ router.use('/templates', requireSession, documentTemplateRouter);
 
 /* /api/cloud */
 router.use('/cloud', requireSession, cloudRouter);
-
-/* /api/integrations */
-router.use('/integrations', requireSession, integrationsRouter);
 
 /* /api/search */
 router.use('/search', requireSession, searchRouter);

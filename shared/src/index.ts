@@ -19,7 +19,6 @@ export * from "./contact.schema.js";
 export * from "./supplier.schema.js";
 export * from "./tariff.schema.js";
 export * from "./pricing.schema.js";
-export * from "./integration.schema.js";
 export * from "./nextcloud.schema.js";
 export * from "./search.schema.js";
 export * from "./dashboard.schema.js";

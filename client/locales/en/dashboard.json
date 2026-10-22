@@ -1,14 +1,13 @@
 {
   "dashboard": {
     "title": "Overview",
-    "description": "Status of connected services and key figures for the last 12 months.",
+    "description": "Key figures for the last 12 months.",
     "statCard": {
       "total": "Total:",
       "volume": "Volume:"
     },
     "recentOffers": "Recent offers",
     "recentOrders": "Recent orders",
-    "integrations": "Integrations",
     "viewAll": "View all",
     "noActivity": "No activity yet.",
     "stats": {
@@ -34,17 +33,6 @@
     "badge": {
       "reserved": "Reserved",
       "converted": "Ordered"
-    },
-    "status": {
-      "connected": "Connected",
-      "checking": "Checking connection…",
-      "failed": "Connection failed",
-      "notConfigured": "Not configured"
-    },
-    "meta": {
-      "url": "Address",
-      "endpoint": "Endpoint"
-    },
-    "retry": "Retry"
+    }
   }
 }
