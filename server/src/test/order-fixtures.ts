@@ -192,6 +192,8 @@ export const orderFixture = () => ({
     acceptedAt: now,
     acceptedById: "user",
     cancelledAt: null,
+    cancelledById: null,
+    updatedById: null,
     documents: [],
     ...timestamps,
     offer: {

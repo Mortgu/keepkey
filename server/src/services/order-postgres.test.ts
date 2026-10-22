@@ -240,7 +240,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         expect(unchanged.acceptedAt).toBeNull();
         expect(unchanged.acceptedSnapshot).toBeNull();
     });
-    it("metadata edits and restores preserve the accepted price and frozen master data", async () => {
+    it("metadata edits preserve the accepted price and frozen master data", async () => {
         const offer = await draft();
         const order = await createOrder(await input(offer.id), "user");
         await prisma.customer.update({
@@ -257,18 +257,24 @@ integration("real PostgreSQL acceptance transactions", () => {
             "user",
         );
 
-        const restored = await getOrderById(order.id);
-        expect(restored.net_amount).toBe(80000);
-        expect(restored.projectNumber).toBeNull();
-        expect(restored.customer.companyName).toBe("Original Ltd");
-        await cancelOrder(order.id, 3, "user");
+        const edited = await getOrderById(order.id);
+        expect(edited.net_amount).toBe(80000);
+        expect(edited.projectNumber).toBe("New project");
+        expect(edited.customer.companyName).toBe("Original Ltd");
+        expect(
+            await prisma.order.findUniqueOrThrow({ where: { id: order.id } }),
+        ).toMatchObject({ updatedById: "user", cancelledById: null });
+        await cancelOrder(order.id, 2, "user");
+        expect(
+            await prisma.order.findUniqueOrThrow({ where: { id: order.id } }),
+        ).toMatchObject({ updatedById: "user", cancelledById: "user" });
         await expect(
             prisma.$transaction((tx) => assertOfferEditable(tx, offer.id)),
         ).rejects.toMatchObject({ code: "OFFER_ACCEPTED" });
         await expect(
             updateOrder(
                 order.id,
-                { expectedVersion: 4, order: metadata },
+                { expectedVersion: 3, order: metadata },
                 "user",
             ),
         ).rejects.toMatchObject({ code: "ORDER_CANCELLED" });

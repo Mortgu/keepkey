@@ -30,7 +30,9 @@ model User {
   customerId String?
 
   offers        Offer[]
-  orders        Order[]
+  orders          Order[] @relation("OrderAcceptedBy")
+  cancelledOrders Order[] @relation("OrderCancelledBy")
+  updatedOrders   Order[] @relation("OrderUpdatedBy")
   confirmations Confirmation[]
   invoices      Invoice[]
 

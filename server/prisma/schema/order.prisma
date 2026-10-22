@@ -15,8 +15,13 @@ model Order {
   contractStartDate  DateTime?
   acceptedAt         DateTime        @default(now()) @db.Timestamptz(6)
   acceptedById       String
-  acceptedBy         User            @relation(fields: [acceptedById], references: [id], onDelete: Restrict)
+  acceptedBy         User            @relation("OrderAcceptedBy", fields: [acceptedById], references: [id], onDelete: Restrict)
   cancelledAt        DateTime?       @db.Timestamptz(6)
+  cancelledById      String?
+  cancelledBy        User?           @relation("OrderCancelledBy", fields: [cancelledById], references: [id], onDelete: Restrict)
+  /// Wer die Bestellung zuletzt geändert hat; keine Historie, nur der letzte Stand.
+  updatedById        String?
+  updatedBy          User?           @relation("OrderUpdatedBy", fields: [updatedById], references: [id], onDelete: Restrict)
   version            Int             @default(1)
   documentVersion    Int             @default(0)
   documents          Document[]
@@ -27,6 +32,8 @@ model Order {
   updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
 
   @@index([acceptedById])
+  @@index([cancelledById])
+  @@index([updatedById])
   @@map("order")
 }
 

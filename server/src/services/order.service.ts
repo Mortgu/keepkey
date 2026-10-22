@@ -141,7 +141,7 @@ async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string
     });
 }
 
-export async function updateOrder(id: string, input: UpdateOrderMetadataInput, _actorId: string) {
+export async function updateOrder(id: string, input: UpdateOrderMetadataInput, actorId: string) {
     const data = updateOrderMetadataSchema.parse(input);
 
     return prisma.$transaction(async (tx) => {
@@ -157,6 +157,7 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, _
                 ...data.order,
                 date: new Date(data.order.date),
                 contractStartDate: data.order.contractStartDate ? new Date(data.order.contractStartDate) : null,
+                updatedById: actorId,
                 version: { increment: 1 },
                 ...(lines ? { positions: { deleteMany: {}, create: lines } } : {}),
             },
@@ -168,13 +169,13 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, _
 }
 
 
-export async function cancelOrder(id: string, expectedVersion: number, _actorId: string) {
+export async function cancelOrder(id: string, expectedVersion: number, actorId: string) {
     return prisma.$transaction(async (tx) => {
         await lockOrderAt(tx, id, expectedVersion);
 
         const order = await tx.order.update({
             where: { id },
-            data: { cancelledAt: new Date(), version: { increment: 1 } },
+            data: { cancelledAt: new Date(), cancelledById: actorId, updatedById: actorId, version: { increment: 1 } },
         });
         await invalidateDocuments(tx, id);
         return order;
