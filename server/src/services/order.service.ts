@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
     acceptOrderSchema, updateOrderMetadataSchema,
@@ -129,8 +130,8 @@ async function lockOrder(
 }
 
 async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string) {
-    await tx.orderDocument.updateMany({
-        where: { orderId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: documentOwnerType("order"), orderId, isCurrent: true },
         data: { isCurrent: false },
     });
 }

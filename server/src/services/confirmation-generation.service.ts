@@ -1,7 +1,9 @@
 import type { DocumentFormat, DocumentStatus } from "@prisma/client";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 import { buildConfirmation } from "../pipelines/confirmation/build-confirmation.js";
 import { runGeneration, type GenerationAdapter } from "./document-generation.js";
+import { requireOwner } from "./document-generation.helpers.js";
 
 type ConfirmationDocumentForGeneration = {
     id: string;
@@ -18,14 +20,14 @@ type ConfirmationDocumentForGeneration = {
 const confirmationAdapter: GenerationAdapter<ConfirmationDocumentForGeneration> = {
     typeName: "ConfirmationDocument",
     type: "confirmation",
-    findByTask: (taskId) => prisma.confirmationDocument.findFirst({
-        where: { taskId, deletedAt: null },
+    findByTask: async (taskId) => requireOwner(await prisma.document.findFirst({
+        where: { taskId, type: documentOwnerType("confirmation"), deletedAt: null },
         include: { artifacts: true },
-    }),
+    }), "confirmationId"),
     currentParentVersion: () => null,
     build: (doc) => buildConfirmation(doc.confirmationId),
     templateKind: "CONFIRMATION",
-    ownerKey: (doc) => ({ confirmationDocumentId: doc.id }),
+    ownerKey: (doc) => ({ documentId: doc.id }),
     recheckNotStale: async () => {},
     demoteSiblingsWhere: (doc) => ({ confirmationId: doc.confirmationId, isCurrent: true }),
 };

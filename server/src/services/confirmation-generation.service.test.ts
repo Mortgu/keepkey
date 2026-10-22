@@ -36,7 +36,7 @@ const fake = vi.hoisted(() => {
 });
 
 vi.mock("../lib/prismaClient.js", () => ({
-    prisma: { confirmationDocument: { findFirst: fake.findFirst }, $transaction: fake.transaction },
+    prisma: { document: { findFirst: fake.findFirst }, $transaction: fake.transaction },
 }));
 vi.mock("../pipelines/confirmation/build-confirmation.js", () => ({ buildConfirmation: fake.buildConfirmation }));
 vi.mock("../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
@@ -44,7 +44,8 @@ vi.mock("../lib/document-artifact-store.js", () => ({
     storeDocumentArtifacts: fake.storeDocumentArtifacts,
     removeDocumentArtifacts: fake.removeDocumentArtifacts,
 }));
-vi.mock("./document-repo.js", () => ({
+vi.mock("./document-repo.js", async (importOriginal) => ({
+    documentOwnerType: (await importOriginal<typeof import("./document-repo.js")>()).documentOwnerType,
     documentTable: () => ({ scope: "confirmations", updateMany: fake.updateMany, findWithArtifacts: vi.fn(async () => null) }),
 }));
 
@@ -72,6 +73,12 @@ describe("generateConfirmationDocument", () => {
             { isCurrent: false },
         );
         expect(fake.tx.documentArtifact.create).toHaveBeenCalledTimes(2);
+        expect(fake.findFirst).toHaveBeenCalledWith(expect.objectContaining({
+            where: { taskId: "task-1", type: "CONFIRMATION", deletedAt: null },
+        }));
+        expect(fake.tx.documentArtifact.create).toHaveBeenCalledWith({
+            data: expect.objectContaining({ documentId: "doc-1", format: "PDF" }),
+        });
         expect(fake.updateMany).toHaveBeenCalledWith(
             { id: "doc-1", deletedAt: null, status: DocumentStatus.PROCESSING },
             expect.objectContaining({ status: DocumentStatus.GENERATED, displayName: "AB-1", isCurrent: true }),
