@@ -3,7 +3,7 @@ import { createInvoiceSchema, type CreateInvoiceInput, type InvoiceFilterParams 
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
-import { requestInvoiceGeneration } from "./document-generation-request.service.js";
+import { requestGeneration } from "./document/document-generation-request.js";
 
 const withDocuments = {
     documents: {
@@ -80,14 +80,14 @@ export async function createInvoice(orderId: string, input: CreateInvoiceInput, 
         throw error;
     }
 
-    await requestInvoiceGeneration(invoice.id);
+    await requestGeneration("invoice", invoice.id);
     return prisma.invoice.findUniqueOrThrow({ where: { id: invoice.id }, include: withDocuments });
 }
 
 export async function regenerateInvoice(orderId: string) {
     const invoice = await prisma.invoice.findUnique({ where: { orderId }, select: { id: true } });
     if (!invoice) throw new AppException("Invoice not found", 404, "INVOICE_NOT_FOUND");
-    return requestInvoiceGeneration(invoice.id);
+    return requestGeneration("invoice", invoice.id);
 }
 
 /**

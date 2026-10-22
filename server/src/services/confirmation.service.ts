@@ -3,7 +3,7 @@ import { createConfirmationSchema, type CreateConfirmationInput } from "@keepit/
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
 import { vatForOrder } from "./document-vat.js";
-import { requestConfirmationGeneration } from "./document-generation-request.service.js";
+import { requestGeneration } from "./document/document-generation-request.js";
 
 const withDocuments = {
     documents: {
@@ -50,14 +50,14 @@ export async function createConfirmation(orderId: string, input: CreateConfirmat
         throw error;
     }
 
-    await requestConfirmationGeneration(confirmation.id);
+    await requestGeneration("confirmation", confirmation.id);
     return prisma.confirmation.findUniqueOrThrow({ where: { id: confirmation.id }, include: withDocuments });
 }
 
 export async function regenerateConfirmation(orderId: string) {
     const confirmation = await prisma.confirmation.findUnique({ where: { orderId }, select: { id: true } });
     if (!confirmation) throw new AppException("Confirmation not found", 404, "CONFIRMATION_NOT_FOUND");
-    return requestConfirmationGeneration(confirmation.id);
+    return requestGeneration("confirmation", confirmation.id);
 }
 
 /**

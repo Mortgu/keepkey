@@ -5,8 +5,8 @@ import { customParser } from "../pipelines/offer/utils.js";
 import { orderTemplateSchema } from "../schemas/templates/order.template.schema.js";
 import { describe, expect, it, vi } from "vitest";
 vi.mock("../lib/prismaClient.js", () => ({ prisma: {} }));
-vi.mock("./document-generation-request.service.js", () => ({
-    requestOrderGeneration: vi.fn(),
+vi.mock("./document/document-generation-request.js", () => ({
+    requestGeneration: vi.fn(),
 }));
 import { presentOrder } from "./order-source.js";
 import { formatOrderData } from "../pipelines/order/build-order.js";

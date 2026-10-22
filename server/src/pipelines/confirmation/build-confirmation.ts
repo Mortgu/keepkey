@@ -17,7 +17,7 @@ import type { Language } from "@prisma/client";
 export async function buildConfirmation(confirmationId: string): Promise<{
     data: Record<string, unknown>;
     language: Language;
-    displayName: string;
+    baseName: string;
 }> {
     const confirmation = await prisma.confirmation.findUniqueOrThrow({ where: { id: confirmationId } });
     const order = await getOrderById(confirmation.orderId);
@@ -38,6 +38,6 @@ export async function buildConfirmation(confirmationId: string): Promise<{
     return {
         data,
         language: order.language,
-        displayName: `${confirmation.confirmationId}_AB_${sanitizeCompanyName(order.customer.companyName)}`,
+        baseName: `${confirmation.confirmationId}_AB_${sanitizeCompanyName(order.customer.companyName)}`,
     };
 }

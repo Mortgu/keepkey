@@ -3,15 +3,8 @@ import type { Job } from "bullmq";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import { documentTable } from "@/services/document-repo.js";
+import { documentTypeForTarget } from "@/services/document/document-types.js";
 import type { TaskJobData } from "./task-contract.js";
-
-/** Nur diese vier `TaskTarget`-Werte haben überhaupt eine Dokumenttabelle; `RENEWAL` nie. */
-const DOCUMENT_TYPE_BY_TARGET = {
-    OFFER: "offer",
-    ORDER: "order",
-    CONFIRMATION: "confirmation",
-    INVOICE: "invoice",
-} as const satisfies Partial<Record<TaskTarget, string>>;
 
 export async function markTaskRunning(taskId: string, runToken: string, target: TaskTarget): Promise<boolean> {
     return prisma.$transaction(async (tx) => {
@@ -30,7 +23,7 @@ export async function markTaskRunning(taskId: string, runToken: string, target: 
         if (claimed.count !== 1) return false;
 
         // Ein Task gehört immer zu genau einem Zieltyp — nur dessen Tabelle anfassen.
-        const type = DOCUMENT_TYPE_BY_TARGET[target as keyof typeof DOCUMENT_TYPE_BY_TARGET];
+        const type = documentTypeForTarget(target);
         if (type) {
             await documentTable(type, tx).updateMany(
                 {
@@ -95,7 +88,7 @@ export async function handleTaskFailure(job: Job<TaskJobData> | undefined, error
         if (failed.count !== 1) return;
 
         const current = await tx.task.findUnique({ where: { id: taskId }, select: { target: true } });
-        const type = current && DOCUMENT_TYPE_BY_TARGET[current.target as keyof typeof DOCUMENT_TYPE_BY_TARGET];
+        const type = current && documentTypeForTarget(current.target);
         if (type) {
             await documentTable(type, tx).updateMany(
                 {

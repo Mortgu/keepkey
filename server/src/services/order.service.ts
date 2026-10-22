@@ -8,7 +8,7 @@ import {
     type AcceptOrderInput,
     type UpdateOrderMetadataInput
 } from "../schemas/order-inputs.js";
-import { requestOrderGeneration } from "./document-generation-request.service.js";
+import { requestGeneration } from "./document/document-generation-request.js";
 import { acceptOffer } from "./offer-acceptance.service.js";
 import { purchaseLines } from "./order-purchase.js";
 import { presentOrder } from "./order-source.js";
@@ -112,12 +112,17 @@ async function purchaseLinesForOffer(
     const source = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
     return purchaseLines(source.positions, input, source.duration_months);
 }
-async function lockOrder(
+/** Serialisiert alles, was die `version` einer Bestellung liest oder ändert — auch ihre Dokumente. */
+export async function lockOrder(tx: Prisma.TransactionClient, id: string) {
+    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${id}`}))::text AS "lock"`;
+}
+
+async function lockOrderAt(
     tx: Prisma.TransactionClient,
     id: string,
     expectedVersion: number,
 ) {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${id}`}))::text AS "lock"`;
+    await lockOrder(tx, id);
     const order = await tx.order.findUniqueOrThrow({ where: { id } });
     if (order.version !== expectedVersion)
         throw new AppException(
@@ -136,11 +141,11 @@ async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string
     });
 }
 
-export async function updateOrder(id: string, input: UpdateOrderMetadataInput, actorId: string) {
+export async function updateOrder(id: string, input: UpdateOrderMetadataInput, _actorId: string) {
     const data = updateOrderMetadataSchema.parse(input);
 
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, data.expectedVersion);
+        const current = await lockOrderAt(tx, id, data.expectedVersion);
 
         const lines = data.positions
             ? await purchaseLinesForOffer(tx, current.offerId, data.positions)
@@ -163,9 +168,9 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, a
 }
 
 
-export async function cancelOrder(id: string, expectedVersion: number, actorId: string) {
+export async function cancelOrder(id: string, expectedVersion: number, _actorId: string) {
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
+        await lockOrderAt(tx, id, expectedVersion);
 
         const order = await tx.order.update({
             where: { id },
@@ -181,13 +186,7 @@ export async function createOrderTask(orderId: string): Promise<void> {
 }
 
 export async function generateOrderDocument(orderId: string) {
-    const order = await prisma.order.findUniqueOrThrow({
-        where: { id: orderId },
-    });
-
-    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
-
-    return requestOrderGeneration(orderId);
+    return requestGeneration("order", orderId);
 }
 
 export async function deleteOrderById(id: string): Promise<void> {

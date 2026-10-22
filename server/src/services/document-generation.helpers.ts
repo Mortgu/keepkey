@@ -84,23 +84,3 @@ export async function createArtifactDocuments(
 
     return { pdf, docx };
 }
-
-
-/**
- * `Document` hat je Elterntyp eine nullbare FK-Spalte; welche gesetzt ist,
- * garantiert der CHECK `document_record_type_owner_check` anhand von `type`.
- * Engt die zum Typ passenden Felder auf nicht-`null` ein — ein `null` hier
- * hieße, der CHECK wurde umgangen.
- */
-export function requireOwner<T extends { id: string }, K extends keyof T>(
-    doc: T | null,
-    ...keys: K[]
-): (T & { [P in K]: NonNullable<T[P]> }) | null {
-    if (!doc) return null;
-    for (const key of keys) {
-        if (doc[key] == null) {
-            throw new Error(`Document ${doc.id} is missing its owner field "${String(key)}".`);
-        }
-    }
-    return doc as T & { [P in K]: NonNullable<T[P]> };
-}

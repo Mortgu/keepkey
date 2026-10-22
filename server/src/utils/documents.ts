@@ -3,13 +3,11 @@ export function sanitizeCompanyName(companyName: string): string {
     return companyName.replaceAll(" ", "").trim();
 }
 
-export function generateOfferDisplayName(quoteId: string, companyName: string, products: Array<string>, version: number): string {
-    const formatedWorkloads = products.join("+");
+export function offerBaseName(quoteId: string, companyName: string, products: Array<string>): string {
+    return `${quoteId}_AG_${sanitizeCompanyName(companyName)}_Keepit-${products.join("+")}`;
+}
 
-    let name = `${quoteId}_AG_${sanitizeCompanyName(companyName)}_Keepit-${formatedWorkloads}`;
-
-    if (version > 0)
-        name = `${name}_v${version}`;
-
-    return name;
+/** Für jeden Dokumenttyp gleich: die Versionsnummer steht erst ab der zweiten Fassung im Namen. */
+export function withDocumentVersion(baseName: string, version: number): string {
+    return version > 1 ? `${baseName}_v${version}` : baseName;
 }

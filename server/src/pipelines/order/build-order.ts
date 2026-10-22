@@ -182,13 +182,11 @@ export function withPurchasePrices(
  * Alles, was die Bestellvorlage braucht — eine Funktion, von oben nach unten:
  * Bestellung laden, mit Verkaufspreisen formatieren, für den Zulieferer auf
  * Einkaufspreise umstellen, Namen bilden.
- *
- * `version` kommt vom `OrderDocument` und steht immer im Dateinamen.
  */
-export async function buildOrder(orderId: string, version: number): Promise<{
+export async function buildOrder(orderId: string): Promise<{
     data: Record<string, unknown>;
     language: Language;
-    displayName: string;
+    baseName: string;
 }> {
     const fetched = await fetchOrderData(orderId);
     const { order } = fetched;
@@ -206,6 +204,6 @@ export async function buildOrder(orderId: string, version: number): Promise<{
         data,
         // Die Sprache steckt am Kunden, nicht an der Bestellung — hier liegt beides zusammen vor.
         language: order.language,
-        displayName: `${order.orderId}_BE_${company}_Keepit-${workloads}_v${version}`,
+        baseName: `${order.orderId}_BE_${company}_Keepit-${workloads}`,
     };
 }

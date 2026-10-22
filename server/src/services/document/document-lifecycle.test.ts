@@ -2,6 +2,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const documentFindFirst = vi.fn();
 const ownerFindFirst = vi.fn();
+const offerFindUnique = vi.fn();
+const confirmationFindUnique = vi.fn();
 const documentUpdateMany = vi.fn();
 const documentArtifactUpdateMany = vi.fn();
 const moveDocumentArtifact = vi.fn();
@@ -11,8 +13,8 @@ const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
 vi.mock("../../lib/prismaClient.js", () => {
     // `documentTable()` queries the single `document` delegate filtered by
-    // `type`. Lookups with a `select` are the facade's owner checks
-    // (`assertEditable`: offer `acceptedAt`, confirmation's order
+    // `type`. Lookups with a `select` read the owner id for `assertEditable`,
+    // which then asks the owner (offer `acceptedAt`, confirmation's order
     // `cancelledAt`); everything else loads the document with its artifacts.
     const document = {
         findFirst: (args: { select?: unknown }) => (args.select ? ownerFindFirst(args) : documentFindFirst(args)),
@@ -28,6 +30,8 @@ vi.mock("../../lib/prismaClient.js", () => {
     return {
         prisma: {
             document,
+            offer: { findUniqueOrThrow: (...args: unknown[]) => offerFindUnique(...args) },
+            confirmation: { findUniqueOrThrow: (...args: unknown[]) => confirmationFindUnique(...args) },
             $transaction: (callback: (client: typeof tx) => unknown) => callback(tx),
         },
     };
@@ -59,7 +63,8 @@ describe("offer document mutations once the offer is accepted", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         documentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
-        ownerFindFirst.mockResolvedValue({ offer: { acceptedAt: new Date() } });
+        ownerFindFirst.mockResolvedValue({ offerId: "offer-1" });
+        offerFindUnique.mockResolvedValue({ acceptedAt: new Date() });
     });
 
     it("renameDocument is rejected", async () => {
@@ -79,7 +84,8 @@ describe("confirmation document mutations once the order is cancelled", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         documentFindFirst.mockResolvedValue({ id: "doc-1", status: "GENERATED", artifacts: [] });
-        ownerFindFirst.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
+        ownerFindFirst.mockResolvedValue({ confirmationId: "confirmation-1" });
+        confirmationFindUnique.mockResolvedValue({ order: { cancelledAt: new Date() } });
     });
 
     it("renameDocument is rejected", async () => {

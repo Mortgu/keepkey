@@ -69,7 +69,7 @@ describe("buildInvoice", () => {
         expect(data.servicePeriodTo).toBe("31. Oktober 2027");    // + 12 Monate − 1 Tag
         expect(data.confirmationNumber).toBe("000042");
         expect(data.customer.fullName).toBe("First Last");
-        expect(built.displayName).toBe("2026-0007_RE_OriginalLtd");
+        expect(built.baseName).toBe("2026-0007_RE_OriginalLtd");
     });
 });
 

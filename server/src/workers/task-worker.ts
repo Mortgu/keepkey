@@ -1,13 +1,11 @@
-import { Task, TaskStatus, TaskTarget } from "@prisma/client";
+import { TaskStatus } from "@prisma/client";
 import { Job, Worker } from "bullmq";
 import type { Redis } from "ioredis";
 import env from "../lib/env.js";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import confirmationTaskHandler from "./handlers/confirmation-handler.js";
-import invoiceTaskHandler from "./handlers/invoice-handler.js";
-import offerTaskHandler from "./handlers/offer-handler.js";
-import orderTaskHandler from "./handlers/order-handler.js";
+import { documentTypeForTarget } from "@/services/document/document-types.js";
+import { runGeneration } from "@/services/document/document-generation.js";
 import { type TaskJobData, taskQueueKey } from "./task-contract.js";
 import {
     handleTaskFailure,
@@ -15,15 +13,6 @@ import {
     markTaskRunning,
     releaseTaskRun,
 } from "./task-lifecycle.js";
-
-type TaskHandlerFn = (task: Task) => Promise<void>;
-
-const handlers: Partial<Record<TaskTarget, TaskHandlerFn>> = {
-    OFFER: offerTaskHandler,
-    ORDER: orderTaskHandler,
-    CONFIRMATION: confirmationTaskHandler,
-    INVOICE: invoiceTaskHandler,
-}
 
 export default function registerTaskWorker(connection: Redis) {
     const taskWorker = new Worker<TaskJobData>(taskQueueKey, async (job: Job<TaskJobData>, token?: string) => {
@@ -43,9 +32,7 @@ export default function registerTaskWorker(connection: Redis) {
             return;
         }
 
-        const handler = handlers[task.target];
-
-        if (!handler) {
+        if (!documentTypeForTarget(task.target)) {
             logger.error('task_worker_no_handler', { taskId, target: task.target });
             return;
         }
@@ -57,7 +44,7 @@ export default function registerTaskWorker(connection: Redis) {
         }
 
         try {
-            await handler(task);
+            await runGeneration(task.id);
             await markTaskCompleted(taskId, token);
         } catch (error) {
             try {

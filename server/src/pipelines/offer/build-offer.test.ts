@@ -174,21 +174,21 @@ describe("angenommenes Angebot", () => {
         const acceptedSnapshot = await acceptedSnapshotFixture();
         const renamed = fixture({ acceptedSnapshot, customerCompanyName: "Renamed Corp AG", productName: "New Product Name" });
 
-        const built = await buildOfferDocument(renamed, 0);
+        const built = await buildOfferDocument(renamed);
 
-        expect(built.displayName).toContain("FrozenCorpGmbH");
-        expect(built.displayName).toContain("LegacyProduct");
-        expect(built.displayName).not.toContain("RenamedCorpAG");
-        expect(built.displayName).not.toContain("NewProductName");
+        expect(built.baseName).toContain("FrozenCorpGmbH");
+        expect(built.baseName).toContain("LegacyProduct");
+        expect(built.baseName).not.toContain("RenamedCorpAG");
+        expect(built.baseName).not.toContain("NewProductName");
     });
 
     it("stellt den Dateinamen aus dem aktuellen Stand dar, wenn kein Snapshot existiert", async () => {
         const live = fixture({ customerCompanyName: "Live Corp AG", productName: "Current Product" });
 
-        const built = await buildOfferDocument(live, 0);
+        const built = await buildOfferDocument(live);
 
-        expect(built.displayName).toContain("LiveCorpAG");
-        expect(built.displayName).toContain("CurrentProduct");
+        expect(built.baseName).toContain("LiveCorpAG");
+        expect(built.baseName).toContain("CurrentProduct");
     });
 });
 

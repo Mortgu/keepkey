@@ -37,7 +37,7 @@ const addMonths = (date: Date, months: number) => {
 export async function buildInvoice(invoiceRowId: string): Promise<{
     data: Record<string, unknown>;
     language: Language;
-    displayName: string;
+    baseName: string;
 }> {
     const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceRowId } });
     const [order, confirmation] = await Promise.all([
@@ -138,6 +138,6 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
     return {
         data,
         language: lang,
-        displayName: `${invoice.invoiceId}_RE_${sanitizeCompanyName(customer.companyName)}`,
+        baseName: `${invoice.invoiceId}_RE_${sanitizeCompanyName(customer.companyName)}`,
     };
 }

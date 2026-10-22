@@ -36,8 +36,8 @@ vi.mock("../lib/prismaClient.js", async () => {
         }),
     };
 });
-vi.mock("./document-generation-request.service.js", () => ({
-    requestOrderGeneration: vi.fn(),
+vi.mock("./document/document-generation-request.js", () => ({
+    requestGeneration: vi.fn(),
 }));
 
 const integration = describe.skipIf(!process.env.ORDER_TEST_DATABASE_URL);

@@ -5,7 +5,7 @@ import { contractOrderBy } from "@/services/contract.service.js";
 import { presentAcceptedOffer } from "@/services/accepted-offer-view.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
-import { generateOfferDisplayName } from "@/utils/documents.js";
+import { offerBaseName } from "@/utils/documents.js";
 import logger from "@/utils/logger.js";
 import type { Language } from "@prisma/client";
 import { z } from "zod";
@@ -55,14 +55,11 @@ export const formatOfferData = async (fetchedData: OfferFetchData): Promise<Offe
 /**
  * Alles, was die Angebotsvorlage braucht, aus bereits geladenen Daten: formatieren
  * (bei angenommenen Angeboten aus dem Snapshot), gegen das Schema prüfen, Namen bilden.
- *
- * `version` kommt vom `OfferDocument` und steht im Dateinamen, sobald es eine
- * Neufassung ist.
  */
-export async function buildOfferDocument(fetched: OfferFetchData, version: number): Promise<{
+export async function buildOfferDocument(fetched: OfferFetchData): Promise<{
     data: Record<string, unknown>;
     language: Language;
-    displayName: string;
+    baseName: string;
 }> {
     const { offer } = fetched;
 
@@ -90,10 +87,10 @@ export async function buildOfferDocument(fetched: OfferFetchData, version: numbe
     return {
         data,
         language: named.language,
-        displayName: generateOfferDisplayName(offer.quoteId, named.customer.companyName, workloads, version),
+        baseName: offerBaseName(offer.quoteId, named.customer.companyName, workloads),
     };
 }
 
-export async function buildOffer(offerId: string, version: number) {
-    return buildOfferDocument(await fetchOfferData(offerId), version);
+export async function buildOffer(offerId: string) {
+    return buildOfferDocument(await fetchOfferData(offerId));
 }

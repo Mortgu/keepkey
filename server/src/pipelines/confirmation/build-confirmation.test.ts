@@ -60,7 +60,7 @@ describe("buildConfirmation", () => {
     it("names the document after the confirmation number, not the order", async () => {
         const built = await buildConfirmation("conf-1");
         const company = presentOrder(orderFixture()).customer.companyName.replaceAll(" ", "");
-        expect(built.displayName).toBe(`000042_AB_${company}`);
+        expect(built.baseName).toBe(`000042_AB_${company}`);
         expect(built.language).toBe(presentOrder(orderFixture()).language);
     });
 });

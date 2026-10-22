@@ -42,6 +42,7 @@ vi.mock("../../lib/prismaClient.js", () => {
 });
 vi.mock("../offer-acceptance.service.js", () => ({
     assertOfferEditable: (...args: unknown[]) => assertOfferEditable(...args),
+    lockOffer: vi.fn(),
 }));
 vi.mock("../document-repo.js", async (importOriginal) => ({
     documentOwnerType: (await importOriginal<typeof import("../document-repo.js")>()).documentOwnerType,
