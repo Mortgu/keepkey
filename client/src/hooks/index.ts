@@ -13,7 +13,6 @@ export * from './dashboard/use-dashboard-stats';
 export * from './documents';
 export * from './flatrates/flatrate-hooks';
 export * from './flatrates/flatrate-mutations';
-export * from './integrations/integration-hooks';
 export * from './nextcloud/nextcloud-hooks';
 export * from './offers/offer-hooks';
 export * from './offers/offer-mutations';
