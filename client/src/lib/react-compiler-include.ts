@@ -21,7 +21,9 @@ const PURE_UTILITY_FILE = [
  * inclusion would silently drop a real component or hook from compilation,
  * which costs more than it saves.
  */
-export const isReactCompilerTarget = (filename: string): boolean => {
+export const isReactCompilerTarget = (filename: string | undefined): boolean => {
+    if (!filename) return false;
+
     if (!/\.tsx?$/.test(filename)) return false;
     return !PURE_UTILITY_FILE.some((pattern) => pattern.test(filename));
 };
