@@ -26,15 +26,10 @@ export default function OrderEditModal({ order, onClose, onCreated }: Props) {
     const formId = `order-form-${source.id}`;
 
     const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
-
         e.preventDefault();
-
         e.stopPropagation();
-
         form.handleSubmit();
-
     };
-
 
     return (
         <Dialog defaultOpen onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
@@ -125,17 +120,20 @@ export default function OrderEditModal({ order, onClose, onCreated }: Props) {
                     <hr className="text-(--border)" />
 
                     {/* Einkaufsseite: Die Bestellung geht an den Zulieferer. */}
-                    <form.Field name="positions" children={(field) => (
-                        <PurchasePriceTable
-                            rows={rows}
-                            values={field.state.value}
-                            disabled={Boolean(order.cancelledAt)}
-                            onChange={(offerPositionId, purchaseCents) => field.handleChange(
-                                field.state.value.map((p) => p.offerPositionId === offerPositionId
-                                    ? { ...p, purchase_eur_user_month: purchaseCents }
-                                    : p),
-                            )}
-                        />
+                    <form.Subscribe selector={(state) => state.submissionAttempts > 0} children={(attempted) => (
+                        <form.Field name="positions" children={(field) => (
+                            <PurchasePriceTable
+                                showMissing={attempted}
+                                rows={rows}
+                                values={field.state.value}
+                                disabled={Boolean(order.cancelledAt)}
+                                onChange={(offerPositionId, totalCents) => field.handleChange(
+                                    field.state.value.map((p) => p.offerPositionId === offerPositionId
+                                        ? { ...p, purchase_total_cents: totalCents }
+                                        : p),
+                                )}
+                            />
+                        )} />
                     )} />
                 </form>
             </Dialog.Body>

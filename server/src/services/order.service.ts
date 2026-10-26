@@ -110,7 +110,7 @@ async function purchaseLinesForOffer(
         select: { acceptedSnapshot: true },
     });
     const source = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
-    return purchaseLines(source.positions, input, source.duration_months);
+    return purchaseLines(source.positions, input);
 }
 async function lockOrder(
     tx: Prisma.TransactionClient,

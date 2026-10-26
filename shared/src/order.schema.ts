@@ -28,8 +28,8 @@ export const purchasePositionInputSchema = z
     .object({
         /** Id der Position im Accepted-Snapshot. */
         offerPositionId: z.string().min(1),
-        /** Einkaufspreis je User/Monat in Cent, wie der Verkaufspreis. */
-        purchase_eur_user_month: z.number().int().min(0),
+        /** Gesamtbetrag der Position an den Zulieferer in Cent. */
+        purchase_total_cents: z.number().int().min(0),
     })
     .strict();
 export type PurchasePositionInput = z.infer<typeof purchasePositionInputSchema>;
@@ -38,13 +38,10 @@ export const supplierPositionSchema = z.object({
     offerPositionId: z.string(),
     productId: z.string(),
     quantity: z.number().int(),
-    free_months: z.number().int(),
-    /** Verkaufspreis je User/Monat, zum Vergleich. */
-    eur_user_month: z.number().int(),
+    /** Aus dem Gesamtbetrag abgeleitet und gerundet — nur zur Anzeige. */
     purchase_eur_user_month: z.number().int(),
     purchase_total_cents: z.number().int(),
-    purchase_discount_cents: z.number().int(),
-    /** true bei Altbestellungen ohne gespeicherte Einkaufspreise (Fallback = Verkaufspreis). */
+    /** true bei Altbestellungen ohne gespeicherte Einkaufspreise (Fallback = Netto-Verkaufssumme). */
     fallback: z.boolean(),
 });
 export type SupplierPosition = z.infer<typeof supplierPositionSchema>;

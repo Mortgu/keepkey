@@ -10,14 +10,13 @@ import { formatEur } from "../../utils/utils.js";
  * an den Kunden und dürfen Einkaufswerte nie enthalten.
  */
 
-const PURCHASE = 700; // Cent je User/Monat, Verkauf im Fixture: 1000
+const PURCHASE_TOTAL = 84_000; // Cent, 10 User × 12 Monate → 7,00 € je User/Monat
+const PURCHASE_UNIT = 700;
 const withPurchase = () => ({
     ...orderFixture(),
     positions: [{
         id: "op", orderId: "order", offerPositionId: "position",
-        purchase_eur_user_month: PURCHASE,
-        purchase_total_cents: PURCHASE * 10 * 12,
-        purchase_discount_cents: PURCHASE * 10 * 3,
+        purchase_total_cents: PURCHASE_TOTAL,
         createdAt: new Date(), updatedAt: new Date(),
     }],
 });
@@ -46,16 +45,17 @@ describe("presentOrder", () => {
 
         expect(order.supplierPositions).toEqual([expect.objectContaining({
             offerPositionId: "position",
-            eur_user_month: 1000,
-            purchase_eur_user_month: PURCHASE,
+            purchase_eur_user_month: PURCHASE_UNIT,
+            purchase_total_cents: PURCHASE_TOTAL,
             fallback: false,
         })]);
-        expect(order.purchase_net_amount).toBe(PURCHASE * 10 * 12 - PURCHASE * 10 * 3);
+        // Keine Freimonate auf der Einkaufsseite: Summe = eingegebener Betrag.
+        expect(order.purchase_net_amount).toBe(PURCHASE_TOTAL);
     });
 
-    it("falls back to the sales price for orders created before purchase prices existed", () => {
+    it("falls back to the net sales line for orders created before purchase prices existed", () => {
         const legacy = presentOrder(orderFixture());
-        expect(legacy.supplierPositions[0]).toMatchObject({ purchase_eur_user_month: 1000, fallback: true });
+        expect(legacy.supplierPositions[0]).toMatchObject({ purchase_total_cents: 120000 - 30000, fallback: true });
         expect(legacy.purchase_net_amount).toBe(120000 - 30000);
     });
 });
@@ -68,10 +68,10 @@ describe("Bestellung (BE) an den Zulieferer", () => {
 
         expect(supplierSide.total).toBe(eur(order.purchase_net_amount));
         expect(supplierSide.groups[0]!.items[0]!.price).toEqual({
-            unit: eur(PURCHASE),
-            gross: eur(PURCHASE * 10 * 12),
-            discount: eur(-PURCHASE * 10 * 3),
-            total: eur(PURCHASE * 10 * 12 - PURCHASE * 10 * 3),
+            unit: eur(PURCHASE_UNIT),
+            gross: eur(PURCHASE_TOTAL),
+            discount: "",
+            total: eur(PURCHASE_TOTAL),
         });
         expect(supplierSide.customerTotal).toBe(customerSide.total);
         // Pauschalen bleiben Kundenpreise — es gibt keinen Einkaufspreis dafür.
@@ -80,7 +80,7 @@ describe("Bestellung (BE) an den Zulieferer", () => {
 });
 
 describe("Kundendokumente", () => {
-    const purchaseMarkers = [eur(PURCHASE), eur(PURCHASE * 10 * 12 - PURCHASE * 10 * 3)];
+    const purchaseMarkers = [eur(PURCHASE_UNIT), eur(PURCHASE_TOTAL)];
 
     it("Auftragsbestätigung enthält keine Einkaufswerte", async () => {
         const { buildConfirmation } = await import("../confirmation/build-confirmation.js");

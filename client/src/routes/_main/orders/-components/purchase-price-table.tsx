@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { PurchaseRow } from "../-hooks/use-order-form";
+import type { PurchaseRow, PurchaseValue } from "../-hooks/use-order-form";
 import { Input } from "@/components";
 import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
@@ -7,32 +7,32 @@ import { centsToEur, eurToCents } from "@/utils/utils";
 
 interface Props {
     rows: Array<PurchaseRow>;
-    /** Einkaufspreis je Position in Cent, Reihenfolge wie `rows`. */
-    values: Array<{ offerPositionId: string; purchase_eur_user_month: number }>;
-    onChange: (offerPositionId: string, purchaseCents: number) => void;
+    /** Gesamtbetrag je Position in Cent, `null` solange nicht eingegeben. */
+    values: Array<PurchaseValue>;
+    onChange: (offerPositionId: string, totalCents: number | null) => void;
     disabled?: boolean;
+    /** Fehlende Beträge markieren — erst nach einem Absendeversuch. */
+    showMissing?: boolean;
 }
 
-/** Netto einer Zeile: Preis × Menge × (Laufzeit − Freimonate). Gleiche Formel wie der Server. */
-const lineNet = (row: PurchaseRow, unitCents: number) =>
-    unitCents * row.quantity * (row.duration_months - row.free_months);
+/** Einzelpreis je User/Monat, nur zur Anzeige. Gleiche Rundung wie der Server. */
+const unitOf = (row: PurchaseRow, totalCents: number) =>
+    row.quantity > 0 && row.duration_months > 0 ? Math.round(totalCents / (row.quantity * row.duration_months)) : 0;
 
 /**
- * Einkaufspreise der Bestellung an den Zulieferer. Verkaufspreis daneben zum
- * Vergleich, Marge unten. Pauschalen und Rabatte des Angebots fehlen bewusst —
- * sie haben keinen Einkaufspreis.
+ * Einkaufsbeträge der Bestellung an den Zulieferer. Eingegeben wird der
+ * Gesamtbetrag je Position; der Einzelpreis ist daraus abgeleitet. Pauschalen
+ * und Rabatte des Angebots fehlen bewusst — sie haben keinen Einkaufspreis.
  */
-export default function PurchasePriceTable({ rows, values, onChange, disabled }: Props) {
+export default function PurchasePriceTable({ rows, values, onChange, disabled, showMissing }: Props) {
     const { formatEur } = useFormatters();
     const { t } = useTranslation();
     const locale = useLocale();
 
-    const purchaseOf = (id: string) =>
-        values.find((v) => v.offerPositionId === id)?.purchase_eur_user_month ?? 0;
+    const totalOf = (id: string) =>
+        values.find((v) => v.offerPositionId === id)?.purchase_total_cents ?? null;
 
-    const sales = rows.reduce((sum, row) => sum + lineNet(row, row.eur_user_month), 0);
-    const purchase = rows.reduce((sum, row) => sum + lineNet(row, purchaseOf(row.offerPositionId)), 0);
-    const margin = sales - purchase;
+    const purchase = rows.reduce((sum, row) => sum + (totalOf(row.offerPositionId) ?? 0), 0);
 
     return (
         <div className="grid gap-2">
@@ -44,19 +44,20 @@ export default function PurchasePriceTable({ rows, values, onChange, disabled }:
                     <tr className="text-left">
                         <th className="py-1 font-normal">{t("orders.purchase.product")}</th>
                         <th className="py-1 font-normal text-right">{t("orders.purchase.quantity")}</th>
-                        <th className="py-1 font-normal text-right">{t("orders.purchase.sales")}</th>
-                        <th className="py-1 font-normal text-right w-36">{t("orders.purchase.purchase")}</th>
-                        <th className="py-1 font-normal text-right">{t("orders.purchase.lineTotal")}</th>
+                        <th className="py-1 font-normal text-right">{t("orders.purchase.unitPrice")}</th>
+                        <th className="py-1 font-normal text-right w-40">{t("orders.purchase.lineTotal")}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {rows.map((row) => {
-                        const unit = purchaseOf(row.offerPositionId);
+                        const total = totalOf(row.offerPositionId);
                         return (
                             <tr key={row.offerPositionId} className="border-t border-(--border)">
                                 <td className="py-2">{localized(row.productName, locale, "name")}</td>
                                 <td className="py-2 text-right font-mono">{row.quantity}</td>
-                                <td className="py-2 text-right font-mono">{formatEur(row.eur_user_month)}</td>
+                                <td className="py-2 text-right font-mono text-(--text-secondary)">
+                                    {total === null ? "—" : formatEur(unitOf(row, total))}
+                                </td>
                                 <td className="py-2 text-right">
                                     <Input
                                         id={`purchase-${row.offerPositionId}`}
@@ -64,28 +65,24 @@ export default function PurchasePriceTable({ rows, values, onChange, disabled }:
                                         step="0.01"
                                         min="0"
                                         suffix="€"
-                                        value={centsToEur(unit)}
+                                        placeholder="0,00"
+                                        value={total === null ? "" : centsToEur(total)}
+                                        error={showMissing && total === null ? t("orders.purchase.required") : undefined}
                                         disabled={disabled}
-                                        onChange={(e) => onChange(row.offerPositionId, eurToCents(Number(e.target.value) || 0))}
+                                        onChange={(e) => onChange(
+                                            row.offerPositionId,
+                                            e.target.value === "" ? null : eurToCents(Number(e.target.value) || 0),
+                                        )}
                                     />
                                 </td>
-                                <td className="py-2 text-right font-mono">{formatEur(lineNet(row, unit))}</td>
                             </tr>
                         );
                     })}
                 </tbody>
                 <tfoot className="border-t border-(--border)">
                     <tr>
-                        <td colSpan={4} className="py-1 text-right text-(--text-secondary)">{t("orders.purchase.salesTotal")}</td>
-                        <td className="py-1 text-right font-mono">{formatEur(sales)}</td>
-                    </tr>
-                    <tr>
-                        <td colSpan={4} className="py-1 text-right text-(--text-secondary)">{t("orders.purchase.purchaseTotal")}</td>
+                        <td colSpan={3} className="py-1 text-right text-(--text-secondary)">{t("orders.purchase.purchaseTotal")}</td>
                         <td className="py-1 text-right font-mono font-medium">{formatEur(purchase)}</td>
-                    </tr>
-                    <tr>
-                        <td colSpan={4} className="py-1 text-right text-(--text-secondary)">{t("orders.purchase.margin")}</td>
-                        <td className={`py-1 text-right font-mono ${margin < 0 ? "text-(--destructive)" : ""}`}>{formatEur(margin)}</td>
                     </tr>
                 </tfoot>
             </table>

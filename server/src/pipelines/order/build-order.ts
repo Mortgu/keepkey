@@ -137,7 +137,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
 
 /**
  * Die Bestellung geht an den Zulieferer: Positionspreise und Summe werden
- * durch die Einkaufswerte ersetzt. Nur hier — `formatOrderData` selbst bleibt
+ * durch die Einkaufswerte ersetzt. Freimonate gibt es dort nicht — der
+ * Gesamtbetrag ist, was wir zahlen; der Einzelpreis ist daraus gerundet. Nur hier — `formatOrderData` selbst bleibt
  * auf Verkaufspreisen, weil Auftragsbestätigung und Rechnung darauf aufbauen.
  * Pauschalen und Rabatte haben keinen Einkaufspreis und bleiben, wie sie sind.
  */
@@ -154,14 +155,14 @@ export function withPurchasePrices(
         items: group.items.map((item) => {
             const purchase = byId.get(item.offerPositionId);
             if (!purchase) return item;
-            const net = purchase.purchase_total_cents - purchase.purchase_discount_cents;
+            const total = formatCentsToEur(purchase.purchase_total_cents);
             return {
                 ...item,
                 price: {
                     unit: formatCentsToEur(purchase.purchase_eur_user_month),
-                    gross: formatCentsToEur(purchase.purchase_total_cents),
-                    discount: purchase.purchase_discount_cents ? formatCentsToEur(-purchase.purchase_discount_cents) : "",
-                    total: formatCentsToEur(net),
+                    gross: total,
+                    discount: "",
+                    total,
                 },
             };
         }),

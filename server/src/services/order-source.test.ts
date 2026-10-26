@@ -84,7 +84,7 @@ describe("accepted offer order data", () => {
         expect(formatted.customer.fullName).toBe("First Last");
     });
     it("requires the version shown at acceptance and purchase prices for the supplier", () => {
-        const positions = [{ offerPositionId: "position", purchase_eur_user_month: 800 }];
+        const positions = [{ offerPositionId: "position", purchase_total_cents: 800 }];
         expect(
             acceptOrderSchema.safeParse({ id: "offer", orderId: "AB-1", positions })
                 .success,

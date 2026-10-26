@@ -81,16 +81,19 @@ export default function OrderModalDetail({ offer, form, rows, error, formId }: P
 
                 {/* Einkaufsseite */}
                 <section className="bg-white border border-(--border) rounded-md p-4">
-                    <form.Field name="positions" children={(field) => (
-                        <PurchasePriceTable
-                            rows={rows}
-                            values={field.state.value}
-                            onChange={(offerPositionId, purchaseCents) => field.handleChange(
-                                field.state.value.map((p) => p.offerPositionId === offerPositionId
-                                    ? { ...p, purchase_eur_user_month: purchaseCents }
-                                    : p),
-                            )}
-                        />
+                    <form.Subscribe selector={(state) => state.submissionAttempts > 0} children={(attempted) => (
+                        <form.Field name="positions" children={(field) => (
+                            <PurchasePriceTable
+                                showMissing={attempted}
+                                rows={rows}
+                                values={field.state.value}
+                                onChange={(offerPositionId, totalCents) => field.handleChange(
+                                    field.state.value.map((p) => p.offerPositionId === offerPositionId
+                                        ? { ...p, purchase_total_cents: totalCents }
+                                        : p),
+                                )}
+                            />
+                        )} />
                     )} />
                 </section>
 

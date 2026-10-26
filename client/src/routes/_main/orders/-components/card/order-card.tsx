@@ -31,9 +31,7 @@ export default function OrderCard({ order }: Props) {
     const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
     const cancelled = Boolean(order.cancelledAt);
 
-    // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
-    const positionsSales = orderPositions.reduce((sum, p) => sum + p.total_cents, 0);
-    // Altbestellungen ohne gespeicherte Einkaufspreise: Fallback = Verkaufspreis.
+    // Altbestellungen ohne gespeicherte Einkaufspreise: Fallback = Netto-Verkaufssumme.
     const hasFallback = order.supplierPositions.some((p) => p.fallback);
 
     const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
@@ -92,10 +90,6 @@ export default function OrderCard({ order }: Props) {
                         {formatEur(order.purchase_net_amount)}
                         {hasFallback && <span className="text-(--text-secondary)"> *</span>}
                     </span>
-                </div>
-                <div className={dateCell}>
-                    <span className="text-(--text-secondary)">{t("orders.purchase.marginShort")}</span>
-                    <span className="text-sm font-medium font-mono">{formatEur(positionsSales - order.purchase_net_amount)}</span>
                 </div>
             </div>
 

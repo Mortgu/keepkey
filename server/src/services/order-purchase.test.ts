@@ -1,41 +1,50 @@
 import { describe, expect, it } from "vitest";
-import { purchaseLines, purchaseNetAmount } from "./order-purchase.js";
+import { purchaseLines, purchaseNetAmount, purchaseUnitCents } from "./order-purchase.js";
 
-const snapshot = [
-    { id: "p1", productId: "m365", quantity: 10, free_months: 2, eur_user_month: 500 },
-    { id: "p2", productId: "gws", quantity: 3, free_months: 0, eur_user_month: 800 },
-];
+const snapshot = [{ id: "p1" }, { id: "p2" }];
 
 describe("purchaseLines", () => {
-    it("applies the offer formulas to the purchase price", () => {
+    it("stores the entered total per position, without free months", () => {
         const lines = purchaseLines(snapshot, [
-            { offerPositionId: "p1", purchase_eur_user_month: 400 },
-            { offerPositionId: "p2", purchase_eur_user_month: 700 },
-        ], 12);
+            { offerPositionId: "p1", purchase_total_cents: 40_000 },
+            { offerPositionId: "p2", purchase_total_cents: 0 },
+        ]);
 
         expect(lines).toEqual([
-            { offerPositionId: "p1", purchase_eur_user_month: 400, purchase_total_cents: 400 * 10 * 12, purchase_discount_cents: 400 * 10 * 2 },
-            { offerPositionId: "p2", purchase_eur_user_month: 700, purchase_total_cents: 700 * 3 * 12, purchase_discount_cents: 0 },
+            { offerPositionId: "p1", purchase_total_cents: 40_000 },
+            { offerPositionId: "p2", purchase_total_cents: 0 },
         ]);
-        expect(purchaseNetAmount(lines)).toBe(48_000 - 8_000 + 25_200);
+        expect(purchaseNetAmount(lines)).toBe(40_000);
     });
 
     it("keeps snapshot order regardless of input order", () => {
         const lines = purchaseLines(snapshot, [
-            { offerPositionId: "p2", purchase_eur_user_month: 1 },
-            { offerPositionId: "p1", purchase_eur_user_month: 1 },
-        ], 12);
+            { offerPositionId: "p2", purchase_total_cents: 1 },
+            { offerPositionId: "p1", purchase_total_cents: 1 },
+        ]);
         expect(lines.map((l) => l.offerPositionId)).toEqual(["p1", "p2"]);
     });
 
     it.each([
-        ["missing", [{ offerPositionId: "p1", purchase_eur_user_month: 1 }]],
-        ["unknown", [{ offerPositionId: "p1", purchase_eur_user_month: 1 }, { offerPositionId: "p2", purchase_eur_user_month: 1 }, { offerPositionId: "px", purchase_eur_user_month: 1 }]],
-        ["duplicate", [{ offerPositionId: "p1", purchase_eur_user_month: 1 }, { offerPositionId: "p1", purchase_eur_user_month: 2 }]],
+        ["missing", [{ offerPositionId: "p1", purchase_total_cents: 1 }]],
+        ["unknown", [{ offerPositionId: "p1", purchase_total_cents: 1 }, { offerPositionId: "p2", purchase_total_cents: 1 }, { offerPositionId: "px", purchase_total_cents: 1 }]],
+        ["duplicate", [{ offerPositionId: "p1", purchase_total_cents: 1 }, { offerPositionId: "p1", purchase_total_cents: 2 }]],
     ])("rejects %s positions with 422", (_label, input) => {
-        expect(() => purchaseLines(snapshot, input, 12)).toThrow(expect.objectContaining({
+        expect(() => purchaseLines(snapshot, input)).toThrow(expect.objectContaining({
             statusCode: 422,
             code: "PURCHASE_POSITIONS_MISMATCH",
         }));
+    });
+});
+
+describe("purchaseUnitCents", () => {
+    it("derives the unit price from the total, rounded to cents", () => {
+        expect(purchaseUnitCents(100_000, 3, 12)).toBe(2_778);
+        expect(purchaseUnitCents(36_000, 3, 12)).toBe(1_000);
+    });
+
+    it("is 0 when there is nothing to divide by", () => {
+        expect(purchaseUnitCents(5_000, 0, 12)).toBe(0);
+        expect(purchaseUnitCents(5_000, 3, 0)).toBe(0);
     });
 });

@@ -1,7 +1,7 @@
 import type { Order, OrderPosition, Prisma } from "@prisma/client";
 import type { SupplierPosition } from "@keepit/schemas";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
-import { purchaseNetAmount } from "./order-purchase.js";
+import { purchaseNetAmount, purchaseUnitCents } from "./order-purchase.js";
 
 export type OrderWithSource = Order & {
     offer: { acceptedSnapshot: Prisma.JsonValue | null };
@@ -17,7 +17,7 @@ export type OrderWithSource = Order & {
  *    Snapshot. Davon leben AB und Rechnung — hier dürfen nie Einkaufswerte stehen.
  *  - `supplierPositions`, `purchase_net_amount`: Einkaufsseite für die Bestellung
  *    an den Zulieferer. Altbestellungen ohne gespeicherte Einkaufspreise fallen
- *    auf den Verkaufspreis zurück (`fallback: true`), also auf das alte Verhalten.
+ *    auf die Netto-Zeilensumme des Verkaufs zurück (`fallback: true`).
  */
 export function presentOrder<T extends OrderWithSource>(order: T) {
     const source = parseAcceptedOfferSnapshot(order.offer.acceptedSnapshot);
@@ -28,15 +28,13 @@ export function presentOrder<T extends OrderWithSource>(order: T) {
     const stored = new Map((positions ?? []).map((p) => [p.offerPositionId, p]));
     const supplierPositions: SupplierPosition[] = source.positions.map((p) => {
         const row = stored.get(p.id);
+        const total = row?.purchase_total_cents ?? p.total_cents - p.discount_cents;
         return {
             offerPositionId: p.id,
             productId: p.productId,
             quantity: p.quantity,
-            free_months: p.free_months,
-            eur_user_month: p.eur_user_month,
-            purchase_eur_user_month: row?.purchase_eur_user_month ?? p.eur_user_month,
-            purchase_total_cents: row?.purchase_total_cents ?? p.total_cents,
-            purchase_discount_cents: row?.purchase_discount_cents ?? p.discount_cents,
+            purchase_eur_user_month: purchaseUnitCents(total, p.quantity, source.duration_months),
+            purchase_total_cents: total,
             fallback: row === undefined,
         };
     });

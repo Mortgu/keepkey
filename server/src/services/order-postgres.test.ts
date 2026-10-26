@@ -173,7 +173,7 @@ integration("real PostgreSQL acceptance transactions", () => {
             id,
             orderId: randomUUID(),
             expectedOfferVersion: 1,
-            positions: positions.map((p) => ({ offerPositionId: p.id, purchase_eur_user_month: 800 })),
+            positions: positions.map((p) => ({ offerPositionId: p.id, purchase_total_cents: 800 })),
         };
     };
     it("allows exactly one of two simultaneous acceptances", async () => {

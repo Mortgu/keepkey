@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import { useForm } from "@tanstack/react-form";
-import { orderFormSchema, purchaseRows } from "./use-order-form";
+import { orderFormSchema, purchaseRows, toPurchaseInput } from "./use-order-form";
 import type { OrderFormValues } from "./use-order-form";
 import type { Offer } from "@keepit/schemas";
 import { useCreateOrder } from "@/hooks";
@@ -11,7 +11,11 @@ interface Props {
     onCreated: () => void;
 }
 
-/** Startwerte für ein Angebot: Bestelldaten leer, Einkaufspreise = Verkaufspreise. */
+/**
+ * Startwerte für ein Angebot: alles leer. Die Einkaufsbeträge werden bewusst
+ * nicht mit dem Verkaufspreis vorbelegt — sonst wäre die Marge ablesbar und
+ * man bestellt versehentlich zum Verkaufspreis.
+ */
 export function defaultsFor(offer: Offer): OrderFormValues {
     return {
         orderId: "",
@@ -22,7 +26,7 @@ export function defaultsFor(offer: Offer): OrderFormValues {
         orderDetails: "",
         positions: purchaseRows(undefined, offer).map((row) => ({
             offerPositionId: row.offerPositionId,
-            purchase_eur_user_month: row.eur_user_month,
+            purchase_total_cents: null,
         })),
     };
 }
@@ -57,7 +61,7 @@ export default function useOrderModal({ initialOffer, onCreated }: Props) {
                 const { positions, ...metadata } = value;
                 await create.createOrder({
                     ...metadata,
-                    positions,
+                    positions: toPurchaseInput(positions),
                     id: target.id,
                     expectedOfferVersion: target.version,
                     date: metadata.date || undefined,

@@ -30,10 +30,10 @@ model Order {
   @@map("order")
 }
 
-/// Einkaufspreis einer Angebotsposition für die Bestellung an den Zulieferer.
-/// Der Preis wird je User/Monat eingegeben wie der Verkaufspreis; die Summen
-/// rechnet der Server mit denselben Formeln wie beim Angebot. Menge, Laufzeit
-/// und Freimonate stehen weiterhin an der Snapshot-Position.
+/// Einkaufsbetrag einer Angebotsposition für die Bestellung an den Zulieferer.
+/// Gespeichert wird nur der Gesamtbetrag, den wir zahlen. Freimonate gibt es
+/// nur auf der Verkaufsseite; der Einzelpreis wird beim Lesen abgeleitet.
+/// Menge und Laufzeit stehen weiterhin an der Snapshot-Position.
 model OrderPosition {
   id String @id @default(cuid())
 
@@ -43,9 +43,7 @@ model OrderPosition {
   /// Id der Position im Accepted-Snapshot des Angebots.
   offerPositionId String
 
-  purchase_eur_user_month Int
-  purchase_total_cents    Int
-  purchase_discount_cents Int @default(0)
+  purchase_total_cents Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
