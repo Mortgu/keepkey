@@ -98,6 +98,28 @@
       "ignore": "Ignore",
       "adopt": "Adopt selection ({{count}})",
       "notAdoptable": "Cannot be adopted into the offer — ignore only. Change such values in the offer form and regenerate the document."
+    },
+    "actions": {
+      "upload": "Upload to NextCloud",
+      "resync": "Sync again",
+      "replace": "Replace document",
+      "preview": "View document",
+      "edit": "Edit document",
+      "rename": "Rename document",
+      "delete": "Delete",
+      "downloadPdf": "Download PDF",
+      "downloadDocx": "Download DOCX",
+      "viewInNextcloud": "View in NextCloud"
+    },
+    "card": {
+      "current": "This is the latest generated document.",
+      "outOfSync": "Out of Sync",
+      "outOfSyncHint": "The NextCloud version differs from the local one!",
+      "dropToReplace": "Drop the file to replace this one",
+      "version": "Version"
+    },
+    "edit": {
+      "loadFailed": "The document could not be loaded."
     }
   },
   "documentPreview": {

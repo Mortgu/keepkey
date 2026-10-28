@@ -1,8 +1,8 @@
-import { ACTION_FOCUS } from "@/components";
 import { Accordion as BaseAccordion } from "@base-ui/react";
 import { ChevronDown } from "lucide-react";
-import type { ReactNode } from "react";
 import { tv } from "tailwind-variants";
+import type { ReactNode } from "react";
+import { ACTION_FOCUS } from "@/components";
 
 const accordionStyles = tv({
     slots: {
@@ -10,7 +10,7 @@ const accordionStyles = tv({
         Item: "border-b border-(--border) last:border-0",
         Trigger: [
             "group w-full flex items-center justify-between gap-2 px-4 py-2",
-            "cursor-pointer text-left text-sm bg-(--page-bg) text-(--text)",
+            "cursor-pointer text-left text-sm bg-gray-100 border-t border-(--border) text-(--text)",
             ACTION_FOCUS,
         ],
         Icon: [
@@ -20,7 +20,7 @@ const accordionStyles = tv({
         Panel: [
             "overflow-hidden h-(--accordion-panel-height)",
         ],
-        Content: "px-4",
+        Content: "",
     },
 });
 

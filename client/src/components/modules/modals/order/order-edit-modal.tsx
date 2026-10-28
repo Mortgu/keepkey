@@ -1,7 +1,7 @@
 import { Dot } from "lucide-react";
 import { t } from "i18next";
-import useOrderForm from "../-hooks/use-order-form";
 import PurchasePriceTable from "./purchase-price-table";
+import useOrderForm from "./_hooks/use-order-form";
 import type { Order } from "@keepit/schemas";
 import { getErrorMessage } from "@/lib/errors";
 import { Button, Dialog, Input, Textarea } from "@/components";

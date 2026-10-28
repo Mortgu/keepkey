@@ -1,10 +1,11 @@
-import { RouteError, Spinner } from "@/components";
-import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
-import FlowDetailView from "./-components/flow-detail-view";
+import { useTranslation } from "react-i18next";
 import { Route } from "./index";
+import { Breadcrumbs, RouteError, Spinner } from "@/components";
+import { useConfirmation, useCustomer, useInvoice, useOffer, useOrder } from "@/hooks";
 
 /** Seite eines Vorgangs — `flowId` ist die Angebots-Id. */
 export default function FlowPage() {
+    const { t } = useTranslation();
     const { customerId, flowId } = Route.useParams();
 
     const { customer } = useCustomer(customerId);
@@ -28,13 +29,18 @@ export default function FlowPage() {
     }
 
     return (
-        <FlowDetailView
-            offer={offer}
-            order={order ?? null}
-            confirmation={confirmation ?? null}
-            invoice={invoice ?? null}
-            customerId={customerId}
-            customer={customer}
-        />
+        <div className="grid gap-5 mx-4 pb-10">
+            <div className="flex h-14 items-center border-b border-(--border)">
+                <Breadcrumbs size="sm" maxItems={4} items={[
+                    { label: t("nav.dashboard"), to: "/" },
+                    { label: t("section.customers"), to: "/customers" },
+                    { label: customer?.companyName ?? "...", to: "/customers/$customerId", params: { customerId } },
+                    { label: offer.quoteId ?? "..." },
+                ]} />
+            </div>
+
+
+
+        </div>
     );
 }

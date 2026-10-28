@@ -26,6 +26,17 @@ export const uploadDocument = (type: DocumentType, documentId: string) =>
 export const documentDownloadUrl = (type: DocumentType, documentId: string, format: DocumentFormatParam) =>
     `${BASE_URL}/api/documents/${type}/${documentId}/artifacts/${format}`;
 
+/**
+ * Lädt die DOCX als Bytes für den Editor. Der Server liefert nur eine
+ * signierte URL; die Datei selbst kommt direkt aus dem Objektspeicher.
+ */
+export const fetchDocxBytes = async (type: DocumentType, documentId: string): Promise<Uint8Array> => {
+    const { url } = await api<{ url: string }>(`/api/documents/${type}/${documentId}/artifacts/docx/url`);
+    const response = await fetch(url);
+    if (!response.ok) throw new Error(`Download failed (${response.status})`);
+    return new Uint8Array(await response.arrayBuffer());
+};
+
 /* ───────────────────────────────
    Erzeugte Datei ersetzen
 

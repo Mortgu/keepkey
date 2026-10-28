@@ -4,7 +4,8 @@ interface Props {
     customer: Customer;
 }
 
-export default function CustomerGeneralTab({ }: Props) {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- Platzhalter, Tab-Inhalt folgt
+export default function CustomerGeneralTab(_props: Props) {
     return (
         <div></div>
     )

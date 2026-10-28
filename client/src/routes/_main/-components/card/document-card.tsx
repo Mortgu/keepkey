@@ -127,6 +127,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
     useDocumentTask(document.taskId);
 
     const [bytes, setBytes] = useState<Uint8Array>();
+    const [bytes, setBytes] = useState<Uint8Array>();
     const [editDocx, setEditDocx] = useState<boolean>(false);
 
     const renderDocumentTooltip = () => {

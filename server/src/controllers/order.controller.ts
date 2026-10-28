@@ -50,7 +50,6 @@ export const updateOrder = async (request: Request, response: Response) => {
     const order = await orderService.updateOrder(
         request.params.orderId as string,
         request.body,
-        request.user!.id,
     );
     return response.status(200).json(order);
 };
@@ -63,6 +62,6 @@ export const deleteOrderById = async (request: Request, response: Response) => {
 };
 
 export const cancelOrder = async (request: Request, response: Response) => {
-    const order = await orderService.cancelOrder(request.params.orderId as string, request.body.expectedVersion, request.user!.id);
+    const order = await orderService.cancelOrder(request.params.orderId as string, request.body.expectedVersion);
     return response.status(200).json(order);
 };

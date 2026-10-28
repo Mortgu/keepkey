@@ -1,14 +1,14 @@
-import { Button, Spinner } from "@/components";
-import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
-import { useContract, useFormatters, useLocale, usePositionPrice, useProduct } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
-import type { CreateOfferPositionInput } from "@keepit/schemas";
 import { coordinatesFrom } from "@keepit/schemas";
 import { CircleAlert, Pen, Tag, Trash, X } from "lucide-react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useOfferModalContext } from "../offer-modal-context";
 import WorkloadForm from "./workload-form";
+import type { CreateOfferPositionInput } from "@keepit/schemas";
+import type { OfferModalPositionValues } from "@/components/modules/modals/offer/_schemas/offer-modal-schema";
+import { localized } from "@/lib/i18n-content";
+import { useContract, useFormatters, useLocale, usePositionPrice, useProduct } from "@/hooks";
+import { Button, Spinner } from "@/components";
 
 interface Props {
     /** Stelle im Positionsarray — adressiert die Preismeldung zu dieser Zeile. */

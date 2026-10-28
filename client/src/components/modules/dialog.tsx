@@ -1,9 +1,9 @@
-import { Button } from "@/components";
 import { Dialog as BaseDialog, ScrollArea } from "@base-ui/react";
 import { X } from "lucide-react";
-import type { ReactNode } from "react";
 import { createContext, useContext, useMemo } from "react";
 import { tv } from "tailwind-variants";
+import type { ReactNode } from "react";
+import { Button } from "@/components";
 /**
  * Slots für einen base-ui-Dialog: Portal → Backdrop → Viewport → Popup,
  * darin Header / Toolbar / Body (scrollbar) / Actions.
@@ -12,6 +12,7 @@ import { tv } from "tailwind-variants";
  * selbst. Wer nur einzelne Slots braucht (Sonderlayouts), kann sie hier direkt
  * abgreifen.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- Slots werden für Sonderlayouts direkt abgegriffen
 export const dialogStyles = tv({
     slots: {
         Backdrop: 'fixed z-100 bg-white/25 backdrop-blur-xs transition-opacity duration inset-0',

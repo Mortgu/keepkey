@@ -1,8 +1,8 @@
-import { Button } from "@/components";
 import { XIcon } from "lucide-react";
-import type { ElementType, ReactNode } from "react";
 import { Children, Fragment, isValidElement, useCallback, useEffect } from "react";
 import { tv } from "tailwind-variants";
+import type { ElementType, ReactNode } from "react";
+import { Button } from "@/components";
 
 
 /**
@@ -10,6 +10,7 @@ import { tv } from "tailwind-variants";
  * verschachtelte Drawer). Ablösung für das handgebaute `Drawer` aus `drawer.tsx` —
  * bis die Migration durch ist, existieren beide nebeneinander.
  */
+// eslint-disable-next-line react-refresh/only-export-components -- Slots werden für Sonderlayouts direkt abgegriffen
 export const drawerStyles = tv({
     slots: {
         Backdrop: '[--backdrop-opacity:0.2] dark:[--backdrop-opacity:0.7] fixed inset-0 min-h-dvh bg-black opacity-[calc(var(--backdrop-opacity)*(1-var(--drawer-swipe-progress)))] transition-opacity duration-[450ms] ease-[cubic-bezier(0.32,0.72,0,1)] data-swiping:duration-0 data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-[calc(var(--drawer-swipe-strength)*400ms)] supports-[-webkit-touch-callout:none]:absolute',

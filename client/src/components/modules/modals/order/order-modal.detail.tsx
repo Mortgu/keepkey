@@ -1,12 +1,12 @@
 import { useTranslation } from "react-i18next";
-import PurchasePriceTable from "../purchase-price-table";
-import type useOrderModal from "../../-hooks/use-order-modal";
 import type { Offer } from "@keepit/schemas";
+import type useOrderModal from "./_hooks/use-order-modal";
 import { Badge, Input, Textarea } from "@/components";
 import { useFormatters, useLocale, useSuppliers } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { localized } from "@/lib/i18n-content";
 import { getFormError } from "@/lib/utils";
+import PurchasePriceTable from "@/components/modules/modals/order/purchase-price-table";
 
 type Modal = ReturnType<typeof useOrderModal>;
 

@@ -183,7 +183,7 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
             }
         }
 
-        const message = error instanceof Error ? error.message : "Document upload failed.";
+        const message = error instanceof Error ? error.message : "Unknown.";
         await config.release(token, message).catch((releaseError) => logger.error(releaseError));
 
         if (error instanceof AppException) throw error;
@@ -192,7 +192,7 @@ async function uploadDocument(config: UploadConfig): Promise<DocumentUploadResul
         }
 
         logger.error(`Document upload failed: ${message}, ${error}`)
-        throw new AppException(`Document upload failed: ${message}`, 500, "DOCUMENT_UPLOAD_FAILED");
+        throw new AppException(message, 500, "DOCUMENT_UPLOAD_FAILED");
     } finally {
         clearInterval(heartbeat);
     }

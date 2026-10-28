@@ -1,10 +1,10 @@
-import type { ComponentSize } from "@/components";
-import { CONTROL_TEXT, LabelBadge } from "@/components";
-import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
-import type { InputHTMLAttributes } from "react";
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
+import type { ComponentSize } from "@/components";
+import type { InputHTMLAttributes } from "react";
+import { CONTROL_TEXT, LabelBadge } from "@/components";
+import { cn } from "@/lib/utils";
 
 export interface CheckboxComponentProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "size"> {
     size?: ComponentSize;

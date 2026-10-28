@@ -1,8 +1,17 @@
+import { vatTotals } from "@keepit/schemas";
+import { Ban, Dot, Pen, Plus, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { cn } from "tailwind-variants";
+import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
+import { stateTone } from "../../../-components/flow/flow-meta";
+import { StageNode } from "../../../-components/flow/flow-ui";
+import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
+import type { Confirmation, Customer, Invoice, Offer, Order } from "@keepit/schemas";
 import { Accordion, Breadcrumbs, Button } from "@/components";
 import ConfirmationModal, { type ConfirmationSubmitType } from "@/components/modules/modals/confirmation/confirmation-modal";
 import InvoiceModal, { type InvoiceSubmitType } from "@/components/modules/modals/invoice/invoice-modal";
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
-import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
 import { useCancelOrder, useCreateConfirmation, useCreateInvoice, useDeleteConfirmation, useDeleteInvoice, useFormatters, useGenerateOfferDocument, useGenerateOrderDocument, useLocale, useModal, useRegenerateConfirmation, useRegenerateInvoice } from "@/hooks";
 import { getErrorMessage } from "@/lib/errors";
 import { localized } from "@/lib/i18n-content";
@@ -10,19 +19,10 @@ import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import { default as DocumentCard } from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
-import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
-import type { Confirmation, Customer, Invoice, Offer, Order } from "@keepit/schemas";
-import { vatTotals } from "@keepit/schemas";
-import { Ban, Dot, Pen, Plus, Trash2 } from "lucide-react";
+import OrderEditModal from "@/components/modules/modals/order/order-edit-modal";
 import type { ReactNode } from "react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { cn } from "tailwind-variants";
-import { derivePhase, deriveStages } from "../../../-components/flow/flow-derive";
-import { stateTone } from "../../../-components/flow/flow-meta";
 import type { FlowStage } from "../../../-components/flow/flow-types";
-import { StageNode } from "../../../-components/flow/flow-ui";
+import OrderModal from "@/components/modules/modals/order/order-modal";
 
 /**
  * Detailseite eines Vorgangs. Links die Belege zum Angebot: Bestellung (an
@@ -171,9 +171,11 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
                     {offer.offerPositions.map((position) => (
                         <PositionRow key={position.id} position={position} contract={offer.contract} durationMonths={offer.duration_months} />
                     ))}
+
                     {offer.offerFlatRates.map((flatrate) => (
                         <FlatRateRow key={flatrate.id} flatrate={flatrate} />
                     ))}
+
                     {offer.offerDiscounts.map((discount) => (
                         <DiscountRow key={discount.id} discount={discount} />
                     ))}

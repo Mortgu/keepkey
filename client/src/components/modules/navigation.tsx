@@ -1,26 +1,22 @@
-import { NavGroup, NavLink, NavSearch, NavUserMenu, SegmentedLanguageToggle, } from "@/components";
-import { useAuth } from "@/context/auth-context";
 import { useRouterState } from "@tanstack/react-router";
 import {
     ChevronDown,
     DollarSign,
     Euro,
-    File,
-    FileText,
-    Languages,
+    File, Languages,
     LayoutGrid,
-    Package, Settings,
-    ShoppingCart,
-    Text,
+    Package, Settings, Text,
     Truck,
     UserCircle2,
     Users
 } from "lucide-react";
-import type { ReactNode } from "react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tv } from "tailwind-variants";
 import { DEFAULT_LANGUAGE_OPTIONS } from "../elements/language-toggle-options";
+import type { ReactNode } from "react";
+import { useAuth } from "@/context/auth-context";
+import { NavGroup, NavLink, NavSearch, NavUserMenu, SegmentedLanguageToggle, } from "@/components";
 
 const ICON_SIZE = 14;
 
@@ -113,30 +109,12 @@ export function Navigation() {
                         icon={<LayoutGrid size={ICON_SIZE} />}
                         label={t("nav.dashboard")}
                     />
-                </Section>
-
-                <Section title={t("nav.sales")} collapsible paths={["/customers", "/offers", "/orders"]}>
                     <NavLink
                         to="/customers"
                         label={t("section.customers")}
                         icon={<Users size={ICON_SIZE} />}
                         activeOptions={{ exact: false }}
                     />
-                    <NavLink
-                        to="/offers"
-                        label={t("section.offers")}
-                        icon={<FileText size={ICON_SIZE} />}
-                    />
-                    <NavLink
-                        to="/orders"
-                        label={t("section.orders")}
-                        icon={<ShoppingCart size={ICON_SIZE} />}
-                    />
-                    {/* <NavLink
-                        to="/invoices"
-                        label={t("section.invoices")}
-                        icon={<ShoppingCart size={ICON_SIZE} />}
-                    /> */}
                 </Section>
 
                 <Section title={t("nav.catalog")} collapsible paths={["/workloads", "/flatrates", "/contracts"]}>

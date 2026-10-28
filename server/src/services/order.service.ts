@@ -136,7 +136,7 @@ async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string
     });
 }
 
-export async function updateOrder(id: string, input: UpdateOrderMetadataInput, actorId: string) {
+export async function updateOrder(id: string, input: UpdateOrderMetadataInput) {
     const data = updateOrderMetadataSchema.parse(input);
 
     return prisma.$transaction(async (tx) => {
@@ -163,9 +163,9 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, a
 }
 
 
-export async function cancelOrder(id: string, expectedVersion: number, actorId: string) {
+export async function cancelOrder(id: string, expectedVersion: number) {
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
+        await lockOrder(tx, id, expectedVersion);
 
         const order = await tx.order.update({
             where: { id },

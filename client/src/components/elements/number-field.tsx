@@ -1,3 +1,10 @@
+import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
+import { Minus, MoveHorizontal, Plus } from "lucide-react";
+import { useId } from "react";
+import { useTranslation } from "react-i18next";
+import { tv } from "tailwind-variants";
+import type { FocusEventHandler, ReactNode } from "react";
+import type { NumberFieldRootProps } from "@base-ui/react/number-field";
 import type { ComponentSize } from "@/components";
 import {
     ACTION_FOCUS,
@@ -13,13 +20,6 @@ import {
     fieldState,
     selectOnFocus
 } from "@/components";
-import type { NumberFieldRootProps } from "@base-ui/react/number-field";
-import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
-import { Minus, MoveHorizontal, Plus } from "lucide-react";
-import type { FocusEventHandler, ReactNode } from "react";
-import { useId } from "react";
-import { useTranslation } from "react-i18next";
-import { tv } from "tailwind-variants";
 
 
 /* `NumberFieldRootProps` erbt die `<div>`-Attribute des Wrappers — Fokus, Blur und

@@ -9,7 +9,7 @@ import {
     resyncDocument,
     uploadDocument,
 } from "./document-api";
-import type { QueryClient} from "@tanstack/react-query";
+import type { QueryClient } from "@tanstack/react-query";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { offerKeys } from "@/hooks/offers/offers-keys";
 import { orderKeys } from "@/hooks/orders/order-keys";
@@ -32,7 +32,6 @@ const invalidate = (queryClient: QueryClient, type: DocumentType, parentId: stri
 
 export function useDocumentMutations(type: DocumentType, parentId: string) {
     const queryClient = useQueryClient();
-
 
     const renameMutation = useMutation({
         mutationFn: ({ documentId, displayName }: { documentId: string; displayName: string }) =>

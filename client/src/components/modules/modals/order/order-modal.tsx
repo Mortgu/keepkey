@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next";
-import useOrderModal from "../../-hooks/use-order-modal";
 import OrderModalDetail from "./order-modal.detail";
 import OrderModalOfferList from "./order-modal.offer-list";
+import useOrderModal from "./_hooks/use-order-modal";
 import type { Offer } from "@keepit/schemas";
 import { Button, Dialog } from "@/components";
 

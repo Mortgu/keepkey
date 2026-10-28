@@ -98,6 +98,28 @@
       "ignore": "Ignorieren",
       "adopt": "Auswahl übernehmen ({{count}})",
       "notAdoptable": "Lässt sich nicht ins Angebot übernehmen — nur ignorieren. Ändere solche Werte in der Angebotsmaske und erzeuge das Dokument neu."
+    },
+    "actions": {
+      "upload": "In NextCloud hochladen",
+      "resync": "Erneut synchronisieren",
+      "replace": "Dokument ersetzen",
+      "preview": "Vorschau",
+      "edit": "Bearbeiten",
+      "rename": "Umbenennen",
+      "delete": "Löschen",
+      "downloadPdf": "PDF herunterladen",
+      "downloadDocx": "DOCX herunterladen",
+      "viewInNextcloud": "In NextCloud öffnen"
+    },
+    "card": {
+      "current": "Das ist das zuletzt erzeugte Dokument.",
+      "outOfSync": "Nicht synchron",
+      "outOfSyncHint": "Die Version in NextCloud weicht von der lokalen ab!",
+      "dropToReplace": "Datei ablegen, um dieses Dokument zu ersetzen",
+      "version": "Version"
+    },
+    "edit": {
+      "loadFailed": "Das Dokument konnte nicht geladen werden."
     }
   },
   "documentPreview": {

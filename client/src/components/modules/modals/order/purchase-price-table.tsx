@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import type { PurchaseRow, PurchaseValue } from "../-hooks/use-order-form";
+import type { PurchaseRow, PurchaseValue } from "./_hooks/use-order-form";
 import { Input } from "@/components";
 import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";

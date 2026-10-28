@@ -157,8 +157,8 @@ function FlowTableRow({ row, customerId }: { row: FlowRow; customerId: string })
 
     return (
         <Link
-            to="/customers/$customerId/vorgang/$flowId"
-            params={{ customerId, flowId: row.offer.id }}
+            to="/customers/$customerId/$offerId"
+            params={{ customerId, offerId: row.offer.id }}
             className={cn(
                 "grid items-center border-b border-(--border) px-4 py-3 outline-none transition-colors last:border-b-0",
                 "hover:bg-(--page-bg) focus-visible:shadow-[inset_0_0_0_2px_var(--primary-400)]",
@@ -214,7 +214,7 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     return (
         <div className="w-full grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                {/*<MultiDropdown
+                {/* <MultiDropdown
                     label={t("flows.table.phaseFilter")}
                     options={(["open", "running", "billed", "cancelled"] as const).map((phase) => ({ value: phase, label: t(`flows.phase.${phase}`) }))}
                     values={(phaseColumn.getFilterValue() as Array<string> | undefined) ?? []}

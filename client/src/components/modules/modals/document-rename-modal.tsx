@@ -1,6 +1,6 @@
-import { Button, Dialog, Input } from "@/components";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Button, Dialog, Input } from "@/components";
 
 type Props = {
   initialValue: string;
@@ -27,7 +27,7 @@ export function DocumentRenameModal({ initialValue, isPending, onClose, onSubmit
   return (
     <Dialog
       defaultOpen
-      size="sm"
+      size="lg"
       onOpenChange={(open) => { if (!open) onClose(); }}
     >
       <Dialog.Header title="Dokument umbenennen" />

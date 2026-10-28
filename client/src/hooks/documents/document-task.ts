@@ -1,13 +1,13 @@
-import { getTask } from "@/hooks/offers/offer-api";
-import { offerKeys } from "@/hooks/offers/offers-keys";
-import { orderKeys } from "@/hooks/orders/order-keys";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import type {
     DocumentStatus, Offer, OffersPage,
     Order
 } from "@keepit/schemas";
 import type { QueryClient } from "@tanstack/react-query";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { getTask } from "@/hooks/offers/offer-api";
+import { offerKeys } from "@/hooks/offers/offers-keys";
+import { orderKeys } from "@/hooks/orders/order-keys";
 
 
 function patchOfferDocuments(

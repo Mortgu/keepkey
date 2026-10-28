@@ -1,16 +1,16 @@
+import { forwardRef } from "react";
+import { tv } from "tailwind-variants";
 import type { ComponentSize } from "@/components";
+import type { TextareaHTMLAttributes } from "react";
 import {
-    Field,
     FIELD_BASE,
     FIELD_FOCUS,
     FIELD_PADDING,
     FIELD_STATE,
+    Field,
     fieldState,
     useFieldId
 } from "@/components";
-import type { TextareaHTMLAttributes } from "react";
-import { forwardRef } from "react";
-import { tv } from "tailwind-variants";
 
 export interface TextareaComponentProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "size"> {
     size?: ComponentSize;

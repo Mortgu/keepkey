@@ -240,7 +240,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         expect(unchanged.acceptedAt).toBeNull();
         expect(unchanged.acceptedSnapshot).toBeNull();
     });
-    it("metadata edits and restores preserve the accepted price and frozen master data", async () => {
+    it("metadata edits preserve the accepted price and frozen master data", async () => {
         const offer = await draft();
         const order = await createOrder(await input(offer.id), "user");
         await prisma.customer.update({
@@ -254,22 +254,20 @@ integration("real PostgreSQL acceptance transactions", () => {
                 expectedVersion: 1,
                 order: { ...metadata, projectNumber: "New project" },
             },
-            "user",
         );
 
-        const restored = await getOrderById(order.id);
-        expect(restored.net_amount).toBe(80000);
-        expect(restored.projectNumber).toBeNull();
-        expect(restored.customer.companyName).toBe("Original Ltd");
-        await cancelOrder(order.id, 3, "user");
+        const edited = await getOrderById(order.id);
+        expect(edited.net_amount).toBe(80000);
+        expect(edited.projectNumber).toBe("New project");
+        expect(edited.customer.companyName).toBe("Original Ltd");
+        await cancelOrder(order.id, 2);
         await expect(
             prisma.$transaction((tx) => assertOfferEditable(tx, offer.id)),
         ).rejects.toMatchObject({ code: "OFFER_ACCEPTED" });
         await expect(
             updateOrder(
                 order.id,
-                { expectedVersion: 4, order: metadata },
-                "user",
+                { expectedVersion: 3, order: metadata },
             ),
         ).rejects.toMatchObject({ code: "ORDER_CANCELLED" });
     });
@@ -285,7 +283,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         const results = await search(order.orderId, "order");
         expect(results.items[0]?.id).toBe(order.id);
         const before = await getDashboardStats();
-        await cancelOrder(order.id, 1, "user");
+        await cancelOrder(order.id, 1);
         const after = await getDashboardStats();
         expect(after.totals.orders.volume_cents).toBe(
             before.totals.orders.volume_cents - 80000,
