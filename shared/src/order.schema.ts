@@ -100,35 +100,26 @@ export const orderMetadataSchema = z
         contractStartDate: dateInput.nullable().optional(),
     })
     .strict();
-export const createOrderSchema = z
-    .object({
-        id: z.string().min(1),
-        expectedOfferVersion: z.number().int().positive(),
-        orderId: z.string().trim().min(1),
-        date: dateInput.optional(),
-        projectNumber: z.string().optional(),
-        projectDescription: z.string().optional(),
-        orderDetails: z.string().optional(),
-        contractStartDate: dateInput.optional(),
-        /** Genau eine Zeile je Snapshot-Position; der Server prüft die Abdeckung. */
-        positions: z.array(purchasePositionInputSchema).min(1),
-    })
-    .strict();
+
+export const createOrderSchema = z.object({
+    orderId: z.string().trim().min(1),
+    date: dateInput.optional(),
+    projectNumber: z.string().optional(),
+    projectDescription: z.string().optional(),
+    orderDetails: z.string().optional(),
+    offerRefId: z.string().min(1),
+}).strict();
+export type CreateOrderInput = z.infer<typeof createOrderSchema>;
+
 export const updateOrderSchema = z
     .object({
         expectedVersion: z.number().int().positive(),
         order: orderMetadataSchema,
-        /**
-         * Optional: Einkaufspreise ersetzen. Bewusst neben `order`, damit die
-         * Revisions-Snapshots (nur Metadaten) unverändert bleiben.
-         */
         positions: z.array(purchasePositionInputSchema).min(1).optional(),
     })
     .strict();
-export type CreateOrderInput = z.infer<typeof createOrderSchema>;
-export type UpdateOrderInput = z.infer<
-    typeof updateOrderSchema
->;
+
+export type UpdateOrderInput = z.infer<typeof updateOrderSchema>;
 
 /* Order (entity) */
 export const orderSchema = z.object({
@@ -181,7 +172,7 @@ export const orderSchema = z.object({
     discounts: z.array(z.object({ id: z.string(), title: z.string(), description: z.string().nullable(), amount_cents: z.number().int() })),
 
     documents: z.array(orderDocumentSchema),
-    orderPositions: z.array(orderPositionSchema),
+    positions: z.array(orderPositionSchema),
     flatRates: z.array(orderFlatRateSchema),
 
     createdAt: z.string(),

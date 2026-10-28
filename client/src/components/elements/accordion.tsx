@@ -1,8 +1,8 @@
+import { ACTION_FOCUS } from "@/components";
 import { Accordion as BaseAccordion } from "@base-ui/react";
 import { ChevronDown } from "lucide-react";
-import { tv } from "tailwind-variants";
 import type { ReactNode } from "react";
-import { ACTION_FOCUS } from "@/components";
+import { tv } from "tailwind-variants";
 
 const accordionStyles = tv({
     slots: {
@@ -18,7 +18,7 @@ const accordionStyles = tv({
             "group-data-panel-open:rotate-180",
         ],
         Panel: [
-            "overflow-hidden h-(--accordion-panel-height)",
+            "h-(--accordion-panel-height)",
         ],
         Content: "",
     },

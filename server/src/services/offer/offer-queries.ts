@@ -30,6 +30,7 @@ const orderSummaryInclude = {
                 documents: { select: { status: true } },
             },
         },
+        positions: true,
     },
 } satisfies Prisma.Offer$ordersArgs;
 

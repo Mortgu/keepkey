@@ -1,3 +1,7 @@
+import { Breadcrumbs, RouteError, Spinner, Tabs } from "@/components";
+import { useCustomer, useModal } from "@/hooks";
+import type { TranslationKey } from "@/i18n";
+import type { Customer } from "@keepit/schemas";
 import { useNavigate } from "@tanstack/react-router";
 import { useTranslation } from "react-i18next";
 import CustomerModal from "../-components/customer-modal";
@@ -5,10 +9,6 @@ import CustomerFlowTab from "./-components/tabs/customer-flow-tab";
 import CustomerGeneralTab from "./-components/tabs/customer-general-tab";
 import CustomerPricesTab from "./-components/tabs/customer-prices-tab";
 import { Route } from "./index";
-import type { TranslationKey } from "@/i18n";
-import type { Customer } from "@keepit/schemas";
-import { useCustomer, useModal } from "@/hooks";
-import { Breadcrumbs, RouteError, Spinner, Tabs } from "@/components";
 
 const TABS = [
     { value: "general", labelKey: "customer.detail.tabs.general" },

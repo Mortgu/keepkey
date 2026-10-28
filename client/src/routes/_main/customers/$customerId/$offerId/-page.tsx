@@ -1,12 +1,13 @@
-import { useTranslation } from "react-i18next";
-import { Route } from "./index";
 import { Breadcrumbs, RouteError, Spinner } from "@/components";
-import { useCustomer, useFormatters, useLocale, useOffer } from "@/hooks";
+import { useCustomer, useFormatters, useLocale, useOffer, useOrder } from "@/hooks";
 import { formatEur } from "@/lib/format";
 import { localized } from "@/lib/i18n-content";
 import { Dot } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import FlowSummary from "./-components/flow-summary";
 import OfferSection from "./-components/offer-section";
+import OrderSection from "./-components/order-section";
+import { Route } from "./index";
 
 export default function FlowPage() {
     const { t } = useTranslation();
@@ -16,6 +17,7 @@ export default function FlowPage() {
 
     const { customer } = useCustomer(customerId);
     const { offer, isPending, error } = useOffer(offerId);
+    const { order, isPending: orderPending } = useOrder(offerId);
 
     const { formatDate } = useFormatters();
 
@@ -27,7 +29,7 @@ export default function FlowPage() {
         );
     }
 
-    if (isPending || !offer) {
+    if (isPending || orderPending || !offer) {
         return (
             <div className="mx-4 p-4"><Spinner /></div>
         );
@@ -79,6 +81,7 @@ export default function FlowPage() {
             <div className="grid w-full items-start gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
                 <div className="grid gap-4">
                     <OfferSection offer={offer} />
+                    <OrderSection order={order} />
                 </div>
 
                 <FlowSummary offer={offer} customer={offer.customer} />

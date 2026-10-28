@@ -52,8 +52,6 @@ model Offer {
   offerPositions OfferPosition[]
   offerDocuments Document[]
 
-  orders Order?
-
   /// Dauerhafte Annahmesperre, unabhängig vom Lebenszyklus der Bestellung.
   acceptedAt       DateTime? @db.Timestamptz(6)
   /// Versioniertes Dokumentdaten-Abbild einschließlich Stammdaten und Texten.

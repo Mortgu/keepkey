@@ -10,9 +10,7 @@ import {
     generateOrderDocument,
     getAllOrders,
     getConfirmation,
-    getInvoice,
-    getNextOrderNumber,
-    getOrderById,
+    getInvoice, getOrderById,
     regenerateConfirmation,
     regenerateInvoice,
     updateOrder
@@ -28,14 +26,16 @@ import { Router } from "express";
 
 const router = Router();
 
+/* [GET] /api/orders/ */
 router.get("/", validateQuery(orderFilterSchema), getAllOrders);
 
-router.get("/next-number", getNextOrderNumber);
-
+/* [GET] /api/orders/:orderId */
 router.get("/:orderId", validateParams(orderIdParamsSchema), getOrderById);
 
-router.post(
-    "/:orderId/documents",
+/* [POST] /api/orders/ */
+router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
+
+router.post("/:orderId/documents",
     validateParams(orderIdParamsSchema),
     generateOrderDocument,
 );
@@ -62,7 +62,6 @@ router.post(
 router.post("/:orderId/invoice/documents", validateParams(orderIdParamsSchema), regenerateInvoice);
 router.delete("/:orderId/invoice", validateParams(orderIdParamsSchema), deleteInvoice);
 
-router.post('/', validate(acceptOrderSchema), createOrder, createOrderTask);
 
 router.patch(
     "/:orderId",

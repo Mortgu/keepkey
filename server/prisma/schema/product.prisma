@@ -4,6 +4,7 @@ model Product {
   translations ProductTranslation[]
 
   offerPositions OfferPosition[]
+  orderPositions OrderPosition[]
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

@@ -1,4 +1,11 @@
+import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
+import OfferModal from "@/components/modules/modals/offer/offer-modal";
+import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
+import type { Formatters } from "@/hooks";
+import { useFormatters, useModal, useOffers } from "@/hooks";
+import type { Offer } from "@keepit/schemas";
 import { Link } from "@tanstack/react-router";
+import type { Column, ColumnDef, FilterFn } from "@tanstack/react-table";
 import {
     columnFilteringFeature,
     createFilteredRowModel,
@@ -10,22 +17,15 @@ import {
     tableFeatures,
     useTable,
 } from "@tanstack/react-table";
+import type { TFunction } from "i18next";
 import { ArrowDown, ArrowUp, ChevronRight, ChevronsUpDown } from "lucide-react";
+import type { ReactNode } from "react";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "tailwind-variants";
 import { derivePhase, deriveStages } from "../flow/flow-derive";
 import { stateTone } from "../flow/flow-meta";
-import type { ReactNode } from "react";
-import type { TFunction } from "i18next";
-import type { Column, ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { FlowStage, Phase, StageKind } from "../flow/flow-types";
-import type { Offer } from "@keepit/schemas";
-import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import type { Formatters } from "@/hooks";
-import { useFormatters, useModal, useOffers } from "@/hooks";
-import OfferModal from "@/components/modules/modals/offer/offer-modal";
-import { Button, ListSkeleton, RouteError, SearchBar, Skeleton } from "@/components";
 
 /**
  * Reiter "Vorgänge" als Tabelle. Eine Zeile ist ein Vorgang: das Angebot und

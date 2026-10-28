@@ -1,104 +1,80 @@
 import { Prisma } from "@prisma/client";
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
-import { documentOwnerType } from "./document-repo.js";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
-    acceptOrderSchema, updateOrderMetadataSchema,
+    updateOrderMetadataSchema,
     type AcceptOrderInput,
     type UpdateOrderMetadataInput
 } from "../schemas/order-inputs.js";
 import { requestOrderGeneration } from "./document-generation-request.service.js";
-import { acceptOffer } from "./offer-acceptance.service.js";
+import { documentOwnerType } from "./document-repo.js";
 import { purchaseLines } from "./order-purchase.js";
-import { presentOrder } from "./order-source.js";
 
-const orderInclude = {
-    offer: true,
-    positions: true,
-    documents: {
-        where: { deletedAt: null },
-        orderBy: { version: "desc" },
-        include: { artifacts: true, task: true },
-    },
-} satisfies Prisma.OrderInclude;
+import { getOfferById } from "./offer/offer-queries.js";
 
-export interface OrderListQuery {
-    companyIds?: unknown;
-}
-export async function getAllOrders(query: OrderListQuery = {}) {
-    const raw = query.companyIds
-        ? Array.isArray(query.companyIds)
-            ? query.companyIds
-            : [query.companyIds]
-        : [];
-    if (!raw.every((id) => typeof id === "string"))
-        throw new AppException(
-            "Invalid customer filter",
-            400,
-            "INVALID_FILTER",
-        );
-    const ids = raw as string[];
-    const where: Prisma.OrderWhereInput = ids.length
-        ? { offer: { customerId: { in: ids } } }
-        : {};
-    const orders = await prisma.order.findMany({
-        where,
-        include: orderInclude,
-        orderBy: { createdAt: "desc" },
-    });
-    return orders.map(presentOrder);
+const orderInclude = { } satisfies Prisma.OrderInclude;
+
+export async function getAllOrders() {
+    const orders = prisma.order.findMany({});
+    return orders;
 }
 
-export async function getOrderById(id: string) {
+export async function getOrderById(orderId: string) {
     const order = await prisma.order.findUnique({
-        where: { id },
+        where: { id: orderId },
         include: orderInclude,
     });
-    if (!order)
-        throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
-    return presentOrder(order);
+
+    if (!order) {
+       throw new AppException("Order not found!", 404, "ORDER_NOT_FOUND");
+    }
+
+    return order;
 }
 
-/** A suggestion, not a reservation. The unique constraint rejects concurrent duplicates. */
-export async function getNextOrderNumber(): Promise<string> {
-    const prefix = `AB-${new Date().getFullYear()}-`;
-    const [row] = await prisma.$queryRaw<{ next: bigint }[]>`
-        SELECT COALESCE(MAX(substring("orderId" from '[0-9]+$')::bigint), 0) + 1 AS next
-        FROM "order" WHERE "orderId" ~ ${`^${prefix}[0-9]+$`}
-    `;
-    return `${prefix}${String(row?.next ?? 1).padStart(3, "0")}`;
+/* [POST] /api/orders/ */
+export async function createOrder(input: AcceptOrderInput) {
+    const { offerRefId } = input;
+
+    const offerRef = await getOfferById(offerRefId);
+
+    if (!offerRef) {
+        throw new AppException("Failed to find offer reference for positions!", 500, "OFFER_NOT_FOUND");
+    }
+
+    const { offerPositions, customer } = offerRef;
+
+    prisma.$transaction(async (tx) => {
+        const order = await tx.order.create({
+            data: {
+                orderId: input.orderId,
+                projectNumber: input.projectNumber,
+                projectDescription: input.projectDescription,
+                orderDetails: input.orderDetails,
+
+                vat: customer.taxRate,
+                net_total: 0,
+                gross_total: 0
+            }
+        });
+        
+        await tx.orderPosition.createMany({
+            data: offerPositions.map(op => ({
+            orderId: order.id,
+            productId: op.productId,
+
+            quantity: op.quantity,
+            unit_price: op.eur_user_month,
+            discount: op.discount_cents,
+            net_total: op.total_cents,
+
+            purchase_total_cents: op.total_cents,
+        }))
+        })
+    });
 }
-export async function createOrder(input: AcceptOrderInput, actorId: string) {
-    const data = acceptOrderSchema.parse(input);
-    return prisma.$transaction(
-        async (tx) => {
-            const acceptedAt = await acceptOffer(
-                tx,
-                data.id,
-                data.expectedOfferVersion,
-            );
-            // Der Snapshot ist soeben entstanden — die Einkaufszeilen beziehen
-            // sich auf genau diese Positionen.
-            const lines = await purchaseLinesForOffer(tx, data.id, data.positions);
-            return tx.order.create({
-                data: {
-                    offerId: data.id,
-                    orderId: data.orderId,
-                    date: data.date ? new Date(data.date) : acceptedAt,
-                    projectNumber: data.projectNumber ?? null,
-                    projectDescription: data.projectDescription ?? null,
-                    orderDetails: data.orderDetails ?? null,
-                    contractStartDate: data.contractStartDate ? new Date(data.contractStartDate) : null,
-                    acceptedAt,
-                    acceptedById: actorId,
-                    positions: { create: lines },
-                },
-            });
-        },
-        { timeout: 30_000 },
-    );
-}
+
 /** Einkaufszeilen gegen den Accepted-Snapshot des Angebots rechnen und prüfen. */
 async function purchaseLinesForOffer(
     tx: Prisma.TransactionClient,

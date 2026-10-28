@@ -33,7 +33,7 @@ export default function OfferSection({ offer }: Props) {
                             <Badge variant="GENERATED">{localized(offer.contract.translations, locale, "name")}</Badge>
                         </div>
 
-                        <div className="flex items-center justify-center text-(--fg-3) text-sm">
+                        <div className="flex items-center justify-start text-(--fg-3) text-sm">
                             <p className="font-mono">AG{offer.quoteId}</p>
                             <Dot size={14} />
                             <p className="">{formatDate(offer.date)}</p>
@@ -45,7 +45,7 @@ export default function OfferSection({ offer }: Props) {
                 {!locked && (
                     <div className="flex items-center gap-2">
                         <Button
-                            size="sm"
+                            size="xs"
                             variant="primary"
                             onClick={() => generateOfferDocument({ offerId: offer.id })}
                         >
@@ -53,7 +53,7 @@ export default function OfferSection({ offer }: Props) {
                         </Button>
 
                         <Button
-                            size="sm"
+                            size="xs"
                             variant="border"
                             onClick={() => offerModal.open()}
                         >
@@ -86,7 +86,7 @@ export default function OfferSection({ offer }: Props) {
                     </div>
                 </Accordion.Section>
 
-                <Accordion.Section value="documents" label="Documents">
+                <Accordion.Section value="documents" label={t("flows.detail.documents")}>
                     <div className="border-t border-(--border)">
                         {/* Workload */}
                         {offer.offerDocuments.map((document) => (
