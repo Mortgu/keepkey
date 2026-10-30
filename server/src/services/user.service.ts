@@ -160,7 +160,7 @@ export async function createContactPersons(userId: string, persons: Array<Create
             throw new AppException("No customer linked to this account!", 400, "NO_CUSTOMER_LINKED");
         }
 
-        const created = await tx.contactPerson.createMany({
+        const created = await tx.person.createMany({
             data: persons.map(person => ({
                 ...person,
                 customerId: customer.id

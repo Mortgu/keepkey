@@ -55,8 +55,11 @@ export async function getOrderById(id: string) {
         where: { id },
         include: orderInclude,
     });
-    if (!order)
+
+    if (!order) {
         throw new AppException("Order not found", 404, "ORDER_NOT_FOUND");
+    }
+
     return presentOrder(order);
 }
 

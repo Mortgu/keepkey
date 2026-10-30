@@ -63,12 +63,12 @@ export async function seedCustomers(prisma: PrismaClient): Promise<Customer[]> {
         }
 
         for (const cp of contactPersons) {
-            const existing = await prisma.contactPerson.findFirst({
+            const existing = await prisma.person.findFirst({
                 where: { customerId: customer.id, email: cp.email },
             });
 
             if (!existing) {
-                await prisma.contactPerson.create({
+                await prisma.person.create({
                     data: { ...cp, customerId: customer.id },
                 });
                 console.log(`  ContactPerson created: ${cp.firstName} ${cp.lastName}`);

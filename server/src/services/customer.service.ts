@@ -50,8 +50,10 @@ export async function getCustomers(filters: CustomerFilterParams) {
             }
         },
     });
-    const counts = await prisma.offer.groupBy({ by: ["customerId"],
-        where: { customerId: { in: customers.map(c => c.id) }, orders: { isNot: null } }, _count: { _all: true } });
+    const counts = await prisma.offer.groupBy({
+        by: ["customerId"],
+        where: { customerId: { in: customers.map(c => c.id) }, orders: { isNot: null } }, _count: { _all: true }
+    });
     const orderCounts = new Map(counts.map(c => [c.customerId, c._count._all]));
     return customers.map(c => ({ ...c, _count: { ...c._count, orders: orderCounts.get(c.id) ?? 0 } }));
 }
@@ -77,7 +79,7 @@ export async function getCustomerById(id: string) {
 }
 
 export async function getCustomerContacts(customerId: string) {
-    return prisma.contactPerson.findMany({
+    return prisma.person.findMany({
         where: { customerId },
     });
 }
@@ -106,13 +108,13 @@ export async function updateCustomer(id: string, input: UpdateCustomerInput): Pr
 }
 
 export async function createCustomerContact(customerId: string, input: CreateContactInput) {
-    return prisma.contactPerson.create({
+    return prisma.person.create({
         data: { ...input, customerId }
     });
 }
 
 export async function updateCustomerContact(contactId: string, input: UpdateContactInput) {
-    const contact = await prisma.contactPerson.update({
+    const contact = await prisma.person.update({
         where: { id: contactId },
         data: input
     });
@@ -133,7 +135,7 @@ export async function deleteCustomer(id: string): Promise<void> {
 }
 
 export async function deleteCustomerContact(contactId: string): Promise<void> {
-    await prisma.contactPerson.delete({
+    await prisma.person.delete({
         where: { id: contactId },
     });
 }

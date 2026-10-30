@@ -534,7 +534,7 @@ function Summary({ offer, customer }: { offer: Offer; customer: Customer | undef
     const preview = vatTotals(offer.net_amount, customer?.taxRate ?? 0);
     const rows: Array<[string, string]> = [
         [t("flows.summary.customer"), offer.customer.companyName],
-        [t("flows.summary.contact"), `${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()],
+        [t("flows.summary.contact"), `${offer.contactPerson.firstName} ${offer.contactPerson.lastName}`.trim()],
         [t("flows.summary.duration"), t("flows.summary.durationMonths", { count: offer.duration_months })],
         [t("flows.summary.paymentTerm"), offer.paymentTerm],
     ];
@@ -612,7 +612,7 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
                         )}
                     </div>
                     <p className="mt-1 text-sm text-(--fg-3)">
-                        {`${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()} · {t(`flows.phase.${phase}`)}
+                        {`${offer.contactPerson.firstName} ${offer.contactPerson.lastName}`.trim()} · {t(`flows.phase.${phase}`)}
                     </p>
                 </div>
                 <div className="text-right">

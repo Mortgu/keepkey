@@ -18,7 +18,7 @@ export const fetchOfferData = async (offerId: string) => {
             where: { id: offerId },
             include: {
                 customer: true,
-                customerContactPerson: true,
+                contactPerson: true,
                 user: true,
                 contract: { include: { translations: true } },
                 offerPositions: {

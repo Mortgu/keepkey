@@ -21,7 +21,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     const order = fetchedData.order;
     // Sprache und Konditionen stammen aus dem angenommenen Angebot.
     const lang = order.language;
-    const { customer, customerContactPerson: ccp, employee } = order;
+    const { customer, contactPerson, employee } = order;
 
     // Resolve the language variant once and flatten it onto each entity so the
     // docx template can keep referencing name/description/table/features directly.
@@ -122,7 +122,13 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             zip: customer.zip || "",
             city: customer.city || "",
 
-            ...formatParty({ salutation: ccp.salutation, firstName: ccp.firstName, lastName: ccp.lastName, phone: customer.phone, email: customer.email }),
+            ...formatParty({
+                salutation: contactPerson.salutation,
+                firstName: contactPerson.firstName,
+                lastName: contactPerson.lastName,
+                phone: customer.phone,
+                email: customer.email
+            }),
         },
 
         employee: formatParty({

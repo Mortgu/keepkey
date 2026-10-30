@@ -29,7 +29,7 @@ export default function OrderModalDetail({ offer, form, rows, error, formId }: P
     const locale = useLocale();
     const { suppliers } = useSuppliers();
     const supplier = suppliers.find((s) => s.id === offer.supplierId);
-    const ccp = offer.customerContactPerson;
+    const ccp = offer.contactPerson;
 
     const submit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

@@ -23,35 +23,11 @@ model Customer {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  contactPersons ContactPerson[]
-
-  offers   Offer[]
-  invoices Invoice[]
-
+  contactPersons       Person[]
+  offers               Offer[]
+  invoices             Invoice[]
   users                User[]
   tariffCustomerPrices TariffCustomerPrice[]
 
   @@map("customer")
-}
-
-model ContactPerson {
-  id String @id @default(uuid())
-
-  customerId String
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
-
-  salutation String?
-  email      String?
-
-  firstName String
-  lastName  String
-
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @updatedAt @db.Timestamptz(6)
-
-  offers Offer[]
-
-  @@unique([id, customerId])
-  @@index([customerId])
-  @@map("contact_person")
 }

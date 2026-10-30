@@ -48,8 +48,8 @@ export async function getOffers(query: OfferFilterParams) {
         where.OR = [
             { quoteId: contains },
             { customer: { companyName: contains } },
-            { customerContactPerson: { firstName: contains } },
-            { customerContactPerson: { lastName: contains } },
+            { contactPerson: { firstName: contains } },
+            { contactPerson: { lastName: contains } },
         ];
     }
 
@@ -85,7 +85,7 @@ export async function getOffers(query: OfferFilterParams) {
             supplier: true,
             contract: { include: { translations: true } },
             customer: { select: { id: true, companyName: true } },
-            customerContactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
+            contactPerson: { select: { id: true, salutation: true, firstName: true, lastName: true } },
             offerDocuments: {
                 where: { deletedAt: null },
                 include: {
@@ -129,7 +129,7 @@ export async function getOfferById(id: string) {
             supplier: true,
             contract: { include: { translations: true } },
             customer: true,
-            customerContactPerson: true,
+            contactPerson: true,
             offerDocuments: {
                 where: { deletedAt: null },
                 orderBy: { version: "desc" as const },

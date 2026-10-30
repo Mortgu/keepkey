@@ -45,7 +45,7 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
         prisma.confirmation.findUnique({ where: { orderId: invoice.orderId }, select: { confirmationId: true } }),
     ]);
     const lang = order.language;
-    const { customer, customerContactPerson: ccp, employee } = order;
+    const { customer, contactPerson, employee } = order;
 
     let pos = 0;
     const items = [
@@ -107,9 +107,9 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
             zip: customer.zip ?? "",
             city: customer.city ?? "",
             ...formatParty({
-                salutation: ccp.salutation,
-                firstName: ccp.firstName,
-                lastName: ccp.lastName,
+                salutation: contactPerson.salutation,
+                firstName: contactPerson.firstName,
+                lastName: contactPerson.lastName,
                 phone: customer.phone,
                 email: customer.invoiceEmail || customer.email,
             }),

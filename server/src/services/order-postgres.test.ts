@@ -94,7 +94,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 taxRate: 19,
             },
         });
-        await prisma.contactPerson.create({
+        await prisma.person.create({
             data: {
                 id: "contact",
                 customerId: "customer",

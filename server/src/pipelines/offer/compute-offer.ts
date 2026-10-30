@@ -154,10 +154,10 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
             phone: offer.customer.phone,
         },
         contactPerson: {
-            salutation: offer.customerContactPerson.salutation,
-            firstName: offer.customerContactPerson.firstName,
-            lastName: offer.customerContactPerson.lastName,
-            email: offer.customerContactPerson.email,
+            salutation: offer.contactPerson.salutation,
+            firstName: offer.contactPerson.firstName,
+            lastName: offer.contactPerson.lastName,
+            email: offer.contactPerson.email,
         },
         employee: {
             salutation: offer.user.salutation,

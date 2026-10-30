@@ -22,7 +22,7 @@ export function presentAcceptedOffer<
         userId: s.employeeId,
         user: s.employee,
         customer: s.customer,
-        customerContactPerson: s.customerContactPerson,
+        contactPerson: s.contactPerson,
         contractId: s.contractId,
         contract: s.contract,
         duration_months: s.duration_months,

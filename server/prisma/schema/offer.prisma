@@ -16,8 +16,8 @@ model Offer {
   customer   Customer @relation(fields: [customerId], references: [id])
   customerId String
 
-  customerContactPerson ContactPerson @relation(fields: [contactPersonId, customerId], references: [id, customerId])
-  contactPersonId       String
+  contactPerson   Person @relation(fields: [contactPersonId, customerId], references: [id, customerId])
+  contactPersonId String
 
   user   User   @relation(fields: [userId], references: [id])
   userId String

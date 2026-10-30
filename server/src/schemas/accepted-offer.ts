@@ -55,7 +55,7 @@ export const commercialSourceSchema = z.object({
         salutation: text,
         ...timestamps,
     }),
-    customerContactPerson: z.object({
+    contactPerson: z.object({
         id: z.string(),
         customerId: z.string(),
         salutation: text,

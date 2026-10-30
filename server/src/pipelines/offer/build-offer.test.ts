@@ -100,7 +100,7 @@ describe("angenommenes Angebot", () => {
                 street: "Weg 1", city: "Berlin", zip: "12345", country: "DE", currency: "EUR" as const,
                 taxRate: 19, salutation: null, ...timestamps,
             },
-            customerContactPerson: {
+            contactPerson: {
                 id: "contact-1", customerId: "cust-1", salutation: "Frau", firstName: "Anna", lastName: "Muster",
                 email: "anna@frozen.test", ...timestamps,
             },

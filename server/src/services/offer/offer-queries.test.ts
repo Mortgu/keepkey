@@ -17,8 +17,8 @@ describe("getOffers filters", () => {
             OR: [
                 { quoteId: contains },
                 { customer: { companyName: contains } },
-                { customerContactPerson: { firstName: contains } },
-                { customerContactPerson: { lastName: contains } },
+                { contactPerson: { firstName: contains } },
+                { contactPerson: { lastName: contains } },
             ],
         });
     });

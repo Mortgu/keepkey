@@ -27,7 +27,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
     const orderModal = useModal();
 
     const {
-        customerContactPerson: ccp,
+        contactPerson,
         quoteId,
         offerPositions,
         offerFlatRates,
@@ -77,7 +77,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     <p className="text-sm font-light text-(--text-secondary)">
                         {[
                             customer.companyName,
-                            `${ccp.firstName} ${ccp.lastName}`,
+                            `${contactPerson.firstName} ${contactPerson.lastName}`,
                             `${customer.zip} ${customer.city}`.trim(),
                         ].filter(Boolean).join(" · ")}
                     </p>

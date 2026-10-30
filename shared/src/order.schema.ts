@@ -170,7 +170,7 @@ export const orderSchema = z.object({
         companyName: z.string(),
     }),
 
-    customerContactPerson: z.object({
+    contactPerson: z.object({
         id: z.string(),
         salutation: z.string().nullable(),
         firstName: z.string(),

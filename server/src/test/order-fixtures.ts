@@ -32,7 +32,7 @@ export const sourceFixture = () => ({
         salutation: null,
         ...timestamps,
     },
-    customerContactPerson: {
+    contactPerson: {
         id: "contact",
         customerId: "customer",
         salutation: null,

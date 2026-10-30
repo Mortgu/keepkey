@@ -42,7 +42,7 @@ export default function OrderEditModal({ order, onClose, onCreated }: Props) {
                 <>
                     {source.customer.companyName}
                     <Dot size={18} />
-                    {source.customerContactPerson.firstName} {source.customerContactPerson.lastName}
+                    {source.contactPerson.firstName} {source.contactPerson.lastName}
                 </>
             } />
             <Dialog.Body>

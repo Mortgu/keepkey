@@ -45,7 +45,7 @@ export function offerFixture(overrides: {
                 customerId: "K-100", companyName: overrides.customerCompanyName ?? "ACME GmbH", street: "Weg 1", zip: "12345",
                 city: "Berlin", phone: "030 1", email: "info@acme.test",
             },
-            customerContactPerson: {
+            contactPerson: {
                 salutation: "Frau", firstName: "Anna", lastName: "Muster", email: "anna@acme.test",
             },
             user: {

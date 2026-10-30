@@ -17,7 +17,7 @@ const isExpired = (offer: Offer) =>
 export default function OrderModalOfferCard({ offer, selected, onSelect }: Props) {
     const { formatDate, formatEur } = useFormatters();
     const { t } = useTranslation();
-    const ccp = offer.customerContactPerson;
+    const ccp = offer.contactPerson;
 
     return (
         <button

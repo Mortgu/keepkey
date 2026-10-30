@@ -7,7 +7,7 @@ import { serializeAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 
 export const acceptanceInclude = {
     customer: true,
-    customerContactPerson: true,
+    contactPerson: true,
     user: true,
     contract: { include: { translations: true } },
     offerPositions: {

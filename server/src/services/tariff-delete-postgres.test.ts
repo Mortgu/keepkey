@@ -3,6 +3,8 @@ import { randomUUID } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import { beforeAll, afterAll, describe, expect, it, vi } from "vitest";
 import pg from "pg";
+import { prisma } from "../lib/prismaClient.js";
+import { deleteTariff, deleteTariffGroup } from "./tariff.service.js";
 
 const state = vi.hoisted(() => ({
     schema: `tariff_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -23,8 +25,6 @@ vi.mock("../lib/prismaClient.js", async () => {
         }),
     };
 });
-import { prisma } from "../lib/prismaClient.js";
-import { deleteTariff, deleteTariffGroup } from "./tariff.service.js";
 
 const integration = describe.skipIf(!process.env.ORDER_TEST_DATABASE_URL);
 integration("removing price tables (real PostgreSQL)", () => {
@@ -55,7 +55,7 @@ integration("removing price tables (real PostgreSQL)", () => {
             },
         });
         await prisma.customer.create({ data: { id: "customer", companyName: "Original Ltd", language: "EN", taxRate: 19 } });
-        await prisma.contactPerson.create({ data: { id: "contact", customerId: "customer", firstName: "First", lastName: "Last" } });
+        await prisma.person.create({ data: { id: "contact", customerId: "customer", firstName: "First", lastName: "Last" } });
         for (const id of ["contract", "other-contract"]) {
             await prisma.contract.create({
                 data: { id, translations: { create: { language: "EN", name: id, features: [], table: "Terms" } } },

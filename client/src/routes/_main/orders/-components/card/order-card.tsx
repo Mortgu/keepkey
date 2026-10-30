@@ -28,7 +28,7 @@ export default function OrderCard({ order }: Props) {
         if (!confirm(t("orders.cancelConfirm", { number: order.orderId }))) return;
         try { await cancelOrder({ orderId: order.id, expectedVersion: order.version }); } catch { /* Render mutation error below. */ }
     };
-    const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
+    const { customer, contactPerson, orderPositions, flatRates, documents } = order;
     const cancelled = Boolean(order.cancelledAt);
 
     // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
@@ -60,7 +60,7 @@ export default function OrderCard({ order }: Props) {
                     <p className="text-sm font-light text-(--text-secondary)">
                         {[
                             customer.companyName,
-                            `${ccp.firstName} ${ccp.lastName}`.trim(),
+                            `${contactPerson.firstName} ${contactPerson.lastName}`.trim(),
                         ].filter(Boolean).join(" · ")}
                     </p>
                 </div>
