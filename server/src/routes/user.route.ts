@@ -32,7 +32,7 @@ router.post("/", requireAdmin, validate(createUserSchema), createUser);
 router.delete("/:id", requireAdmin, validateParams(idParamsSchema), deleteUser);
 
 router.post(
-  "/me/contact-persons",
+  "/me/persons",
   validate(createContactSchema),
   createContactPersons,
 );

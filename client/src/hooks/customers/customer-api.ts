@@ -24,7 +24,7 @@ export const getCustomers = (filters: CustomerFilterParams = {}) => {
 };
 
 export const getContacts = () =>
-    api<ContactList>(`/api/contact-persons`, {
+    api<ContactList>(`/api/persons`, {
         method: "GET",
     });
 

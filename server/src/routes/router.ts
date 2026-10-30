@@ -50,8 +50,8 @@ router.use("/flatrates", requireSession, flatRatesRouter);
 /* /api/task */
 router.use("/tasks", requireSession, taskRouter);
 
-/* /api/contact-persons */
-router.use("/contact-persons", requireSession, contactPersonRouter);
+/* /api/persons */
+router.use("/persons", requireSession, contactPersonRouter);
 
 /* /api/tariffs */
 router.use("/tariffs", requireSession, tariffRouter);

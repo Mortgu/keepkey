@@ -20,7 +20,9 @@ export default function OfferList({ filters }: Props) {
   const locale = useLocale();
   const { customerFilterOptions, contactPersonFilterOptions, productFilterOptions } = useOfferFilterOptions(customers, contacts, products, locale);
 
-  if (error) return <RouteError error={error} />;
+  if (error) {
+    return <RouteError error={error} />;
+  }
 
   return (
     <div className="grid grid-rows-[auto_1fr] h-full">

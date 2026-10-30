@@ -28,7 +28,7 @@ Alle Router werden in `server/src/routes/router.ts` unter einem gemeinsamen Prä
 | `/documents` | `document.route.ts` | `server/src/routes/router.ts:67` |
 | *(nichts)* | `confirmation.route.ts` | wird nicht importiert |
 
-Die übrigen Mounts (`/products`, `/suppliers`, `/users`, `/contracts`, `/customers`, `/flatrates`, `/tasks`, `/contact-persons`, `/tariffs`, `/templates`, `/cloud`, `/integrations`, `/search`, `/dashboard`) stehen in `router.ts:27-79`. Sie zeigen dieselbe Konvention: Plural-Collections, Sub-Ressourcen verschachtelt, z. B. `/customers/:id/contacts/:contactId` in `server/src/routes/customer.route.ts:45-54`.
+Die übrigen Mounts (`/products`, `/suppliers`, `/users`, `/contracts`, `/customers`, `/flatrates`, `/tasks`, `/persons`, `/tariffs`, `/templates`, `/cloud`, `/integrations`, `/search`, `/dashboard`) stehen in `router.ts:27-79`. Sie zeigen dieselbe Konvention: Plural-Collections, Sub-Ressourcen verschachtelt, z. B. `/customers/:id/contacts/:contactId` in `server/src/routes/customer.route.ts:45-54`.
 
 ### 1.2 Was es mit `confirmation.route.ts` auf sich hat
 

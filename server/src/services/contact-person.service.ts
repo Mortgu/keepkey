@@ -2,13 +2,8 @@ import { prisma } from "../lib/prismaClient.js";
 
 /* ========== Queries ========== */
 
-export async function getAllContactPersons() {
+export async function getAllPersons() {
     return prisma.person.findMany({
-        include: {
-            customer: true,
-        },
-        orderBy: {
-            lastName: "asc",
-        },
+        orderBy: { lastName: "asc" },
     });
 }

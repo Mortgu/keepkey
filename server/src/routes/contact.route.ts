@@ -1,9 +1,10 @@
 import { Router } from "express";
 
-import { getAllContactPersons } from "@/controllers/index.js";
+import { getAllPersons } from "@/controllers/index.js";
 
 const router = Router();
 
-router.get("/", getAllContactPersons);
+/* [GET] /api/person/ */
+router.get("/", getAllPersons);
 
 export default router;
