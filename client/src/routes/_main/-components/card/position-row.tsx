@@ -1,26 +1,17 @@
-import type { Contract, OfferPosition, OrderPosition } from "@keepit/schemas";
-import { Badge } from "@/components";
-import { useFormatters, useLocale } from "@/hooks";
-import { localized } from "@/lib/i18n-content";
+import type {Contract, OfferPosition, OrderPosition} from "@keepit/schemas";
+import {Badge} from "@/components";
+import {useFormatters, useLocale} from "@/hooks";
+import {localized} from "@/lib/i18n-content";
 
 type Props = {
     position: OfferPosition | OrderPosition;
-    /**
-     * Vertrag und Laufzeit gehören dem Beleg, nicht der Position — alle
-     * Positionen eines Angebots teilen sie. Die Zeile zeigt sie trotzdem, damit
-     * sie für sich lesbar bleibt.
-     */
     contract: Contract;
     durationMonths: number;
 };
 
-/**
- * Eine Produktzeile in Angebots- und Bestellkarte. `OrderPosition` ist
- * `OfferPosition` ohne Freimonate — der Rabattblock entfällt dort deshalb.
- */
-export default function PositionRow({ position, contract, durationMonths }: Props) {
-    const { formatEur } = useFormatters();
-    const { product, quantity, totalCents } = position;
+export default function PositionRow({position, contract, durationMonths}: Props) {
+    const {formatEur} = useFormatters();
+    const {product, quantity, totalCents} = position;
 
     const locale = useLocale();
 

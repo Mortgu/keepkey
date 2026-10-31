@@ -159,7 +159,7 @@ describe("angenommenes Angebot", () => {
                 },
             ],
             discounts: [
-                { id: "disc-1", title: "Treuerabatt", description: null, amount_cents: 5000, ...timestamps },
+                { id: "disc-1", title: "Treuerabatt", description: null, totalCents: 5000, ...timestamps },
             ],
         };
     }

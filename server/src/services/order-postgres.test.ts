@@ -162,7 +162,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                     },
                 },
                 offerDiscounts: {
-                    create: { title: "Discount", amount_cents: 10000 },
+                    create: { title: "Discount", totalCents: 10000 },
                 },
             },
         });

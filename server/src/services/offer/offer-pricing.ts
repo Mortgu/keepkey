@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 
-import { prisma } from "../../lib/prismaClient.js";
-import { AppException } from "../../lib/exceptions.js";
-import { loadTariffForPricing, selectPrice } from "../../utils/products.js";
+import { prisma } from "@/lib/prismaClient.js";
+import { AppException } from "@/lib/exceptions.js";
+import { loadTariffForPricing, selectPrice } from "@/utils/products.js";
 import { sealTariffVersion } from "../tariff.service.js";
 
 import {
@@ -13,7 +13,7 @@ import {
 import {
     parseTariffVersionSnapshot,
     tariffFromSnapshot,
-} from "../../schemas/tariff-version-schema.js";
+} from "@/schemas/tariff-version-schema.js";
 
 /* ========== Types ========== */
 
@@ -21,55 +21,32 @@ export type PricedPosition = CreateOfferPositionInput & {
     totalCents: number;
     unitCents: number;
     discountCents: number;
-    /** Angepinnte, unveränderliche Preisgrundlage dieser Position. */
     tariffVersionId: string | null;
 };
 
-/**
- * Vertrag und Laufzeit des Angebots. Sie adressieren zusammen mit Produkt und
- * Menge eine Zelle der Preistabelle — und stehen am Kopf, weil alle Positionen
- * eines Angebots dieselbe Spalte derselben Tabelle treffen.
- */
 export type PriceHeader = {
     contractId: string;
     duration_months: number;
 };
-export type PricedFlatrate = CreateOfferFlatrateInput & { totalCents: number };
+
+export type PricedFlatRate = CreateOfferFlatrateInput & { totalCents: number };
+
 export type PricedDiscount = {
     title: string;
     description?: string | null;
-    amount_cents: number;
+    totalCents: number;
 };
 
-/**
- * Nettobetrag eines Angebots: Positionen abzüglich Freimonate, zuzüglich
- * Flatrates, abzüglich Rabatte.
- */
 export function calculateNetAmount(
     positions: ReadonlyArray<Pick<PricedPosition, "totalCents" | "discountCents">>,
-    flatrates: ReadonlyArray<Pick<PricedFlatrate, "totalCents">>,
-    discounts: ReadonlyArray<Pick<PricedDiscount, "amount_cents">>,
+    flatRates: ReadonlyArray<Pick<PricedFlatRate, "totalCents">>,
+    discounts: ReadonlyArray<Pick<PricedDiscount, "totalCents">>,
 ): number {
     return positions.reduce((sum, p) => sum + p.totalCents - p.discountCents, 0) +
-        flatrates.reduce((sum, f) => sum + f.totalCents, 0) -
-        discounts.reduce((sum, d) => sum + d.amount_cents, 0);
+        flatRates.reduce((sum, f) => sum + f.totalCents, 0) -
+        discounts.reduce((sum, d) => sum + d.totalCents, 0);
 }
 
-/**
- * Berechnet totalCents für jede Position über den Tarif (wirft AppException,
- * wenn kein Preis ermittelbar).
- *
- * Dabei wird der verwendete Tarifstand als unveränderliche `TariffVersion`
- * versiegelt und an der Position angepinnt. Der Hash-Vergleich in
- * {@link sealTariffVersion} sorgt dafür, dass unveränderte Tabellen keine neue
- * Version erzeugen — es entsteht genau eine Version je tatsächlich verkaufter
- * Konfiguration.
- *
- * Läuft der Aufrufer bereits in einer Transaktion, muss er sie als `db`
- * hereinreichen: Sonst öffnet {@link sealTariffVersion} je Position eine
- * eigene, unabhängige Transaktion, während die äußere eine Verbindung hält —
- * bei parallelen Bearbeitungen läuft so der Pool leer.
- */
 export async function pricePositions(
     positions: CreateOfferPositionInput[],
     header: PriceHeader,
@@ -148,7 +125,7 @@ async function getFlatRateCentsById(
 export async function priceFlatrates(
     flatrates: CreateOfferFlatrateInput[],
     db: Prisma.TransactionClient = prisma,
-): Promise<PricedFlatrate[]> {
+): Promise<PricedFlatRate[]> {
     const rateById = await getFlatRateCentsById(flatrates.map((f) => f.flatRateId), db);
 
     return flatrates.map((flatrate) => {

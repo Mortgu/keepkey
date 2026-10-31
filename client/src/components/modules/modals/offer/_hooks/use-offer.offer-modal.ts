@@ -1,9 +1,8 @@
 import type { DropdownOption } from "@/components";
+import type { OfferModalValues } from "../_schemas/offer-modal-schema";
+import type { Offer } from '@keepit/schemas';
 import { useContracts, useCustomers, useLocale, useStandardDurations, useSuppliers, useUsers } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
-import type { Offer } from '@keepit/schemas';
-import type { OfferModalValues } from "../_schemas/offer-modal-schema";
-
 
 interface Props {
     currentOffer?: Offer;
@@ -71,7 +70,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
         discounts: currentOffer?.offerDiscounts.map(d => ({
             title: d.title,
             description: d.description,
-            amount_cents: d.amount_cents,
+            totalCents: d.totalCents,
         })) ?? [],
     };
 

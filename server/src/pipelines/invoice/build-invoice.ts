@@ -20,21 +20,6 @@ const addMonths = (date: Date, months: number) => {
     return d;
 };
 
-/**
- * Alles, was die Rechnungsvorlage braucht — eine Funktion, von oben nach unten:
- * Rechnung + Bestellung laden, Positionen als Rechnungszeilen, Steuerblock,
- * Name bilden. Datenvertrag ist `invoiceContract`.
- *
- * Preise: `presentOrder` liefert `totalCents` je Position bereits netto
- * (Freimonate abgezogen) und `discountCents` als den abgezogenen Betrag.
- * Einzelpreis ist `unitCents`. Die Zeilensumme entspricht damit exakt
- * `netAmount` des angenommenen Angebots, das beim Anlegen als `netCents`
- * gespeichert wurde.
- *
- * Rabatte erscheinen als eigene Zeilen mit negativem Betrag, damit die Summe
- * der Zeilen dem Nettobetrag entspricht.
- */
-
 type BuildInvoiceReturn = {
     data: Record<string, unknown>;
     language: Language;
@@ -85,10 +70,10 @@ export async function buildInvoice(invoiceRowId: string): Promise<BuildInvoiceRe
             pos: ++pos,
             description: d.title,
             quantity: 1,
-            unitPrice: formatCentsToEur(-d.amount_cents),
-            gross: formatCentsToEur(-d.amount_cents),
+            unitPrice: formatCentsToEur(-d.totalCents),
+            gross: formatCentsToEur(-d.totalCents),
             discount: "",
-            total: formatCentsToEur(-d.amount_cents),
+            total: formatCentsToEur(-d.totalCents),
         })),
     ];
 
@@ -136,9 +121,6 @@ export async function buildInvoice(invoiceRowId: string): Promise<BuildInvoiceRe
         orderDetails: order.orderDetails ?? "",
         items,
 
-        // Steuerblock aus der Row — beim Anlegen aus offer.netAmount festgelegt,
-        // Regenerieren rechnet nie neu. Die Zeilen oben müssen dieselbe Summe ergeben
-        // (Test), sonst stimmt die Darstellung nicht mit dem Beleg überein.
         netTotal: formatCentsToEur(invoice.netCents),
         vatRate: formatPercent(invoice.taxRate),
         vatAmount: formatCentsToEur(invoice.vatCents),

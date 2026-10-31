@@ -45,7 +45,7 @@ beforeAll(async () => {
         INSERT INTO offer_position (id, "offerId", "productId", quantity, totalCents, discountCents, eur_user_month, "updatedAt")
             VALUES ('position', 'offer', 'product', 10, 120000, 30000, 1000, now());
         INSERT INTO offer_flat_rate (id, "offerId", "flatRateId", quantity, totalCents) VALUES ('flat', 'offer', 'flat-rate', 1, 10000);
-        INSERT INTO offer_discount (id, "offerId", title, amount_cents, "updatedAt") VALUES ('discount', 'offer', 'Discount', 10000, now());
+        INSERT INTO offer_discount (id, "offerId", title, totalCents, "updatedAt") VALUES ('discount', 'offer', 'Discount', 10000, now());
     `);
     await db.query(
         `UPDATE offer SET "acceptedAt" = '2026-09-08T12:00:00Z', "acceptedSnapshot" = $1 WHERE id = 'offer'`,
@@ -104,7 +104,7 @@ describe("order migration and PostgreSQL invariants", () => {
         `DELETE FROM offer_position WHERE id = 'position'`,
         `UPDATE offer_flat_rate SET total_cents = 0 WHERE id = 'flat'`,
         `DELETE FROM offer_discount WHERE id = 'discount'`,
-        `INSERT INTO offer_discount (id, "offerId", title, amount_cents, "updatedAt") VALUES ('new', 'offer', 'New', 1, now())`,
+        `INSERT INTO offer_discount (id, "offerId", title, totalCents, "updatedAt") VALUES ('new', 'offer', 'New', 1, now())`,
         `UPDATE offer SET "acceptedSnapshot" = '{}' WHERE id = 'offer'`,
         `UPDATE offer SET "acceptedAt" = NULL WHERE id = 'offer'`,
     ])("protects accepted content against direct SQL: %s", async (sql) => {

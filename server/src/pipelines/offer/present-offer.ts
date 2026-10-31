@@ -11,19 +11,8 @@ function requireTranslation<T extends { language: Language }>(translations: T[],
     return translation;
 }
 
-/**
- * Nummer vor der Überschrift einer Offerte. Nur Vergleichsangebote bestehen aus
- * mehreren, alternativen Offerten, die sich beziehen müssen; ein einzelnes
- * Angebot trägt keine Nummer.
- */
 const numberPrefix = (index: number, compare: boolean) => (compare ? `${index + 1}. ` : "");
 
-/**
- * Setzt die Nummern an Gruppen und Tabellen neu. Für Dokumente, die aus einem
- * eingefrorenen Snapshot kommen: der stammt aus der Zeit vor den Nummern und
- * würde sonst ohne rendern. Idempotent — auf frisch dargestellte Daten
- * angewandt ändert es nichts.
- */
 export function withNumberPrefixes(template: OfferTemplate): OfferTemplate {
     return {
         ...template,
@@ -32,24 +21,6 @@ export function withNumberPrefixes(template: OfferTemplate): OfferTemplate {
     };
 }
 
-/**
- * Die einzige Stelle, an der aus einer Angebotsposition eine PDF-Zeile wird.
- *
- * Der Preis kommt als Parameter: die Haupttabelle reicht die gespeicherten
- * Werte durch, die Vergleichstabellen einen anderen Preis für denselben
- * Eintrag. Beide durchlaufen dieselbe Abbildung und können nicht
- * auseinanderlaufen.
- *
- * `total` ist **brutto** über die volle Laufzeit, der Wert der Freimonate steht
- * getrennt in `discount.total` (negativ, weil er im Dokument als eigene Zeile
- * darunter erscheint). Netto ist die Differenz — siehe `netCents` in
- * `@keepit/schemas`.
- *
- * `durationLabel` gibt der Aufrufer vor: die flache `products`-Liste rendert
- * "12 Monate", die Tabellen die nackte Zahl, weil deren Kopfzeile selbst
- * " Monaten" anhängt. Solange beide Formen im Template stecken, wäre eine
- * gemeinsame Formatierung hier eine stille Änderung am Dokument.
- */
 function presentItem(
     position: PositionModel,
     price: PositionAmounts,
@@ -75,11 +46,6 @@ function presentItem(
     };
 }
 
-/**
- * Macht aus dem Angebotsmodell die Daten der Vorlage: formatiert Beträge und
- * Daten, löst Übersetzungen auf und bildet die Gruppen, die die Vorlage
- * erwartet. Rein und synchron — es wird nichts gerechnet oder geladen.
- */
 export function presentOffer(model: OfferModel): OfferTemplate {
     const { language, duration_months: duration } = model;
 
@@ -171,7 +137,7 @@ export function presentOffer(model: OfferModel): OfferTemplate {
         discounts: model.discounts.map((d) => ({
             title: d.title,
             description: d.description ?? "",
-            total: formatCentsToEur(-d.amount_cents),
+            total: formatCentsToEur(-d.totalCents),
         })),
     };
 }

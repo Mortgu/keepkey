@@ -1,28 +1,27 @@
-import { ChevronRight, Pen, Trash } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import {ChevronRight, Pen, Trash} from "lucide-react";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
 
-import { Accordion, Badge, Button } from "@/components";
-import { useFormatters, useModal } from "@/hooks";
-import { useDeleteOffer, useGenerateOfferDocument } from "@/hooks/offers/offer-mutations";
+import type {OfferModalMode} from "@/components/modules/modals/offer/offer-modal-policy.ts";
+import type {Offer, OfferDocument} from '@keepit/schemas';
+import OfferModal from "@/components/modules/modals/offer/offer-modal";
+import {Accordion, Badge, Button} from "@/components";
+import {useFormatters, useModal} from "@/hooks";
+import {useDeleteOffer, useGenerateOfferDocument} from "@/hooks/offers/offer-mutations";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
-import type { Offer, OfferDocument } from '@keepit/schemas';
-import OfferModal from "../../../../../components/modules/modals/offer/offer-modal";
-import type { OfferModalMode } from "../../../../../components/modules/modals/offer/offer-modal-policy";
 
 type OfferListItemProps = {
     offer: Offer;
 };
 
-export default function OfferCard({ offer }: OfferListItemProps) {
-    const { formatDate, formatEur } = useFormatters();
-    const { t } = useTranslation();
+export default function OfferCard({offer}: OfferListItemProps) {
+    const {formatDate, formatEur} = useFormatters();
+    const {t} = useTranslation();
 
-    /** `data` trägt nur die Variante — die Quelle ist immer das Angebot dieser Karte. */
     const offerModal = useModal<{ mode: OfferModalMode }>();
     const orderModal = useModal();
 
@@ -41,12 +40,12 @@ export default function OfferCard({ offer }: OfferListItemProps) {
     } = useDeleteOffer();
 
 
-    const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
+    const {generateOfferDocument, isGenerating} = useGenerateOfferDocument();
 
     const [openSections, setOpenSections] = useState<Array<string>>([]);
 
     const handleGenerateDocument = async () => {
-        await generateOfferDocument({ offerId: offer.id });
+        await generateOfferDocument({offerId: offer.id});
         setOpenSections((sections) =>
             sections.includes("documents") ? sections : [...sections, "documents"],
         );
@@ -54,7 +53,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
     const handleDeleteOffer = () => {
         if (!offer.acceptedAt && confirm("Angebot löschen")) {
-            deleteOffer({ id: offer.id });
+            deleteOffer({id: offer.id});
         }
     };
 
@@ -92,12 +91,13 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             {/* Status- und Datumsleiste */}
             <div className="grid grid-cols-2 md:grid-cols-4 border-t border-(--border) bg-(--page-bg) text-(--text)">
                 {offer.acceptedAt && (
-                    <div className={`${dateCell} flex-row items-center justify-between bg-(--primary-50) text-(--primary)`}>
+                    <div
+                        className={`${dateCell} flex-row items-center justify-between bg-(--primary-50) text-(--primary)`}>
                         <div className="grid gap-0.5">
                             <span className="text-xs">{t("orders.accepted")} am:</span>
                             <span className="text-sm font-medium">{formatDate(offer.acceptedAt)}</span>
                         </div>
-                        <ChevronRight className="size-4" />
+                        <ChevronRight className="size-4"/>
                     </div>
                 )}
                 <div className={dateCell}>
@@ -126,11 +126,11 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                     ))}
 
                     {offerFlatRates.map((flatrate) => (
-                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
+                        <FlatRateRow key={flatrate.id} offerFlatRate={flatrate}/>
                     ))}
 
                     {offerDiscounts.map((discount) => (
-                        <DiscountRow key={discount.id} discount={discount} />
+                        <DiscountRow key={discount.id} discount={discount}/>
                     ))}
                 </Accordion.Section>
 
@@ -186,7 +186,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         variant="secondary"
                         type="button"
                         size="xs"
-                        onClick={() => offerModal.open({ mode: "renewal" })}>
+                        onClick={() => offerModal.open({mode: "renewal"})}>
                         {t("derived.action_renewal")}
                     </Button>
 
@@ -194,7 +194,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         variant="secondary"
                         type="button"
                         size="xs"
-                        onClick={() => offerModal.open({ mode: "extension" })}>
+                        onClick={() => offerModal.open({mode: "extension"})}>
                         {t("derived.action_extension")}
                     </Button>
                 </div>
@@ -206,7 +206,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         disabled={Boolean(offer.acceptedAt)}
                         title={offer.acceptedAt ? t("orders.acceptedHint") : t("orders.edit")}
                         onClick={() => offerModal.open()}
-                        icon={<Pen className="size-3" />}
+                        icon={<Pen className="size-3"/>}
                         iconOnly
                     />
 
@@ -218,7 +218,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                         title={offer.acceptedAt ? t("orders.acceptedHint") : undefined}
                         onClick={handleDeleteOffer}
                         loading={isDeletingOffer}
-                        icon={<Trash className="size-3" />}
+                        icon={<Trash className="size-3"/>}
                         iconOnly
                     />
                 </div>

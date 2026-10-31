@@ -1,9 +1,9 @@
-import { z } from "zod";
-import { useState } from "react";
-import { orderMetadataSchema, purchasePositionInputSchema } from "@keepit/schemas";
-import { useForm } from "@tanstack/react-form";
+import {z} from "zod";
+import {useState} from "react";
+import {orderMetadataSchema, purchasePositionInputSchema} from "@keepit/schemas";
+import {useForm} from "@tanstack/react-form";
 import type {Offer, Order} from "@keepit/schemas";
-import { useCreateOrder, useUpdateOrder } from "@/hooks";
+import {useCreateOrder, useUpdateOrder} from "@/hooks";
 
 export const orderFormSchema = orderMetadataSchema.extend({
     date: orderMetadataSchema.shape.date.or(z.literal("")),
@@ -28,7 +28,6 @@ export type PurchaseRow = {
     quantity: number;
     freeMonths: number;
     duration_months: number;
-    /** Verkaufspreis je User/Monat in Cent. */
     unitCents: number;
 };
 
@@ -63,7 +62,7 @@ interface Props {
     onDone: () => void;
 }
 
-export default function useOrderForm({ currentOrder, currentOffer, onDone }: Props) {
+export default function useOrderForm({currentOrder, currentOffer, onDone}: Props) {
     const create = useCreateOrder();
     const update = useUpdateOrder();
     // Pin the version the user opened; a background refetch must not silently accept another version.
@@ -81,27 +80,35 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
             positions: rows.map((row) => ({
                 offerPositionId: row.offerPositionId,
                 purchase_eur_user_month: currentOrder?.supplierPositions
-                    .find((sp) => sp.offerPositionId === row.offerPositionId)?.purchase_eur_user_month
+                        .find((sp) => sp.offerPositionId === row.offerPositionId)?.purchase_eur_user_month
                     ?? row.unitCents,
             })),
         },
-        validators: { onChange: orderFormSchema, onSubmit: orderFormSchema },
-        onSubmit: async ({ value }) => {
+        validators: {onChange: orderFormSchema, onSubmit: orderFormSchema},
+        onSubmit: async ({value}) => {
             if (expectedVersion === undefined) return;
             try {
-                const { positions, ...metadata } = value;
+                const {positions, ...metadata} = value;
                 if (currentOrder) {
-                    await update.updateOrder({ orderId: currentOrder.id, input: {
-                        expectedVersion,
-                        order: { ...metadata, date: metadata.date || currentOrder.date,
-                            contractStartDate: metadata.contractStartDate || null,
-                            projectNumber: metadata.projectNumber || null, projectDescription: metadata.projectDescription || null,
-                            orderDetails: metadata.orderDetails || null },
-                        positions,
-                    } });
+                    await update.updateOrder({
+                        orderId: currentOrder.id, input: {
+                            expectedVersion,
+                            order: {
+                                ...metadata,
+                                date: metadata.date || currentOrder.date,
+                                contractStartDate: metadata.contractStartDate || null,
+                                projectNumber: metadata.projectNumber || null,
+                                projectDescription: metadata.projectDescription || null,
+                                orderDetails: metadata.orderDetails || null
+                            },
+                            positions,
+                        }
+                    });
                 } else if (currentOffer) {
-                    await create.createOrder({ ...metadata, positions, id: currentOffer.id, expectedOfferVersion: expectedVersion,
-                        date: metadata.date || undefined, contractStartDate: metadata.contractStartDate || undefined });
+                    await create.createOrder({
+                        ...metadata, positions, id: currentOffer.id, expectedOfferVersion: expectedVersion,
+                        date: metadata.date || undefined, contractStartDate: metadata.contractStartDate || undefined
+                    });
                 } else return;
                 onDone();
             } catch {
@@ -109,5 +116,5 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
             }
         },
     });
-    return { form, rows, error: update.errorUpdatingOrder ?? create.errorCreatingOrder };
+    return {form, rows, error: update.errorUpdatingOrder ?? create.errorCreatingOrder};
 }

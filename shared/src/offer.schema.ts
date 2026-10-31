@@ -61,7 +61,7 @@ export type OfferFlatrate = z.infer<typeof offerFlatrateSchema>;
 export const createOfferDiscountSchema = z.object({
     title: z.string().min(1),
     description: z.string().nullable(),
-    amount_cents: z.number().int().nonnegative(),
+    totalCents: z.number().int().nonnegative(),
 });
 
 export type CreateOfferDiscountInput = z.infer<typeof createOfferDiscountSchema>;
@@ -177,7 +177,7 @@ export const offerDiscountSchema = z.object({
     title: z.string(),
     description: z.string().nullable(),
 
-    amount_cents: z.number().int(),
+    totalCents: z.number().int(),
 
     createdAt: isoDateTime,
     updatedAt: isoDateTime,

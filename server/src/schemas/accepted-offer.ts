@@ -119,7 +119,7 @@ export const commercialSourceSchema = z.object({
             id: z.string(),
             title: z.string(),
             description: text,
-            amount_cents: z.number().int(),
+            totalCents: z.number().int(),
             ...timestamps,
         }),
     ),

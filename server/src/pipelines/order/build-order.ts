@@ -1,16 +1,16 @@
-import type { Language } from "@prisma/client";
-import { getOrderById } from "../../services/order.service.js";
-import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
-import { translateFields } from "../../utils/i18n.js";
-import { formatParty } from "../../utils/party.js";
-import { sanitizeCompanyName } from "../../utils/documents.js";
-import { formatCentsToEur, formatDate, formatDuration } from "../../utils/utils.js";
+import type {Language} from "@prisma/client";
+import {getOrderById} from "@/services/order.service.js";
+import {orderTemplateSchema} from "@/schemas/templates/order.template.schema.js";
+import {translateFields} from "@/utils/i18n.js";
+import {formatParty} from "@/utils/party.js";
+import {sanitizeCompanyName} from "@/utils/documents.js";
+import {formatCentsToEur, formatDate, formatDuration} from "@/utils/utils.js";
 
 export type OrderFetchedData = Awaited<ReturnType<typeof fetchOrderData>>;
 export type OrderFormattedData = Awaited<ReturnType<typeof formatOrderData>>;
 
 export async function fetchOrderData(orderId: string) {
-    return { order: await getOrderById(orderId) };
+    return {order: await getOrderById(orderId)};
 }
 
 export async function formatOrderData(fetchedData?: OrderFetchedData) {
@@ -19,33 +19,27 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     }
 
     const order = fetchedData.order;
-    // Sprache und Konditionen stammen aus dem angenommenen Angebot.
     const lang = order.language;
-    const { customer, customerContactPerson: ccp, employee } = order;
+    const {customer, customerContactPerson: ccp, employee} = order;
 
-    // Resolve the language variant once and flatten it onto each entity so the
-    // docx template can keep referencing name/description/table/features directly.
-    // Vertrag und Laufzeit gelten fuer die ganze Bestellung. Sie werden einmal
-    // aufgeloest und an jede Position gehaengt, damit das Template weiterhin
-    // `position.contract` und `position.duration_months` lesen kann.
     const contract = {
         ...order.contract,
-        ...translateFields(order.contract.translations, lang, { name: "", features: [] as string[], table: "" }),
+        ...translateFields(order.contract.translations, lang, {name: "", features: [] as string[], table: ""}),
     };
     const duration_months = order.duration_months;
 
     const orderPositions = order.orderPositions.map((position) => {
-        const pt = translateFields(position.product.translations, lang, { name: "", description: "", table: "" });
+        const pt = translateFields(position.product.translations, lang, {name: "", description: "", table: ""});
         return {
             ...position,
             duration_months,
             contract,
-            product: { ...position.product, ...pt },
+            product: {...position.product, ...pt},
         };
     });
     const flatRates = order.flatRates.map((fr) => {
-        const ft = translateFields(fr.flatRate.translations, lang, { name: "", table: "" });
-        return { ...fr, flatRate: { ...fr.flatRate, ...ft } };
+        const ft = translateFields(fr.flatRate.translations, lang, {name: "", table: ""});
+        return {...fr, flatRate: {...fr.flatRate, ...ft}};
     });
 
     const products = orderPositions.map((position) => ({
@@ -56,8 +50,6 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         duration: formatDuration(duration_months),
     }));
 
-    // Frueher nach `contract_duration` gruppiert — beides steht jetzt an der
-    // Bestellung, es gibt also genau eine Gruppe.
     const grouped = [orderPositions].map((group) => {
         const group_total = order.netAmount;
 
@@ -67,8 +59,6 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             duration_months,
             duration: formatDuration(duration_months),
             total: formatCentsToEur(group_total),
-            // `item.totalCents` ist bereits netto (Freimonate abgezogen, siehe
-            // presentOrder); `discountCents` ist der abgezogene Betrag.
             items: group.map((item) => ({
                 offerPositionId: item.id,
                 name: item.product.name,
@@ -107,7 +97,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         products, groups: grouped, tables: grouped,
         flatRates: orderFlatRates, flatrates: orderFlatRates,
         total: formatCentsToEur(order.netAmount),
-        discounts: order.discounts.map(d => ({ ...d, total: formatCentsToEur(-d.amount_cents) })),
+        discounts: order.discounts.map(d => ({...d, total: formatCentsToEur(-d.totalCents)})),
         date: formatDate(order.date),
         paymentTerm: order.paymentTerm,
         validUntil: order.validUntil ? formatDate(order.validUntil) : "",
@@ -122,7 +112,13 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             zip: customer.zip || "",
             city: customer.city || "",
 
-            ...formatParty({ salutation: ccp.salutation, firstName: ccp.firstName, lastName: ccp.lastName, phone: customer.phone, email: customer.email }),
+            ...formatParty({
+                salutation: ccp.salutation,
+                firstName: ccp.firstName,
+                lastName: ccp.lastName,
+                phone: customer.phone,
+                email: customer.email
+            }),
         },
 
         employee: formatParty({
@@ -135,12 +131,6 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     };
 }
 
-/**
- * Die Bestellung geht an den Zulieferer: Positionspreise und Summe werden
- * durch die Einkaufswerte ersetzt. Nur hier — `formatOrderData` selbst bleibt
- * auf Verkaufspreisen, weil Auftragsbestätigung und Rechnung darauf aufbauen.
- * Pauschalen und Rabatte haben keinen Einkaufspreis und bleiben, wie sie sind.
- */
 export function withPurchasePrices(
     formatted: OrderFormattedData,
     order: OrderFetchedData["order"],
@@ -178,20 +168,13 @@ export function withPurchasePrices(
     };
 }
 
-/**
- * Alles, was die Bestellvorlage braucht — eine Funktion, von oben nach unten:
- * Bestellung laden, mit Verkaufspreisen formatieren, für den Zulieferer auf
- * Einkaufspreise umstellen, Namen bilden.
- *
- * `version` kommt vom `OrderDocument` und steht immer im Dateinamen.
- */
 export async function buildOrder(orderId: string, version: number): Promise<{
     data: Record<string, unknown>;
     language: Language;
     displayName: string;
 }> {
     const fetched = await fetchOrderData(orderId);
-    const { order } = fetched;
+    const {order} = fetched;
 
     // Verkaufspreise formatieren, dann für den Zulieferer auf Einkauf umstellen.
     const data = withPurchasePrices(await formatOrderData(fetched), order);
@@ -199,7 +182,7 @@ export async function buildOrder(orderId: string, version: number): Promise<{
 
     const company = sanitizeCompanyName(order.customer.companyName);
     const workloads = order.orderPositions
-        .map((p) => translateFields(p.product.translations, "DE", { name: "" }).name.replaceAll(" ", ""))
+        .map((p) => translateFields(p.product.translations, "DE", {name: ""}).name.replaceAll(" ", ""))
         .join("+");
 
     return {

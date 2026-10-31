@@ -181,7 +181,7 @@ export const orderSchema = z.object({
     acceptedAt: z.string(),
     acceptedById: z.string(),
     cancelledAt: z.string().nullable(),
-    discounts: z.array(z.object({ id: z.string(), title: z.string(), description: z.string().nullable(), amount_cents: z.number().int() })),
+    discounts: z.array(z.object({ id: z.string(), title: z.string(), description: z.string().nullable(), totalCents: z.number().int() })),
 
     documents: z.array(orderDocumentSchema),
     orderPositions: z.array(orderPositionSchema),

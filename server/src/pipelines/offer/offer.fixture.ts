@@ -81,7 +81,7 @@ export function offerFixture(overrides: {
                 { totalCents: 25000, flatRate: { translations: [t("DE", "Setup", { table: "Setup-Tabelle" }), t("EN", "Setup", { table: "Setup table" })] } },
             ],
             offerDiscounts: [
-                { title: "Treuerabatt", description: null, amount_cents: 5000 },
+                { title: "Treuerabatt", description: null, totalCents: 5000 },
             ],
         },
         contracts: [base, plus, broken],

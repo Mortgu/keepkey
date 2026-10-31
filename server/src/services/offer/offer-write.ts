@@ -7,7 +7,7 @@ import { documentOwnerType } from "../document-repo.js";
 import {
     calculateNetAmount,
     type PricedDiscount,
-    type PricedFlatrate,
+    type PricedFlatRate,
     type PricedPosition,
     type PriceHeader,
 } from "./offer-pricing.js";
@@ -36,7 +36,7 @@ export async function replaceOfferLines(
     offerId: string,
     lines: {
         positions: PricedPosition[];
-        flatRates: PricedFlatrate[];
+        flatRates: PricedFlatRate[];
         discounts: ReadonlyArray<PricedDiscount>;
     },
 ): Promise<void> {
@@ -63,7 +63,7 @@ async function replacePositions(tx: Prisma.TransactionClient, offerId: string, p
     });
 }
 
-async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatrate[]) {
+async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatRate[]) {
     await tx.offerFlatRate.deleteMany({ where: { offerId } });
     await tx.offerFlatRate.createMany({
         data: flatRates.map(({ flatRateId, quantity, totalCents }) => ({
@@ -77,8 +77,8 @@ async function replaceDiscounts(tx: Prisma.TransactionClient, offerId: string, d
     if (discounts.length === 0) return;
 
     await tx.offerDiscount.createMany({
-        data: discounts.map(({ title, description, amount_cents }) => ({
-            offerId, title, description: description ?? null, amount_cents,
+        data: discounts.map(({ title, description, totalCents }) => ({
+            offerId, title, description: description ?? null, totalCents,
         })),
     });
 }
@@ -109,7 +109,7 @@ export type OfferFields = PriceHeader & {
 export async function persistOffer(
     fields: OfferFields,
     positions: PricedPosition[],
-    flatrates: PricedFlatrate[],
+    flatrates: PricedFlatRate[],
     discounts: ReadonlyArray<PricedDiscount>,
     options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType },
 ) {

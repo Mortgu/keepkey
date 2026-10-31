@@ -17,10 +17,6 @@ export async function getConfirmationByOrder(orderId: string) {
     return prisma.confirmation.findUnique({ where: { orderId }, include: withDocuments });
 }
 
-/**
- * Legt die AB zur Bestellung an und stößt direkt die Generierung an. Die
- * AB-Nummer ist danach fest — es gibt bewusst kein Update.
- */
 export async function createConfirmation(orderId: string, input: CreateConfirmationInput, actorId: string) {
     const data = createConfirmationSchema.parse(input);
 
@@ -60,11 +56,6 @@ export async function regenerateConfirmation(orderId: string) {
     return requestConfirmationGeneration(confirmation.id);
 }
 
-/**
- * Löscht die AB unwiderruflich — nur solange kein aktives Dokument mehr
- * existiert. Ein noch vorhandenes (nicht soft-gelöschtes) Dokument muss zuerst
- * über den Dokument-Löschen-Flow entfernt werden.
- */
 export async function deleteConfirmation(orderId: string): Promise<void> {
     const confirmation = await prisma.confirmation.findUnique({
         where: { orderId },

@@ -3,31 +3,12 @@ import { calculatePrice } from "@/utils/products.js";
 import type { OfferFetchData } from "./build-offer.js";
 import type { ContractModel, OfferModel, PositionAmounts, PositionModel, PriceTableModel } from "./offer-model.js";
 
-/**
- * Preis einer Position so, wie er beim Anlegen des Angebots festgeschrieben
- * wurde.
- *
- * Das Angebot ist die Quelle der Wahrheit, nicht der heutige Tarif: ein einmal
- * verschicktes Dokument muss bei jeder erneuten Erzeugung dieselben Zahlen
- * zeigen, auch wenn die Preistabelle inzwischen eine andere ist.
- */
 const storedPrice = (position: PositionAmounts): PositionAmounts => ({
     unitCents: position.unitCents,
     totalCents: position.totalCents,
     discountCents: position.discountCents,
 });
 
-/**
- * Preis aus einer frischen Tarif-Berechnung — für die Vergleichstabellen.
- *
- * Nur dort richtig: diese Positionen hat es unter dem anderen Vertrag nie
- * gegeben, es gibt also keinen gespeicherten Wert, der gelten könnte.
- *
- * Die Aufteilung ist dieselbe wie beim Speichern einer Position
- * (`pricePositions` in offer.service): `totalCents` brutto über die volle
- * Laufzeit, die Freimonate getrennt in `discountCents`. Die Laufzeit kommt vom
- * Angebot, nicht von der Position — sie gilt für alle Positionen gemeinsam.
- */
 const livePrice = (
     unitPrice: number,
     position: { quantity: number; freeMonths: number },
@@ -46,24 +27,7 @@ const toContract = (contract: OfferFetchData["contracts"][number]): ContractMode
     translations: contract.translations.map((t) => ({ language: t.language, name: t.name, features: t.features })),
 });
 
-/**
- * Rechnet aus den geladenen Daten das Angebotsmodell: Positionen, Summen und
- * die Preistabellen. Nichts davon ist formatiert — das macht `presentOffer`.
- *
- * Die Haupttabelle nutzt die festgeschriebenen Preise der Positionen. Die
- * Vergleichstabellen anderer Verträge werden live berechnet; fehlt dafür
- * irgendwo eine Preistabelle, entfällt die Tabelle — ein Vergleich ist
- * optionales Beiwerk und darf die Erzeugung des Angebots nicht scheitern
- * lassen.
- *
- * Flatrates und Rabatte gelten für das gesamte Angebot und gehen in jede
- * Tabellensumme ein: die Vergleichsvarianten sind vollständige Alternativen.
- * Die Summe ist netto — im Dokument steht über ihr der Bruttopreis und
- * darunter der Rabatt als eigene Zeile.
- */
 export async function computeOfferModel({ offer, contracts }: OfferFetchData): Promise<OfferModel> {
-    // Vertrag und Laufzeit stehen am Angebot; die frühere Gruppierung nach
-    // `contractId_duration_months` konnte deshalb entfallen.
     const duration_months = offer.duration_months;
 
     const positions: PositionModel[] = offer.offerPositions.map((position) => ({
@@ -93,11 +57,11 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
     const discounts = offer.offerDiscounts.map((d) => ({
         title: d.title,
         description: d.description,
-        amount_cents: d.amount_cents,
+        totalCents: d.totalCents,
     }));
 
     const flatRatesTotal = flatRates.reduce((sum, fr) => sum + fr.totalCents, 0);
-    const discountsTotal = discounts.reduce((sum, d) => sum + d.amount_cents, 0);
+    const discountsTotal = discounts.reduce((sum, d) => sum + d.totalCents, 0);
     const tableTotal = (items: PositionAmounts[]) =>
         items.reduce((sum, item) => sum + netCents(item), 0) + flatRatesTotal - discountsTotal;
 

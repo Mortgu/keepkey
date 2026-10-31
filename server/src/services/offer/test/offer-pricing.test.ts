@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { calculateNetAmount } from "./offer-pricing.js";
+import { calculateNetAmount } from "../offer-pricing.js";
 
 describe("calculateNetAmount", () => {
     it("is zero for an empty offer", () => {
@@ -19,11 +19,11 @@ describe("calculateNetAmount", () => {
         expect(calculateNetAmount(
             [{ totalCents: 10_000, discountCents: 1_000 }],
             [{ totalCents: 2_500 }, { totalCents: 500 }],
-            [{ amount_cents: 1_500 }],
+            [{ totalCents: 1_500 }],
         )).toBe(10_500);
     });
 
     it("can become negative when discounts exceed the total", () => {
-        expect(calculateNetAmount([], [{ totalCents: 1_000 }], [{ amount_cents: 1_200 }])).toBe(-200);
+        expect(calculateNetAmount([], [{ totalCents: 1_000 }], [{ totalCents: 1_200 }])).toBe(-200);
     });
 });

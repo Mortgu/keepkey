@@ -172,7 +172,7 @@ function OfferStageSection({ stage, offer }: { stage: FlowStage; offer: Offer })
                         <PositionRow key={position.id} position={position} contract={offer.contract} durationMonths={offer.duration_months} />
                     ))}
                     {offer.offerFlatRates.map((flatrate) => (
-                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
+                        <FlatRateRow key={flatrate.id} offerFlatRate={flatrate} />
                     ))}
                     {offer.offerDiscounts.map((discount) => (
                         <DiscountRow key={discount.id} discount={discount} />
@@ -262,7 +262,7 @@ function OrderStageSection({ stage, offer, order }: { stage: FlowStage; offer: O
                         <PositionRow key={position.id} position={position} contract={order.contract} durationMonths={order.duration_months} />
                     ))}
                     {order.flatRates.map((flatrate) => (
-                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
+                        <FlatRateRow key={flatrate.id} offerFlatRate={flatrate} />
                     ))}
                     {order.discounts.map((discount) => (
                         <DiscountRow key={discount.id} discount={discount} />

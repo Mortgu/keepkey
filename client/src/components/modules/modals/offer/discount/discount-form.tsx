@@ -16,7 +16,7 @@ export default function DiscountForm({ currentDiscount, saveFn, cancelFn }: Prop
 
     const [title, setTitle] = useState(currentDiscount?.title ?? "");
     const [amountEur, setAmountEur] = useState<number>(
-        currentDiscount?.amount_cents ? (currentDiscount.amount_cents / 100) : 0);
+        currentDiscount?.totalCents ? (currentDiscount.totalCents / 100) : 0);
     const [description, setDescription] = useState(currentDiscount?.description ?? "");
     const [error, setError] = useState("");
 
@@ -31,7 +31,7 @@ export default function DiscountForm({ currentDiscount, saveFn, cancelFn }: Prop
         saveFn({
             title: title.trim(),
             description: description.trim() || null,
-            amount_cents: eurToCents(amountEur),
+            totalCents: eurToCents(amountEur),
         });
         cancelFn();
     };

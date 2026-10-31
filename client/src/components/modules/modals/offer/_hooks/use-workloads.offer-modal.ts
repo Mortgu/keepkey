@@ -5,7 +5,6 @@ import type { OfferModalFormApi } from "./use-offer-modal-form";
 import { usePriceResolver } from "@/hooks";
 
 interface Props {
-    /** Kunde, Vertrag und Laufzeit — der gemeinsame Teil jeder Preiskoordinate. */
     header: PriceHeader;
     form: OfferModalFormApi;
 }
@@ -15,11 +14,6 @@ export default function useWorkloadOfferModal({ header, form }: Props) {
 
     const offerPositions = useStore(form.store, (s) => s.values.offerPositions);
 
-    /**
-     * Ergänzt eine Position um den aktuellen Preis, bevor sie ins Formular geht.
-     * Der Server rechnet beim Speichern ohnehin neu — hier geht es um die
-     * Anzeige der Summen im Modal.
-     */
     const priced = async (workload: CreateOfferPositionInput): Promise<CreateOfferPositionInput> => {
         const price = await resolvePrice(coordinatesFrom(header, workload));
 

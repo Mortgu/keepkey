@@ -116,7 +116,7 @@ export const sourceFixture = () => ({
             ...timestamps,
             title: "Offer discount",
             description: null,
-            amount_cents: 10000,
+            totalCents: 10000,
         },
     ],
 });

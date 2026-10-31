@@ -123,7 +123,7 @@ model OfferDiscount {
   title       String
   description String?
 
-  amount_cents Int
+  totalCents Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

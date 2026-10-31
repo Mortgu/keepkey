@@ -86,7 +86,7 @@ export type OfferModel = {
 
     positions: PositionModel[];
     flatRates: Array<{ totalCents: number; translations: Translation[] }>;
-    discounts: Array<{ title: string; description: string | null; amount_cents: number }>;
+    discounts: Array<{ title: string; description: string | null; totalCents: number }>;
 
     /**
      * Preistabellen. Vergleichsverträge ohne vollständige Preise fehlen hier,

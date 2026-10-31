@@ -1,46 +1,47 @@
-import { Ban, Pen } from "lucide-react";
-import { useState } from "react";
-import { useTranslation } from "react-i18next";
+import {Ban, Pen} from "lucide-react";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
 import OrderEditModal from "../order-edit-modal";
 import ConfirmationSection from "./confirmation-section";
 import InvoiceSection from "./invoice-section";
-import type { Order } from "@keepit/schemas";
-import { useCancelOrder, useGenerateOrderDocument } from "@/hooks/orders/order-mutations";
-import { getErrorMessage } from "@/lib/errors";
+import type {Order} from "@keepit/schemas";
+import {useCancelOrder, useGenerateOrderDocument} from "@/hooks/orders/order-mutations";
+import {getErrorMessage} from "@/lib/errors";
 
-import { Accordion, Badge, Button } from "@/components";
+import {Accordion, Badge, Button} from "@/components";
 import DiscountRow from "@/routes/_main/-components/card/discount-row";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
-import { useFormatters } from "@/hooks";
+import {useFormatters} from "@/hooks";
 
 interface Props {
     order: Order;
 }
 
-export default function OrderCard({ order }: Props) {
-    const { formatDate, formatEur } = useFormatters();
-    const { t } = useTranslation();
+export default function OrderCard({order}: Props) {
+    const {formatDate, formatEur} = useFormatters();
+    const {t} = useTranslation();
     const [editing, setEditing] = useState(false);
-    const { cancelOrder, isCancellingOrder, errorCancellingOrder } = useCancelOrder();
+    const {cancelOrder, isCancellingOrder, errorCancellingOrder} = useCancelOrder();
     const cancel = async () => {
-        if (!confirm(t("orders.cancelConfirm", { number: order.orderId }))) return;
-        try { await cancelOrder({ orderId: order.id, expectedVersion: order.version }); } catch { /* Render mutation error below. */ }
+        if (!confirm(t("orders.cancelConfirm", {number: order.orderId}))) return;
+        try {
+            await cancelOrder({orderId: order.id, expectedVersion: order.version});
+        } catch { /* Render mutation error below. */
+        }
     };
-    const { customer, customerContactPerson: ccp, orderPositions, flatRates, documents } = order;
+    const {customer, customerContactPerson: ccp, orderPositions, flatRates, documents} = order;
     const cancelled = Boolean(order.cancelledAt);
 
-    // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
     const positionsSales = orderPositions.reduce((sum, p) => sum + p.totalCents, 0);
-    // Altbestellungen ohne gespeicherte Einkaufspreise: Fallback = Verkaufspreis.
     const hasFallback = order.supplierPositions.some((p) => p.fallback);
 
-    const { generateOrderDocument, isGeneratingDocument } = useGenerateOrderDocument();
+    const {generateOrderDocument, isGeneratingDocument} = useGenerateOrderDocument();
     const [openSections, setOpenSections] = useState<Array<string>>([]);
 
     const handleGenerateDocument = async () => {
-        await generateOrderDocument({ orderId: order.id });
+        await generateOrderDocument({orderId: order.id});
         setOpenSections((sections) =>
             sections.includes("documents") ? sections : [...sections, "documents"],
         );
@@ -95,7 +96,8 @@ export default function OrderCard({ order }: Props) {
                 </div>
                 <div className={dateCell}>
                     <span className="text-(--text-secondary)">{t("orders.purchase.marginShort")}</span>
-                    <span className="text-sm font-medium font-mono">{formatEur(positionsSales - order.purchase_net_amount)}</span>
+                    <span
+                        className="text-sm font-medium font-mono">{formatEur(positionsSales - order.purchase_net_amount)}</span>
                 </div>
             </div>
 
@@ -111,27 +113,31 @@ export default function OrderCard({ order }: Props) {
                     ))}
 
                     {flatRates.map((flatrate) => (
-                        <FlatRateRow key={flatrate.id} flatrate={flatrate} />
+                        <FlatRateRow key={flatrate.id} offerFlatRate={flatrate}/>
                     ))}
 
                     {order.discounts.map((discount) => (
-                        <DiscountRow key={discount.id} discount={discount} />
+                        <DiscountRow key={discount.id} discount={discount}/>
                     ))}
                 </Accordion.Section>
 
                 <Accordion.Section value="details" label={t("orders.details")}>
                     <dl className="grid gap-2 py-3 text-sm">
-                        <dt>{t("orders.projectNumber")}</dt><dd>{order.projectNumber || "—"}</dd>
-                        <dt>{t("orders.projectDescription")}</dt><dd>{order.projectDescription || "—"}</dd>
-                        <dt>{t("orders.details")}</dt><dd>{order.orderDetails || "—"}</dd>
-                        <dt>{t("orders.contractStartDate")}</dt><dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
+                        <dt>{t("orders.projectNumber")}</dt>
+                        <dd>{order.projectNumber || "—"}</dd>
+                        <dt>{t("orders.projectDescription")}</dt>
+                        <dd>{order.projectDescription || "—"}</dd>
+                        <dt>{t("orders.details")}</dt>
+                        <dd>{order.orderDetails || "—"}</dd>
+                        <dt>{t("orders.contractStartDate")}</dt>
+                        <dd>{order.contractStartDate ? formatDate(order.contractStartDate) : "—"}</dd>
                     </dl>
                 </Accordion.Section>
                 <Accordion.Section value="confirmation" label={t("orders.confirmation.title")}>
-                    <ConfirmationSection order={order} />
+                    <ConfirmationSection order={order}/>
                 </Accordion.Section>
                 <Accordion.Section value="invoice" label={t("orders.invoice.title")}>
-                    <InvoiceSection order={order} />
+                    <InvoiceSection order={order}/>
                 </Accordion.Section>
                 <Accordion.Section
                     value="documents"
@@ -170,7 +176,8 @@ export default function OrderCard({ order }: Props) {
             <div className="flex items-center justify-between gap-2 p-2 border-t border-(--border)">
                 <div className="flex items-center gap-2">
                     {errorCancellingOrder && (
-                        <p role="alert" className="px-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>
+                        <p role="alert"
+                           className="px-2 text-sm text-(--destructive)">{getErrorMessage(errorCancellingOrder)}</p>
                     )}
                 </div>
 
@@ -181,7 +188,7 @@ export default function OrderCard({ order }: Props) {
                         disabled={cancelled || isCancellingOrder}
                         title={cancelled ? t("orders.cancelled") : t("orders.edit")}
                         onClick={() => setEditing(true)}
-                        icon={<Pen className="size-3" />}
+                        icon={<Pen className="size-3"/>}
                         iconOnly
                     />
 
@@ -193,13 +200,14 @@ export default function OrderCard({ order }: Props) {
                         title={cancelled ? t("orders.cancelled") : t("orders.cancelOrder")}
                         onClick={cancel}
                         loading={isCancellingOrder}
-                        icon={<Ban className="size-3" />}
+                        icon={<Ban className="size-3"/>}
                         iconOnly
                     />
                 </div>
             </div>
 
-            {editing && <OrderEditModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)} />}
+            {editing &&
+                <OrderEditModal order={order} onClose={() => setEditing(false)} onCreated={() => setEditing(false)}/>}
         </div>
     );
 }

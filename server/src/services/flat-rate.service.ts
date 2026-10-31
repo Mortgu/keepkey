@@ -22,16 +22,16 @@ export async function getFlatRates(filters: FlatrateFilterParams = {}) {
 }
 
 export async function getFlatRateById(id: string) {
-    const flatrate = await prisma.flatRate.findUnique({
+    const flatRate = await prisma.flatRate.findUnique({
         where: { id },
         include: { translations: true },
     });
 
-    if (!flatrate) {
+    if (!flatRate) {
         throw new AppException("Flat rate not found!", 404, "FLAT_RATE_NOT_FOUND");
     }
 
-    return flatrate;
+    return flatRate;
 }
 
 /* ========== Mutations ========== */
