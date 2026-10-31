@@ -306,7 +306,7 @@ production is not yet done (the Dockerfile ships one combined-process image).
 only the reviewer's prose. What can be confirmed from the current repo alone:
 there is no `lib/docx.test.ts` today (`find . -iname "docx.test.ts"` returns
 nothing), and the server currently has 8 `*.test.ts` files
-(`server/src/runtime/shutdown.test.ts`, `entrypoints.test.ts`,
+(`../../server/src/runtime/tests/shutdown.test.ts`, `entrypoints.test.ts`,
 `server/src/lib/document.test.ts`, `services/contract.service.test.ts`,
 `services/order-postgres.test.ts`, `services/order-source.test.ts`,
 `test/order-migration.test.ts`, `services/offer/offer-pricing.test.ts`), run

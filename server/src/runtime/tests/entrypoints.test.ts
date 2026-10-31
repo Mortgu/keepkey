@@ -61,7 +61,7 @@ describe("entry points", () => {
     });
 
     it("startApi() serves HTTP without registering a worker or connecting to Redis", async () => {
-        const { startApi } = await import("./api-runtime.js");
+        const { startApi } = await import("../api-runtime.js");
 
         const { server, shutdownSteps } = await startApi();
 
@@ -78,7 +78,7 @@ describe("entry points", () => {
     });
 
     it("startWorker() registers the worker without opening an HTTP port", async () => {
-        const { startWorker } = await import("./worker-runtime.js");
+        const { startWorker } = await import("../worker-runtime.js");
 
         const { worker, shutdownSteps } = await startWorker();
         for (const step of shutdownSteps) await step.run();

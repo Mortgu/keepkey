@@ -7,7 +7,7 @@ vi.mock("./bootstrap.js", () => ({
     isLoggerClosed: () => false,
 }));
 
-import { createShutdown } from "./shutdown.js";
+import { createShutdown } from "../shutdown.js";
 
 describe("createShutdown", () => {
     let exitSpy: ReturnType<typeof vi.spyOn>;
