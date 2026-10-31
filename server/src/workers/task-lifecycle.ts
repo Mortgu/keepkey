@@ -5,13 +5,12 @@ import logger from "@/utils/logger.js";
 import { documentTable } from "@/services/document/document-repo.js";
 import type { TaskJobData } from "./task-contract.js";
 
-/** Nur diese vier `TaskTarget`-Werte haben überhaupt eine Dokumenttabelle; `RENEWAL` nie. */
 const DOCUMENT_TYPE_BY_TARGET = {
     OFFER: "offer",
     ORDER: "order",
     CONFIRMATION: "confirmation",
     INVOICE: "invoice",
-} as const satisfies Partial<Record<TaskTarget, string>>;
+} as const satisfies Record<TaskTarget, string>;
 
 export async function markTaskRunning(taskId: string, runToken: string, target: TaskTarget): Promise<boolean> {
     return prisma.$transaction(async (tx) => {

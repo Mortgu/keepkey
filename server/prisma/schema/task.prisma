@@ -8,7 +8,6 @@ enum TaskStatus {
 enum TaskTarget {
   OFFER
   ORDER
-  RENEWAL
   INVOICE
   CONFIRMATION
 }
