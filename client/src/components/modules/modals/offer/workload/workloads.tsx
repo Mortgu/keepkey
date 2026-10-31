@@ -14,8 +14,8 @@ export default function WorkloadSection() {
 
     const { form, policy, sourceOffer, header } = useOfferModalContext();
 
-    const featureComparison = useStore(form.store, (s) => s.values.featureComparison);
-    const setFeatureComparison = (val: boolean) => form.setFieldValue("featureComparison", val);
+    const showsFeatureComparison = useStore(form.store, (s) => s.values.showsFeatureComparison);
+    const setShowsFeatureComparison = (val: boolean) => form.setFieldValue("showsFeatureComparison", val);
 
     const toCompare = useStore(form.store, (s) => s.values.toCompare);
     const setToCompare = (vals: Array<string>) => form.setFieldValue("toCompare", vals);
@@ -35,7 +35,7 @@ export default function WorkloadSection() {
 
     // Ein Angebot ohne Position gibt es nicht — die letzte bleibt stehen.
     const canRemove = policy.positions.canRemove && offerPositions.length > 1;
-    const showsComparison = policy.featureComparison === "edit";
+    const showsComparison = policy.showsFeatureComparison === "edit";
 
     return (
         <div className="grid gap-4">
@@ -47,8 +47,8 @@ export default function WorkloadSection() {
                 <div className="flex items-center gap-4">
 
                     {showsComparison && (
-                        <Checkbox label={t("offerModal.compare")} checked={featureComparison}
-                            onChange={(e) => setFeatureComparison(e.target.checked)} />
+                        <Checkbox label={t("offerModal.compare")} checked={showsFeatureComparison}
+                            onChange={(e) => setShowsFeatureComparison(e.target.checked)} />
                     )}
 
                     {policy.positions.canAdd && (
@@ -62,7 +62,7 @@ export default function WorkloadSection() {
 
             </div>
 
-            {showsComparison && featureComparison && (
+            {showsComparison && showsFeatureComparison && (
                 <MultiSelectList
                     options={compareOptions}
                     onChange={(c) => setToCompare(c)}

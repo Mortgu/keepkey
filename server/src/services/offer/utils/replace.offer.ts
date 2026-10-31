@@ -19,8 +19,8 @@ export async function replaceOfferLines(
 export async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-            offerId, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+        data: positions.map(({ productId, free_months, quantity, isOptional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+            offerId, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, isOptional,
             tariffVersionId: tariffVersionId ?? null,
         })),
     });

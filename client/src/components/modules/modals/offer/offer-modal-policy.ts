@@ -37,7 +37,7 @@ export type PositionField =
     | "productId"
     | "quantity"
     | "free_months"
-    | "optional"
+    | "isOptional"
     | "unitPrice";
 
 export interface SectionPolicy {
@@ -54,7 +54,7 @@ export interface OfferModalPolicy {
     positions: SectionPolicy & { fields: Record<PositionField, FieldAccess> };
     flatrates: SectionPolicy;
     discounts: SectionPolicy;
-    featureComparison: FieldAccess;
+    showsFeatureComparison: FieldAccess;
     /**
      * Woher die angezeigten Preise kommen. Die Erweiterung liest die angepinnte
      * Tarif-Version, weil der Server sie ebenso abrechnet — läse die UI live,
@@ -111,13 +111,13 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
                 productId: "edit",
                 quantity: "edit",
                 free_months: "edit",
-                optional: "edit",
+                isOptional: "edit",
                 unitPrice: "edit",
             },
         },
         flatrates: { access: "edit", canAdd: true, canRemove: true, startEmpty: false },
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: false },
-        featureComparison: "edit",
+        showsFeatureComparison: "edit",
         priceSource: "live",
         resetQuoteNumber: false,
     },
@@ -137,13 +137,13 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
                 productId: "readonly",
                 quantity: "edit",
                 free_months: "edit",
-                optional: "hidden",
+                isOptional: "hidden",
                 unitPrice: "hidden",
             },
         },
         flatrates: { access: "edit", canAdd: false, canRemove: true, startEmpty: false },
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: false },
-        featureComparison: "hidden",
+        showsFeatureComparison: "hidden",
         priceSource: "live",
         resetQuoteNumber: true,
     },
@@ -168,7 +168,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
                 productId: "edit",
                 quantity: "edit",
                 free_months: "edit",
-                optional: "hidden",
+                isOptional: "hidden",
                 unitPrice: "edit",
             },
         },
@@ -176,7 +176,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
         // Rabatte des Quellangebots gelten nicht automatisch für eine
         // Nachbestellung — sie starten leer und sind manuell ergänzbar.
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: true },
-        featureComparison: "hidden",
+        showsFeatureComparison: "hidden",
         priceSource: "pinned",
         resetQuoteNumber: true,
     },

@@ -26,7 +26,7 @@ const { offerTemplateSchema } = await import("../../schemas/templates/offer.temp
  * Dokument ändert — auch die Unterschiede zwischen den Zweigen mit und ohne
  * Vergleich. Nach gewollten Änderungen: `vitest -u`.
  */
-async function renderLines(options: { featureComparison: boolean }) {
+async function renderLines(options: { showsFeatureComparison: boolean }) {
     const data = offerTemplateSchema.parse(await formatOfferData(offerFixture(options)));
     const rendered = await renderDocument("OFFER", "DE", data, { documentType: "offer", documentId: "doc-1" });
     return readDocumentLines(rendered.docxBuffer).join("\n");
@@ -39,10 +39,10 @@ describe("offer.docx", () => {
     });
 
     it("mit Vergleich", async () => {
-        expect(await renderLines({ featureComparison: true })).toMatchSnapshot();
+        expect(await renderLines({ showsFeatureComparison: true })).toMatchSnapshot();
     });
 
     it("ohne Vergleich", async () => {
-        expect(await renderLines({ featureComparison: false })).toMatchSnapshot();
+        expect(await renderLines({ showsFeatureComparison: false })).toMatchSnapshot();
     });
 });

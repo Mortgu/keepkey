@@ -34,7 +34,7 @@ export async function createOffer(input: CreateOfferInput, options?: CreateOffer
             validFrom: input.validFrom,
             validUntil: input.validUntil,
             requestFrom: input.requestFrom,
-            featureComparison: input.featureComparison,
+            showsFeatureComparison: input.showsFeatureComparison,
             toCompare: input.toCompare,
         },
         positions,

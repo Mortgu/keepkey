@@ -50,7 +50,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
     const [freeMonths, setFreeMonths] = useState<number>(currentWorkload?.free_months || 0);
 
-    const [optional, setOptional] = useState<boolean>(currentWorkload?.optional || false);
+    const [isOptional, setIsOptional] = useState<boolean>(currentWorkload?.isOptional || false);
 
     const [editingPrice, setEditingPrice] = useState<boolean>(false);
     const [overrideEur, setOverrideEur] = useState<string>("");
@@ -140,7 +140,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
             productId: workload,
             quantity,
             free_months: freeMonths,
-            optional,
+            isOptional,
             total_cents: 0,
             eur_user_month: 0,
             discount_cents: 0,
@@ -265,9 +265,9 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
             <div className="flex items-center justify-between border-t border-(--border) pt-4">
                 {/* left */}
                 <div className="flex items-center gap-4">
-                    {shows("optional") && (
-                        <Checkbox label="Optional?" checked={optional}
-                            onChange={() => setOptional(!optional)} />
+                    {shows("isOptional") && (
+                        <Checkbox label="Optional?" checked={isOptional}
+                            onChange={() => setIsOptional(!isOptional)} />
                     )}
                 </div>
 

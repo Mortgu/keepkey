@@ -26,7 +26,7 @@ describe("formatOfferData", () => {
     });
 
     it("Englisch ohne Vergleich", async () => {
-        expect(await formatOfferData(fixture({ language: "EN", featureComparison: false }))).toMatchSnapshot();
+        expect(await formatOfferData(fixture({ language: "EN", showsFeatureComparison: false }))).toMatchSnapshot();
     });
 
     it("lässt eine Vergleichstabelle weg, wenn ein Preis fehlt, nicht aber die Gruppe", async () => {
@@ -65,7 +65,7 @@ describe("Angebotsmodell", () => {
     });
 
     it("stellt dasselbe Modell in der Sprache des Angebots dar und meldet fehlende Übersetzungen klar", async () => {
-        const model = await computeOfferModel(fixture({ featureComparison: false }));
+        const model = await computeOfferModel(fixture({ showsFeatureComparison: false }));
         model.contract.translations = [];
 
         expect(() => presentOffer(model)).toThrow(/No translation available for contract c-base/);
@@ -199,7 +199,7 @@ describe("Nummerierung der Offerten", () => {
 
     it("nummeriert Gruppen und Tabellen nur bei Vergleich", async () => {
         const compare = await formatOfferData(fixture());
-        const single = await formatOfferData(fixture({ featureComparison: false }));
+        const single = await formatOfferData(fixture({ showsFeatureComparison: false }));
 
         expect(compare.groups.map((g) => g.numberPrefix)).toEqual(["1. ", "2. ", "3. "]);
         expect(compare.tables.map((t) => t.numberPrefix)).toEqual(["1. ", "2. ", "3. "]);

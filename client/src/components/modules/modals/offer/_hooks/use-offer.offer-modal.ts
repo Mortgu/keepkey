@@ -47,7 +47,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
         requestFrom: currentOffer?.requestFrom || null,
         language: currentOffer?.language || "DE",
 
-        featureComparison: currentOffer?.featureComparison ?? false,
+        showsFeatureComparison: currentOffer?.showsFeatureComparison ?? false,
         toCompare: currentOffer?.toCompare ?? [],
 
         offerPositions: currentOffer?.offerPositions.map(op => ({
@@ -57,7 +57,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
             productId: op.productId,
             free_months: op.free_months,
             quantity: op.quantity,
-            optional: op.optional,
+            isOptional: op.isOptional,
             total_cents: op.total_cents,
             eur_user_month: op.eur_user_month,
             discount_cents: op.discount_cents,

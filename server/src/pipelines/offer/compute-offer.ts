@@ -71,7 +71,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
         productId: position.productId,
         quantity: position.quantity,
         free_months: position.free_months,
-        optional: position.optional ?? false,
+        optional: position.isOptional ?? false,
         ...storedPrice(position),
         translations: position.product.translations.map((t) => ({
             language: t.language,
@@ -107,7 +107,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
     ];
 
     const otherContracts = contracts.filter((c) => c.id !== offer.contractId);
-    const comparisonContracts = offer.featureComparison ? otherContracts.map(toContract) : [];
+    const comparisonContracts = offer.showsFeatureComparison ? otherContracts.map(toContract) : [];
 
     for (const contract of comparisonContracts) {
         const items: PriceTableModel["items"] = [];
@@ -142,7 +142,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
         requestFrom: iso(offer.requestFrom),
         paymentTerm: offer.paymentTerm,
         supplierId: offer.supplierId ?? null,
-        compare: offer.featureComparison,
+        compare: offer.showsFeatureComparison,
         duration_months,
 
         customer: {

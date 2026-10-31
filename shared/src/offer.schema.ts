@@ -20,7 +20,7 @@ import { userSchema } from "./user.schema.js";
 export const createOfferPositionSchema = z.object({
     productId: z.string(),
     free_months: z.number().int(),
-    optional: z.boolean(),
+    isOptional: z.boolean(),
     quantity: z.number().int(),
     total_cents: z.number().int(),
 
@@ -121,7 +121,7 @@ export const createOfferSchema = z.object({
     requestFrom: z.string().nullable(),
     language: z.enum(["EN", "DE"]),
 
-    featureComparison: z.boolean(),
+    showsFeatureComparison: z.boolean(),
     toCompare: z.array(z.string()),
 
     offerPositions: z.array(createOfferPositionSchema).min(1),
@@ -204,7 +204,7 @@ export const offerSchema = z.object({
     requestFrom: z.string().nullable().optional(),
     language: z.enum(["EN", "DE"]),
 
-    featureComparison: z.boolean(),
+    showsFeatureComparison: z.boolean(),
     toCompare: z.array(z.string()),
 
     offerPositions: z.array(offerPositionSchema),

@@ -20,7 +20,7 @@ model DocumentTemplate {
   language Language
 
   /// Frei waehlbarer Anzeigename in der Verwaltung.
-  name String
+  name     String
   /// Urspruenglicher Dateiname beim Upload — nur informativ.
   fileName String
 

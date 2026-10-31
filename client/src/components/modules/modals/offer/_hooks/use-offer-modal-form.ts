@@ -27,7 +27,7 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
             productId: position.productId,
             free_months: position.free_months,
             quantity: position.quantity,
-            optional: position.optional,
+            isOptional: position.isOptional,
             total_cents: position.total_cents,
             eur_user_month: position.eur_user_month,
             discount_cents: position.discount_cents,

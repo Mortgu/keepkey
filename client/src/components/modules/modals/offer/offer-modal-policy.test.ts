@@ -28,7 +28,7 @@ describe("resolveOfferModalPolicy", () => {
 
         expect(policy.header.duration_months).toBe("edit");
         expect(policy.flatrates.access).toBe("hidden");
-        expect(policy.featureComparison).toBe("hidden");
+        expect(policy.showsFeatureComparison).toBe("hidden");
         expect(policy.priceSource).toBe("live");
     });
 });

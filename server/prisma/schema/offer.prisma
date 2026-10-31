@@ -40,8 +40,8 @@ model Offer {
   documentVersion Int    @default(0)
   paymentTerm     String
 
-  featureComparison Boolean  @default(false)
-  toCompare         String[]
+  showsFeatureComparison Boolean  @default(false)
+  toCompare              String[]
 
   date        DateTime  @default(now())
   validFrom   DateTime?
@@ -100,7 +100,7 @@ model OfferPosition {
   /// Vertrag und Laufzeit stehen am Angebot — siehe {@link Offer}.
   free_months Int     @default(0)
   quantity    Int
-  optional    Boolean @default(false)
+  isOptional  Boolean @default(false)
 
   eur_user_month Int
   total_cents    Int

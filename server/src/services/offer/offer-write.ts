@@ -29,7 +29,7 @@ export type OfferFields = PriceHeader & {
     validFrom: string | null;
     validUntil: string | null;
     requestFrom: string | null;
-    featureComparison: boolean;
+    showsFeatureComparison: boolean;
     toCompare: string[];
 };
 
@@ -60,7 +60,7 @@ export async function persistOffer(
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
+            data: positions.map(({ productId, free_months, quantity, isOptional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
                 offerId: offer.id,
                 productId,
                 free_months,
@@ -68,7 +68,7 @@ export async function persistOffer(
                 eur_user_month,
                 total_cents,
                 discount_cents,
-                optional,
+                isOptional,
                 tariffVersionId,
             })),
         });

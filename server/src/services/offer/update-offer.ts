@@ -47,7 +47,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 validFrom: input.validFrom,
                 validUntil: input.validUntil,
                 requestFrom: input.requestFrom,
-                featureComparison: input.featureComparison,
+                showsFeatureComparison: input.showsFeatureComparison,
                 toCompare: input.toCompare,
                 net_amount,
                 version: { increment: 1 },
