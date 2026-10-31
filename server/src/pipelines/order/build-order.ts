@@ -1,5 +1,5 @@
 import type { Language } from "@prisma/client";
-import { getOrderById } from "../../services/order.service.js";
+import { getOrderById } from "../../services/order/order.service.js";
 import { orderTemplateSchema } from "../../schemas/templates/order.template.schema.js";
 import { translateFields } from "../../utils/i18n.js";
 import { formatParty } from "../../utils/party.js";

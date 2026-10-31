@@ -1,7 +1,7 @@
 import type { Language } from "@prisma/client";
 import { prisma } from "../../lib/prismaClient.js";
 import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
-import { getOrderById } from "../../services/order.service.js";
+import { getOrderById } from "../../services/order/order.service.js";
 import { translateFields } from "../../utils/i18n.js";
 import { formatParty } from "../../utils/party.js";
 import { sanitizeCompanyName } from "../../utils/documents.js";

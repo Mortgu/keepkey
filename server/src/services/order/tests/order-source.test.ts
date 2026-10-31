@@ -1,30 +1,30 @@
 import { readFile } from "node:fs/promises";
 import Docxtemplater from "docxtemplater";
 import PizZip from "pizzip";
-import { customParser } from "../pipelines/offer/utils.js";
-import { orderTemplateSchema } from "../schemas/templates/order.template.schema.js";
+import { customParser } from "../../../pipelines/offer/utils.js";
+import { orderTemplateSchema } from "../../../schemas/templates/order.template.schema.js";
 import { describe, expect, it, vi } from "vitest";
 vi.mock("../lib/prismaClient.js", () => ({ prisma: {} }));
 vi.mock("./document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
-import { presentOrder } from "./order-source.js";
-import { formatOrderData } from "../pipelines/order/build-order.js";
+import { presentOrder } from "../order-source.js";
+import { formatOrderData } from "../../../pipelines/order/build-order.js";
 import {
     parseAcceptedOfferSnapshot,
     serializeAcceptedOfferSnapshot,
-} from "../schemas/accepted-offer.js";
+} from "../../../schemas/accepted-offer.js";
 import {
     acceptOrderSchema,
     updateOrderMetadataSchema,
     metadataSnapshot,
     parseMetadataRevision,
-} from "../schemas/order-inputs.js";
+} from "../../../schemas/order-inputs.js";
 import {
     orderFixture,
     sourceFixture,
     templateFixture,
-} from "../test/order-fixtures.js";
+} from "../../../test/order-fixtures.js";
 
 describe("accepted offer order data", () => {
     it("keeps free months, offer discounts and totals when metadata changes", () => {

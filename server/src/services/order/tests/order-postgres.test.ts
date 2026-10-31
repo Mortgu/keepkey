@@ -3,19 +3,19 @@ import { randomUUID } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
-import { prisma } from "../lib/prismaClient.js";
-import { metadataSnapshot } from "../schemas/order-inputs.js";
-import { getCustomerById, getCustomers } from "./customer.service.js";
-import { getDashboardStats } from "./dashboard.service.js";
-import { assertOfferEditable } from "./offer-acceptance.service.js";
+import { prisma } from "../../../lib/prismaClient.js";
+import { metadataSnapshot } from "../../../schemas/order-inputs.js";
+import { getCustomerById, getCustomers } from "../../customer.service.js";
+import { getDashboardStats } from "../../dashboard.service.js";
+import { assertOfferEditable } from "../../offer-acceptance.service.js";
 import {
     cancelOrder,
     createOrder,
     getOrderById,
     updateOrder,
-} from "./order.service.js";
-import { search } from "./search.service.js";
-import { getSuppliers } from "./supplier.service.js";
+} from "../order.service.js";
+import { search } from "../../search.service.js";
+import { getSuppliers } from "../../supplier.service.js";
 
 const state = vi.hoisted(() => ({
     schema: `order_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,
@@ -261,7 +261,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         expect(restored.net_amount).toBe(80000);
         expect(restored.projectNumber).toBeNull();
         expect(restored.customer.companyName).toBe("Original Ltd");
-        await cancelOrder(order.id, 3, "user");
+        await cancelOrder(order.id, 3);
         await expect(
             prisma.$transaction((tx) => assertOfferEditable(tx, offer.id)),
         ).rejects.toMatchObject({ code: "OFFER_ACCEPTED" });
@@ -285,7 +285,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         const results = await search(order.orderId, "order");
         expect(results.items[0]?.id).toBe(order.id);
         const before = await getDashboardStats();
-        await cancelOrder(order.id, 1, "user");
+        await cancelOrder(order.id, 1);
         const after = await getDashboardStats();
         expect(after.totals.orders.volume_cents).toBe(
             before.totals.orders.volume_cents - 80000,

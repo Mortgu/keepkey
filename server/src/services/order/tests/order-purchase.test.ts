@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { purchaseLines, purchaseNetAmount } from "./order-purchase.js";
+import { purchaseLines, purchaseNetAmount } from "../order-purchase.js";
 
 const snapshot = [
     { id: "p1", productId: "m365", quantity: 10, free_months: 2, eur_user_month: 500 },

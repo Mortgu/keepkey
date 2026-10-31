@@ -1,17 +1,19 @@
 import { Prisma } from "@prisma/client";
-import { AppException, assertNotFrozen } from "../lib/exceptions.js";
-import { prisma } from "../lib/prismaClient.js";
-import { documentOwnerType } from "./document-repo.js";
-import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
+import { AppException, assertNotFrozen } from "../../lib/exceptions.js";
+import { prisma } from "../../lib/prismaClient.js";
+import { documentOwnerType } from "../document-repo.js";
+import { parseAcceptedOfferSnapshot } from "../../schemas/accepted-offer.js";
 import {
     acceptOrderSchema, updateOrderMetadataSchema,
     type AcceptOrderInput,
     type UpdateOrderMetadataInput
-} from "../schemas/order-inputs.js";
-import { requestOrderGeneration } from "./document-generation-request.service.js";
-import { acceptOffer } from "./offer-acceptance.service.js";
+} from "../../schemas/order-inputs.js";
+import { requestOrderGeneration } from "../document-generation-request.service.js";
+import { acceptOffer } from "../offer-acceptance.service.js";
 import { purchaseLines } from "./order-purchase.js";
 import { presentOrder } from "./order-source.js";
+import lockOrder from "@/services/order/utils/lock.order.js";
+import {invalidateOrderDocuments} from "@/services/order/utils/invalidate.order.js";
 
 const orderInclude = {
     offer: true,
@@ -27,32 +29,39 @@ export interface OrderListQuery {
     companyIds?: unknown;
 }
 export async function getAllOrders(query: OrderListQuery = {}) {
-    const raw = query.companyIds
-        ? Array.isArray(query.companyIds)
-            ? query.companyIds
-            : [query.companyIds]
-        : [];
-    if (!raw.every((id) => typeof id === "string"))
+    const raw = query.companyIds ? Array.isArray(query.companyIds)
+            ? query.companyIds : [query.companyIds] : [];
+
+    if (!raw.every((id) => typeof id === "string")) {
         throw new AppException(
             "Invalid customer filter",
             400,
             "INVALID_FILTER",
         );
+    }
+
     const ids = raw as string[];
     const where: Prisma.OrderWhereInput = ids.length
         ? { offer: { customerId: { in: ids } } }
         : {};
+
     const orders = await prisma.order.findMany({
         where,
         include: orderInclude,
         orderBy: { createdAt: "desc" },
     });
+
     return orders.map(presentOrder);
 }
 
-export async function getOrderById(id: string) {
+export async function getOrderById(orderId: string) {
     const order = await prisma.order.findFirst({
-        where: { OR: [{ id }, { offerId: id }] },
+        where: {
+            OR: [
+                { id: orderId },
+                { offerId: orderId }
+            ]
+        },
         include: orderInclude,
     });
 
@@ -63,17 +72,9 @@ export async function getOrderById(id: string) {
     return presentOrder(order);
 }
 
-/** A suggestion, not a reservation. The unique constraint rejects concurrent duplicates. */
-export async function getNextOrderNumber(): Promise<string> {
-    const prefix = `AB-${new Date().getFullYear()}-`;
-    const [row] = await prisma.$queryRaw<{ next: bigint }[]>`
-        SELECT COALESCE(MAX(substring("orderId" from '[0-9]+$')::bigint), 0) + 1 AS next
-        FROM "order" WHERE "orderId" ~ ${`^${prefix}[0-9]+$`}
-    `;
-    return `${prefix}${String(row?.next ?? 1).padStart(3, "0")}`;
-}
 export async function createOrder(input: AcceptOrderInput, actorId: string) {
     const data = acceptOrderSchema.parse(input);
+
     return prisma.$transaction(
         async (tx) => {
             const acceptedAt = await acceptOffer(
@@ -81,9 +82,9 @@ export async function createOrder(input: AcceptOrderInput, actorId: string) {
                 data.id,
                 data.expectedOfferVersion,
             );
-            // Der Snapshot ist soeben entstanden — die Einkaufszeilen beziehen
-            // sich auf genau diese Positionen.
+
             const lines = await purchaseLinesForOffer(tx, data.id, data.positions);
+
             return tx.order.create({
                 data: {
                     offerId: data.id,
@@ -102,41 +103,17 @@ export async function createOrder(input: AcceptOrderInput, actorId: string) {
         { timeout: 30_000 },
     );
 }
+
 /** Einkaufszeilen gegen den Accepted-Snapshot des Angebots rechnen und prüfen. */
-async function purchaseLinesForOffer(
-    tx: Prisma.TransactionClient,
-    offerId: string,
-    input: Parameters<typeof purchaseLines>[1],
-) {
+async function purchaseLinesForOffer(tx: Prisma.TransactionClient, offerId: string, input: Parameters<typeof purchaseLines>[1]) {
     const offer = await tx.offer.findUniqueOrThrow({
         where: { id: offerId },
         select: { acceptedSnapshot: true },
     });
-    const source = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
-    return purchaseLines(source.positions, input, source.duration_months);
-}
-async function lockOrder(
-    tx: Prisma.TransactionClient,
-    id: string,
-    expectedVersion: number,
-) {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${id}`}))::text AS "lock"`;
-    const order = await tx.order.findUniqueOrThrow({ where: { id } });
-    if (order.version !== expectedVersion)
-        throw new AppException(
-            "The order changed. Reload it.",
-            409,
-            "VERSION_CONFLICT",
-        );
-    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot be changed.");
-    return order;
-}
 
-async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string) {
-    await tx.document.updateMany({
-        where: { type: documentOwnerType("order"), orderId, isCurrent: true },
-        data: { isCurrent: false },
-    });
+    const source = parseAcceptedOfferSnapshot(offer.acceptedSnapshot);
+
+    return purchaseLines(source.positions, input, source.duration_months);
 }
 
 export async function updateOrder(id: string, input: UpdateOrderMetadataInput, actorId: string) {
@@ -160,21 +137,25 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, a
             },
         });
 
-        await invalidateDocuments(tx, id);
+        await invalidateOrderDocuments(tx, id);
         return order;
     });
 }
 
-
-export async function cancelOrder(id: string, expectedVersion: number, actorId: string) {
+export async function cancelOrder(orderId: string, expectedVersion: number) {
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
+        await lockOrder(tx, orderId, expectedVersion);
 
         const order = await tx.order.update({
-            where: { id },
-            data: { cancelledAt: new Date(), version: { increment: 1 } },
+            where: { id: orderId },
+            data: {
+                cancelledAt: new Date(),
+                version: { increment: 1 }
+            },
         });
-        await invalidateDocuments(tx, id);
+
+        await invalidateOrderDocuments(tx, orderId);
+
         return order;
     });
 }
@@ -188,7 +169,11 @@ export async function generateOrderDocument(orderId: string) {
         where: { id: orderId },
     });
 
-    assertNotFrozen(order.cancelledAt, "ORDER_CANCELLED", "Cancelled orders cannot generate documents.");
+    assertNotFrozen(
+        order.cancelledAt,
+        "ORDER_CANCELLED",
+        "Cancelled orders cannot generate documents."
+    );
 
     return requestOrderGeneration(orderId);
 }

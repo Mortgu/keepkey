@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prismaClient.js";
-import { getOrderById } from "../../services/order.service.js";
+import { getOrderById } from "../../services/order/order.service.js";
 import { sanitizeCompanyName } from "../../utils/documents.js";
 import { formatCentsToEur, formatDate, formatPercent } from "../../utils/utils.js";
 import { confirmationTemplateSchema } from "../../schemas/templates/confirmation.template.schema.js";

@@ -11,7 +11,6 @@ import {
     getAllOrders,
     getConfirmation,
     getInvoice,
-    getNextOrderNumber,
     getOrderById,
     regenerateConfirmation,
     regenerateInvoice,
@@ -29,8 +28,6 @@ import { Router } from "express";
 const router = Router();
 
 router.get("/", validateQuery(orderFilterSchema), getAllOrders);
-
-router.get("/next-number", getNextOrderNumber);
 
 router.get("/:orderId", validateParams(orderIdParamsSchema), getOrderById);
 

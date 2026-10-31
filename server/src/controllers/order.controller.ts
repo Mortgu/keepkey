@@ -1,18 +1,13 @@
 import { NextFunction, Request, Response } from "express";
 import { AppException } from "../lib/exceptions.js";
 
-import * as orderService from "../services/order.service.js";
+import * as orderService from "../services/order/order.service.js";
 
 /* ========== GET ========== */
 
 export const getAllOrders = async (request: Request, response: Response) => {
     const orders = await orderService.getAllOrders(request.query);
     return response.status(200).json(orders);
-};
-
-export const getNextOrderNumber = async (request: Request, response: Response) => {
-    const orderId = await orderService.getNextOrderNumber();
-    return response.status(200).json({ orderId });
 };
 
 export const getOrderById = async (request: Request, response: Response) => {

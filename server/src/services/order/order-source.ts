@@ -1,6 +1,6 @@
 import type { Order, OrderPosition, Prisma } from "@prisma/client";
 import type { SupplierPosition } from "@keepit/schemas";
-import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
+import { parseAcceptedOfferSnapshot } from "../../schemas/accepted-offer.js";
 import { purchaseNetAmount } from "./order-purchase.js";
 
 export type OrderWithSource = Order & {

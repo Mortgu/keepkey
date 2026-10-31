@@ -1,5 +1,5 @@
 import type { PurchasePositionInput } from "@keepit/schemas";
-import { AppException } from "../lib/exceptions.js";
+import { AppException } from "../../lib/exceptions.js";
 
 /** Das Nötigste aus einer Snapshot-Position, um den Einkauf zu rechnen. */
 export type SnapshotPositionForPurchase = {
@@ -43,6 +43,7 @@ export function purchaseLines(
     const expected = new Set(snapshotPositions.map((p) => p.id));
     const unknown = input.find((p) => !expected.has(p.offerPositionId));
     const missing = snapshotPositions.find((p) => !byId.has(p.id));
+
     if (unknown || missing) {
         throw new AppException(
             "Purchase prices must cover exactly the positions of the accepted offer.",
