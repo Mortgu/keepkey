@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prismaClient.js";
-import { requestOfferGeneration } from "../document-generation-request.service.js";
+import { requestOfferGeneration } from "../document/document-generation-request.service.js";
 import { generateOfferDisplayName } from "../../utils/documents.js";
 import { pickTranslation } from "../../utils/i18n.js";
 

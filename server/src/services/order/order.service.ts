@@ -1,15 +1,15 @@
 import { Prisma } from "@prisma/client";
 import { AppException, assertNotFrozen } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
-import { documentOwnerType } from "../document-repo.js";
+import { documentOwnerType } from "../document/document-repo.js";
 import { parseAcceptedOfferSnapshot } from "../../schemas/accepted-offer.js";
 import {
     acceptOrderSchema, updateOrderMetadataSchema,
     type AcceptOrderInput,
     type UpdateOrderMetadataInput
 } from "../../schemas/order-inputs.js";
-import { requestOrderGeneration } from "../document-generation-request.service.js";
-import { acceptOffer } from "../offer-acceptance.service.js";
+import { requestOrderGeneration } from "../document/document-generation-request.service.js";
+import { acceptOffer } from "../offer/offer-acceptance.service.js";
 import { purchaseLines } from "./order-purchase.js";
 import { presentOrder } from "./order-source.js";
 import lockOrder from "@/services/order/utils/lock.order.js";

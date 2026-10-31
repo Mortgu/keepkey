@@ -1,6 +1,6 @@
-import { assertOfferEditable } from "../offer-acceptance.service.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
 import { prisma } from "../../lib/prismaClient.js";
-import { documentOwnerType } from "../document-repo.js";
+import { documentOwnerType } from "../document/document-repo.js";
 import { AppException } from "../../lib/exceptions.js";
 
 export async function deleteOffer(id: string): Promise<void> {

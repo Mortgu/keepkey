@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as contractService from "../services/contract.service.js";
+import * as contractService from "../services/contract/contract.service.js";
 
 /* ========== GET ========== */
 

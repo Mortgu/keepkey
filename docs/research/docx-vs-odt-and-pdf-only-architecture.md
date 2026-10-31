@@ -35,7 +35,7 @@ Business/product calls that this research cannot settle are listed at the end.
   (`createReplacementUpload`, `confirmReplacementUpload`, `inspectReplacement`)
   orchestrates the upload-a-new-docx flow, including re-converting the
   replacement to PDF.
-- **Template storage**: `server/src/services/document-template.service.ts`
+- **Template storage**: `../../server/src/services/document/document-template.service.ts`
   stores uploaded `.docx` templates in object storage keyed
   `templates/<kind>/<uuid>.docx`, one active template per
   `(DocumentTemplateKind, Language)`, with a legacy on-disk fallback
@@ -345,7 +345,7 @@ replacements/adoptions:
   uploaded *templates*, which remain `.docx` under this option.
 - `server/src/lib/docx-to-pdf.ts` (`convertDocxToPdf`) — still needed; see
   3.2, this is the crux of the "does PDF-only remove LibreOffice" question.
-- `server/src/services/document-template.service.ts` — template storage is
+- `../../server/src/services/document/document-template.service.ts` — template storage is
   unaffected; templates are still uploaded, stored, and activated per
   kind/language.
 - `warnOnTemplateDrift` in `render-document.ts` — drift detection is about
@@ -485,7 +485,7 @@ These are business/product calls this research cannot settle from docs alone:
   `8547620c` base per `graphify-out/GRAPH_REPORT.md`):
   `server/src/lib/render-document.ts`, `docx.ts`, `docx-to-pdf.ts`,
   `docx-controls.ts`, `docx-text.ts`, `docx-provenance.ts`,
-  `replacement-check.ts`, `server/src/services/document-template.service.ts`,
+  `replacement-check.ts`, `../../server/src/services/document/document-template.service.ts`,
   `server/src/services/offer/adopt-document-changes.ts`,
   `server/src/services/document/document-lifecycle.ts`,
   `server/src/services/document/document-replacement.ts`,

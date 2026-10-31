@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as service from "../services/contact-person.service.js";
+import * as service from "../services/customer/contact-person.service.js";
 
 /* ========== GET ========== */
 

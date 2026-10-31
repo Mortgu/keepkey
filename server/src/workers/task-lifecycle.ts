@@ -2,7 +2,7 @@ import { DocumentStatus, TaskStatus, type TaskTarget } from "@prisma/client";
 import type { Job } from "bullmq";
 import { prisma } from "@/lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import { documentTable } from "@/services/document-repo.js";
+import { documentTable } from "@/services/document/document-repo.js";
 import type { TaskJobData } from "./task-contract.js";
 
 /** Nur diese vier `TaskTarget`-Werte haben überhaupt eine Dokumenttabelle; `RENEWAL` nie. */

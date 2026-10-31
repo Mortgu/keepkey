@@ -3,7 +3,7 @@ import type { Prisma } from "@prisma/client";
 
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
-import { presentAcceptedOffer } from "../accepted-offer-view.js";
+import { presentAcceptedOffer } from "./accepted-offer-view.js";
 
 /**
  * Schlanke Order-Teilansicht fürs Angebot — nur Status, keine Artefakte.

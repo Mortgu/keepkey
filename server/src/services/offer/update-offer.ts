@@ -1,8 +1,8 @@
 import { UpdateOfferInput } from '@keepit/schemas';
 
 import { prisma } from "../../lib/prismaClient.js";
-import { assertOfferEditable } from "../offer-acceptance.service.js";
-import { assertStandardDuration } from "../tariff.service.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
+import { assertStandardDuration } from "../contract/tariff.service.js";
 import { calculateNetAmount, priceFlatrates, pricePositions } from "./offer-pricing.js";
 import {
     assertExpectedVersion,

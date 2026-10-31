@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as productService from "../services/product.service.js";
+import * as productService from "../services/product/product.service.js";
 import { productListSchema, productSchema, workloadFilterSchema } from "@keepit/schemas";
 
 /*

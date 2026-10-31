@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as tariffService from "../services/tariff.service.js";
+import * as tariffService from "../services/contract/tariff.service.js";
 
 /* ========== GET ========== */
 

@@ -23,7 +23,7 @@ import { sha256Document } from "../../lib/nextcloud-document-store.js";
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentCapabilities, DocumentFormatParam, DocumentType, ReplacementWarning } from "@keepit/schemas";
-import { documentTable } from "../document-repo.js";
+import { documentTable } from "./document-repo.js";
 
 /** Kurz genug, dass eine gesetzte CORS-Regel zügig sichtbar wird. */
 const CAPABILITIES_TTL_MS = 60_000;

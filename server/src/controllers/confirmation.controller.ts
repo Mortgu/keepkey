@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as confirmationService from "../services/confirmation.service.js";
+import * as confirmationService from "../services/confirmation/confirmation.service.js";
 
 export const getConfirmation = async (request: Request, response: Response) => {
     const confirmation = await confirmationService.getConfirmationByOrder(request.params.orderId as string);

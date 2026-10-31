@@ -4,7 +4,7 @@ import PizZip from "pizzip";
 import type { DocumentTemplateKind, Language } from "@prisma/client";
 import { z } from "zod";
 import logger from "@/utils/logger.js";
-import { loadTemplateForRendering } from "../services/document-template.service.js";
+import { loadTemplateForRendering } from "../services/document/document-template.service.js";
 import { customParser, deepIterate } from "../pipelines/offer/utils.js";
 import { convertDocxToPdf } from "./docx-to-pdf.js";
 import { hashModel, writeProvenance } from "./docx-provenance.js";

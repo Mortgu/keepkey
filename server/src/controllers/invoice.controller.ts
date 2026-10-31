@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import * as invoiceService from "../services/invoice.service.js";
+import * as invoiceService from "../services/invoice/invoice.service.js";
 
 export const getAllInvoices = async (request: Request, response: Response) => {
     const invoices = await invoiceService.getAllInvoices(request.query);

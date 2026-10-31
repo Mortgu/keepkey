@@ -2,7 +2,7 @@ import { OfferDerivationType, Prisma } from "@prisma/client";
 
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
-import { documentOwnerType } from "../document-repo.js";
+import { documentOwnerType } from "../document/document-repo.js";
 
 import {
     calculateNetAmount,

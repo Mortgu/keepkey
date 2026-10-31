@@ -10,7 +10,7 @@ import {
     replaceDocumentTemplateContent,
     uploadDocumentTemplate,
 } from "@/controllers/index.js";
-import { DOCX_MIME } from "@/services/document-template.service.js";
+import { DOCX_MIME } from "@/services/document/document-template.service.js";
 import { validate, validateParams, validateQuery } from "@/middlewares/zod.middleware.js";
 import {
     documentTemplateParamsSchema,

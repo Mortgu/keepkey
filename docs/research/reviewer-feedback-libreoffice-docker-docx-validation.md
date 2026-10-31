@@ -180,7 +180,7 @@ it.
 
 **Verdict: Confirmed on all three sub-claims; the quoted error message format is close but not verified as an exact string from this repo's docxtemplater version.**
 
-1. **Accepted at upload/save**: `server/src/services/document-template.service.ts`
+1. **Accepted at upload/save**: `../../server/src/services/document/document-template.service.ts`
    — both `createTemplate` (upload) and `replaceTemplateContent` (save from
    the DOCX editor) call only `assertDocxBuffer(content)` (line 69 and 104).
    `assertDocxBuffer` itself (`server/src/lib/docx.ts`) checks only the ZIP
@@ -348,7 +348,7 @@ without the patch itself.
   `server/src/pipelines/pipeline.ts`, `server/src/workers/task-worker.ts`,
   `server/src/workers/task-contract.ts`, `server/src/workers/task-lifecycle.ts`,
   `server/src/runtime/worker-runtime.ts`, `server/src/lib/redis.ts`,
-  `server/src/lib/env.ts`, `server/src/services/document-template.service.ts`,
+  `server/src/lib/env.ts`, `../../server/src/services/document/document-template.service.ts`,
   `server/package.json`, `docker-entrypoint.sh`,
   `node_modules/libreoffice-convert/index.js` (installed v1.8.1 source,
   resolved from the workspace root)

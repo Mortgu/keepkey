@@ -4,7 +4,7 @@ import { createHash } from "node:crypto";
 import type { DocumentTemplateKind, Language } from "@prisma/client";
 import env from "../src/lib/env.js";
 import { prisma } from "../src/lib/prismaClient.js";
-import { createTemplate, setActiveTemplate } from "../src/services/document-template.service.js";
+import { createTemplate, setActiveTemplate } from "../src/services/document/document-template.service.js";
 
 /**
  * Übernimmt die mitgelieferten Vorlagen aus `TEMPLATES_DIR` in den

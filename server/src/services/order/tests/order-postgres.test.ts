@@ -5,9 +5,9 @@ import pg from "pg";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { prisma } from "../../../lib/prismaClient.js";
 import { metadataSnapshot } from "../../../schemas/order-inputs.js";
-import { getCustomerById, getCustomers } from "../../customer.service.js";
+import { getCustomerById, getCustomers } from "../../customer/customer.service.js";
 import { getDashboardStats } from "../../dashboard.service.js";
-import { assertOfferEditable } from "../../offer-acceptance.service.js";
+import { assertOfferEditable } from "../../offer/offer-acceptance.service.js";
 import {
     cancelOrder,
     createOrder,
@@ -15,7 +15,7 @@ import {
     updateOrder,
 } from "../order.service.js";
 import { search } from "../../search.service.js";
-import { getSuppliers } from "../../supplier.service.js";
+import { getSuppliers } from "../../supplier/supplier.service.js";
 
 const state = vi.hoisted(() => ({
     schema: `order_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,

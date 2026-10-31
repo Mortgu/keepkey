@@ -1,8 +1,8 @@
 import { parseAcceptedOfferTemplate } from "../../schemas/accepted-offer.js";
 
 import { prisma } from "@/lib/prismaClient.js";
-import { contractOrderBy } from "@/services/contract.service.js";
-import { presentAcceptedOffer } from "@/services/accepted-offer-view.js";
+import { contractOrderBy } from "@/services/contract/contract.service.js";
+import { presentAcceptedOffer } from "@/services/offer/accepted-offer-view.js";
 import { OfferTemplate, offerTemplateSchema } from "@/schemas/templates/offer.template.schema.js";
 import { pickTranslation } from "@/utils/i18n.js";
 import { generateOfferDisplayName } from "@/utils/documents.js";

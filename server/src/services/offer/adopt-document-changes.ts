@@ -6,8 +6,8 @@ import { offerAdoptions } from "../../pipelines/offer/offer-adoption.js";
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
 import type { DocumentType } from "@keepit/schemas";
-import { documentOwnerType, documentTable } from "../document-repo.js";
-import { assertOfferEditable } from "../offer-acceptance.service.js";
+import { documentOwnerType, documentTable } from "../document/document-repo.js";
+import { assertOfferEditable } from "./offer-acceptance.service.js";
 
 /**
  * Übernimmt abweichende Feldwerte aus der abgelegten DOCX ins Angebot.

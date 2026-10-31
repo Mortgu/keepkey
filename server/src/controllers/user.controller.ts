@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import { AppException } from "../lib/exceptions.js";
 
-import * as userService from "../services/user.service.js";
+import * as userService from "../services/user/user.service.js";
 import { userListSchema, userSchema } from "@keepit/schemas";
 
 /* ========== GET ========== */

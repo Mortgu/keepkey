@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 
-import * as templateService from "../services/document-template.service.js";
+import * as templateService from "../services/document/document-template.service.js";
 import { uploadDocumentTemplateQuerySchema } from "@/schemas/document-template-schemas.js";
 
 export const getDocumentTemplates = async (_request: Request, response: Response) => {

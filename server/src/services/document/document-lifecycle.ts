@@ -15,8 +15,8 @@ import {
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
 import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
-import { uploadGeneratedDocument } from "../document-upload.service.js";
-import { documentTable } from "../document-repo.js";
+import { uploadGeneratedDocument } from "./document-upload.service.js";
+import { documentTable } from "./document-repo.js";
 
 export type RenameDocumentInput = { displayName: string };
 
