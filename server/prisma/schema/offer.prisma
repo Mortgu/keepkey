@@ -1,5 +1,9 @@
+/// Art, auf die ein Angebot aus einem anderen abgeleitet wurde.
+/// `null` bedeutet: eigenstaendig erstellt.
 enum OfferDerivationType {
+  /// Verlaengerung — rechnet zum aktuellen Tarif neu
   RENEWAL
+  /// Lizenzerweiterung — behaelt den Preis der Quellposition
   LICENSE_EXTENSION
 }
 
@@ -20,12 +24,19 @@ model Offer {
 
   language Language @default(DE)
 
+  /// Vertrag und Laufzeit des Angebots. Sie gelten für alle Positionen
+  /// gemeinsam: fachlich hat ein Angebot genau einen Vertrag und genau eine
+  /// Laufzeit. Vorher hing beides an jeder Position, wodurch ein Angebot keine
+  /// eindeutige Laufzeit hatte — und damit keine bestimmbare Restlaufzeit.
   contract   Contract @relation(fields: [contractId], references: [id])
   contractId String
 
   duration_months Int
 
+  /// Belegnummer. Eindeutig — bei Rechnungsnummern in DE auch rechtlich
+  /// geboten (Eindeutigkeit); Lückenlosigkeit sichert der Vergabeprozess.
   quoteId         String @unique // quoteId / voucherId
+  /// @openapi.ignore
   documentVersion Int    @default(0)
   paymentTerm     String
 
@@ -39,13 +50,17 @@ model Offer {
 
   offerFlatRates OfferFlatRate[]
   offerPositions OfferPosition[]
-  offerDocuments OfferDocument[]
+  offerDocuments Document[]
 
   orders Order?
 
+  /// Dauerhafte Annahmesperre, unabhängig vom Lebenszyklus der Bestellung.
   acceptedAt       DateTime? @db.Timestamptz(6)
+  /// Versioniertes Dokumentdaten-Abbild einschließlich Stammdaten und Texten.
   acceptedSnapshot Json?
 
+  /// Quellangebot, aus dem dieses abgeleitet wurde — fuer Verlaengerung
+  /// und Lizenzerweiterung gleichermassen. `derivationType` unterscheidet beide.
   renewedFromOfferId String?
   renewedFrom        Offer?               @relation("OfferRenewals", fields: [renewedFromOfferId], references: [id], onDelete: SetNull)
   renewals           Offer[]              @relation("OfferRenewals")
@@ -77,9 +92,12 @@ model OfferPosition {
   product   Product @relation(fields: [productId], references: [id])
   productId String
 
+  /// Eingefrorene Preisgrundlage dieser Position. Null bei Bestandspositionen,
+  /// die vor Einfuehrung der Tarif-Versionierung angelegt wurden.
   tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
   tariffVersionId String?
 
+  /// Vertrag und Laufzeit stehen am Angebot — siehe {@link Offer}.
   free_months Int     @default(0)
   quantity    Int
   optional    Boolean @default(false)
@@ -112,36 +130,6 @@ model OfferFlatRate {
   @@index([offerId])
   @@index([flatRateId])
   @@map("offer_flat_rate")
-}
-
-model OfferDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  uploadToken String?
-
-  model Json?
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  artifacts DocumentArtifact[] @relation("OfferDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([offerId, version])
-  @@map("offer_document")
 }
 
 model OfferDiscount {

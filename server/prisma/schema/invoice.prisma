@@ -16,6 +16,8 @@ model Invoice {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   orderId String @unique
 
+  /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
+  /// `offer.netAmount`, der Satz aus dem Formular (Default: Kundensatz).
   taxRate    Float
   netCents   Int
   vatCents   Int
@@ -27,7 +29,7 @@ model Invoice {
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
 
-  documents InvoiceDocument[]
+  documents Document[]
 
   /// @openapi.ignore
   documentVersion Int @default(0)
@@ -38,43 +40,4 @@ model Invoice {
   @@index([customerId])
   @@index([createdById])
   @@map("invoice")
-}
-
-/// Dieselben Spalten wie die anderen Dokumenttabellen (siehe
-/// `ConfirmationDocument`) — Versionierung wie dort: jede Generierung legt
-/// eine neue Version an, keine wird automatisch gelöscht. `sourceVersion`
-/// bleibt immer `null`, da die Rechnungskonditionen ab Anlage unveränderlich
-/// sind.
-model InvoiceDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  /// @openapi.ignore
-  uploadToken String?
-
-  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
-  /// @openapi.ignore
-  model Json?
-
-  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
-  invoiceId String
-
-  artifacts DocumentArtifact[] @relation("InvoiceDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([invoiceId, version])
-  @@index([invoiceId])
-  @@map("invoice_document")
 }
