@@ -11,12 +11,12 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: false,
-    include: ["src/**/*.test.ts"],
-    setupFiles: ["src/test/setup.ts"],
+    include: ["src/**/*.tests.ts"],
+    setupFiles: ["src/tests/setup.ts"],
     coverage: {
       provider: "v8",
       include: ["src/**/*.ts"],
-      exclude: ["src/**/*.test.ts", "src/server.ts", "src/api.ts", "src/worker.ts", "src/routes/**"],
+      exclude: ["src/**/*.tests.ts", "src/server.ts", "src/api.ts", "src/worker.ts", "src/routes/**"],
     },
   },
 });

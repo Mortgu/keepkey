@@ -33,7 +33,7 @@ beforeAll(async () => {
     }
     await db.exec(`
         INSERT INTO "user" (id, name, salutation, "firstName", "lastName", email, "emailVerified", "createdAt", "updatedAt")
-            VALUES ('user', 'Test User', '', 'Test', 'User', 'test@example.com', false, now(), now());
+            VALUES ('user', 'Test User', '', 'Test', 'User', 'tests@example.com', false, now(), now());
         INSERT INTO customer (id, "companyName", "taxRate", "updatedAt") VALUES ('customer', 'Original Ltd', 19, now());
         INSERT INTO contact_person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());

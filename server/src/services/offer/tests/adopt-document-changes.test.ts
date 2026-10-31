@@ -87,7 +87,7 @@ describe("adoptChanges", () => {
         offerUpdate.mockResolvedValue({ version: 5 });
         // `vi.clearAllMocks()` only clears call history, not an implementation
         // set via `mockRejectedValue`/`mockResolvedValue` — reset explicitly so
-        // one test's override can't leak into the next.
+        // one tests's override can't leak into the next.
         assertOfferEditable.mockResolvedValue(undefined);
     });
 

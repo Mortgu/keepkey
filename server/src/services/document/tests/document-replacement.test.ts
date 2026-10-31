@@ -178,7 +178,7 @@ describe("confirmReplacementUpload bei Angeboten", () => {
         getDocumentArtifact.mockResolvedValue(offerDocx({ text: "14 Tage" }));
         assertEditable.mockResolvedValue(undefined);
         // Übernahmefähigkeit selbst ist Sache von `canAdopt` (getestet
-        // in document-repo.test.ts) — hier zählt nur, dass ihr Ergebnis
+        // in document-repo.tests.ts) — hier zählt nur, dass ihr Ergebnis
         // korrekt ins `adoptable`-Flag durchgereicht wird.
         canAdopt.mockResolvedValue(true);
     });
@@ -291,10 +291,10 @@ describe("getDocumentCapabilities", () => {
 
     beforeEach(() => {
         vi.clearAllMocks();
-        // Monotonically advances past whatever cache the previous test left
-        // behind — re-calling `useFakeTimers()` per test would instead reset
+        // Monotonically advances past whatever cache the previous tests left
+        // behind — re-calling `useFakeTimers()` per tests would instead reset
         // the clock back to the same starting point every time, letting an
-        // earlier test's cached result win forever.
+        // earlier tests's cached result win forever.
         vi.advanceTimersByTime(61_000);
         browserEndpointIssue.mockReturnValue(null);
         isS3Available.mockResolvedValue(true);

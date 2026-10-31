@@ -24,7 +24,7 @@ import {
     orderFixture,
     sourceFixture,
     templateFixture,
-} from "../../../test/order-fixtures.js";
+} from "@/tests/order-fixtures.js";
 
 describe("accepted offer order data", () => {
     it("keeps free months, offer discounts and totals when metadata changes", () => {

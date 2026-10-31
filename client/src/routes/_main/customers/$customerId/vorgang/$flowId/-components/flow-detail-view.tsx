@@ -61,12 +61,11 @@ export function cancelledStageShell(stage: FlowStage): ReactNode | null {
     return stage.state === "cancelled" ? <StageShell stage={stage} /> : null;
 }
 
-export default function FlowDetailView({ offer, order, confirmation, invoice, customer }: {
+export default function FlowDetailView({ offer, order, confirmation, invoice }: {
     offer: Offer;
     order: Order | null;
     confirmation: Confirmation | null;
     invoice: Invoice | null;
-    customer: Customer | undefined;
 }) {
     const stages = deriveStages(offer);
     const [offerStage, orderStage, confirmationStage, invoiceStage] = stages;

@@ -53,7 +53,7 @@ Läuft automatisch im `server build`-Skript (`prebuild`) und im Dockerfile.
 
 ```bash
 pnpm -r build
-pnpm -r test
+pnpm -r tests
 pnpm -r lint
 ```
 
@@ -62,9 +62,9 @@ pnpm -r lint
 ## Einzelnen Workspace testen / starten
 
 ```bash
-pnpm --filter server test
-pnpm --filter client test
-pnpm --filter @keepit/schemas test
+pnpm --filter server tests
+pnpm --filter client tests
+pnpm --filter @keepit/schemas tests
 
 pnpm --filter client dev        # vite
 pnpm --filter server dev        # nodemon + tsx

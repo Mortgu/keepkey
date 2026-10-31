@@ -15,7 +15,7 @@ jobs:
     timeout-minutes: 15
 
     services:
-      # Echte Postgres-Instanz für die Annahme-/Locking-Tests (order-postgres.test.ts).
+      # Echte Postgres-Instanz für die Annahme-/Locking-Tests (order-postgres.tests.ts).
       # Die Tests legen je Lauf ein eigenes Schema an und räumen es wieder ab.
       postgres:
         image: postgres:16
@@ -59,4 +59,4 @@ jobs:
         run: pnpm lint
 
       - name: Tests
-        run: pnpm test
+        run: pnpm tests

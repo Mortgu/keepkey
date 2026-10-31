@@ -2,14 +2,15 @@ import { prisma } from "@/lib/prismaClient.js";
 import { documentOwnerType } from "../document/document-repo.js";
 import { AppException } from "@/lib/exceptions.js";
 import {assertOfferEditable} from "@/services/offer/utils/assert.offer.js";
+import lockOffer from "@/services/offer/utils/lock.offer.js";
 
-export async function deleteOffer(id: string): Promise<void> {
+export async function deleteOffer(offerId: string): Promise<void> {
     await prisma.$transaction(async (tx) => {
-        await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-generation:${id}`}))::text AS "lock"`;
+        await lockOffer(tx, offerId);
 
-        await assertOfferEditable(tx, id);
+        await assertOfferEditable(tx, offerId);
 
-        if (await tx.document.count({ where: { type: documentOwnerType("offer"), offerId: id } }) > 0) {
+        if (await tx.document.count({ where: { type: documentOwnerType("offer"), offerId: offerId } }) > 0) {
             throw new AppException(
                 "Offers with document history cannot be deleted.",
                 409,
@@ -17,6 +18,6 @@ export async function deleteOffer(id: string): Promise<void> {
             );
         }
 
-        await tx.offer.delete({ where: { id } });
+        await tx.offer.delete({ where: { id: offerId } });
     });
 }

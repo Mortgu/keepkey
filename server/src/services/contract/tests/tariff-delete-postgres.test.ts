@@ -51,7 +51,7 @@ integration("removing price tables (real PostgreSQL)", () => {
         await prisma.user.create({
             data: {
                 id: "user", name: "Test User", salutation: "", firstName: "Test", lastName: "User",
-                email: "test@example.com", emailVerified: false, createdAt: new Date(), updatedAt: new Date(),
+                email: "tests@example.com", emailVerified: false, createdAt: new Date(), updatedAt: new Date(),
             },
         });
         await prisma.customer.create({ data: { id: "customer", companyName: "Original Ltd", language: "EN", taxRate: 19 } });

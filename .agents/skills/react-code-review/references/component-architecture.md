@@ -15,7 +15,7 @@ function UserListContainer() {
   return <UserList users={users} filter={filter} onFilterChange={setFilter} />;
 }
 
-// Presentational: Pure rendering, easy to test
+// Presentational: Pure rendering, easy to tests
 function UserList({
   users,
   filter,

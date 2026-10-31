@@ -6,7 +6,7 @@ vi.mock("../lib/env.js", () => ({
         LOG_LEVEL: "error",
         TEMPLATES_DIR: "assets/templates",
         GOTENBERG_URL: "http://127.0.0.1:1",
-        DATABASE_URL: "postgresql://test:test@127.0.0.1:1/test",
+        DATABASE_URL: "postgresql://tests:tests@127.0.0.1:1/tests",
         WORKER_CONCURRENCY: 1,
         // Port 1 ist geschlossen — Redis-Zugriffe scheitern, statt irgendwohin zu verbinden.
         REDIS_URL: "redis://127.0.0.1:1",

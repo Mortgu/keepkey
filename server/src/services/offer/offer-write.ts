@@ -61,7 +61,14 @@ export async function persistOffer(
 
         await tx.offerPosition.createMany({
             data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-                offerId: offer.id, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+                offerId: offer.id,
+                productId,
+                free_months,
+                quantity,
+                eur_user_month,
+                total_cents,
+                discount_cents,
+                optional,
                 tariffVersionId,
             })),
         });
@@ -69,7 +76,10 @@ export async function persistOffer(
         if (flatrates.length > 0) {
             await tx.offerFlatRate.createMany({
                 data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
-                    offerId: offer.id, flatRateId, quantity, total_cents,
+                    offerId: offer.id,
+                    flatRateId,
+                    quantity,
+                    total_cents,
                 })),
             });
         }

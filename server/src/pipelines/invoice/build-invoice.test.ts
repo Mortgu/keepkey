@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { orderFixture } from "../../test/order-fixtures.js";
+import { orderFixture } from "@/tests/order-fixtures.js";
 import { presentOrder } from "../../services/order/order-source.js";
 import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
 import { formatEur } from "../../utils/utils.js";

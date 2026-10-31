@@ -31,7 +31,7 @@ export default defineConfig([
   {
     // Sichtbare Texte gehören in locales/ — vorerst Warnung, bis der Bestand übersetzt ist.
     files: ["src/**/*.tsx"],
-    ignores: ["src/routes/dev/**", "**/*.test.tsx"],
+    ignores: ["src/routes/dev/**", "**/*.tests.tsx"],
     plugins: { i18next },
     rules: {
       "i18next/no-literal-string": ["warn", {
@@ -53,7 +53,7 @@ export default defineConfig([
     // Komponenten formatieren über useFormatters(): nur so ist die Sprache eine
     // Eingabe, und ein Sprachwechsel formatiert bereits gerenderte Ansichten neu.
     files: ["src/**/*.tsx"],
-    ignores: ["**/*.test.tsx"],
+    ignores: ["**/*.tests.tsx"],
     rules: {
       "no-restricted-imports": ["error", {
         paths: [{

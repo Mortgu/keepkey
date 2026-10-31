@@ -1,4 +1,4 @@
-/** Optional real-PostgreSQL concurrency tests. Only an explicitly supplied test URL is used. */
+/** Optional real-PostgreSQL concurrency tests. Only an explicitly supplied tests URL is used. */
 import { randomUUID } from "node:crypto";
 import { readdir, readFile } from "node:fs/promises";
 import pg from "pg";
@@ -62,7 +62,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                     new URL(`${name}/migration.sql`, directory),
                     "utf8",
                 );
-                // Historical migrations qualify enum names with public; scope those to the isolated test schema.
+                // Historical migrations qualify enum names with public; scope those to the isolated tests schema.
                 await client.query(
                     sql
                         .replaceAll('"public".', `"${state.schema}".`)
@@ -80,7 +80,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 salutation: "",
                 firstName: "Test",
                 lastName: "User",
-                email: "test@example.com",
+                email: "tests@example.com",
                 emailVerified: false,
                 createdAt: new Date(),
                 updatedAt: new Date(),

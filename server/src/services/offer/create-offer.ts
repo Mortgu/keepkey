@@ -7,10 +7,13 @@ import { assertStandardDuration } from "../contract/tariff.service.js";
 import { priceFlatrates, pricePositions } from "./offer-pricing.js";
 import { persistOffer } from "./offer-write.js";
 
-export async function createOffer(
-    input: CreateOfferInput,
-    options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType; actorId?: string | null },
-) {
+type CreateOfferOptions = {
+    renewedFromOfferId?: string;
+    derivationType?: OfferDerivationType;
+    actorId?: string | null
+};
+
+export async function createOffer(input: CreateOfferInput, options?: CreateOfferOptions) {
     await assertStandardDuration(input.duration_months);
 
     const header = { contractId: input.contractId, duration_months: input.duration_months };
@@ -51,6 +54,7 @@ export async function renewOffer(sourceOfferId: string, input: CreateOfferInput,
         where: { id: sourceOfferId },
         select: { id: true },
     });
+
     if (!source) {
         throw new AppException("Offer not found", 404, "OFFER_NOT_FOUND");
     }

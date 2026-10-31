@@ -96,17 +96,17 @@ describe("angenommenes Angebot", () => {
             net_amount: 166000,
             customer: {
                 id: "cust-1", customerId: "K-100", companyName: "Frozen Corp GmbH", language: "DE" as const,
-                email: "info@frozen.test", invoiceEmail: "billing@frozen.test", phone: "030 1",
+                email: "info@frozen.tests", invoiceEmail: "billing@frozen.tests", phone: "030 1",
                 street: "Weg 1", city: "Berlin", zip: "12345", country: "DE", currency: "EUR" as const,
                 taxRate: 19, salutation: null, ...timestamps,
             },
             contactPerson: {
                 id: "contact-1", customerId: "cust-1", salutation: "Frau", firstName: "Anna", lastName: "Muster",
-                email: "anna@frozen.test", ...timestamps,
+                email: "anna@frozen.tests", ...timestamps,
             },
             employee: {
                 id: "user-1", name: "Max Verkauf", salutation: "Herr", firstName: "Max", lastName: "Verkauf",
-                email: "max@keepit.test", phone: null, ...timestamps,
+                email: "max@keepit.tests", phone: null, ...timestamps,
             },
             contract: {
                 id: "c-base",

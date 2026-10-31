@@ -43,13 +43,13 @@ export function offerFixture(overrides: {
             contract: base,
             customer: {
                 customerId: "K-100", companyName: overrides.customerCompanyName ?? "ACME GmbH", street: "Weg 1", zip: "12345",
-                city: "Berlin", phone: "030 1", email: "info@acme.test",
+                city: "Berlin", phone: "030 1", email: "info@acme.tests",
             },
             contactPerson: {
-                salutation: "Frau", firstName: "Anna", lastName: "Muster", email: "anna@acme.test",
+                salutation: "Frau", firstName: "Anna", lastName: "Muster", email: "anna@acme.tests",
             },
             user: {
-                salutation: "Herr", firstName: "Max", lastName: "Verkauf", phone: null, email: "max@keepit.test",
+                salutation: "Herr", firstName: "Max", lastName: "Verkauf", phone: null, email: "max@keepit.tests",
             },
             offerPositions: [
                 {

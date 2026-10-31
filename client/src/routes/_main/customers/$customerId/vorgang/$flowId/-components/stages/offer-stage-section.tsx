@@ -1,9 +1,9 @@
 import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import type { OfferModalMode } from "@/components/modules/modals/offer/offer-modal-policy";
-import { useModal, useGenerateOfferDocument, useFormatters, useLocale } from "@/hooks";
+import {useModal, useGenerateOfferDocument, useFormatters, useLocale, useDeleteOffer} from "@/hooks";
 import DocumentCard from "@/routes/_main/-components/card/document-card";
 import type { Offer } from "@keepit/schemas";
-import { Dot, EllipsisVertical, Plus, RotateCcw } from "lucide-react";
+import {Dot, EllipsisVertical, Plus, RotateCcw, Trash} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FlowStage } from "../../../../-components/flow/flow-types";
 import StageShell from "../flow-stage-shell";
@@ -17,6 +17,8 @@ export default function OfferStageSection({ stage, offer }: { stage: FlowStage; 
     const locale = useLocale();
 
     const offerModal = useModal<{ mode: OfferModalMode }>();
+    const { deleteOffer } = useDeleteOffer();
+
     const { generateOfferDocument, isGenerating } = useGenerateOfferDocument();
     const [openAccordions, setOpenAccordions] = useState<Array<string>>([]);
     const locked = Boolean(offer.acceptedAt);
@@ -83,6 +85,10 @@ export default function OfferStageSection({ stage, offer }: { stage: FlowStage; 
 
                                         <Menu.Item className={menu.Item()} onClick={() => offerModal.open({ mode: "extension" })}>
                                             <Plus size={14} /> {t("derived.action_extension")}
+                                        </Menu.Item>
+
+                                        <Menu.Item className={menu.Item()} onClick={() => deleteOffer({ id: offer.id })} data-danger>
+                                            <Trash size={14} /> {t("button.delete")}
                                         </Menu.Item>
 
                                     </Menu.Popup>

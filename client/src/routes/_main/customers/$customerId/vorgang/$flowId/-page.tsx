@@ -83,7 +83,6 @@ export default function FlowPage() {
                 order={order ?? null}
                 confirmation={confirmation ?? null}
                 invoice={invoice ?? null}
-                customer={customer}
             />
         </div>
     );
