@@ -1,5 +1,5 @@
 model Order {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Restrict)
   offerId String @unique

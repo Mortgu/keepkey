@@ -1,5 +1,5 @@
 model Person {
-    id String @id @default(uuid())
+    id String @id @default(cuid())
 
     customerId String
     customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)

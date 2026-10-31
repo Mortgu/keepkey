@@ -8,7 +8,7 @@ enum OfferDerivationType {
 }
 
 model Offer {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   supplier   Supplier? @relation(fields: [supplierId], references: [id], onDelete: Restrict)
   supplierId String?
@@ -84,7 +84,7 @@ model Offer {
 }
 
 model OfferPosition {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
@@ -116,7 +116,7 @@ model OfferPosition {
 }
 
 model OfferFlatRate {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   flatRate   FlatRate @relation(fields: [flatRateId], references: [id])
   flatRateId String

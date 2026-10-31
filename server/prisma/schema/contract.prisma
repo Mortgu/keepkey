@@ -1,5 +1,5 @@
 model Contract {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   translations ContractTranslation[]
   tariffs      Tariff[]

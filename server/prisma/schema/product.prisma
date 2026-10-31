@@ -1,5 +1,5 @@
 model Product {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   translations ProductTranslation[]
 

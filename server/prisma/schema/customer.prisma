@@ -1,5 +1,5 @@
 model Customer {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   customerId  String?
   companyName String

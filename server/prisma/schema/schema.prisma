@@ -92,7 +92,7 @@ model Verification {
 }
 
 model Supplier {
-  id String @id @default(uuid())
+  id String @id @default(cuid())
 
   supplierId String?
   name       String
@@ -106,7 +106,7 @@ model Supplier {
 }
 
 model FlatRate {
-  id          String @id @default(uuid())
+  id          String @id @default(cuid())
   total_cents Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
