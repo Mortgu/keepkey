@@ -84,7 +84,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
                 </div>
 
                 <div className="flex flex-col items-end">
-                    <p className="text-md font-mono font-semibold">{formatEur(offer.net_amount)}</p>
+                    <p className="text-md font-mono font-semibold">{formatEur(offer.netAmount)}</p>
                     <p className="text-(--text-secondary) font-light text-sm">Gesamtpreis</p>
                 </div>
             </div>

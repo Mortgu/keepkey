@@ -93,7 +93,7 @@ describe("angenommenes Angebot", () => {
             language: "DE" as const,
             validUntil: iso("2026-11-01"),
             requestFrom: iso("2026-09-15"),
-            net_amount: 166000,
+            netAmount: 166000,
             customer: {
                 id: "cust-1", customerId: "K-100", companyName: "Frozen Corp GmbH", language: "DE" as const,
                 email: "info@frozen.test", invoiceEmail: "billing@frozen.test", phone: "030 1",

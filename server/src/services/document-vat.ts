@@ -4,7 +4,7 @@ import type {Prisma} from "@prisma/client";
 /**
  * Steuerblock für einen Beleg (AB, Rechnung) zum Zeitpunkt des Anlegens.
  *
- * Netto ist `offer.net_amount` des angenommenen Angebots — authoritativ und
+ * Netto ist `offer.netAmount` des angenommenen Angebots — authoritativ und
  * unveränderlich. Keine zweite Summenbildung aus Zeilen. Der Satz kommt aus
  * dem Formular, sonst vom Kunden (aktueller Stand, nicht der Snapshot). Die
  * Werte werden mit der Row gespeichert; Regenerieren rechnet nie neu.
@@ -22,7 +22,7 @@ export async function vatForOrder(transaction: Prisma.TransactionClient, orderId
         select: {
             offer: {
                 select: {
-                    net_amount: true,
+                    netAmount: true,
                     customer: {
                         select: {
                             taxRate: true
@@ -34,7 +34,7 @@ export async function vatForOrder(transaction: Prisma.TransactionClient, orderId
     });
 
     const rate = taxRate ?? order.offer.customer.taxRate;
-    const totals = vatTotals(order.offer.net_amount, rate);
+    const totals = vatTotals(order.offer.netAmount, rate);
 
     return {
         taxRate: rate,

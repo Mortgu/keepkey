@@ -1,7 +1,3 @@
-/// Auftragsbestätigung (AB) zu einer Bestellung. Die AB-Nummer vergibt der
-/// Nutzer einmal; danach ist sie unveränderlich. Konditionen stehen am
-/// angenommenen Angebot — hier kommen nur MwSt und Brutto dazu, und die werden
-/// bei der Generierung aus `customer.taxRate` des Snapshots berechnet.
 model Confirmation {
   id String @id @default(cuid())
 
@@ -31,12 +27,6 @@ model Confirmation {
   @@map("confirmation")
 }
 
-/// Dieselben Spalten wie OfferDocument/OrderDocument, damit Umbenennen,
-/// Löschen, Download und Nextcloud-Upload über `document-repo.ts` unverändert
-/// funktionieren. Versioniert wie dort: jede Generierung legt eine neue Version
-/// an, keine wird automatisch gelöscht. `sourceVersion` bleibt immer `null` —
-/// die Konditionen der AB sind ab Anlage unveränderlich, es gibt also nichts,
-/// wogegen eine Generierung veralten könnte.
 model ConfirmationDocument {
   id String @id @default(cuid())
 
@@ -47,11 +37,8 @@ model ConfirmationDocument {
   isCurrent     Boolean        @default(false)
 
   error       String?
-  /// @openapi.ignore
   uploadToken String?
 
-  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
-  /// @openapi.ignore
   model Json?
 
   confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)

@@ -29,7 +29,7 @@ export default function ConfirmationSection({ order }: Props) {
     const { customer } = useCustomer(order.customer.id);
     const [taxRate, setTaxRate] = useState<number | null>(null);
     const effectiveRate = taxRate ?? customer?.taxRate ?? 0;
-    const preview = vatTotals(order.net_amount, effectiveRate);
+    const preview = vatTotals(order.netAmount, effectiveRate);
 
     const cancelled = Boolean(order.cancelledAt);
 

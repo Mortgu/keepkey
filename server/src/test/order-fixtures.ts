@@ -14,7 +14,7 @@ export const sourceFixture = () => ({
     validFrom: null,
     validUntil: null,
     requestFrom: null,
-    net_amount: 90000,
+    netAmount: 90000,
     customer: {
         id: "customer",
         customerId: "C-1",

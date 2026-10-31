@@ -103,7 +103,7 @@ export type OfferFields = PriceHeader & {
  *
  * Bewusst von der Preisermittlung getrennt: `createOffer` bepreist über den
  * Live-Tarif, `extendOffer` über die angepinnte Tarif-Version — die Persistenz
- * inklusive `net_amount`-Formel ist für beide dieselbe.
+ * inklusive `netAmount`-Formel ist für beide dieselbe.
  */
 export async function persistOffer(
     fields: OfferFields,
@@ -113,12 +113,12 @@ export async function persistOffer(
     options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType },
 ) {
     return prisma.$transaction(async (tx) => {
-        const net_amount = calculateNetAmount(positions, flatrates, discounts);
+        const netAmount = calculateNetAmount(positions, flatrates, discounts);
 
         const offer = await tx.offer.create({
             data: {
                 ...fields,
-                net_amount,
+                netAmount,
                 renewedFromOfferId: options?.renewedFromOfferId ?? null,
                 derivationType: options?.derivationType ?? null,
             },

@@ -1,12 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
 import { vatForOrder } from "./document-vat.js";
 
-const tx = (net_amount: number, customerRate: number) => ({
-    order: { findUniqueOrThrow: vi.fn(async () => ({ offer: { net_amount, customer: { taxRate: customerRate } } })) },
+const tx = (netAmount: number, customerRate: number) => ({
+    order: { findUniqueOrThrow: vi.fn(async () => ({ offer: { netAmount, customer: { taxRate: customerRate } } })) },
 }) as never;
 
 describe("vatForOrder", () => {
-    it("uses the rate from the form and offer.net_amount as net", async () => {
+    it("uses the rate from the form and offer.netAmount as net", async () => {
         await expect(vatForOrder(tx(90_000, 19), "order", 7.7)).resolves.toEqual({
             taxRate: 7.7, netCents: 90_000, vatCents: 6_930, grossCents: 96_930,
         });

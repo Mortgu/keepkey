@@ -41,7 +41,7 @@ describe("presentOrder", () => {
         const order = presentOrder(withPurchase());
         const legacy = presentOrder(orderFixture());
 
-        expect(order.net_amount).toBe(legacy.net_amount);
+        expect(order.netAmount).toBe(legacy.netAmount);
         expect(order.orderPositions).toEqual(legacy.orderPositions);
 
         expect(order.supplierPositions).toEqual([expect.objectContaining({
@@ -86,7 +86,7 @@ describe("Kundendokumente", () => {
         const { buildConfirmation } = await import("../confirmation/build-confirmation.js");
         const text = JSON.stringify((await buildConfirmation("c")).data);
         for (const marker of purchaseMarkers) expect(text).not.toContain(marker);
-        expect(text).toContain(eur(presentOrder(withPurchase()).net_amount));
+        expect(text).toContain(eur(presentOrder(withPurchase()).netAmount));
     });
 
     it("Rechnung enthält keine Einkaufswerte", async () => {

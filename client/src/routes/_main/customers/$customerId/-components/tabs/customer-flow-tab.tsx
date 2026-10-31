@@ -73,7 +73,7 @@ function toFlowRow(offer: Offer, t: TFunction, { formatDate, formatEur }: Format
     const phase = derivePhase(offer, stages);
     const searchText = [
         ...stages.flatMap((stage) => [stage.number, stage.date && formatDate(stage.date)]),
-        formatEur(offer.net_amount),
+        formatEur(offer.netAmount),
         t(`flows.phase.${phase}`),
     ].filter(Boolean).join(" ").toLowerCase();
 
@@ -101,7 +101,7 @@ const columns: Array<ColumnDef<typeof features, FlowRow>> = [
         // ISO-Strings sortieren lexikografisch chronologisch.
         { id: `${kind}Date`, accessorFn: (row) => rawDate(row.offer, kind), sortFn: "text", sortUndefined: "last" },
     ]),
-    { id: "net", accessorFn: (row) => row.offer.net_amount, sortFn: "basic" },
+    { id: "net", accessorFn: (row) => row.offer.netAmount, sortFn: "basic" },
     { id: "phase", accessorFn: (row) => row.phase, filterFn: "arrIncludesSome", enableSorting: false },
 ];
 
@@ -171,7 +171,7 @@ function FlowTableRow({ row, customerId }: { row: FlowRow; customerId: string })
             ))}
 
             <p className={cn("pr-3 text-right text-[14px] font-medium tabular-nums", cancelled && "text-(--fg-3) line-through")}>
-                {formatEur(row.offer.net_amount)}
+                {formatEur(row.offer.netAmount)}
             </p>
 
             <ChevronRight className="size-4 text-(--fg-3)" />

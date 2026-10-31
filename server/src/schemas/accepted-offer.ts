@@ -37,7 +37,7 @@ export const commercialSourceSchema = z.object({
     language,
     validUntil: date.nullable(),
     requestFrom: date.nullable(),
-    net_amount: z.number().int(),
+    netAmount: z.number().int(),
     customer: z.object({
         id: z.string(),
         customerId: text,

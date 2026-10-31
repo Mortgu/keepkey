@@ -45,7 +45,7 @@ export type Invoice = z.infer<typeof invoiceSchema>;
 
 /** Listeneintrag mit dem Nötigsten aus Bestellung und Kunde. */
 export const invoiceListItemSchema = invoiceSchema.extend({
-    order: z.object({ id: z.string(), orderId: z.string(), net_amount: z.number().int() }),
+    order: z.object({ id: z.string(), orderId: z.string(), netAmount: z.number().int() }),
     customer: z.object({ id: z.string(), companyName: z.string() }),
 });
 export type InvoiceListItem = z.infer<typeof invoiceListItemSchema>;

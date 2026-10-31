@@ -37,7 +37,7 @@ export default function OrderModalOfferCard({ offer, selected, onSelect }: Props
                     <span className="font-mono text-sm text-(--text-secondary) shrink-0">AG{offer.quoteId}</span>
                     <span className="font-medium truncate">{offer.customer.companyName}</span>
                 </div>
-                <span className="font-mono text-sm font-medium shrink-0">{formatEur(offer.net_amount)}</span>
+                <span className="font-mono text-sm font-medium shrink-0">{formatEur(offer.netAmount)}</span>
             </div>
             <div className="flex flex-wrap items-center gap-x-1 gap-y-1 text-sm text-(--text-secondary)">
                 <span>{ccp.firstName} {ccp.lastName}</span>

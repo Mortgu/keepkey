@@ -28,7 +28,7 @@ describe("order write contracts", () => {
     it("rejects the old request without an offer version and copied commercial data", () => {
         const oldRequest = { id: acceptance.id, orderId: acceptance.orderId, projectNumber: acceptance.projectNumber };
         expect(createOrderSchema.safeParse(oldRequest).success).toBe(false);
-        expect(createOrderSchema.safeParse({ ...acceptance, net_amount: 100 }).success).toBe(false);
+        expect(createOrderSchema.safeParse({ ...acceptance, netAmount: 100 }).success).toBe(false);
         // Einkaufspreise sind Pflicht — ohne sie hätte die Bestellung keine Preise für den Zulieferer.
         expect(createOrderSchema.safeParse({ ...acceptance, positions: [] }).success).toBe(false);
         expect(createOrderSchema.safeParse({ ...acceptance, positions: [{ offerPositionId: "p", purchase_eur_user_month: -1 }] }).success).toBe(false);
@@ -41,7 +41,7 @@ describe("order write contracts", () => {
         const [, options] = fetchMock.mock.calls[0];
         expect(options.method).toBe("PATCH");
         expect(updateOrderSchema.parse(JSON.parse(options.body))).toEqual(input);
-        expect(updateOrderSchema.safeParse({ ...input, order: { ...input.order, net_amount: 1 } }).success).toBe(false);
+        expect(updateOrderSchema.safeParse({ ...input, order: { ...input.order, netAmount: 1 } }).success).toBe(false);
     });
 
     it("cancels with a version instead of deleting", async () => {

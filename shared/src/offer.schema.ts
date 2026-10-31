@@ -222,7 +222,7 @@ export const offerSchema = z.object({
     customer: customerSchema,
     customerContactPerson: contactSchema,
 
-    net_amount: z.number().int(),
+    netAmount: z.number().int(),
     version: z.number().int().positive(),
 
     date: isoDateTime,

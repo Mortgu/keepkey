@@ -59,7 +59,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     // Frueher nach `contract_duration` gruppiert — beides steht jetzt an der
     // Bestellung, es gibt also genau eine Gruppe.
     const grouped = [orderPositions].map((group) => {
-        const group_total = order.net_amount;
+        const group_total = order.netAmount;
 
         return {
             names: group.map((p) => p.product.name).join(" & "),
@@ -106,7 +106,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         orderDetails: order.orderDetails ?? "",
         products, groups: grouped, tables: grouped,
         flatRates: orderFlatRates, flatrates: orderFlatRates,
-        total: formatCentsToEur(order.net_amount),
+        total: formatCentsToEur(order.netAmount),
         discounts: order.discounts.map(d => ({ ...d, total: formatCentsToEur(-d.amount_cents) })),
         date: formatDate(order.date),
         paymentTerm: order.paymentTerm,

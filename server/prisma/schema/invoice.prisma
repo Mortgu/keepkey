@@ -16,8 +16,6 @@ model Invoice {
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   orderId String @unique
 
-  /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
-  /// `offer.net_amount`, der Satz aus dem Formular (Default: Kundensatz).
   taxRate    Float
   netCents   Int
   vatCents   Int

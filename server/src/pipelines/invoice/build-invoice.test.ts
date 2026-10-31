@@ -29,16 +29,16 @@ import { buildInvoice, paymentTermDays } from "./build-invoice.js";
 const eur = (cents: number) => formatEur(cents / 100);
 
 describe("buildInvoice", () => {
-    it("line totals add up to the stored netCents (= offer.net_amount) — free months are not deducted twice", async () => {
+    it("line totals add up to the stored netCents (= offer.netAmount) — free months are not deducted twice", async () => {
         const data = invoiceContract.parse((await buildInvoice("inv-1")).data);
         const offer = orderFixture().offer;
 
         const toCents = (s: string) => Math.round(Number(s.replace(/[^\d,-]/g, "").replace(",", ".")) * 100);
-        expect(data.items.reduce((sum, i) => sum + toCents(i.total), 0)).toBe(offer.net_amount);
+        expect(data.items.reduce((sum, i) => sum + toCents(i.total), 0)).toBe(offer.netAmount);
 
         // Fixture: 10 × 10,00 € × 12 Monate = 1.200 €, 3 Freimonate = −300 €,
-        // Pauschale +100 €, Rabatt −100 € → net_amount 900 €.
-        expect(data.netTotal).toBe(eur(offer.net_amount));
+        // Pauschale +100 €, Rabatt −100 € → netAmount 900 €.
+        expect(data.netTotal).toBe(eur(offer.netAmount));
         expect(data.netTotal).toBe("900,00 €");
 
         const line = data.items[0]!;

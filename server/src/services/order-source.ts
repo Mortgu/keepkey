@@ -13,7 +13,7 @@ export type OrderWithSource = Order & {
  * Keeps existing response fields as derived values, never as editable Order data.
  *
  * Zwei Preisseiten, bewusst getrennt benannt:
- *  - `orderPositions`, `net_amount`, `flatRates`, `discounts`: Kundenseite aus dem
+ *  - `orderPositions`, `netAmount`, `flatRates`, `discounts`: Kundenseite aus dem
  *    Snapshot. Davon leben AB und Rechnung — hier dürfen nie Einkaufswerte stehen.
  *  - `supplierPositions`, `purchase_net_amount`: Einkaufsseite für die Bestellung
  *    an den Zulieferer. Altbestellungen ohne gespeicherte Einkaufspreise fallen
