@@ -9,7 +9,7 @@ import { deleteTariff, deleteTariffGroup } from "../tariff.service.js";
 const state = vi.hoisted(() => ({
     schema: `tariff_test_${Date.now()}_${Math.random().toString(36).slice(2)}`,
 }));
-vi.mock("../lib/prismaClient.js", async () => {
+vi.mock("../../../lib/prismaClient.js", async () => {
     if (!process.env.ORDER_TEST_DATABASE_URL) return { prisma: {} };
     const { PrismaClient } = await import("@prisma/client");
     const { PrismaPg } = await import("@prisma/adapter-pg");

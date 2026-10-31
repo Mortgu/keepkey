@@ -5,7 +5,7 @@ import { z } from "zod";
 
 const { warn } = vi.hoisted(() => ({ warn: vi.fn() }));
 
-vi.mock("../services/document-template.service.js", () => ({
+vi.mock("../services/document/document-template.service.js", () => ({
     loadTemplateForRendering: vi.fn(async () =>
         fs.readFileSync(path.resolve(__dirname, "../../assets/templates/offer.docx"))),
 }));

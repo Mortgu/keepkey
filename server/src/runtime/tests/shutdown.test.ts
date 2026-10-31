@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const flushLogger = vi.hoisted(() => vi.fn(async () => undefined));
 
-vi.mock("./bootstrap.js", () => ({
+vi.mock("../bootstrap.js", () => ({
     flushLogger,
     isLoggerClosed: () => false,
 }));

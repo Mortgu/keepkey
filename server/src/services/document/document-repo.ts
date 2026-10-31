@@ -7,7 +7,7 @@ import type { DocumentType } from "@keepit/schemas";
 
 /**
  * Der einzige Ort, der weiß, wie ein `DocumentType` auf die gemeinsame
- * `Document`-Tabelle (document_record) abgebildet wird. Alle Dokumenttypen
+ * `Document`-Tabelle (document) abgebildet wird. Alle Dokumenttypen
  * liegen in derselben Tabelle, unterschieden durch `type` — jede Operation
  * filtert darauf, damit eine echte ID eines anderen Typs nie gefunden wird.
  *
@@ -58,7 +58,7 @@ const OWNER_TYPES: Record<DocumentType, DocumentOwnerType> = {
     invoice: DocumentOwnerType.INVOICE,
 };
 
-/** Der `type`-Diskriminator in document_record für einen `DocumentType`. */
+/** Der `type`-Diskriminator in document für einen `DocumentType`. */
 export function documentOwnerType(type: DocumentType): DocumentOwnerType {
     return OWNER_TYPES[type];
 }

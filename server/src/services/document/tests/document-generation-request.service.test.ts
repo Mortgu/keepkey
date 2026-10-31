@@ -17,8 +17,8 @@ const fake = vi.hoisted(() => {
     };
 });
 
-vi.mock("../lib/prismaClient.js", () => ({ prisma: { $transaction: fake.transaction } }));
-vi.mock("../lib/document.js", () => ({ enqueueTask: fake.enqueueTask }));
+vi.mock("../../../lib/prismaClient.js", () => ({ prisma: { $transaction: fake.transaction } }));
+vi.mock("../../../lib/document.js", () => ({ enqueueTask: fake.enqueueTask }));
 
 const {
     requestOfferGeneration,

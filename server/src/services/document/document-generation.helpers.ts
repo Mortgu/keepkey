@@ -88,7 +88,7 @@ export async function createArtifactDocuments(
 
 /**
  * `Document` hat je Elterntyp eine nullbare FK-Spalte; welche gesetzt ist,
- * garantiert der CHECK `document_record_type_owner_check` anhand von `type`.
+ * garantiert der CHECK `document_type_owner_check` anhand von `type`.
  * Engt die zum Typ passenden Felder auf nicht-`null` ein — ein `null` hier
  * hieße, der CHECK wurde umgangen.
  */

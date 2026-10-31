@@ -25,7 +25,7 @@ const document = {
     ],
 };
 
-vi.mock("../../lib/prismaClient.js", () => {
+vi.mock("../../../lib/prismaClient.js", () => {
     const tx = {
         $queryRaw: vi.fn(),
         documentArtifact: { update: (...args: unknown[]) => documentArtifactUpdate(...args) },
@@ -46,7 +46,7 @@ vi.mock("../document-repo.js", () => ({
         canAdopt: (...args: unknown[]) => canAdopt(...args),
     }),
 }));
-vi.mock("../../lib/document-artifact-store.js", () => ({
+vi.mock("../../../lib/document-artifact-store.js", () => ({
     MIME_TYPES: { pdf: "application/pdf", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
     toDocumentFormat: (format: string) => (format === "pdf" ? "PDF" : "DOCX"),
     browserEndpointIssue: (...args: unknown[]) => browserEndpointIssue(...args),
@@ -57,9 +57,9 @@ vi.mock("../../lib/document-artifact-store.js", () => ({
     removeDocumentArtifact: (...args: unknown[]) => removeDocumentArtifact(...args),
     storeObject: (...args: unknown[]) => storeObject(...args),
 }));
-vi.mock("../../lib/docx.js", () => ({ assertDocxBuffer: vi.fn() }));
-vi.mock("../../lib/docx-to-pdf.js", () => ({ convertDocxToPdf: vi.fn(async () => Buffer.from("%PDF")) }));
-vi.mock("../../lib/nextcloud-document-store.js", () => ({ sha256Document: () => "docx-hash" }));
+vi.mock("../../../lib/docx.js", () => ({ assertDocxBuffer: vi.fn() }));
+vi.mock("../../../lib/docx-to-pdf.js", () => ({ convertDocxToPdf: vi.fn(async () => Buffer.from("%PDF")) }));
+vi.mock("../../../lib/nextcloud-document-store.js", () => ({ sha256Document: () => "docx-hash" }));
 vi.mock("@/utils/logger.js", () => ({ default: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
 
 const { confirmReplacementUpload, createReplacementUpload, getDocumentCapabilities } =

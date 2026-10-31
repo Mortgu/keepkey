@@ -32,7 +32,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
         invoice: { findUniqueOrThrow: vi.fn(async () => ({ id: "i", invoiceId: "1", date: new Date(), orderId: "order", taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100, })) },
     },
 }));
-vi.mock("../../services/order.service.js", () => ({
+vi.mock("../../services/order/order.service.js", () => ({
     getOrderById: vi.fn(async () => presentOrder(withPurchase())),
 }));
 

@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // Alle Dokumenttypen liegen in einer Tabelle — ein einziger Delegate, gefiltert über `type`.
 const documentFindFirst = vi.fn();
 
-vi.mock("../lib/prismaClient.js", () => ({
+vi.mock("../../../lib/prismaClient.js", () => ({
     prisma: {
         document: { findFirst: (...args: unknown[]) => documentFindFirst(...args) },
     },

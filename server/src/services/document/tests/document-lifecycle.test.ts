@@ -9,7 +9,7 @@ const deleteDocumentArtifact = vi.fn();
 const uploadGeneratedDocument = vi.fn();
 const logger = { info: vi.fn(), warn: vi.fn(), error: vi.fn() };
 
-vi.mock("../../lib/prismaClient.js", () => {
+vi.mock("../../../lib/prismaClient.js", () => {
     // `documentTable()` queries the single `document` delegate filtered by
     // `type`. Lookups with a `select` are the facade's owner checks
     // (`assertEditable`: offer `acceptedAt`, confirmation's order
@@ -32,12 +32,12 @@ vi.mock("../../lib/prismaClient.js", () => {
         },
     };
 });
-vi.mock("../../lib/document-artifact-store.js", () => ({
+vi.mock("../../../lib/document-artifact-store.js", () => ({
     MIME_TYPES: { pdf: "application/pdf", docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" },
     getDocumentDownloadUrl: vi.fn(async () => "https://example.test/download"),
     removeDocumentArtifacts: vi.fn(),
 }));
-vi.mock("../../lib/nextcloud-document-store.js", () => ({
+vi.mock("../../../lib/nextcloud-document-store.js", () => ({
     RemoteDocumentExistsError: class RemoteDocumentExistsError extends Error {
         remotePath: string;
         constructor(remotePath: string) {

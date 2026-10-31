@@ -7,7 +7,7 @@ const calculatePrice = vi.fn();
 vi.mock("@/lib/prismaClient.js", () => ({ prisma: {} }));
 vi.mock("@/utils/products.js", () => ({ calculatePrice: (...args: unknown[]) => calculatePrice(...args) }));
 vi.mock("@/utils/logger.js", () => ({ default: { warn: vi.fn(), info: vi.fn(), error: vi.fn() } }));
-vi.mock("../../services/document-template.service.js", () => ({
+vi.mock("../../services/document/document-template.service.js", () => ({
     loadTemplateForRendering: vi.fn(async () =>
         fs.readFileSync(path.resolve(__dirname, "../../../assets/templates/offer.docx"))),
 }));

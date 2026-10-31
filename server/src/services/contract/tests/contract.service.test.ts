@@ -7,7 +7,7 @@ const tx = vi.hoisted(() => ({
     },
 }));
 
-vi.mock("../lib/prismaClient.js", () => ({
+vi.mock("../../../lib/prismaClient.js", () => ({
     prisma: {
         $transaction: vi.fn((fn: (client: typeof tx) => unknown) => fn(tx)),
     },

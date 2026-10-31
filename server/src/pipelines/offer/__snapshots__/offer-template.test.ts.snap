@@ -10,7 +10,7 @@ exports[`offer.docx > mit Vergleich 1`] = `
 | Lieferanten-Nr.: |  |
 | Ihre Anfrage vom: | 15. September 2026 |
 | Ihr Ansprechpartner: | Frau Muster |
-| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.test |
+| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.tests |
 | dignum GmbH • Peterhofstr. 5 • 86438 Kissing • Germany |
 ACME GmbH
 Frau Anna Muster
@@ -21,21 +21,21 @@ Keepit SaaS-Backup für Microsoft 365 & Salesforce
 Sehr geehrte(r) Frau Muster,
 hiermit senden wir Ihnen wie besprochen unser Angebot zur Einrichtung einer SaaS-Backup Lösung für Ihre Microsoft 365 & Salesforce Umgebung:
 Das Angebot ist unterteilt in folgende, alternative Offerten:
-* Keepit für Microsoft 365 & Salesforce
-* Im Vertrag „Basic“
+1. Keepit für Microsoft 365 & Salesforce
+* Im Vertrag: „Basic“
   * Backup
 * Vertragslaufzeit: 24 Monate
 * Zahlungsweise: im Voraus
 *
-* Keepit für Microsoft 365 & Salesforce
-* Im Vertrag „Plus“
+2. Keepit für Microsoft 365 & Salesforce
+* Im Vertrag: „Plus“
   * Backup
   * Restore
 * Vertragslaufzeit: 24 Monate
 * Zahlungsweise: im Voraus
 *
-* Keepit für Microsoft 365 & Salesforce
-* Im Vertrag „Broken“
+3. Keepit für Microsoft 365 & Salesforce
+* Im Vertrag: „Broken“
   * x
 * Vertragslaufzeit: 24 Monate
 * Zahlungsweise: im Voraus
@@ -74,7 +74,7 @@ exports[`offer.docx > ohne Vergleich 1`] = `
 | Lieferanten-Nr.: |  |
 | Ihre Anfrage vom: | 15. September 2026 |
 | Ihr Ansprechpartner: | Frau Muster |
-| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.test |
+| Unser Ansprechpartner: | Herr Max Verkauf / max@keepit.tests |
 | dignum GmbH • Peterhofstr. 5 • 86438 Kissing • Germany |
 ACME GmbH
 Frau Anna Muster
@@ -89,6 +89,7 @@ Keepit für Microsoft 365 & Salesforce
   * Backup
 * Vertragslaufzeit: 24 Monate
 * Zahlungsweise: im Voraus
+*
 M365
 Insbesondere ergeben sich keine weiteren Kosten für z.B. Storage, Datenübertragung, Bereitstellung von Bandbreiten, etc. Der Preis enthält ebenfalls die Aufbewahrung der Daten in doppelter Kopie jedes Backup Images, jeweils an zwei getrennten Rechenzentrumsstandorten innerhalb Deutschlands (oder in der Schweiz, oder in Dänemark, etc.). Der Backup Storage befindet sich in der Keepit-eigenen Cloud, unabhängig von Microsoft und anderen Hyperscalern, und es handelt sich immer um Hot-Storage (drehende Festplatten) sowie einen unveränderbaren, Ransomware-sicheren Speicherplatz.
 Das Datenvolumen ist unbegrenzt - sowohl für Backup, als auch für Restore. Die Lizenzierung erfolgt auf Grundlage „aktiver User Lizenzen“ (bei M365 unterteilt in Microsoft E- bzw. A-/F-Lizenzen).

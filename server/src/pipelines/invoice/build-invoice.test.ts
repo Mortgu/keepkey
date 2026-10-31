@@ -20,7 +20,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
         confirmation: { findUnique: vi.fn(async () => ({ confirmationId: "000042" })) },
     },
 }));
-vi.mock("../../services/order.service.js", () => ({
+vi.mock("../../services/order/order.service.js", () => ({
     getOrderById: vi.fn(async () => presentOrder(fixture())),
 }));
 

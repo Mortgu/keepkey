@@ -21,7 +21,7 @@ const document = {
     ],
 };
 
-vi.mock("../../lib/prismaClient.js", () => {
+vi.mock("../../../lib/prismaClient.js", () => {
     const tx = {
         $queryRaw: vi.fn(),
         document: {
@@ -40,10 +40,10 @@ vi.mock("../../lib/prismaClient.js", () => {
         },
     };
 });
-vi.mock("../offer-acceptance.service.js", () => ({
+vi.mock("../utils/assert.offer.js", () => ({
     assertOfferEditable: (...args: unknown[]) => assertOfferEditable(...args),
 }));
-vi.mock("../document-repo.js", async (importOriginal) => ({
+vi.mock("../../document/document-repo.js", async (importOriginal) => ({
     documentOwnerType: (await importOriginal<typeof import("../../document/document-repo.js")>()).documentOwnerType,
     documentTable: () => ({
         scope: "offers",
@@ -52,7 +52,7 @@ vi.mock("../document-repo.js", async (importOriginal) => ({
         readModel: (...args: unknown[]) => readModel(...args),
     }),
 }));
-vi.mock("../../lib/document-artifact-store.js", () => ({
+vi.mock("../../../lib/document-artifact-store.js", () => ({
     getDocumentArtifact: (...args: unknown[]) => getDocumentArtifact(...args),
 }));
 

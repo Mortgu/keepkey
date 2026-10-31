@@ -16,7 +16,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
         },
     },
 }));
-vi.mock("../../services/order.service.js", () => ({
+vi.mock("../../services/order/order.service.js", () => ({
     getOrderById: vi.fn(async () => presentOrder(orderFixture())),
 }));
 

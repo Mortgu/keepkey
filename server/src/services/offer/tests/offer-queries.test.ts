@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const findMany = vi.hoisted(() => vi.fn(async () => []));
-vi.mock("../../lib/prismaClient.js", () => ({ prisma: { offer: { findMany } } }));
+vi.mock("../../../lib/prismaClient.js", () => ({ prisma: { offer: { findMany } } }));
 
 import { getOffers } from "../offer-queries.js";
 

@@ -24,13 +24,13 @@ const fake = vi.hoisted(() => {
     };
 });
 
-vi.mock("../lib/prismaClient.js", () => ({ prisma: { $transaction: fake.transaction } }));
-vi.mock("../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
-vi.mock("../lib/document-artifact-store.js", () => ({
+vi.mock("../../../lib/prismaClient.js", () => ({ prisma: { $transaction: fake.transaction } }));
+vi.mock("../../../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
+vi.mock("../../../lib/document-artifact-store.js", () => ({
     storeDocumentArtifacts: fake.storeDocumentArtifacts,
     removeDocumentArtifacts: fake.removeDocumentArtifacts,
 }));
-vi.mock("./document-repo.js", () => ({
+vi.mock("../document-repo.js", () => ({
     documentTable: () => ({
         scope: "offers",
         updateMany: fake.documentTableUpdateMany,

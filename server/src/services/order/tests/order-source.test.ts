@@ -4,8 +4,8 @@ import PizZip from "pizzip";
 import { customParser } from "../../../pipelines/offer/utils.js";
 import { orderTemplateSchema } from "../../../schemas/templates/order.template.schema.js";
 import { describe, expect, it, vi } from "vitest";
-vi.mock("../lib/prismaClient.js", () => ({ prisma: {} }));
-vi.mock("./document-generation-request.service.js", () => ({
+vi.mock("../../../lib/prismaClient.js", () => ({ prisma: {} }));
+vi.mock("../../document/document-generation-request.service.js", () => ({
     requestOrderGeneration: vi.fn(),
 }));
 import { presentOrder } from "../order-source.js";
@@ -150,7 +150,7 @@ describe("accepted offer order data", () => {
                 order: presentOrder(orderFixture()),
             });
             const content = await readFile(
-                new URL(`../../assets/templates/${file}`, import.meta.url),
+                new URL(`../../../../assets/templates/${file}`, import.meta.url),
             );
             const doc = new Docxtemplater(new PizZip(content), {
                 paragraphLoop: true,

@@ -35,16 +35,16 @@ const fake = vi.hoisted(() => {
     };
 });
 
-vi.mock("../lib/prismaClient.js", () => ({
+vi.mock("../../../lib/prismaClient.js", () => ({
     prisma: { document: { findFirst: fake.findFirst }, $transaction: fake.transaction },
 }));
-vi.mock("../pipelines/confirmation/build-confirmation.js", () => ({ buildConfirmation: fake.buildConfirmation }));
-vi.mock("../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
-vi.mock("../lib/document-artifact-store.js", () => ({
+vi.mock("../../../pipelines/confirmation/build-confirmation.js", () => ({ buildConfirmation: fake.buildConfirmation }));
+vi.mock("../../../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
+vi.mock("../../../lib/document-artifact-store.js", () => ({
     storeDocumentArtifacts: fake.storeDocumentArtifacts,
     removeDocumentArtifacts: fake.removeDocumentArtifacts,
 }));
-vi.mock("./document-repo.js", async (importOriginal) => ({
+vi.mock("../../document/document-repo.js", async (importOriginal) => ({
     documentOwnerType: (await importOriginal<typeof import("../../document/document-repo.js")>()).documentOwnerType,
     documentTable: () => ({ scope: "confirmations", updateMany: fake.updateMany, findWithArtifacts: vi.fn(async () => null) }),
 }));

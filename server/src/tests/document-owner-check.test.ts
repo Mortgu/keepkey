@@ -3,7 +3,7 @@ import { readFile, readdir } from "node:fs/promises";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 /**
- * Die Eigentümer-Regel der gemeinsamen Dokumenttabelle (document_record) lebt als
+ * Die Eigentümer-Regel der gemeinsamen Dokumenttabelle (document) lebt als
  * handgeschriebener CHECK in der Migration (#73), nicht im Prisma-Schema — deshalb
  * wird sie hier gegen die echten Migrationen geprüft: genau der zu `type` passende
  * Eltern-FK muss gesetzt sein.
@@ -20,7 +20,7 @@ beforeAll(async () => {
         INSERT INTO "user" (id, name, salutation, "firstName", "lastName", email, "emailVerified", "createdAt", "updatedAt")
             VALUES ('user', 'Test User', '', 'Test', 'User', 'tests@example.com', false, now(), now());
         INSERT INTO customer (id, "companyName", "taxRate", "updatedAt") VALUES ('customer', 'Customer Ltd', 19, now());
-        INSERT INTO contact_person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
+        INSERT INTO person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
         INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", net_amount, "updatedAt")
             VALUES ('offer', 'customer', 'contact', 'user', 'contract', 12, 'Q-1', '30 Tage', 100, now());
@@ -40,15 +40,15 @@ async function insertDocument(type: string, parents: Partial<Record<"offerId" | 
     const columns = Object.keys(parents).map((c) => `"${c}"`);
     const values = Object.values(parents);
     await db.query(
-        `INSERT INTO document_record (id, type, status, "taskId", "updatedAt"${columns.map((c) => `, ${c}`).join("")})
+        `INSERT INTO document (id, type, status, "taskId", "updatedAt"${columns.map((c) => `, ${c}`).join("")})
          VALUES ($1, $2::"DocumentOwnerType", 'PENDING', $3, now()${values.map((_, i) => `, $${i + 4}`).join("")})`,
         [`doc-${taskId}`, type, taskId, ...values],
     );
 }
 
-const ownerCheckViolation = { code: "23514", constraint: "document_record_type_owner_check" };
+const ownerCheckViolation = { code: "23514", constraint: "document_type_owner_check" };
 
-describe("document_record ownership CHECK", () => {
+describe("document ownership CHECK", () => {
     it("accepts a document whose only parent matches its type", async () => {
         await expect(insertDocument("OFFER", { offerId: "offer" })).resolves.toBeUndefined();
     });

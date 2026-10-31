@@ -6,7 +6,7 @@ exports[`formatOfferData > Deutsch mit Vergleich 1`] = `
   "customer": {
     "city": "Berlin",
     "companyName": "ACME GmbH",
-    "email": "anna@acme.test",
+    "email": "anna@acme.tests",
     "firstName": "Anna",
     "fullName": "Frau Anna Muster",
     "id": "K-100",
@@ -25,7 +25,7 @@ exports[`formatOfferData > Deutsch mit Vergleich 1`] = `
     },
   ],
   "employee": {
-    "email": "max@keepit.test",
+    "email": "max@keepit.tests",
     "firstName": "Max",
     "fullName": "Herr Max Verkauf",
     "lastName": "Verkauf",
@@ -200,7 +200,7 @@ exports[`formatOfferData > Englisch ohne Vergleich 1`] = `
   "customer": {
     "city": "Berlin",
     "companyName": "ACME GmbH",
-    "email": "anna@acme.test",
+    "email": "anna@acme.tests",
     "firstName": "Anna",
     "fullName": "Frau Anna Muster",
     "id": "K-100",
@@ -219,7 +219,7 @@ exports[`formatOfferData > Englisch ohne Vergleich 1`] = `
     },
   ],
   "employee": {
-    "email": "max@keepit.test",
+    "email": "max@keepit.tests",
     "firstName": "Max",
     "fullName": "Herr Max Verkauf",
     "lastName": "Verkauf",
