@@ -49,7 +49,7 @@ describe("Angebotsmodell", () => {
         expect(JSON.parse(JSON.stringify(model))).toEqual(model);
         expect(model.validUntil).toBe("2026-11-01T12:00:00.000Z");
         // Haupttabelle netto: (120000 - 10000) + 36000, dazu Flatrate 25000, minus Rabatt 5000.
-        expect(model.tables[0]).toMatchObject({ contractId: "c-base", total_cents: 166000 });
+        expect(model.tables[0]).toMatchObject({ contractId: "c-base", totalCents: 166000 });
         expect(model.tables.map((table) => table.contractId)).toEqual(["c-base", "c-plus"]);
         expect(model.comparisonContracts.map((c) => c.id)).toEqual(["c-plus", "c-broken"]);
     });
@@ -127,8 +127,8 @@ describe("angenommenes Angebot", () => {
                         ],
                         ...timestamps,
                     },
-                    quantity: 10, optional: false, total_cents: 120000, discount_cents: 10000, free_months: 2,
-                    eur_user_month: 500, ...timestamps,
+                    quantity: 10, optional: false, totalCents: 120000, discountCents: 10000, freeMonths: 2,
+                    unitCents: 500, ...timestamps,
                 },
                 {
                     id: "p-2", productId: "prod-2",
@@ -140,22 +140,22 @@ describe("angenommenes Angebot", () => {
                         ],
                         ...timestamps,
                     },
-                    quantity: 5, optional: true, total_cents: 36000, discount_cents: 0, free_months: 0,
-                    eur_user_month: 300, ...timestamps,
+                    quantity: 5, optional: true, totalCents: 36000, discountCents: 0, freeMonths: 0,
+                    unitCents: 300, ...timestamps,
                 },
             ],
             flatRates: [
                 {
                     id: "fr-1", flatRateId: "flatrate-1",
                     flatRate: {
-                        id: "flatrate-1", total_cents: 25000,
+                        id: "flatrate-1", totalCents: 25000,
                         translations: [
                             { language: "DE" as const, name: "Setup", description: null, table: "Setup-Tabelle" },
                             { language: "EN" as const, name: "Setup", description: null, table: "Setup table" },
                         ],
                         ...timestamps,
                     },
-                    quantity: 1, total_cents: 25000,
+                    quantity: 1, totalCents: 25000,
                 },
             ],
             discounts: [

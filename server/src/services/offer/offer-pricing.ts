@@ -18,9 +18,9 @@ import {
 /* ========== Types ========== */
 
 export type PricedPosition = CreateOfferPositionInput & {
-    total_cents: number;
-    eur_user_month: number;
-    discount_cents: number;
+    totalCents: number;
+    unitCents: number;
+    discountCents: number;
     /** Angepinnte, unveränderliche Preisgrundlage dieser Position. */
     tariffVersionId: string | null;
 };
@@ -34,7 +34,7 @@ export type PriceHeader = {
     contractId: string;
     duration_months: number;
 };
-export type PricedFlatrate = CreateOfferFlatrateInput & { total_cents: number };
+export type PricedFlatrate = CreateOfferFlatrateInput & { totalCents: number };
 export type PricedDiscount = {
     title: string;
     description?: string | null;
@@ -46,17 +46,17 @@ export type PricedDiscount = {
  * Flatrates, abzüglich Rabatte.
  */
 export function calculateNetAmount(
-    positions: ReadonlyArray<Pick<PricedPosition, "total_cents" | "discount_cents">>,
-    flatrates: ReadonlyArray<Pick<PricedFlatrate, "total_cents">>,
+    positions: ReadonlyArray<Pick<PricedPosition, "totalCents" | "discountCents">>,
+    flatrates: ReadonlyArray<Pick<PricedFlatrate, "totalCents">>,
     discounts: ReadonlyArray<Pick<PricedDiscount, "amount_cents">>,
 ): number {
-    return positions.reduce((sum, p) => sum + p.total_cents - p.discount_cents, 0) +
-        flatrates.reduce((sum, f) => sum + f.total_cents, 0) -
+    return positions.reduce((sum, p) => sum + p.totalCents - p.discountCents, 0) +
+        flatrates.reduce((sum, f) => sum + f.totalCents, 0) -
         discounts.reduce((sum, d) => sum + d.amount_cents, 0);
 }
 
 /**
- * Berechnet total_cents für jede Position über den Tarif (wirft AppException,
+ * Berechnet totalCents für jede Position über den Tarif (wirft AppException,
  * wenn kein Preis ermittelbar).
  *
  * Dabei wird der verwendete Tarifstand als unveränderliche `TariffVersion`
@@ -108,14 +108,14 @@ export async function pricePositions(
 
             const version = await sealTariffVersion(tariff.id, actorId, db);
 
-            const eur_user_month = result.breakdown.unitPrice;
-            const discount_cents = eur_user_month * position.quantity * (position.free_months ?? 0);
+            const unitCents = result.breakdown.unitPrice;
+            const discountCents = unitCents * position.quantity * (position.freeMonths ?? 0);
 
             priced.push({
                 ...position,
-                total_cents: result.price,
-                eur_user_month,
-                discount_cents,
+                totalCents: result.price,
+                unitCents,
+                discountCents,
                 tariffVersionId: version.id,
             });
         } catch (exception: any) {
@@ -131,20 +131,20 @@ export async function pricePositions(
     return priced;
 }
 
-/** Lädt die total_cents aller angefragten FlatRates als Map (id → cents). */
+/** Lädt die totalCents aller angefragten FlatRates als Map (id → cents). */
 async function getFlatRateCentsById(
     flatRateIds: string[],
     db: Prisma.TransactionClient,
 ): Promise<Map<string, number>> {
     const rates = await db.flatRate.findMany({
         where: { id: { in: flatRateIds } },
-        select: { id: true, total_cents: true },
+        select: { id: true, totalCents: true },
     });
 
-    return new Map(rates.map((r) => [r.id, r.total_cents]));
+    return new Map(rates.map((r) => [r.id, r.totalCents]));
 }
 
-/** Berechnet total_cents (= rate * quantity) für jede Flatrate. */
+/** Berechnet totalCents (= rate * quantity) für jede Flatrate. */
 export async function priceFlatrates(
     flatrates: CreateOfferFlatrateInput[],
     db: Prisma.TransactionClient = prisma,
@@ -157,7 +157,7 @@ export async function priceFlatrates(
             throw new AppException(`FlatRate ${flatrate.flatRateId} not found!`, 404, "FLAT_RATE_NOT_FOUND");
         }
 
-        return { ...flatrate, total_cents: rate_cents * flatrate.quantity };
+        return { ...flatrate, totalCents: rate_cents * flatrate.quantity };
     });
 }
 
@@ -170,8 +170,8 @@ export async function priceFlatrates(
 export type SourcePosition = {
     id: string;
     productId: string;
-    free_months: number;
-    eur_user_month: number;
+    freeMonths: number;
+    unitCents: number;
     tariffVersionId: string | null;
 };
 
@@ -196,10 +196,10 @@ export async function priceFromPin(
     quantity: number,
     customerId: string,
 ) {
-    const flat = (eur_user_month: number, fromSnapshot: boolean) => ({
-        eur_user_month,
-        total_cents: eur_user_month * quantity * duration,
-        discount_cents: eur_user_month * quantity * source.free_months,
+    const flat = (unitCents: number, fromSnapshot: boolean) => ({
+        unitCents,
+        totalCents: unitCents * quantity * duration,
+        discountCents: unitCents * quantity * source.freeMonths,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot,
         origin: "list" as const,
@@ -207,7 +207,7 @@ export async function priceFromPin(
     });
 
     if (!source.tariffVersionId) {
-        return flat(source.eur_user_month, false);
+        return flat(source.unitCents, false);
     }
 
     const version = await prisma.tariffVersion.findUnique({
@@ -250,12 +250,12 @@ export async function priceFromPin(
         );
     }
 
-    const eur_user_month = result.breakdown.unitPrice;
+    const unitCents = result.breakdown.unitPrice;
 
     return {
-        eur_user_month,
-        total_cents: result.price,
-        discount_cents: eur_user_month * quantity * source.free_months,
+        unitCents,
+        totalCents: result.price,
+        discountCents: unitCents * quantity * source.freeMonths,
         tariffVersionId: source.tariffVersionId,
         fromSnapshot: true,
         // Der Kundenpreis wird aktuell gelesen, nicht aus dem Snapshot — die

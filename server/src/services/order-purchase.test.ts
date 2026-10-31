@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { purchaseLines, purchaseNetAmount } from "./order-purchase.js";
 
 const snapshot = [
-    { id: "p1", productId: "m365", quantity: 10, free_months: 2, eur_user_month: 500 },
-    { id: "p2", productId: "gws", quantity: 3, free_months: 0, eur_user_month: 800 },
+    { id: "p1", productId: "m365", quantity: 10, freeMonths: 2, unitCents: 500 },
+    { id: "p2", productId: "gws", quantity: 3, freeMonths: 0, unitCents: 800 },
 ];
 
 describe("purchaseLines", () => {

@@ -25,9 +25,9 @@ export default function useWorkloadOfferModal({ header, form }: Props) {
 
         return {
             ...workload,
-            total_cents: price.total_cents,
-            eur_user_month: price.eur_user_month,
-            discount_cents: price.discount_cents,
+            totalCents: price.totalCents,
+            unitCents: price.unitCents,
+            discountCents: price.discountCents,
         };
     };
 

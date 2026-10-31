@@ -17,7 +17,7 @@ export const orderPositionSchema = z.object({
     quantity: z.number().int(),
     optional: z.boolean().optional(),
 
-    total_cents: z.number().int(),
+    totalCents: z.number().int(),
 
     createdAt: z.string(),
 });
@@ -38,9 +38,9 @@ export const supplierPositionSchema = z.object({
     offerPositionId: z.string(),
     productId: z.string(),
     quantity: z.number().int(),
-    free_months: z.number().int(),
+    freeMonths: z.number().int(),
     /** Verkaufspreis je User/Monat, zum Vergleich. */
-    eur_user_month: z.number().int(),
+    unitCents: z.number().int(),
     purchase_eur_user_month: z.number().int(),
     purchase_total_cents: z.number().int(),
     purchase_discount_cents: z.number().int(),
@@ -58,7 +58,7 @@ export const orderFlatRateSchema = z.object({
     flatRate: flatrateSchema,
 
     quantity: z.number().int(),
-    total_cents: z.number().int(),
+    totalCents: z.number().int(),
 });
 export type OrderFlatRate = z.infer<typeof orderFlatRateSchema>;
 

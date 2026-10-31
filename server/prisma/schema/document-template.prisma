@@ -1,14 +1,6 @@
-/// Dokumentvorlage (.docx), aus der Angebote, Bestellungen, Auftragsbestätigungen
-/// und Rechnungen gerendert werden.
-///
-/// Die Datei selbst liegt im Objektspeicher — hier steht nur, wozu sie gehört
-/// und welche je Slot (Typ x Sprache) gerade benutzt wird. Vorher lagen
-/// Vorlagen ausschliesslich als Dateien unter `TEMPLATES_DIR` und liessen sich
-/// deshalb weder auswaehlen noch aus der Anwendung heraus bearbeiten.
 enum DocumentTemplateKind {
   OFFER
   ORDER
-  /// Auftragsbestätigung (AB) — Order-Daten plus MwSt und Brutto.
   CONFIRMATION
   INVOICE
 }
@@ -19,19 +11,13 @@ model DocumentTemplate {
   kind     DocumentTemplateKind
   language Language
 
-  /// Frei waehlbarer Anzeigename in der Verwaltung.
-  name String
-  /// Urspruenglicher Dateiname beim Upload — nur informativ.
+  name     String
   fileName String
 
   objectKey String @unique
   size      Int
   sha256    String
 
-  /// Genau eine aktive Vorlage je (kind, language). Erzwungen wird das nicht
-  /// von Prisma, sondern von einem partiellen Unique-Index, der in der
-  /// Migration von Hand steht — Prisma kennt keine `WHERE`-Klausel an einem
-  /// Index.
   isActive Boolean @default(false)
 
   createdBy   User?   @relation(fields: [createdById], references: [id], onDelete: SetNull)

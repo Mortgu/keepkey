@@ -25,12 +25,12 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
         ...values,
         offerPositions: values.offerPositions.map((position) => ({
             productId: position.productId,
-            free_months: position.free_months,
+            freeMonths: position.freeMonths,
             quantity: position.quantity,
             optional: position.optional,
-            total_cents: position.total_cents,
-            eur_user_month: position.eur_user_month,
-            discount_cents: position.discount_cents,
+            totalCents: position.totalCents,
+            unitCents: position.unitCents,
+            discountCents: position.discountCents,
         })),
     };
 }

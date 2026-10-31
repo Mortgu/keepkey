@@ -4,14 +4,14 @@ const FLAT_RATE_TABLE = "dignum Dienstleistung - Keepit Backup für {products.na
 
 const FLAT_RATES = [
     {
-        total_cents: 299_00,
+        totalCents: 299_00,
         translations: {
             DE: { name: "Einrichtungsgebühr", table: FLAT_RATE_TABLE },
             EN: { name: "Setup fee", table: FLAT_RATE_TABLE },
         },
     },
     {
-        total_cents: 499_00,
+        totalCents: 499_00,
         translations: {
             DE: { name: "Migrationsservice", table: FLAT_RATE_TABLE },
             EN: { name: "Migration service", table: FLAT_RATE_TABLE },
@@ -35,7 +35,7 @@ export async function seedFlatRates(prisma: PrismaClient): Promise<FlatRate[]> {
         if (!flatRate) {
             flatRate = await prisma.flatRate.create({
                 data: {
-                    total_cents: data.total_cents,
+                    totalCents: data.totalCents,
                     translations: {
                         create: [
                             { language: "DE", ...data.translations.DE },

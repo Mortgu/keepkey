@@ -12,7 +12,7 @@ async function loadSourcePosition(offerId: string, positionId: string) {
         where: { id: positionId },
         select: {
             id: true, offerId: true, productId: true,
-            free_months: true, eur_user_month: true, tariffVersionId: true,
+            freeMonths: true, unitCents: true, tariffVersionId: true,
         },
     });
 
@@ -43,10 +43,10 @@ export async function getExtensionPrice(
     }
 
     const source = await loadSourcePosition(offerId, positionId);
-    const { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month } =
+    const { unitCents, totalCents, discountCents, fromSnapshot, origin, list_eur_user_month } =
         await priceFromPin(source, offer.duration_months, quantity, offer.customerId);
 
-    return { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month };
+    return { unitCents, totalCents, discountCents, fromSnapshot, origin, list_eur_user_month };
 }
 
 /**
@@ -87,12 +87,12 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
 
         positions.push({
             productId: sourcePosition.productId,
-            free_months: sourcePosition.free_months,
+            freeMonths: sourcePosition.freeMonths,
             quantity: requested.quantity,
             optional: sourcePosition.optional,
-            total_cents: priced.total_cents,
-            eur_user_month: priced.eur_user_month,
-            discount_cents: priced.discount_cents,
+            totalCents: priced.totalCents,
+            unitCents: priced.unitCents,
+            discountCents: priced.discountCents,
             // Der Pin wird weitergereicht, damit auch die Erweiterung einer
             // Erweiterung noch auf derselben Preisgrundlage steht.
             tariffVersionId: priced.tariffVersionId,

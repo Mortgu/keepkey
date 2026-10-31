@@ -37,11 +37,11 @@ export async function getFlatRateById(id: string) {
 /* ========== Mutations ========== */
 
 export async function createFlatRate(input: CreateFlatrateInput) {
-    const { total_cents, translations } = input;
+    const { totalCents, translations } = input;
 
     return prisma.flatRate.create({
         data: {
-            total_cents,
+            totalCents,
             translations: { create: translations },
         },
         include: { translations: true },
@@ -49,12 +49,12 @@ export async function createFlatRate(input: CreateFlatrateInput) {
 }
 
 export async function updateFlatRate(id: string, input: UpdateFlatrateInput) {
-    const { total_cents, translations } = input;
+    const { totalCents, translations } = input;
 
     const flatrate = await prisma.flatRate.update({
         where: { id },
         data: {
-            ...(total_cents !== undefined ? { total_cents } : {}),
+            ...(totalCents !== undefined ? { totalCents } : {}),
             ...(Array.isArray(translations)
                 ? {
                     translations: {

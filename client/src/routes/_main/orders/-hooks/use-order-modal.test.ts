@@ -8,8 +8,8 @@ const offer = {
     version: 3,
     duration_months: 12,
     offerPositions: [
-        { id: "p1", quantity: 10, free_months: 0, eur_user_month: 500, product: { translations: [] } },
-        { id: "p2", quantity: 2, free_months: 1, eur_user_month: 900, product: { translations: [] } },
+        { id: "p1", quantity: 10, freeMonths: 0, unitCents: 500, product: { translations: [] } },
+        { id: "p2", quantity: 2, freeMonths: 1, unitCents: 900, product: { translations: [] } },
     ],
 } as unknown as Offer;
 

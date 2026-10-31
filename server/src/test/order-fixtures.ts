@@ -69,10 +69,10 @@ export const sourceFixture = () => ({
             productId: "product",
             quantity: 10,
             optional: false,
-            total_cents: 120000,
-            discount_cents: 30000,
-            free_months: 3,
-            eur_user_month: 1000,
+            totalCents: 120000,
+            discountCents: 30000,
+            freeMonths: 3,
+            unitCents: 1000,
             tariffVersionId: null,
             createdAt: now,
             updatedAt: now,
@@ -95,10 +95,10 @@ export const sourceFixture = () => ({
             id: "flat",
             flatRateId: "flat-rate",
             quantity: 1,
-            total_cents: 10000,
+            totalCents: 10000,
             flatRate: {
                 id: "flat-rate",
-                total_cents: 10000,
+                totalCents: 10000,
                 translations: [
                     {
                         language: "EN" as const,

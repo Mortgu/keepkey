@@ -36,7 +36,7 @@ export type HeaderField =
 export type PositionField =
     | "productId"
     | "quantity"
-    | "free_months"
+    | "freeMonths"
     | "optional"
     | "unitPrice";
 
@@ -110,7 +110,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             fields: {
                 productId: "edit",
                 quantity: "edit",
-                free_months: "edit",
+                freeMonths: "edit",
                 optional: "edit",
                 unitPrice: "edit",
             },
@@ -136,7 +136,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             fields: {
                 productId: "readonly",
                 quantity: "edit",
-                free_months: "edit",
+                freeMonths: "edit",
                 optional: "hidden",
                 unitPrice: "hidden",
             },
@@ -167,7 +167,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
             fields: {
                 productId: "edit",
                 quantity: "edit",
-                free_months: "edit",
+                freeMonths: "edit",
                 optional: "hidden",
                 unitPrice: "edit",
             },

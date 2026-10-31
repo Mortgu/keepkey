@@ -49,22 +49,36 @@ export function offerFixture(overrides: {
                 salutation: "Frau", firstName: "Anna", lastName: "Muster", email: "anna@acme.test",
             },
             user: {
-                salutation: "Herr", firstName: "Max", lastName: "Verkauf", phone: null, email: "max@keepit.test",
+                salutation: "Herr",
+                firstName: "Max",
+                lastName: "Verkauf",
+                phone: null,
+                email: "max@keepit.test",
             },
             offerPositions: [
                 {
-                    id: "p-1", productId: "prod-1", quantity: 10, free_months: 2, optional: false,
-                    eur_user_month: 500, total_cents: 120000, discount_cents: 10000,
-                    product: { translations: [t("DE", productName, { description: "M365", table: "Tabelle M365" }), t("EN", productName)] },
+                    id: "p-1",
+                    productId: "prod-1",
+                    quantity: 10,
+                    freeMonths: 2,
+                    optional: false,
+                    unitCents: 500,
+                    totalCents: 120000,
+                    discountCents: 10000,
+                    product: {
+                        translations: [
+                            t("DE", productName, { description: "M365", table: "Tabelle M365" }),
+                            t("EN", productName)]
+                    },
                 },
                 {
-                    id: "p-2", productId: "prod-2", quantity: 5, free_months: 0, optional: true,
-                    eur_user_month: 300, total_cents: 36000, discount_cents: 0,
+                    id: "p-2", productId: "prod-2", quantity: 5, freeMonths: 0, optional: true,
+                    unitCents: 300, totalCents: 36000, discountCents: 0,
                     product: { translations: [t("DE", "Salesforce"), t("EN", "Salesforce")] },
                 },
             ],
             offerFlatRates: [
-                { total_cents: 25000, flatRate: { translations: [t("DE", "Setup", { table: "Setup-Tabelle" }), t("EN", "Setup", { table: "Setup table" })] } },
+                { totalCents: 25000, flatRate: { translations: [t("DE", "Setup", { table: "Setup-Tabelle" }), t("EN", "Setup", { table: "Setup table" })] } },
             ],
             offerDiscounts: [
                 { title: "Treuerabatt", description: null, amount_cents: 5000 },

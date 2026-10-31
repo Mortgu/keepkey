@@ -46,7 +46,7 @@ describe("presentOrder", () => {
 
         expect(order.supplierPositions).toEqual([expect.objectContaining({
             offerPositionId: "position",
-            eur_user_month: 1000,
+            unitCents: 1000,
             purchase_eur_user_month: PURCHASE,
             fallback: false,
         })]);

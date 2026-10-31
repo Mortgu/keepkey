@@ -9,19 +9,11 @@
 model Invoice {
   id String @id @default(cuid())
 
-  /// Rechnungs-Nr., vom Nutzer vergeben.
   invoiceId String   @unique
   date      DateTime @default(now())
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Restrict)
   orderId String @unique
-
-  /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
-  /// `offer.netAmount`, der Satz aus dem Formular (Default: Kundensatz).
-  taxRate    Float
-  netCents   Int
-  vatCents   Int
-  grossCents Int
 
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
   customerId String
@@ -29,13 +21,17 @@ model Invoice {
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
 
-  documents Document[]
+  taxRate    Float
+  netCents   Int
+  vatCents   Int
+  grossCents Int
 
-  /// @openapi.ignore
   documentVersion Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  documents Document[]
 
   @@index([customerId])
   @@index([createdById])

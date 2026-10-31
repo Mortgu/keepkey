@@ -98,8 +98,8 @@ integration("removing price tables (real PostgreSQL)", () => {
                 paymentTerm: "30 days", netAmount: 1000, language: "EN",
                 offerPositions: {
                     create: {
-                        id: `pos-${randomUUID()}`, productId: "product", quantity: 1, total_cents: 1000,
-                        eur_user_month: 100, tariffVersionId: options.tariffVersionId,
+                        id: `pos-${randomUUID()}`, productId: "product", quantity: 1, totalCents: 1000,
+                        unitCents: 100, tariffVersionId: options.tariffVersionId,
                     },
                 },
             },

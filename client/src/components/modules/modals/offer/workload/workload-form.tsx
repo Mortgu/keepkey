@@ -48,7 +48,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
 
     const [quantity, setQuantity] = useState<number>(currentWorkload?.quantity || 1);
 
-    const [freeMonths, setFreeMonths] = useState<number>(currentWorkload?.free_months || 0);
+    const [freeMonths, setFreeMonths] = useState<number>(currentWorkload?.freeMonths || 0);
 
     const [optional, setOptional] = useState<boolean>(currentWorkload?.optional || false);
 
@@ -59,7 +59,7 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
     const coordinates = coordinatesFrom(header, {
         productId: workload,
         quantity,
-        free_months: freeMonths,
+        freeMonths,
     });
 
     const {
@@ -139,11 +139,11 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
         const data: CreateOfferPositionInput = {
             productId: workload,
             quantity,
-            free_months: freeMonths,
+            freeMonths,
             optional,
-            total_cents: 0,
-            eur_user_month: 0,
-            discount_cents: 0,
+            totalCents: 0,
+            unitCents: 0,
+            discountCents: 0,
         };
 
         saveFn(data);
@@ -245,14 +245,14 @@ export default function WorkloadForm({ currentWorkload, cancelFn, saveFn }: Prop
                     </div>
                 )}
 
-                {shows("free_months") && (
+                {shows("freeMonths") && (
                     <NumberField
                         step={1}
                         min={0}
                         max={header.duration_months}
-                        label={t("offerModal.free_months")}
+                        label={t("offerModal.freeMonths")}
                         value={freeMonths}
-                        disabled={locked("free_months")}
+                        disabled={locked("freeMonths")}
                         onValueChange={(value) => setFreeMonths(value ?? 0)}
                     />
 

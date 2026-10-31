@@ -26,10 +26,10 @@ export type PurchaseRow = {
     offerPositionId: string;
     productName: Array<{ language: "DE" | "EN"; name: string }>;
     quantity: number;
-    free_months: number;
+    freeMonths: number;
     duration_months: number;
     /** Verkaufspreis je User/Monat in Cent. */
-    eur_user_month: number;
+    unitCents: number;
 };
 
 export function purchaseRows(currentOrder?: Order, currentOffer?: Offer): Array<PurchaseRow> {
@@ -39,9 +39,9 @@ export function purchaseRows(currentOrder?: Order, currentOffer?: Offer): Array<
             offerPositionId: sp.offerPositionId,
             productName: byId.get(sp.offerPositionId)?.product.translations ?? [],
             quantity: sp.quantity,
-            free_months: sp.free_months,
+            freeMonths: sp.freeMonths,
             duration_months: currentOrder.duration_months,
-            eur_user_month: sp.eur_user_month,
+            unitCents: sp.unitCents,
         }));
     }
     if (currentOffer) {
@@ -49,9 +49,9 @@ export function purchaseRows(currentOrder?: Order, currentOffer?: Offer): Array<
             offerPositionId: op.id,
             productName: op.product.translations,
             quantity: op.quantity,
-            free_months: op.free_months,
+            freeMonths: op.freeMonths,
             duration_months: currentOffer.duration_months,
-            eur_user_month: op.eur_user_month,
+            unitCents: op.unitCents,
         }));
     }
     return [];
@@ -82,7 +82,7 @@ export default function useOrderForm({ currentOrder, currentOffer, onDone }: Pro
                 offerPositionId: row.offerPositionId,
                 purchase_eur_user_month: currentOrder?.supplierPositions
                     .find((sp) => sp.offerPositionId === row.offerPositionId)?.purchase_eur_user_month
-                    ?? row.eur_user_month,
+                    ?? row.unitCents,
             })),
         },
         validators: { onChange: orderFormSchema, onSubmit: orderFormSchema },

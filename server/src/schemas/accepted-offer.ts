@@ -22,7 +22,7 @@ const product = z.object({
 });
 const flatRate = z.object({
     id: z.string(),
-    total_cents: z.number().int(),
+    totalCents: z.number().int(),
     translations: z.array(translation),
     ...timestamps,
 });
@@ -96,10 +96,10 @@ export const commercialSourceSchema = z.object({
                 .boolean()
                 .nullish()
                 .transform((v) => v ?? false),
-            total_cents: z.number().int(),
-            discount_cents: z.number().int().default(0),
-            free_months: z.number().int().default(0),
-            eur_user_month: z.number().int().default(0),
+            totalCents: z.number().int(),
+            discountCents: z.number().int().default(0),
+            freeMonths: z.number().int().default(0),
+            unitCents: z.number().int().default(0),
             tariffVersionId: text.optional(),
             createdAt: date,
             updatedAt: date,
@@ -111,7 +111,7 @@ export const commercialSourceSchema = z.object({
             flatRateId: z.string(),
             flatRate,
             quantity: z.number().int(),
-            total_cents: z.number().int(),
+            totalCents: z.number().int(),
         }),
     ),
     discounts: z.array(

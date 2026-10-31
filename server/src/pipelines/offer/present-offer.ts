@@ -62,15 +62,15 @@ function presentItem(
         description: translation.description,
         content: translation.table,
         quantity: String(position.quantity),
-        eur_user_month: formatCentsToEur(price.eur_user_month),
+        unitCents: formatCentsToEur(price.unitCents),
         duration: context.durationLabel,
-        total: formatCentsToEur(price.total_cents),
+        total: formatCentsToEur(price.totalCents),
         contract: context.contractName,
         optional: position.optional,
-        discount: position.free_months > 0 ? {
-            free_months: position.free_months,
+        discount: position.freeMonths > 0 ? {
+            freeMonths: position.freeMonths,
             valid_until: formatDate(context.validUntil),
-            total: formatCentsToEur(-price.discount_cents),
+            total: formatCentsToEur(-price.discountCents),
         } : null,
     };
 }
@@ -112,7 +112,7 @@ export function presentOffer(model: OfferModel): OfferTemplate {
 
     const flatrates = model.flatRates.map((fr) => {
         const translation = requireTranslation(fr.translations, language, "flat rate");
-        return { name: translation.name, content: translation.table, total: formatCentsToEur(fr.total_cents) };
+        return { name: translation.name, content: translation.table, total: formatCentsToEur(fr.totalCents) };
     });
 
     const contractsById = new Map([model.contract, ...model.comparisonContracts].map((c) => [c.id, c]));
@@ -132,7 +132,7 @@ export function presentOffer(model: OfferModel): OfferTemplate {
                 durationLabel: String(duration),
             })),
             flatrates,
-            total: formatCentsToEur(table.total_cents),
+            total: formatCentsToEur(table.totalCents),
         };
     });
 

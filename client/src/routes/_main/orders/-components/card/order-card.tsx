@@ -32,7 +32,7 @@ export default function OrderCard({ order }: Props) {
     const cancelled = Boolean(order.cancelledAt);
 
     // Marge nur über die Positionen — die Einkaufsseite kennt keine Pauschalen und Rabatte.
-    const positionsSales = orderPositions.reduce((sum, p) => sum + p.total_cents, 0);
+    const positionsSales = orderPositions.reduce((sum, p) => sum + p.totalCents, 0);
     // Altbestellungen ohne gespeicherte Einkaufspreise: Fallback = Verkaufspreis.
     const hasFallback = order.supplierPositions.some((p) => p.fallback);
 

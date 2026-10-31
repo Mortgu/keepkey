@@ -67,8 +67,8 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
             duration_months,
             duration: formatDuration(duration_months),
             total: formatCentsToEur(group_total),
-            // `item.total_cents` ist bereits netto (Freimonate abgezogen, siehe
-            // presentOrder); `discount_cents` ist der abgezogene Betrag.
+            // `item.totalCents` ist bereits netto (Freimonate abgezogen, siehe
+            // presentOrder); `discountCents` ist der abgezogene Betrag.
             items: group.map((item) => ({
                 offerPositionId: item.id,
                 name: item.product.name,
@@ -76,14 +76,14 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
                 table: item.product.table,
                 quantity: item.quantity,
                 optional: item.optional,
-                free_months: item.free_months,
+                freeMonths: item.freeMonths,
                 contract,
                 duration_months,
                 price: {
-                    unit: formatCentsToEur(item.eur_user_month),
-                    gross: formatCentsToEur(item.total_cents + item.discount_cents),
-                    discount: item.discount_cents ? formatCentsToEur(-item.discount_cents) : "",
-                    total: formatCentsToEur(item.total_cents),
+                    unit: formatCentsToEur(item.unitCents),
+                    gross: formatCentsToEur(item.totalCents + item.discountCents),
+                    discount: item.discountCents ? formatCentsToEur(-item.discountCents) : "",
+                    total: formatCentsToEur(item.totalCents),
                 },
             })),
         };
@@ -92,7 +92,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
     const orderFlatRates = flatRates.map((fr) => ({
         ...fr,
         price: {
-            total: formatCentsToEur(fr.total_cents),
+            total: formatCentsToEur(fr.totalCents),
         },
     }));
 

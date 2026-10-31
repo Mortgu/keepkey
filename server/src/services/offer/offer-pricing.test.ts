@@ -8,8 +8,8 @@ describe("calculateNetAmount", () => {
 
     it("subtracts free months from positions", () => {
         const positions = [
-            { total_cents: 12_000, discount_cents: 2_000 },
-            { total_cents: 5_000, discount_cents: 0 },
+            { totalCents: 12_000, discountCents: 2_000 },
+            { totalCents: 5_000, discountCents: 0 },
         ];
 
         expect(calculateNetAmount(positions, [], [])).toBe(15_000);
@@ -17,13 +17,13 @@ describe("calculateNetAmount", () => {
 
     it("adds flat rates and subtracts discounts", () => {
         expect(calculateNetAmount(
-            [{ total_cents: 10_000, discount_cents: 1_000 }],
-            [{ total_cents: 2_500 }, { total_cents: 500 }],
+            [{ totalCents: 10_000, discountCents: 1_000 }],
+            [{ totalCents: 2_500 }, { totalCents: 500 }],
             [{ amount_cents: 1_500 }],
         )).toBe(10_500);
     });
 
     it("can become negative when discounts exceed the total", () => {
-        expect(calculateNetAmount([], [{ total_cents: 1_000 }], [{ amount_cents: 1_200 }])).toBe(-200);
+        expect(calculateNetAmount([], [{ totalCents: 1_000 }], [{ amount_cents: 1_200 }])).toBe(-200);
     });
 });

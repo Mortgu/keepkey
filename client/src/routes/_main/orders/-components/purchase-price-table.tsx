@@ -15,7 +15,7 @@ interface Props {
 
 /** Netto einer Zeile: Preis × Menge × (Laufzeit − Freimonate). Gleiche Formel wie der Server. */
 const lineNet = (row: PurchaseRow, unitCents: number) =>
-    unitCents * row.quantity * (row.duration_months - row.free_months);
+    unitCents * row.quantity * (row.duration_months - row.freeMonths);
 
 /**
  * Einkaufspreise der Bestellung an den Zulieferer. Verkaufspreis daneben zum
@@ -30,7 +30,7 @@ export default function PurchasePriceTable({ rows, values, onChange, disabled }:
     const purchaseOf = (id: string) =>
         values.find((v) => v.offerPositionId === id)?.purchase_eur_user_month ?? 0;
 
-    const sales = rows.reduce((sum, row) => sum + lineNet(row, row.eur_user_month), 0);
+    const sales = rows.reduce((sum, row) => sum + lineNet(row, row.unitCents), 0);
     const purchase = rows.reduce((sum, row) => sum + lineNet(row, purchaseOf(row.offerPositionId)), 0);
     const margin = sales - purchase;
 
@@ -56,7 +56,7 @@ export default function PurchasePriceTable({ rows, values, onChange, disabled }:
                             <tr key={row.offerPositionId} className="border-t border-(--border)">
                                 <td className="py-2">{localized(row.productName, locale, "name")}</td>
                                 <td className="py-2 text-right font-mono">{row.quantity}</td>
-                                <td className="py-2 text-right font-mono">{formatEur(row.eur_user_month)}</td>
+                                <td className="py-2 text-right font-mono">{formatEur(row.unitCents)}</td>
                                 <td className="py-2 text-right">
                                     <Input
                                         id={`purchase-${row.offerPositionId}`}

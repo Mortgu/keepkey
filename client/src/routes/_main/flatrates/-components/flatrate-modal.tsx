@@ -49,7 +49,7 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 
 	const form = useForm({
 		defaultValues: {
-			total_cents: currentFlatrate?.total_cents ?? 0,
+			totalCents: currentFlatrate?.totalCents ?? 0,
 			translations: [
 				seedLang(currentFlatrate?.translations, "DE"),
 				seedLang(currentFlatrate?.translations, "EN"),
@@ -111,7 +111,7 @@ export default function FlatRateModal({ currentFlatrate, onClose }: Props) {
 
 					{/* Gespeichert wird in Cent, eingegeben in Euro — die Umrechnung
 					    läuft über die zentralen Helfer, nicht über eigene /100. */}
-					<form.Field name="total_cents">
+					<form.Field name="totalCents">
 						{(field) => (
 							<NumberField
 								min={0.01}

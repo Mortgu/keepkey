@@ -190,7 +190,7 @@ export function resolveTier(
  * selects the column AND is a multiplier.
  *
  * **Immer brutto.** Freimonate kennt diese Funktion bewusst nicht: ihr Wert
- * wird überall getrennt als `discount_cents` geführt (siehe `PositionPrice` in
+ * wird überall getrennt als `discountCents` geführt (siehe `PositionPrice` in
  * `@keepit/schemas`), netto ist die Differenz. Ein Rabatt-Parameter hier hätte
  * zwei Bedeutungen von „Gesamtpreis" nebeneinander gestellt — genau daran ist
  * die Angebots-PDF einmal auseinandergelaufen.
@@ -279,7 +279,7 @@ export async function calculatePrice(props: PriceCalculatorProps): Promise<Price
 /**
  * Convenience wrapper for callers that only need the numeric price.
  * Throws a {@link PriceError} when the tariff is not fully configured or
- * the inputs are invalid — prevents silently storing `total_cents: 0`.
+ * the inputs are invalid — prevents silently storing `totalCents: 0`.
  */
 export async function calculatePriceOrThrow(props: PriceCalculatorProps): Promise<number> {
     const result = await calculatePrice(props);

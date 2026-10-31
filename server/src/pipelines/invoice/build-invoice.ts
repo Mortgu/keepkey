@@ -25,9 +25,9 @@ const addMonths = (date: Date, months: number) => {
  * Rechnung + Bestellung laden, Positionen als Rechnungszeilen, Steuerblock,
  * Name bilden. Datenvertrag ist `invoiceContract`.
  *
- * Preise: `presentOrder` liefert `total_cents` je Position bereits netto
- * (Freimonate abgezogen) und `discount_cents` als den abgezogenen Betrag.
- * Einzelpreis ist `eur_user_month`. Die Zeilensumme entspricht damit exakt
+ * Preise: `presentOrder` liefert `totalCents` je Position bereits netto
+ * (Freimonate abgezogen) und `discountCents` als den abgezogenen Betrag.
+ * Einzelpreis ist `unitCents`. Die Zeilensumme entspricht damit exakt
  * `netAmount` des angenommenen Angebots, das beim Anlegen als `netCents`
  * gespeichert wurde.
  *
@@ -66,20 +66,20 @@ export async function buildInvoice(invoiceRowId: string): Promise<BuildInvoiceRe
                 pos: ++pos,
                 description: table,
                 quantity: p.quantity,
-                unitPrice: formatCentsToEur(p.eur_user_month),
-                gross: formatCentsToEur(p.total_cents + p.discount_cents),
-                discount: p.discount_cents ? formatCentsToEur(-p.discount_cents) : "",
-                total: formatCentsToEur(p.total_cents),
+                unitPrice: formatCentsToEur(p.unitCents),
+                gross: formatCentsToEur(p.totalCents + p.discountCents),
+                discount: p.discountCents ? formatCentsToEur(-p.discountCents) : "",
+                total: formatCentsToEur(p.totalCents),
             };
         }),
         ...order.flatRates.map((fr) => ({
             pos: ++pos,
             description: translateFields(fr.flatRate.translations, lang, { table: "" }).table,
             quantity: fr.quantity,
-            unitPrice: formatCentsToEur(fr.quantity ? fr.total_cents / fr.quantity : 0),
-            gross: formatCentsToEur(fr.total_cents),
+            unitPrice: formatCentsToEur(fr.quantity ? fr.totalCents / fr.quantity : 0),
+            gross: formatCentsToEur(fr.totalCents),
             discount: "",
-            total: formatCentsToEur(fr.total_cents),
+            total: formatCentsToEur(fr.totalCents),
         })),
         ...order.discounts.map((d) => ({
             pos: ++pos,

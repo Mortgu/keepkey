@@ -38,13 +38,13 @@ beforeAll(async () => {
         INSERT INTO contact_person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
         INSERT INTO product (id, "updatedAt") VALUES ('product', now());
-        INSERT INTO flat_rate (id, total_cents, "updatedAt") VALUES ('flat-rate', 10000, now());
+        INSERT INTO flat_rate (id, totalCents, "updatedAt") VALUES ('flat-rate', 10000, now());
         INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", netAmount, "updatedAt")
             VALUES ('offer', 'customer', 'contact', 'user', 'contract', 12, 'Q-1', '30 Tage', 90000, now()),
                    ('draft', 'customer', 'contact', 'user', 'contract', 12, 'Q-2', '30 Tage', 100, now());
-        INSERT INTO offer_position (id, "offerId", "productId", quantity, total_cents, discount_cents, eur_user_month, "updatedAt")
+        INSERT INTO offer_position (id, "offerId", "productId", quantity, totalCents, discountCents, eur_user_month, "updatedAt")
             VALUES ('position', 'offer', 'product', 10, 120000, 30000, 1000, now());
-        INSERT INTO offer_flat_rate (id, "offerId", "flatRateId", quantity, total_cents) VALUES ('flat', 'offer', 'flat-rate', 1, 10000);
+        INSERT INTO offer_flat_rate (id, "offerId", "flatRateId", quantity, totalCents) VALUES ('flat', 'offer', 'flat-rate', 1, 10000);
         INSERT INTO offer_discount (id, "offerId", title, amount_cents, "updatedAt") VALUES ('discount', 'offer', 'Discount', 10000, now());
     `);
     await db.query(
@@ -84,7 +84,7 @@ describe("order migration and PostgreSQL invariants", () => {
         );
         const names = positionColumns.rows.map((c) => c.column_name);
         expect(names).toEqual(expect.arrayContaining(["offerPositionId", "purchase_eur_user_month", "purchase_total_cents"]));
-        for (const customerColumn of ["productId", "quantity", "total_cents", "eur_user_month", "discount_cents"]) {
+        for (const customerColumn of ["productId", "quantity", "total_cents", "eur_user_month", "discountCents"]) {
             expect(names).not.toContain(customerColumn);
         }
         const columns = await db.query<{ column_name: string }>(

@@ -23,18 +23,18 @@ export type ContractModel = {
     translations: Array<{ language: Language; name: string; features: string[] }>;
 };
 
-/** Die drei Beträge, die an einer Position hängen. `total_cents` ist brutto, siehe `netCents`. */
+/** Die drei Beträge, die an einer Position hängen. `totalCents` ist brutto, siehe `netCents`. */
 export type PositionAmounts = {
-    eur_user_month: number;
-    total_cents: number;
-    discount_cents: number;
+    unitCents: number;
+    totalCents: number;
+    discountCents: number;
 };
 
 export type PositionModel = PositionAmounts & {
     id: string;
     productId: string;
     quantity: number;
-    free_months: number;
+    freeMonths: number;
     optional: boolean;
     translations: Translation[];
 };
@@ -44,7 +44,7 @@ export type PriceTableModel = {
     contractId: string;
     items: Array<PositionAmounts & { positionId: string }>;
     /** Netto über alle Positionen, plus Flatrates, minus Rabatte. */
-    total_cents: number;
+    totalCents: number;
 };
 
 export type OfferModel = {
@@ -85,7 +85,7 @@ export type OfferModel = {
     comparisonContracts: ContractModel[];
 
     positions: PositionModel[];
-    flatRates: Array<{ total_cents: number; translations: Translation[] }>;
+    flatRates: Array<{ totalCents: number; translations: Translation[] }>;
     discounts: Array<{ title: string; description: string | null; amount_cents: number }>;
 
     /**

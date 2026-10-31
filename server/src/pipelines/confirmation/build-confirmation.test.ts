@@ -47,9 +47,9 @@ describe("buildConfirmation", () => {
     it("shows the real unit price and the free-month deduction per line", async () => {
         const built = await buildConfirmation("conf-1");
         const data = confirmationTemplateSchema.parse(built.data);
-        const line = (data.groups[0] as unknown as { items: Array<{ free_months: number; price: Record<string, string> }> }).items[0]!;
+        const line = (data.groups[0] as unknown as { items: Array<{ freeMonths: number; price: Record<string, string> }> }).items[0]!;
 
-        expect(line.free_months).toBe(3);
+        expect(line.freeMonths).toBe(3);
         expect(line.price.unit).toBe("10,00 €");
         expect(line.price.gross).toBe("1.200,00 €");
         expect(line.price.discount).toBe("-300,00 €");

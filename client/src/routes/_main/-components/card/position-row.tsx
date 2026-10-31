@@ -20,13 +20,13 @@ type Props = {
  */
 export default function PositionRow({ position, contract, durationMonths }: Props) {
     const { formatEur } = useFormatters();
-    const { product, quantity, total_cents } = position;
+    const { product, quantity, totalCents } = position;
 
     const locale = useLocale();
 
-    const freeMonths = "free_months" in position ? position.free_months : 0;
-    const discountCents = "discount_cents" in position ? position.discount_cents : 0;
-    const unitCents = "eur_user_month" in position ? position.eur_user_month : 0;
+    const freeMonths = "freeMonths" in position ? position.freeMonths : 0;
+    const discountCents = "discountCents" in position ? position.discountCents : 0;
+    const unitCents = "unitCents" in position ? position.unitCents : 0;
 
     return (
         <div className="grid gap-4 border-b border-(--border) py-3 last:border-0">
@@ -56,7 +56,7 @@ export default function PositionRow({ position, contract, durationMonths }: Prop
                     </div>
                 </div>
                 <div className="flex flex-col items-end">
-                    <p className="text-md font-mono">{formatEur(total_cents)}</p>
+                    <p className="text-md font-mono">{formatEur(totalCents)}</p>
                 </div>
             </div>
 

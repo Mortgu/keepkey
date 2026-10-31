@@ -1,7 +1,3 @@
-/// Auftragsbestätigung (AB) zu einer Bestellung. Die AB-Nummer vergibt der
-/// Nutzer einmal; danach ist sie unveränderlich. Konditionen stehen am
-/// angenommenen Angebot — hier kommen nur MwSt und Brutto dazu, und die werden
-/// bei der Generierung aus `customer.taxRate` des Snapshots berechnet.
 model Confirmation {
   id String @id @default(cuid())
 
@@ -21,7 +17,6 @@ model Confirmation {
 
   documents Document[]
 
-  /// @openapi.ignore
   documentVersion Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)

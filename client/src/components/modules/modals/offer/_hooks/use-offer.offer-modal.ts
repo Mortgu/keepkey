@@ -55,12 +55,12 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
             // verweist darauf, statt die Positionsdaten selbst zu schicken.
             sourcePositionId: op.id,
             productId: op.productId,
-            free_months: op.free_months,
+            freeMonths: op.freeMonths,
             quantity: op.quantity,
             optional: op.optional,
-            total_cents: op.total_cents,
-            eur_user_month: op.eur_user_month,
-            discount_cents: op.discount_cents,
+            totalCents: op.totalCents,
+            unitCents: op.unitCents,
+            discountCents: op.discountCents,
         })) ?? [],
 
         flatrates: currentOffer?.offerFlatRates.map(of => ({

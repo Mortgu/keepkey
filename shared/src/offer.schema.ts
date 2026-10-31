@@ -19,14 +19,14 @@ import { userSchema } from "./user.schema.js";
  */
 export const createOfferPositionSchema = z.object({
     productId: z.string(),
-    free_months: z.number().int(),
+    freeMonths: z.number().int(),
     optional: z.boolean(),
     quantity: z.number().int(),
-    total_cents: z.number().int(),
+    totalCents: z.number().int(),
 
     // TODO: remove these from the body
-    discount_cents: z.number().int(),
-    eur_user_month: z.number().int(),
+    discountCents: z.number().int(),
+    unitCents: z.number().int(),
 });
 export type CreateOfferPositionInput = z.infer<typeof createOfferPositionSchema>;
 
@@ -52,7 +52,7 @@ export const offerFlatrateSchema = createOfferFlatrateSchema.extend({
     id: z.string(),
     offerId: z.string(),
 
-    total_cents: z.number().int().positive(),
+    totalCents: z.number().int().positive(),
     flatRate: flatrateSchema,
 });
 export type OfferFlatrate = z.infer<typeof offerFlatrateSchema>;
