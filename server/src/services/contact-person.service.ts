@@ -7,3 +7,9 @@ export async function getAllPersons() {
         orderBy: { lastName: "asc" },
     });
 }
+
+export async function getPersonById(id: string) {
+    return prisma.person.findUnique({
+        where: { id },
+    });
+}

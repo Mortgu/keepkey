@@ -11,10 +11,22 @@
             "LICENSE_EXTENSION": "Extension"
         },
         "station": {
-            "offer": { "label": "Offer", "short": "Offer" },
-            "order": { "label": "Order", "short": "Order" },
-            "confirmation": { "label": "Order confirmation", "short": "Confirmation" },
-            "invoice": { "label": "Invoice", "short": "Invoice" }
+            "offer": {
+                "label": "Offer",
+                "short": "Offer"
+            },
+            "order": {
+                "label": "Order",
+                "short": "Order"
+            },
+            "confirmation": {
+                "label": "Order confirmation",
+                "short": "Confirmation"
+            },
+            "invoice": {
+                "label": "Invoice",
+                "short": "Invoice"
+            }
         },
         "state": {
             "done": "Created",
@@ -58,6 +70,7 @@
             "generateDocument": "Generate document",
             "noDocuments": "No documents generated yet.",
             "products": "Products",
+            "workloads": "Workloads",
             "documents": "Documents",
             "details": "Details",
             "projectNumber": "Project number",

@@ -1,46 +1,43 @@
-/// Eine Bestellung nimmt ein unveränderliches Angebot an. Die Kundenkonditionen
-/// stehen ausschließlich am Angebot (Snapshot). Die Bestellung geht an den
-/// Zulieferer und trägt deshalb je Position einen eigenen Einkaufspreis
-/// (`OrderPosition`); Pauschalen und Rabatte bleiben Kundensache.
 model Order {
-  id                 String          @id @default(uuid())
-  offerId            String          @unique
-  offer              Offer           @relation(fields: [offerId], references: [id], onDelete: Restrict)
-  orderId            String          @unique
-  date               DateTime        @default(now())
+  id String @id @default(uuid())
+
+  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Restrict)
+  offerId String @unique
+
+  orderId            String   @unique
+  date               DateTime @default(now())
   projectNumber      String?
   projectDescription String?
   orderDetails       String?
-  /// Optionaler Vertragsbeginn; die Laufzeit (duration_months) steht am Angebot.
-  contractStartDate  DateTime?
-  acceptedAt         DateTime        @default(now()) @db.Timestamptz(6)
-  acceptedById       String
-  acceptedBy         User            @relation(fields: [acceptedById], references: [id], onDelete: Restrict)
-  cancelledAt        DateTime?       @db.Timestamptz(6)
-  version            Int             @default(1)
-  documentVersion    Int             @default(0)
-  documents          Document[]
-  positions          OrderPosition[]
-  confirmation       Confirmation?
-  invoice            Invoice?
-  createdAt          DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
+
+  contractStartDate DateTime?
+  acceptedAt        DateTime? @db.Timestamptz(6)
+
+  acceptedBy   User   @relation(fields: [acceptedById], references: [id], onDelete: Restrict)
+  acceptedById String
+
+  version         Int @default(1)
+  documentVersion Int @default(0)
+
+  cancelledAt DateTime? @db.Timestamptz(6)
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(6)
+
+  documents    Document[]
+  positions    OrderPosition[]
+  confirmation Confirmation?
+  invoice      Invoice?
 
   @@index([acceptedById])
   @@map("order")
 }
 
-/// Einkaufspreis einer Angebotsposition für die Bestellung an den Zulieferer.
-/// Der Preis wird je User/Monat eingegeben wie der Verkaufspreis; die Summen
-/// rechnet der Server mit denselben Formeln wie beim Angebot. Menge, Laufzeit
-/// und Freimonate stehen weiterhin an der Snapshot-Position.
 model OrderPosition {
   id String @id @default(cuid())
 
   order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
   orderId String
 
-  /// Id der Position im Accepted-Snapshot des Angebots.
   offerPositionId String
 
   purchase_eur_user_month Int

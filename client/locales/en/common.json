@@ -48,6 +48,7 @@
     "months": "months",
     "increment": "Increase value",
     "decrement": "Decrease value",
+    "discount": "Discount",
     "sort": {
       "label": "Sort:",
       "createdAtDesc": "Date – newest first",

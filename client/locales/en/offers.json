@@ -78,6 +78,9 @@
     "create": "Create offer",
     "createRenewal": "Renewal",
     "createExtension": "License extension",
-    "description": "Central management of offers"
+    "description": "Central management of offers",
+    "documents": {
+      "not_generated": "No offer document generated yet!"
+    }
   }
 }

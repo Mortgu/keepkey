@@ -12,6 +12,7 @@ export function useInvoice(orderId: string) {
         // Solange ein Dokument läuft, nachladen — das Statusfeld hängt daran.
         refetchInterval: (q) =>
             q.state.data?.documents.some((d) => d.status === "PENDING" || d.status === "PROCESSING") ? 3_000 : false,
+        enabled: Boolean(orderId)
     });
     return { invoice: query.data ?? null, isPending: query.isPending, error: query.error };
 }

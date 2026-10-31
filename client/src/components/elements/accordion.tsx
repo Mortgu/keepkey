@@ -7,10 +7,11 @@ import { tv } from "tailwind-variants";
 const accordionStyles = tv({
     slots: {
         Root: "grid",
-        Item: "border-b border-(--border) last:border-0",
+        Item: " last:border-0",
         Trigger: [
             "group w-full flex items-center justify-between gap-2 px-4 py-2",
-            "cursor-pointer text-left text-sm bg-(--page-bg) text-(--text)",
+            "cursor-pointer text-left text-sm bg-gray-100 text-(--text)",
+            "border-t border-(--border)",
             ACTION_FOCUS,
         ],
         Icon: [
@@ -18,9 +19,9 @@ const accordionStyles = tv({
             "group-data-panel-open:rotate-180",
         ],
         Panel: [
-            "overflow-hidden h-(--accordion-panel-height)",
+            "h-(--accordion-panel-height)",
         ],
-        Content: "px-4",
+        Content: "",
     },
 });
 

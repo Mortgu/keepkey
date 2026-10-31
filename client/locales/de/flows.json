@@ -11,10 +11,22 @@
             "LICENSE_EXTENSION": "Erweiterung"
         },
         "station": {
-            "offer": { "label": "Angebot", "short": "Angebot" },
-            "order": { "label": "Bestellung", "short": "Bestellung" },
-            "confirmation": { "label": "Auftragsbestätigung", "short": "Auftragsbest." },
-            "invoice": { "label": "Rechnung", "short": "Rechnung" }
+            "offer": {
+                "label": "Angebot",
+                "short": "Angebot"
+            },
+            "order": {
+                "label": "Bestellung",
+                "short": "Bestellung"
+            },
+            "confirmation": {
+                "label": "Auftragsbestätigung",
+                "short": "Auftragsbest."
+            },
+            "invoice": {
+                "label": "Rechnung",
+                "short": "Rechnung"
+            }
         },
         "state": {
             "done": "Angelegt",
@@ -58,6 +70,7 @@
             "generateDocument": "Dokument generieren",
             "noDocuments": "Noch keine Dokumente generiert!",
             "products": "Produkte",
+            "workloads": "Workloads",
             "documents": "Dokumente",
             "details": "Details",
             "projectNumber": "Projektnummer",

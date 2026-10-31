@@ -48,6 +48,7 @@
     "months": "Monate",
     "increment": "Wert erhöhen",
     "decrement": "Wert verringern",
+    "discount": "Rabatt",
     "sort": {
       "label": "Sortierung:",
       "createdAtDesc": "Datum – neuestes zuerst",

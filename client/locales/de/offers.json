@@ -78,6 +78,9 @@
     "create": "Angebot erstellen",
     "createRenewal": "Verlängerung",
     "createExtension": "Lizenzerweiterung",
-    "description": "Zentrale Verwaltung der Angebote"
+    "description": "Zentrale Verwaltung der Angebote",
+    "documents": {
+      "not_generated": "Noch kein Angebots Dokument generiert!"
+    }
   }
 }

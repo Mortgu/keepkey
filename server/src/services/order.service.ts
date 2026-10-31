@@ -51,8 +51,8 @@ export async function getAllOrders(query: OrderListQuery = {}) {
 }
 
 export async function getOrderById(id: string) {
-    const order = await prisma.order.findUnique({
-        where: { id },
+    const order = await prisma.order.findFirst({
+        where: { OR: [{ id }, { offerId: id }] },
         include: orderInclude,
     });
 
