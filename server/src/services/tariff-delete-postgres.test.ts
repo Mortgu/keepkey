@@ -95,7 +95,7 @@ integration("removing price tables (real PostgreSQL)", () => {
             data: {
                 id, customerId: "customer", contactPersonId: "contact", userId: "user",
                 contractId: options.contractId ?? "contract", duration_months: 12, quoteId: id,
-                paymentTerm: "30 days", net_amount: 1000, language: "EN",
+                paymentTerm: "30 days", netAmount: 1000, language: "EN",
                 offerPositions: {
                     create: {
                         id: `pos-${randomUUID()}`, productId: "product", quantity: 1, total_cents: 1000,

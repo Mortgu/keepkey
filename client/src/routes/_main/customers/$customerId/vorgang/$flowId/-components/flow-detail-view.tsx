@@ -531,7 +531,7 @@ function InvoiceStageSection({ stage, order, invoice }: { stage: FlowStage; orde
 function Summary({ offer, customer }: { offer: Offer; customer: Customer | undefined }) {
     const { t } = useTranslation();
     const { formatEur } = useFormatters();
-    const preview = vatTotals(offer.net_amount, customer?.taxRate ?? 0);
+    const preview = vatTotals(offer.netAmount, customer?.taxRate ?? 0);
     const rows: Array<[string, string]> = [
         [t("flows.summary.customer"), offer.customer.companyName],
         [t("flows.summary.contact"), `${offer.customerContactPerson.firstName} ${offer.customerContactPerson.lastName}`.trim()],
@@ -551,7 +551,7 @@ function Summary({ offer, customer }: { offer: Offer; customer: Customer | undef
                 ))}
             </dl>
             <dl className="grid gap-1.5 border-t border-(--border) px-4 py-3 text-[13px] tabular-nums">
-                <div className="flex justify-between"><dt className="text-(--fg-3)">{t("flows.summary.net")}</dt><dd>{formatEur(offer.net_amount)}</dd></div>
+                <div className="flex justify-between"><dt className="text-(--fg-3)">{t("flows.summary.net")}</dt><dd>{formatEur(offer.netAmount)}</dd></div>
                 <div className="flex justify-between">
                     <dt className="text-(--fg-3)">{t("flows.summary.vat")}</dt><dd>{formatEur(preview.vatCents)}</dd>
                 </div>
@@ -616,7 +616,7 @@ export default function FlowDetailView({ offer, order, confirmation, invoice, cu
                     </p>
                 </div>
                 <div className="text-right">
-                    <p className="text-xl font-medium tabular-nums">{formatEur(offer.net_amount)}</p>
+                    <p className="text-xl font-medium tabular-nums">{formatEur(offer.netAmount)}</p>
                     <p className="text-xs text-(--fg-3)">{t("flows.detail.net")}</p>
                 </div>
             </div>

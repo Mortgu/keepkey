@@ -35,7 +35,7 @@ describe("accepted offer order data", () => {
             projectNumber: "Changed",
             version: 2,
         });
-        expect(after.net_amount).toBe(90000);
+        expect(after.netAmount).toBe(90000);
         expect(after.orderPositions[0]?.total_cents).toBe(90000);
         expect(after.discounts).toEqual(before.discounts);
         expect(after.positions[0]?.eur_user_month).toBe(1000);
@@ -115,7 +115,7 @@ describe("accepted offer order data", () => {
         expect(
             updateOrderMetadataSchema.safeParse({
                 ...input,
-                order: { ...input.order, net_amount: 0 },
+                order: { ...input.order, netAmount: 0 },
             }).success,
         ).toBe(false);
         expect(

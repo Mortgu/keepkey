@@ -148,7 +148,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 duration_months: 12,
                 quoteId: id,
                 paymentTerm: "30 days",
-                net_amount: 80000,
+                netAmount: 80000,
                 language: "EN",
                 offerPositions: {
                     create: {
@@ -258,7 +258,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         );
 
         const restored = await getOrderById(order.id);
-        expect(restored.net_amount).toBe(80000);
+        expect(restored.netAmount).toBe(80000);
         expect(restored.projectNumber).toBeNull();
         expect(restored.customer.companyName).toBe("Original Ltd");
         await cancelOrder(order.id, 3, "user");

@@ -52,7 +52,7 @@ export default function OrderModalDetail({ offer, form, rows, error, formId }: P
                         <p className="text-sm text-(--text-secondary)">{ccp.salutation} {ccp.firstName} {ccp.lastName}</p>
                     </div>
                     <div className="text-right shrink-0">
-                        <p className="font-mono font-medium">{formatEur(offer.net_amount)}</p>
+                        <p className="font-mono font-medium">{formatEur(offer.netAmount)}</p>
                         <p className="text-xs text-(--text-secondary)">{t("orders.modal.netTotal")}</p>
                     </div>
                 </div>

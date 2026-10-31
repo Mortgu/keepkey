@@ -58,14 +58,14 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         prisma.$queryRaw<MonthRow[]>`
             SELECT to_char(date_trunc('month', "date"), 'YYYY-MM') AS month,
                    count(*)                                        AS count,
-                   sum("net_amount")                               AS volume
+                   sum("netAmount")                               AS volume
             FROM "offer"
             WHERE "date" >= ${start}
             GROUP BY 1
         `,
         prisma.$queryRaw<MonthRow[]>`
             SELECT to_char(date_trunc('month', o."date"), 'YYYY-MM') AS month,
-                   count(*) AS count, sum(f."net_amount") AS volume
+                   count(*) AS count, sum(f."netAmount") AS volume
             FROM "order" o JOIN "offer" f ON f.id = o."offerId"
             WHERE o."date" >= ${start} AND o."cancelledAt" IS NULL
             GROUP BY 1
@@ -74,10 +74,10 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         prisma.offer.aggregate({
             where: { acceptedAt: null },
             _count: { _all: true },
-            _sum: { net_amount: true },
+            _sum: { netAmount: true },
         }),
         prisma.$queryRaw<{ count: bigint; volume: bigint | null }[]>`
-            SELECT count(*) AS count, sum(f."net_amount") AS volume
+            SELECT count(*) AS count, sum(f."netAmount") AS volume
             FROM "order" o JOIN "offer" f ON f.id = o."offerId"
             WHERE o."cancelledAt" IS NULL
         `,
@@ -103,7 +103,7 @@ export async function getDashboardStats(): Promise<DashboardStats> {
         totals: {
             offers: {
                 count: openOffers._count._all,
-                volume_cents: openOffers._sum.net_amount ?? 0,
+                volume_cents: openOffers._sum.netAmount ?? 0,
             },
             orders: {
                 count: Number(orderTotals[0]?.count ?? 0),

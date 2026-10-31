@@ -29,10 +29,10 @@ export async function buildConfirmation(confirmationId: string): Promise<{
         confirmationId: confirmation.confirmationId,
         confirmationDate: formatDate(confirmation.date) ?? "",
         // Steuerblock aus der Row — beim Anlegen festgelegt, Regenerieren rechnet nie neu.
-        netTotal: formatCentsToEur(confirmation.net_cents),
+        netTotal: formatCentsToEur(confirmation.netCents),
         vatRate: formatPercent(confirmation.taxRate),
-        vatAmount: formatCentsToEur(confirmation.vat_cents),
-        grossTotal: formatCentsToEur(confirmation.gross_cents),
+        vatAmount: formatCentsToEur(confirmation.vatCents),
+        grossTotal: formatCentsToEur(confirmation.grossCents),
     });
 
     return {

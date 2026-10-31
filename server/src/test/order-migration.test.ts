@@ -39,7 +39,7 @@ beforeAll(async () => {
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
         INSERT INTO product (id, "updatedAt") VALUES ('product', now());
         INSERT INTO flat_rate (id, total_cents, "updatedAt") VALUES ('flat-rate', 10000, now());
-        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", net_amount, "updatedAt")
+        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", netAmount, "updatedAt")
             VALUES ('offer', 'customer', 'contact', 'user', 'contract', 12, 'Q-1', '30 Tage', 90000, now()),
                    ('draft', 'customer', 'contact', 'user', 'contract', 12, 'Q-2', '30 Tage', 100, now());
         INSERT INTO offer_position (id, "offerId", "productId", quantity, total_cents, discount_cents, eur_user_month, "updatedAt")
@@ -91,14 +91,14 @@ describe("order migration and PostgreSQL invariants", () => {
             `SELECT column_name FROM information_schema.columns WHERE table_name = 'order'`,
         );
         expect(columns.rows.map((c) => c.column_name)).not.toContain(
-            "net_amount",
+            "netAmount",
         );
         expect(columns.rows.map((c) => c.column_name)).not.toContain(
             "customerId",
         );
     });
     it.each([
-        `UPDATE offer SET net_amount = 0 WHERE id = 'offer'`,
+        `UPDATE offer SET netAmount = 0 WHERE id = 'offer'`,
         `DELETE FROM offer WHERE id = 'offer'`,
         `UPDATE offer_position SET quantity = 99 WHERE id = 'position'`,
         `DELETE FROM offer_position WHERE id = 'position'`,
@@ -113,10 +113,10 @@ describe("order migration and PostgreSQL invariants", () => {
     it("allows document counters and order metadata without changing the agreed total", async () => {
         await db.exec(`UPDATE offer SET "documentVersion" = "documentVersion" + 1 WHERE id = 'offer';
             UPDATE "order" SET "projectNumber" = 'New project', version = version + 1 WHERE id = 'order';`);
-        const result = await db.query<{ net_amount: number }>(
-            `SELECT f.net_amount FROM "order" o JOIN offer f ON f.id = o."offerId" WHERE o.id = 'order'`,
+        const result = await db.query<{ netAmount: number }>(
+            `SELECT f.netAmount FROM "order" o JOIN offer f ON f.id = o."offerId" WHERE o.id = 'order'`,
         );
-        expect(result.rows[0]?.net_amount).toBe(90000);
+        expect(result.rows[0]?.netAmount).toBe(90000);
     });
     it("rejects orders that reference a draft", async () => {
         await expect(
@@ -146,7 +146,7 @@ describe("order migration and PostgreSQL invariants", () => {
             `UPDATE "order" SET "cancelledAt" = now() WHERE id = 'order'`,
         );
         await expect(
-            db.exec(`UPDATE offer SET net_amount = 0 WHERE id = 'offer'`),
+            db.exec(`UPDATE offer SET netAmount = 0 WHERE id = 'offer'`),
         ).rejects.toThrow(/OFFER_ACCEPTED/);
     });
     it("aborts before any destructive DDL if unexpected orders exist", async () => {

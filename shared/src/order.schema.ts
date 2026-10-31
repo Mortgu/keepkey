@@ -159,7 +159,7 @@ export const orderSchema = z.object({
     requestFrom: z.string().nullish(),
     contractStartDate: z.string().nullish(),
 
-    net_amount: z.number().int(),
+    netAmount: z.number().int(),
     /** Einkaufsseite: Summe der Positionen zum Einkaufspreis (Pauschalen/Rabatte nicht enthalten). */
     purchase_net_amount: z.number().int(),
     supplierPositions: z.array(supplierPositionSchema),

@@ -33,9 +33,9 @@ export const invoiceSchema = z.object({
     customerId: z.string(),
     /** Beim Anlegen festgelegt, danach fest. */
     taxRate: z.number(),
-    net_cents: z.number().int(),
-    vat_cents: z.number().int(),
-    gross_cents: z.number().int(),
+    netCents: z.number().int(),
+    vatCents: z.number().int(),
+    grossCents: z.number().int(),
     createdById: z.string(),
     documents: z.array(invoiceDocumentSchema),
     createdAt: z.string(),
@@ -45,7 +45,7 @@ export type Invoice = z.infer<typeof invoiceSchema>;
 
 /** Listeneintrag mit dem Nötigsten aus Bestellung und Kunde. */
 export const invoiceListItemSchema = invoiceSchema.extend({
-    order: z.object({ id: z.string(), orderId: z.string(), net_amount: z.number().int() }),
+    order: z.object({ id: z.string(), orderId: z.string(), netAmount: z.number().int() }),
     customer: z.object({ id: z.string(), companyName: z.string() }),
 });
 export type InvoiceListItem = z.infer<typeof invoiceListItemSchema>;

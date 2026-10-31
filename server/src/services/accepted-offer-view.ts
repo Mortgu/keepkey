@@ -30,7 +30,7 @@ export function presentAcceptedOffer<
         language: s.language,
         validUntil: s.validUntil,
         requestFrom: s.requestFrom,
-        net_amount: s.net_amount,
+        netAmount: s.netAmount,
         offerPositions: s.positions.map((p) => ({ ...p, offerId: offer.id })),
         offerFlatRates: s.flatRates.map((p) => ({ ...p, offerId: offer.id })),
         offerDiscounts: s.discounts.map((d) => ({ ...d, offerId: offer.id })),

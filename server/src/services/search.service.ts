@@ -48,7 +48,7 @@ async function searchOffers(q: string): Promise<Array<SearchResultItem>> {
         type: "offer" as const,
         title: `Angebot #${offer.quoteId}`,
         searchValue: offer.quoteId,
-        meta: `${offer.customer.companyName} · ${formatCentsToEur(offer.net_amount)}`,
+        meta: `${offer.customer.companyName} · ${formatCentsToEur(offer.netAmount)}`,
         updatedAt: offer.updatedAt.toISOString(),
     }));
 }

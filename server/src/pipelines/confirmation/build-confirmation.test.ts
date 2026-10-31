@@ -11,7 +11,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
                 confirmationId: "000042",
                 date: new Date("2026-10-06T00:00:00Z"),
                 orderId: "order",
-                taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100,
+                taxRate: 19, netCents: 90000, vatCents: 17100, grossCents: 107100,
             })),
         },
     },
@@ -35,7 +35,7 @@ describe("buildConfirmation", () => {
         expect(data.customer.companyName).toBe(order.customer.companyName);
 
         // Steuerblock aus der Row, nicht aus dem Kunden.
-        const net = order.net_amount;
+        const net = order.netAmount;
         const vat = Math.round(net * 0.19);
         const eur = (cents: number) => (cents / 100).toLocaleString("de-DE", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         expect(data.vatRate).toBe("19,00 %");

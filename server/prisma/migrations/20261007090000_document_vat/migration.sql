@@ -1,5 +1,5 @@
 -- Steuer je Beleg: beim Anlegen festgelegt, danach unveränderlich.
--- Bestehende Zeilen werden aus offer.net_amount und dem aktuellen Kundensatz
+-- Bestehende Zeilen werden aus offer.netAmount und dem aktuellen Kundensatz
 -- nachgefüllt (Rundung kaufmännisch auf den Cent, wie vatTotals()).
 
 ALTER TABLE "confirmation"

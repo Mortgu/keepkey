@@ -29,7 +29,7 @@ export default function InvoiceSection({ order }: Props) {
     const { customer } = useCustomer(order.customer.id);
     const [taxRate, setTaxRate] = useState<number | null>(null);
     const effectiveRate = taxRate ?? customer?.taxRate ?? 0;
-    const preview = vatTotals(order.net_amount, effectiveRate);
+    const preview = vatTotals(order.netAmount, effectiveRate);
 
     const cancelled = Boolean(order.cancelledAt);
 
@@ -122,7 +122,7 @@ export default function InvoiceSection({ order }: Props) {
                     <div className="flex items-center gap-1">
                         <dt className="text-(--text-secondary)">{t("orders.vat.stored")}:</dt>
                         <dd className="font-mono">
-                            {formatEur(invoice.net_cents)} + {formatNumber(invoice.taxRate)} % = {formatEur(invoice.gross_cents)}
+                            {formatEur(invoice.netCents)} + {formatNumber(invoice.taxRate)} % = {formatEur(invoice.grossCents)}
                         </dd>
                     </div>
                 </dl>

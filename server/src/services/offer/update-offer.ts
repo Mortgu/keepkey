@@ -31,8 +31,8 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
         // Auf `tx`, nicht `prisma`: sonst öffnet sealTariffVersion je Position
         // eine eigene Transaktion, während diese hier eine Verbindung hält.
         const positions = await pricePositions(rawPositions, header, input.customerId, actorId, tx);
-        const flatrates = await priceFlatrates(rawFlatrates, tx);
-        const net_amount = calculateNetAmount(positions, flatrates, discounts);
+        const flatRates = await priceFlatrates(rawFlatrates, tx);
+        const netAmount = calculateNetAmount(positions, flatRates, discounts);
 
         const [offer] = await tx.offer.updateManyAndReturn({
             where: { id: offerId },
@@ -50,12 +50,12 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 requestFrom: input.requestFrom,
                 featureComparison: input.featureComparison,
                 toCompare: input.toCompare,
-                net_amount,
+                netAmount: netAmount,
                 version: { increment: 1 },
             },
         });
 
-        await replaceOfferLines(tx, offerId, { positions, flatRates: flatrates, discounts });
+        await replaceOfferLines(tx, offerId, { positions, flatRates: flatRates, discounts });
         await invalidateCurrentDocuments(tx, offerId);
 
         return offer;
