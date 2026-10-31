@@ -1,8 +1,8 @@
 import { OfferFilterParams } from '@keepit/schemas';
 import type { Prisma } from "@prisma/client";
 
-import { AppException } from "../../lib/exceptions.js";
-import { prisma } from "../../lib/prismaClient.js";
+import { AppException } from "@/lib/exceptions.js";
+import { prisma } from "@/lib/prismaClient.js";
 import { presentAcceptedOffer } from "./accepted-offer-view.js";
 
 /**

@@ -1,8 +1,8 @@
 import { Prisma } from "@prisma/client";
 
-import { prisma } from "../../lib/prismaClient.js";
-import { AppException } from "../../lib/exceptions.js";
-import { loadTariffForPricing, selectPrice } from "../../utils/products.js";
+import { prisma } from "@/lib/prismaClient.js";
+import { AppException } from "@/lib/exceptions.js";
+import { loadTariffForPricing, selectPrice } from "@/utils/products.js";
 import { sealTariffVersion } from "../contract/tariff.service.js";
 
 import {
@@ -13,7 +13,7 @@ import {
 import {
     parseTariffVersionSnapshot,
     tariffFromSnapshot,
-} from "../../schemas/tariff-version-schema.js";
+} from "@/schemas/tariff-version-schema.js";
 
 /* ========== Types ========== */
 

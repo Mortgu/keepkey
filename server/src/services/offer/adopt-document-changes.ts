@@ -1,13 +1,13 @@
 import { DocumentFormat, Prisma } from "@prisma/client";
-import { findArtifact } from "../../lib/document-artifacts.js";
-import { getDocumentArtifact } from "../../lib/document-artifact-store.js";
-import { diffControls, withAdoptedValue } from "../../lib/replacement-check.js";
-import { offerAdoptions } from "../../pipelines/offer/offer-adoption.js";
-import { AppException } from "../../lib/exceptions.js";
-import { prisma } from "../../lib/prismaClient.js";
+import { findArtifact } from "@/lib/document-artifacts.js";
+import { getDocumentArtifact } from "@/lib/document-artifact-store.js";
+import { diffControls, withAdoptedValue } from "@/lib/replacement-check.js";
+import { offerAdoptions } from "@/pipelines/offer/offer-adoption.js";
+import { AppException } from "@/lib/exceptions.js";
+import { prisma } from "@/lib/prismaClient.js";
 import type { DocumentType } from "@keepit/schemas";
 import { documentOwnerType, documentTable } from "../document/document-repo.js";
-import { assertOfferEditable } from "./offer-acceptance.service.js";
+import {assertOfferEditable} from "@/services/offer/utils/assert.offer.js";
 
 /**
  * Übernimmt abweichende Feldwerte aus der abgelegten DOCX ins Angebot.

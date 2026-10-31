@@ -1,8 +1,5 @@
-import { OfferDerivationType, Prisma } from "@prisma/client";
-
-import { AppException } from "../../lib/exceptions.js";
-import { prisma } from "../../lib/prismaClient.js";
-import { documentOwnerType } from "../document/document-repo.js";
+import { OfferDerivationType } from "@prisma/client";
+import { prisma } from "@/lib/prismaClient.js";
 
 import {
     calculateNetAmount,
@@ -11,6 +8,7 @@ import {
     type PricedPosition,
     type PriceHeader,
 } from "./offer-pricing.js";
+import {replaceDiscounts} from "@/services/offer/utils/replace.offer.js";
 
 /** Alles, was eine Revision festhält: Kopf plus Positionen, Flatrates und Rabatte. */
 export const offerLinesInclude = {
@@ -18,70 +16,6 @@ export const offerLinesInclude = {
     offerFlatRates: true,
     offerDiscounts: true,
 } as const;
-
-/** Optimistisches Locking: Änderungen nur auf dem Stand, den der Client kennt. */
-export function assertExpectedVersion(current: { version: number }, expectedVersion: number): void {
-    if (current.version !== expectedVersion) {
-        throw new AppException(
-            "The offer was changed by another user. Reload it and try again.",
-            409,
-            "VERSION_CONFLICT",
-        );
-    }
-}
-
-/** Ersetzt Positionen, Flatrates und Rabatte eines bestehenden Angebots. */
-export async function replaceOfferLines(
-    tx: Prisma.TransactionClient,
-    offerId: string,
-    lines: {
-        positions: PricedPosition[];
-        flatRates: PricedFlatrate[];
-        discounts: ReadonlyArray<PricedDiscount>;
-    },
-): Promise<void> {
-    await replacePositions(tx, offerId, lines.positions);
-    await replaceFlatRates(tx, offerId, lines.flatRates);
-    await replaceDiscounts(tx, offerId, lines.discounts);
-}
-
-/** Nach einer inhaltlichen Änderung passt kein bisher erzeugtes Dokument mehr. */
-export async function invalidateCurrentDocuments(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    await tx.document.updateMany({
-        where: { type: documentOwnerType("offer"), offerId, isCurrent: true },
-        data: { isCurrent: false },
-    });
-}
-
-async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
-    await tx.offerPosition.deleteMany({ where: { offerId } });
-    await tx.offerPosition.createMany({
-        data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-            offerId, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
-            tariffVersionId: tariffVersionId ?? null,
-        })),
-    });
-}
-
-async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatrate[]) {
-    await tx.offerFlatRate.deleteMany({ where: { offerId } });
-    await tx.offerFlatRate.createMany({
-        data: flatRates.map(({ flatRateId, quantity, total_cents }) => ({
-            offerId, flatRateId, quantity, total_cents,
-        })),
-    });
-}
-
-async function replaceDiscounts(tx: Prisma.TransactionClient, offerId: string, discounts: ReadonlyArray<PricedDiscount>) {
-    await tx.offerDiscount.deleteMany({ where: { offerId } });
-    if (discounts.length === 0) return;
-
-    await tx.offerDiscount.createMany({
-        data: discounts.map(({ title, description, amount_cents }) => ({
-            offerId, title, description: description ?? null, amount_cents,
-        })),
-    });
-}
 
 /** Skalarfelder eines Angebots — alles ausser Positionen, Flatrates und Rabatten. */
 export type OfferFields = PriceHeader & {

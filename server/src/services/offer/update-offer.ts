@@ -1,15 +1,14 @@
 import { UpdateOfferInput } from '@keepit/schemas';
 
-import { prisma } from "../../lib/prismaClient.js";
-import { assertOfferEditable } from "./offer-acceptance.service.js";
+import { prisma } from "@/lib/prismaClient.js";
 import { assertStandardDuration } from "../contract/tariff.service.js";
 import { calculateNetAmount, priceFlatrates, pricePositions } from "./offer-pricing.js";
 import {
-    assertExpectedVersion,
-    invalidateCurrentDocuments,
     offerLinesInclude,
-    replaceOfferLines,
 } from "./offer-write.js";
+import {assertExpectedVersion, assertOfferEditable} from "@/services/offer/utils/assert.offer.js";
+import {replaceOfferLines} from "@/services/offer/utils/replace.offer.js";
+import {invalidateCurrentDocuments} from "@/services/offer/utils/invalidate.offer.js";
 
 export async function updateOffer(offerId: string, input: UpdateOfferInput, actorId: string) {
     const { offerPositions: rawPositions, flatrates: rawFlatrates, discounts, expectedVersion } = input;

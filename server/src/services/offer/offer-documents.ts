@@ -1,7 +1,7 @@
-import { prisma } from "../../lib/prismaClient.js";
+import { prisma } from "@/lib/prismaClient.js";
 import { requestOfferGeneration } from "../document/document-generation-request.service.js";
-import { generateOfferDisplayName } from "../../utils/documents.js";
-import { pickTranslation } from "../../utils/i18n.js";
+import { generateOfferDisplayName } from "@/utils/documents.js";
+import { pickTranslation } from "@/utils/i18n.js";
 
 export async function enqueueGeneration(offerId: string) {
     const offer = await prisma.offer.findUniqueOrThrow({

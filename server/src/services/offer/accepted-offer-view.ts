@@ -1,5 +1,5 @@
 import type { Prisma } from "@prisma/client";
-import { parseAcceptedOfferSnapshot } from "../../schemas/accepted-offer.js";
+import { parseAcceptedOfferSnapshot } from "@/schemas/accepted-offer.js";
 
 /**
  * Overlay frozen business fields while keeping live document/task metadata.

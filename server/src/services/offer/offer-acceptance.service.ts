@@ -1,9 +1,9 @@
-import { formatOfferData } from "../../pipelines/offer/build-offer.js";
+import { formatOfferData } from "@/pipelines/offer/build-offer.js";
 import type { Prisma } from "@prisma/client";
-import { AppException, assertNotFrozen } from "../../lib/exceptions.js";
+import { AppException } from "@/lib/exceptions.js";
 import { contractOrderBy } from "../contract/contract.service.js";
 import { documentOwnerType } from "../document/document-repo.js";
-import { serializeAcceptedOfferSnapshot } from "../../schemas/accepted-offer.js";
+import { serializeAcceptedOfferSnapshot } from "@/schemas/accepted-offer.js";
 
 export const acceptanceInclude = {
     customer: true,
@@ -21,34 +21,12 @@ export const acceptanceInclude = {
     offerDiscounts: { orderBy: [{ createdAt: "asc" }, { id: "asc" }] },
 } satisfies Prisma.OfferInclude;
 
-export async function lockOffer(tx: Prisma.TransactionClient, offerId: string) {
-    await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`offer-version:${offerId}`}))::text AS "lock"`;
-    await tx.$queryRaw`SELECT id FROM "offer" WHERE id = ${offerId} FOR UPDATE`;
-}
-
-/** Must run inside the same transaction as every commercial mutation. */
-export async function assertOfferEditable(
-    tx: Prisma.TransactionClient,
-    offerId: string,
-) {
-    await lockOffer(tx, offerId);
-    const offer = await tx.offer.findUniqueOrThrow({
-        where: { id: offerId },
-        select: { acceptedAt: true },
-    });
-    assertNotFrozen(offer.acceptedAt, "OFFER_ACCEPTED", "Accepted offers cannot be changed. Create a new offer instead.");
-}
-
-export async function acceptOffer(
-    tx: Prisma.TransactionClient,
-    offerId: string,
-    expectedVersion: number,
-) {
-    await assertOfferEditable(tx, offerId);
+export async function acceptOffer(tx: Prisma.TransactionClient, offerId: string, expectedVersion: number) {
     const offer = await tx.offer.findUniqueOrThrow({
         where: { id: offerId },
         include: acceptanceInclude,
     });
+
     if (offer.version !== expectedVersion) {
         throw new AppException(
             "The offer changed before acceptance. Reload it and try again.",
@@ -56,10 +34,12 @@ export async function acceptOffer(
             "VERSION_CONFLICT",
         );
     }
+
     const contracts = await tx.contract.findMany({
         include: { translations: true },
         orderBy: contractOrderBy,
     });
+
     const offerTemplate = await formatOfferData({ offer, contracts });
     const acceptedAt = new Date();
     const acceptedSnapshot = serializeAcceptedOfferSnapshot(

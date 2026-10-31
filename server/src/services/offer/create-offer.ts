@@ -1,8 +1,8 @@
 import { OfferDerivationType } from "@prisma/client";
 import { CreateOfferInput } from '@keepit/schemas';
 
-import { prisma } from "../../lib/prismaClient.js";
-import { AppException } from "../../lib/exceptions.js";
+import { prisma } from "@/lib/prismaClient.js";
+import { AppException } from "@/lib/exceptions.js";
 import { assertStandardDuration } from "../contract/tariff.service.js";
 import { priceFlatrates, pricePositions } from "./offer-pricing.js";
 import { persistOffer } from "./offer-write.js";
