@@ -46,7 +46,7 @@ export async function getOffers(query: OfferFilterParams) {
     if (search && typeof search === "string" && search.trim()) {
         const contains = { contains: search.trim(), mode: "insensitive" as const };
         where.OR = [
-            { quoteId: contains },
+            { quoteNumber: contains },
             { customer: { companyName: contains } },
             { contactPerson: { firstName: contains } },
             { contactPerson: { lastName: contains } },

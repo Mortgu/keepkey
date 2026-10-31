@@ -4,7 +4,7 @@ export const offerSchema = z.object({
   customerId: z.string().min(1, "Required!"),
   contactPersonId: z.string().min(1, "Required!"),
   userId: z.string().min(1, "Required!"),
-  quoteId: z.string().min(1, "Required!"),
+  quoteNumber: z.string().min(1, "Required!"),
   language: z.enum(["EN", "DE"]),
 
   supplierId: z.string().nullable(),

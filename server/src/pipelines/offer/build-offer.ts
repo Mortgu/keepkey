@@ -90,7 +90,7 @@ export async function buildOfferDocument(fetched: OfferFetchData, version: numbe
     return {
         data,
         language: named.language,
-        displayName: generateOfferDisplayName(offer.quoteId, named.customer.companyName, workloads, version),
+        displayName: generateOfferDisplayName(offer.quoteNumber, named.customer.companyName, workloads, version),
     };
 }
 

@@ -25,7 +25,7 @@ export async function enqueueGeneration(offerId: string) {
     ).replaceAll(" ", "").trim());
 
     return requestOfferGeneration(offerId, (version) => generateOfferDisplayName(
-        offer.quoteId,
+        offer.quoteNumber,
         offer.customer.companyName,
         formatedWorkloads,
         version,

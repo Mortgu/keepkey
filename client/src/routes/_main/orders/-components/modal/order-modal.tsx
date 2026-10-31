@@ -32,7 +32,7 @@ export default function OrderModal({ offer: initialOffer, onClose }: Props) {
             <Dialog.Header
                 title={t("orders.modal.title")}
                 description={offer
-                    ? t("orders.modal.fromOffer", { quoteId: offer.quoteId, company: offer.customer.companyName })
+                    ? t("orders.modal.fromOffer", { quoteNumber: offer.quoteNumber, company: offer.customer.companyName })
                     : t("orders.modal.pickHint")}
             />
 
@@ -53,7 +53,7 @@ export default function OrderModal({ offer: initialOffer, onClose }: Props) {
 
             <Dialog.Footer className="justify-between">
                 <p className="text-sm text-(--text-secondary) self-center">
-                    {offer ? `AG${offer.quoteId} → BE…` : t("orders.modal.noneSelected")}
+                    {offer ? `AG${offer.quoteNumber} → BE…` : t("orders.modal.noneSelected")}
                 </p>
                 <div className="flex items-center gap-3">
                     <Dialog.Close render={<Button variant="border" size="sm">{t("button.cancel")}</Button>} />

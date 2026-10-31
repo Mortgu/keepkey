@@ -44,7 +44,7 @@ export default function OrderModalDetail({ offer, form, rows, error, formId }: P
                 <div className="flex items-start justify-between gap-4 p-4">
                     <div className="grid gap-0.5 min-w-0">
                         <div className="flex items-center gap-2">
-                            <span className="font-mono text-sm text-(--text-secondary)">AG{offer.quoteId}</span>
+                            <span className="font-mono text-sm text-(--text-secondary)">AG{offer.quoteNumber}</span>
                             {offer.derivationType === "RENEWAL" && <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>}
                             {offer.derivationType === "LICENSE_EXTENSION" && <Badge variant="GENERATED" size="xs">{t("derived.badge_extension")}</Badge>}
                         </div>

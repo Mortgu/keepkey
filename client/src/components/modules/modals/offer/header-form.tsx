@@ -180,10 +180,10 @@ export default function HeaderForm() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {/* QuoteId */}
-                    {shows("quoteId") && (
-                        <form.Field name="quoteId" children={(field) => (
-                            <Input label={t("offerModal.quoteId")} value={field.state.value} disabled={locked("quoteId")}
+                    {/* QuoteNumber */}
+                    {shows("quoteNumber") && (
+                        <form.Field name="quoteNumber" children={(field) => (
+                            <Input label={t("offerModal.quoteNumber")} value={field.state.value} disabled={locked("quoteNumber")}
                                 prefix="AG"
                                 onChange={(e) => field.handleChange(e.target.value)}
                                 error={getFormError(field.state.meta.errors)} />

@@ -40,7 +40,7 @@ export async function updateOffer(offerId: string, input: UpdateOfferInput, acto
                 customerId: input.customerId,
                 contactPersonId: input.contactPersonId,
                 userId: input.userId,
-                quoteId: input.quoteId,
+                quoteNumber: input.quoteNumber,
                 language: input.language,
                 supplierId: input.supplierId,
                 paymentTerm: input.paymentTerm,

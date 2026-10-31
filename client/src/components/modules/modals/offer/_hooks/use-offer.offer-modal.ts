@@ -40,7 +40,7 @@ export default function useOfferModal({ currentOffer, preselectedCustomerId }: P
             || [...durations].sort((a, b) => a.months - b.months)[0]?.months
             || 0,
 
-        quoteId: currentOffer?.quoteId || "",
+        quoteNumber: currentOffer?.quoteNumber || "",
         paymentTerm: currentOffer?.paymentTerm || "30 Tage",
         validFrom: currentOffer?.validFrom || null,
         validUntil: currentOffer?.validUntil || null,

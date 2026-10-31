@@ -135,7 +135,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
     }
 
     return {
-        quoteId: offer.quoteId,
+        quoteId: offer.quoteNumber,
         language: offer.language,
         date: iso(offer.date),
         validUntil: iso(offer.validUntil),

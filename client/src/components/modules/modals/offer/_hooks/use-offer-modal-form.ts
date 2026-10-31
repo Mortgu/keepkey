@@ -45,7 +45,7 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
  */
 function toExtendInput(values: OfferModalValues): ExtendOfferInput {
     return {
-        quoteId: values.quoteId,
+        quoteNumber: values.quoteNumber,
         validFrom: values.validFrom,
         validUntil: values.validUntil,
         requestFrom: values.requestFrom,
@@ -85,7 +85,7 @@ export default function useOfferModalForm({ mode, sourceOffer, onClose, preselec
     const form = useForm({
         defaultValues: {
             ...defaultValues,
-            quoteId: policy.resetQuoteId ? "" : defaultValues.quoteId,
+            quoteNumber: policy.resetQuoteNumber ? "" : defaultValues.quoteNumber,
             flatrates: policy.flatrates.startEmpty ? [] : defaultValues.flatrates,
             discounts: policy.discounts.startEmpty ? [] : defaultValues.discounts,
         } satisfies OfferModalValues,

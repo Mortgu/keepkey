@@ -101,7 +101,7 @@ export async function formatOrderData(fetchedData?: OrderFetchedData) {
         orderId: order.orderId,
         projectNumber: order.projectNumber ?? "",
         projectId: order.projectNumber ?? "",
-        offerId: order.offer.quoteId,
+        offerId: order.offer.quoteNumber,
         projectDescription: order.projectDescription ?? "",
         orderDetails: order.orderDetails ?? "",
         products, groups: grouped, tables: grouped,

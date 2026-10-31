@@ -52,7 +52,7 @@ export default function FlowPage() {
                         { label: t("nav.dashboard"), to: "/" },
                         { label: t("section.customers"), to: "/customers" },
                         { label: customer?.companyName ?? "…", to: "/customers/$customerId", params: { customerId } },
-                        { label: positions || `AG${offer.quoteId}` },
+                        { label: positions || `AG${offer.quoteNumber}` },
                     ]}
                 />
             </div>
@@ -61,7 +61,7 @@ export default function FlowPage() {
             <div className="flex flex-wrap items-center justify-between gap-4 pb-5 border-b border-(--border)">
                 <div className="flex-2">
                     <div className="flex flex-wrap items-center gap-2">
-                        <h1 className="text-xl font-medium">{positions || `AG${offer.quoteId}`}</h1>
+                        <h1 className="text-xl font-medium">{positions || `AG${offer.quoteNumber}`}</h1>
                         {offer.derivationType && (
                             <span className="rounded bg-(--subtle-50) px-1.5 py-px text-xs text-(--fg-2)">
                                 {t(`flows.derivation.${offer.derivationType}`)}

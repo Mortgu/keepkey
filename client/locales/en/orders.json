@@ -4,7 +4,7 @@
     "create": "Create order",
     "search": "Search orders…",
     "editTitle": "Edit order",
-    "createTitle": "Order for {{quoteId}}",
+    "createTitle": "Order for {{quoteNumber}}",
     "fixedOffer": "The accepted offer remains unchanged. Only order and project details are saved here.",
     "number": "Order number",
     "projectNumber": "Project number",
@@ -64,7 +64,7 @@
     "modal": {
       "title": "Create order",
       "pickHint": "Pick the offer the customer accepted.",
-      "fromOffer": "From offer AG{{quoteId}} · {{company}}",
+      "fromOffer": "From offer AG{{quoteNumber}} · {{company}}",
       "searchPlaceholder": "Offer no., customer, contact…",
       "resultCount_one": "{{count}} open offer",
       "resultCount_other": "{{count}} open offers",

@@ -37,7 +37,7 @@ export async function search(term: string, type?: SearchType): Promise<SearchRes
 
 async function searchOffers(q: string): Promise<Array<SearchResultItem>> {
     const offers = await prisma.offer.findMany({
-        where: { quoteId: { contains: q, mode: "insensitive" } },
+        where: { quoteNumber: { contains: q, mode: "insensitive" } },
         include: { customer: { select: { companyName: true } } },
         orderBy: { updatedAt: "desc" },
         take: LIMIT_PER_TYPE,
@@ -46,8 +46,8 @@ async function searchOffers(q: string): Promise<Array<SearchResultItem>> {
     return offers.map((offer) => ({
         id: offer.id,
         type: "offer" as const,
-        title: `Angebot #${offer.quoteId}`,
-        searchValue: offer.quoteId,
+        title: `Angebot #${offer.quoteNumber}`,
+        searchValue: offer.quoteNumber,
         meta: `${offer.customer.companyName} · ${formatCentsToEur(offer.net_amount)}`,
         updatedAt: offer.updatedAt.toISOString(),
     }));

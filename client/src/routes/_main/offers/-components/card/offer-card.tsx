@@ -28,7 +28,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
 
     const {
         contactPerson,
-        quoteId,
+        quoteNumber,
         offerPositions,
         offerFlatRates,
         customer,
@@ -66,7 +66,7 @@ export default function OfferCard({ offer }: OfferListItemProps) {
             <div className="flex items-start justify-between gap-4 px-4 py-3">
                 <div className="grid gap-0">
                     <div className="flex items-center gap-2">
-                        <a className="text-md font-mono font-semibold text-(--text)">AG{quoteId}</a>
+                        <a className="text-md font-mono font-semibold text-(--text)">AG{quoteNumber}</a>
                         {offer.derivationType === "RENEWAL" && (
                             <Badge variant="GENERATED" size="xs">{t("derived.badge_renewal")}</Badge>
                         )}

@@ -18,7 +18,7 @@
     "duration": "Runtime",
     "employee": "Our Employee",
     "contact": "Your Contact",
-    "quoteId": "Quote id",
+    "quoteNumber": "Quote number",
     "supplierId": "Supplier",
     "paymentTerm": "Payment term",
     "validFrom": "Valid from",

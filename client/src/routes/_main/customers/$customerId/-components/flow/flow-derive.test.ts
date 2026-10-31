@@ -4,7 +4,7 @@ import type { Offer } from "@keepit/schemas";
 
 function offerWithOrder(order: unknown): Offer {
     return {
-        quoteId: "1001",
+        quoteNumber: "1001",
         date: "2026-01-01",
         offerDocuments: [],
         order,

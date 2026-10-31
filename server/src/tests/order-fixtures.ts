@@ -162,7 +162,7 @@ export const offerFixture = () => {
         id: "offer",
         userId: s.employeeId,
         user: s.employee,
-        quoteId: "Q-1",
+        quoteNumber: "Q-1",
         date: now,
         featureComparison: false,
         toCompare: [],

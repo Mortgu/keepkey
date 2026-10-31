@@ -7,7 +7,7 @@ import { prisma } from "../../../lib/prismaClient.js";
 import { metadataSnapshot } from "../../../schemas/order-inputs.js";
 import { getCustomerById, getCustomers } from "../../customer/customer.service.js";
 import { getDashboardStats } from "../../dashboard.service.js";
-import { assertOfferEditable } from "../../offer/offer-acceptance.service.js";
+import { assertOfferEditable } from "../../offer/utils/assert.offer.js";
 import {
     cancelOrder,
     createOrder,
@@ -146,7 +146,7 @@ integration("real PostgreSQL acceptance transactions", () => {
                 userId: "user",
                 contractId: "contract",
                 duration_months: 12,
-                quoteId: id,
+                quoteNumber: id,
                 paymentTerm: "30 days",
                 net_amount: 80000,
                 language: "EN",

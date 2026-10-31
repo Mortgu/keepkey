@@ -79,7 +79,7 @@ export default function OrderCard({ order }: Props) {
                 </div>
                 <div className={dateCell}>
                     <span className="text-(--text-secondary)">Angebots-Nr.:</span>
-                    <span className="text-sm font-medium font-mono">AG{order.offer.quoteId}</span>
+                    <span className="text-sm font-medium font-mono">AG{order.offer.quoteNumber}</span>
                 </div>
                 <div className={dateCell}>
                     <span className="text-(--text-secondary)">Gültig bis:</span>

@@ -33,7 +33,7 @@ export function deriveStages(offer: Offer): Stages {
     const offerStage: FlowStage = {
         kind: "offer",
         state: documentsState(offer.offerDocuments),
-        number: `AG${offer.quoteId}`,
+        number: `AG${offer.quoteNumber}`,
         date: offer.date,
     };
 

@@ -28,7 +28,7 @@ export async function createOffer(input: CreateOfferInput, options?: CreateOffer
             contactPersonId: input.contactPersonId,
             userId: input.userId,
             supplierId: input.supplierId,
-            quoteId: input.quoteId,
+            quoteNumber: input.quoteNumber,
             paymentTerm: input.paymentTerm,
             language: input.language,
             validFrom: input.validFrom,

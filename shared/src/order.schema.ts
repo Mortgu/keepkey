@@ -177,7 +177,7 @@ export const orderSchema = z.object({
         lastName: z.string(),
     }),
 
-    offer: offerSchema.pick({ id: true, quoteId: true, version: true, acceptedAt: true }),
+    offer: offerSchema.pick({ id: true, quoteNumber: true, version: true, acceptedAt: true }),
     acceptedAt: z.string(),
     acceptedById: z.string(),
     cancelledAt: z.string().nullable(),

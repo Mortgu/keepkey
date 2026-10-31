@@ -20,7 +20,7 @@ describe("resolveOfferModalPolicy", () => {
         expect(policy.positions.startEmpty).toBe(true);
         expect(policy.flatrates.canAdd).toBe(true);
         expect(policy.priceSource).toBe("live");
-        expect(policy.resetQuoteId).toBe(true);
+        expect(policy.resetQuoteNumber).toBe(true);
     });
 
     it("keeps what defines an extension: no flatrates, no comparison, live price without pin", () => {

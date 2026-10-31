@@ -444,14 +444,14 @@ async function assertNoOpenOffersUse(
                 },
             })),
         },
-        select: { quoteId: true },
-        orderBy: { quoteId: "asc" },
+        select: { quoteNumber: true },
+        orderBy: { quoteNumber: "asc" },
         take: 5,
     });
 
     if (openOffers.length > 0) {
         throw new AppException(
-            `Die Preistabelle wird noch von offenen Angeboten verwendet (${openOffers.map((offer) => offer.quoteId).join(", ")}). `
+            `Die Preistabelle wird noch von offenen Angeboten verwendet (${openOffers.map((offer) => offer.quoteNumber).join(", ")}). `
             + "Nehmen Sie die Angebote an oder löschen Sie sie zuerst.",
             409,
             "TARIFF_IN_OPEN_OFFERS",

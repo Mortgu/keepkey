@@ -94,7 +94,7 @@ integration("removing price tables (real PostgreSQL)", () => {
         const created = await prisma.offer.create({
             data: {
                 id, customerId: "customer", contactPersonId: "contact", userId: "user",
-                contractId: options.contractId ?? "contract", duration_months: 12, quoteId: id,
+                contractId: options.contractId ?? "contract", duration_months: 12, quoteNumber: id,
                 paymentTerm: "30 days", net_amount: 1000, language: "EN",
                 offerPositions: {
                     create: {

@@ -4,7 +4,7 @@
     "create": "Bestellung erstellen",
     "search": "Bestellungen durchsuchen…",
     "editTitle": "Bestellung bearbeiten",
-    "createTitle": "Bestellung für {{quoteId}}",
+    "createTitle": "Bestellung für {{quoteNumber}}",
     "fixedOffer": "Das angenommene Angebot bleibt unverändert. Hier werden nur Bestell- und Projektangaben gespeichert.",
     "number": "Bestell-Nr.",
     "projectNumber": "Projekt-Nr.",
@@ -64,7 +64,7 @@
     "modal": {
       "title": "Bestellung anlegen",
       "pickHint": "Wähle das Angebot, das der Kunde angenommen hat.",
-      "fromOffer": "Aus Angebot AG{{quoteId}} · {{company}}",
+      "fromOffer": "Aus Angebot AG{{quoteNumber}} · {{company}}",
       "searchPlaceholder": "Angebotsnr., Kunde, Ansprechpartner…",
       "resultCount_one": "{{count}} offenes Angebot",
       "resultCount_other": "{{count}} offene Angebote",

@@ -39,7 +39,7 @@ beforeAll(async () => {
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
         INSERT INTO product (id, "updatedAt") VALUES ('product', now());
         INSERT INTO flat_rate (id, total_cents, "updatedAt") VALUES ('flat-rate', 10000, now());
-        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", net_amount, "updatedAt")
+        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteNumber", "paymentTerm", net_amount, "updatedAt")
             VALUES ('offer', 'customer', 'contact', 'user', 'contract', 12, 'Q-1', '30 Tage', 90000, now()),
                    ('draft', 'customer', 'contact', 'user', 'contract', 12, 'Q-2', '30 Tage', 100, now());
         INSERT INTO offer_position (id, "offerId", "productId", quantity, total_cents, discount_cents, eur_user_month, "updatedAt")

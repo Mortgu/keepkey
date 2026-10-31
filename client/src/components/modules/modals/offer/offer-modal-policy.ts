@@ -21,7 +21,7 @@ export type HeaderField =
     | "customerId"
     | "contactPersonId"
     | "userId"
-    | "quoteId"
+    | "quoteNumber"
     | "supplierId"
     | "paymentTerm"
     | "validFrom"
@@ -62,7 +62,7 @@ export interface OfferModalPolicy {
      */
     priceSource: PriceSource;
     /** Abgeleitete Angebote bekommen eine neue AG-Nummer, keine übernommene. */
-    resetQuoteId: boolean;
+    resetQuoteNumber: boolean;
 }
 
 const ALL_HEADER_FIELDS_EDITABLE: Record<HeaderField, FieldAccess> = {
@@ -71,7 +71,7 @@ const ALL_HEADER_FIELDS_EDITABLE: Record<HeaderField, FieldAccess> = {
     customerId: "edit",
     contactPersonId: "edit",
     userId: "edit",
-    quoteId: "edit",
+    quoteNumber: "edit",
     supplierId: "edit",
     paymentTerm: "edit",
     validFrom: "edit",
@@ -119,7 +119,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: false },
         featureComparison: "edit",
         priceSource: "live",
-        resetQuoteId: false,
+        resetQuoteNumber: false,
     },
 
     /**
@@ -145,7 +145,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: false },
         featureComparison: "hidden",
         priceSource: "live",
-        resetQuoteId: true,
+        resetQuoteNumber: true,
     },
 
     /**
@@ -178,7 +178,7 @@ export const OFFER_MODAL_POLICIES: Record<OfferModalMode, OfferModalPolicy> = {
         discounts: { access: "edit", canAdd: true, canRemove: true, startEmpty: true },
         featureComparison: "hidden",
         priceSource: "pinned",
-        resetQuoteId: true,
+        resetQuoteNumber: true,
     },
 };
 

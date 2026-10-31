@@ -22,7 +22,7 @@ beforeAll(async () => {
         INSERT INTO customer (id, "companyName", "taxRate", "updatedAt") VALUES ('customer', 'Customer Ltd', 19, now());
         INSERT INTO person (id, "customerId", "firstName", "lastName", "updatedAt") VALUES ('contact', 'customer', 'First', 'Last', now());
         INSERT INTO contract (id, "updatedAt") VALUES ('contract', now());
-        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteId", "paymentTerm", net_amount, "updatedAt")
+        INSERT INTO offer (id, "customerId", "contactPersonId", "userId", "contractId", duration_months, "quoteNumber", "paymentTerm", net_amount, "updatedAt")
             VALUES ('offer', 'customer', 'contact', 'user', 'contract', 12, 'Q-1', '30 Tage', 100, now());
     `);
 });

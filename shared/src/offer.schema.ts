@@ -114,7 +114,7 @@ export const createOfferSchema = z.object({
     contractId: z.string().min(1),
     duration_months: z.number().int().positive(),
 
-    quoteId: z.string().trim().nonempty("Required!"),
+    quoteNumber: z.string().trim().nonempty("Required!"),
     paymentTerm: z.string().nonempty("Required!"),
     validFrom: z.string().nullable(),
     validUntil: z.string().nullable(),
@@ -160,7 +160,7 @@ export const extendOfferPositionSchema = z.object({
 export type ExtendOfferPositionInput = z.infer<typeof extendOfferPositionSchema>;
 
 export const extendOfferSchema = z.object({
-    quoteId: z.string().trim().nonempty("Required!"),
+    quoteNumber: z.string().trim().nonempty("Required!"),
     validFrom: z.string().nullable(),
     validUntil: z.string().nullable(),
     requestFrom: z.string().nullable(),
@@ -197,7 +197,7 @@ export const offerSchema = z.object({
     contract: contractSchema,
     duration_months: z.number().int(),
 
-    quoteId: z.string(),
+    quoteNumber: z.string(),
     paymentTerm: z.string(),
     validFrom: z.string().nullable().optional(),
     validUntil: z.string().nullable().optional(),

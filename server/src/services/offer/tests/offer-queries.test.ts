@@ -15,7 +15,7 @@ describe("getOffers filters", () => {
         const contains = { contains: "Brandt", mode: "insensitive" };
         expect(whereOf()).toEqual({
             OR: [
-                { quoteId: contains },
+                { quoteNumber: contains },
                 { customer: { companyName: contains } },
                 { contactPerson: { firstName: contains } },
                 { contactPerson: { lastName: contains } },

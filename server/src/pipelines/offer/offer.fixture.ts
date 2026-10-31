@@ -28,7 +28,7 @@ export function offerFixture(overrides: {
     return {
         offer: {
             id: "o-1",
-            quoteId: "AG-0001",
+            quoteNumber: "AG-0001",
             language: overrides.language ?? "DE",
             customerId: "cust-1",
             contractId: "c-base",

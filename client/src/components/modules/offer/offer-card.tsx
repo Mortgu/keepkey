@@ -61,7 +61,7 @@ export default function OfferCard({ offerId }: Props) {
                         </div>
 
                         <div className="flex items-center justify-start text-(--fg-3) text-sm">
-                            <p className="font-mono">AG{offer.quoteId}</p>
+                            <p className="font-mono">AG{offer.quoteNumber}</p>
                             <Dot size={14} />
                             <p className="">{formatDate(offer.createdAt)}</p>
                         </div>

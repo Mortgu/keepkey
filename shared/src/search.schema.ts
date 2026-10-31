@@ -15,7 +15,7 @@ export const searchResultItemSchema = z.object({
     id: z.string(),
     type: searchTypeSchema,
     title: z.string(),
-    /** Rohwert für den `search`-Filterparameter der Liste (quoteId, orderId, companyName). */
+    /** Rohwert für den `search`-Filterparameter der Liste (quoteNumber, orderId, companyName). */
     searchValue: z.string(),
     meta: z.string(),
     updatedAt: isoDateTime,

@@ -23,7 +23,7 @@ export type OfferFields = PriceHeader & {
     contactPersonId: string;
     userId: string;
     supplierId: string | null;
-    quoteId: string;
+    quoteNumber: string;
     paymentTerm: string;
     language: "DE" | "EN";
     validFrom: string | null;
