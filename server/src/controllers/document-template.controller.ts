@@ -14,7 +14,7 @@ export const uploadDocumentTemplate = async (request: Request, response: Respons
     const query = uploadDocumentTemplateQuerySchema.parse(request.query);
 
     const template = await templateService.createTemplate({
-        kind: query.kind,
+        type: query.type,
         language: query.language,
         name: query.name,
         fileName: query.fileName,

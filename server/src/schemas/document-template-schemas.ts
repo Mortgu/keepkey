@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { documentTemplateKindSchema, languageSchema } from "@keepit/schemas";
+import { documentTemplateTypeSchema, languageSchema } from "@keepit/schemas";
 
 export const documentTemplateParamsSchema = z.object({
     id: z.string().min(1),
@@ -16,7 +16,7 @@ export const documentTemplateParamsSchema = z.object({
  * `Content-Disposition` heraus.
  */
 export const uploadDocumentTemplateQuerySchema = z.object({
-    kind: documentTemplateKindSchema,
+    type: documentTemplateTypeSchema,
     language: languageSchema,
     name: z.string().trim().min(1).max(120).optional(),
     fileName: z.string()

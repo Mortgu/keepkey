@@ -10,16 +10,16 @@ import { languageSchema } from "./language.schema.js";
  * benutzt. Vorlagen gibt es dagegen auch für Dokumentarten, die noch gar nicht
  * erzeugt werden können — `INVOICE` kommt später genau hier dazu.
  */
-export const documentTemplateKindSchema = z.enum(["OFFER", "ORDER", "CONFIRMATION", "INVOICE"]);
-export type DocumentTemplateKind = z.infer<typeof documentTemplateKindSchema>;
+export const documentTemplateTypeSchema = z.enum(["OFFER", "ORDER", "CONFIRMATION", "INVOICE"]);
+export type DocumentTemplateType = z.infer<typeof documentTemplateTypeSchema>;
 
-export const DOCUMENT_TEMPLATE_KINDS = documentTemplateKindSchema.options;
+export const DOCUMENT_TEMPLATE_TYPES = documentTemplateTypeSchema.options;
 export const DOCUMENT_TEMPLATE_LANGUAGES = languageSchema.options;
 
 export const documentTemplateSchema = z.object({
     id: z.string(),
 
-    kind: documentTemplateKindSchema,
+    type: documentTemplateTypeSchema,
     language: languageSchema,
 
     name: z.string(),
@@ -44,7 +44,7 @@ export type DocumentTemplate = z.infer<typeof documentTemplateSchema>;
  * genau eine Vorlage aktiv sein kann.
  */
 export type DocumentTemplateSlot = {
-    kind: DocumentTemplateKind;
+    type: DocumentTemplateType;
     language: z.infer<typeof languageSchema>;
     active?: DocumentTemplate;
     templates: Array<DocumentTemplate>;
@@ -52,10 +52,10 @@ export type DocumentTemplateSlot = {
 
 export const findActiveTemplate = (
     templates: Array<DocumentTemplate>,
-    kind: DocumentTemplateKind,
+    type: DocumentTemplateType,
     language: z.infer<typeof languageSchema>,
 ) => templates.find((template) =>
-    template.kind === kind && template.language === language && template.isActive);
+    template.type === type && template.language === language && template.isActive);
 
 /**
  * Ordnet die flache Liste den Slots zu — in fester Reihenfolge, damit die
@@ -65,11 +65,11 @@ export const findActiveTemplate = (
 export const groupTemplatesBySlot = (
     templates: Array<DocumentTemplate>,
 ): Array<DocumentTemplateSlot> =>
-    DOCUMENT_TEMPLATE_KINDS.flatMap((kind) =>
+    DOCUMENT_TEMPLATE_TYPES.flatMap((type) =>
         DOCUMENT_TEMPLATE_LANGUAGES.map((language) => ({
-            kind,
+            type,
             language,
-            active: findActiveTemplate(templates, kind, language),
+            active: findActiveTemplate(templates, type, language),
             templates: templates.filter((template) =>
-                template.kind === kind && template.language === language),
+                template.type === type && template.language === language),
         })));

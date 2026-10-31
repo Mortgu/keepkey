@@ -1,5 +1,5 @@
 import { DocumentFormat, DocumentStatus, Prisma } from "@prisma/client";
-import type { DocumentTemplateKind, Language } from "@prisma/client";
+import type { DocumentTemplateType, Language } from "@prisma/client";
 import { z } from "zod";
 import type { DocumentType } from "@keepit/schemas";
 import { prisma } from "../../lib/prismaClient.js";
@@ -40,7 +40,7 @@ export type GenerationAdapter<TDoc extends GeneratedDocument> = {
      */
     currentParentVersion: (doc: TDoc) => number | null;
     build: (doc: TDoc) => Promise<{ language: Language; data: Record<string, unknown>; displayName: string }>;
-    templateKind: DocumentTemplateKind;
+    templateType: DocumentTemplateType;
     renderSchema?: z.ZodType;
     ownerKey: (doc: TDoc) => Parameters<typeof createArtifactDocuments>[2];
     /**
@@ -72,7 +72,7 @@ export async function runGeneration<TDoc extends GeneratedDocument>(
     const table = documentTable(adapter.type);
     const built = await adapter.build(doc);
     const rendered = await renderDocument(
-        adapter.templateKind,
+        adapter.templateType,
         built.language,
         built.data,
         { documentType: adapter.type, documentId: doc.id },

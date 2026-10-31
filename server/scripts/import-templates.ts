@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { createHash } from "node:crypto";
-import type { DocumentTemplateKind, Language } from "@prisma/client";
+import type { DocumentTemplateType, Language } from "@prisma/client";
 import env from "../src/lib/env.js";
 import { prisma } from "../src/lib/prismaClient.js";
 import { createTemplate, setActiveTemplate } from "../src/services/document/document-template.service.js";
@@ -25,14 +25,14 @@ import { createTemplate, setActiveTemplate } from "../src/services/document/docu
  */
 const LEGACY_TEMPLATES: Array<{
     file: string;
-    kind: DocumentTemplateKind;
+    type: DocumentTemplateType;
     language: Language;
     name: string;
 }> = [
-    { file: "offer.docx", kind: "OFFER", language: "DE", name: "Angebot (Standard)" },
-    { file: "offer.en.docx", kind: "OFFER", language: "EN", name: "Offer (default)" },
-    { file: "order.docx", kind: "ORDER", language: "DE", name: "Bestellung (Standard)" },
-    { file: "order.en.docx", kind: "ORDER", language: "EN", name: "Order (default)" },
+    { file: "offer.docx", type: "OFFER", language: "DE", name: "Angebot (Standard)" },
+    { file: "offer.en.docx", type: "OFFER", language: "EN", name: "Offer (default)" },
+    { file: "order.docx", type: "ORDER", language: "DE", name: "Bestellung (Standard)" },
+    { file: "order.en.docx", type: "ORDER", language: "EN", name: "Order (default)" },
 ];
 
 const dryRun = process.argv.includes("--dry-run");
@@ -55,7 +55,7 @@ async function main() {
         const sizeKb = Math.round(content.length / 1024);
 
         const existing = await prisma.documentTemplate.findFirst({
-            where: { kind: entry.kind, language: entry.language, sha256 },
+            where: { type: entry.type, language: entry.language, sha256 },
         });
 
         if (existing) {
@@ -64,24 +64,24 @@ async function main() {
         }
 
         if (dryRun) {
-            console.log(`[templates] ${entry.file}: würde angelegt — ${entry.kind}/${entry.language}, ${sizeKb} KB, ${sha256.slice(0, 12)}…`);
+            console.log(`[templates] ${entry.file}: würde angelegt — ${entry.type}/${entry.language}, ${sizeKb} KB, ${sha256.slice(0, 12)}…`);
             continue;
         }
 
         const template = await createTemplate({
-            kind: entry.kind,
+            type: entry.type,
             language: entry.language,
             name: entry.name,
             fileName: entry.file,
             content,
         });
 
-        console.log(`[templates] ${entry.file}: angelegt (${template.id}) — ${entry.kind}/${entry.language}, ${sizeKb} KB`);
+        console.log(`[templates] ${entry.file}: angelegt (${template.id}) — ${entry.type}/${entry.language}, ${sizeKb} KB`);
 
         // Nur einspringen, wenn der Slot noch leer ist: ein bereits gesetztes
         // Template darf ein Import nicht verdrängen.
         const active = await prisma.documentTemplate.findFirst({
-            where: { kind: entry.kind, language: entry.language, isActive: true },
+            where: { type: entry.type, language: entry.language, isActive: true },
         });
 
         if (!active) {

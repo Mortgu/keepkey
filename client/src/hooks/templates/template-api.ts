@@ -1,4 +1,4 @@
-import type { DocumentTemplate, DocumentTemplateKind, Language } from "@keepit/schemas";
+import type { DocumentTemplate, DocumentTemplateType, Language } from "@keepit/schemas";
 import { BASE_URL, api } from "@/lib/api-client";
 
 const DOCX_MIME = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
@@ -7,7 +7,7 @@ export const getTemplates = () =>
     api<Array<DocumentTemplate>>("/api/templates");
 
 export type UploadTemplateInput = {
-    kind: DocumentTemplateKind;
+    type: DocumentTemplateType;
     language: Language;
     file: File;
     name?: string;
@@ -20,8 +20,8 @@ export type UploadTemplateInput = {
  * Dateien: die haengt an einer CORS-Regel des Buckets, und fehlt die, waere
  * die Vorlagenverwaltung unbenutzbar statt nur unbequem.
  */
-export const uploadTemplate = ({ kind, language, file, name }: UploadTemplateInput) => {
-    const params = new URLSearchParams({ kind, language, fileName: file.name });
+export const uploadTemplate = ({ type, language, file, name }: UploadTemplateInput) => {
+    const params = new URLSearchParams({ type, language, fileName: file.name });
     if (name) params.set("name", name);
 
     return api<DocumentTemplate>(`/api/templates?${params.toString()}`, {

@@ -2,14 +2,11 @@ import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Download, Pencil, Plus, Trash, Type } from "lucide-react";
 import {
-    DOCUMENT_TEMPLATE_KINDS,
-    
-    
-    
+    DOCUMENT_TEMPLATE_TYPES,
     groupTemplatesBySlot
 } from "@keepit/schemas";
 import SectionCard from "./section-card";
-import type {DocumentTemplate, DocumentTemplateKind, DocumentTemplateSlot} from "@keepit/schemas";
+import type {DocumentTemplate, DocumentTemplateType, DocumentTemplateSlot} from "@keepit/schemas";
 import {
     Button,
     Dialog,
@@ -30,7 +27,7 @@ import {
 import { formatBytesToKB } from "@/lib/utils";
 
 /** Welcher Slot gerade eine Datei erwartet — der Upload-Dialog kennt keinen eigenen. */
-type PendingUpload = { kind: DocumentTemplateKind; language: DocumentTemplateSlot["language"] };
+type PendingUpload = { type: DocumentTemplateType; language: DocumentTemplateSlot["language"] };
 
 export default function TemplateList() {
     const { formatDate } = useFormatters();
@@ -58,8 +55,8 @@ export default function TemplateList() {
 
     const slots = groupTemplatesBySlot(templates);
 
-    const openUpload = (kind: DocumentTemplateKind, language: DocumentTemplateSlot["language"]) => {
-        pendingUpload.current = { kind, language };
+    const openUpload = (type: DocumentTemplateType, language: DocumentTemplateSlot["language"]) => {
+        pendingUpload.current = { type, language };
         fileInputRef.current?.click();
     };
 
@@ -184,7 +181,7 @@ export default function TemplateList() {
         const others = slot.templates.filter((template) => !template.isActive);
 
         return (
-            <div key={`${slot.kind}-${slot.language}`} className="grid gap-2">
+            <div key={`${slot.type}-${slot.language}`} className="grid gap-2">
                 <div className="flex items-center justify-between gap-4">
                     <h2 className="font-medium">
                         {t(`templates.language.${slot.language}`)}
@@ -194,7 +191,7 @@ export default function TemplateList() {
                         variant="primary"
                         icon={<Plus className="size-4" />}
                         loading={mutations.isUploadingTemplate}
-                        onClick={() => openUpload(slot.kind, slot.language)}
+                        onClick={() => openUpload(slot.type, slot.language)}
                     >
                         {t("templates.upload")}
                     </Button>
@@ -230,10 +227,10 @@ export default function TemplateList() {
                 onChange={handleFileChange}
             />
 
-            {DOCUMENT_TEMPLATE_KINDS.map((kind) => (
-                <SectionCard key={kind} title={t(`templates.kind.${kind}`)}>
+            {DOCUMENT_TEMPLATE_TYPES.map((type) => (
+                <SectionCard key={type} title={t(`templates.type.${type}`)}>
                     <div className="grid gap-6">
-                        {slots.filter((slot) => slot.kind === kind).map(renderSlot)}
+                        {slots.filter((slot) => slot.type === type).map(renderSlot)}
                     </div>
                 </SectionCard>
             ))}

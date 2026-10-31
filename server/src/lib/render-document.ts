@@ -1,7 +1,7 @@
 import Docxtemplater from "docxtemplater";
 import InspectModule from "docxtemplater/js/inspect-module.js";
 import PizZip from "pizzip";
-import type { DocumentTemplateKind, Language } from "@prisma/client";
+import type { DocumentTemplateType, Language } from "@prisma/client";
 import { z } from "zod";
 import logger from "@/utils/logger.js";
 import { loadTemplateForRendering } from "../services/document/document-template.service.js";
@@ -37,7 +37,7 @@ export type RenderProvenance = {
  * Vorlage liest, das Schema aber nicht kennt (Abweichung zwischen Vorlage und Code).
  */
 export async function renderDocument(
-    kind: DocumentTemplateKind,
+    type: DocumentTemplateType,
     language: Language,
     data: Record<string, unknown>,
     provenance: RenderProvenance,
@@ -48,7 +48,7 @@ export async function renderDocument(
     const model = JSON.parse(JSON.stringify(resolved)) as Record<string, unknown>;
     const modelHash = hashModel(model);
 
-    const content = await loadTemplateForRendering(kind, language);
+    const content = await loadTemplateForRendering(type, language);
     const zip = new PizZip(content);
     // @ts-expect-error - inspect-module exports a function at runtime but is typed as a class
     const inspect = options.schema ? InspectModule() : null;
@@ -59,7 +59,7 @@ export async function renderDocument(
         parser: customParser,
     });
 
-    if (inspect && options.schema) warnOnTemplateDrift(kind, inspect.getAllTags(), options.schema);
+    if (inspect && options.schema) warnOnTemplateDrift(type, inspect.getAllTags(), options.schema);
 
     doc.render(resolved);
     writeProvenance(doc.getZip(), { ...provenance, modelHash });
@@ -97,12 +97,12 @@ function flattenSchema(schema: any, prefix = ""): string[] {
     return prefix ? [prefix] : [];
 }
 
-function warnOnTemplateDrift(kind: DocumentTemplateKind, tags: unknown, schema: z.ZodType): void {
+function warnOnTemplateDrift(type: DocumentTemplateType, tags: unknown, schema: z.ZodType): void {
     const schemaPaths = flattenSchema(schema);
     const uncovered = flattenTags(tags as Record<string, unknown>).filter((t) => !schemaPaths.includes(t));
     if (uncovered.length > 0) {
         logger.warn(
-            `[render]: ${kind} template tags not covered by schema (possible drift): ${uncovered.join(", ")}`,
+            `[render]: ${type} template tags not covered by schema (possible drift): ${uncovered.join(", ")}`,
         );
     }
 }

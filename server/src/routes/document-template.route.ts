@@ -37,7 +37,7 @@ const docxBody = express.raw({ type: DOCX_MIME, limit: "50mb" });
 /* [GET] /api/templates */
 router.get("/", getDocumentTemplates);
 
-/* [POST] /api/templates?kind=&language=&fileName=&name= */
+/* [POST] /api/templates?type=&language=&fileName=&name= */
 router.post(
     "/",
     docxBody,

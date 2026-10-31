@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import fs from "node:fs/promises";
-import { DocumentTemplateKind, Language } from "@prisma/client";
+import { DocumentTemplateType, Language } from "@prisma/client";
 import {
     getDocumentArtifact,
     getDocumentDownloadUrl,
@@ -17,15 +17,15 @@ export const DOCX_MIME =
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 /** Basisname der mitgelieferten Vorlage je Dokumentart unter `TEMPLATES_DIR`. */
-const LEGACY_BASE_NAME: Record<DocumentTemplateKind, string> = {
+const LEGACY_BASE_NAME: Record<DocumentTemplateType, string> = {
     OFFER: "offer",
     ORDER: "order",
     CONFIRMATION: "confirmation",
     INVOICE: "invoice",
 };
 
-const templateObjectKey = (kind: DocumentTemplateKind) =>
-    `templates/${kind.toLowerCase()}/${randomUUID()}.docx`;
+const templateObjectKey = (type: DocumentTemplateType) =>
+    `templates/${type.toLowerCase()}/${randomUUID()}.docx`;
 
 async function requireTemplate(id: string) {
     const template = await prisma.documentTemplate.findUnique({ where: { id } });
@@ -54,12 +54,12 @@ async function discardObject(objectKey: string): Promise<void> {
 
 export function listTemplates() {
     return prisma.documentTemplate.findMany({
-        orderBy: [{ kind: "asc" }, { language: "asc" }, { createdAt: "desc" }],
+        orderBy: [{ type: "asc" }, { language: "asc" }, { createdAt: "desc" }],
     });
 }
 
 export type CreateTemplateInput = {
-    kind: DocumentTemplateKind;
+    type: DocumentTemplateType;
     language: Language;
     name?: string;
     fileName: string;
@@ -70,12 +70,12 @@ export type CreateTemplateInput = {
 export async function createTemplate(input: CreateTemplateInput) {
     assertDocxBuffer(input.content);
 
-    const stored = await storeObject(templateObjectKey(input.kind), input.content, DOCX_MIME);
+    const stored = await storeObject(templateObjectKey(input.type), input.content, DOCX_MIME);
 
     try {
         return await prisma.documentTemplate.create({
             data: {
-                kind: input.kind,
+                type: input.type,
                 language: input.language,
                 name: input.name?.trim() || input.fileName.replace(/\.docx$/i, ""),
                 fileName: input.fileName,
@@ -105,7 +105,7 @@ export async function replaceTemplateContent(id: string, content: Buffer) {
     const template = await requireTemplate(id);
     assertDocxBuffer(content);
 
-    const stored = await storeObject(templateObjectKey(template.kind), content, DOCX_MIME);
+    const stored = await storeObject(templateObjectKey(template.type), content, DOCX_MIME);
 
     let updated;
     try {
@@ -149,7 +149,7 @@ export async function setActiveTemplate(id: string) {
     return prisma.$transaction(async (tx) => {
         await tx.documentTemplate.updateMany({
             where: {
-                kind: template.kind,
+                type: template.type,
                 language: template.language,
                 isActive: true,
                 id: { not: id },
@@ -178,7 +178,7 @@ export async function deleteTemplate(id: string) {
     if (template.isActive) {
         const alternatives = await prisma.documentTemplate.count({
             where: {
-                kind: template.kind,
+                type: template.type,
                 language: template.language,
                 id: { not: template.id },
             },
@@ -221,35 +221,34 @@ export async function getTemplateDownloadUrl(id: string) {
  * Vorlage soll sofort greifen und nicht erst nach Ablauf einer Frist.
  */
 export async function loadTemplateForRendering(
-    kind: DocumentTemplateKind,
+    type: DocumentTemplateType,
     language: Language,
 ): Promise<Buffer> {
     const active =
-        await prisma.documentTemplate.findFirst({ where: { kind, language, isActive: true } })
+        await prisma.documentTemplate.findFirst({ where: { type, language, isActive: true } })
         // Wie schon `resolveTemplateName`: fehlt die Sprachvariante, gilt die
         // deutsche Vorlage.
         ?? (language === Language.DE
             ? null
             : await prisma.documentTemplate.findFirst({
-                where: { kind, language: Language.DE, isActive: true },
+                where: { type, language: Language.DE, isActive: true },
             }));
 
     if (active) {
-        logger.debug("template_resolved", { kind, language, templateId: active.id });
+        logger.debug("template_resolved", { type, language, templateId: active.id });
         return getDocumentArtifact(active.objectKey);
     }
 
-    const legacyPath = resolveTemplateName(LEGACY_BASE_NAME[kind], language);
-    logger.debug("template_resolved_legacy", { kind, language, path: legacyPath });
+    const legacyPath = resolveTemplateName(LEGACY_BASE_NAME[type], language);
+    logger.debug("template_resolved_legacy", { type, language, path: legacyPath });
 
     try {
         return await fs.readFile(legacyPath);
     } catch {
         throw new AppException(
-            `Für ${kind} (${language}) ist keine Vorlage hinterlegt.`,
+            `Für ${type} (${language}) ist keine Vorlage hinterlegt.`,
             404,
             "TEMPLATE_NOT_FOUND",
         );
     }
 }
-

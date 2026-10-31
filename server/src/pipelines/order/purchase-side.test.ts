@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { orderFixture } from "@/tests/order-fixtures.js";
-import { presentOrder } from "../../services/order/order-source.js";
+import { presentOrder } from "@/services/order/order-source.js";
 import { formatOrderData, withPurchasePrices } from "./build-order.js";
-import { formatEur } from "../../utils/utils.js";
+import { formatEur } from "@/utils/utils.js";
 
 /**
  * Zwei Preisseiten an einer Bestellung. Die Bestellung (BE) geht an den

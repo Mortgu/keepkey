@@ -26,7 +26,7 @@ const offerAdapter: GenerationAdapter<OfferDocumentForGeneration> = {
     }), "offerId", "offer"),
     currentParentVersion: (doc) => doc.offer.version,
     build: (doc) => buildOffer(doc.offerId, doc.version),
-    templateKind: "OFFER",
+    templateType: "OFFER",
     renderSchema: offerTemplateSchema,
     ownerKey: (doc) => ({ documentId: doc.id }),
     recheckNotStale: async (tx, doc) => {
@@ -65,7 +65,7 @@ const orderAdapter: GenerationAdapter<OrderDocumentForGeneration> = {
     }), "orderId", "order"),
     currentParentVersion: (doc) => doc.order.version,
     build: (doc) => buildOrder(doc.orderId, doc.version),
-    templateKind: "ORDER",
+    templateType: "ORDER",
     ownerKey: (doc) => ({ documentId: doc.id }),
     recheckNotStale: async (tx, doc) => {
         await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${`order-version:${doc.orderId}`}))::text AS "lock"`;

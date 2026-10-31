@@ -64,7 +64,7 @@ function baseAdapter(doc: FakeDoc, overrides: Record<string, unknown> = {}) {
         findByTask: vi.fn(async () => doc),
         currentParentVersion: vi.fn(() => null as number | null),
         build: vi.fn(async () => ({ language: "DE" as const, data: {}, displayName: "Angebot v1" })),
-        templateKind: "OFFER" as const,
+        templateType: "OFFER" as const,
         ownerKey: vi.fn(() => ({ documentId: doc.id })),
         recheckNotStale: vi.fn(async () => {}),
         demoteSiblingsWhere: vi.fn(() => ({ offerId: "parent-1", isCurrent: true })),

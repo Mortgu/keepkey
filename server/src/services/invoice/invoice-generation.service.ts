@@ -26,7 +26,7 @@ const invoiceAdapter: GenerationAdapter<InvoiceDocumentForGeneration> = {
     }), "invoiceId"),
     currentParentVersion: () => null,
     build: (doc) => buildInvoice(doc.invoiceId),
-    templateKind: "INVOICE",
+    templateType: "INVOICE",
     ownerKey: (doc) => ({ documentId: doc.id }),
     recheckNotStale: async () => {},
     demoteSiblingsWhere: (doc) => ({ invoiceId: doc.invoiceId, isCurrent: true }),

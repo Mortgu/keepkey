@@ -1,6 +1,6 @@
 {
   "templates": {
-    "kind": {
+    "type": {
       "OFFER": "Offer templates",
       "ORDER": "Order templates",
       "CONFIRMATION": "Order confirmation templates",

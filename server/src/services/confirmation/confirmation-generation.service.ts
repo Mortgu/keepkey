@@ -26,7 +26,7 @@ const confirmationAdapter: GenerationAdapter<ConfirmationDocumentForGeneration> 
     }), "confirmationId"),
     currentParentVersion: () => null,
     build: (doc) => buildConfirmation(doc.confirmationId),
-    templateKind: "CONFIRMATION",
+    templateType: "CONFIRMATION",
     ownerKey: (doc) => ({ documentId: doc.id }),
     recheckNotStale: async () => {},
     demoteSiblingsWhere: (doc) => ({ confirmationId: doc.confirmationId, isCurrent: true }),

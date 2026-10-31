@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
 import { orderFixture } from "@/tests/order-fixtures.js";
-import { presentOrder } from "../../services/order/order-source.js";
-import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
-import { formatEur } from "../../utils/utils.js";
+import { presentOrder } from "@/services/order/order-source.js";
+import { invoiceContract } from "@/schemas/templates/invoice.template.schema.js";
+import { formatEur } from "@/utils/utils.js";
 
 const fixture = () => ({ ...orderFixture(), contractStartDate: new Date("2026-11-01T00:00:00Z") });
 

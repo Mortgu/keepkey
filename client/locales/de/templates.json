@@ -1,6 +1,6 @@
 {
   "templates": {
-    "kind": {
+    "type": {
       "OFFER": "Angebotsvorlagen",
       "ORDER": "Bestellvorlagen",
       "CONFIRMATION": "Auftragsbestätigungsvorlagen",

@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import { orderFixture } from "@/tests/order-fixtures.js";
-import { presentOrder } from "../../services/order/order-source.js";
-import { confirmationTemplateSchema } from "../../schemas/templates/confirmation.template.schema.js";
+import { presentOrder } from "@/services/order/order-source.js";
+import { confirmationTemplateSchema } from "@/schemas/templates/confirmation.template.schema.js";
 
 vi.mock("../../lib/prismaClient.js", () => ({
     prisma: {

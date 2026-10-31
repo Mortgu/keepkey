@@ -5,7 +5,7 @@
 /// und welche je Slot (Typ x Sprache) gerade benutzt wird. Vorher lagen
 /// Vorlagen ausschliesslich als Dateien unter `TEMPLATES_DIR` und liessen sich
 /// deshalb weder auswaehlen noch aus der Anwendung heraus bearbeiten.
-enum DocumentTemplateKind {
+enum DocumentTemplateType {
   OFFER
   ORDER
   /// Auftragsbestätigung (AB) — Order-Daten plus MwSt und Brutto.
@@ -16,7 +16,7 @@ enum DocumentTemplateKind {
 model DocumentTemplate {
   id String @id @default(cuid())
 
-  kind     DocumentTemplateKind
+  type     DocumentTemplateType
   language Language
 
   /// Frei waehlbarer Anzeigename in der Verwaltung.
@@ -28,7 +28,7 @@ model DocumentTemplate {
   size      Int
   sha256    String
 
-  /// Genau eine aktive Vorlage je (kind, language). Erzwungen wird das nicht
+  /// Genau eine aktive Vorlage je (type, language). Erzwungen wird das nicht
   /// von Prisma, sondern von einem partiellen Unique-Index, der in der
   /// Migration von Hand steht — Prisma kennt keine `WHERE`-Klausel an einem
   /// Index.
@@ -40,7 +40,7 @@ model DocumentTemplate {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@index([kind, language])
+  @@index([type, language])
   @@index([createdById])
   @@map("document_template")
 }
