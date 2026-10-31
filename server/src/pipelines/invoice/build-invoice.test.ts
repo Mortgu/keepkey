@@ -14,7 +14,7 @@ vi.mock("../../lib/prismaClient.js", () => ({
                 invoiceId: "2026-0007",
                 date: new Date("2026-10-06T00:00:00Z"),
                 orderId: "order",
-                taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100,
+                taxRate: 19, netCents: 90000, vatCents: 17100, grossCents: 107100,
             })),
         },
         confirmation: { findUnique: vi.fn(async () => ({ confirmationId: "000042" })) },
@@ -29,7 +29,7 @@ import { buildInvoice, paymentTermDays } from "./build-invoice.js";
 const eur = (cents: number) => formatEur(cents / 100);
 
 describe("buildInvoice", () => {
-    it("line totals add up to the stored net_cents (= offer.net_amount) — free months are not deducted twice", async () => {
+    it("line totals add up to the stored netCents (= offer.net_amount) — free months are not deducted twice", async () => {
         const data = invoiceContract.parse((await buildInvoice("inv-1")).data);
         const offer = orderFixture().offer;
 

@@ -1,5 +1,5 @@
-import { vatTotals } from "@keepit/schemas";
-import type { Prisma } from "@prisma/client";
+import {vatTotals} from "@keepit/schemas";
+import type {Prisma} from "@prisma/client";
 
 /**
  * Steuerblock für einen Beleg (AB, Rechnung) zum Zeitpunkt des Anlegens.
@@ -9,16 +9,37 @@ import type { Prisma } from "@prisma/client";
  * dem Formular, sonst vom Kunden (aktueller Stand, nicht der Snapshot). Die
  * Werte werden mit der Row gespeichert; Regenerieren rechnet nie neu.
  */
-export async function vatForOrder(
-    tx: Prisma.TransactionClient,
-    orderId: string,
-    taxRate: number | undefined,
-): Promise<{ taxRate: number; net_cents: number; vat_cents: number; gross_cents: number }> {
-    const order = await tx.order.findUniqueOrThrow({
-        where: { id: orderId },
-        select: { offer: { select: { net_amount: true, customer: { select: { taxRate: true } } } } },
+type vatForOrderReturn = {
+    taxRate: number;
+    netCents: number;
+    vatCents: number;
+    grossCents: number;
+};
+
+export async function vatForOrder(transaction: Prisma.TransactionClient, orderId: string, taxRate: number | undefined): Promise<vatForOrderReturn> {
+    const order = await transaction.order.findUniqueOrThrow({
+        where: {id: orderId},
+        select: {
+            offer: {
+                select: {
+                    net_amount: true,
+                    customer: {
+                        select: {
+                            taxRate: true
+                        }
+                    }
+                }
+            }
+        },
     });
+
     const rate = taxRate ?? order.offer.customer.taxRate;
     const totals = vatTotals(order.offer.net_amount, rate);
-    return { taxRate: rate, net_cents: totals.netCents, vat_cents: totals.vatCents, gross_cents: totals.grossCents };
+
+    return {
+        taxRate: rate,
+        netCents: totals.netCents,
+        vatCents: totals.vatCents,
+        grossCents: totals.grossCents
+    };
 }

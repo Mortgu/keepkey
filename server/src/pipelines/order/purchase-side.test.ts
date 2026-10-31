@@ -26,10 +26,10 @@ const eur = (cents: number) => formatEur(cents / 100);
 vi.mock("../../lib/prismaClient.js", () => ({
     prisma: {
         confirmation: {
-            findUniqueOrThrow: vi.fn(async () => ({ id: "c", confirmationId: "1", date: new Date(), orderId: "order", taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100, })),
+            findUniqueOrThrow: vi.fn(async () => ({ id: "c", confirmationId: "1", date: new Date(), orderId: "order", taxRate: 19, netCents: 90000, vatCents: 17100, grossCents: 107100, })),
             findUnique: vi.fn(async () => null),
         },
-        invoice: { findUniqueOrThrow: vi.fn(async () => ({ id: "i", invoiceId: "1", date: new Date(), orderId: "order", taxRate: 19, net_cents: 90000, vat_cents: 17100, gross_cents: 107100, })) },
+        invoice: { findUniqueOrThrow: vi.fn(async () => ({ id: "i", invoiceId: "1", date: new Date(), orderId: "order", taxRate: 19, netCents: 90000, vatCents: 17100, grossCents: 107100, })) },
     },
 }));
 vi.mock("../../services/order.service.js", () => ({

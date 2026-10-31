@@ -122,7 +122,7 @@ export default function InvoiceSection({ order }: Props) {
                     <div className="flex items-center gap-1">
                         <dt className="text-(--text-secondary)">{t("orders.vat.stored")}:</dt>
                         <dd className="font-mono">
-                            {formatEur(invoice.net_cents)} + {formatNumber(invoice.taxRate)} % = {formatEur(invoice.gross_cents)}
+                            {formatEur(invoice.netCents)} + {formatNumber(invoice.taxRate)} % = {formatEur(invoice.grossCents)}
                         </dd>
                     </div>
                 </dl>

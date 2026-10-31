@@ -1,11 +1,11 @@
 import type { Language } from "@prisma/client";
-import { prisma } from "../../lib/prismaClient.js";
-import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
-import { getOrderById } from "../../services/order.service.js";
-import { translateFields } from "../../utils/i18n.js";
-import { formatParty } from "../../utils/party.js";
-import { sanitizeCompanyName } from "../../utils/documents.js";
-import { formatCentsToEur, formatDate, formatDuration, formatPercent } from "../../utils/utils.js";
+import { prisma } from "@/lib/prismaClient.js";
+import { invoiceContract } from "@/schemas/templates/invoice.template.schema.js";
+import { getOrderById } from "@/services/order.service.js";
+import { translateFields } from "@/utils/i18n.js";
+import { formatParty } from "@/utils/party.js";
+import { sanitizeCompanyName } from "@/utils/documents.js";
+import { formatCentsToEur, formatDate, formatDuration, formatPercent } from "@/utils/utils.js";
 
 /** "30 Tage" / "14 days" → 30 / 14; sonst null. */
 export function paymentTermDays(paymentTerm: string): number | null {
@@ -28,22 +28,32 @@ const addMonths = (date: Date, months: number) => {
  * Preise: `presentOrder` liefert `total_cents` je Position bereits netto
  * (Freimonate abgezogen) und `discount_cents` als den abgezogenen Betrag.
  * Einzelpreis ist `eur_user_month`. Die Zeilensumme entspricht damit exakt
- * `net_amount` des angenommenen Angebots, das beim Anlegen als `net_cents`
+ * `net_amount` des angenommenen Angebots, das beim Anlegen als `netCents`
  * gespeichert wurde.
  *
  * Rabatte erscheinen als eigene Zeilen mit negativem Betrag, damit die Summe
  * der Zeilen dem Nettobetrag entspricht.
  */
-export async function buildInvoice(invoiceRowId: string): Promise<{
+
+type BuildInvoiceReturn = {
     data: Record<string, unknown>;
     language: Language;
     displayName: string;
-}> {
-    const invoice = await prisma.invoice.findUniqueOrThrow({ where: { id: invoiceRowId } });
+};
+
+export async function buildInvoice(invoiceRowId: string): Promise<BuildInvoiceReturn> {
+    const invoice = await prisma.invoice.findUniqueOrThrow({
+        where: { id: invoiceRowId } 
+    });
+
     const [order, confirmation] = await Promise.all([
         getOrderById(invoice.orderId),
-        prisma.confirmation.findUnique({ where: { orderId: invoice.orderId }, select: { confirmationId: true } }),
+        prisma.confirmation.findUnique({ 
+            where: { orderId: invoice.orderId }, 
+            select: { confirmationId: true } 
+        }),
     ]);
+    
     const lang = order.language;
     const { customer, customerContactPerson: ccp, employee } = order;
 
@@ -129,10 +139,10 @@ export async function buildInvoice(invoiceRowId: string): Promise<{
         // Steuerblock aus der Row — beim Anlegen aus offer.net_amount festgelegt,
         // Regenerieren rechnet nie neu. Die Zeilen oben müssen dieselbe Summe ergeben
         // (Test), sonst stimmt die Darstellung nicht mit dem Beleg überein.
-        netTotal: formatCentsToEur(invoice.net_cents),
+        netTotal: formatCentsToEur(invoice.netCents),
         vatRate: formatPercent(invoice.taxRate),
-        vatAmount: formatCentsToEur(invoice.vat_cents),
-        grossTotal: formatCentsToEur(invoice.gross_cents),
+        vatAmount: formatCentsToEur(invoice.vatCents),
+        grossTotal: formatCentsToEur(invoice.grossCents),
     });
 
     return {

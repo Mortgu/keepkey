@@ -18,10 +18,10 @@ model Invoice {
 
   /// Steuer beim Anlegen festgelegt und danach unveränderlich. Netto kommt aus
   /// `offer.net_amount`, der Satz aus dem Formular (Default: Kundensatz).
-  taxRate     Float
-  net_cents   Int
-  vat_cents   Int
-  gross_cents Int
+  taxRate    Float
+  netCents   Int
+  vatCents   Int
+  grossCents Int
 
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Restrict)
   customerId String
@@ -76,7 +76,7 @@ model InvoiceDocument {
   updatedAt DateTime  @updatedAt @db.Timestamptz(6)
   deletedAt DateTime? @db.Timestamptz(6)
 
-  @@index([invoiceId])
   @@unique([invoiceId, version])
+  @@index([invoiceId])
   @@map("invoice_document")
 }

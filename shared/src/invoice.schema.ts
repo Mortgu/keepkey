@@ -33,9 +33,9 @@ export const invoiceSchema = z.object({
     customerId: z.string(),
     /** Beim Anlegen festgelegt, danach fest. */
     taxRate: z.number(),
-    net_cents: z.number().int(),
-    vat_cents: z.number().int(),
-    gross_cents: z.number().int(),
+    netCents: z.number().int(),
+    vatCents: z.number().int(),
+    grossCents: z.number().int(),
     createdById: z.string(),
     documents: z.array(invoiceDocumentSchema),
     createdAt: z.string(),
