@@ -45,7 +45,7 @@
     },
     "purchase": {
       "title": "Purchase prices (order to the supplier)",
-      "hint": "Per user and month, net. Prefilled with the sales price. Flat rates and discounts of the offer stay with the customer.",
+      "hint": "Net total per position over the term; the price per user and month is derived from it. Prefilled with the sales price. Flat rates and discounts of the offer stay with the customer.",
       "product": "Product",
       "quantity": "Qty",
       "sales": "Sales",
