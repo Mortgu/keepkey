@@ -1,6 +1,5 @@
 import { Router } from "express";
 import {
-    adoptChanges,
     confirmReplacementUpload,
     createReplacementUpload,
     deleteDocument,
@@ -13,7 +12,6 @@ import {
 } from "@/controllers/index.js";
 import { validate, validateParams } from "@/middlewares/zod.middleware.js";
 import {
-    adoptChangesSchema,
     confirmReplacementSchema,
     documentArtifactParamsSchema,
     documentParamsSchema,
@@ -71,14 +69,6 @@ router.post(
     validateParams(documentArtifactParamsSchema),
     validate(confirmReplacementSchema),
     confirmReplacementUpload,
-);
-
-/* Abweichungen einer ersetzten Datei ins Angebot übernehmen. */
-router.post(
-    "/:type/:documentId/adopt",
-    validateParams(documentParamsSchema),
-    validate(adoptChangesSchema),
-    adoptChanges,
 );
 
 export default router;

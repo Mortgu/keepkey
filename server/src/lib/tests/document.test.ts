@@ -1,16 +1,15 @@
-import { afterAll, describe, expect, it, vi } from "vitest";
+import {afterAll, describe, expect, it, vi} from "vitest";
+import {closeTaskQueue} from "../../workers/task-queue.js";
+import {enqueueTask} from "../document.js";
+import {prisma} from "../prismaClient.js";
 
 vi.mock("./prismaClient.js", () => ({
     prisma: {
         $transaction: vi.fn(async () => []),
-        task: { updateMany: vi.fn(), update: vi.fn() },
-        document: { updateMany: vi.fn() },
+        task: {updateMany: vi.fn(), update: vi.fn()},
+        document: {updateMany: vi.fn()},
     },
 }));
-
-import { closeTaskQueue } from "../workers/task-queue.js";
-import { enqueueTask } from "./document.js";
-import { prisma } from "./prismaClient.js";
 
 describe("enqueueTask without Redis", () => {
     afterAll(async () => {
@@ -31,8 +30,8 @@ describe("enqueueTask without Redis", () => {
         // Ein einziges updateMany über die gemeinsame Dokumenttabelle markiert alle Dokumente des Tasks.
         expect(prisma.document.updateMany).toHaveBeenCalledOnce();
         expect(prisma.document.updateMany).toHaveBeenCalledWith({
-            where: { taskId: "task-1", status: "PENDING" },
-            data: { status: "FAILED", error: expect.any(String) },
+            where: {taskId: "task-1", status: "PENDING"},
+            data: {status: "FAILED", error: expect.any(String)},
         });
     });
 });

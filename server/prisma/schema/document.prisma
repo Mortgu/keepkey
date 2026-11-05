@@ -57,8 +57,6 @@ model Document {
   error       String?
   uploadToken String?
 
-  model Json?
-
   offer   Offer?  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String?
 

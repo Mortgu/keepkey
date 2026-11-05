@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
-    adoptChanges,
     confirmReplacementUpload,
     deleteDocument,
     putReplacementFile,
@@ -68,13 +67,6 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         onSuccess: () => invalidate(queryClient, type, parentId),
     });
 
-    // Das Angebot hat sich geändert (neue Version) — Listen und Detail neu laden.
-    const adoptMutation = useMutation({
-        mutationFn: ({ documentId, fields }: { documentId: string; fields: Array<string> }) =>
-            adoptChanges(type, documentId, fields),
-        onSuccess: () => invalidate(queryClient, type, parentId),
-    });
-
     const resyncMutation = useMutation({
         mutationFn: (documentId: string) => resyncDocument(type, documentId),
         onSuccess: () => invalidate(queryClient, type, parentId),
@@ -84,8 +76,6 @@ export function useDocumentMutations(type: DocumentType, parentId: string) {
         replaceDocumentFile: replaceMutation.mutateAsync,
         isReplacingDocumentFile: replaceMutation.isPending,
         errorReplacingDocumentFile: replaceMutation.error,
-        adoptChanges: adoptMutation.mutateAsync,
-        isAdoptingChanges: adoptMutation.isPending,
         resyncDocument: resyncMutation.mutateAsync,
         isResyncingDocument: resyncMutation.isPending,
         errorResyncingDocument: resyncMutation.error,

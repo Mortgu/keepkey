@@ -1,15 +1,15 @@
-import { Request, Response } from "express";
+import type {Request, Response} from "express";
 
-import * as taskService from "../services/task.service.js";
+import * as service from "../services/task.service.js";
 
 /* ========== GET ========== */
 
 export const getAllTasks = async (request: Request, response: Response) => {
-    const tasks = await taskService.getAllTasks();
+    const tasks = await service.getAllTasks();
     return response.status(200).json(tasks);
 };
 
 export const getTaskById = async (request: Request, response: Response) => {
-    const task = await taskService.getTaskById(request.params.id as string);
+    const task = await service.getTaskById(request.params.id as string);
     return response.status(200).json(task);
 };

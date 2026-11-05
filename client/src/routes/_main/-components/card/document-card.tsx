@@ -20,16 +20,13 @@ import {tv} from "tailwind-variants";
 import {useState} from "react";
 import {useQuery} from "@tanstack/react-query";
 import {Menu} from "@base-ui/react";
-import {handleReplacementWarnings} from "./replacement-warnings";
 import type {ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument} from "@keepit/schemas";
-import type {FieldChange} from "@/components";
 import {
     Badge,
     Button,
     DocumentDocxEditor,
     DocumentPreviewModal,
     DocumentRenameModal,
-    ReplacementChangesModal,
     Spinner,
     Tooltip,
     buttonStyles,
@@ -87,7 +84,6 @@ export default function DocumentCard({type, parentId, document, locked = false}:
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
 
     const mutations = useDocumentMutations(type, parentId);
-    const [changes, setChanges] = useState<Array<FieldChange> | null>(null);
 
     const {canReplaceFiles, replaceBlocker} = useDocumentCapabilities();
 
@@ -110,13 +106,12 @@ export default function DocumentCard({type, parentId, document, locked = false}:
             if (file === undefined) return;
 
             try {
-                const replaced = await mutations.replaceDocumentFile({
+                await mutations.replaceDocumentFile({
                     documentId: document.id,
                     format: "docx",
                     file,
                 });
                 showToast.success("documents.toast.replaced");
-                handleReplacementWarnings(replaced.warnings, setChanges);
             } catch {
                 // Der globale onError-Handler zeigt die Server-Meldung bereits an.
             }
@@ -390,17 +385,6 @@ export default function DocumentCard({type, parentId, document, locked = false}:
                     />
                 )}
 
-                {changes && (
-                    <ReplacementChangesModal
-                        changes={changes}
-                        isPending={mutations.isAdoptingChanges}
-                        onClose={() => setChanges(null)}
-                        onAdopt={async (fields) => {
-                            await mutations.adoptChanges({documentId: document.id, fields});
-                            showToast.success("documents.toast.adopted");
-                        }}
-                    />
-                )}
                 {renameModal.isOpen && (
                     <DocumentRenameModal
                         key={renameModal.key}
@@ -424,14 +408,13 @@ export default function DocumentCard({type, parentId, document, locked = false}:
                         displayName={document.displayName ?? document.id + ".docx"}
                         onSave={async (file) => {
                             try {
-                                const replaced = await mutations.replaceDocumentFile({
+                                await mutations.replaceDocumentFile({
                                     documentId: document.id,
                                     format: "docx",
                                     file,
                                 });
                                 showToast.success("documents.toast.saved");
                                 setEditDocx(false);
-                                handleReplacementWarnings(replaced.warnings, setChanges);
                             } catch {
                                 // Editor offen lassen, damit nichts verloren geht;
                                 // der globale onError-Handler meldet den Fehler.

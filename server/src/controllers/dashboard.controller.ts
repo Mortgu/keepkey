@@ -1,5 +1,6 @@
-import { Request, Response } from "express";
-import { getDashboardStats } from "../services/dashboard.service.js";
+import type {Request, Response} from "express";
+
+import {getDashboardStats} from "../services/dashboard.service.js";
 
 export const getStats = async (_request: Request, response: Response) => {
     const stats = await getDashboardStats();

@@ -11,8 +11,6 @@ const fake = vi.hoisted(() => {
         renderDocument: vi.fn(async () => ({
             docxBuffer: Buffer.from("docx"),
             pdfBuffer: Buffer.from("pdf"),
-            model: { hello: "world" },
-            modelHash: "hash",
         })),
         storeDocumentArtifacts: vi.fn(async () => ({
             pdf: { objectKey: "pdf-key", size: 1, sha256: "a" },
@@ -117,7 +115,6 @@ describe("runGeneration", () => {
             "OFFER",
             "DE",
             {},
-            { documentType: "offer", documentId: "doc-1" },
             { schema: undefined },
         );
         expect(fake.storeDocumentArtifacts).toHaveBeenCalledWith("offers", "doc-1", expect.anything(), expect.anything(), "task-1");

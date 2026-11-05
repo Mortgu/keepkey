@@ -1,31 +1,31 @@
-import { Request, Response } from "express";
+import type {Request, Response} from "express";
 
-import * as contractService from "../services/contract.service.js";
+import * as service from "../services/contract.service.js";
 
 /* ========== GET ========== */
 
 export const getAllContracts = async (request: Request, response: Response) => {
-    const contracts = await contractService.getAllContracts();
+    const contracts = await service.getAllContracts();
     return response.status(200).json(contracts);
 };
 
 export const getContract = async (request: Request, response: Response) => {
     const contractId = request.params.id as string;
-    const contract = await contractService.getContract(contractId);
+    const contract = await service.getContract(contractId);
     return response.status(200).json(contract);
 };
 
 /* ========== POST ========== */
 
 export const createContract = async (request: Request, response: Response) => {
-    const contract = await contractService.createContract(request.body);
+    const contract = await service.createContract(request.body);
     return response.status(200).json(contract);
 };
 
 /* ========== UPDATE ========== */
 
 export const updateContract = async (request: Request, response: Response) => {
-    const contract = await contractService.updateContract(
+    const contract = await service.updateContract(
         request.params.id as string,
         request.body
     );
@@ -33,13 +33,13 @@ export const updateContract = async (request: Request, response: Response) => {
 };
 
 export const reorderContracts = async (request: Request, response: Response) => {
-    await contractService.reorderContracts(request.body.ids);
-    return response.status(200).json({ success: true });
+    await service.reorderContracts(request.body.ids);
+    return response.status(200).json({success: true});
 };
 
 /* ========== DELETE ========== */
 
 export const deleteContract = async (request: Request, response: Response) => {
-    await contractService.deleteContract(request.params.id as string);
-    return response.status(200).json({ success: true });
+    await service.deleteContract(request.params.id as string);
+    return response.status(200).json({success: true});
 };

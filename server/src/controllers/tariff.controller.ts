@@ -1,38 +1,38 @@
-import { Request, Response } from "express";
+import type {Request, Response} from "express";
 
-import * as tariffService from "../services/tariff.service.js";
+import * as service from "../services/tariff.service.js";
 
 /* ========== GET ========== */
 
 export const getTariffGroups = async (request: Request, response: Response) => {
-    const groups = await tariffService.getTariffGroups();
+    const groups = await service.getTariffGroups();
     return response.status(200).json(groups);
 };
 
 export const getTariffGroup = async (request: Request, response: Response) => {
-    const group = await tariffService.getTariffGroup(request.params.id as string);
+    const group = await service.getTariffGroup(request.params.id as string);
     return response.status(200).json(group);
 };
 
 export const getTariff = async (request: Request, response: Response) => {
-    const tariff = await tariffService.getTariff(request.params.tariffId as string);
+    const tariff = await service.getTariff(request.params.tariffId as string);
     return response.status(200).json(tariff);
 };
 
 export const getStandardTiers = async (request: Request, response: Response) => {
-    const tiers = await tariffService.getStandardTiers();
+    const tiers = await service.getStandardTiers();
     return response.status(200).json(tiers);
 };
 
 export const getStandardDurations = async (request: Request, response: Response) => {
-    const durations = await tariffService.getStandardDurations();
+    const durations = await service.getStandardDurations();
     return response.status(200).json(durations);
 };
 
 export const getTariffPrice = async (request: Request, response: Response) => {
-    const { productId, contractId, duration, quantity, customerId, freeMonths } = request.query;
+    const {productId, contractId, duration, quantity, customerId, freeMonths} = request.query;
 
-    const result = await tariffService.getTariffPrice(
+    const result = await service.getTariffPrice(
         productId as string,
         contractId as string,
         Number(duration),
@@ -47,30 +47,30 @@ export const getTariffPrice = async (request: Request, response: Response) => {
 /* ========== POST ========== */
 
 export const createStandardDuration = async (request: Request, response: Response) => {
-    const duration = await tariffService.createStandardDuration(request.body);
+    const duration = await service.createStandardDuration(request.body);
     return response.status(201).json(duration);
 };
 
 export const createTariffGroup = async (request: Request, response: Response) => {
-    const group = await tariffService.createTariffGroup(request.body);
+    const group = await service.createTariffGroup(request.body);
     return response.status(201).json(group);
 };
 
 export const createTariff = async (request: Request, response: Response) => {
     const tariffGroupId = request.params.id as string;
-    const tariff = await tariffService.createTariff(tariffGroupId, request.body);
+    const tariff = await service.createTariff(tariffGroupId, request.body);
     return response.status(201).json(tariff);
 };
 
 export const createStandardTier = async (request: Request, response: Response) => {
-    const tier = await tariffService.createStandardTier(request.body);
+    const tier = await service.createStandardTier(request.body);
     return response.status(201).json(tier);
 };
 
 /* ========== UPDATE ========== */
 
 export const updateTariffGroup = async (request: Request, response: Response) => {
-    const group = await tariffService.updateTariffGroup(
+    const group = await service.updateTariffGroup(
         request.params.id as string,
         request.body
     );
@@ -78,45 +78,45 @@ export const updateTariffGroup = async (request: Request, response: Response) =>
 };
 
 export const updateStandardTier = async (request: Request, response: Response) => {
-    const tier = await tariffService.updateStandardTier(request.params.id as string, request.body);
+    const tier = await service.updateStandardTier(request.params.id as string, request.body);
     return response.status(200).json(tier);
 };
 
 export const updateTariffCell = async (request: Request, response: Response) => {
     const tariffId = request.params.tariffId as string;
-    const updated = await tariffService.updateTariffCell(tariffId, request.body);
-    return response.status(200).json({ message: 'Cell updated successfully!', updated });
+    const updated = await service.updateTariffCell(tariffId, request.body);
+    return response.status(200).json({message: 'Cell updated successfully!', updated});
 };
 
 export const getCustomerPrices = async (request: Request, response: Response) => {
-    const prices = await tariffService.getCustomerPrices(request.query.customerId as string);
+    const prices = await service.getCustomerPrices(request.query.customerId as string);
     return response.status(200).json(prices);
 };
 
 export const upsertCustomerPrice = async (request: Request, response: Response) => {
-    const result = await tariffService.upsertCustomerPrice(request.body);
+    const result = await service.upsertCustomerPrice(request.body);
     return response.status(200).json(result);
 };
 
 /* ========== DELETE ========== */
 
 export const deleteStandardDuration = async (request: Request, response: Response) => {
-    await tariffService.deleteStandardDuration(request.params.id as string);
+    await service.deleteStandardDuration(request.params.id as string);
     return response.status(204).send();
 };
 
 export const deleteTariffGroup = async (request: Request, response: Response) => {
-    await tariffService.deleteTariffGroup(request.params.id as string);
-    return response.status(200).json({ success: true, message: "TariffGroup deleted." });
+    await service.deleteTariffGroup(request.params.id as string);
+    return response.status(200).json({success: true, message: "TariffGroup deleted."});
 };
 
 export const deleteTariff = async (request: Request, response: Response) => {
-    await tariffService.deleteTariff(request.params.id as string, request.params.tariffId as string);
-    return response.status(200).json({ success: true, message: "Tariff deleted." });
+    await service.deleteTariff(request.params.id as string, request.params.tariffId as string);
+    return response.status(200).json({success: true, message: "Tariff deleted."});
 };
 
 export const deleteStandardTier = async (request: Request, response: Response) => {
-    await tariffService.deleteStandardTier(request.params.id as string);
+    await service.deleteStandardTier(request.params.id as string);
     return response.status(204).send();
 };
 
@@ -129,7 +129,7 @@ export const deleteTariffCell = async (request: Request, response: Response) => 
     const tariffId = request.params.tariffId as string;
     const duration = request.query.duration;
 
-    await tariffService.deleteTariffCell(tariffId, {
+    await service.deleteTariffCell(tariffId, {
         min_quantity: Number(request.query.min_quantity),
         duration: duration === undefined ? undefined : Number(duration),
     });
@@ -138,12 +138,12 @@ export const deleteTariffCell = async (request: Request, response: Response) => 
 };
 
 export const deleteCustomerPriceById = async (request: Request, response: Response) => {
-    await tariffService.deleteCustomerPriceById(request.params.id as string);
+    await service.deleteCustomerPriceById(request.params.id as string);
     return response.status(204).send();
 };
 
 export const deleteCustomerPrice = async (request: Request, response: Response) => {
-    const result = await tariffService.deleteCustomerPrice({
+    const result = await service.deleteCustomerPrice({
         productId: request.query.productId as string,
         contractId: request.query.contractId as string,
         duration: Number(request.query.duration),

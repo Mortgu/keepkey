@@ -95,53 +95,6 @@ describe('documentTable("invoice").assertEditable', () => {
     });
 });
 
-describe('documentTable("offer").canAdopt', () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    const current = (overrides: Record<string, unknown> = {}) => ({
-        isCurrent: true,
-        sourceVersion: 4,
-        offer: { version: 4, acceptedAt: null },
-        ...overrides,
-    });
-
-    it("is true for the current document of an unchanged, unaccepted offer", async () => {
-        documentFindFirst.mockResolvedValue(current());
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(true);
-    });
-
-    it("is false once the offer has moved past the document's source version", async () => {
-        documentFindFirst.mockResolvedValue(current({ offer: { version: 5, acceptedAt: null } }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-
-    it("is false for a document that is no longer the current one", async () => {
-        documentFindFirst.mockResolvedValue(current({ isCurrent: false }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-
-    it("is false once the offer is accepted", async () => {
-        documentFindFirst.mockResolvedValue(current({ offer: { version: 4, acceptedAt: new Date() } }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-});
-
-describe("documentTable(type).canAdopt for other document types", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it("is false — never even queries", async () => {
-        expect(await documentTable("invoice").canAdopt("doc-1")).toBe(false);
-        expect(documentFindFirst).not.toHaveBeenCalled();
-    });
-});
 
 describe("documentTable(type) on the shared document table", () => {
     beforeEach(() => {

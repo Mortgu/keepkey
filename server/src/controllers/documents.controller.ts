@@ -1,14 +1,14 @@
-import { Request, Response } from "express";
-import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
-import * as documentsService from "../services/document/index.js";
-import * as offerService from "../services/offer/index.js";
+import type {Request, Response} from "express";
+import type {DocumentFormatParam, DocumentType} from "@keepit/schemas";
+
+import * as service from "../services/document/index.js";
 
 export const getDocumentCapabilities = async (_request: Request, response: Response) => {
-    return response.status(200).json(await documentsService.getDocumentCapabilities());
+    return response.status(200).json(await service.getDocumentCapabilities());
 };
 
 export const renameDocument = async (request: Request, response: Response) => {
-    const document = await documentsService.renameDocument(
+    const document = await service.renameDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.body,
@@ -17,7 +17,7 @@ export const renameDocument = async (request: Request, response: Response) => {
 };
 
 export const deleteDocument = async (request: Request, response: Response) => {
-    await documentsService.deleteDocument(
+    await service.deleteDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
     );
@@ -25,7 +25,7 @@ export const deleteDocument = async (request: Request, response: Response) => {
 };
 
 export const uploadDocument = async (request: Request, response: Response) => {
-    await documentsService.uploadDocument(
+    await service.uploadDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
     );
@@ -33,7 +33,7 @@ export const uploadDocument = async (request: Request, response: Response) => {
 };
 
 export const downloadDocument = async (request: Request, response: Response) => {
-    const result = await documentsService.downloadDocument(
+    const result = await service.downloadDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.params.format as DocumentFormatParam,
@@ -42,7 +42,7 @@ export const downloadDocument = async (request: Request, response: Response) => 
 };
 
 export const getDocumentDownloadUrl = async (request: Request, response: Response) => {
-    const result = await documentsService.downloadDocument(
+    const result = await service.downloadDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.params.format as DocumentFormatParam,
@@ -51,7 +51,7 @@ export const getDocumentDownloadUrl = async (request: Request, response: Respons
 };
 
 export const createReplacementUpload = async (request: Request, response: Response) => {
-    const result = await documentsService.createReplacementUpload(
+    const result = await service.createReplacementUpload(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.params.format as DocumentFormatParam,
@@ -60,7 +60,7 @@ export const createReplacementUpload = async (request: Request, response: Respon
 };
 
 export const confirmReplacementUpload = async (request: Request, response: Response) => {
-    const document = await documentsService.confirmReplacementUpload(
+    const document = await service.confirmReplacementUpload(
         request.params.type as DocumentType,
         request.params.documentId as string,
         request.params.format as DocumentFormatParam,
@@ -70,18 +70,9 @@ export const confirmReplacementUpload = async (request: Request, response: Respo
 };
 
 export const resyncDocument = async (request: Request, response: Response) => {
-    await documentsService.resyncDocument(
+    await service.resyncDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
     );
     return response.status(204).send();
-};
-
-export const adoptChanges = async (request: Request, response: Response) => {
-    const result = await offerService.adoptChanges(
-        request.params.type as DocumentType,
-        request.params.documentId as string,
-        request.body.fields as string[],
-    );
-    return response.status(200).json(result);
 };

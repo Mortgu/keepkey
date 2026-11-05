@@ -75,7 +75,6 @@ export async function runGeneration<TDoc extends GeneratedDocument>(
         adapter.templateKind,
         built.language,
         built.data,
-        { documentType: adapter.type, documentId: doc.id },
         { schema: adapter.renderSchema },
     );
     const files = await storeDocumentArtifacts(
@@ -98,7 +97,6 @@ export async function runGeneration<TDoc extends GeneratedDocument>(
                 {
                     status: DocumentStatus.GENERATED,
                     displayName: built.displayName,
-                    model: rendered.model as Prisma.InputJsonValue,
                     error: null,
                     isCurrent: true,
                 },

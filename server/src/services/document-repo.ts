@@ -25,9 +25,6 @@ async function requireFrom<T>(find: () => Promise<T | null>): Promise<T> {
     return document;
 }
 
-/** Die Übernahme editierter Felder aus einer ersetzten DOCX ist eine reine Angebots-Funktion. */
-const canAdoptNever = { canAdopt: async () => false };
-
 /** Die für alle Typen identischen Operationen, eingeschränkt auf einen `type`. */
 function typedOperations(type: DocumentOwnerType, client: Prisma.TransactionClient) {
     const findWithArtifacts = (id: string) => client.document.findFirst({
@@ -37,11 +34,6 @@ function typedOperations(type: DocumentOwnerType, client: Prisma.TransactionClie
     return {
         findWithArtifacts,
         requireWithArtifacts: (id: string) => requireFrom(() => findWithArtifacts(id)),
-        /** Der Render-Snapshot — global ausgenommen, nur hier gezielt gelesen. */
-        readModel: async (id: string) => (await client.document.findFirst({
-            where: { id, type },
-            select: { model: true },
-        }))?.model ?? null,
         reloadWithArtifacts: (id: string) => client.document.findFirst({
             where: { id, type },
             include: { artifacts: true },
@@ -89,21 +81,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                         "Accepted offers' documents can no longer be changed.",
                     );
                 },
-                /**
-                 * Ob sich Änderungen dieses Dokuments ins Angebot übernehmen lassen: nur beim
-                 * aktuellen Dokument des unveränderten Angebots. Wurde das Angebot nach dem
-                 * Erzeugen geändert (oder ist es angenommen), würde ein Wert aus der Datei
-                 * einen neueren Stand überschreiben.
-                 */
-                canAdopt: async (id: string): Promise<boolean> => {
-                    const document = await client.document.findFirst({
-                        where: { id, type: ownerType },
-                        select: { isCurrent: true, sourceVersion: true, offer: { select: { version: true, acceptedAt: true } } },
-                    });
-                    return Boolean(document?.isCurrent)
-                        && document?.sourceVersion === document?.offer?.version
-                        && !document?.offer?.acceptedAt;
-                },
             };
         }
         case "order": {
@@ -126,7 +103,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                         "Cancelled orders' documents can no longer be changed.",
                     );
                 },
-                ...canAdoptNever,
             };
         }
         case "confirmation": {
@@ -149,7 +125,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                         "Cancelled orders' confirmations can no longer be changed.",
                     );
                 },
-                ...canAdoptNever,
             };
         }
         case "invoice": {
@@ -172,7 +147,6 @@ export function documentTable(type: DocumentType, client: Prisma.TransactionClie
                         "Cancelled orders' invoices can no longer be changed.",
                     );
                 },
-                ...canAdoptNever,
             };
         }
     }

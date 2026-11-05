@@ -23,8 +23,6 @@ const fake = vi.hoisted(() => {
         renderDocument: vi.fn(async () => ({
             docxBuffer: Buffer.from("docx"),
             pdfBuffer: Buffer.from("pdf"),
-            model: {},
-            modelHash: "hash",
         })),
         storeDocumentArtifacts: vi.fn(async () => ({
             pdf: { objectKey: "pdf-key", size: 1, sha256: "a" },
@@ -65,7 +63,6 @@ describe("generateConfirmationDocument", () => {
             "CONFIRMATION",
             "DE",
             {},
-            { documentType: "confirmation", documentId: "doc-1" },
             { schema: undefined },
         );
         expect(fake.updateMany).toHaveBeenCalledWith(
