@@ -1,11 +1,11 @@
-import { Button, Dialog, Spinner } from "@/components";
-import { documentDownloadUrl } from "@/hooks";
-import { api } from "@/lib/api-client";
-import type { DocumentType } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { Download } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
+import type { DocumentType } from "@keepit/schemas";
+import { api } from "@/lib/api-client";
+import { documentDownloadUrl } from "@/hooks";
+import { Button, Dialog, Spinner } from "@/components";
 
 type Props = {
   type: DocumentType;

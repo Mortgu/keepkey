@@ -1,4 +1,4 @@
-import { Task } from "@prisma/client";
+import type { Task } from "@prisma/client";
 import { generateConfirmationDocument } from "../../services/confirmation-generation.service.js";
 
 export default async function confirmationTaskHandler(task: Task): Promise<void> {

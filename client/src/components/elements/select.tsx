@@ -1,8 +1,8 @@
-import type { ComponentSize } from "@/components";
-import { Field, fieldState, selectStyles } from "@/components";
 import { Select as BaseSelect } from "@base-ui/react";
 import { Check, ChevronDown } from "lucide-react";
+import type { ComponentSize } from "@/components";
 import type { ReactElement, ReactNode } from "react";
+import { Field, fieldState, selectStyles } from "@/components";
 
 export interface SelectOption<TValue = string> {
     value: TValue;

@@ -1,8 +1,8 @@
-import { ACTION_FOCUS } from "@/components";
 import { Accordion as BaseAccordion } from "@base-ui/react";
 import { ChevronDown } from "lucide-react";
-import type { ReactNode } from "react";
 import { tv } from "tailwind-variants";
+import type { ReactNode } from "react";
+import { ACTION_FOCUS } from "@/components";
 
 const accordionStyles = tv({
     slots: {

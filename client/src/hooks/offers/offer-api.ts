@@ -1,5 +1,3 @@
-import { api } from "@/lib/api-client";
-import { formatQueryString } from "@/lib/utils";
 import type {
     CreateOfferInput,
     ExtendOfferInput,
@@ -11,6 +9,8 @@ import type {
 
     UpdateOfferInput
 } from "@keepit/schemas";
+import { api } from "@/lib/api-client";
+import { formatQueryString } from "@/lib/utils";
 
 
 /* Offer */

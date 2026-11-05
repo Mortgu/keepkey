@@ -1,9 +1,9 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { forwardRef } from 'react';
 import { tv } from 'tailwind-variants';
-import type { ComponentSize, ComponentVariant } from '../tokens';
 import { ACTION_FOCUS, ACTION_ICON, ACTION_SIZE } from '../tokens';
 import { Spinner } from './spinner';
+import type { ComponentSize, ComponentVariant } from '../tokens';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 export interface ButtonComponentProps extends ButtonHTMLAttributes<HTMLButtonElement> {
     variant?: ComponentVariant;

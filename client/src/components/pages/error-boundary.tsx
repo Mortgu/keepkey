@@ -1,7 +1,7 @@
-import { Button } from "@/components";
 import { useQueryClient } from "@tanstack/react-query";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Button } from "@/components";
 
 interface RouteErrorProps {
     error: unknown;

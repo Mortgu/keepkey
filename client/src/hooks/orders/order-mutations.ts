@@ -5,12 +5,12 @@ import { offerKeys } from "../offers/offers-keys";
 import { searchKeys } from "../search/search-keys";
 import { supplierKeys } from "../suppliers/supplier-keys";
 
-import { showToast } from "@/components";
-import type { QueryClient } from "@tanstack/react-query";
-import type { CreateOrderInput, UpdateOrderInput } from "./order-api";
 import { cancelOrder, createOrder, generateOrderDocument, updateOrder } from "./order-api";
 import { useNextOrderNumber, useOrders } from "./order-hooks";
 import { orderKeys } from "./order-keys";
+import type { CreateOrderInput, UpdateOrderInput } from "./order-api";
+import type { QueryClient } from "@tanstack/react-query";
+import { showToast } from "@/components";
 
 async function invalidateOrderViews(client: QueryClient) {
     await Promise.all([orderKeys.all, offerKeys.all, customerKeys.all, supplierKeys.all, dashboardKeys.all, searchKeys.all]

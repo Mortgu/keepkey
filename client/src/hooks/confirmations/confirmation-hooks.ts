@@ -1,5 +1,5 @@
-import type {QueryClient} from "@tanstack/react-query";
 import {useMutation, useQuery, useQueryClient} from "@tanstack/react-query";
+import {offerKeys} from "../offers/offers-keys";
 import {
     createConfirmation,
     deleteConfirmation,
@@ -7,7 +7,7 @@ import {
     regenerateConfirmation
 } from "./confirmation-api";
 import {confirmationKeys} from "./confirmation-keys";
-import {offerKeys} from "../offers/offers-keys";
+import type {QueryClient} from "@tanstack/react-query";
 import type {CreateConfirmationInput} from "@keepit/schemas";
 
 export function useConfirmation(orderId: string) {

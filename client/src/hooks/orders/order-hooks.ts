@@ -1,6 +1,6 @@
-import type { OrderFilterParams } from "@keepit/schemas";
 import { useQuery } from "@tanstack/react-query";
 import { orderQueries } from "./order-queries";
+import type { OrderFilterParams } from "@keepit/schemas";
 
 const EMPTY_ARRAY: Array<never> = [];
 

@@ -1,10 +1,21 @@
-import {Accordion, Breadcrumbs, Button} from "@/components";
-import ConfirmationModal, {
-    type ConfirmationSubmitType
-} from "@/components/modules/modals/confirmation/confirmation-modal";
-import InvoiceModal, {type InvoiceSubmitType} from "@/components/modules/modals/invoice/invoice-modal";
-import OfferModal from "@/components/modules/modals/offer/offer-modal";
+import {vatTotals} from "@keepit/schemas";
+import {Ban, Dot, Pen, Plus, Trash2} from "lucide-react";
+import {useState} from "react";
+import {useTranslation} from "react-i18next";
+import {cn} from "tailwind-variants";
+import {derivePhase, deriveStages} from "../../../-components/flow/flow-derive";
+import {stateTone} from "../../../-components/flow/flow-meta";
+import {StageNode} from "../../../-components/flow/flow-ui";
 import type {OfferModalMode} from "@/components/modules/modals/offer/offer-modal-policy";
+import type {Confirmation, Customer, Invoice, Offer, Order} from "@keepit/schemas";
+import type {ConfirmationSubmitType} from "@/components/modules/modals/confirmation/confirmation-modal";
+import type {InvoiceSubmitType} from "@/components/modules/modals/invoice/invoice-modal";
+import type {ReactNode} from "react";
+import type {FlowStage} from "../../../-components/flow/flow-types";
+import {Accordion, Breadcrumbs, Button} from "@/components";
+import ConfirmationModal from "@/components/modules/modals/confirmation/confirmation-modal";
+import InvoiceModal from "@/components/modules/modals/invoice/invoice-modal";
+import OfferModal from "@/components/modules/modals/offer/offer-modal";
 import {
     useCancelOrder,
     useCreateConfirmation,
@@ -27,17 +38,6 @@ import FlatRateRow from "@/routes/_main/-components/card/flatrate-row";
 import PositionRow from "@/routes/_main/-components/card/position-row";
 import OrderModal from "@/routes/_main/orders/-components/modal/order-modal";
 import OrderEditModal from "@/routes/_main/orders/-components/order-edit-modal";
-import type {Confirmation, Customer, Invoice, Offer, Order} from "@keepit/schemas";
-import {vatTotals} from "@keepit/schemas";
-import {Ban, Dot, Pen, Plus, Trash2} from "lucide-react";
-import type {ReactNode} from "react";
-import {useState} from "react";
-import {useTranslation} from "react-i18next";
-import {cn} from "tailwind-variants";
-import {derivePhase, deriveStages} from "../../../-components/flow/flow-derive";
-import {stateTone} from "../../../-components/flow/flow-meta";
-import type {FlowStage} from "../../../-components/flow/flow-types";
-import {StageNode} from "../../../-components/flow/flow-ui";
 
 /**
  * Detailseite eines Vorgangs. Links die Belege zum Angebot: Bestellung (an
@@ -359,23 +359,23 @@ function ConfirmationStageSection({stage, order, confirmation}: {
 }) {
     const {t} = useTranslation();
     const modal = useModal<ConfirmationSubmitType>();
+    const orderId = order?.id ?? "";
 
     const {
         createConfirmation,
-        isCreatingConfirmation,
         errorCreatingConfirmation
-    } = useCreateConfirmation(order?.id!);
+    } = useCreateConfirmation(orderId);
 
     const {
         regenerateConfirmation,
         isRegenerating
-    } = useRegenerateConfirmation(order?.id!);
+    } = useRegenerateConfirmation(orderId);
 
     const {
         deleteConfirmation,
         isDeletingConfirmation,
         errorDeletingConfirmation
-    } = useDeleteConfirmation(order?.id!);
+    } = useDeleteConfirmation(orderId);
 
     // Löschen ist nur erlaubt, solange kein noch aktives (nicht gelöschtes) Dokument existiert.
     const hasActiveDocument = Boolean(confirmation?.documents.some((d) => d.deletedAt == null));
@@ -448,7 +448,7 @@ function ConfirmationStageSection({stage, order, confirmation}: {
 
             <div className="px-4">
                 {confirmation?.documents.map(document => (
-                    <DocumentCard key={document.id} type="confirmation" parentId={order?.id!} document={document}/>
+                    <DocumentCard key={document.id} type="confirmation" parentId={orderId} document={document}/>
                 ))}
             </div>
 
@@ -474,23 +474,23 @@ function InvoiceStageSection({stage, order, invoice}: {
 }) {
     const {t} = useTranslation();
     const modal = useModal<InvoiceSubmitType>();
+    const orderId = order?.id ?? "";
 
     const {
         createInvoice,
-        isCreatingInvoice,
         errorCreatingInvoice
-    } = useCreateInvoice(order?.id!);
+    } = useCreateInvoice(orderId);
 
     const {
         regenerateInvoice,
         isRegenerating
-    } = useRegenerateInvoice(order?.id!);
+    } = useRegenerateInvoice(orderId);
 
     const {
         deleteInvoice,
         isDeletingInvoice,
         errorDeletingInvoice
-    } = useDeleteInvoice(order?.id!);
+    } = useDeleteInvoice(orderId);
 
     // Löschen ist nur erlaubt, solange kein noch aktives (nicht gelöschtes) Dokument existiert.
     const hasActiveDocument = Boolean(invoice?.documents.some((d) => d.deletedAt == null));
@@ -563,7 +563,7 @@ function InvoiceStageSection({stage, order, invoice}: {
 
             <div className="px-4">
                 {invoice?.documents.map(document => (
-                    <DocumentCard key={document.id} type="invoice" parentId={order?.id!} document={document}/>
+                    <DocumentCard key={document.id} type="invoice" parentId={orderId} document={document}/>
                 ))}
             </div>
 

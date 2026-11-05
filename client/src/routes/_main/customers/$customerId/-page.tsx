@@ -62,7 +62,7 @@ export default function CustomerDetailPage() {
 
                     <div className="gap-4 py-6">
                         {tab === "general" && (
-                            <CustomerGeneralTab customer={customer} />
+                            <CustomerGeneralTab />
                         )}
 
                         {tab === "flow" && (

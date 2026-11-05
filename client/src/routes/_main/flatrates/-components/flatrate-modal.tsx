@@ -1,9 +1,10 @@
 import {useForm} from "@tanstack/react-form";
-import {type SyntheticEvent, useState} from "react";
+import { useState} from "react";
 import {useTranslation} from "react-i18next";
 
 import {createFlatrateSchema, flatrateTranslationSchema} from '@keepit/schemas';
 import {z} from "zod";
+import type {SyntheticEvent} from "react";
 import type {CreateFlatrateTranslationInput, Flatrate, Language} from '@keepit/schemas';
 import type {TranslationKey} from "@/i18n";
 

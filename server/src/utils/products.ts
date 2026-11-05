@@ -1,4 +1,4 @@
-import { Prisma, prisma } from "../lib/prismaClient.js";
+import { type Prisma, prisma } from "../lib/prismaClient.js";
 
 interface PriceCalculatorProps {
     productId: string;

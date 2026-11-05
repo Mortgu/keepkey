@@ -1,12 +1,12 @@
-import type { ComponentSize } from "@/components";
-import { ACTION_FOCUS } from "@/components";
-import type { LinkProps } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
 import { MoreHorizontal } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { ReactNode } from "react";
 import * as React from "react";
 import { tv } from "tailwind-variants";
+import type { ReactNode } from "react";
+import type { LinkProps } from "@tanstack/react-router";
+import type { ComponentSize } from "@/components";
+import { ACTION_FOCUS } from "@/components";
 
 /**
  * Ein Eintrag der Breadcrumb-Leiste.

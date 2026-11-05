@@ -1,9 +1,9 @@
-import { buttonStyles } from "@/components";
 import { Select } from "@base-ui/react";
 import { Check, ChevronDown } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import type { ComponentSize } from "../tokens";
 import { selectStyles } from "./select-styles";
+import type { ComponentSize } from "../tokens";
+import { buttonStyles } from "@/components";
 
 export interface DropdownOption {
   value: string;

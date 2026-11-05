@@ -1,5 +1,6 @@
 import { toast as reactToast } from "react-toastify";
-import i18n, { type TranslationKey } from "@/i18n";
+import type {TranslationKey} from "@/i18n";
+import i18n from "@/i18n";
 
 type ToastVariant = "success" | "error" | "info" | "warning";
 

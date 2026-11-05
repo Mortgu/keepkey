@@ -48,10 +48,6 @@ export default function PurchasePriceTable({rows, values, onChange, disabled}: P
     const purchaseOf = (id: string) =>
         values.find((v) => v.offerPositionId === id)?.purchase_eur_user_month ?? 0;
 
-    const sales = rows.reduce((sum, row) => sum + lineNet(row, row.unitCents), 0);
-    const purchase = rows.reduce((sum, row) => sum + lineNet(row, purchaseOf(row.offerPositionId)), 0);
-    const margin = sales - purchase;
-
     return (
         <div className="grid gap-2">
             <p className="text-sm font-medium">{t("orders.purchase.title")}</p>

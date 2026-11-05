@@ -101,7 +101,7 @@ export default function DocumentCard({type, parentId, document, locked = false}:
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": []
         },
         onDrop: async (acceptedFiles) => {
-            const [file] = acceptedFiles;
+            const file = acceptedFiles.at(0);
 
             if (file === undefined) return;
 

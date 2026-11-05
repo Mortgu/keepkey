@@ -1,5 +1,5 @@
-import type {Request, Response} from "express";
-import type {DocumentFormatParam, DocumentType} from "@keepit/schemas";
+import type { Request, Response } from "express";
+import type { DocumentFormatParam, DocumentType } from "@keepit/schemas";
 
 import * as service from "../services/document/index.js";
 
@@ -11,7 +11,7 @@ export const renameDocument = async (request: Request, response: Response) => {
     const document = await service.renameDocument(
         request.params.type as DocumentType,
         request.params.documentId as string,
-        request.body,
+        request.body as service.RenameDocumentInput,
     );
     return response.status(200).json(document);
 };
