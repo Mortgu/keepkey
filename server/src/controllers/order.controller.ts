@@ -1,5 +1,5 @@
-import type {NextFunction, Request, Response} from "express";
-import {AppException} from "../lib/exceptions.js";
+import type { NextFunction, Request, Response } from "express";
+import { AppException } from "../lib/exceptions.js";
 
 import * as service from "../services/order.service.js";
 
@@ -12,7 +12,7 @@ export const getAllOrders = async (request: Request, response: Response) => {
 
 export const getNextOrderNumber = async (request: Request, response: Response) => {
     const orderId = await service.getNextOrderNumber();
-    return response.status(200).json({orderId});
+    return response.status(200).json({ orderId });
 };
 
 export const getOrderById = async (request: Request, response: Response) => {
@@ -41,7 +41,7 @@ export const createOrderTask = async (request: Request, response: Response) => {
 
 export const generateOrderDocument = async (request: Request, response: Response) => {
     const task = await service.generateOrderDocument(request.params.orderId as string);
-    return response.status(200).json({taskId: task.id});
+    return response.status(200).json({ taskId: task.id });
 };
 
 /* ========== PATCH ========== */
@@ -50,7 +50,6 @@ export const updateOrder = async (request: Request, response: Response) => {
     const order = await service.updateOrder(
         request.params.orderId as string,
         request.body,
-        request.user!.id,
     );
     return response.status(200).json(order);
 };
@@ -59,10 +58,10 @@ export const updateOrder = async (request: Request, response: Response) => {
 
 export const deleteOrderById = async (request: Request, response: Response) => {
     await service.deleteOrderById(request.params.id as string);
-    return response.status(200).json({message: "Deletion successfully", success: true});
+    return response.status(200).json({ message: "Deletion successfully", success: true });
 };
 
 export const cancelOrder = async (request: Request, response: Response) => {
-    const order = await service.cancelOrder(request.params.orderId as string, request.body.expectedVersion, request.user!.id);
+    const order = await service.cancelOrder(request.params.orderId as string, request.body.expectedVersion);
     return response.status(200).json(order);
 };

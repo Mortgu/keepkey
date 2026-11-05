@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DocumentStatus } from "@prisma/client";
+import {beforeEach, describe, expect, it, vi} from "vitest";
+import {DocumentStatus} from "@prisma/client";
 
 const fake = vi.hoisted(() => {
-    const tx = { documentArtifact: { create: vi.fn(async (args: { data: Record<string, unknown> }) => args.data) } };
+    const tx = {documentArtifact: {create: vi.fn(async (args: { data: Record<string, unknown> }) => args.data)}};
     return {
         tx,
         transaction: vi.fn((fn: (tx: unknown) => unknown) => fn(tx)),
@@ -19,40 +19,45 @@ const fake = vi.hoisted(() => {
             confirmationId: "conf-1",
             artifacts: [],
         })),
-        buildConfirmation: vi.fn(async () => ({ data: {}, language: "DE" as const, displayName: "AB-1" })),
+        buildConfirmation: vi.fn(async () => ({data: {}, language: "DE" as const, displayName: "AB-1"})),
         renderDocument: vi.fn(async () => ({
             docxBuffer: Buffer.from("docx"),
             pdfBuffer: Buffer.from("pdf"),
         })),
         storeDocumentArtifacts: vi.fn(async () => ({
-            pdf: { objectKey: "pdf-key", size: 1, sha256: "a" },
-            docx: { objectKey: "docx-key", size: 1, sha256: "b" },
+            pdf: {objectKey: "pdf-key", size: 1, sha256: "a"},
+            docx: {objectKey: "docx-key", size: 1, sha256: "b"},
         })),
-        removeDocumentArtifacts: vi.fn(async () => {}),
-        updateMany: vi.fn(async () => ({ count: 1 })),
+        removeDocumentArtifacts: vi.fn(async () => {
+        }),
+        updateMany: vi.fn(async () => ({count: 1})),
     };
 });
 
 vi.mock("../lib/prismaClient.js", () => ({
-    prisma: { document: { findFirst: fake.findFirst }, $transaction: fake.transaction },
+    prisma: {document: {findFirst: fake.findFirst}, $transaction: fake.transaction},
 }));
-vi.mock("../pipelines/confirmation/build-confirmation.js", () => ({ buildConfirmation: fake.buildConfirmation }));
-vi.mock("../lib/render-document.js", () => ({ renderDocument: fake.renderDocument }));
+vi.mock("../pipelines/confirmation/build-confirmation.js", () => ({buildConfirmation: fake.buildConfirmation}));
+vi.mock("../lib/render-document.js", () => ({renderDocument: fake.renderDocument}));
 vi.mock("../lib/document-artifact-store.js", () => ({
     storeDocumentArtifacts: fake.storeDocumentArtifacts,
     removeDocumentArtifacts: fake.removeDocumentArtifacts,
 }));
 vi.mock("./document-repo.js", async (importOriginal) => ({
-    documentOwnerType: (await importOriginal<typeof import("./document-repo.js")>()).documentOwnerType,
-    documentTable: () => ({ scope: "confirmations", updateMany: fake.updateMany, findWithArtifacts: vi.fn(async () => null) }),
+    documentOwnerType: (await importOriginal<typeof import("../../document-repo.js")>()).documentOwnerType,
+    documentTable: () => ({
+        scope: "confirmations",
+        updateMany: fake.updateMany,
+        findWithArtifacts: vi.fn(async () => null)
+    }),
 }));
 
-const { generateConfirmationDocument } = await import("./confirmation-generation.service.js");
+const {generateConfirmationDocument} = await import("../../confirmation-generation.service.js");
 
 describe("generateConfirmationDocument", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        fake.updateMany.mockResolvedValue({ count: 1 });
+        fake.updateMany.mockResolvedValue({count: 1});
     });
 
     it("builds from the confirmationId, never checks staleness, and finalizes as a new version", async () => {
@@ -63,22 +68,22 @@ describe("generateConfirmationDocument", () => {
             "CONFIRMATION",
             "DE",
             {},
-            { schema: undefined },
+            {schema: undefined},
         );
         expect(fake.updateMany).toHaveBeenCalledWith(
-            { confirmationId: "conf-1", isCurrent: true },
-            { isCurrent: false },
+            {confirmationId: "conf-1", isCurrent: true},
+            {isCurrent: false},
         );
         expect(fake.tx.documentArtifact.create).toHaveBeenCalledTimes(2);
         expect(fake.findFirst).toHaveBeenCalledWith(expect.objectContaining({
-            where: { taskId: "task-1", type: "CONFIRMATION", deletedAt: null },
+            where: {taskId: "task-1", type: "CONFIRMATION", deletedAt: null},
         }));
         expect(fake.tx.documentArtifact.create).toHaveBeenCalledWith({
-            data: expect.objectContaining({ documentId: "doc-1", format: "PDF" }),
+            data: expect.objectContaining({documentId: "doc-1", format: "PDF"}),
         });
         expect(fake.updateMany).toHaveBeenCalledWith(
-            { id: "doc-1", deletedAt: null, status: DocumentStatus.PROCESSING },
-            expect.objectContaining({ status: DocumentStatus.GENERATED, displayName: "AB-1", isCurrent: true }),
+            {id: "doc-1", deletedAt: null, status: DocumentStatus.PROCESSING},
+            expect.objectContaining({status: DocumentStatus.GENERATED, displayName: "AB-1", isCurrent: true}),
         );
     });
 
