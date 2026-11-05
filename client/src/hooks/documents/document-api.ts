@@ -3,7 +3,6 @@ import type {
     DocumentFormatParam,
     DocumentType,
     GeneratedDocument,
-    ReplacedDocument,
 } from "@keepit/schemas";
 import { BASE_URL, api } from "@/lib/api-client";
 
@@ -92,7 +91,7 @@ export const confirmReplacementUpload = (
     format: DocumentFormatParam,
     objectKey: string,
 ) =>
-    api<ReplacedDocument>(
+    api<GeneratedDocument>(
         `/api/documents/${type}/${documentId}/artifacts/${format}/replace`,
         { method: "POST", body: JSON.stringify({ objectKey }) },
     );
@@ -100,10 +99,3 @@ export const confirmReplacementUpload = (
 /** Überträgt den ersetzten Stand erneut nach Nextcloud. */
 export const resyncDocument = (type: DocumentType, documentId: string) =>
     api<void>(`/api/documents/${type}/${documentId}/resync`, { method: "POST" });
-
-/** Übernimmt abweichende Felder der abgelegten Datei ins Angebot. */
-export const adoptChanges = (type: DocumentType, documentId: string, fields: Array<string>) =>
-    api<{ adopted: Array<string> }>(
-        `/api/documents/${type}/${documentId}/adopt`,
-        { method: "POST", body: JSON.stringify({ fields }) },
-    );

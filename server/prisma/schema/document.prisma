@@ -7,6 +7,13 @@ enum DocumentStatus {
   FAILED
 }
 
+enum DocumentOwnerType {
+  OFFER
+  ORDER
+  CONFIRMATION
+  INVOICE
+}
+
 enum DocumentFormat {
   PDF
   DOCX
@@ -26,24 +33,54 @@ model DocumentArtifact {
   remoteEtag   String?
   remoteSha256 String?
 
-  offerDocument   OfferDocument? @relation("OfferDocumentArtifacts", fields: [offerDocumentId], references: [id], onDelete: Cascade)
-  offerDocumentId String?
-
-  orderDocument   OrderDocument? @relation("OrderDocumentArtifacts", fields: [orderDocumentId], references: [id], onDelete: Cascade)
-  orderDocumentId String?
-
-  confirmationDocument   ConfirmationDocument? @relation("ConfirmationDocumentArtifacts", fields: [confirmationDocumentId], references: [id], onDelete: Cascade)
-  confirmationDocumentId String?
-
-  invoiceDocument   InvoiceDocument? @relation("InvoiceDocumentArtifacts", fields: [invoiceDocumentId], references: [id], onDelete: Cascade)
-  invoiceDocumentId String?
+  document   Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  documentId String
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  @@unique([offerDocumentId, format])
-  @@unique([orderDocumentId, format])
-  @@unique([confirmationDocumentId, format])
-  @@unique([invoiceDocumentId, format])
+  @@unique([documentId, format])
   @@map("document")
+}
+
+model Document {
+  id String @id @default(cuid())
+
+  type DocumentOwnerType
+
+  displayName   String?
+  version       Int            @default(0)
+  sourceVersion Int?
+  status        DocumentStatus
+  isCurrent     Boolean        @default(false)
+
+  error       String?
+  uploadToken String?
+
+  offer   Offer?  @relation(fields: [offerId], references: [id], onDelete: Cascade)
+  offerId String?
+
+  order   Order?  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId String?
+
+  confirmation   Confirmation? @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
+  confirmationId String?
+
+  invoice   Invoice? @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  invoiceId String?
+
+  artifacts DocumentArtifact[]
+
+  task   Task   @relation(fields: [taskId], references: [id])
+  taskId String @unique
+
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+  deletedAt DateTime? @db.Timestamptz(6)
+
+  @@unique([offerId, version])
+  @@unique([orderId, version])
+  @@unique([confirmationId, version])
+  @@unique([invoiceId, version])
+  @@map("document_record")
 }

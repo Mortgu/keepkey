@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from "vitest";
-import { orderFixture } from "../../test/order-fixtures.js";
-import { presentOrder } from "../../services/order-source.js";
-import { invoiceContract } from "../../schemas/templates/invoice.template.schema.js";
-import { formatEur } from "../../utils/utils.js";
+import { orderFixture } from "@/test/order-fixtures.js";
+import { presentOrder } from "@/services/order-source.js";
+import { invoiceContract } from "@/schemas/templates/invoice.template.schema.js";
+import { formatEur } from "@/utils/utils.js";
 
 const fixture = () => ({ ...orderFixture(), contractStartDate: new Date("2026-11-01T00:00:00Z") });
 
@@ -52,7 +52,7 @@ describe("buildInvoice", () => {
         const data = invoiceContract.parse((await buildInvoice("inv-1")).data);
         const order = presentOrder(fixture());
         expect(data.items.map((i) => i.pos)).toEqual([1, 2, 3]);
-        expect(data.items.map((i) => i.total)).toEqual(["900,00 €", "100,00 €", eur(-order.discounts[0]!.amount_cents)]);
+        expect(data.items.map((i) => i.total)).toEqual(["900,00 €", "100,00 €", eur(-order.discounts[0]!.totalCents)]);
         expect(data.items[0]).not.toHaveProperty("articleNumber");
     });
 

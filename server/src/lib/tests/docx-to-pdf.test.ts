@@ -1,5 +1,5 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
-import { convertDocxToPdf } from "./docx-to-pdf.js";
+import {afterEach, describe, expect, it, vi} from "vitest";
+import {convertDocxToPdf} from "../docx-to-pdf.js";
 
 /**
  * `convertDocxToPdf` ruft Gotenberg über HTTP auf — diese Tests stubben
@@ -23,7 +23,7 @@ describe("convertDocxToPdf", () => {
             expect(await file.text()).toBe("docx-bytes");
             expect(file.name.endsWith(".docx")).toBe(true);
 
-            return new Response(Buffer.from("%PDF-fake"), { status: 200 });
+            return new Response(Buffer.from("%PDF-fake"), {status: 200});
         });
         vi.stubGlobal("fetch", fetchMock);
 
@@ -38,7 +38,7 @@ describe("convertDocxToPdf", () => {
 
     it("scheitert bei einer nicht-2xx-Antwort von Gotenberg", async () => {
         vi.stubGlobal("fetch", vi.fn(async () =>
-            new Response("document could not be converted", { status: 422 })));
+            new Response("document could not be converted", {status: 422})));
 
         await expect(convertDocxToPdf(Buffer.from("x"))).rejects.toThrow();
     });

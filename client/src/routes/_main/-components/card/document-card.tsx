@@ -1,15 +1,38 @@
-import { findDocumentArtifact, hasOutdatedRemote } from "@keepit/schemas";
-import { Dot, Download, EllipsisVertical, ExternalLink, Eye, File as FileIcon, Info, Pencil, RefreshCw, Replace, Trash2, UploadCloud, X } from "lucide-react";
-import { useDropzone } from "react-dropzone";
-import { useTranslation } from "react-i18next";
-import { tv } from "tailwind-variants";
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Menu } from "@base-ui/react";
-import { handleReplacementWarnings } from "./replacement-warnings";
-import type { ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument } from "@keepit/schemas";
-import type { FieldChange } from "@/components";
-import { Badge, Button, DocumentDocxEditor, DocumentPreviewModal, DocumentRenameModal, ReplacementChangesModal, Spinner, Tooltip, buttonStyles, menuStyles, showToast } from "@/components";
+import {findDocumentArtifact, hasOutdatedRemote} from "@keepit/schemas";
+import {
+    Dot,
+    Download,
+    EllipsisVertical,
+    ExternalLink,
+    Eye,
+    File as FileIcon,
+    Info,
+    Pencil,
+    RefreshCw,
+    Replace,
+    Trash2,
+    UploadCloud,
+    X
+} from "lucide-react";
+import {useDropzone} from "react-dropzone";
+import {useTranslation} from "react-i18next";
+import {tv} from "tailwind-variants";
+import {useState} from "react";
+import {useQuery} from "@tanstack/react-query";
+import {Menu} from "@base-ui/react";
+import type {ConfirmationDocument, DocumentType, InvoiceDocument, OfferDocument, OrderDocument} from "@keepit/schemas";
+import {
+    Badge,
+    Button,
+    DocumentDocxEditor,
+    DocumentPreviewModal,
+    DocumentRenameModal,
+    Spinner,
+    Tooltip,
+    buttonStyles,
+    menuStyles,
+    showToast
+} from "@/components";
 import {
     documentDownloadUrl,
     replaceBlockerMessage,
@@ -20,9 +43,9 @@ import {
     useLocale,
     useModal,
 } from "@/hooks";
-import { api } from "@/lib/api-client";
-import { getDocumentStatus } from "@/utils/status";
-import { formatBytesToKB } from "@/lib/utils";
+import {api} from "@/lib/api-client";
+import {getDocumentStatus} from "@/utils/status";
+import {formatBytesToKB} from "@/lib/utils";
 
 const cardStyles = tv({
     slots: {
@@ -46,37 +69,27 @@ const cardStyles = tv({
 })
 
 interface Props {
-    /** Woran das Dokument hängt — steuert Endpunkte und Cache-Keys. */
     type: DocumentType;
-    /** Id des Angebots bzw. der Bestellung. */
     parentId: string;
     document: OfferDocument | OrderDocument | ConfirmationDocument | InvoiceDocument;
-    /** Das Elternobjekt ist eingefroren (z.B. ein angenommenes Angebot) — Edit/Rename/Delete/Replace sind gesperrt. */
     locked?: boolean;
 }
 
-export default function DocumentCard({ type, parentId, document, locked = false }: Props) {
-    const { formatDate } = useFormatters();
+export default function DocumentCard({type, parentId, document, locked = false}: Props) {
+    const {formatDate} = useFormatters();
     const locales = useLocale();
-    const { t } = useTranslation();
+    const {t} = useTranslation();
 
     const pdf = findDocumentArtifact(document.artifacts, "PDF");
     const docx = findDocumentArtifact(document.artifacts, "DOCX");
 
     const mutations = useDocumentMutations(type, parentId);
-    // Abweichungen der zuletzt ersetzten Datei, über die der Nutzer noch entscheidet.
-    const [changes, setChanges] = useState<Array<FieldChange> | null>(null);
 
-    const { canReplaceFiles, replaceBlocker } = useDocumentCapabilities();
+    const {canReplaceFiles, replaceBlocker} = useDocumentCapabilities();
 
     const hasArtifact = document.status === "GENERATED" || document.status === "UPLOADED";
     const canReplace = hasArtifact && canReplaceFiles && !mutations.isReplacingDocumentFile && !locked;
 
-    /*
-     * Beim Ersetzen wird die PDF serverseitig neu aus der DOCX erzeugt. Das
-     * läuft im selben Request und dauert Sekunden — ohne Anzeige wirkt die
-     * Karte in der Zeit eingefroren.
-     */
     const isBusy = document.status === "PROCESSING" || mutations.isReplacingDocumentFile;
 
     const dropzone = useDropzone({
@@ -87,23 +100,18 @@ export default function DocumentCard({ type, parentId, document, locked = false 
         accept: {
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document": []
         },
-        // Erst nach dem Hochladen melden, nicht schon beim Annehmen der Datei:
-        // Bricht der Upload ab — etwa an einer fehlenden CORS-Regel des Buckets —
-        // stand hier vorher trotzdem "erfolgreich ersetzt".
         onDrop: async (acceptedFiles) => {
-            const [file] = acceptedFiles;
-            // Ein leerer Drop liefert kein Element, auch wenn der Typ das nicht abbildet.
-            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            const file = acceptedFiles.at(0);
+
             if (file === undefined) return;
 
             try {
-                const replaced = await mutations.replaceDocumentFile({
+                await mutations.replaceDocumentFile({
                     documentId: document.id,
                     format: "docx",
                     file,
                 });
                 showToast.success("documents.toast.replaced");
-                handleReplacementWarnings(replaced.warnings, setChanges);
             } catch {
                 // Der globale onError-Handler zeigt die Server-Meldung bereits an.
             }
@@ -112,13 +120,14 @@ export default function DocumentCard({ type, parentId, document, locked = false 
             const reason = fileRejections
                 .flatMap(r => r.errors.map(e => e.message))
                 .join(" & ");
-            showToast.error("documents.toast.fileRejected", { vars: { reason } });
+            showToast.error("documents.toast.fileRejected", {vars: {reason}});
         },
         onError(err) {
-            showToast.error("documents.toast.fileRejected", { vars: { reason: err.message } });
+            showToast.error("documents.toast.fileRejected", {vars: {reason: err.message}});
         },
     });
-    const styles = cardStyles({ focused: dropzone.isFocused });
+
+    const styles = cardStyles({focused: dropzone.isFocused});
     const renameModal = useModal();
     const previewModal = useModal();
     const canPreview = (document.status === "GENERATED" || document.status === "UPLOADED") && Boolean(pdf);
@@ -139,11 +148,11 @@ export default function DocumentCard({ type, parentId, document, locked = false 
         )
     }
 
-    const { refetch } = useQuery({
+    const {refetch} = useQuery({
         queryKey: ['fetched', type, document.id],
         enabled: false,
         queryFn: async () => {
-            const { url } = await api<{ url: string }>(
+            const {url} = await api<{ url: string }>(
                 `/api/documents/${type}/${document.id}/artifacts/docx/url`
             );
             const res = await fetch(url);
@@ -154,13 +163,13 @@ export default function DocumentCard({ type, parentId, document, locked = false 
 
     return (
         <>
-            <div {...dropzone.getRootProps()} className={styles.base({ focused: dropzone.isDragAccept })}>
+            <div {...dropzone.getRootProps()} className={styles.base({focused: dropzone.isDragAccept})}>
                 {/* Dropzone */}
                 <input {...dropzone.getInputProps()} />
                 {dropzone.isDragAccept && (
                     <div className={styles.dropzone()}>
                         <div className="flex-row h-full flex items-center justify-center gap-4">
-                            <FileIcon className="" size={22} />
+                            <FileIcon className="" size={22}/>
                             <div className="grid gap-1">
                                 <p className="uppercase text-sm font-medium">Drop the file to replace this one!</p>
                             </div>
@@ -178,14 +187,14 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                             <div className="flex items-center gap-2">
                                 {document.isCurrent && (
                                     <Tooltip side="top" content="This is the latest generated document.">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-(--primary-600)" />
+                                        <div className="w-1.5 h-1.5 rounded-full bg-(--primary-600)"/>
                                     </Tooltip>
                                 )}
 
                                 <p className="text-md font-medium">{document.displayName}</p>
                             </div>
                             <Tooltip content={<>{renderDocumentTooltip()}</>} side="right">
-                                <Info size={18} className="text-gray-400 hover:text-black" />
+                                <Info size={18} className="text-gray-400 hover:text-black"/>
                             </Tooltip>
                         </div>
                         {/* createdAt + document status */}
@@ -194,16 +203,17 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                             {/* Displays normal status badge */}
                             {!remoteOutdated && (
                                 <>
-                                    <Dot size={14} className="text-gray-200" />
+                                    <Dot size={14} className="text-gray-200"/>
                                     <Tooltip content={getDocumentStatus(document.status, locales, "description")}>
-                                        <Badge variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
+                                        <Badge
+                                            variant={document.status}>{getDocumentStatus(document.status, locales, "value")}</Badge>
                                     </Tooltip>
                                 </>
                             )}
                             {/* Displays "out of sync" badge */}
                             {remoteOutdated && (
                                 <>
-                                    <Dot size={14} className="text-gray-200" />
+                                    <Dot size={14} className="text-gray-200"/>
                                     <Tooltip content='The NextCloud version differs from the local one!'>
                                         <Badge variant="FAILED">Out of Sync</Badge>
                                     </Tooltip>
@@ -220,7 +230,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    icon={<RefreshCw size={16} strokeWidth={2} />}
+                                    icon={<RefreshCw size={16} strokeWidth={2}/>}
                                     iconOnly
                                     onClick={() => mutations.resyncDocument(document.id)}
                                     loading={mutations.isResyncingDocument}
@@ -230,7 +240,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    icon={<X size={18} strokeWidth={2.2} />}
+                                    icon={<X size={18} strokeWidth={2.2}/>}
                                     iconOnly
                                     disabled
                                 />
@@ -244,7 +254,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Button
                                     variant="ghost"
                                     size="sm"
-                                    icon={<UploadCloud size={14} strokeWidth={2} />}
+                                    icon={<UploadCloud size={14} strokeWidth={2}/>}
                                     iconOnly
                                     onClick={() => mutations.uploadDocument(document.id)}
                                     loading={mutations.isUploadingDocument}
@@ -257,7 +267,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Button
                                     variant="ghost"
                                     size="xs"
-                                    icon={<Eye size={14} />}
+                                    icon={<Eye size={14}/>}
                                     iconOnly
                                     onClick={() => previewModal.open()}
                                 />
@@ -268,16 +278,19 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Menu.Root>
                                     <Menu.Trigger
                                         className={menuStyles().Trigger()}
-                                        render={<Button size="xs" variant="ghost" icon={<Download size={14} />} iconOnly />}
+                                        render={<Button size="xs" variant="ghost" icon={<Download size={14}/>}
+                                                        iconOnly/>}
                                     />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "pdf"))}>
-                                                    <Download size={14} /> Download PDF
+                                                <Menu.Item className={menuStyles().Item()}
+                                                           onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "pdf"))}>
+                                                    <Download size={14}/> Download PDF
                                                 </Menu.Item>
-                                                <Menu.Item className={menuStyles().Item()} onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "docx"))}>
-                                                    <Download size={14} /> Download DOCX
+                                                <Menu.Item className={menuStyles().Item()}
+                                                           onClick={() => window.location.assign(documentDownloadUrl(type, document.id, "docx"))}>
+                                                    <Download size={14}/> Download DOCX
                                                 </Menu.Item>
                                             </Menu.Popup>
                                         </Menu.Positioner>
@@ -290,13 +303,14 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                 <Menu.Root>
                                     <Menu.Trigger
                                         className={menuStyles().Trigger()}
-                                        render={<Button size="xs" variant="ghost" icon={<EllipsisVertical size={14} />} iconOnly />}
+                                        render={<Button size="xs" variant="ghost" icon={<EllipsisVertical size={14}/>}
+                                                        iconOnly/>}
                                     />
                                     <Menu.Portal>
                                         <Menu.Positioner className={menuStyles().Positioner()} align="end">
                                             <Menu.Popup className={menuStyles().Popup()}>
                                                 <Menu.Item className={menuStyles().Item()} disabled>
-                                                    <ExternalLink size={14} /> View in NextCloud
+                                                    <ExternalLink size={14}/> View in NextCloud
                                                 </Menu.Item>
                                                 {/* react-dropzone liefert zur Laufzeit `open: null`, solange die
                                                     Zone deaktiviert ist — entgegen seiner Typen. */}
@@ -304,13 +318,16 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                                     className={menuStyles().Item()}
                                                     disabled={!canReplace}
                                                     title={canReplace ? undefined : replaceBlockerMessage(replaceBlocker)}
-                                                    onClick={() => { if (canReplace) dropzone.open(); }}
+                                                    onClick={() => {
+                                                        if (canReplace) dropzone.open();
+                                                    }}
                                                 >
-                                                    <Replace size={14} /> Replace File
+                                                    <Replace size={14}/> Replace File
                                                 </Menu.Item>
                                                 {canPreview && (
-                                                    <Menu.Item className={menuStyles().Item()} onClick={() => previewModal.open()}>
-                                                        <Eye size={14} /> Vorschau
+                                                    <Menu.Item className={menuStyles().Item()}
+                                                               onClick={() => previewModal.open()}>
+                                                        <Eye size={14}/> Vorschau
                                                     </Menu.Item>
                                                 )}
                                                 <Menu.Item
@@ -322,7 +339,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                                         if (result.data) setBytes(result.data);
                                                         setEditDocx(true)
                                                     }}>
-                                                    <Pencil size={14} /> Edit
+                                                    <Pencil size={14}/> Edit
                                                 </Menu.Item>
                                                 <Menu.Item
                                                     className={menuStyles().Item()}
@@ -330,7 +347,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                                     title={locked ? t("orders.acceptedHint") : undefined}
                                                     onClick={() => renameModal.open()}
                                                 >
-                                                    <Pencil size={14} /> Rename File
+                                                    <Pencil size={14}/> Rename File
                                                 </Menu.Item>
                                                 <Menu.Item
                                                     className={menuStyles().Item()}
@@ -339,7 +356,7 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                                                     onClick={() => mutations.deleteDocument(document.id)}
                                                     data-danger
                                                 >
-                                                    <Trash2 size={14} /> Delete
+                                                    <Trash2 size={14}/> Delete
                                                 </Menu.Item>
                                             </Menu.Popup>
                                         </Menu.Positioner>
@@ -349,8 +366,8 @@ export default function DocumentCard({ type, parentId, document, locked = false 
 
                             {/* Loader Circle */}
                             {isBusy && (
-                                <div className={buttonStyles({ variant: "ghost", size: "sm" })}>
-                                    <Spinner size={16} />
+                                <div className={buttonStyles({variant: "ghost", size: "sm"})}>
+                                    <Spinner size={16}/>
                                 </div>
                             )}
                         </div>
@@ -368,17 +385,6 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                     />
                 )}
 
-                {changes && (
-                    <ReplacementChangesModal
-                        changes={changes}
-                        isPending={mutations.isAdoptingChanges}
-                        onClose={() => setChanges(null)}
-                        onAdopt={async (fields) => {
-                            await mutations.adoptChanges({ documentId: document.id, fields });
-                            showToast.success("documents.toast.adopted");
-                        }}
-                    />
-                )}
                 {renameModal.isOpen && (
                     <DocumentRenameModal
                         key={renameModal.key}
@@ -402,14 +408,13 @@ export default function DocumentCard({ type, parentId, document, locked = false 
                         displayName={document.displayName ?? document.id + ".docx"}
                         onSave={async (file) => {
                             try {
-                                const replaced = await mutations.replaceDocumentFile({
+                                await mutations.replaceDocumentFile({
                                     documentId: document.id,
                                     format: "docx",
                                     file,
                                 });
                                 showToast.success("documents.toast.saved");
                                 setEditDocx(false);
-                                handleReplacementWarnings(replaced.warnings, setChanges);
                             } catch {
                                 // Editor offen lassen, damit nichts verloren geht;
                                 // der globale onError-Handler meldet den Fehler.

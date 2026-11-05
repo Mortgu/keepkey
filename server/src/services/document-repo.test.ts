@@ -1,16 +1,11 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const offerDocumentFindUnique = vi.fn();
-const orderDocumentFindUnique = vi.fn();
-const confirmationDocumentFindUnique = vi.fn();
-const invoiceDocumentFindUnique = vi.fn();
+// Alle Dokumenttypen liegen in einer Tabelle — ein einziger Delegate, gefiltert über `type`.
+const documentFindFirst = vi.fn();
 
 vi.mock("../lib/prismaClient.js", () => ({
     prisma: {
-        offerDocument: { findUnique: (...args: unknown[]) => offerDocumentFindUnique(...args) },
-        orderDocument: { findUnique: (...args: unknown[]) => orderDocumentFindUnique(...args) },
-        confirmationDocument: { findUnique: (...args: unknown[]) => confirmationDocumentFindUnique(...args) },
-        invoiceDocument: { findUnique: (...args: unknown[]) => invoiceDocumentFindUnique(...args) },
+        document: { findFirst: (...args: unknown[]) => documentFindFirst(...args) },
     },
 }));
 
@@ -22,7 +17,7 @@ describe('documentTable("offer").assertEditable', () => {
     });
 
     it("rejects once the offer behind the document is accepted", async () => {
-        offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: new Date() } });
+        documentFindFirst.mockResolvedValue({ offer: { acceptedAt: new Date() } });
 
         await expect(documentTable("offer").assertEditable("doc-1")).rejects.toMatchObject({
             code: "OFFER_ACCEPTED",
@@ -31,7 +26,7 @@ describe('documentTable("offer").assertEditable', () => {
     });
 
     it("passes for an unaccepted offer's document", async () => {
-        offerDocumentFindUnique.mockResolvedValue({ offer: { acceptedAt: null } });
+        documentFindFirst.mockResolvedValue({ offer: { acceptedAt: null } });
 
         await expect(documentTable("offer").assertEditable("doc-1")).resolves.toBeUndefined();
     });
@@ -43,7 +38,7 @@ describe('documentTable("order").assertEditable', () => {
     });
 
     it("rejects once the order behind the document is cancelled", async () => {
-        orderDocumentFindUnique.mockResolvedValue({ order: { cancelledAt: new Date() } });
+        documentFindFirst.mockResolvedValue({ order: { cancelledAt: new Date() } });
 
         await expect(documentTable("order").assertEditable("doc-1")).rejects.toMatchObject({
             code: "ORDER_CANCELLED",
@@ -52,7 +47,7 @@ describe('documentTable("order").assertEditable', () => {
     });
 
     it("passes for a document of an uncancelled order", async () => {
-        orderDocumentFindUnique.mockResolvedValue({ order: { cancelledAt: null } });
+        documentFindFirst.mockResolvedValue({ order: { cancelledAt: null } });
 
         await expect(documentTable("order").assertEditable("doc-1")).resolves.toBeUndefined();
     });
@@ -64,7 +59,7 @@ describe('documentTable("confirmation").assertEditable', () => {
     });
 
     it("rejects once the confirmation's order is cancelled", async () => {
-        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
+        documentFindFirst.mockResolvedValue({ confirmation: { order: { cancelledAt: new Date() } } });
 
         await expect(documentTable("confirmation").assertEditable("doc-1")).rejects.toMatchObject({
             code: "ORDER_CANCELLED",
@@ -73,7 +68,7 @@ describe('documentTable("confirmation").assertEditable', () => {
     });
 
     it("passes for a confirmation of an uncancelled order", async () => {
-        confirmationDocumentFindUnique.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
+        documentFindFirst.mockResolvedValue({ confirmation: { order: { cancelledAt: null } } });
 
         await expect(documentTable("confirmation").assertEditable("doc-1")).resolves.toBeUndefined();
     });
@@ -85,7 +80,7 @@ describe('documentTable("invoice").assertEditable', () => {
     });
 
     it("rejects once the invoice's order is cancelled", async () => {
-        invoiceDocumentFindUnique.mockResolvedValue({ invoice: { order: { cancelledAt: new Date() } } });
+        documentFindFirst.mockResolvedValue({ invoice: { order: { cancelledAt: new Date() } } });
 
         await expect(documentTable("invoice").assertEditable("doc-1")).rejects.toMatchObject({
             code: "ORDER_CANCELLED",
@@ -94,56 +89,29 @@ describe('documentTable("invoice").assertEditable', () => {
     });
 
     it("passes for an invoice of an uncancelled order", async () => {
-        invoiceDocumentFindUnique.mockResolvedValue({ invoice: { order: { cancelledAt: null } } });
+        documentFindFirst.mockResolvedValue({ invoice: { order: { cancelledAt: null } } });
 
         await expect(documentTable("invoice").assertEditable("doc-1")).resolves.toBeUndefined();
     });
 });
 
-describe('documentTable("offer").canAdopt', () => {
+
+describe("documentTable(type) on the shared document table", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        documentFindFirst.mockResolvedValue(null);
     });
 
-    const current = (overrides: Record<string, unknown> = {}) => ({
-        isCurrent: true,
-        sourceVersion: 4,
-        offer: { version: 4, acceptedAt: null },
-        ...overrides,
-    });
+    it.each([
+        ["offer", "OFFER"],
+        ["order", "ORDER"],
+        ["confirmation", "CONFIRMATION"],
+        ["invoice", "INVOICE"],
+    ] as const)("scopes %s lookups to type %s, so another type's id is never found", async (type, ownerType) => {
+        await documentTable(type).findWithArtifacts("doc-1");
 
-    it("is true for the current document of an unchanged, unaccepted offer", async () => {
-        offerDocumentFindUnique.mockResolvedValue(current());
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(true);
-    });
-
-    it("is false once the offer has moved past the document's source version", async () => {
-        offerDocumentFindUnique.mockResolvedValue(current({ offer: { version: 5, acceptedAt: null } }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-
-    it("is false for a document that is no longer the current one", async () => {
-        offerDocumentFindUnique.mockResolvedValue(current({ isCurrent: false }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-
-    it("is false once the offer is accepted", async () => {
-        offerDocumentFindUnique.mockResolvedValue(current({ offer: { version: 4, acceptedAt: new Date() } }));
-
-        expect(await documentTable("offer").canAdopt("doc-1")).toBe(false);
-    });
-});
-
-describe("documentTable(type).canAdopt for other document types", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-    });
-
-    it("is false — never even queries", async () => {
-        expect(await documentTable("invoice").canAdopt("doc-1")).toBe(false);
-        expect(invoiceDocumentFindUnique).not.toHaveBeenCalled();
+        expect(documentFindFirst).toHaveBeenCalledWith(
+            expect.objectContaining({ where: expect.objectContaining({ id: "doc-1", type: ownerType }) }),
+        );
     });
 });

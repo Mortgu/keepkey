@@ -207,14 +207,13 @@ export default function CustomerFlowTab({ customerId }: { customerId: string }) 
     }
 
     const column = (id: string) => table.getColumn(id)!;
-    const phaseColumn = column("phase");
     const netColumn = column("net");
     const rows = table.getRowModel().rows;
 
     return (
         <div className="w-full grid gap-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                {/*<MultiDropdown
+                {/* <MultiDropdown
                     label={t("flows.table.phaseFilter")}
                     options={(["open", "running", "billed", "cancelled"] as const).map((phase) => ({ value: phase, label: t(`flows.phase.${phase}`) }))}
                     values={(phaseColumn.getFilterValue() as Array<string> | undefined) ?? []}

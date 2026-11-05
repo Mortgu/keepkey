@@ -1,7 +1,7 @@
-import type { OfferFilterParams } from "@keepit/schemas";
 import { queryOptions } from "@tanstack/react-query";
 import { getOffer, getOffers } from "./offer-api";
 import { offerKeys } from "./offers-keys";
+import type { OfferFilterParams } from "@keepit/schemas";
 
 export const offerQueries = {
     list: (filters: OfferFilterParams = {}) => {

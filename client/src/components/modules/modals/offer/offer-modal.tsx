@@ -1,15 +1,15 @@
 import { useTranslation } from "react-i18next";
 
-import { Button, Dialog } from "@/components";
-import useOfferModalForm from "@/components/modules/modals/offer/_hooks/use-offer-modal-form";
-import type { Offer } from '@keepit/schemas';
 import DiscountSection from "./discount/discounts";
 import FlatrateSection from "./flatrate/flatrates";
 import HeaderForm from "./header-form";
 import { OfferModalProvider } from "./offer-modal-context";
-import type { OfferModalMode } from "./offer-modal-policy";
 import { OFFER_MODAL_FORM_ID } from "./offer-modal-policy";
 import WorkloadSection from "./workload/workloads";
+import type { OfferModalMode } from "./offer-modal-policy";
+import type { Offer } from '@keepit/schemas';
+import useOfferModalForm from "@/components/modules/modals/offer/_hooks/use-offer-modal-form";
+import { Button, Dialog } from "@/components";
 
 interface OfferModalProps {
     /** Angebotstyp — bestimmt Bedienbarkeit, Preisquelle und Speichern-Aktion. */

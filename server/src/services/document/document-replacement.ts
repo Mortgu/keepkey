@@ -15,14 +15,12 @@ import {
     type StoredDocumentArtifact,
 } from "../../lib/document-artifact-store.js";
 import { assertDocxBuffer } from "../../lib/docx.js";
-import { checkReplacement, isUserWarning } from "../../lib/replacement-check.js";
-import { offerAdoptions } from "../../pipelines/offer/offer-adoption.js";
 import { convertDocxToPdf } from "../../lib/docx-to-pdf.js";
 import { AppException } from "../../lib/exceptions.js";
 import { sha256Document } from "../../lib/nextcloud-document-store.js";
 import { prisma } from "../../lib/prismaClient.js";
 import logger from "@/utils/logger.js";
-import type { DocumentCapabilities, DocumentFormatParam, DocumentType, ReplacementWarning } from "@keepit/schemas";
+import type { DocumentCapabilities, DocumentFormatParam, DocumentType } from "@keepit/schemas";
 import { documentTable } from "../document-repo.js";
 
 /** Kurz genug, dass eine gesetzte CORS-Regel zügig sichtbar wird. */
@@ -176,46 +174,6 @@ async function discardObject(objectKey: string): Promise<void> {
 }
 
 /**
- * Prüft eine hochgeladene DOCX gegen das Modell, aus dem das Dokument erzeugt
- * wurde. Die Prüfung ist eine Hilfe, kein Tor: scheitert sie, wird der Upload
- * trotzdem übernommen.
- */
-async function inspectReplacement(
-    type: DocumentType,
-    id: string,
-    docx: Buffer,
-): Promise<ReplacementWarning[]> {
-    try {
-        const warnings = checkReplacement({
-            documentType: type,
-            documentId: id,
-            model: await documentTable(type).readModel(id),
-            docx,
-        });
-        const silent = warnings.filter((warning) => !isUserWarning(warning));
-        if (silent.length > 0) {
-            logger.info('document_replacement_not_comparable', {
-                documentId: id,
-                reasons: silent.map((warning) => warning.code),
-            });
-        }
-
-        const adoptNow = warnings.some((warning) => warning.code === "FIELD_CHANGED")
-            && await documentTable(type).canAdopt(id);
-        return warnings.filter(isUserWarning).map((warning): ReplacementWarning =>
-            warning.code === "FIELD_CHANGED"
-                ? { ...warning, adoptable: adoptNow && Boolean(offerAdoptions[warning.field]?.parse(warning.actual)) }
-                : warning);
-    } catch (error) {
-        logger.error('document_replacement_inspection_failed', {
-            documentId: id,
-            error: (error as Error).message,
-        });
-        return [];
-    }
-}
-
-/**
  * Übernimmt eine hochgeladene DOCX als neuen Inhalt — und erzeugt die PDF neu.
  *
  * Die PDF muss mitgezogen werden, sonst zeigt sie weiter auf den alten
@@ -263,7 +221,6 @@ export async function confirmReplacementUpload(
     // Was bereits abgelegt wurde und bei einem Fehlschlag wieder aufzuräumen ist.
     const staged = [objectKey];
 
-    let warnings: ReplacementWarning[];
     let storedPdf: StoredDocumentArtifact;
     let previous: { docx: string; pdf: string };
 
@@ -275,8 +232,6 @@ export async function confirmReplacementUpload(
          * so unbemerkt durch.
          */
         assertDocxBuffer(content);
-
-        warnings = await inspectReplacement(type, id, content);
 
         let pdfContent: Buffer;
         try {
@@ -363,5 +318,5 @@ export async function confirmReplacementUpload(
         }
     }
 
-    return { ...await documentTable(type).requireWithArtifacts(id), warnings };
+    return documentTable(type).requireWithArtifacts(id);
 }

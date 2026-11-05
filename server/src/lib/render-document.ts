@@ -7,19 +7,10 @@ import logger from "@/utils/logger.js";
 import { loadTemplateForRendering } from "../services/document-template.service.js";
 import { customParser, deepIterate } from "../pipelines/offer/utils.js";
 import { convertDocxToPdf } from "./docx-to-pdf.js";
-import { hashModel, writeProvenance } from "./docx-provenance.js";
 
 export type RenderedDocument = {
     docxBuffer: Buffer;
     pdfBuffer: Buffer;
-    /** Die Daten, aus denen gerendert wurde — Platzhalter bereits aufgelöst, JSON-sicher. */
-    model: Record<string, unknown>;
-    modelHash: string;
-};
-
-export type RenderProvenance = {
-    documentType: string;
-    documentId: string;
 };
 
 /**
@@ -31,22 +22,16 @@ export type RenderProvenance = {
  * `deepIterate` löst Platzhalter wie `{product.name}` innerhalb von
  * Datenfeldern auf, bevor docxtemplater das Dokument füllt.
  *
- * Das aufgelöste Modell kommt zurück, damit der Aufrufer es am Dokument
- * speichern kann; die DOCX trägt nur Kennung und Hash davon (siehe
- * `docx-provenance`). Mit `schema` meldet der Render Platzhalter, die die
- * Vorlage liest, das Schema aber nicht kennt (Abweichung zwischen Vorlage und Code).
+ * Mit `schema` meldet der Render Platzhalter, die die Vorlage liest, das Schema
+ * aber nicht kennt (Abweichung zwischen Vorlage und Code).
  */
 export async function renderDocument(
     kind: DocumentTemplateKind,
     language: Language,
     data: Record<string, unknown>,
-    provenance: RenderProvenance,
     options: { schema?: z.ZodType } = {},
 ): Promise<RenderedDocument> {
     const resolved = deepIterate(data, data);
-    // Das Modell wird gespeichert: Daten wie Date müssen die JSON-Runde schon hinter sich haben.
-    const model = JSON.parse(JSON.stringify(resolved)) as Record<string, unknown>;
-    const modelHash = hashModel(model);
 
     const content = await loadTemplateForRendering(kind, language);
     const zip = new PizZip(content);
@@ -62,11 +47,10 @@ export async function renderDocument(
     if (inspect && options.schema) warnOnTemplateDrift(kind, inspect.getAllTags(), options.schema);
 
     doc.render(resolved);
-    writeProvenance(doc.getZip(), { ...provenance, modelHash });
 
     const docxBuffer = doc.toBuffer();
     const pdfBuffer = await convertDocxToPdf(docxBuffer);
-    return { docxBuffer, pdfBuffer, model, modelHash };
+    return { docxBuffer, pdfBuffer };
 }
 
 /* Drift detection: compare template tags against the data schema. */

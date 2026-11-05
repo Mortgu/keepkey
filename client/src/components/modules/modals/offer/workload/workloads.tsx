@@ -1,6 +1,3 @@
-import { Button, Checkbox, MultiSelectList } from "@/components";
-import useOfferModal from "@/components/modules/modals/offer/_hooks/use-offer.offer-modal";
-import useWorkloadOfferModal from "@/components/modules/modals/offer/_hooks/use-workloads.offer-modal";
 import { useStore } from "@tanstack/react-form";
 import { Plus } from "lucide-react";
 import { useState } from "react";
@@ -8,6 +5,9 @@ import { useTranslation } from "react-i18next";
 import { useOfferModalContext } from "../offer-modal-context";
 import WorkloadForm from "./workload-form";
 import WorkloadItem from "./workload-item";
+import useWorkloadOfferModal from "@/components/modules/modals/offer/_hooks/use-workloads.offer-modal";
+import useOfferModal from "@/components/modules/modals/offer/_hooks/use-offer.offer-modal";
+import { Button, Checkbox, MultiSelectList } from "@/components";
 
 export default function WorkloadSection() {
     const { t } = useTranslation();

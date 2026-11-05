@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import type {Request, Response} from "express";
 
 import * as templateService from "../services/document-template.service.js";
-import { uploadDocumentTemplateQuerySchema } from "@/schemas/document-template-schemas.js";
+import {uploadDocumentTemplateQuerySchema} from "@/schemas/document-template-schemas.js";
 
 export const getDocumentTemplates = async (_request: Request, response: Response) => {
     return response.status(200).json(await templateService.listTemplates());
@@ -62,7 +62,7 @@ export const deleteDocumentTemplate = async (request: Request, response: Respons
  * Vorlagen sind klein genug, dass der Umweg nichts kostet.
  */
 export const getDocumentTemplateContent = async (request: Request, response: Response) => {
-    const { content } = await templateService.getTemplateContent(request.params.id as string);
+    const {content} = await templateService.getTemplateContent(request.params.id as string);
 
     response.setHeader("Content-Type", templateService.DOCX_MIME);
     response.setHeader("Content-Length", String(content.length));

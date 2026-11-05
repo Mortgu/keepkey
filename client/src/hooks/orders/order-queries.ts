@@ -1,7 +1,7 @@
-import type { OrderFilterParams } from "@keepit/schemas";
 import { queryOptions } from "@tanstack/react-query";
 import { getNextOrderNumber, getOrderById, getOrders } from "./order-api";
 import { orderKeys } from "./order-keys";
+import type { OrderFilterParams } from "@keepit/schemas";
 
 export const orderQueries = {
     list: (filters: OrderFilterParams = {}) => queryOptions({

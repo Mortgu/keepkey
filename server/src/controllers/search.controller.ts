@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { search } from "../services/search.service.js";
-import { searchQuerySchema } from "@keepit/schemas";
+import type {Request, Response} from "express";
+import {searchQuerySchema} from "@keepit/schemas";
+import {search} from "../services/search.service.js";
 
 export const getSearch = async (request: Request, response: Response) => {
     const query = searchQuerySchema.parse(request.query);

@@ -155,14 +155,14 @@ integration("real PostgreSQL acceptance transactions", () => {
                         id: `pos-${randomUUID()}`,
                         productId: "product",
                         quantity: 10,
-                        total_cents: 120000,
-                        eur_user_month: 1000,
-                        discount_cents: 30000,
-                        free_months: 3,
+                        totalCents: 120000,
+                        unitCents: 1000,
+                        discountCents: 30000,
+                        freeMonths: 3,
                     },
                 },
                 offerDiscounts: {
-                    create: { title: "Discount", amount_cents: 10000 },
+                    create: { title: "Discount", totalCents: 10000 },
                 },
             },
         });
@@ -254,14 +254,13 @@ integration("real PostgreSQL acceptance transactions", () => {
                 expectedVersion: 1,
                 order: { ...metadata, projectNumber: "New project" },
             },
-            "user",
         );
 
         const restored = await getOrderById(order.id);
         expect(restored.netAmount).toBe(80000);
         expect(restored.projectNumber).toBeNull();
         expect(restored.customer.companyName).toBe("Original Ltd");
-        await cancelOrder(order.id, 3, "user");
+        await cancelOrder(order.id, 3);
         await expect(
             prisma.$transaction((tx) => assertOfferEditable(tx, offer.id)),
         ).rejects.toMatchObject({ code: "OFFER_ACCEPTED" });
@@ -269,7 +268,6 @@ integration("real PostgreSQL acceptance transactions", () => {
             updateOrder(
                 order.id,
                 { expectedVersion: 4, order: metadata },
-                "user",
             ),
         ).rejects.toMatchObject({ code: "ORDER_CANCELLED" });
     });
@@ -285,7 +283,7 @@ integration("real PostgreSQL acceptance transactions", () => {
         const results = await search(order.orderId, "order");
         expect(results.items[0]?.id).toBe(order.id);
         const before = await getDashboardStats();
-        await cancelOrder(order.id, 1, "user");
+        await cancelOrder(order.id, 1);
         const after = await getDashboardStats();
         expect(after.totals.orders.volume_cents).toBe(
             before.totals.orders.volume_cents - 80000,

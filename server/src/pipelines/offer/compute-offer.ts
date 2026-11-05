@@ -3,39 +3,20 @@ import { calculatePrice } from "@/utils/products.js";
 import type { OfferFetchData } from "./build-offer.js";
 import type { ContractModel, OfferModel, PositionAmounts, PositionModel, PriceTableModel } from "./offer-model.js";
 
-/**
- * Preis einer Position so, wie er beim Anlegen des Angebots festgeschrieben
- * wurde.
- *
- * Das Angebot ist die Quelle der Wahrheit, nicht der heutige Tarif: ein einmal
- * verschicktes Dokument muss bei jeder erneuten Erzeugung dieselben Zahlen
- * zeigen, auch wenn die Preistabelle inzwischen eine andere ist.
- */
 const storedPrice = (position: PositionAmounts): PositionAmounts => ({
-    eur_user_month: position.eur_user_month,
-    total_cents: position.total_cents,
-    discount_cents: position.discount_cents,
+    unitCents: position.unitCents,
+    totalCents: position.totalCents,
+    discountCents: position.discountCents,
 });
 
-/**
- * Preis aus einer frischen Tarif-Berechnung — für die Vergleichstabellen.
- *
- * Nur dort richtig: diese Positionen hat es unter dem anderen Vertrag nie
- * gegeben, es gibt also keinen gespeicherten Wert, der gelten könnte.
- *
- * Die Aufteilung ist dieselbe wie beim Speichern einer Position
- * (`pricePositions` in offer.service): `total_cents` brutto über die volle
- * Laufzeit, die Freimonate getrennt in `discount_cents`. Die Laufzeit kommt vom
- * Angebot, nicht von der Position — sie gilt für alle Positionen gemeinsam.
- */
 const livePrice = (
     unitPrice: number,
-    position: { quantity: number; free_months: number },
+    position: { quantity: number; freeMonths: number },
     duration_months: number,
 ): PositionAmounts => ({
-    eur_user_month: unitPrice,
-    total_cents: unitPrice * position.quantity * duration_months,
-    discount_cents: unitPrice * position.quantity * position.free_months,
+    unitCents: unitPrice,
+    totalCents: unitPrice * position.quantity * duration_months,
+    discountCents: unitPrice * position.quantity * position.freeMonths,
 });
 
 const iso = (date: Date | string | null | undefined): string | null =>
@@ -46,31 +27,14 @@ const toContract = (contract: OfferFetchData["contracts"][number]): ContractMode
     translations: contract.translations.map((t) => ({ language: t.language, name: t.name, features: t.features })),
 });
 
-/**
- * Rechnet aus den geladenen Daten das Angebotsmodell: Positionen, Summen und
- * die Preistabellen. Nichts davon ist formatiert — das macht `presentOffer`.
- *
- * Die Haupttabelle nutzt die festgeschriebenen Preise der Positionen. Die
- * Vergleichstabellen anderer Verträge werden live berechnet; fehlt dafür
- * irgendwo eine Preistabelle, entfällt die Tabelle — ein Vergleich ist
- * optionales Beiwerk und darf die Erzeugung des Angebots nicht scheitern
- * lassen.
- *
- * Flatrates und Rabatte gelten für das gesamte Angebot und gehen in jede
- * Tabellensumme ein: die Vergleichsvarianten sind vollständige Alternativen.
- * Die Summe ist netto — im Dokument steht über ihr der Bruttopreis und
- * darunter der Rabatt als eigene Zeile.
- */
 export async function computeOfferModel({ offer, contracts }: OfferFetchData): Promise<OfferModel> {
-    // Vertrag und Laufzeit stehen am Angebot; die frühere Gruppierung nach
-    // `contractId_duration_months` konnte deshalb entfallen.
     const duration_months = offer.duration_months;
 
     const positions: PositionModel[] = offer.offerPositions.map((position) => ({
         id: position.id,
         productId: position.productId,
         quantity: position.quantity,
-        free_months: position.free_months,
+        freeMonths: position.freeMonths,
         optional: position.optional ?? false,
         ...storedPrice(position),
         translations: position.product.translations.map((t) => ({
@@ -82,7 +46,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
     }));
 
     const flatRates = offer.offerFlatRates.map((fr) => ({
-        total_cents: fr.total_cents,
+        totalCents: fr.totalCents,
         translations: fr.flatRate.translations.map((t) => ({
             language: t.language,
             name: t.name,
@@ -93,17 +57,17 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
     const discounts = offer.offerDiscounts.map((d) => ({
         title: d.title,
         description: d.description,
-        amount_cents: d.amount_cents,
+        totalCents: d.totalCents,
     }));
 
-    const flatRatesTotal = flatRates.reduce((sum, fr) => sum + fr.total_cents, 0);
-    const discountsTotal = discounts.reduce((sum, d) => sum + d.amount_cents, 0);
+    const flatRatesTotal = flatRates.reduce((sum, fr) => sum + fr.totalCents, 0);
+    const discountsTotal = discounts.reduce((sum, d) => sum + d.totalCents, 0);
     const tableTotal = (items: PositionAmounts[]) =>
         items.reduce((sum, item) => sum + netCents(item), 0) + flatRatesTotal - discountsTotal;
 
     const mainItems = positions.map((position) => ({ positionId: position.id, ...storedPrice(position) }));
     const tables: PriceTableModel[] = [
-        { contractId: offer.contractId, items: mainItems, total_cents: tableTotal(mainItems) },
+        { contractId: offer.contractId, items: mainItems, totalCents: tableTotal(mainItems) },
     ];
 
     const otherContracts = contracts.filter((c) => c.id !== offer.contractId);
@@ -131,7 +95,7 @@ export async function computeOfferModel({ offer, contracts }: OfferFetchData): P
             });
         }
 
-        if (complete) tables.push({ contractId: contract.id, items, total_cents: tableTotal(items) });
+        if (complete) tables.push({ contractId: contract.id, items, totalCents: tableTotal(items) });
     }
 
     return {

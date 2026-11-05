@@ -11,7 +11,7 @@ vi.mock("@/hooks/flatrates/flatrate-mutations", () => ({
 
 const flatrate = {
     id: "f1",
-    total_cents: 123456,
+    totalCents: 123456,
     createdAt: "2026-10-20T12:00:00Z",
     translations: [],
 } as unknown as Flatrate;

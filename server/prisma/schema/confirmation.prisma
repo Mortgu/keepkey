@@ -15,9 +15,8 @@ model Confirmation {
   createdBy   User   @relation(fields: [createdById], references: [id], onDelete: Restrict)
   createdById String
 
-  documents ConfirmationDocument[]
+  documents Document[]
 
-  /// @openapi.ignore
   documentVersion Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
@@ -25,35 +24,4 @@ model Confirmation {
 
   @@index([createdById])
   @@map("confirmation")
-}
-
-model ConfirmationDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  uploadToken String?
-
-  model Json?
-
-  confirmation   Confirmation @relation(fields: [confirmationId], references: [id], onDelete: Cascade)
-  confirmationId String
-
-  artifacts DocumentArtifact[] @relation("ConfirmationDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([confirmationId, version])
-  @@index([confirmationId])
-  @@map("confirmation_document")
 }

@@ -8,6 +8,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_storage:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
     restart: always
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-keepit} -d ${POSTGRES_DB:-keepit}" ]

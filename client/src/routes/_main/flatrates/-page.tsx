@@ -54,7 +54,7 @@ export default function FlatratePage() {
                 <FlatRateModal
                     key={modal.key}
                     onClose={modal.close}
-                    currentFlatrate={modal.data}
+                    currentFlatRate={modal.data}
                 />
             )}
         </div>

@@ -3,13 +3,12 @@ import { useFormatters, useLocale } from "@/hooks";
 import { localized } from "@/lib/i18n-content";
 
 type Props = {
-    flatrate: OfferFlatrate | OrderFlatRate;
+    offerFlatRate: OfferFlatrate | OrderFlatRate;
 };
 
-/** Eine Flatrate-Zeile in Angebots- und Bestellkarte. */
-export default function FlatRateRow({ flatrate }: Props) {
+export default function FlatRateRow({ offerFlatRate }: Props) {
     const { formatEur } = useFormatters();
-    const { flatRate, quantity, total_cents } = flatrate;
+    const { flatRate, quantity, totalCents } = offerFlatRate;
 
     const locale = useLocale();
 
@@ -27,7 +26,7 @@ export default function FlatRateRow({ flatrate }: Props) {
                 </div>
             </div>
             <div className="flex flex-col items-end">
-                <p className="text-md font-mono">{formatEur(total_cents)}</p>
+                <p className="text-md font-mono">{formatEur(totalCents)}</p>
             </div>
         </div>
     );

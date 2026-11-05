@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import { AppException, assertNotFrozen } from "../lib/exceptions.js";
 import { prisma } from "../lib/prismaClient.js";
+import { documentOwnerType } from "./document-repo.js";
 import { parseAcceptedOfferSnapshot } from "../schemas/accepted-offer.js";
 import {
     acceptOrderSchema, updateOrderMetadataSchema,
@@ -129,13 +130,13 @@ async function lockOrder(
 }
 
 async function invalidateDocuments(tx: Prisma.TransactionClient, orderId: string) {
-    await tx.orderDocument.updateMany({
-        where: { orderId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: documentOwnerType("order"), orderId, isCurrent: true },
         data: { isCurrent: false },
     });
 }
 
-export async function updateOrder(id: string, input: UpdateOrderMetadataInput, actorId: string) {
+export async function updateOrder(id: string, input: UpdateOrderMetadataInput) {
     const data = updateOrderMetadataSchema.parse(input);
 
     return prisma.$transaction(async (tx) => {
@@ -162,15 +163,17 @@ export async function updateOrder(id: string, input: UpdateOrderMetadataInput, a
 }
 
 
-export async function cancelOrder(id: string, expectedVersion: number, actorId: string) {
+export async function cancelOrder(id: string, expectedVersion: number) {
     return prisma.$transaction(async (tx) => {
-        const current = await lockOrder(tx, id, expectedVersion);
+        await lockOrder(tx, id, expectedVersion);
 
         const order = await tx.order.update({
             where: { id },
             data: { cancelledAt: new Date(), version: { increment: 1 } },
         });
+
         await invalidateDocuments(tx, id);
+
         return order;
     });
 }

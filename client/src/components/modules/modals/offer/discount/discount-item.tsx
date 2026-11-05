@@ -28,7 +28,7 @@ export default function DiscountItem({ discount, updateFn, deleteFn }: Props) {
                 </div>
 
                 <div className="flex items-center gap-12">
-                    <p className="text-sm  font-mono">-{formatEur(discount.amount_cents)}</p>
+                    <p className="text-sm  font-mono">-{formatEur(discount.totalCents)}</p>
 
                     {/* actions */}
                     <div className="flex items-center gap-2">

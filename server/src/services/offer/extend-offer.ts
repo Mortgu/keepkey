@@ -1,18 +1,17 @@
 import { OfferDerivationType } from "@prisma/client";
 import { ExtendOfferInput, PositionPrice } from '@keepit/schemas';
 
-import { prisma } from "../../lib/prismaClient.js";
-import { AppException } from "../../lib/exceptions.js";
+import { prisma } from "@/lib/prismaClient.js";
+import { AppException } from "@/lib/exceptions.js";
 import { type PricedPosition, priceFromPin } from "./offer-pricing.js";
 import { persistOffer } from "./offer-write.js";
 
-/** Lädt eine Quellposition und stellt sicher, dass sie zum Angebot gehört. */
 async function loadSourcePosition(offerId: string, positionId: string) {
     const position = await prisma.offerPosition.findUnique({
         where: { id: positionId },
         select: {
             id: true, offerId: true, productId: true,
-            free_months: true, eur_user_month: true, tariffVersionId: true,
+            freeMonths: true, unitCents: true, tariffVersionId: true,
         },
     });
 
@@ -23,12 +22,7 @@ async function loadSourcePosition(offerId: string, positionId: string) {
     return position;
 }
 
-/** Preis-Vorschau für eine einzelne Erweiterungsposition (Anzeige im Modal). */
-export async function getExtensionPrice(
-    offerId: string,
-    positionId: string,
-    quantity: number,
-): Promise<PositionPrice> {
+export async function getExtensionPrice(offerId: string, positionId: string, quantity: number): Promise<PositionPrice> {
     if (!Number.isInteger(quantity) || quantity <= 0) {
         throw new AppException("quantity muss eine positive Ganzzahl sein.", 400, "INVALID_INPUT");
     }
@@ -43,20 +37,12 @@ export async function getExtensionPrice(
     }
 
     const source = await loadSourcePosition(offerId, positionId);
-    const { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month } =
+    const { unitCents, totalCents, discountCents, fromSnapshot, origin, list_eur_user_month } =
         await priceFromPin(source, offer.duration_months, quantity, offer.customerId);
 
-    return { eur_user_month, total_cents, discount_cents, fromSnapshot, origin, list_eur_user_month };
+    return { unitCents, totalCents, discountCents, fromSnapshot, origin, list_eur_user_month };
 }
 
-/**
- * Erzeugt eine Lizenzerweiterung: zusätzliche Seats innerhalb eines laufenden
- * Vertrags, abgerechnet zu den Konditionen des Quellangebots.
- *
- * Produkt, Vertrag und Laufzeit stammen unverändert aus der Quellposition, nur
- * die Menge darf abweichen. Flatrates entfallen bewusst — sie sind vertragsweite
- * Pauschalen und wären in einer Nachbestellung eine Doppelfakturierung.
- */
 export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput) {
     const source = await prisma.offer.findUnique({
         where: { id: sourceOfferId },
@@ -87,25 +73,18 @@ export async function extendOffer(sourceOfferId: string, input: ExtendOfferInput
 
         positions.push({
             productId: sourcePosition.productId,
-            free_months: sourcePosition.free_months,
+            freeMonths: sourcePosition.freeMonths,
             quantity: requested.quantity,
             optional: sourcePosition.optional,
-            total_cents: priced.total_cents,
-            eur_user_month: priced.eur_user_month,
-            discount_cents: priced.discount_cents,
-            // Der Pin wird weitergereicht, damit auch die Erweiterung einer
-            // Erweiterung noch auf derselben Preisgrundlage steht.
+            totalCents: priced.totalCents,
+            unitCents: priced.unitCents,
+            discountCents: priced.discountCents,
             tariffVersionId: priced.tariffVersionId,
         });
     }
 
     return persistOffer(
         {
-            // Vertrag und Laufzeit werden unveraendert uebernommen: eine
-            // Erweiterung laeuft innerhalb des bestehenden Vertrags. Sie wird
-            // bewusst *nicht* gegen die Standardlaufzeiten geprueft — sonst
-            // liessen sich laufende Vertraege nicht mehr erweitern, sobald ihre
-            // Laufzeit aus der Liste genommen wird.
             contractId: source.contractId,
             duration_months: source.duration_months,
             customerId: source.customerId,

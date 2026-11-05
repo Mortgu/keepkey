@@ -1,29 +1,29 @@
-import { NextFunction, Request, Response } from "express";
+import type { NextFunction, Request, Response } from "express";
 import { AppException } from "../lib/exceptions.js";
 
-import * as orderService from "../services/order.service.js";
+import * as service from "../services/order.service.js";
 
 /* ========== GET ========== */
 
 export const getAllOrders = async (request: Request, response: Response) => {
-    const orders = await orderService.getAllOrders(request.query);
+    const orders = await service.getAllOrders(request.query);
     return response.status(200).json(orders);
 };
 
 export const getNextOrderNumber = async (request: Request, response: Response) => {
-    const orderId = await orderService.getNextOrderNumber();
+    const orderId = await service.getNextOrderNumber();
     return response.status(200).json({ orderId });
 };
 
 export const getOrderById = async (request: Request, response: Response) => {
-    const order = await orderService.getOrderById(request.params.orderId as string);
+    const order = await service.getOrderById(request.params.orderId as string);
     return response.status(200).json(order);
 };
 
 /* ========== POST ========== */
 
 export const createOrder = async (request: Request, response: Response, next: NextFunction) => {
-    const order = await orderService.createOrder(request.body, request.user!.id);
+    const order = await service.createOrder(request.body, request.user!.id);
     response.locals.order = order;
     next();
 };
@@ -35,22 +35,21 @@ export const createOrderTask = async (request: Request, response: Response) => {
         throw new AppException("Failed to create order task. Missing order!", 404, "MISSING_ORDER");
     }
 
-    await orderService.createOrderTask(order.id);
+    await service.createOrderTask(order.id);
     return response.status(200).json(order);
 };
 
 export const generateOrderDocument = async (request: Request, response: Response) => {
-    const task = await orderService.generateOrderDocument(request.params.orderId as string);
+    const task = await service.generateOrderDocument(request.params.orderId as string);
     return response.status(200).json({ taskId: task.id });
 };
 
 /* ========== PATCH ========== */
 
 export const updateOrder = async (request: Request, response: Response) => {
-    const order = await orderService.updateOrder(
+    const order = await service.updateOrder(
         request.params.orderId as string,
         request.body,
-        request.user!.id,
     );
     return response.status(200).json(order);
 };
@@ -58,11 +57,11 @@ export const updateOrder = async (request: Request, response: Response) => {
 /* ========== DELETE ========== */
 
 export const deleteOrderById = async (request: Request, response: Response) => {
-    await orderService.deleteOrderById(request.params.id as string);
+    await service.deleteOrderById(request.params.id as string);
     return response.status(200).json({ message: "Deletion successfully", success: true });
 };
 
 export const cancelOrder = async (request: Request, response: Response) => {
-    const order = await orderService.cancelOrder(request.params.orderId as string, request.body.expectedVersion, request.user!.id);
+    const order = await service.cancelOrder(request.params.orderId as string, request.body.expectedVersion);
     return response.status(200).json(order);
 };

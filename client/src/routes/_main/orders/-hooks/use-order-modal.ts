@@ -22,7 +22,7 @@ export function defaultsFor(offer: Offer): OrderFormValues {
         orderDetails: "",
         positions: purchaseRows(undefined, offer).map((row) => ({
             offerPositionId: row.offerPositionId,
-            purchase_eur_user_month: row.eur_user_month,
+            purchase_eur_user_month: row.unitCents,
         })),
     };
 }

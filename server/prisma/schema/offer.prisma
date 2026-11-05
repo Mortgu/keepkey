@@ -37,10 +37,6 @@ model Offer {
   validUntil  DateTime?
   requestFrom DateTime?
 
-  offerFlatRates OfferFlatRate[]
-  offerPositions OfferPosition[]
-  offerDocuments OfferDocument[]
-
   orders Order?
 
   acceptedAt       DateTime? @db.Timestamptz(6)
@@ -55,9 +51,13 @@ model Offer {
 
   version Int @default(1)
 
-  createdAt      DateTime        @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime        @updatedAt @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
   offerDiscounts OfferDiscount[]
+  offerFlatRates OfferFlatRate[]
+  offerPositions OfferPosition[]
+  offerDocuments Document[]
 
   @@index([customerId])
   @@index([contactPersonId])
@@ -80,13 +80,13 @@ model OfferPosition {
   tariffVersion   TariffVersion? @relation(fields: [tariffVersionId], references: [id], onDelete: Restrict)
   tariffVersionId String?
 
-  free_months Int     @default(0)
-  quantity    Int
-  optional    Boolean @default(false)
+  freeMonths Int     @default(0)
+  quantity   Int
+  optional   Boolean @default(false)
 
-  eur_user_month Int
-  total_cents    Int
-  discount_cents Int @default(0)
+  unitCents     Int
+  totalCents    Int
+  discountCents Int @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
@@ -106,42 +106,12 @@ model OfferFlatRate {
   offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
   offerId String
 
-  quantity    Int
-  total_cents Int
+  quantity   Int
+  totalCents Int
 
   @@index([offerId])
   @@index([flatRateId])
   @@map("offer_flat_rate")
-}
-
-model OfferDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  uploadToken String?
-
-  model Json?
-
-  offer   Offer  @relation(fields: [offerId], references: [id], onDelete: Cascade)
-  offerId String
-
-  artifacts DocumentArtifact[] @relation("OfferDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([offerId, version])
-  @@map("offer_document")
 }
 
 model OfferDiscount {
@@ -153,7 +123,7 @@ model OfferDiscount {
   title       String
   description String?
 
-  amount_cents Int
+  totalCents Int
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)

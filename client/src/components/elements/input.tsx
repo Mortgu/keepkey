@@ -1,9 +1,5 @@
-import type { ButtonComponentProps } from "@/components";
-import { Button } from "@/components";
-import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
 import { forwardRef } from "react";
 import { tv } from "tailwind-variants";
-import type { ComponentSize } from "../tokens";
 import {
     CONTROL_HEIGHT,
     CONTROL_TEXT,
@@ -15,9 +11,14 @@ import {
     FIELD_STATE_WITHIN,
     fieldState,
 } from "../tokens";
-import { Field, useFieldId } from "./field";
+import { Field } from "./field";
+import { useFieldId } from "./use-field-id";
 import { selectOnFocus } from "./select-on-focus";
 import { Spinner } from "./spinner";
+import type { ComponentSize } from "../tokens";
+import type { FocusEvent, InputHTMLAttributes, ReactNode } from "react";
+import type { ButtonComponentProps } from "@/components";
+import { Button } from "@/components";
 
 type InputAdornmentButton = Omit<ButtonComponentProps, "children" | "iconOnly" | "iconPosition" | "size">;
 

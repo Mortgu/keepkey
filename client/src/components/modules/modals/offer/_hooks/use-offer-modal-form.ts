@@ -1,12 +1,13 @@
-import { useExtendOffer, useOfferManager, useRenewOffer } from "@/hooks";
-import type { CreateOfferInput, ExtendOfferInput, Offer, OfferDerivationType } from "@keepit/schemas";
 import { useForm, useStore } from "@tanstack/react-form";
 import { useState } from "react";
-import { offerModalSchema, type OfferModalValues } from "../_schemas/offer-modal-schema";
-import type { OfferModalMode } from "../offer-modal-policy";
+import {  offerModalSchema } from "../_schemas/offer-modal-schema";
 import { resolveOfferModalPolicy } from "../offer-modal-policy";
 import useOfferModal from "./use-offer.offer-modal";
 import usePricingStatus from "./use-pricing-status.offer-modal";
+import type {OfferModalValues} from "../_schemas/offer-modal-schema";
+import type { OfferModalMode } from "../offer-modal-policy";
+import type { CreateOfferInput, ExtendOfferInput, Offer, OfferDerivationType } from "@keepit/schemas";
+import { useExtendOffer, useOfferManager, useRenewOffer } from "@/hooks";
 
 interface Props {
     mode: OfferModalMode;
@@ -25,12 +26,12 @@ function toCreateInput(values: OfferModalValues): CreateOfferInput {
         ...values,
         offerPositions: values.offerPositions.map((position) => ({
             productId: position.productId,
-            free_months: position.free_months,
+            freeMonths: position.freeMonths,
             quantity: position.quantity,
             optional: position.optional,
-            total_cents: position.total_cents,
-            eur_user_month: position.eur_user_month,
-            discount_cents: position.discount_cents,
+            totalCents: position.totalCents,
+            unitCents: position.unitCents,
+            discountCents: position.discountCents,
         })),
     };
 }

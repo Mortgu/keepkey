@@ -25,14 +25,6 @@ export const confirmReplacementSchema = z.object({
     objectKey: z.string().min(1),
 });
 
-/**
- * Welche abweichenden Felder ins Angebot übernommen werden sollen.
- * Die Werte kommen bewusst nicht vom Client, sondern aus der abgelegten DOCX.
- */
-export const adoptChangesSchema = z.object({
-    fields: z.array(z.string().min(1).max(200)).min(1).max(100),
-});
-
 export const renameDocumentSchema = z.object({
     displayName: z.string()
         .trim()

@@ -9,7 +9,10 @@ export default defineConfig({
     // damit veraltete gemerkte Ausgaben (z. B. nach einem Sprachwechsel) auffallen.
     plugins: [
         react(),
-        babel({ presets: [reactCompilerPreset()], include: isReactCompilerTarget }),
+        babel({
+            presets: [reactCompilerPreset()],
+            include: isReactCompilerTarget
+        }),
     ],
     resolve: {
         conditions: ["development"],

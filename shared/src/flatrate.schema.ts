@@ -12,7 +12,7 @@ export type CreateFlatrateTranslationInput = z.infer<typeof flatrateTranslationS
 
 export const createFlatrateSchema = z.object({
     translations: z.array(flatrateTranslationSchema).min(1),
-    total_cents: z.number().int().positive(),
+    totalCents: z.number().int().positive(),
 });
 
 export type CreateFlatrateInput = z.infer<typeof createFlatrateSchema>;
@@ -24,7 +24,7 @@ export type UpdateFlatrateInput = z.infer<typeof updateFlatrateSchema>;
 export const flatrateSchema = z.object({
     id: z.string(),
 
-    total_cents: z.number().int(),
+    totalCents: z.number().int(),
     translations: z.array(flatrateTranslationSchema),
 
     createdAt: isoDateTime,

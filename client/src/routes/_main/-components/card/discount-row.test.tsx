@@ -11,7 +11,7 @@ describe("DiscountRow", () => {
 
     it("zeigt den Betrag nach einem Sprachwechsel ohne Neuaufbau im neuen Format", async () => {
         await act(() => i18n.changeLanguage("de"));
-        render(<DiscountRow discount={{ title: "Treuerabatt", description: "", amount_cents: 123456 }} />);
+        render(<DiscountRow discount={{ title: "Treuerabatt", description: "", totalCents: 123456 }} />);
 
         const amount = screen.getByText((text) => plain(text) === "-1.234,56 €");
 

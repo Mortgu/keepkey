@@ -15,7 +15,6 @@ model Customer {
   language Language @default(DE)
   country  String   @default("Deutschland")
   currency Currency @default(EUR)
-  /// Prozent (19 = 19 %). Kein Default: ein Kunde ohne Satz ist ein Fehler, kein 0 %.
   taxRate  Float
 
   salutation String?
@@ -23,11 +22,9 @@ model Customer {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @updatedAt @db.Timestamptz(6)
 
-  contactPersons ContactPerson[]
-
-  offers   Offer[]
-  invoices Invoice[]
-
+  contactPersons       ContactPerson[]
+  offers               Offer[]
+  invoices             Invoice[]
   users                User[]
   tariffCustomerPrices TariffCustomerPrice[]
 

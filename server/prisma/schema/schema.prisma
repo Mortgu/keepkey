@@ -106,8 +106,8 @@ model Supplier {
 }
 
 model FlatRate {
-  id          String @id @default(uuid())
-  total_cents Int
+  id         String @id @default(uuid())
+  totalCents Int    @default(0)
 
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)

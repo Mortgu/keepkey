@@ -11,8 +11,6 @@ const fake = vi.hoisted(() => {
         renderDocument: vi.fn(async () => ({
             docxBuffer: Buffer.from("docx"),
             pdfBuffer: Buffer.from("pdf"),
-            model: { hello: "world" },
-            modelHash: "hash",
         })),
         storeDocumentArtifacts: vi.fn(async () => ({
             pdf: { objectKey: "pdf-key", size: 1, sha256: "a" },
@@ -65,7 +63,7 @@ function baseAdapter(doc: FakeDoc, overrides: Record<string, unknown> = {}) {
         currentParentVersion: vi.fn(() => null as number | null),
         build: vi.fn(async () => ({ language: "DE" as const, data: {}, displayName: "Angebot v1" })),
         templateKind: "OFFER" as const,
-        ownerKey: vi.fn(() => ({ offerDocumentId: doc.id })),
+        ownerKey: vi.fn(() => ({ documentId: doc.id })),
         recheckNotStale: vi.fn(async () => {}),
         demoteSiblingsWhere: vi.fn(() => ({ offerId: "parent-1", isCurrent: true })),
         ...overrides,
@@ -117,7 +115,6 @@ describe("runGeneration", () => {
             "OFFER",
             "DE",
             {},
-            { documentType: "offer", documentId: "doc-1" },
             { schema: undefined },
         );
         expect(fake.storeDocumentArtifacts).toHaveBeenCalledWith("offers", "doc-1", expect.anything(), expect.anything(), "task-1");

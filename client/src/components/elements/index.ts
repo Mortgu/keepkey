@@ -4,6 +4,7 @@ export * from './breadcrumbs';
 export * from './button';
 export * from './checkbox';
 export * from './field';
+export * from './use-field-id';
 export * from './field-input';
 export * from './filter-chip';
 export * from './input';

@@ -36,9 +36,9 @@ describe("accepted offer order data", () => {
             version: 2,
         });
         expect(after.netAmount).toBe(90000);
-        expect(after.orderPositions[0]?.total_cents).toBe(90000);
+        expect(after.orderPositions[0]?.totalCents).toBe(90000);
         expect(after.discounts).toEqual(before.discounts);
-        expect(after.positions[0]?.eur_user_month).toBe(1000);
+        expect(after.positions[0]?.unitCents).toBe(1000);
         expect(after.projectNumber).toBe("Changed");
         expect(after.offer).not.toHaveProperty("acceptedSnapshot");
     });

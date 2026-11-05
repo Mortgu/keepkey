@@ -6,8 +6,8 @@ export type SnapshotPositionForPurchase = {
     id: string;
     productId: string;
     quantity: number;
-    free_months: number;
-    eur_user_month: number;
+    freeMonths: number;
+    unitCents: number;
 };
 
 export type PurchaseLine = {
@@ -21,8 +21,8 @@ export type PurchaseLine = {
  * Rechnet die Einkaufszeilen einer Bestellung aus den eingegebenen Preisen.
  *
  * Dieselben zwei Formeln wie beim Verkaufspreis (`offer-pricing.ts`):
- *   total    = eur_user_month × Menge × Laufzeit
- *   discount = eur_user_month × Menge × Freimonate
+ *   total    = unitCents × Menge × Laufzeit
+ *   discount = unitCents × Menge × Freimonate
  * Bewusst kopiert statt geteilt — die Einkaufsseite soll sich unabhängig
  * ändern dürfen.
  *
@@ -57,7 +57,7 @@ export function purchaseLines(
             offerPositionId: position.id,
             purchase_eur_user_month: price,
             purchase_total_cents: price * position.quantity * durationMonths,
-            purchase_discount_cents: price * position.quantity * position.free_months,
+            purchase_discount_cents: price * position.quantity * position.freeMonths,
         };
     });
 }

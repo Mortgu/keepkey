@@ -1,30 +1,30 @@
-import { Request, Response } from "express";
-import { AppException } from "../lib/exceptions.js";
+import type {Request, Response} from "express";
+import {AppException} from "../lib/exceptions.js";
+import {userListSchema, userSchema} from "@keepit/schemas";
 
-import * as userService from "../services/user.service.js";
-import { userListSchema, userSchema } from "@keepit/schemas";
+import * as service from "../services/user.service.js";
 
 /* ========== GET ========== */
 
 export const getUsers = async (request: Request, response: Response) => {
-    const users = await userService.getAllUsers(request.query);
+    const users = await service.getAllUsers(request.query);
     return response.status(200).json(userListSchema.parse(users));
 };
 
 export const getUserById = async (request: Request, response: Response) => {
-    const user = await userService.getUserById(request.params.id as string);
+    const user = await service.getUserById(request.params.id as string);
     return response.status(200).json(userSchema.parse(user));
 };
 
 export const getSessionUser = async (request: Request, response: Response) => {
-    const user = await userService.getSessionUser(request.user!.id);
+    const user = await service.getSessionUser(request.user!.id);
     return response.status(200).json(user);
 };
 
 /* ========== POST ========== */
 
 export const createUser = async (request: Request, response: Response) => {
-    const user = await userService.createUser(request.body);
+    const user = await service.createUser(request.body);
     return response.status(200).json(user);
 };
 
@@ -35,14 +35,14 @@ export const createContactPersons = async (request: Request, response: Response)
         throw new AppException("Unauthorized", 401, "UNAUTHORIZED");
     }
 
-    const result = await userService.createContactPersons(userId, request.body);
+    const result = await service.createContactPersons(userId, request.body);
     return response.status(201).json(result);
 };
 
 /* ========== UPDATE ========== */
 
 export const updateUserById = async (request: Request, response: Response) => {
-    const user = await userService.updateUser(
+    const user = await service.updateUser(
         request.params.id as string,
         request.body,
     );
@@ -56,7 +56,7 @@ export const deleteUser = async (request: Request, response: Response) => {
         throw new AppException("You cannot delete your own account!", 403, "USER_DELETE_SELF_FORBIDDEN");
     }
 
-    await userService.deleteUser(request.params.id as string);
+    await service.deleteUser(request.params.id as string);
 
     return response.status(200).json({
         success: true,
@@ -65,7 +65,7 @@ export const deleteUser = async (request: Request, response: Response) => {
 };
 
 export const deleteAccount = async (request: Request, response: Response) => {
-    await userService.deleteAccount(request.user!.id);
+    await service.deleteAccount(request.user!.id);
 
     return response.status(200).json({
         success: true,

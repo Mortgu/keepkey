@@ -32,11 +32,11 @@ export function presentOrder<T extends OrderWithSource>(order: T) {
             offerPositionId: p.id,
             productId: p.productId,
             quantity: p.quantity,
-            free_months: p.free_months,
-            eur_user_month: p.eur_user_month,
-            purchase_eur_user_month: row?.purchase_eur_user_month ?? p.eur_user_month,
-            purchase_total_cents: row?.purchase_total_cents ?? p.total_cents,
-            purchase_discount_cents: row?.purchase_discount_cents ?? p.discount_cents,
+            freeMonths: p.freeMonths,
+            unitCents: p.unitCents,
+            purchase_eur_user_month: row?.purchase_eur_user_month ?? p.unitCents,
+            purchase_total_cents: row?.purchase_total_cents ?? p.totalCents,
+            purchase_discount_cents: row?.purchase_discount_cents ?? p.discountCents,
             fallback: row === undefined,
         };
     });
@@ -48,7 +48,7 @@ export function presentOrder<T extends OrderWithSource>(order: T) {
         orderPositions: source.positions.map((p) => ({
             ...p,
             orderId: order.id,
-            total_cents: p.total_cents - p.discount_cents,
+            totalCents: p.totalCents - p.discountCents,
         })),
         flatRates: source.flatRates.map((p) => ({ ...p, orderId: order.id })),
         supplierPositions,

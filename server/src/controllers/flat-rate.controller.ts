@@ -1,32 +1,32 @@
-import { Request, Response } from "express";
-import { flatrateFilterSchema } from "@keepit/schemas";
+import type {Request, Response} from "express";
+import {flatrateFilterSchema} from "@keepit/schemas";
 
-import * as flatRateService from "../services/flat-rate.service.js";
+import * as service from "../services/flat-rate.service.js";
 
 /* ========== GET ========== */
 
 export const getFlatRates = async (request: Request, response: Response) => {
     const filters = flatrateFilterSchema.parse(request.query);
-    const result = await flatRateService.getFlatRates(filters);
+    const result = await service.getFlatRates(filters);
     return response.status(200).json(result);
 };
 
 export const getFlatRate = async (request: Request, response: Response) => {
-    const flatrate = await flatRateService.getFlatRateById(request.params.id as string);
+    const flatrate = await service.getFlatRateById(request.params.id as string);
     return response.status(200).json(flatrate);
 };
 
 /* ========== POST ========== */
 
 export const createFlatRate = async (request: Request, response: Response) => {
-    const flatrate = await flatRateService.createFlatRate(request.body);
+    const flatrate = await service.createFlatRate(request.body);
     return response.status(201).json(flatrate);
 };
 
 /* ========== UPDATE ========== */
 
 export const updateFlatRate = async (request: Request, response: Response) => {
-    const flatrate = await flatRateService.updateFlatRate(
+    const flatrate = await service.updateFlatRate(
         request.params.id as string,
         request.body,
     );
@@ -36,7 +36,7 @@ export const updateFlatRate = async (request: Request, response: Response) => {
 /* ========== DELETE ========== */
 
 export const deleteFlatRate = async (request: Request, response: Response) => {
-    await flatRateService.deleteFlatRate(request.params.id as string);
+    await service.deleteFlatRate(request.params.id as string);
 
     return response.status(200).json({
         success: true,

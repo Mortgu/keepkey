@@ -1,9 +1,6 @@
-import PizZip from "pizzip";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
-import { hashModel, writeProvenance } from "../../lib/docx-provenance.js";
 import { AppException } from "../../lib/exceptions.js";
 
-const readModel = vi.fn();
 const findWithArtifacts = vi.fn();
 const getDocumentArtifact = vi.fn();
 const getDocumentUploadUrl = vi.fn();
@@ -13,7 +10,6 @@ const browserEndpointIssue = vi.fn();
 const isS3Available = vi.fn();
 const bucketAllowsBrowserUploads = vi.fn();
 const assertEditable = vi.fn();
-const canAdopt = vi.fn();
 const documentArtifactUpdate = vi.fn();
 
 const document = {
@@ -41,9 +37,7 @@ vi.mock("../document-repo.js", () => ({
         scope: "confirmations",
         findWithArtifacts: (...args: unknown[]) => findWithArtifacts(...args),
         requireWithArtifacts: (...args: unknown[]) => findWithArtifacts(...args),
-        readModel: (...args: unknown[]) => readModel(...args),
         assertEditable: (...args: unknown[]) => assertEditable(...args),
-        canAdopt: (...args: unknown[]) => canAdopt(...args),
     }),
 }));
 vi.mock("../../lib/document-artifact-store.js", () => ({
@@ -65,26 +59,7 @@ vi.mock("@/utils/logger.js", () => ({ default: { info: vi.fn(), warn: vi.fn(), e
 const { confirmReplacementUpload, createReplacementUpload, getDocumentCapabilities } =
     await import("./document-replacement.js");
 
-const model = { paymentTerm: "30 Tage" };
 const KEY = "replaced/confirmations/doc-1/upload.docx";
-
-function uploadedDocx(options: {
-    text?: string; documentId?: string; provenance?: boolean; tag?: string; documentType?: string;
-} = {}) {
-    const { text = "30 Tage", documentId = "doc-1", provenance = true, tag = "paymentTerm", documentType = "confirmation" } = options;
-    const zip = new PizZip();
-    zip.file("word/document.xml",
-        `<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p>`
-        + `<w:sdt><w:sdtPr><w:tag w:val="${tag}"/></w:sdtPr><w:sdtContent><w:r><w:t>${text}</w:t></w:r>`
-        + `</w:sdtContent></w:sdt></w:p></w:body></w:document>`);
-    zip.file("docProps/custom.xml",
-        `<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/custom-properties"`
-        + ` xmlns:vt="http://schemas.openxmlformats.org/officeDocument/2006/docPropsVTypes"></Properties>`);
-    if (provenance) {
-        writeProvenance(zip, { documentType, documentId, modelHash: hashModel(model) });
-    }
-    return zip.generate({ type: "nodebuffer" });
-}
 
 describe("offer document mutations once the offer is accepted", () => {
     beforeEach(() => {
@@ -102,125 +77,12 @@ describe("offer document mutations once the offer is accepted", () => {
     });
 });
 
-describe("confirmReplacementUpload warnings", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        readModel.mockResolvedValue(model);
-        findWithArtifacts.mockResolvedValue(document);
-        storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
-        assertEditable.mockResolvedValue(undefined);
-        canAdopt.mockResolvedValue(false);
-    });
-
-    it("liefert keine Hinweise, wenn die Datei zum Modell passt", async () => {
-        getDocumentArtifact.mockResolvedValue(uploadedDocx());
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result).toMatchObject({ id: "doc-1", warnings: [] });
-    });
-
-    it("meldet ein geändertes Feld und übernimmt die Datei trotzdem", async () => {
-        getDocumentArtifact.mockResolvedValue(uploadedDocx({ text: "14 Tage" }));
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result.warnings).toEqual([
-            { code: "FIELD_CHANGED", field: "paymentTerm", expected: "30 Tage", actual: "14 Tage", adoptable: false },
-        ]);
-    });
-
-    it("meldet eine Datei, die zu einem anderen Dokument gehört", async () => {
-        getDocumentArtifact.mockResolvedValue(uploadedDocx({ documentId: "other" }));
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result.warnings).toEqual([{ code: "DOCUMENT_MISMATCH", expected: "doc-1", found: "other" }]);
-    });
-
-    it("behandelt Dateien ohne Herkunft still, vergleicht aber die Felder", async () => {
-        getDocumentArtifact.mockResolvedValue(uploadedDocx({ provenance: false, text: "14 Tage" }));
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result.warnings).toEqual([
-            { code: "FIELD_CHANGED", field: "paymentTerm", expected: "30 Tage", actual: "14 Tage", adoptable: false },
-        ]);
-    });
-
-    it("schweigt bei Dokumenten ohne gespeichertes Modell", async () => {
-        readModel.mockResolvedValue(null);
-        getDocumentArtifact.mockResolvedValue(uploadedDocx({ text: "14 Tage" }));
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result.warnings).toEqual([]);
-    });
-
-    it("lässt den Upload gelingen, wenn die Prüfung selbst scheitert", async () => {
-        readModel.mockRejectedValue(new Error("db down"));
-        getDocumentArtifact.mockResolvedValue(uploadedDocx());
-
-        const result = await confirmReplacementUpload("confirmation", "doc-1", "docx", KEY);
-
-        expect(result).toMatchObject({ id: "doc-1", warnings: [] });
-    });
-});
-
-const offerDocx = (options: Parameters<typeof uploadedDocx>[0] = {}) => uploadedDocx({ documentType: "offer", ...options });
-
-describe("confirmReplacementUpload bei Angeboten", () => {
-    beforeEach(() => {
-        vi.clearAllMocks();
-        readModel.mockResolvedValue(model);
-        findWithArtifacts.mockResolvedValue(document);
-        storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
-        getDocumentArtifact.mockResolvedValue(offerDocx({ text: "14 Tage" }));
-        assertEditable.mockResolvedValue(undefined);
-        // Übernahmefähigkeit selbst ist Sache von `canAdopt` (getestet
-        // in document-repo.test.ts) — hier zählt nur, dass ihr Ergebnis
-        // korrekt ins `adoptable`-Flag durchgereicht wird.
-        canAdopt.mockResolvedValue(true);
-    });
-
-    const replace = () => confirmReplacementUpload("offer", "doc-1", "docx", KEY);
-    const warning = (field: string) => ({ code: "FIELD_CHANGED", field, expected: "30 Tage", actual: "14 Tage" });
-
-    it("markiert zuordenbare Felder am aktuellen Dokument als übernehmbar", async () => {
-        expect((await replace()).warnings).toEqual([{ ...warning("paymentTerm"), adoptable: true }]);
-    });
-
-    it("markiert nichts als übernehmbar, wenn das Dokument nicht übernahmefähig ist", async () => {
-        canAdopt.mockResolvedValue(false);
-
-        expect((await replace()).warnings).toEqual([{ ...warning("paymentTerm"), adoptable: false }]);
-    });
-
-    it("markiert Felder ohne Zuordnung als nicht übernehmbar", async () => {
-        readModel.mockResolvedValue({ customer: { firstName: "Anna" } });
-        getDocumentArtifact.mockResolvedValue(offerDocx({ text: "Berta", tag: "customer.firstName" }));
-
-        const [result] = (await replace()).warnings;
-
-        expect(result).toMatchObject({ field: "customer.firstName", adoptable: false });
-    });
-
-    it("markiert unlesbare Werte als nicht übernehmbar", async () => {
-        readModel.mockResolvedValue({ validUntil: "01. November 2026" });
-        getDocumentArtifact.mockResolvedValue(offerDocx({ text: "irgendwann", tag: "validUntil" }));
-
-        expect((await replace()).warnings).toMatchObject([{ field: "validUntil", adoptable: false }]);
-    });
-});
-
 describe("confirmReplacementUpload swaps the stored pair", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        readModel.mockResolvedValue(model);
-        getDocumentArtifact.mockResolvedValue(uploadedDocx());
+        getDocumentArtifact.mockResolvedValue(Buffer.from("docx"));
         storeObject.mockImplementation(async (objectKey: string) => ({ objectKey, size: 1, sha256: "pdf-hash" }));
         assertEditable.mockResolvedValue(undefined);
-        canAdopt.mockResolvedValue(false);
     });
 
     it("swaps both artifacts to the new objects and discards the previous pair", async () => {

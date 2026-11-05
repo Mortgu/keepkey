@@ -12,7 +12,7 @@ const toQuery = (coordinates: PriceCoordinates) =>
         duration: String(coordinates.duration_months),
         quantity: String(coordinates.quantity),
         customerId: coordinates.customerId,
-        freeMonths: String(coordinates.free_months),
+        freeMonths: String(coordinates.freeMonths),
     });
 
 /** Preis aus dem aktuell gültigen Tarif. */

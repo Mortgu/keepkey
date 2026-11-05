@@ -38,7 +38,7 @@ export default function FlatRateItem({ flatrate, onEdit }: Props) {
           <div className="flex items-center gap-2 text-md text-gray-500 mr-2">
             <span>{t("flatrates.total")}</span>
             <span className="text-gray-900 font-medium font-mono">
-              {formatEur(flatrate.total_cents)}
+              {formatEur(flatrate.totalCents)}
             </span>
           </div>
 

@@ -15,9 +15,9 @@ import type {PositionPrice, PriceCoordinates} from "@keepit/schemas";
 export type PriceSource = "live" | "pinned";
 
 const EMPTY_PRICE: PositionPrice = {
-    eur_user_month: 0,
-    total_cents: 0,
-    discount_cents: 0,
+    unitCents: 0,
+    totalCents: 0,
+    discountCents: 0,
     fromSnapshot: false,
     origin: "list",
     list_eur_user_month: null,
@@ -58,11 +58,11 @@ export function usePositionPrice({ source, coordinates, pin }: UsePositionPriceA
     return {
         price,
         /** Brutto, vor Abzug der Freimonate. */
-        totalCents: price.total_cents,
+        totalCents: price.totalCents,
         /** Brutto abzüglich der Freimonate. */
         netCents: netCents(price),
-        unitCents: price.eur_user_month,
-        discountCents: price.discount_cents,
+        unitCents: price.unitCents,
+        discountCents: price.discountCents,
         fromSnapshot: price.fromSnapshot,
         /**
          * true, wenn der Stückpreis ein für diesen Kunden hinterlegter Preis

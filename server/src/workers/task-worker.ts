@@ -1,5 +1,6 @@
-import { Task, TaskStatus, TaskTarget } from "@prisma/client";
-import { Job, Worker } from "bullmq";
+import { type Task, type TaskTarget, TaskStatus } from "@prisma/client";
+import { type Job, Worker } from "bullmq";
+
 import type { Redis } from "ioredis";
 import env from "../lib/env.js";
 import { prisma } from "@/lib/prismaClient.js";

@@ -19,7 +19,7 @@ model Order {
   cancelledAt        DateTime?       @db.Timestamptz(6)
   version            Int             @default(1)
   documentVersion    Int             @default(0)
-  documents          OrderDocument[]
+  documents          Document[]
   positions          OrderPosition[]
   confirmation       Confirmation?
   invoice            Invoice?
@@ -28,39 +28,6 @@ model Order {
 
   @@index([acceptedById])
   @@map("order")
-}
-
-model OrderDocument {
-  id String @id @default(cuid())
-
-  displayName   String?
-  version       Int            @default(0)
-  sourceVersion Int?
-  status        DocumentStatus
-  isCurrent     Boolean        @default(false)
-
-  error       String?
-  /// @openapi.ignore
-  uploadToken String?
-
-  /// Die Daten, aus denen die aktuellen Artefakte gerendert wurden (Snapshot).
-  /// @openapi.ignore
-  model Json?
-
-  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  orderId String
-
-  artifacts DocumentArtifact[] @relation("OrderDocumentArtifacts")
-
-  task   Task   @relation(fields: [taskId], references: [id])
-  taskId String @unique
-
-  createdAt DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
-  deletedAt DateTime? @db.Timestamptz(6)
-
-  @@unique([orderId, version])
-  @@map("order_document")
 }
 
 /// Einkaufspreis einer Angebotsposition für die Bestellung an den Zulieferer.

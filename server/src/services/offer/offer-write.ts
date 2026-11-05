@@ -2,11 +2,12 @@ import { OfferDerivationType, Prisma } from "@prisma/client";
 
 import { AppException } from "../../lib/exceptions.js";
 import { prisma } from "../../lib/prismaClient.js";
+import { documentOwnerType } from "../document-repo.js";
 
 import {
     calculateNetAmount,
     type PricedDiscount,
-    type PricedFlatrate,
+    type PricedFlatRate,
     type PricedPosition,
     type PriceHeader,
 } from "./offer-pricing.js";
@@ -35,7 +36,7 @@ export async function replaceOfferLines(
     offerId: string,
     lines: {
         positions: PricedPosition[];
-        flatRates: PricedFlatrate[];
+        flatRates: PricedFlatRate[];
         discounts: ReadonlyArray<PricedDiscount>;
     },
 ): Promise<void> {
@@ -46,8 +47,8 @@ export async function replaceOfferLines(
 
 /** Nach einer inhaltlichen Änderung passt kein bisher erzeugtes Dokument mehr. */
 export async function invalidateCurrentDocuments(tx: Prisma.TransactionClient, offerId: string): Promise<void> {
-    await tx.offerDocument.updateMany({
-        where: { offerId, isCurrent: true },
+    await tx.document.updateMany({
+        where: { type: documentOwnerType("offer"), offerId, isCurrent: true },
         data: { isCurrent: false },
     });
 }
@@ -55,18 +56,18 @@ export async function invalidateCurrentDocuments(tx: Prisma.TransactionClient, o
 async function replacePositions(tx: Prisma.TransactionClient, offerId: string, positions: PricedPosition[]) {
     await tx.offerPosition.deleteMany({ where: { offerId } });
     await tx.offerPosition.createMany({
-        data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-            offerId, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+        data: positions.map(({ productId, freeMonths, quantity, optional, unitCents, totalCents, discountCents, tariffVersionId }) => ({
+            offerId, productId, freeMonths, quantity, unitCents, totalCents, discountCents, optional,
             tariffVersionId: tariffVersionId ?? null,
         })),
     });
 }
 
-async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatrate[]) {
+async function replaceFlatRates(tx: Prisma.TransactionClient, offerId: string, flatRates: PricedFlatRate[]) {
     await tx.offerFlatRate.deleteMany({ where: { offerId } });
     await tx.offerFlatRate.createMany({
-        data: flatRates.map(({ flatRateId, quantity, total_cents }) => ({
-            offerId, flatRateId, quantity, total_cents,
+        data: flatRates.map(({ flatRateId, quantity, totalCents }) => ({
+            offerId, flatRateId, quantity, totalCents,
         })),
     });
 }
@@ -76,8 +77,8 @@ async function replaceDiscounts(tx: Prisma.TransactionClient, offerId: string, d
     if (discounts.length === 0) return;
 
     await tx.offerDiscount.createMany({
-        data: discounts.map(({ title, description, amount_cents }) => ({
-            offerId, title, description: description ?? null, amount_cents,
+        data: discounts.map(({ title, description, totalCents }) => ({
+            offerId, title, description: description ?? null, totalCents,
         })),
     });
 }
@@ -108,7 +109,7 @@ export type OfferFields = PriceHeader & {
 export async function persistOffer(
     fields: OfferFields,
     positions: PricedPosition[],
-    flatrates: PricedFlatrate[],
+    flatrates: PricedFlatRate[],
     discounts: ReadonlyArray<PricedDiscount>,
     options?: { renewedFromOfferId?: string; derivationType?: OfferDerivationType },
 ) {
@@ -125,16 +126,16 @@ export async function persistOffer(
         });
 
         await tx.offerPosition.createMany({
-            data: positions.map(({ productId, free_months, quantity, optional, eur_user_month, total_cents, discount_cents, tariffVersionId }) => ({
-                offerId: offer.id, productId, free_months, quantity, eur_user_month, total_cents, discount_cents, optional,
+            data: positions.map(({ productId, freeMonths, quantity, optional, unitCents, totalCents, discountCents, tariffVersionId }) => ({
+                offerId: offer.id, productId, freeMonths, quantity, unitCents, totalCents, discountCents, optional,
                 tariffVersionId,
             })),
         });
 
         if (flatrates.length > 0) {
             await tx.offerFlatRate.createMany({
-                data: flatrates.map(({ flatRateId, quantity, total_cents }) => ({
-                    offerId: offer.id, flatRateId, quantity, total_cents,
+                data: flatrates.map(({ flatRateId, quantity, totalCents }) => ({
+                    offerId: offer.id, flatRateId, quantity, totalCents,
                 })),
             });
         }

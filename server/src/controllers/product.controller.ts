@@ -1,7 +1,7 @@
-import { Request, Response } from "express";
+import type {Request, Response} from "express";
+import {productListSchema, productSchema, workloadFilterSchema} from "@keepit/schemas";
 
-import * as productService from "../services/product.service.js";
-import { productListSchema, productSchema, workloadFilterSchema } from "@keepit/schemas";
+import * as service from "../services/product.service.js";
 
 /*
  * Get Workload
@@ -9,7 +9,7 @@ import { productListSchema, productSchema, workloadFilterSchema } from "@keepit/
  */
 export const getProducts = async (request: Request, response: Response) => {
     const filters = workloadFilterSchema.parse(request.query);
-    const products = await productService.getProducts(filters);
+    const products = await service.getProducts(filters);
     return response.status(200).json(productListSchema.parse(products));
 }
 
@@ -19,7 +19,7 @@ export const getProducts = async (request: Request, response: Response) => {
  */
 export const getProduct = async (request: Request, response: Response) => {
     const productId = request.params.id as string;
-    const product = await productService.getProduct(productId);
+    const product = await service.getProduct(productId);
 
     return response.status(200).json(productSchema.parse(product));
 }
@@ -29,7 +29,7 @@ export const getProduct = async (request: Request, response: Response) => {
  * [POST] http://localhost:3000/api/products
  */
 export const createProduct = async (request: Request, response: Response) => {
-    const result = await productService.createProduct(request.body);
+    const result = await service.createProduct(request.body);
     return response.status(200).json(result);
 }
 
@@ -39,7 +39,7 @@ export const createProduct = async (request: Request, response: Response) => {
  */
 export const updateProduct = async (request: Request, response: Response) => {
     const productId = request.params.id as string;
-    const result = await productService.updateProduct(productId, request.body);
+    const result = await service.updateProduct(productId, request.body);
 
     return response.status(200).json(result);
 }
@@ -50,7 +50,7 @@ export const updateProduct = async (request: Request, response: Response) => {
  */
 export const deleteProduct = async (request: Request, response: Response) => {
     const productId = request.params.id as string;
-    await productService.deleteProduct(productId);
+    await service.deleteProduct(productId);
 
     return response.status(200).json({
         message: "Successfully deleted product!",

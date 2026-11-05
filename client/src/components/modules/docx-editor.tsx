@@ -1,12 +1,12 @@
 import '@docx-editor.dev/core/styles/editor.css';
 
-import { Button } from '@/components';
 import { loadDefaultFonts } from '@docx-editor.dev/fonts';
-import type { DocxEditorRef, FontResolver } from '@docx-editor.dev/react';
 import { DocxEditor, composeFontConfiguration } from '@docx-editor.dev/react';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { showToast } from './toast';
+import type { DocxEditorRef, FontResolver } from '@docx-editor.dev/react';
+import { Button } from '@/components';
 
 interface Props {
     document?: Uint8Array;

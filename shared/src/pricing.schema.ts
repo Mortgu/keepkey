@@ -1,62 +1,24 @@
 import { z } from "zod";
 
-/**
- * Preis einer Angebotsposition — einheitlich für alle Preisquellen.
- *
- * Es gibt zwei Quellen, die dieselbe Form liefern:
- *
- * - **live**: der aktuell gültige Tarif (`GET /api/tariffs/price`).
- * - **pinned**: die Tarif-Version, die eine bestehende Position angepinnt hat
- *   (`GET /api/offers/:offerId/positions/:positionId/extension-price`).
- *
- * `total_cents` ist **brutto**, also `eur_user_month * quantity * duration_months`
- * ohne Abzug der Freimonate. Der Wert der Freimonate steht getrennt in
- * `discount_cents`; netto ist `total_cents - discount_cents`. Diese Aufteilung
- * ist dieselbe, in der eine Position gespeichert wird — Vorschau und
- * gespeichertes Angebot zeigen dadurch dieselben Zahlen.
- */
 export const priceOriginSchema = z.enum(["list", "customer"]);
 export type PriceOrigin = z.infer<typeof priceOriginSchema>;
 
 export const positionPriceSchema = z.object({
-    /** Stückpreis pro Einheit und Monat. */
-    eur_user_month: z.number().int(),
-    /** Brutto-Gesamtpreis, vor Abzug der Freimonate. */
-    total_cents: z.number().int(),
-    /** Wert der Freimonate: `eur_user_month * quantity * free_months`. */
-    discount_cents: z.number().int(),
-    /**
-     * true, wenn der Preis aus einer angepinnten Tarif-Version stammt.
-     *
-     * Live-Preise melden `false`. Bei einer Erweiterung bedeutet `false`
-     * dagegen, dass die Quellposition keinen Pin hat und flach mit ihrem
-     * gespeicherten Stückpreis gerechnet wurde — dann greifen Mengenstaffeln
-     * nicht mehr.
-     */
+    unitCents: z.number().int(),
+    totalCents: z.number().int(),
+    discountCents: z.number().int(),
+
     fromSnapshot: z.boolean(),
 
-    /**
-     * Woher der Stückpreis stammt: aus der Preistabelle (`list`) oder aus einem
-     * für diesen Kunden hinterlegten Preis (`customer`).
-     *
-     * Ohne diese Angabe ist einem Betrag nicht anzusehen, ob er ausgehandelt
-     * oder Listenpreis ist — ein Sonderpreis blieb dadurch unsichtbar und war
-     * über die Oberfläche weder erkennbar noch zurückzunehmen.
-     */
     origin: priceOriginSchema,
 
-    /**
-     * Der Listenpreis an derselben Koordinate — `null`, wenn dort keiner
-     * hinterlegt ist. Erst dadurch ist sichtbar, *wovon* ein Kundenpreis
-     * abweicht.
-     */
     list_eur_user_month: z.number().int().nullable(),
 });
 export type PositionPrice = z.infer<typeof positionPriceSchema>;
 
 /** Netto-Gesamtpreis einer Position: brutto abzüglich der Freimonate. */
-export const netCents = (price: Pick<PositionPrice, "total_cents" | "discount_cents">): number =>
-    price.total_cents - price.discount_cents;
+export const netCents = (price: Pick<PositionPrice, "totalCents" | "discountCents">): number =>
+    price.totalCents - price.discountCents;
 
 export type VatTotals = {
     netCents: number;
@@ -92,7 +54,7 @@ export const priceCoordinatesSchema = z.object({
     contractId: z.string(),
     duration_months: z.number().int(),
     quantity: z.number().int(),
-    free_months: z.number().int(),
+    freeMonths: z.number().int(),
 });
 export type PriceCoordinates = z.infer<typeof priceCoordinatesSchema>;
 
@@ -107,19 +69,19 @@ export type PriceHeader = Pick<PriceCoordinates, "customerId" | "contractId" | "
  * Koordinaten aus Angebotskopf und Position.
  *
  * Die Felder werden einzeln übernommen statt gespreadet: eine gespeicherte
- * Position bringt `id`, `total_cents` und weitere Felder mit, die den
+ * Position bringt `id`, `totalCents` und weitere Felder mit, die den
  * Query-Key aufblähen und Treffer im Cache verhindern würden.
  */
 export const coordinatesFrom = (
     header: PriceHeader,
-    position: Pick<PriceCoordinates, "productId" | "quantity" | "free_months">,
+    position: Pick<PriceCoordinates, "productId" | "quantity" | "freeMonths">,
 ): PriceCoordinates => ({
     customerId: header.customerId,
     contractId: header.contractId,
     duration_months: header.duration_months,
     productId: position.productId,
     quantity: position.quantity,
-    free_months: position.free_months,
+    freeMonths: position.freeMonths,
 });
 
 /** true, wenn die Koordinaten vollständig sind und abgefragt werden dürfen. */
@@ -129,8 +91,8 @@ export const isPriceable = (coordinates: PriceCoordinates): boolean =>
     && Boolean(coordinates.contractId)
     && Number.isInteger(coordinates.quantity) && coordinates.quantity > 0
     && Number.isInteger(coordinates.duration_months) && coordinates.duration_months > 0
-    && Number.isInteger(coordinates.free_months) && coordinates.free_months >= 0
-    && coordinates.free_months <= coordinates.duration_months;
+    && Number.isInteger(coordinates.freeMonths) && coordinates.freeMonths >= 0
+    && coordinates.freeMonths <= coordinates.duration_months;
 
 /**
  * Query des Erweiterungspreis-Endpunkts. `coerce`, weil Query-Parameter

@@ -128,9 +128,9 @@ async function recalculateAfterOverrideChange(
     // Ein Kundenpreis adressiert eine Tarif-Koordinate, keine Angebotsposition —
     // es gibt hier keine Freimonate, die abzuziehen wären.
     return {
-        eur_user_month: result.breakdown.unitPrice,
-        total_cents: result.price,
-        discount_cents: 0,
+        unitCents: result.breakdown.unitPrice,
+        totalCents: result.price,
+        discountCents: 0,
         fromSnapshot: false,
         origin: result.breakdown.origin,
         list_eur_user_month: result.breakdown.listUnitPrice,
@@ -300,7 +300,7 @@ export async function getTariff(tariffId: string) {
  *
  * `freeMonths` ist ein Parameter dieser Funktion, nicht der Preisrechnung:
  * `calculatePrice` liefert immer brutto, der Wert der Freimonate wird hier
- * daraus abgeleitet und getrennt als `discount_cents` ausgewiesen — dieselbe
+ * daraus abgeleitet und getrennt als `discountCents` ausgewiesen — dieselbe
  * Aufteilung, in der eine Position später gespeichert wird (siehe
  * `pricePositions` in offer.service). Damit zeigt die Vorschau dieselben Zahlen
  * wie das fertige Angebot.
@@ -315,10 +315,9 @@ export async function getTariffPrice(
 ): Promise<PositionPrice> {
     const free_months = freeMonths ?? 0;
 
-    // Muss hier geprüft werden: die Preisrechnung kennt keine Freimonate.
     if (!Number.isInteger(free_months) || free_months < 0 || free_months > duration) {
         throw new AppException(
-            "freeMonths muss eine Ganzzahl zwischen 0 und duration sein.",
+            "freeMonths has to be an integer between 0 and 'duration'!",
             400,
             "INVALID_INPUT"
         );
@@ -335,7 +334,7 @@ export async function getTariffPrice(
     if (!result.ok) {
         if (result.reason === 'INVALID_INPUT') {
             throw new AppException(
-                "duration und quantity müssen positive Ganzzahlen sein.",
+                "duration and quantity have to be positive integer numbers!",
                 400,
                 "INVALID_INPUT"
             );
@@ -344,12 +343,12 @@ export async function getTariffPrice(
         throw priceFailure(result.reason);
     }
 
-    const eur_user_month = result.breakdown.unitPrice;
+    const unitCents = result.breakdown.unitPrice;
 
     return {
-        eur_user_month,
-        total_cents: result.price,
-        discount_cents: eur_user_month * quantity * free_months,
+        unitCents: unitCents,
+        totalCents: result.price,
+        discountCents: unitCents * quantity * free_months,
         fromSnapshot: false,
         origin: result.breakdown.origin,
         list_eur_user_month: result.breakdown.listUnitPrice,
